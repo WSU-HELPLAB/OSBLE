@@ -269,6 +269,7 @@ namespace OSBLE.Models.Assignments
         [Association("TeamEvaluationSettings_Assignment", "ID", "AssignmentID")]
         public virtual TeamEvaluationSettings TeamEvaluationSettings { get; set; }
 
+        [Display(Name = "ABET Outcomes")]
         public virtual IList<AbetAssignmentOutcome> AbetOutcomes { get; set; }
 
         public int? AssociatedEventID { get; set; }

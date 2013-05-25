@@ -353,6 +353,15 @@
     <Compile Include="Services\AuthenticationService.svc.cs">
       <DependentUpon>AuthenticationService.svc</DependentUpon>
     </Compile>
+    <Compile Include="Services\CourseFilesOps.ashx.cs">
+      <DependentUpon>CourseFilesOps.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Services\CourseFilesService.svc.cs">
+      <DependentUpon>CourseFilesService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="Services\CourseFilesUploader.ashx.cs">
+      <DependentUpon>CourseFilesUploader.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Services\OsbleService.svc.cs">
       <DependentUpon>OsbleService.svc</DependentUpon>
     </Compile>
@@ -643,6 +652,7 @@
     <Content Include="Content\themes\base\minified\jquery.ui.tabs.min.css" />
     <Content Include="Content\themes\base\minified\jquery.ui.theme.min.css" />
     <Content Include="Resources\CSVReader\CSVCellReaderStateMachine.png" />
+    <Content Include="Scripts\CourseFilesUploader.js" />
     <Content Include="Scripts\jquery-1.7.2-vsdoc.js" />
     <Content Include="Scripts\jquery-1.7.2.js" />
     <Content Include="Scripts\jquery-1.7.2.min.js" />
@@ -695,6 +705,7 @@
     <Content Include="Scripts\Silverlight.js" />
     <Content Include="Services\AssignmentSubmissionService.svc" />
     <Content Include="Services\AuthenticationService.svc" />
+    <Content Include="Services\CourseFilesService.svc" />
     <Content Include="Services\OsbleService.svc" />
     <Content Include="Services\UploaderWebService.svc" />
     <Content Include="Silverlight.js" />
@@ -981,6 +992,8 @@
     <Content Include="Views\Help\FileUploader.cshtml" />
     <Content Include="Views\Shared\Site.Master" />
     <Content Include="Views\OpenId\AskUser.cshtml" />
+    <Content Include="Services\CourseFilesUploader.ashx" />
+    <Content Include="Services\CourseFilesOps.ashx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

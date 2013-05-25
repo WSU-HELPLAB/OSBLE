@@ -31,26 +31,7 @@ namespace OSBLE.Models.FileSystem
             return afp;
         }
 
-        public GradebookFilePath Gradebook()
-        {
-            GradebookFilePath gfp = new GradebookFilePath(this);
-            return gfp;
-        }
-
-        public CourseDocsFilePath CourseDocs()
-        {
-            CourseDocsFilePath cfp = new CourseDocsFilePath(this);
-            return cfp;
-        }
-
-        public override string GetPath()
-        {
-            string returnPath = Path.Combine(PathBuilder.GetPath(), _coursePathPrefix, _courseID.ToString());
-            return returnPath;
-        }
-
         /// <summary>
-        /// E.O.
         /// Gets the path for attributable files for this course.
         /// </summary>
         public AttributableFilesFilePath AttributableFiles
@@ -62,7 +43,6 @@ namespace OSBLE.Models.FileSystem
         }
 
         /// <summary>
-        /// E.O. - (don't know why this wasn't already here)
         /// Gets the file system for the "course documents" for this course. As of 
         /// now these are files that appear on the homepage and are accessible for 
         /// all students in the course as well as the teacher.
@@ -73,6 +53,18 @@ namespace OSBLE.Models.FileSystem
             {
                 return new FileSystem(Path.Combine(GetPath(), "CourseDocs"));
             }
+        }
+
+        public GradebookFilePath Gradebook()
+        {
+            GradebookFilePath gfp = new GradebookFilePath(this);
+            return gfp;
+        }
+
+        public override string GetPath()
+        {
+            string returnPath = Path.Combine(PathBuilder.GetPath(), _coursePathPrefix, _courseID.ToString());
+            return returnPath;
         }
     }
 }

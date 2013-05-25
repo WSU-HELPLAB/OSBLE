@@ -33,7 +33,7 @@ namespace OSBLE.Controllers
                 //build the file path
                 OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
                 string[] pathPieces = filePath.Split('/');
-                IFileSystem fsPath = fs.Course(courseId).CourseDocs();
+                IFileSystem fsPath = fs.Course(courseId).CourseDocs;
                 for (int i = 0; i < pathPieces.Length - 1; i++)
                 {
                     fsPath = fsPath.Directory(pathPieces[i]);
