@@ -18,7 +18,7 @@ namespace OSBLE.Services
     {
         public void ProcessRequest(HttpContext context)
         {
-            // This web service returns XML
+            // This web service returns XML in most cases
             context.Response.ContentType = "text/xml";
 
             // We need a "cmd" parameter to tell us what to deliver
@@ -50,12 +50,13 @@ namespace OSBLE.Services
                 return;
             }
 
-            // Make sure they have access to this course
-            if (!VerifyCoursePermissions(context, up, courseID)) { return; }
-
             // Now look at the command and handle it appropriately
             if ("assignment_files_list" == cmdParam)
             {
+                // Make sure they have access to this course. Right now we only let 
+                // people who can modify the course have access to this service.
+                if (!VerifyModifyPermissions(context, up, courseID)) { return; }
+                
                 // The client wants a list of files from the attributable storage location 
                 // for the assignment.
 
@@ -81,6 +82,75 @@ namespace OSBLE.Services
                     "<CourseFilesOpsResponse success=\"true\">" +
                     attrFiles.GetXMLListing() +
                     "</CourseFilesOpsResponse>");
+                return;
+            }
+            else if ("assignment_file_download" == cmdParam)
+            {
+                // First make sure we have the "assignmentID" parameter
+                int aID = -1;
+                if (!VerifyIntParam(context, "assignmentID", ref aID))
+                {
+                    return;
+                }
+
+                // Now make sure we have the "filename" parameter
+                string fileName = context.Request.Params["filename"];
+                if (string.IsNullOrEmpty(fileName))
+                {
+                    WriteErrorResponse(context, "Missing required parameter: \"filename\"");
+                    return;
+                }
+                fileName = System.IO.Path.GetFileName(fileName);
+
+                // Get the attributable file storage
+                AttributableFilesFilePath attrFiles =
+                    (new Models.FileSystem.FileSystem()).Course(courseID).Assignment(aID).AttributableFiles;
+                if (null == attrFiles)
+                {
+                    WriteErrorResponse(context,
+                        "Internal error: could not get attributable files manager for assignment");
+                    return;
+                }
+
+                // Make sure the file exists
+                AttributableFile af = attrFiles.GetFile(fileName);
+                if (null == af)
+                {
+                    WriteErrorResponse(context,
+                        "Internal error: could not get attributable file");
+                    return;
+                }
+
+                // Make sure the user has permission to download
+                OSBLEContext db = new OSBLEContext();
+                CourseUser courseUser = (
+                                      from cu in db.CourseUsers
+                                      where cu.UserProfileID == up.ID
+                                      &&
+                                      cu.AbstractCourse is Course
+                                      &&
+                                      cu.AbstractCourseID == courseID
+                                      select cu
+                                      ).FirstOrDefault();
+                if (null == courseUser || !af.CanUserDownload(courseUser))
+                {
+                    WriteErrorResponse(context,
+                        "User does not have permission to download this file");
+                    return;
+                }
+
+                if (fileName.ToLower().EndsWith(".pdf"))
+                {
+                    context.Response.ContentType = "application/pdf";
+                }
+                else
+                {
+                    context.Response.ContentType = "application/octet-stream";
+                }
+                context.Response.AddHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+
+                // Transmit file data
+                context.Response.TransmitFile(af.DataFileName);
                 return;
             }
             

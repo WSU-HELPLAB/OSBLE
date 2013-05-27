@@ -119,6 +119,13 @@ else
         </th>
         <td>
             @Html.Raw(HttpUtility.HtmlDecode(Helpers.WikiUrlLinking(Model.CurrentAssignment.AssignmentDescription).ToString()))
+            @{
+                // Put in links to the assignment description file(s)
+                if (!string.IsNullOrEmpty(ViewBag.DescFilesHTML))
+                {
+                    @Html.Raw(ViewBag.DescFilesHTML);   
+                }
+            }
         </td>
     </tr>
     <tr>

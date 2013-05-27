@@ -169,6 +169,14 @@ namespace OSBLE.Services
                 sys.Add("created", DateTime.Now.ToString());
                 sys.Add(fileUsage, aIDString);
                 sys.Add("uploadedby", up.UserName);
+                if ("assignment_solution" == fileUsage)
+                {
+                    sys.Add("any_course_user_can_download", "false");
+                }
+                else
+                {
+                    sys.Add("any_course_user_can_download", "true");
+                }
 
                 // Save each file to the target directory
                 for (int i = 0; i < coll.Count; i++)

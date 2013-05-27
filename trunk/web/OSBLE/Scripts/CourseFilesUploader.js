@@ -2,55 +2,81 @@
 // For two years this project has been using a Silverlight file uploader and I 
 // figured it was time to replace that.
 
-if (XMLHttpRequest)
+// inputNameString:
+//   String for the name (both id and name) of the <input type="file" ...> object.
+// allowMultiple:
+//   Boolean value indicating whether or not multiple files can be selected for upload.
+// extraServiceArgs:
+//   String of the form: "&arg1=val1&arg2=val2" that represents additional arguments to 
+//   be passed to the upload service. The course ID will be auto-determined so this does 
+//   not need to be provided. This argument can be null if desired.
+// onCompletion:
+//   Code to execute when upload is complete. If this is null then the page will be refreshed 
+//   when the upload completes. If non-null, this string must not contain single or double 
+//   quotes.
+function fileuploader_getcontrolshtml(inputNameString, allowMultiple, extraServiceArgs, onCompletion)
 {
-    document.write("<form enctype='multipart/form-data' action='../Services/CourseFilesUploader.ashx' method='post'>");
-    document.write("<input id='file_src' name='file_src' type='file' multiple />");
-    document.write("<input type='button' value='Upload' onclick='fileuploader_uploadfiles();' />");
-    document.write("</form> <div id='uploadProgressDIV'></div>");
-}
-else
-{
-    document.write("File upload not supported. Please upgrade your web browser.");
+    var divName = "uploadProgressDIV_" + inputNameString;
+    if (null == extraServiceArgs) {
+        extraServiceArgs = "null";
+    }
+    else {
+        extraServiceArgs = "\"" + extraServiceArgs + "\"";
+    }
+    if (null == onCompletion) {
+        onCompletion = "document.location.reload();";
+    }
+
+    var code = "<form enctype='multipart/form-data' action='../Services/CourseFilesUploader.ashx' method='post'>";
+    code += "<input id='" + inputNameString + "' name='" + inputNameString + "' type='file' ";
+    if (allowMultiple) { code += "multiple />"; }
+    else { code += "/>"; }
+    code += "<input type='button' value='Upload' onclick='fileuploader_uploadfiles(\"";
+    code += inputNameString + "\", \"" + divName + "\", " + extraServiceArgs + ", ";
+    code += "\"" + onCompletion + "\");' />";
+    code += "</form> <div id='" + divName + "'></div>";
+    return code;
 }
 
-var fileuploader_currentindex = -1;
-var fileuploader_filesarray = null;
-function fileuploader_uploadfiles()
+function fileuploader_writecontrolsauto() {
+    if (XMLHttpRequest) {
+        document.write(fileuploader_getcontrolshtml("file_src", true, null, null));
+    }
+    else {
+        document.write("File upload not supported. Please upgrade your web browser.");
+    }
+}
+
+function fileuploader_uploadfiles(fileSourceElementName, progressDIVName, extraServiceArgs, onCompletion)
 {
-    var files = document.getElementById("file_src").files;
+    var files = document.getElementById(fileSourceElementName).files;
     if (0 == files.length) { return; }
-    fileuploader_filesarray = files;
 
-    // We upload one file at a time and this is the 0-based index of the one we're on
-    fileuploader_currentindex = 0;
-    var progressDIV = document.getElementById("uploadProgressDIV");
-    
+    // TODO: Use onCompletion argument
+
+    // We upload one file at a time
+    var progressDIV = document.getElementById(progressDIVName);    
     progressDIV.innerHTML = "Uploading (1 of " + files.length + "): 0%";
-    fileuploader_uploadnext();
+    fileuploader_uploadRemaining(files, 0, progressDIV, extraServiceArgs, onCompletion);
 }
 
-function fileuploader_uploadnext()
+function fileuploader_uploadRemaining(filesArray, fileIndex, progressDIV, extraServiceArgs, onCompletion)
 {
-    if (null == fileuploader_filesarray)
+    if (null == filesArray)
     {
         // Nothing we can do
-        document.getElementById("uploadProgressDIV").innerHTML = "";
+        progressDIV.innerHTML = "";
         return;
     }
 
     // If the index is beyond the last item in the array then this implies completion
-    if (fileuploader_currentindex >= fileuploader_filesarray.length)
+    if (fileIndex >= filesArray.length)
     {
-        document.getElementById("uploadProgressDIV").innerHTML = "Uploaded " +
-            fileuploader_currentindex + ((1 == fileuploader_currentindex) ? " file" : " files");
-        fileuploader_currentindex = -1;
-        fileuploader_filesarray = null;
+        progressDIV.innerHTML = "Uploaded " +
+            fileIndex.toString() + ((1 == fileIndex) ? " file" : " files");
 
-        // Refresh the page. This is probably going to be temporary since ideally the file 
-        // listing should be refreshable without a total page reload. But right now it's 
-        // not, so I'm sticking with this.
-        document.location.reload();
+        // Execute the onCompletion code
+        eval(onCompletion);
 
         return;
     }
@@ -62,50 +88,56 @@ function fileuploader_uploadnext()
     var courseID = selectCourseObj.value;
 
     var fd = new FormData();
-    fd.append("file_src", fileuploader_filesarray[fileuploader_currentindex]);
+    fd.append("file_src", filesArray[fileIndex]);
+
+    // Build the POST URL
+    var url = "../Services/CourseFilesUploader.ashx?courseID=" + courseID;
+    if (null != extraServiceArgs) {
+        url += extraServiceArgs;
+    }
 
     var req = new XMLHttpRequest();
-    req.upload.addEventListener("progress", fileuploader_progress, false);
-    req.addEventListener("load", fileuploader_completion, false);
-    req.addEventListener("error", fileuploader_fail, false);
+    req.upload.addEventListener(
+        "progress",
+        function (args) { fileuploader_progress(args, fileIndex, filesArray.length, progressDIV); },
+        false);
+    req.addEventListener("load",
+        function (args)
+        {
+            fileuploader_completion(args, filesArray, fileIndex + 1, progressDIV, extraServiceArgs, onCompletion);
+        },
+        false);
+    req.addEventListener("error",
+        function (args) { fileuploader_fail(args, progressDIV); },
+        false);
     req.addEventListener("abort", fileuploader_canceled, false);
-    req.open("POST", "../Services/CourseFilesUploader.ashx?courseID=" + courseID);
+    req.open("POST", url);
     req.send(fd);
 }
 
-function fileuploader_progress(args)
+function fileuploader_progress(args, currentIndex, totalFileCount, progressDIV)
 {
     if (args.lengthComputable)
     {
         var percent = Math.round(args.loaded * 100 / args.total);
-        document.getElementById("uploadProgressDIV").innerHTML = "Uploading (" +
-            (fileuploader_currentindex + 1) + " of " + 
-            fileuploader_filesarray.length + "): " + percent.toString() + "%";
+        progressDIV.innerHTML = "Uploading (" +
+            (currentIndex + 1) + " of " + 
+            totalFileCount.toString() + "): " + percent.toString() + "%";
     }
 }
 
-function fileuploader_completion(args)
+function fileuploader_completion(args, filesArray, nextIndex, progressDIV, extraServiceArgs, onCompletion)
 {
-    if (-1 == fileuploader_currentindex || null == fileuploader_filesarray)
-    {
-        fileuploader_currentindex = -1;
-        fileuploader_filesarray = null;
-        return;
-    }
-
     // TODO: Parse response XML and make sure the upload worked
-    //alert(args.target.responseText);
+    //alert(args.target.responseXML);
 
     // Start the next upload if there is one
-    fileuploader_currentindex++;
-    fileuploader_uploadnext();
+    fileuploader_uploadRemaining(filesArray, nextIndex, progressDIV, extraServiceArgs, onCompletion);
 }
 
-function fileuploader_fail(args)
+function fileuploader_fail(args, progressDIV)
 {
-    fileuploader_currentindex = -1;
-    fileuploader_filesarray = null;
-    document.getElementById("uploadProgressDIV").innerHTML = "Error uploading file. Please try again.";
+    progressDIV.innerHTML = "Error uploading file. Please try again.";
 }
 
 function fileuploader_canceled(args)

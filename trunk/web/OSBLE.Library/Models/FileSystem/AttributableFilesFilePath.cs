@@ -173,6 +173,24 @@ namespace OSBLE.Models.FileSystem
             return new AttributableFileCollection(DataFilesPath, AttrFilesPath, predicate);
         }
 
+        public AttributableFile GetFile(string fileName)
+        {            
+            // If the file doesn't exist then we'll assume it's a relative path and 
+            // try combining it with the data files path.
+            if (!System.IO.File.Exists(fileName))
+            {
+                fileName = Path.Combine(DataFilesPath, fileName);
+                if (!System.IO.File.Exists(fileName))
+                {
+                    return null;
+                }
+            }
+            return AttributableFile.CreateFromExisting(
+                fileName,
+                AttributableFileCollection.GetAttrFileName(
+                    AttrFilesPath, Path.GetFileName(fileName)));
+        }
+
         private FileCollection GetFilesWithAttribute(string attrClass, string attrName, string attrValue)
         {
             if (!System.IO.Directory.Exists(DataFilesPath))
@@ -197,52 +215,24 @@ namespace OSBLE.Models.FileSystem
                     continue;
                 }
 
-                // Try to load the attribute file as an XmlDocument
-                XmlDocument doc = new XmlDocument();
-                try { doc.Load(attrFileName); }
-                catch (Exception) { continue; }
+                AttributableFile af = AttributableFile.CreateFromExisting(file, attrFileName);
 
-                XmlElement root = doc.DocumentElement;
-                if ("osblefileattributes" != root.LocalName.ToLower())
+                if ("systemattributes" == attrClass)
                 {
-                    // Invalid attribute file
-                    continue;
-                }
-
-                // Find the child under the root with a name that matches the 
-                // requested attribute class
-                XmlNode parentAttr = null;
-                for (int i = 0; i < root.ChildNodes.Count; i++)
-                {
-                    if (attrClass == root.ChildNodes[i].LocalName.ToLower())
+                    if (!af.ContainsSystemAttribute(attrName, attrValue))
                     {
-                        parentAttr = root.ChildNodes[i];
-                        break;
+                        continue;
+                    }
+                }
+                else
+                {
+                    if (!af.ContainsUserAttribute(attrName, attrValue))
+                    {
+                        continue;
                     }
                 }
 
-                if (null == parentAttr)
-                {
-                    // Didn't find it, so move on
-                    continue;
-                }
-
-                // Look through all the attributes
-                for (int i = 0; i < parentAttr.ChildNodes.Count; i++)
-                {
-                    XmlNode temp = parentAttr.ChildNodes[i];
-                    if (attrName == temp.LocalName.ToLower())
-                    {
-                        // We've found the attribute, now we just need to compare the 
-                        // value. If the attrValue passed to this function is null then 
-                        // we always take it
-                        if (null == attrValue || attrValue == temp.InnerText)
-                        {
-                            files.Add(file);
-                        }
-                        break;
-                    }
-                }
+                files.Add(file);
             }
             return new AttributableFileCollection(DataFilesPath, AttrFilesPath, files);
         }
@@ -287,7 +277,7 @@ namespace OSBLE.Models.FileSystem
         /// are included with each file.
         /// Format example:
         /// &lt;file_list&gt;
-        ///   &lt;file name=&quot;whatever.dat&quot;&gt;
+        ///   &lt;file name=&quot;whatever.ext&quot;&gt;
         ///     (all attributes in here)
         ///   &lt;/file&gt;
         /// &lt;/file_list&gt;
@@ -307,6 +297,11 @@ namespace OSBLE.Models.FileSystem
                 }
 
                 string xml = System.IO.File.ReadAllText(attrFileName);
+                if (xml.StartsWith("<?xml"))
+                {
+                    int i = xml.IndexOf("?>");
+                    xml = xml.Substring(i + 2);
+                }
                 sb.AppendFormat("<file name=\"{0}\">{1}</file>",
                     System.IO.Path.GetFileName(file), xml);
             }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using OSBLE.Models.Assignments;
@@ -24,6 +25,34 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
             }
             AssignmentDetailsFactory factory = new AssignmentDetailsFactory();
             AssignmentDetailsViewModel viewModel = factory.Bake(assignment, ActiveCourseUser);
+
+            // E.O.: There can be files associated with an assignment description. We look 
+            // for these now.
+            ViewBag.DescFilesHTML = string.Empty;
+            if (assignment.CourseID.HasValue)
+            {
+                OSBLE.Models.FileSystem.FileSystem fs = new OSBLE.Models.FileSystem.FileSystem();
+                OSBLE.Models.FileSystem.AttributableFilesFilePath attrFiles =
+                    fs.Course(assignment.CourseID.Value).Assignment(assignmentId).AttributableFiles;
+                OSBLE.Models.FileSystem.FileCollection files = 
+                    attrFiles.GetFilesWithSystemAttribute("assignment_description", assignmentId.ToString());
+                if (files.Count > 0)
+                {
+                    StringBuilder sb = new StringBuilder("<ul>");
+                    foreach (string fileName in files)
+                    {
+                        // Make a link for the file
+                        sb.AppendFormat(
+                            "<li><a href=\"/Services/CourseFilesOps.ashx?cmd=assignment_file_download" + 
+                            "&courseID={0}&assignmentID={1}&filename={2}\">{2}</li>",
+                            assignment.CourseID.Value,
+                            assignment.ID,
+                            System.IO.Path.GetFileName(fileName));
+                    }
+                    sb.Append("</ul>");
+                    ViewBag.DescFilesHTML = sb.ToString();
+                }
+            }
 
             //discussion assignments and critical reviews require their own special view
             if (assignment.Type == AssignmentTypes.TeamEvaluation)

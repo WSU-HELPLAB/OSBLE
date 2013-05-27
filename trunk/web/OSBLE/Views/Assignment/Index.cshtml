@@ -8,12 +8,14 @@
 }
 </script>
 
+<div id="assignments_view_header">
 <h2>Assignments</h2>
 
 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
 {
     <a href="@Url.Action("Index", "Home", new { area = "AssignmentWizard"})" class="add_link" id="assignment_create_button">@Helpers.AddButton() Create New Assignment</a><br /><br />
 }
+</div>
 
 @if (ViewBag.Assignments.Count == 0)
 { 
