@@ -22,7 +22,7 @@ namespace OSBLE.Attributes
         {
             if (OsbleAuthentication.CurrentUser == null)
             {
-                filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Account", action = "LogOn" }));
+                filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Account", action = "LogOn", returnUrl = filterContext.HttpContext.Request.Url }));
             }
         }
     }
