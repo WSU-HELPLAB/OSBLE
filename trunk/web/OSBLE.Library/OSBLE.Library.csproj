@@ -109,7 +109,6 @@
     <Compile Include="Models\ContextBase.cs" />
     <Compile Include="Models\DiscussionAssignment\DiscussionPost.cs" />
     <Compile Include="Models\FileSystem\AssignmentFilePath.cs" />
-    <Compile Include="Models\FileSystem\CourseDocsFilePath.cs" />
     <Compile Include="Models\FileSystem\AttributableFilesFilePath.cs" />
     <Compile Include="Models\FileSystem\CourseFilePath.cs" />
     <Compile Include="Models\FileSystem\EmptyFilePathDecorator.cs" />
