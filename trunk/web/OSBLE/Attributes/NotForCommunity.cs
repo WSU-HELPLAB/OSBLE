@@ -35,8 +35,11 @@ namespace OSBLE.Attributes
                         Sender = typeof(NotForCommunity).ToString(),
                         Message = "IP " + filterContext.HttpContext.Request.UserHostAddress + " encountered exception: " + ex.ToString()
                     };
+                    //AC: turned off to save space / improve performance
+                    /*
                     db.ActivityLogs.Add(log);
                     db.SaveChanges();
+                     * */
                 }
             }
         }

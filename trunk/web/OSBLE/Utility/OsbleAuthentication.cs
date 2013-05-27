@@ -39,15 +39,15 @@ namespace OSBLE.Utility
                 annotateUser = ConfigurationManager.AppSettings["AnnotateUserName"];
             }
             string apiUser = ConfigurationManager.AppSettings["AnnotateUserName"];
-            
+
             //build our string, convert into bytes for sha1
             string rawString = string.Format("{0}\n{1}\n{2}\n{3}", phpFunction, apiUser, unixEpoch, annotateUser);
             byte[] rawBytes = Encoding.UTF8.GetBytes(rawString);
-            
+
             //build our hasher
             byte[] seed = Encoding.UTF8.GetBytes(ConfigurationManager.AppSettings["AnnotateApiKey"]);
             HMACSHA1 sha1 = new HMACSHA1(seed);
-            
+
             //hash our bytes
             byte[] hashBytes = sha1.ComputeHash(rawBytes);
 
@@ -184,8 +184,11 @@ namespace OSBLE.Utility
                                 Sender = typeof(OsbleAuthentication).ToString(),
                                 Message = message
                             };
-                            db.ActivityLogs.Add(log);
-                            db.SaveChanges();
+                            //AC: turned off to save space / improve performance
+                            /*
+                                    db.ActivityLogs.Add(log);
+                                    db.SaveChanges();
+                             * */
                         }
                     }
                 }
