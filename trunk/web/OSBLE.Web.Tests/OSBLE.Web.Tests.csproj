@@ -37,6 +37,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Ionic.Zip">
+      <HintPath>..\packages\DotNetZip.1.9.1.8\lib\net20\Ionic.Zip.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
@@ -113,6 +116,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\OSBLE.Library\OSBLE.Library.csproj">
+      <Project>{6873caf7-4914-4b62-af7e-bfffa0a9ffd4}</Project>
+      <Name>OSBLE.Library</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OSBLE.Web\OSBLE.Web.csproj">
       <Project>{A88C37D7-0144-490F-8101-BD30B14A48ED}</Project>
       <Name>OSBLE.Web</Name>

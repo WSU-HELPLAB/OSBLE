@@ -3,8 +3,6 @@ using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OSBLE.UnitTests.AuthenticationService;
-using OSBLE.UnitTests.OsbleService;
 using OSBLE.Models.Users;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Assignments;
@@ -20,7 +18,7 @@ namespace OSBLE.UnitTests
         public OsbleServiceTest()
         {
         }
-
+        /*
         [TestMethod]
         public void OsbleService_AuthStringTest()
         {
@@ -190,5 +188,6 @@ namespace OSBLE.UnitTests
             int result = osbleClient.UploadCourseGradebook(56, zipStream.ToArray(), token);
             Assert.IsTrue(result == 0);
         }
+         * */
     }
 }
