@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OSBLE.Models.HomePage
 {

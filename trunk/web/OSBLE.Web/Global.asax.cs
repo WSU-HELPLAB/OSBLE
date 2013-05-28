@@ -16,6 +16,12 @@ namespace OSBLE.Web
     {
         protected void Application_Start()
         {
+#if DEBUG
+            //Development only.
+            System.Data.Entity.Database.SetInitializer(new OSBLE.Models.OSBLEContextModelChangeInitializer());
+            //System.Data.Entity.Database.SetInitializer(new OSBLE.Models.OSBLEContextAlwaysCreateInitializer());
+#endif
+
             AreaRegistration.RegisterAllAreas();
 
             WebApiConfig.Register(GlobalConfiguration.Configuration);

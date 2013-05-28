@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5F5F62F4-7B96-4A21-B6AB-9EC48CDB768C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSBLE", "OSBLE\OSBLE.csproj", "{7297687F-BF8A-4195-8EA3-A05DA302B24E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSBLE.UnitTests", "OSBLE.UnitTests\OSBLE.UnitTests.csproj", "{5AA0B7E4-E77B-4B92-9658-682AD71F3163}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSBLE.Library", "OSBLE.Library\OSBLE.Library.csproj", "{6873CAF7-4914-4B62-AF7E-BFFFA0A9FFD4}"
@@ -17,28 +15,25 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSBLE.Web.Tests", "OSBLE.We
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 7
+		SccNumberOfProjects = 6
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs25
 		SccLocalPath0 = .
-		SccProjectUniqueName1 = OSBLE\\OSBLE.csproj
-		SccProjectName1 = OSBLE
-		SccLocalPath1 = OSBLE
-		SccProjectUniqueName2 = OSBLE.UnitTests\\OSBLE.UnitTests.csproj
-		SccProjectName2 = OSBLE.UnitTests
-		SccLocalPath2 = OSBLE.UnitTests
-		SccProjectUniqueName3 = OSBLE.Library\\OSBLE.Library.csproj
-		SccProjectName3 = OSBLE.Library
-		SccLocalPath3 = OSBLE.Library
-		SccProjectUniqueName4 = OSBLE.Library.Signed\\OSBLE.Library.Signed.csproj
-		SccProjectName4 = OSBLE.Library.Signed
-		SccLocalPath4 = OSBLE.Library.Signed
-		SccProjectUniqueName5 = OSBLE.Web\\OSBLE.Web.csproj
-		SccProjectName5 = OSBLE.Web
-		SccLocalPath5 = OSBLE.Web
-		SccProjectUniqueName6 = OSBLE.Web.Tests\\OSBLE.Web.Tests.csproj
-		SccProjectName6 = OSBLE.Web.Tests
-		SccLocalPath6 = OSBLE.Web.Tests
+		SccProjectUniqueName1 = OSBLE.UnitTests\\OSBLE.UnitTests.csproj
+		SccProjectName1 = OSBLE.UnitTests
+		SccLocalPath1 = OSBLE.UnitTests
+		SccProjectUniqueName2 = OSBLE.Library\\OSBLE.Library.csproj
+		SccProjectName2 = OSBLE.Library
+		SccLocalPath2 = OSBLE.Library
+		SccProjectUniqueName3 = OSBLE.Library.Signed\\OSBLE.Library.Signed.csproj
+		SccProjectName3 = OSBLE.Library.Signed
+		SccLocalPath3 = OSBLE.Library.Signed
+		SccProjectUniqueName4 = OSBLE.Web\\OSBLE.Web.csproj
+		SccProjectName4 = OSBLE.Web
+		SccLocalPath4 = OSBLE.Web
+		SccProjectUniqueName5 = OSBLE.Web.Tests\\OSBLE.Web.Tests.csproj
+		SccProjectName5 = OSBLE.Web.Tests
+		SccLocalPath5 = OSBLE.Web.Tests
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = OSBLE.vsmdi
@@ -50,14 +45,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7297687F-BF8A-4195-8EA3-A05DA302B24E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7297687F-BF8A-4195-8EA3-A05DA302B24E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7297687F-BF8A-4195-8EA3-A05DA302B24E}.OSBLE Deployment|Any CPU.ActiveCfg = OSBLE Deployment|Any CPU
-		{7297687F-BF8A-4195-8EA3-A05DA302B24E}.OSBLE Deployment|Any CPU.Build.0 = OSBLE Deployment|Any CPU
-		{7297687F-BF8A-4195-8EA3-A05DA302B24E}.OSBLE Dev Server|Any CPU.ActiveCfg = Osble Dev Server|Any CPU
-		{7297687F-BF8A-4195-8EA3-A05DA302B24E}.OSBLE Dev Server|Any CPU.Build.0 = Osble Dev Server|Any CPU
-		{7297687F-BF8A-4195-8EA3-A05DA302B24E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7297687F-BF8A-4195-8EA3-A05DA302B24E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5AA0B7E4-E77B-4B92-9658-682AD71F3163}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5AA0B7E4-E77B-4B92-9658-682AD71F3163}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5AA0B7E4-E77B-4B92-9658-682AD71F3163}.OSBLE Deployment|Any CPU.ActiveCfg = Release|Any CPU

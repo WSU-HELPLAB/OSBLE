@@ -5,6 +5,7 @@ using System.Web;
 using System.ComponentModel.DataAnnotations;
 using OSBLE.Models.Users;
 using OSBLE.Models.Courses;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OSBLE.Models.Assignments
 {

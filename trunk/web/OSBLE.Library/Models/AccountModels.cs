@@ -19,7 +19,7 @@ namespace OSBLE.Models
 
         [DataType(DataType.Password)]
         [Display(Name = "Confirm new password")]
-        [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
+        [System.Web.Mvc.Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
     }
 
@@ -49,7 +49,7 @@ namespace OSBLE.Models
 
         [DataType(DataType.Password)]
         [Display(Name = "Confirm email address")]
-        [Compare("Email", ErrorMessage = "Email address do not match.")]
+        [System.Web.Mvc.Compare("Email", ErrorMessage = "Email address do not match.")]
         public string ConfirmEmail { get; set; }
 
         [Required]
@@ -60,7 +60,7 @@ namespace OSBLE.Models
 
         [DataType(DataType.Password)]
         [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        [System.Web.Mvc.Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
 
         [Required]
@@ -86,7 +86,7 @@ namespace OSBLE.Models
         public string Identification { get; set; }
 
         [Required]
-        [Compare("Identification", ErrorMessage = "The school ID number and confirmation school ID number do not match.")]
+        [System.Web.Mvc.Compare("Identification", ErrorMessage = "The school ID number and confirmation school ID number do not match.")]
         [Display(Name = "Confirm Student, Faculty, or Staff ID Number")]
         public string ConfirmIdentification { get; set; }
     }

@@ -1,39 +1,40 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 
 namespace OSBLE.Models.Assignments
 {
     public enum DeliverableType
     {
-        [FileExtensions(new string[] { ".c", ".cpp", ".h", ".cs", ".py", ".java" })]
+        [OSBLE.Models.Assignments.FileExtensions(new string[] { ".c", ".cpp", ".h", ".cs", ".py", ".java" })]
         Code,
 
-        [FileExtensions(new string[] { ".txt" })]
+        [OSBLE.Models.Assignments.FileExtensions(new string[] { ".txt" })]
         Text,
 
-        [FileExtensions(new string[] { ".cpml" })]
+        [OSBLE.Models.Assignments.FileExtensions(new string[] { ".cpml" })]
         ChemProV,
 
-        [FileExtensions(new string[] { ".wmv", ".mp4" })]
+        [OSBLE.Models.Assignments.FileExtensions(new string[] { ".wmv", ".mp4" })]
         Video,
 
-        [FileExtensions(new string[] { ".zip" })]
+        [OSBLE.Models.Assignments.FileExtensions(new string[] { ".zip" })]
         Zip,
 
-        [FileExtensions(new string[] { ".txt" })]
+        [OSBLE.Models.Assignments.FileExtensions(new string[] { ".txt" })]
         InBrowserText,
 
-        [FileExtensions(new string[] {".ppt", ".pptx"})]
+        [OSBLE.Models.Assignments.FileExtensions(new string[] { ".ppt", ".pptx" })]
         PowerPoint,
 
-        [FileExtensions(new string[] { ".doc", ".docx" })]
+        [OSBLE.Models.Assignments.FileExtensions(new string[] { ".doc", ".docx" })]
         WordDocument,
 
-        [FileExtensions(new string[] { ".pdf" })]
+        [OSBLE.Models.Assignments.FileExtensions(new string[] { ".pdf" })]
         PDF,
 
-        [FileExtensions(new string[] { ".xls", ".xlsx"})]
+        [OSBLE.Models.Assignments.FileExtensions(new string[] { ".xls", ".xlsx" })]
         ExcelSpreadSheet,
     }
 

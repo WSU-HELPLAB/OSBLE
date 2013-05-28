@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 using OSBLE.Models.Users;
 using OSBLE.Models.Courses;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OSBLE.Models.HomePage
 {

@@ -5,6 +5,7 @@ using System.Web;
 using System.ComponentModel.DataAnnotations;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.Rubrics;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OSBLE.Models.AbstractCourses
 {

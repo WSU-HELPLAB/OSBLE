@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using OSBLE.Models.Courses;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OSBLE.Models.Assignments
 {

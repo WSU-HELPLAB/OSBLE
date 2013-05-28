@@ -7,6 +7,7 @@ using OSBLE.Models.Courses.Rubrics;
 using System.ComponentModel.DataAnnotations;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.HomePage;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OSBLE.Models.Assignments
 {

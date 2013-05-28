@@ -13,7 +13,6 @@ using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
-using Microsoft.Web.Helpers;
 using OSBLE.Models;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
@@ -290,7 +289,7 @@ namespace OSBLE.Controllers
             string privatekey = GetReCaptchaPrivateKey();
 
             //Fall through if ReCaptcha is not set up correctly
-            if (privatekey == null || ReCaptcha.Validate(privateKey: privatekey))
+            if (privatekey == null)// || ReCaptcha.Validate(privateKey: privatekey))
             {
                 model.School = (from c in db.Schools where c.Name == Constants.ProfessionalSchool select c).FirstOrDefault();
                 model.SchoolID = model.School.ID;
@@ -363,7 +362,7 @@ namespace OSBLE.Controllers
             string privatekey = GetReCaptchaPrivateKey();
 
             //Fall through if ReCaptcha is not set up correctly
-            if (privatekey == null || ReCaptcha.Validate(privateKey: privatekey))
+            if (privatekey == null)// || ReCaptcha.Validate(privateKey: privatekey))
             {
                 if (ModelState.IsValid)
                 {
@@ -520,7 +519,7 @@ namespace OSBLE.Controllers
             string privatekey = GetReCaptchaPrivateKey();
 
             //Fall through if ReCaptcha is not set up correctly
-            if (privatekey == null || ReCaptcha.Validate(privateKey: privatekey))
+            if (privatekey == null)// || ReCaptcha.Validate(privateKey: privatekey))
             {
                 UserProfile osbleProfile = db.UserProfiles.Where(m => m.UserName.CompareTo(model.EmailAddress) == 0).FirstOrDefault();
                 if (osbleProfile != null)
@@ -616,7 +615,7 @@ namespace OSBLE.Controllers
             string privatekey = GetReCaptchaPrivateKey();
 
             //Fall through if ReCaptcha is not set up correctly
-            if (privatekey == null || ReCaptcha.Validate(privateKey: privatekey))
+            if (privatekey == null)// || ReCaptcha.Validate(privateKey: privatekey))
             {
                 if (ModelState.IsValid)
                 {
