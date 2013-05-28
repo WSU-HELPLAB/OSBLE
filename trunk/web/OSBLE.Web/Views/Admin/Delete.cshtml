@@ -1,0 +1,56 @@
+﻿@model OSBLE.Models.Users.UserProfile
+
+@using OSBLE.Models
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<fieldset>
+    <legend>UserProfile</legend>
+
+    <div class="display-label">UserName @Helpers.CreateToolTip(ToolTips.AdminUserName) </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.UserName)
+    </div>
+
+    <div class="display-label">School @Helpers.CreateToolTip(ToolTips.AdminUserSchool) </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.School.Name)
+    </div>
+
+    <div class="display-label">FirstName @Helpers.CreateToolTip(ToolTips.AdminUserFirstName) </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.FirstName)
+    </div>
+
+    <div class="display-label">LastName @Helpers.CreateToolTip(ToolTips.AdminUserLastName) </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.LastName)
+    </div>
+
+    <div class="display-label">Identification @Helpers.CreateToolTip(ToolTips.AdminUserID) </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Identification)
+    </div>
+
+    <div class="display-label">IsAdmin @Helpers.CreateToolTip(ToolTips.AdminUserIsAdmin) </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.IsAdmin)
+    </div>
+
+    <div class="display-label">CanCreateCourses @Helpers.CreateToolTip(ToolTips.AdminUserIsCourseCreator) </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.CanCreateCourses)
+    </div>
+</fieldset>
+@using (Html.BeginForm())
+{
+    <div>
+        <input type="submit" value="Delete" /> @Helpers.CreateToolTip(ToolTips.AdminDelete)  |
+        @Html.ActionLink("Back to List", "Index") 
+    </div>
+}

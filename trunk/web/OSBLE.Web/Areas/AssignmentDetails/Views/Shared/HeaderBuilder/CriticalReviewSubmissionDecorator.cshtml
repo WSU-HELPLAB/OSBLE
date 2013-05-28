@@ -1,0 +1,171 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+    List<ReviewTeam> authorTeams = dataModel.CRSubmission.authorTeams;
+}
+@{
+    
+    AjaxOptions options = new AjaxOptions()
+    {
+        LoadingElementId = "Loading",
+        HttpMethod = "Get",
+        UpdateTargetId = "submitFiles",
+        OnComplete = "SubmissionLoaded"
+    };
+    <tr>
+        <th>
+            Submissions to Review
+        </th>
+        <td>
+            <table id="CriticalReviews">
+                @{
+                    int i = 0;
+                    foreach (ReviewTeam rt in authorTeams)
+                    {
+                    <!-- Add a seperating line (table border bottom) except for the last cell -->
+                        string trclass = "";
+                        if (i != authorTeams.Count() - 1)
+                        {
+                            trclass = "TableRowCriticalReview";
+                        }
+                    <tr class="@trclass">
+                        <td>
+                            <table id="CriticalReviewSubTable">
+                                <tr>
+                                    <td>
+                                        @{
+                                            string name = "";
+                                            
+                                            //anonymize names?
+                                            CriticalReviewSettings reviewSettings = dataModel.Assignment.CriticalReviewSettings;
+                                            if (reviewSettings.AnonymizeAuthor == true)
+                                            {
+                                                name = string.Format("Anonymous {0}", rt.AuthorTeamID);
+                                            }
+                                            else
+                                            {
+                                                if (rt.AuthorTeam.TeamMembers.Count > 1) 
+                                                {
+                                                    name = rt.AuthorTeam.Name;
+                                                }
+                                                else
+                                                {
+                                                    name = rt.AuthorTeam.TeamMembers.FirstOrDefault().CourseUser.UserProfile.FirstName + " " +
+                                                        rt.AuthorTeam.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName;
+                                                }
+                                            }
+
+                                            if (dataModel.CRSubmission.authorSubmissionTimes[i] == null)
+                                            {
+                                                @name@: has not submitted anything to review.
+                                            }
+                                            else
+                                            {
+                                                    @Html.ActionLink("Review " + name
+                                                + ".",
+                                                 "GetDocumentsForCriticalReview", "FileHandler",
+                                                new { assignmentId = dataModel.CRSubmission.assignmentId, authorTeamId = rt.AuthorTeamID, area = "" },
+                                                new { onclick = "create_and_open_downloading_submission_dialog()" })
+                                             }
+                                        }
+                                        
+                                    </td>
+                                </tr>
+                                @if(rt.Assignment.PreceedingAssignment.HasDeliverables &&
+                                    rt.Assignment.PreceedingAssignment.Deliverables[0].DeliverableType != DeliverableType.PDF)
+                                {
+                                    //PDF reviews don't have upload options (they use annotate)
+                                    if (dataModel.CRSubmission.submissionTimes[i] == null)
+                                    {
+                                        if(dataModel.CRSubmission.authorSubmissionTimes[i] != null)
+                                        {
+                                        <tr>
+                                            <td>
+                                                @Ajax.ActionLink("Upload your review", "Create", "Submission", new { id = dataModel.CRSubmission.assignmentId, authorTeamID = rt.AuthorTeamID, area = "" }, options, new object())
+                                            </td>
+                                        </tr>
+                                   
+                                        }
+                                    }
+                                
+                                    else
+                                    {
+                                        String submissionTime = dataModel.CRSubmission.submissionTimes[i].ToString();
+                                        <tr>
+
+                                            <td> 
+                                                <ul id="SubmissionItems">
+                                                    <li>
+                                                        @Html.ActionLink("Download your review", 
+                                                        "GetReviewForAuthor", 
+                                                        "FileHandler", 
+                                                        new { assignmentId = dataModel.CRSubmission.assignmentId, authorTeamId = rt.AuthorTeamID, area = "" }, 
+                                                        new { onclick = "create_and_open_downloading_submission_dialog()",
+                                                              title = "Last submitted: " + submissionTime})
+                                                    </li>
+
+                                                    <li>
+                                                        @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = dataModel.CRSubmission.assignmentId, authorTeamID = rt.AuthorTeamID, area = "" }, options, new object())
+                                                    </li>
+                                                    @if (dataModel.CRSubmission.SubmissionReceived && rt.AuthorTeamID ==dataModel.CRSubmission.AuthorTeamId)
+                                                    {
+                                                        <li id="SubmissionReceivedText">Submission received</li>
+                                                    }
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                    
+                                        @*
+                                            header.CRSubmission.SubmissionReceived = true;
+                                            header.CRSubmission.AuthorTeamId
+                                        *@
+                                    
+                                    }
+                                }
+
+                                 @if (dataModel.CRSubmission.hasStudentRubric == true &&
+                                     dataModel.CRSubmission.authorSubmissionTimes[i] != null)
+                                    {
+                                        <tr>
+                                            <td> 
+                                                @Html.ActionLink("Rubric Link", 
+                                                "StudentIndex", 
+                                                "Rubric", 
+                                                new { assignmentId = rt.AssignmentID, 
+                                                    cuId = rt.AuthorTeam.TeamMembers.FirstOrDefault().CourseUserID, 
+                                                    area = "" }, 
+                                                new { })
+                                            </td>
+                                        </tr>
+                                    }
+                            </table>
+                        </td>
+                    </tr>
+                    
+                                i++;
+                    }
+                }
+            </table>
+        </td>
+    </tr>
+}
+<!--Elements for submission modal box and loading message-->
+<span id="Loading" style="display: none"> <br />Please Wait...</span>
+<div id="submit_files_dialog" style="display: none">
+    <div id="submitFiles">
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            $('#submit_files_dialog').dialog(
+            {
+                modal: true,
+                autoOpen: false,
+                height: 600,
+                width: 500
+            });
+        });
+    </script>
+</div>
+</div> 

@@ -1,0 +1,159 @@
+﻿@using OSBLE.Models.Assignments;
+@using OSBLE.Models;
+@using System.Web.Configuration;
+@{
+    Layout = "";
+    ViewBag.Title = "Submission";
+    ViewBag.MaxFileSizeMB = ((WebConfigurationManager.GetSection("system.web/httpRuntime") as HttpRuntimeSection).MaxRequestLength / 1024);
+}
+<h2>Submission</h2>
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+<script type="text/javascript">
+
+
+    $(function () {
+
+        $('#file_uploader_form').submit(function ValidateForm(event) {
+            var file_uploaders = $("#file_uploader_form :input");
+            var i = 0;
+            var askedToContinue = false;
+            for (i = 0; i < file_uploaders.length; i++) {
+                if (isValid(file_uploaders[i]) == false) {
+                    askedToContinue = true;
+                    if (!confirm('One or more deliverables does not have a file. Would you like to continue')) {
+                        event.preventDefault();
+                    }
+                    break;
+                }
+            }
+
+            if (askedToContinue == false) {
+                var inBrowserTextAreas = $("#file_uploader_form .textAreaClass");
+                for (i = 0; i < inBrowserTextAreas.length; i++) {
+                    if (inBrowserTextAreas.value.length == 0) {
+                        askedToContinue = true;
+                        if (!confirm('One or more deliverables does not have a file. Would you like to continue')) {
+                            event.preventDefault();
+                        }
+                        break;
+                    }
+                }
+            }
+        });
+
+    });
+    function checkFileExension(elem, validExtensions) {
+        var filePath = elem.value;
+        var indexOfDot = filePath.indexOf('.');
+        if (indexOfDot == -1) {
+
+            //this does not work for IE
+            elem.value = "";
+            return false;
+        }
+
+        var ext = filePath.substring(filePath.lastIndexOf('.') + 1).toLowerCase();
+        for (var i = 0; i < validExtensions.length; i++) {
+            if (ext == validExtensions[i]) {
+                return true;
+            }
+        }
+
+        alert('The file extension ' + ext.toUpperCase() + ' is not allowed!');
+
+        elem.value = "";
+
+        return false;
+    }
+
+    function isValid(elem) {
+        if (elem.value == null || elem.value.length == 0) {
+            return false;
+        }
+        return true;
+    }
+
+</script>
+@{
+    int fileUploadsSoFar = 0;
+    int inBrowserCount = 0;
+}
+@using (Html.BeginForm("Create", "Submission", new { authorTeamID = ViewBag.authorTeamID }, FormMethod.Post, new { id = "file_uploader_form", enctype = "multipart/form-data" }))
+{
+    @Html.ValidationSummary(true)
+    <fieldset>
+        <legend>Select Files To Submit</legend>
+        @foreach (Deliverable deliverable in ViewBag.Deliverables.Keys)
+        {
+            <table id="submission_table">
+                <tr>
+                    <td>
+                        <b>Desired Name:</b>
+                    </td>
+                    <td>
+                        @deliverable.Name
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <b>File Type:</b>
+                    </td>
+                    <td>
+                        @(((DeliverableType)deliverable.Type).ToString())
+                    </td>
+                </tr>
+                @if (((DeliverableType)deliverable.Type) != DeliverableType.InBrowserText)
+                {
+                    <tr>
+                        <td>
+                            <b>Allowed File Extensions:</b>
+                        </td>
+                        <td>
+                            @String.Join(" ", ViewBag.Deliverables[deliverable])
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @{
+                                //write javascript code to create a new array call it stringArray{0} where {0} is the one we are on.
+                                //then push all the allowed extensions on it while removing the . from them
+                                string newString = "";
+                                newString = "var stringArray" + fileUploadsSoFar.ToString() + " = new Array();";
+                                foreach (string s in ViewBag.Deliverables[deliverable])
+                                {
+                                    newString += "stringArray" + fileUploadsSoFar.ToString() + ".push(" + "\"" + s.Remove(0, 1) + "\");";
+                                }
+                            }
+                            <script type="text/javascript">
+                                //we create our JavaScript string this is where it runs the code it just generated.
+                                @MvcHtmlString.Create(newString);
+                            </script>
+                                <input type='file' name='files' onchange="checkFileExension(this, @MvcHtmlString.Create("stringArray" + fileUploadsSoFar.ToString()))"/>
+                                <em>Your submission must be less than @(ViewBag.MaxFileSizeMB)mb.</em>
+                            @{
+                                fileUploadsSoFar++;
+                            }
+                        </td>
+                    </tr>
+                }
+                // InBrowserText field
+                else
+                {
+                    <tr>
+                        <td colspan="2">
+                            <input type="hidden" name="desiredName[@inBrowserCount]" readonly="true" value="@deliverable.Name"/>
+                            <textarea class="textAreaClass" name="inBrowserText[@inBrowserCount]" rows="10" cols = "53" ></textarea>
+                        </td>
+                    </tr>
+                        
+                    inBrowserCount++;
+                }
+            </table>
+            <br/>
+        }
+        <p>
+            <input type="submit" value="Submit"/>
+        </p>
+    </fieldset>
+}
