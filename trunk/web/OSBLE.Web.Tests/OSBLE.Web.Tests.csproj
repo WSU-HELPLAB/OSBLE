@@ -101,6 +101,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnnotateApiTest.cs" />
+    <Compile Include="FileSystemTest.cs" />
+    <Compile Include="OsbleServiceTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
