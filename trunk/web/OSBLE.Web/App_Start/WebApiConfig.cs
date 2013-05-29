@@ -38,6 +38,7 @@ namespace OSBLE.Web
             modelBuilder.EntitySet<Event>("AssociatedEvent");
 
 
+            modelBuilder.Namespace = "OSBLE.Controllers.Odata";
             Microsoft.Data.Edm.IEdmModel model = modelBuilder.GetEdmModel();
             config.Routes.MapODataRoute("ODataRoute", "odata", model);
         }
