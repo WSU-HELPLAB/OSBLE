@@ -12,6 +12,7 @@ function time() {
     $.ajax({
         url: "/Home/Time",
         success: function (data) {
+            data = $.trim(data);
             if (data == "true") {
             }
             else {
