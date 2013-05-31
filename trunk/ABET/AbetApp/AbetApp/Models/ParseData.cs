@@ -70,17 +70,47 @@ namespace AbetApp.Models
                     string[] values = data.Split(delimiterChars);
                     string preReqs = values[0].ToString();
                     string[] preReqValues = preReqs.Split(delimiterChars2);
+                    int ParentCourseNum = 0;
+                    int foundFlag = 0;
                     for (int i = 0; i < preReqValues.Count(); i++)
                     {
-                        if ((preReqValues[i] == "CPT") || (preReqValues[i] == "CptS"))
+                         CourseRelation courseRelation = new CourseRelation();
+                        if (preReqValues[i] == "CptS")
                         {
-                            CourseRelation courseRelation = new CourseRelation();
-                            int ParentCourseNum = Convert.ToInt32(preReqValues[i + 1]);
-                            Course parentCourse = CourseDict[ParentCourseNum];
-                            int parentId = parentCourse.Id;
-                            courseRelation.ParentCourseId = parentId;
-                            courseRelation.ChildCourseId = course.Id;
-                            db.CourseRelations.Add(courseRelation);
+                            ParentCourseNum = Convert.ToInt32(preReqValues[i + 1]);
+                            foundFlag = 1;
+                        }
+                        else if(preReqValues[i] == "CPT")
+                        {
+                            ParentCourseNum = Convert.ToInt32(preReqValues[i + 2]);
+                            foundFlag = 1;
+                        }
+                        if(foundFlag == 1)
+                        {
+
+                            if (CourseDict.ContainsKey(ParentCourseNum))
+                            {
+                                Course parentCourse = CourseDict[ParentCourseNum];
+                                int parentId = parentCourse.Id;
+                                courseRelation.ParentCourseId = parentId;
+                                courseRelation.ChildCourseId = course.Id;
+                                db.CourseRelations.Add(courseRelation);
+                                foundFlag = 0;
+                            }
+                            else
+                            {
+                                Course newCourse = new Course();
+                                newCourse.Major = "CPT S";
+                                newCourse.CourseNum = ParentCourseNum;
+                                db.Courses.Add(newCourse);
+                                db.SaveChanges();
+                                CourseDict.Add(ParentCourseNum, newCourse);
+                                int parentId = newCourse.Id;
+                                courseRelation.ParentCourseId = parentId;
+                                courseRelation.ChildCourseId = course.Id;
+                                db.CourseRelations.Add(courseRelation);
+                                foundFlag = 0;
+                            }
                         }
                     }
                 }
