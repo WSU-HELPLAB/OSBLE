@@ -4,8 +4,8 @@ namespace OSBLE.Areas.AssignmentWizard
 {
     public class AssignmentWizardAreaRegistration : AreaRegistration
     {
-        public static string AssignmentWizardRoute = "AssignmentWizard_default";
-        public static string AssignmentWizardContentRoute = "AssignmentWizard_content";
+        public static string AssignmentWizardRoute = "AssignmentWizard_default_sdfsdfsdf";
+        public static string AssignmentWizardContentRoute = "AssignmentWizard_content_w3werwer";
 
         public override string AreaName
         {
@@ -20,13 +20,15 @@ namespace OSBLE.Areas.AssignmentWizard
             context.MapRoute(
                 AssignmentWizardAreaRegistration.AssignmentWizardContentRoute,
                 "AssignmentWizard/Content/{*pathInfo}",
-                new { action = "Index", controller = "Content" }
+                new { action = "Index", controller = "Content" },
+                namespaces: new[] { "OSBLE.Areas.AssignmentDetails.Controllers" }
             );
 
             context.MapRoute(
                 AssignmentWizardAreaRegistration.AssignmentWizardRoute,
                 "AssignmentWizard/{controller}/{action}/{assignmentId}",
-                new { action = "Index", controller = "Home", assignmentId = UrlParameter.Optional }
+                new { action = "Index", controller = "Home", assignmentId = UrlParameter.Optional },
+                namespaces: new[] { "OSBLE.Areas.AssignmentDetails.Controllers" }
             );
         }
     }

@@ -71,7 +71,7 @@ namespace OSBLE.Controllers
             }
             else
             {
-                return RedirectToRoute(new { controller = "Home", action = "Index" });
+                return RedirectToRoute(new { controller = "Home", action = "Index", area = "" });
             }
 
             return View("Review");
@@ -163,7 +163,7 @@ namespace OSBLE.Controllers
                 }
                 else
                 {
-                    return RedirectToRoute(new { controller = "Home", action = "Index" });
+                    return RedirectToRoute(new { controller = "Home", action = "Index", area = "" });
                 }
             }
             return View();

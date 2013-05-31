@@ -30,7 +30,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             if (assignmentId != null)
             {
                 Assignment assignment = db.Assignments.Find(assignmentId);
-                
+
                 //prime the manager for the new assignment
                 manager.ActiveAssignmentId = assignment.ID;
                 manager.SetActiveAssignmentType((AssignmentTypes)assignment.AssignmentTypeID);
@@ -41,8 +41,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
                 //now, load in essential components
                 List<WizardBaseController> components = (from comp in manager.GetComponentsForAssignmentType(assignment.Type)
-                                                        where comp.IsRequired == true
-                                                        select comp).ToList();
+                                                         where comp.IsRequired == true
+                                                         select comp).ToList();
                 foreach (WizardBaseController component in components)
                 {
                     component.IsSelected = true;
@@ -66,7 +66,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 //set the assignment type and carry on to the next screen.
                 manager.SetActiveAssignmentType(Request.Form[keyName]);
-                return RedirectToRoute(new { controller = "Home", action = "SelectComponent" });
+                return RedirectToRoute(new { controller = "Home", action = "SelectComponent", area = "" });
             }
             else
             {
@@ -134,7 +134,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         private void ActivateAssignmentComponents(Assignment assignment)
         {
             manager.DeactivateAllComponents();
-            
+
             //RUBRICS
             if (assignment.HasRubric)
             {
@@ -146,7 +146,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 manager.GetComponentByType(typeof(StudentRubricController)).IsSelected = true;
             }
-            
+
             //COMMENT CATEGORIES
             if (assignment.HasCommentCategories)
             {
@@ -194,7 +194,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     }
                     assignment.Rubric = null;
                     assignment.RubricID = null;
-                    
+
                 }
 
                 //STUDENT RUBRICS

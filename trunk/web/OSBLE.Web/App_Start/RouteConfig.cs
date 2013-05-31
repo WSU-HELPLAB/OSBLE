@@ -5,7 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 
-namespace OSBLE.Web
+namespace OSBLE
 {
     public class RouteConfig
     {
@@ -42,21 +42,22 @@ namespace OSBLE.Web
                 "Rubric-eval",
                 "Rubric/{AbstractAssignmentActivityId}/{teamUserId}",
                 new { controller = "Rubric", action = "Index" },
-                new[] { "OSBLE.Controllers" }
+                namespaces: new[] { "OSBLE.Controllers" }
                 );
 
             //very generic.  Make sure that these stay at the bottom.
             routes.MapRoute(
                 "File System",
                 "FileSystem/{*pathInfo}",
-                new { controller = "Home", action = "NoAccess" }
+                new { controller = "Home", action = "NoAccess" },
+                namespaces: new[] { "OSBLE.Controllers" }
             );
 
             routes.MapRoute(
                 "Default", // Route name
                 "{controller}/{action}/{id}", // URL with parameters
                 new { controller = "Home", action = "Index", id = UrlParameter.Optional }, // Parameter defaults
-                new[] { "OSBLE.Controllers" }
+                namespaces: new[] { "OSBLE.Controllers" }
             );
         }
     }

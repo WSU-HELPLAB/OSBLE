@@ -434,6 +434,7 @@
     <Content Include="Content\images\help\discussion_4.png" />
     <Content Include="Content\images\help\discussion_5.png" />
     <Content Include="Content\images\help\discussion_6.png" />
+    <Content Include="Content\images\help\discussion_7.png" />
     <Content Include="Content\images\help\gradebook_1.png" />
     <Content Include="Content\images\help\gradebook_2.png" />
     <Content Include="Content\images\help\gradebook_3.png" />
@@ -633,6 +634,7 @@
     <Content Include="Areas\AssignmentDetails\Views\Shared\_Layout.cshtml" />
     <Content Include="Resources\CSVReader\CSVCellReaderStateMachine.png" />
     <Content Include="Scripts\CourseFilesUploader.js" />
+    <None Include="Properties\PublishProfiles\filesystem.pubxml" />
     <None Include="Scripts\jquery-2.0.1.intellisense.js" />
     <Content Include="Scripts\jquery-2.0.1.js" />
     <Content Include="Scripts\jquery-2.0.1.min.js" />

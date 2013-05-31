@@ -22,7 +22,7 @@ namespace OSBLE.Attributes
 
                 if ((controller.CurrentUser == null) || (!controller.CurrentUser.IsAdmin))
                 {
-                    filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
+                    filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Home", action = "Index", area = "" }));
                 }
             }
         }

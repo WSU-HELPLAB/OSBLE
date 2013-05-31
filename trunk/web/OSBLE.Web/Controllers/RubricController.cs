@@ -343,7 +343,7 @@ namespace OSBLE.Controllers
 
             if (!HasValidViewModel(vm))
             {
-                return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
+                return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index", area = "" }));
             }
 
             //if we've gotten this far, then it's probably okay to save to the DB
@@ -400,7 +400,7 @@ namespace OSBLE.Controllers
         {
             if (!HasValidViewModel(viewModel))
             {
-                return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
+                return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index", area = "" }));
             }
 
             ViewBag.isEditable = true;
@@ -484,7 +484,7 @@ namespace OSBLE.Controllers
                     return View(mergedRubric);
                 }
             }
-            return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
+            return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index", area = "" }));
         }
 
         /// <summary>
@@ -570,7 +570,7 @@ namespace OSBLE.Controllers
                     return View(viewModel);
                 }
             }
-            return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
+            return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index", area = "" }));
         }
 
         public ActionResult ViewAsUneditable(int assignmentId)
@@ -585,7 +585,7 @@ namespace OSBLE.Controllers
                 ViewBag.DisplayGrade = false;
                 return View("View", viewModel);
             }
-            return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
+            return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index", area = "" }));
         }
 
         [HttpPost]

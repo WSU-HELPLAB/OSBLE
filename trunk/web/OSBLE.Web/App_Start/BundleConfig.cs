@@ -1,7 +1,7 @@
 ﻿using System.Web;
 using System.Web.Optimization;
 
-namespace OSBLE.Web
+namespace OSBLE
 {
     public class BundleConfig
     {

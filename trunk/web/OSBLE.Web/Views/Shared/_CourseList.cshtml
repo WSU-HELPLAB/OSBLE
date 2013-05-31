@@ -37,10 +37,9 @@ bool courseOptGroup = false;
                 {
                     @:</optgroup>
                 }
+                @:<optgroup label="Communities">
             }
-            
-            @:<optgroup label="Communities">
-    
+
             if ((ac != null) && (ac.AbstractCourseID == cu.AbstractCourseID))
             {
             <option value=@cu.AbstractCourseID selected="selected">@courseDisplay</option>
@@ -48,13 +47,12 @@ bool courseOptGroup = false;
             else
             {
             <option value=@cu.AbstractCourseID>@courseDisplay</option>
-            }        
-    
-            if(courseOptGroup || communityOptGroup) 
+            }
+        }
+        if (courseOptGroup || communityOptGroup)
             {
                 @:</optgroup>   
             }
-        }
         @:</select>
     <input type="hidden" name="redirect" value="@Request.Path" />
     }       
@@ -69,12 +67,12 @@ else
     @:No Courses!
 }
 @if (ViewBag.CurrentUser != null && ViewBag.CurrentUser.CanCreateCourses)
-    {
+{
     <a href="#" onclick="create_and_open_course_create_dialog()" title="Create Course or Community" id="course_create_button" class="course_modify_buttons">@Helpers.AddButton()</a>
-        if (ViewBag.ActiveCourse != null && ViewBag.ActiveCourse.AbstractRole.CanModify)
-        {
+    if (ViewBag.ActiveCourse != null && ViewBag.ActiveCourse.AbstractRole.CanModify)
+    {
     <a href="/Course/Delete" title="Delete current course / community" class="course_modify_buttons">@Helpers.DeleteButton()</a>
-        }
+    }
     <script type="text/javascript">
 
         function create_and_open_course_create_dialog() {
@@ -84,7 +82,7 @@ else
             $('body').append(
            '<div id="course_create_dialog" title="Create Course"> \
         <p>Would you like to create a Course or a Community?</p> \
-        @Html.ActionLink("Create Course", "Create", "Course", new {area = ""}, null) | @Html.ActionLink("Create Community", "Create", "Community", new {area = ""}, null) \
+        @Html.ActionLink("Create Course", "Create", "Course", new { area = "" }, null) | @Html.ActionLink("Create Community", "Create", "Community", new { area = "" }, null) \
     </div>');
 
             //make the div we just created into a dialog box

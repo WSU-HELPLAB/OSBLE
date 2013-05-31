@@ -19,7 +19,7 @@ namespace OSBLE.Attributes
 
                 if (!(controller.ActiveCourseUser.AbstractCourse is Community))
                 {
-                    filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
+                    filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Home", action = "Index", area = "" }));
                 }
             }
         }
