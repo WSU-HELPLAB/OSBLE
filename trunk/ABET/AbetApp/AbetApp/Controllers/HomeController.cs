@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -64,7 +65,7 @@ namespace AbetApp.Controllers
                     Dictionary<int, Course> CourseDict = new Dictionary<int, Course>();
                     List<Course> cleanList = new List<Course>();
                     foreach (Course course in courseList)
-                    {    
+                    {
                         course.CourseNum = ParseData.ParseCourseNum(course.Title);
                         course.Title = ParseData.ParseTitle(course.Title);
                         course.Major = "CPTS";
@@ -74,7 +75,6 @@ namespace AbetApp.Controllers
                             db.Courses.Add(course);
                             cleanList.Add(course);
                         }
-
                     }
                     db.SaveChanges();
                     ParseData.ParsePreReq(CourseDict, cleanList);
@@ -87,6 +87,73 @@ namespace AbetApp.Controllers
             return RedirectToAction("Index");
         }
 
+        public ActionResult Delete(int id)
+        {
+            Course course = new Course();
+            List<CourseRelation> relations = new List<CourseRelation>();
+            using (LocalContext db = new LocalContext())
+            {
+                course = db.Courses.Find(id);
+                if (course == null)
+                {
+                    return HttpNotFound();
+                }
+
+                relations = (from u in db.CourseRelations select u).ToList();
+
+                foreach (CourseRelation relation in relations)
+                {
+                    if ((relation.ChildCourseId == id) || (relation.ParentCourseId == id))
+                    {
+                        db.CourseRelations.Remove(relation);
+                    }
+                }
+                db.Courses.Remove(course);
+                db.SaveChanges();
+            }
+            return RedirectToAction("Index");
+        }
+
+        public ActionResult Edit(int id)
+        {
+            Course course = new Course();
+            using (LocalContext db = new LocalContext())
+            {
+                course = db.Courses.Find(id);
+                if (course == null)
+                {
+                    return HttpNotFound();
+                }
+            }
+            return View(course);
+        }
+
+        [HttpPost]
+        public ActionResult Edit(Course course)
+        {
+            using (LocalContext db = new LocalContext())
+            {
+                if (ModelState.IsValid)
+                {
+                    db.Entry(course).State = EntityState.Modified;
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+            }
+            return View(course);
+        }
+
+        public ActionResult PreReqs(int id)
+        {
+            List<CourseRelation> relations = new List<CourseRelation>();
+            using (LocalContext db = new LocalContext())
+            {
+                relations = (from u in db.CourseRelations select u).ToList();
+            }
+            return View(relations);
+        }
+
+
         public ActionResult Error()
         {
             return View();
@@ -95,12 +162,20 @@ namespace AbetApp.Controllers
         public ActionResult CoursesRemove()
         {
             List<Course> courses = new List<Course>();
+            List<CourseRelation> courseRelation = new List<CourseRelation>();
             using (LocalContext db = new LocalContext())
             {
                 courses = (from u in db.Courses select u).ToList();
                 foreach (Course course in courses)
                 {
                     db.Courses.Remove(course);
+                }
+                db.SaveChanges();
+
+                courseRelation = (from u in db.CourseRelations select u).ToList();
+                foreach (CourseRelation relation in courseRelation)
+                {
+                    db.CourseRelations.Remove(relation);
                 }
                 db.SaveChanges();
             }

@@ -4,15 +4,28 @@
 @model List<Course>
 @using AbetApp.Models
 
-<h2>Courses Added:</h2>
-<ul>
-    @foreach (Course course in Model)
-    {
-        <li><b>@course.CourseNum</b> @course.Title
-        </li>
-    }
-
-</ul>
+<h2>Current Courses:</h2>
+<table>
+@foreach (Course item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(model => item.CourseNum)
+        </td>
+        <td>
+            @Html.DisplayFor(model => item.Title)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Id })
+        </td>
+        <td>
+            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+        </td>
+        <td>
+            @Html.ActionLink("PreReqs", "PreReqs", new { id=item.Id })
+        </td>
+    </tr>
+}
+</table>
 
 <h2>Index</h2>
 Enter URL to add courses:
