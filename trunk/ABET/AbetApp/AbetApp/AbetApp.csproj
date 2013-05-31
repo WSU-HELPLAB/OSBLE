@@ -129,8 +129,11 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\ContextRecreateOnChange.cs" />
     <Compile Include="Models\Course.cs" />
+    <Compile Include="Models\CourseRelation.cs" />
     <Compile Include="Models\LocalContext.cs" />
+    <Compile Include="Models\ParseData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

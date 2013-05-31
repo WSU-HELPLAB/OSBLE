@@ -55,19 +55,29 @@ namespace AbetApp.Controllers
                 {
                     //Get the descriptions
                     string courseDescrip = courseDiscrip.InnerText;
-                    courseList[evalPlanIndex].Description = courseDescrip;
-                    courseList[evalPlanIndex].ParsePreReq();
+                    courseList[evalPlanIndex].Data = courseDescrip;
                     evalPlanIndex++;
                 }
 
                 using (LocalContext db = new LocalContext())
                 {
+                    Dictionary<int, Course> CourseDict = new Dictionary<int, Course>();
+                    List<Course> cleanList = new List<Course>();
                     foreach (Course course in courseList)
-                    {
-                        
-                        db.Courses.Add(course);
+                    {    
+                        course.CourseNum = ParseData.ParseCourseNum(course.Title);
+                        course.Title = ParseData.ParseTitle(course.Title);
+                        course.Major = "CPTS";
+                        if (CourseDict.ContainsKey(course.CourseNum) != true)
+                        {
+                            CourseDict.Add(course.CourseNum, course);
+                            db.Courses.Add(course);
+                            cleanList.Add(course);
+                        }
+
                     }
                     db.SaveChanges();
+                    ParseData.ParsePreReq(CourseDict, cleanList);
                 }
             }
             catch (Exception e)

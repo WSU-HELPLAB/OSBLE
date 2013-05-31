@@ -8,8 +8,7 @@
 <ul>
     @foreach (Course course in Model)
     {
-        <li><b>@course.Title</b>
-            <br />@course.PreReq.ToString();
+        <li><b>@course.CourseNum</b> @course.Title
         </li>
     }
 
@@ -22,3 +21,4 @@ Enter URL to add courses:
     @Html.TextBox("url")
     <input type="submit" value="Send" />
 }
+<br /><a href="Home/CoursesRemove">Clear Courses</a>
