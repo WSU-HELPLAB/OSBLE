@@ -1,0 +1,42 @@
+﻿@model  AbetApp.Models.Course
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit</h2>
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+
+    <fieldset>
+        <legend>Course:</legend>
+
+        @Html.HiddenFor(model => model.Id)
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Title)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Title)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.CourseNum)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.CourseNum)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Data)
+        </div>
+         <div class="editor-field">
+            @Html.EditorFor(model => model.Data)
+        </div>
+        
+        <p>
+            <input type="submit" value="Save" />
+        </p>
+    </fieldset>
+}

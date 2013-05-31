@@ -1,0 +1,21 @@
+﻿@{
+    ViewBag.Title = "PreReqs";
+}
+
+@model List<CourseRelation>
+@using AbetApp.Models
+
+<h2>PreReqs</h2>
+<table>
+@foreach (CourseRelation item in Model)
+{
+     <tr>
+        <td>
+            @Html.DisplayFor(model => item.ParentCourseId)
+        </td>
+         <td>
+             @Html.DisplayFor(model => item.ChildCourseId)
+         </td>
+      </tr>
+}
+</table>
