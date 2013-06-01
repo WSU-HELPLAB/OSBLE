@@ -27,15 +27,13 @@ namespace OSBLE.Areas.AssignmentDetails
             context.MapRoute(
                 AssignmentDetailsShortcutRoute,
                 "AssignmentDetails/{assignmentId}",
-                new { action = "Index", controller = "Home", assignmentId = UrlParameter.Optional },
-                namespaces: new[] { "OSBLE.Areas.AssignmentDetails.Controllers" }
+                new { action = "Index", controller = "Home", assignmentId = UrlParameter.Optional }
             );
 
             context.MapRoute(
                 AssignmentDetailsRoute,
                 "AssignmentDetails/{controller}/{action}/{assignmentId}",
-                new { action = "Index", controller = "Home", assignmentId = UrlParameter.Optional },
-                namespaces: new[] { "OSBLE.Areas.AssignmentDetails.Controllers" }
+                new { action = "Index", controller = "Home", assignmentId = UrlParameter.Optional }
             );
         }
     }

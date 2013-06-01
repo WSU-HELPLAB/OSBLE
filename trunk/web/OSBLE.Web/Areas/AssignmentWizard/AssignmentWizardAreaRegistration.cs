@@ -20,15 +20,13 @@ namespace OSBLE.Areas.AssignmentWizard
             context.MapRoute(
                 AssignmentWizardAreaRegistration.AssignmentWizardContentRoute,
                 "AssignmentWizard/Content/{*pathInfo}",
-                new { action = "Index", controller = "Content" },
-                namespaces: new[] { "OSBLE.Areas.AssignmentWizard.Controllers" }
+                new { action = "Index", controller = "Content" }
             );
 
             context.MapRoute(
                 AssignmentWizardAreaRegistration.AssignmentWizardRoute,
                 "AssignmentWizard/{controller}/{action}/{assignmentId}",
-                new { action = "Index", controller = "Home", assignmentId = UrlParameter.Optional },
-                namespaces: new[] { "OSBLE.Areas.AssignmentWizard.Controllers" }
+                new { action = "Index", controller = "Home", assignmentId = UrlParameter.Optional }
             );
         }
     }
