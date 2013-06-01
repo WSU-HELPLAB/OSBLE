@@ -765,7 +765,7 @@ namespace OSBLE.Controllers
             ";
             if (acedemia)
             {
-                message += @"If you are a teacher and would like to use OSBLE for one or more of your courses, please e-mail instructor_request@osble.org to request an instructor account.  In the e-mail, please include the name of your school and brief descriptions of the courses you'd like to teach using OSBLE.<br/>
+                message += @"If you are a teacher and would like to use OSBLE for one or more of your courses, please e-mail support@osble.org to request an instructor account.  In the e-mail, please include the name of your school and brief descriptions of the courses you'd like to teach using OSBLE.<br/>
                 <br/>
                 ";
             }

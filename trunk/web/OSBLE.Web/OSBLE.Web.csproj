@@ -44,7 +44,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DotNetOpenAuth">
-      <HintPath>..\packages\DotNetOpenAuth.4.3.0.13117\DotNetOpenAuth.dll</HintPath>
+      <HintPath>..\packages\DotNetOpenAuth\DotNetOpenAuth.dll</HintPath>
     </Reference>
     <Reference Include="FileCache">
       <HintPath>..\packages\FileCache.1.1.3\lib\FileCache.dll</HintPath>
