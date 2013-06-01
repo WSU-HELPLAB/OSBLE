@@ -681,7 +681,6 @@
     <Content Include="Services\UploaderWebService.svc" />
     <Content Include="Views\OpenId\AskUser_old.aspx" />
     <Content Include="Views\OpenId\Provider.aspx" />
-    <Content Include="Views\Shared\Error.aspx" />
     <Content Include="Views\Shared\LogOnUserControl.ascx" />
     <Content Include="Views\Shared\Xrds.aspx" />
     <Content Include="Views\User\Identity.aspx" />
@@ -809,7 +808,6 @@
     <Content Include="Views\Shared\_MenuControl.cshtml" />
     <Content Include="Views\Shared\_Notifications.cshtml" />
     <Content Include="Views\Shared\_ReCaptcha.cshtml" />
-    <Content Include="Views\Shared\Site.Master" />
     <Content Include="Views\Submission\Create.cshtml" />
     <Content Include="Views\Submission\SubmittedSuccessfully.cshtml" />
     <Content Include="Views\Submission\_Submit.cshtml" />
