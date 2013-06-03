@@ -76,6 +76,9 @@
     <Compile Include="..\OSBLE.Library\FileSystem.cs">
       <Link>FileSystem.cs</Link>
     </Compile>
+    <Compile Include="..\OSBLE.Library\IdenticonRenderer.cs">
+      <Link>IdenticonRenderer.cs</Link>
+    </Compile>
     <Compile Include="..\OSBLE.Library\Models\AbstractCourses\AbstractCourse.cs">
       <Link>Models\AbstractCourses\AbstractCourse.cs</Link>
     </Compile>
@@ -309,6 +312,9 @@
     </Compile>
     <Compile Include="..\OSBLE.Library\Models\Users\Mail.cs">
       <Link>Models\Users\Mail.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\Users\ProfileImage.cs">
+      <Link>Models\Users\ProfileImage.cs</Link>
     </Compile>
     <Compile Include="..\OSBLE.Library\Models\Users\UserProfile.cs">
       <Link>Models\Users\UserProfile.cs</Link>

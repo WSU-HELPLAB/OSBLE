@@ -32,6 +32,9 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
             List<bool> ListOfHideMailIcon = new List<bool>();
             List<int> ListOfNewPostCounts = new List<int>();
 
+            //AC: Quick hack to get author IDs into the view.  Not sure if this is the best way to go about.
+            Dictionary<int, int> TeamsToAuthors = new Dictionary<int, int>();
+
             //Finding "Client's" Discussion Team(s). In some assignment types (CRD) users can be part of multiple DiscussionTeams
             foreach (DiscussionTeam dt in assignment.DiscussionTeams.OrderBy(dt => dt.TeamName).ToList())
             {
@@ -103,6 +106,10 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
                         ListOfListOfPosters.Add(posters);
                         ListOfTeamNames.Add(dt.TeamName);
                         ListOfTeamIDs.Add(dt.ID);
+                        if (dt.AuthorTeamID != null)
+                        {
+                            TeamsToAuthors[dt.ID] = (int)dt.AuthorTeamID;
+                        }
                         break;
                     }
                 }
@@ -114,6 +121,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
             header.DiscussionTeam.ListOfListOfPosters = ListOfListOfPosters;
             header.DiscussionTeam.ListOfTeamNames = ListOfTeamNames;
             header.DiscussionTeam.ListOfTeamIDs = ListOfTeamIDs;
+            header.DiscussionTeam.TeamsToAuthors = TeamsToAuthors;
 
             return header;
         }

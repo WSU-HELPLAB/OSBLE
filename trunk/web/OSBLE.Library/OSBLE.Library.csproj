@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="Attributes\EmailAttribute.cs" />
     <Compile Include="FileSystem.cs" />
+    <Compile Include="IdenticonRenderer.cs" />
     <Compile Include="Models\AbstractCourses\AbstractCourse.cs" />
     <Compile Include="Models\AbstractCourses\AbstractRole.cs" />
     <Compile Include="Models\AbstractCourses\Community\Community.cs" />
@@ -146,6 +147,7 @@
     <Compile Include="Models\Triggers\ModelTrigger.cs" />
     <Compile Include="Models\Triggers\TeamDeleteTrigger.cs" />
     <Compile Include="Models\Users\Mail.cs" />
+    <Compile Include="Models\Users\ProfileImage.cs" />
     <Compile Include="Models\Users\UserProfile.cs" />
     <Compile Include="Models\ViewModels\DiscussionViewModel.cs" />
     <Compile Include="Models\ViewModels\ReviewInterfaceModels.cs" />

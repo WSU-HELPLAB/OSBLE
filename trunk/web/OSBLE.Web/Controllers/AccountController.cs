@@ -542,6 +542,7 @@ namespace OSBLE.Controllers
         }
 
         [OsbleAuthorize]
+        [Obsolete("Use UserController/Picture instead")]
         public ActionResult ProfilePicture()
         {
             return new FileStreamResult(FileSystem.GetProfilePictureOrDefault(CurrentUser), "image/jpeg");
@@ -592,11 +593,9 @@ namespace OSBLE.Controllers
                                                 new Rectangle(0, 0, thumbSize, thumbSize),
                                                 new Rectangle(0, 0, square, square),
                                                 GraphicsUnit.Pixel);
-
-                            // Write image to memory stream.
-                            FileStream fs = FileSystem.GetProfilePictureForWrite(CurrentUser);
-                            finalImage.Save(fs, ImageFormat.Jpeg);
-                            fs.Close();
+                            UserProfile profile = db.UserProfiles.Where(u => u.ID == CurrentUser.ID).FirstOrDefault();
+                            profile.SetProfileImage(finalImage);
+                            db.SaveChanges();
                         }
                     }
                 }

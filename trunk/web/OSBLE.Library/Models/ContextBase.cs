@@ -243,6 +243,8 @@ namespace OSBLE.Models
 
         public DbSet<UserProfile> UserProfiles { get; set; }
 
+        public DbSet<ProfileImage> ProfileImages { get; set; }
+
         //misc
         public DbSet<ActivityLog> ActivityLogs { get; set; }
 

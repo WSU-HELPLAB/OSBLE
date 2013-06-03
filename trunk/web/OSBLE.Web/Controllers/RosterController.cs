@@ -613,33 +613,10 @@ namespace OSBLE.Controllers
         }
 
         [HttpGet, FileCache(Duration = 3600)]
-        public FileStreamResult ProfilePicture(int userProfile)
+        [Obsolete("Use UserController/Picture instead")]
+        public ActionResult ProfilePicture(int userProfile)
         {
-            bool show = false;
-            UserProfile u = db.UserProfiles.Find(userProfile);
-
-            if (userProfile == CurrentUser.ID)
-            {
-                show = true;
-            }
-            else
-            {
-                CourseUser cu = db.CourseUsers.Where(c => (c.AbstractCourseID == ActiveCourseUser.AbstractCourseID) && (c.UserProfileID == userProfile)).FirstOrDefault();
-
-                if (cu != null)
-                {
-                    show = true;
-                }
-            }
-
-            if (show == true)
-            {
-                return new FileStreamResult(FileSystem.GetProfilePictureOrDefault(u), "image/jpeg");
-            }
-            else
-            {
-                return new FileStreamResult(FileSystem.GetDefaultProfilePicture(), "image/jpeg");
-            }
+            return RedirectToAction("Picture", "User", new { id = userProfile });
         }
 
         /// <summary>

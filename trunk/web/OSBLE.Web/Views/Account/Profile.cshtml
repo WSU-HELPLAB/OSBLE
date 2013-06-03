@@ -9,7 +9,7 @@
 }
 
 <h2>Upload Profile Picture @Helpers.CreateToolTip(ToolTips.AccountProfilePicture) </h2>
-@Helpers.ProfilePicture(Url.Action("ProfilePicture"))
+@Helpers.ProfilePicture(Url.Action("Picture", "User", new { id = ViewBag.CurrentUser.ID }))
 
 <div id="picture_upload">
 @using (Html.BeginForm("UploadPicture", "Account", FormMethod.Post, new { enctype = "multipart/form-data" }))

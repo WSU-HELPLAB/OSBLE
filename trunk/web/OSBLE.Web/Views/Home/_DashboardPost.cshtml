@@ -47,7 +47,12 @@
 
                 @if (Model.ShowProfilePicture)
                 {
-                    @Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = course.ID, userprofile = Model.CourseUser.UserProfileID }));
+                    <img 
+                        src="@Url.Action("Picture", "User", new { id = Model.CourseUser.UserProfileID, size = 52 })" 
+                        alt="Picture of @Model.CourseUser.UserProfile.DisplayName(ViewBag.ActiveCourseUser.AbstractRoleID)" 
+                        class="profile_picture"
+                        />
+                    
                 }
                 else
                 {

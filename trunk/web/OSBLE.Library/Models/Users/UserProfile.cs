@@ -6,12 +6,13 @@ using System.Security.Cryptography;
 using System;
 using OSBLE.Models.Courses;
 using System.Runtime.Serialization;
+using System.IO;
 
 namespace OSBLE.Models.Users
 {
     [Serializable]
     [DataContract]
-    public class UserProfile
+    public class UserProfile : IModelBuilderExtender
     {
         [DataMember]
         [Required]
@@ -52,6 +53,9 @@ namespace OSBLE.Models.Users
 
         [DataMember]
         public int DefaultCourse { get; set; }
+
+        [DataMember]
+        public virtual ProfileImage ProfileImage { get; set; }
 
         // User E-mail Notification Settings
 
@@ -141,6 +145,18 @@ namespace OSBLE.Models.Users
             return returnValue;
         }
 
+        public void SetProfileImage(System.Drawing.Bitmap bmp)
+        {
+            if (ProfileImage == null)
+            {
+                ProfileImage = new ProfileImage();
+            }
+            MemoryStream stream = new MemoryStream();
+            bmp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+            stream.Position = 0;
+            ProfileImage.Picture = stream.ToArray();
+        }
+
         /// <summary>
         /// Converts a clear-text password into its encrypted form
         /// </summary>
@@ -192,6 +208,10 @@ namespace OSBLE.Models.Users
                 return true;
             }
             return false;
+        }
+
+        public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
+        {
         }
     }
 }
