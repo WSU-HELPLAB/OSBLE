@@ -456,6 +456,15 @@ function create_and_open_downloading_submission_dialog() {
         <input type="hidden" name="@ViewBag.AssignmentId" value="@Model.SelectedAssignment.ID" />
         <input type="hidden" name="@ViewBag.CourseUserId" value="@Model.SelectedTeam.Team.TeamMembers.FirstOrDefault().CourseUserID" />
         <input type="hidden" name="@ViewBag.TeamId" value="@Model.SelectedTeam.TeamID" />
-        <input type="hidden" name="@ViewBag.StudentStatusName" value="@Model.Student"/>
+            
+        //AC: For some reason, doing a direct render of Model.Student results in the value
+        //    "value."  As such, I'm using this IF statement as a workaround
+        string statusValue = "false";
+        if (Model.Student == true)
+        {
+            statusValue = "true";
+        }
+        
+        <input type="hidden" name="@ViewBag.StudentStatusName" value="@statusValue"/>
     }
 </div>
