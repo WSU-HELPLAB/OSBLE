@@ -66,7 +66,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 //set the assignment type and carry on to the next screen.
                 manager.SetActiveAssignmentType(Request.Form[keyName]);
-                return RedirectToRoute(new { controller = "Home", action = "SelectComponent", area = "" });
+                return RedirectToRoute(new { controller = "Home", action = "SelectComponent", area = "AssignmentWizard" });
             }
             else
             {
