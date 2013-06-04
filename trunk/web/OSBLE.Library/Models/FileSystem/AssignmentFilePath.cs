@@ -21,8 +21,15 @@ namespace OSBLE.Models.FileSystem
 
         public IFileSystem Submission(int teamID)
         {
-            SubmissionFilePath sfp = new SubmissionFilePath(this, teamID);
-            return sfp;
+            // Within this assignment folder is a "Submissions" subdirectory and 
+            // folders named with team IDs within that. See FileSystem.cs for 
+            // a diagram of the file system.
+
+            string p = this.GetPath();
+            return new AttributableFilesFilePath(
+                this, // For compatibility
+                Path.Combine(p, "Submissions", teamID.ToString()),
+                Path.Combine(p, "SubmissionsAttr", teamID.ToString()));
         }
 
         public IFileSystem Submission(Team team)
@@ -48,7 +55,6 @@ namespace OSBLE.Models.FileSystem
         }
 
         /// <summary>
-        /// E.O.
         /// Gets the path for attributable files for this assignment. These can be things 
         /// like files for detailed descriptions of the assignment requirements, files 
         /// for assignment solutions, and so on.
@@ -57,7 +63,11 @@ namespace OSBLE.Models.FileSystem
         {
             get
             {
-                return new AttributableFilesFilePath(this);
+                string path = this.GetPath();
+                return new AttributableFilesFilePath(
+                    new FileSystem(Path.Combine(path, "AssignmentDocs")),
+                    Path.Combine(path, "AssignmentDocs"),
+                    Path.Combine(path, "AssignmentDocsAttr"));
             }
         }
     }

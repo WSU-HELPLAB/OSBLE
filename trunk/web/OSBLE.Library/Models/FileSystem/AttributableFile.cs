@@ -9,10 +9,11 @@ namespace OSBLE.Models.FileSystem
 {
     /// <summary>
     /// Represents a file with attributes that can describe many things, including access 
-    /// permissions. An "attribute" in this context is a key-value pair of strings. The 
-    /// file has a set of "system" attributes and "user" attributes. The system attributes 
-    /// are designed to be things that have some potential meaning within the OSBLE code 
-    /// whereas user attributes are meant to be solely user determined.
+    /// permissions. An "attribute" in this context is, for the most part, a key-value pair 
+    /// of strings. Some attributes will have no associated value and just exist as a "key". 
+    /// The file has a set of "system" attributes and "user" attributes. The system 
+    /// attributes are designed to be things that have some potential meaning within the 
+    /// OSBLE code whereas user attributes are meant to be solely user determined.
     /// Some system attributes have reserved meaning, and map to properties in this class. It 
     /// is recommended that attribute files ONLY ever get modified through the use of this 
     /// class, so as to keep attribute meaning consistent.
@@ -21,18 +22,26 @@ namespace OSBLE.Models.FileSystem
     /// </summary>
     public class AttributableFile
     {
+        private const string c_emptyAttr = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+@"<osblefileattributes>
+  <systemattributes></systemattributes>
+  <userattributes></userattributes>
+</osblefileattributes>";
+        
         private string m_attrFileName = null;
 
         private string m_dataFileName = null;
+        
+        private XmlDocument m_doc = null;
 
         private bool m_modified = false;
 
-        private Dictionary<string, string> m_sys = new Dictionary<string, string>();
-
-        private Dictionary<string, string> m_usr = new Dictionary<string, string>();
+        private XmlNode m_sys = null;
 
         /// <summary>
-        /// Creates an AttributableFile from existing data and attribute files on disk.
+        /// Creates an AttributableFile from existing data and attribute files on disk. The 
+        /// data file MUST exist, but the attribute file does not have to. If it does then 
+        /// it is loaded as-is, otherwise it is created as an empty attribute file.
         /// </summary>
         /// <param name="dataFullPath">Full path and file name for the data file.</param>
         /// <param name="attrFullPath">Full path and file name for the attribute file.</param>
@@ -41,11 +50,16 @@ namespace OSBLE.Models.FileSystem
             m_dataFileName = dataFullPath;
             m_attrFileName = attrFullPath;
 
-            // Load the attributes into memory
-            XmlDocument doc = new XmlDocument();
-            doc.Load(attrFullPath);
+            if (!System.IO.File.Exists(m_attrFileName))
+            {
+                System.IO.File.WriteAllText(m_attrFileName, c_emptyAttr);
+            }
 
-            XmlElement root = doc.DocumentElement;
+            // Load the XML document into memory
+            m_doc = new XmlDocument();
+            m_doc.Load(attrFullPath);
+
+            XmlElement root = m_doc.DocumentElement;
             if ("osblefileattributes" != root.LocalName.ToLower())
             {
                 // Invalid attribute file
@@ -53,29 +67,46 @@ namespace OSBLE.Models.FileSystem
                     "XML attribute file was invalid for file: " + dataFullPath);
             }
 
-            // Find the system attributes first
-            XmlNodeList sys = doc.GetElementsByTagName("systemattributes");
-            if (sys.Count > 0)
+            // Find the system attributes node
+            m_sys = null;
+            foreach (XmlNode child in root.ChildNodes)
             {
-                foreach (XmlNode node in sys[0].ChildNodes)
+                if ("systemattributes" == child.LocalName.ToLower())
                 {
-                    m_sys.Add(node.LocalName, node.InnerText);
+                    m_sys = child;
+                    break;
                 }
             }
-
-            // Now the user attributes
-            // Find the system attributes first
-            XmlNodeList usr = doc.GetElementsByTagName("userattributes");
-            if (usr.Count > 0)
+            
+            // We NEED the system attributes node to function properly
+            if (null == m_sys)
             {
-                foreach (XmlNode node in usr[0].ChildNodes)
-                {
-                    m_usr.Add(node.LocalName, node.InnerText);
-                }
+                throw new Exception(
+                    "Could not find system attributes node in XML attribute file");
             }
 
             // Everything is in memory and nothing is modified yet
             m_modified = false;
+        }
+
+        /// <summary>
+        /// Adds an attribute to the collection of system attributes, with the 
+        /// possibility of creating a duplicate. No checks are made to see 
+        /// whether or not an attribute with the name already exists. This 
+        /// method adds the attribute regardless.
+        /// If you wish to replace attributes that already exist, then use 
+        /// methods that start with "Set" as opposed to methods that start 
+        /// with "Add".
+        /// </summary>
+        public void AddSysAttr(string name, string value)
+        {
+            // We're about to modify
+            m_modified = true;
+
+            // Add a new node
+            XmlElement elem = m_doc.CreateElement(name);
+            elem.InnerText = value;
+            m_sys.AppendChild(elem);
         }
 
         public string AttributeFileName
@@ -87,20 +118,15 @@ namespace OSBLE.Models.FileSystem
         {
             // There's a system attribute that would make this public to 
             // any course user.
-            if (m_sys.ContainsKey("any_course_user_can_download"))
+            XmlNodeList any = m_doc.GetElementsByTagName("any_course_user_can_download");
+            if (any.Count > 0)
             {
-                bool b;
-                if (!bool.TryParse(m_sys["any_course_user_can_download"], out b))
-                {
-                    // We take the attribute without any value to mean true
-                    b = true;
-                }
-                return b;
+                return true;
             }
 
             // The current security model is only course modifiers can get 
             // assignment solutions.
-            if (m_sys.ContainsKey("assignment_solution"))
+            if (ContainsSysAttr("assignment_solution"))
             {
                 return user.AbstractRole.CanModify;
             }
@@ -108,32 +134,82 @@ namespace OSBLE.Models.FileSystem
             return true;
         }
 
-        public bool ContainsSystemAttribute(string attributeName)
+        public bool ContainsAttribute(string category, string attributeName, string attributeValue)
         {
-            return m_sys.ContainsKey(attributeName);
-        }
-
-        public bool ContainsSystemAttribute(string attributeName, string attributeValue)
-        {
-            if (m_sys.ContainsKey(attributeName))
+            // Find the system or user attributes first. The category is expected to be 
+            // either "systemattributes" or "userattributes".
+            XmlNodeList sys = m_doc.GetElementsByTagName(category);
+            if (0 == sys.Count)
             {
-                return (attributeValue == m_sys[attributeName]);
+                // This actually indicates a fairly large problem (corrupt 
+                // attributes file)
+                return false;
             }
+
+            foreach (XmlNode node in sys[0].ChildNodes)
+            {
+                if (node.LocalName == attributeName &&
+                    node.InnerText == attributeValue)
+                {
+                    return true;
+                }
+            }
+
             return false;
         }
 
-        public bool ContainsUserAttribute(string attributeName)
+        public bool ContainsSysAttr(string attributeName)
         {
-            return m_usr.ContainsKey(attributeName);
+            // Find the system attributes first
+            XmlNodeList sys = m_doc.GetElementsByTagName("systemattributes");
+            if (0 == sys.Count)
+            {
+                // This actually indicates a fairly large problem (corrupt 
+                // attribute file)
+                return false;
+            }
+
+            foreach (XmlNode node in sys[0].ChildNodes)
+            {
+                if (node.LocalName == attributeName)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
-        public bool ContainsUserAttribute(string attributeName, string attributeValue)
+        public bool ContainsSysAttr(string attributeName, string attributeValue)
         {
-            if (m_usr.ContainsKey(attributeName))
+            return ContainsAttribute("systemattributes", attributeName, attributeValue);
+        }
+
+        public bool ContainsUserAttr(string attributeName)
+        {
+            // Find the system attributes first
+            XmlNodeList sys = m_doc.GetElementsByTagName("userattributes");
+            if (0 == sys.Count)
             {
-                return (attributeValue == m_usr[attributeName]);
+                // This actually indicates a fairly large problem (corrupt 
+                // attribute file)
+                return false;
             }
+
+            foreach (XmlNode node in sys[0].ChildNodes)
+            {
+                if (node.LocalName == attributeName)
+                {
+                    return true;
+                }
+            }
+
             return false;
+        }
+
+        public bool ContainsUserAttr(string attributeName, string attributeValue)
+        {
+            return ContainsAttribute("userattributes", attributeName, attributeValue);
         }
 
         public static AttributableFile CreateFromExisting(string dataFullPath, string attrFullPath)
@@ -156,13 +232,63 @@ namespace OSBLE.Models.FileSystem
         }
 
         /// <summary>
-        /// Gets a value indicating whether the set of attributes has been modified since 
-        /// the last save. This value cannot be set directly. Use the "Save" (TODO) method to 
-        /// write changes to disk and reset this value to false.
+        /// Deletes all system attributes with the specified name.
+        /// </summary>
+        public void DeleteSysAttrs(string name)
+        {
+            for (int i = 0; i < m_sys.ChildNodes.Count; i++)
+            {
+                if (m_sys.ChildNodes[i].LocalName == name)
+                {
+                    m_sys.RemoveChild(m_sys.ChildNodes[i]);
+                    i--;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the set of attributes has been modified 
+        /// since the last save. This value cannot be set directly. Use the 
+        /// "SaveAttrs" method to write changes to disk and reset this value to 
+        /// false.
         /// </summary>
         public bool Modified
         {
             get { return m_modified; }
+        }
+
+        public void SaveAttrs()
+        {
+            m_doc.Save(m_attrFileName);
+            m_modified = false;
+        }
+
+        /// <summary>
+        /// Sets a system attribute with the specified name and value. If an 
+        /// attribute with the specified name already exists then it will 
+        /// be overwritten.
+        /// </summary>
+        public void SetSysAttr(string attrName, string attrValue)
+        {
+            // We're about to modify
+            m_modified = true;
+
+            // Search through all children and try to find a child node with 
+            // a matching name
+            foreach (XmlNode child in m_sys.ChildNodes)
+            {
+                if (child.LocalName == attrName)
+                {
+                    // Replace existing value
+                    child.InnerText = attrValue;
+                    return;
+                }
+            }
+            
+            // Coming here implies that we need to add a new node
+            XmlElement elem = m_doc.CreateElement(attrName);
+            elem.InnerText = attrValue;
+            m_sys.AppendChild(elem);
         }
     }
 }

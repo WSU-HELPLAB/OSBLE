@@ -6,53 +6,35 @@ using System.Web;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 
-//the following is a diagram of our file system.  Items in brackets [] indicate
-//using a key of sorts (e.g. the user id).  Items in curly braces {} indicate
-//the intended use of the folder
+// The following is a diagram of our file system.
+// Items in brackets [] indicate using a key of sorts (e.g. the user id). It is likely 
+// that many such folders exist within the directory if they are used in this way.
+// Comments in curly braces {} indicate the intended use of the folder
 /*
- *
- *                          ____FileSystem_____
- *                         /                   \  
- *                        /                     \  
- *                    Courses                  Users                                 
- *                     /                          \                                 
- *                     |                        [userId]
- *                     |                           |
- *                     |                    {global user content}
- *                     |
- *                [courseID]____________________________                    
- *               /     |  \ \_________                  \
- *              /      |   \          \                AttributableFiles
- *     CourseDocs      |    ZipFolder  \                 /     \
- *          |    Assignments     \      Gradebook      data    attr
- *          |          |          \         |            
- *  {course docs}      |           \     {gradebook.zip / gradebook file}
- *                     |  Records.txt { %random number%.zip}
- *                     |
- *               [AssignmentId]
- *                     |       \
- *                     |        \
- *                Submissions   Reviews
- *                     |             \
- *                     |          [AuthorTeamId]
- *                     |                 |
- *                  [TeamID]      [ReviewTeamId]
- *                   /                   |
- *       {team submissions}      {critical reviews}
- *                                     
- * */
-
-// Added May 15, 2013 by Evan Olds
-// Description of contents in the "AttributableFiles" folder for a course:
-// This is a collection of files and accompanying attribute files. The idea is 
-// that this is just a collection of files with attributes. The attributes can then 
-// determine what the files will be used for, who can access them, etc.
-// It is intended for files to be put here only by instructor uploads (although there 
-// may be other priviledged roles that can upload here in the future).
-// data folder: the actual uploaded files go here
-// attr folder: XML attribute files go here, corresponding to the data files
-//  - The attribute files contain a list of system and user attributes.
-// See file: AttributableFilesFilePath.cs
+ * FileSystem {OSBLE-wide configuration and data files, as well as the folders listed below}
+ *  |> Users
+ *     |> [userId] {global user content}    
+ *  |> Courses
+ *     |> [CourseID]
+ *         |> CourseDocs
+ *         |> CourseDocsAttr {stores XML attribute files that correspond to files in CourseDocs}
+ *         |> Assignments
+ *            |> [AssignmentID]
+ *                |> AssignmentDocs
+ *                |> AssignmentDocsAttr {XML attribute files corresponding to files in AssignmentDocs}
+ *                |> Submissions
+ *                   |> [TeamID] {team submissions}
+ *                |> SubmissionsAttr
+ *                   |> [TeamID] {XML attribute files corresponding to files in Submissions}
+ *                |> Reviews
+ *                   |> [AuthorTeamId]
+ *                   |> [ReviewTeamId] {critical reviews}
+ *         |> ZipFolder
+ *            |> Records.txt
+ *            |> {%random number%.zip}
+ *         |> Gradebook
+ *            |> {gradebook.zip / gradebook file}
+ */
 namespace OSBLE.Models.FileSystem
 {
     public class FileSystem : FileSystemBase

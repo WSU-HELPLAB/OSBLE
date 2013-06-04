@@ -24,7 +24,7 @@ namespace OSBLE.Models.Assignments
             IsDraft = true;
             Type = AssignmentTypes.Basic;
             CriticalReviewPublishDate = null;
-            AbetOutcomes = new List<AbetAssignmentOutcome>();
+            ABETOutcomes = new List<AbetAssignmentOutcome>();
         }
 
         public Assignment(Assignment other)
@@ -271,7 +271,7 @@ namespace OSBLE.Models.Assignments
         public virtual TeamEvaluationSettings TeamEvaluationSettings { get; set; }
 
         [Display(Name = "ABET Outcomes")]
-        public virtual IList<AbetAssignmentOutcome> AbetOutcomes { get; set; }
+        public virtual IList<AbetAssignmentOutcome> ABETOutcomes { get; set; }
 
         public int? AssociatedEventID { get; set; }
 
@@ -294,6 +294,12 @@ namespace OSBLE.Models.Assignments
         /// Returns the date of when a critical review assignment had its reviewed documents published back to their original author(s)
         /// </summary>
         public DateTime? CriticalReviewPublishDate { get; set; }
+
+        /// <summary>
+        /// The department name for ABET assessment. If this value is null then it is implied 
+        /// that ABET assessment is not being done for the course (at least not within OSBLE).
+        /// </summary>
+        public string ABETDepartment { get; set; }
 
         #endregion
 

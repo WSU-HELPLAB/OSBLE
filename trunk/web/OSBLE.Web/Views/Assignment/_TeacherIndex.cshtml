@@ -15,7 +15,7 @@
     <th style="font-size:larger">Due Date</th>
     <th style="font-size:larger">Student Activity</th>
     <th style="font-size:larger; padding-left: 20px">Grading Progress</th>
-    <th style="font-size:larger; padding-left: 20px">Files</th>
+    <th style="font-size:larger; padding-left: 20px">ABET</th>
 </tr>
 
     @{
@@ -145,8 +145,24 @@
                 </td>
 
                 <!-- Cell for file manager button -->
+                <!--
                 <td style="padding-left: 20px">
                     <input type="button" value="Manage..." onclick="assignmentfilemanager_open('@assignments[i].AssignmentName', @assignments[i].ID);" />
+                </td>
+                -->
+
+                <!-- Cell for ABET tagging link -->
+                <td style="padding-left: 20px">
+                @{
+                    if (null == assignments[i].ABETDepartment)
+                    {
+                        @Html.Raw("(not available)");
+                    }
+                    else
+                    {
+                        <a title="Tag..." href="@Url.Action("Index", "ABET", new { area = "ABETTagging", assignmentId = assignments[i].ID }, null)">Tag...</a>
+                    }
+                }
                 </td>
             </tr>                
         }

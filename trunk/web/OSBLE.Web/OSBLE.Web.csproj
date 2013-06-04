@@ -166,6 +166,9 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Areas\ABETTagging\ABETTaggingAreaRegistration.cs" />
+    <Compile Include="Areas\ABETTagging\Controllers\ABETController.cs" />
+    <Compile Include="Areas\ABETTagging\Models\ABETTaggingViewModel.cs" />
     <Compile Include="Areas\AssignmentDetails\AssignmentDetailsAreaRegistration.cs" />
     <Compile Include="Areas\AssignmentDetails\Controllers\ContentController.cs" />
     <Compile Include="Areas\AssignmentDetails\Controllers\HomeController.cs" />
@@ -208,6 +211,7 @@
     <Compile Include="Areas\AssignmentDetails\ViewModels\AssignmentDetailsViewModel.cs" />
     <Compile Include="Areas\AssignmentDetails\ViewModels\CriticalReviewsReceivedTeam.cs" />
     <Compile Include="Areas\AssignmentWizard\AssignmentWizardAreaRegistration.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\ABETController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\BasicsController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\CommentCategoryController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\ContentController.cs" />
@@ -289,9 +293,6 @@
     </Compile>
     <Compile Include="Services\CourseFilesOps.ashx.cs">
       <DependentUpon>CourseFilesOps.ashx</DependentUpon>
-    </Compile>
-    <Compile Include="Services\CourseFilesService.svc.cs">
-      <DependentUpon>CourseFilesService.svc</DependentUpon>
     </Compile>
     <Compile Include="Services\CourseFilesUploader.ashx.cs">
       <DependentUpon>CourseFilesUploader.ashx</DependentUpon>
@@ -632,6 +633,10 @@
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\TeamEvaluationMultiplierTableDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\TeamEvaluationProgressTableDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\ABET\Index.cshtml" />
+    <Content Include="Areas\ABETTagging\Views\Web.config" />
+    <Content Include="Areas\ABETTagging\Views\Shared\Index.cshtml" />
+    <None Include="Scripts\jquery-1.8.2.intellisense.js" />
     <Content Include="Resources\CSVReader\CSVCellReaderStateMachine.png" />
     <Content Include="Scripts\CourseFilesUploader.js" />
     <None Include="Properties\PublishProfiles\filesystem.pubxml" />
@@ -676,7 +681,6 @@
     <Content Include="Scripts\_references.js" />
     <Content Include="Services\AssignmentSubmissionService.svc" />
     <Content Include="Services\AuthenticationService.svc" />
-    <Content Include="Services\CourseFilesService.svc" />
     <Content Include="Services\OsbleService.svc" />
     <Content Include="Services\UploaderWebService.svc" />
     <Content Include="Views\OpenId\AskUser_old.aspx" />

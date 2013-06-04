@@ -10,11 +10,11 @@ using System.Xml;
 namespace OSBLE.Models.FileSystem
 {
     /// <summary>
-    /// There are two folders within an AttributableFiles folder: data and attr
+    /// There are two folders associated with a collection of attributable files: data and attr
     /// data:
-    ///   There will be files in this folder that were uploaded by the instructor (or 
-    ///   potentially the administrator). Each file will have an accompanying XML file 
-    ///   for attributes for this file, but this file is in the attr folder.
+    ///   This folder contains the actual data files that were uploaded.
+    ///   Each file can have an accompanying XML file for attributes for this file, 
+    ///   but this file is in the attr folder.
     /// attr:
     ///   Contains XML files for file attributes. There should be a one-to-one correspondence 
     ///   of data files to XML attribute files, with the exception of the possibility of a 
@@ -23,15 +23,16 @@ namespace OSBLE.Models.FileSystem
     /// </summary>
     public class AttributableFilesFilePath : FileSystemBase
     {
-        private const string c_emptyAttr = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
-@"<osblefileattributes>
-  <systemattributes></systemattributes>
-  <userattributes></userattributes>
-</osblefileattributes>";
+        private string m_attrDir;
         
-        public AttributableFilesFilePath(IFileSystem pathBuilder)
+        private string m_dataDir;
+        
+        public AttributableFilesFilePath(IFileSystem pathBuilder, string dataPath, string attrPath)
             : base(pathBuilder)
         {
+            m_dataDir = dataPath;
+            m_attrDir = attrPath;
+            
             if (!System.IO.Directory.Exists(DataFilesPath))
             {
                 System.IO.Directory.CreateDirectory(DataFilesPath);
@@ -153,7 +154,7 @@ namespace OSBLE.Models.FileSystem
         {
             get
             {
-                return Path.Combine(PathBuilder.GetPath(), "AttributableFiles", "attr");
+                return m_attrDir;
             }
         }
 
@@ -161,7 +162,7 @@ namespace OSBLE.Models.FileSystem
         {
             get
             {
-                return Path.Combine(PathBuilder.GetPath(), "AttributableFiles", "data");
+                return m_dataDir;
             }
         }
 
@@ -171,6 +172,26 @@ namespace OSBLE.Models.FileSystem
         public override FileCollection File(Func<string, bool> predicate)
         {
             return new AttributableFileCollection(DataFilesPath, AttrFilesPath, predicate);
+        }
+
+        /// <summary>
+        /// Gets the first file in the path or null if there are no files.
+        /// </summary>
+        public AttributableFile FirstFile
+        {
+            get
+            {
+                string[] dfNames = System.IO.Directory.GetFiles(m_dataDir);
+                if (null == dfNames || 0 == dfNames.Length)
+                {
+                    return null;
+                }
+
+                string firstName = Path.GetFileName(dfNames[0]);
+                return AttributableFile.CreateFromExisting(
+                    Path.Combine(m_dataDir, firstName),
+                    AttributableFileCollection.GetAttrFileName(m_attrDir, firstName));
+            }
         }
 
         public AttributableFile GetFile(string fileName)
@@ -219,14 +240,14 @@ namespace OSBLE.Models.FileSystem
 
                 if ("systemattributes" == attrClass)
                 {
-                    if (!af.ContainsSystemAttribute(attrName, attrValue))
+                    if (!af.ContainsSysAttr(attrName, attrValue))
                     {
                         continue;
                     }
                 }
                 else
                 {
-                    if (!af.ContainsUserAttribute(attrName, attrValue))
+                    if (!af.ContainsUserAttr(attrName, attrValue))
                     {
                         continue;
                     }
