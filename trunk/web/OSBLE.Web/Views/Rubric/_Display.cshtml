@@ -244,9 +244,18 @@
                         @*First loop i = 0 so for each RubricEvaluation, we only want the first one, which
                         would be criterion #1 for each RubricEvaluation*@
                         CriterionEvaluation crit = re.CriterionEvaluations.ElementAt(i);
+                        bool anon = false;
                         if (Model.MergedEvaluations.Count > 1)
                         {
-                            @:<text class="level_header">@re.Evaluator.UserProfile.FirstName @re.Evaluator.UserProfile.LastName's Evaluation:</text>
+                            if (re.Assignment.CriticalReviewSettings != null)
+                            {
+                                if (re.Assignment.CriticalReviewSettings.AnonymizeAuthor || re.Assignment.CriticalReviewSettings.AnonymizeComments || re.Assignment.CriticalReviewSettings.AnonymizeCommentsAfterPublish)
+                                {
+                                    anon = true;
+                                }
+                            }
+                            
+                            @:<text class="level_header">@re.Evaluator.UserProfile.DisplayName(ViewBag.ActiveCourseUser.AbstractRoleID, true, anon)'s Evaluation:</text>
                         }
                     <table class="selector_table">
                         <tr>
