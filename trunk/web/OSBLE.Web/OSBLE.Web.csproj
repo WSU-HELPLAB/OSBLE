@@ -825,7 +825,6 @@
     <Folder Include="App_Data\" />
     <Folder Include="Areas\AssignmentWizard\Views\Deliverables\Deliverables\" />
     <Folder Include="Areas\AssignmentWizard\Views\Rubric\Rubric\" />
-    <Folder Include="Areas\AssignmentWizard\Views\Team\Team\" />
     <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
