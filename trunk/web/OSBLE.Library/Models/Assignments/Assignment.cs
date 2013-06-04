@@ -450,7 +450,13 @@ namespace OSBLE.Models.Assignments
                     else //Class wide discussion
                     {
                         //Get new posts for any discussion team, since the whole class is posting together.
-                        returnVal = this.DiscussionTeams.FirstOrDefault().GetNewPostsCount(currentCourseUserId);
+                        if (this.DiscussionTeams != null)
+                        {
+                            if (this.DiscussionTeams.FirstOrDefault() != null)
+                            {
+                                returnVal = this.DiscussionTeams.FirstOrDefault().GetNewPostsCount(currentCourseUserId);
+                            }
+                        }
                     }
                 }
             }
