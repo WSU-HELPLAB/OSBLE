@@ -19,6 +19,7 @@
     List<DiscussionPostViewModel> DiscussionPostViewModelList = ViewBag.DiscussionPostViewModelList;
     int discussionTeamID = ViewBag.DiscussionTeamID;
     string selectBoxID = "dtStudentSelect";
+    DiscussionTeam discussionTeam = ViewBag.DiscussionTeam;
     if (ViewBag.ActiveCourse.AbstractRole.CanGrade)
     {
         selectBoxID = "dtInstructorSelect";
@@ -156,11 +157,32 @@
 
         @if (assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
         {
-            @Html.ActionLink("Access reviewed items to discuss.",
+            @Html.ActionLink("Access reviewed items to discuss",
                      "GetDocumentsForCriticalReviewDiscussion",
                 "FileHandler",
                 new { area = "", discussionTeamID = discussionTeamID },
                 new { onclick = "create_and_open_downloading_submission_dialog()" })
+
+            if (assignment.PreceedingAssignment != null)
+            {
+                if (assignment.PreceedingAssignment.Type == AssignmentTypes.CriticalReview)
+                {
+                    if (assignment.PreceedingAssignment.HasStudentRubric == true)
+                    {
+                            @:&nbsp-&nbsp 
+                            @Html.ActionLink("View merged rubric",
+                                            "ViewForCriticalReview",
+                                            "Rubric",
+                                            new
+                                            {
+                                                assignmentId = assignment.PrecededingAssignmentID,
+                                                authorTeamId = discussionTeam.AuthorTeamID,
+                                                area = ""
+                                            },
+                                            new { })
+                        }
+                }
+            }
         }
     </div>
     <br />

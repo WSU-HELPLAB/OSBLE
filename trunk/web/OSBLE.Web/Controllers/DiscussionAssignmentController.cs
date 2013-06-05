@@ -262,6 +262,7 @@ namespace OSBLE.Controllers
                 ViewBag.ActiveCourse = ActiveCourseUser;
                 ViewBag.Assignment = assignment;
                 ViewBag.DiscussionTeamID = discussionTeam.ID;
+                ViewBag.DiscussionTeam = discussionTeam;
                 return View();
             }
             else //User is not part of discussion, kick them to assignment details.
@@ -352,6 +353,7 @@ namespace OSBLE.Controllers
                 ViewBag.ActiveCourse = ActiveCourseUser;
                 ViewBag.DiscussionTeamID = discussionTeam.ID;
                 ViewBag.IsAnonymous = anonymous;
+                ViewBag.DiscussionTeam = discussionTeam;
                 return View("Index");
             }
             return RedirectToAction("Index", "Home", new { area = "AssignmentDetails", assignmentId = assignmentId });
