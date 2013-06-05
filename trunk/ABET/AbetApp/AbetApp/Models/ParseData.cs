@@ -41,10 +41,7 @@ namespace AbetApp.Models
                 }
                 data = newValues;
             }
-
-
             return data;
-
         }
 
         public static int ParseCourseNum(string data)

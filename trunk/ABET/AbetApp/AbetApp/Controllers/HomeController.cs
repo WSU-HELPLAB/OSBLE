@@ -28,6 +28,13 @@ namespace AbetApp.Controllers
         public ActionResult Index(FormCollection collection)
         {
             string url = collection["url"].ToString();
+            string year = collection["Year"].ToString();
+            string major = collection["Major"].ToString();
+            string semester = collection["Semester"].ToString();
+            if (semester == "F")
+                semester = "Fall";
+            else
+                semester = "Spring";
 
             List<Course> courseList = new List<Course>();
 
@@ -60,6 +67,7 @@ namespace AbetApp.Controllers
                     evalPlanIndex++;
                 }
 
+                //Build dictionary and clean up list
                 using (LocalContext db = new LocalContext())
                 {
                     Dictionary<int, Course> CourseDict = new Dictionary<int, Course>();
@@ -68,7 +76,10 @@ namespace AbetApp.Controllers
                     {
                         course.CourseNum = ParseData.ParseCourseNum(course.Title);
                         course.Title = ParseData.ParseTitle(course.Title);
-                        course.Major = "CPTS";
+                        course.Major = major;
+                        course.Year = year;
+                        course.Semester = semester;
+
                         if (CourseDict.ContainsKey(course.CourseNum) != true)
                         {
                             CourseDict.Add(course.CourseNum, course);
@@ -145,11 +156,19 @@ namespace AbetApp.Controllers
 
         public ActionResult PreReqs(int id)
         {
+            Dictionary<int, Course> CourseDic = new Dictionary<int, Course>();
             List<CourseRelation> relations = new List<CourseRelation>();
+            List<Course> coursePreReqs = new List<Course>();
             using (LocalContext db = new LocalContext())
             {
                 relations = (from u in db.CourseRelations select u).ToList();
             }
+
+            foreach (CourseRelation relation in relations)
+            {
+                
+            }
+
             return View(relations);
         }
 

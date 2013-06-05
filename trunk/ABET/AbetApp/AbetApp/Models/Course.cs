@@ -15,6 +15,7 @@ namespace AbetApp.Models
         public string Data { get; set; }
         public string Major { get; set; }
         public string Outcomes { get; set; }
-        public string YearSemester { get; set; }
+        public string Year { get; set; }
+        public string Semester { get; set; }
     }
 }
