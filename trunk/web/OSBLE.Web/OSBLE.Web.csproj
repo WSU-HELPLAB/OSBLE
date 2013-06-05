@@ -252,6 +252,7 @@
     <Compile Include="Controllers\CommunityController.cs" />
     <Compile Include="Controllers\CookieTestController.cs" />
     <Compile Include="Controllers\CourseController.cs" />
+    <Compile Include="Controllers\DepartmentsController.cs" />
     <Compile Include="Controllers\DiscussionAssignmentController.cs" />
     <Compile Include="Controllers\EventController.cs" />
     <Compile Include="Controllers\FileHandlerController.cs" />
@@ -821,6 +822,7 @@
     <Content Include="Views\Weight\Details.cshtml" />
     <Content Include="Views\Weight\Edit.cshtml" />
     <Content Include="Views\Weight\Index.cshtml" />
+    <Content Include="Views\Departments\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
