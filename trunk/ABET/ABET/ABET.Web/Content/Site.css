@@ -1,61 +1,178 @@
-﻿body {
-    font-size: .85em;
-    font-family: "Segoe UI", Verdana, Helvetica, Sans-Serif;
-    color: #232323;
-    background-color: #fff;
+﻿@import url("reset.css");
+body
+{
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+    font-size: 13px;
+    color: #333;
 }
 
-header, footer, nav, section {
-    display: block;
+p
+{
+    padding: 10px;
 }
 
+#wrapper
+{
+    width: 100%;
+    min-width: 1000px;
+    max-width: 2000px;
+    margin: 0;
+    padding: 0;
+}
+
+#header
+{
+    float: left;
+    height: 67px;
+    width: 100%;
+    background-image: url('Images/topBarBackground.jpg');
+    margin:0;
+    padding:0;
+}
+
+#headerUser
+{
+    float: right;
+    text-align:center
+    height: 67px;
+    width: 400px;
+    margin: 0;
+    padding: 0;
+}
+
+#navigation
+{
+    float: left;
+    height: 47px;
+    width: 100%;
+    background-image: url('Images/navBarBackground.jpg');
+    margin:0;
+    padding:0;
+}
+
+#navigationLeft
+{
+    float:left;
+    height: 47px;
+    width: 47px;
+    background-image: url('Images/navBarBackgroundLeft.jpg');
+    margin:0;
+    padding:0;
+}
+
+
+#navigationRight
+{
+    float:right;
+    height: 37px;
+    width: 47px;
+    background-image: url('Images/navBarBackgroundRight.jpg');
+    margin:0;
+    padding:0;
+}
+
+#contentliquid
+{
+    float: left;
+    width: 100%;
+    margin:0;
+    padding:0;
+}
+
+#content
+{
+    background: #FFFFFF;
+    width: 100%;
+    margin:0;
+    padding:0;
+}
+
+/* Menu styles
+-----------------------------------------------------------*/
+.menu {
+	margin: 0;
+	padding: 0;
+    float: right;
+	list-style: none;
+    background-image: url('Images/navBarBackground.jpg');
+}
+.menu li {
+	padding: 0;
+	margin: 0;
+	height: 47px;
+	list-style: none;
+    margin: 0px;
+    padding: 0px;
+    text-align: center;
+}
+.menu li a, .menu li a:visited {
+	display: block;
+	text-decoration: none;
+	height: 47px;
+}
+.link {background-image: url('Images/menuRollOver.jpg'); width: 136px; color:#991e33}
+.link a {background-image:  url('Images/menuPlain.jpg'); width: 136px; color:white}
+.current {background-image: url('Images/menuRollOver.jpg'); width: 136px; color:#991e33}
+ul.menu li a:hover {background: none; color:#991e33}
+.menu li {float: left; color:#991e33}
+.menu:after {content: "."; display: block; height: 0; clear: both; visibility: hidden;}
 
 /* Styles for basic forms
 -----------------------------------------------------------*/
-fieldset {
+fieldset
+{
     border: 1px solid #ddd;
     padding: 0 1.4em 1.4em 1.4em;
     margin: 0 0 1.5em 0;
 }
 
-legend {
+legend
+{
     font-size: 1.2em;
     font-weight: bold;
 }
 
-textarea {
+textarea
+{
     min-height: 75px;
 }
 
-.editor-label {
+.editor-label
+{
     margin: 1em 0 0 0;
 }
 
-.editor-field {
+.editor-field
+{
     margin: 0.5em 0 0 0;
 }
 
 
 /* Styles for validation helpers
 -----------------------------------------------------------*/
-.field-validation-error {
+.field-validation-error
+{
     color: #f00;
 }
 
-.field-validation-valid {
+.field-validation-valid
+{
     display: none;
 }
 
-.input-validation-error {
+.input-validation-error
+{
     border: 1px solid #f00;
     background-color: #fee;
 }
 
-.validation-summary-errors {
+.validation-summary-errors
+{
     font-weight: bold;
     color: #f00;
 }
 
-.validation-summary-valid {
+.validation-summary-valid
+{
     display: none;
 }

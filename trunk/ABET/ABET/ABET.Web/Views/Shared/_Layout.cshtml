@@ -3,14 +3,37 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>@ViewBag.Title</title>
+    <title>ABET</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
 </head>
 <body>
-    @RenderBody()
+    <div id="wrapper">
+        <div id="header">
+            <img src ="@Url.Content("~/Content/Images/topBarLogo.jpg")" />
+            <div id="headerUser">
+                <br />
+                <br />
+                User Info Here
+            </div>
+        </div>
+        <div id="navigation">
+            <div id="navigationLeft"></div>
+                <ul class="menu">
+                    <li class="current"><a href="#"><br /><br />Home</a></li>
+                    <li class="link"><a href="#"><br /><br />Home</a></li>
+                    <li class="link"><a href="#"><br /><br />Home</a></li>
+                    <li class="link"><a href="#"><br /><br />Home</a></li>
+                </ul>
+        </div>
+        <div id="contentliquid">
+            <div id="content">
+                @RenderBody()
+                @Scripts.Render("~/bundles/jquery")
+                @RenderSection("scripts", required: false)
+            </div>
+        </div>
+    </div>
 
-    @Scripts.Render("~/bundles/jquery")
-    @RenderSection("scripts", required: false)
 </body>
 </html>
