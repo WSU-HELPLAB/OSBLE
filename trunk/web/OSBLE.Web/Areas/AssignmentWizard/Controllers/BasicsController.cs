@@ -63,6 +63,23 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             ModelState.Clear();
             Assignment.Type = manager.ActiveAssignmentType;
 
+            // The temporary ID that we use before the assignment actually gets created 
+            // is the number of milliseconds that has elapsed since the beginning of 
+            // the day + 10,000 to avoid conflicts with assignment IDs (HACK). When 
+            // the assignment gets created then uploaded files get moved.
+            // If a valid assignment already exists then we instead use the assignment 
+            // ID.
+            if (0 != Assignment.ID)
+            {
+                ViewBag.TemporaryID = Assignment.ID;
+            }
+            else
+            {
+                int ms = (int)(DateTime.Now - DateTime.Today).TotalMilliseconds;
+                ms += 10000;
+                ViewBag.TemporaryID = ms.ToString();
+            }
+
             //If the assignment is new and has default zero values, overwrite them with Course default late penalty values
             if (Assignment.HoursLateWindow == 0 && Assignment.DeductionPerUnit == 0 && Assignment.HoursPerDeduction == 0)
             {
@@ -131,6 +148,31 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 WasUpdateSuccessful = false;
             }
+
+            // At this point if the assignment ID is not 0 and the temporary ID does 
+            // not match the assignment ID then we need to check if we need to move 
+            // files that were uploaded to a temporary location over to the 
+            // permenant location.
+            int tempID = Convert.ToInt32(Request.Form["temporaryAssignmentID"]);
+            if (0 != Assignment.ID && Assignment.ID != tempID)
+            {
+                OSBLE.Models.FileSystem.CourseFilePath cfp =
+                    (new OSBLE.Models.FileSystem.FileSystem()).Course(Assignment.CourseID.Value);
+                OSBLE.Models.FileSystem.AttributableFilesFilePath temp =
+                    cfp.Assignment(tempID).AttributableFiles;
+                OSBLE.Models.FileSystem.AttributableFilesFilePath perm =
+                    cfp.Assignment(Assignment.ID).AttributableFiles;
+                OSBLE.Models.FileSystem.AttributableFilesFilePath.MoveAll(temp, perm, true);
+
+                // After the move, we need to make sure that we update attributes because 
+                // the attributes will label the files as assignment descriptions/solutions 
+                // for an assignment with the temporary ID.
+                perm.ReplaceSysAttrAll("assignment_description",
+                    tempID.ToString(), Assignment.ID.ToString());
+                perm.ReplaceSysAttrAll("assignment_solution",
+                    tempID.ToString(), Assignment.ID.ToString());
+            }
+
             return base.PostBack(Assignment);
         }
 

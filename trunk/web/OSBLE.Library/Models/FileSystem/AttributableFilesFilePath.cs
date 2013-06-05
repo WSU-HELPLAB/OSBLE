@@ -330,6 +330,38 @@ namespace OSBLE.Models.FileSystem
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Moves all data and attribute files from one location to another. The 
+        /// empty folders remaining from the source storage can optionally be 
+        /// removed when the move is completed.
+        /// </summary>
+        public static int MoveAll(AttributableFilesFilePath from,
+            AttributableFilesFilePath to, bool deleteFromFoldersWhenDone)
+        {
+            int moved = 0;
+            string[] srcFiles = System.IO.Directory.GetFiles(from.m_dataDir);
+            foreach (string srcData in srcFiles)
+            {
+                string srcAttr = AttributableFileCollection.GetAttrFileName(
+                    from.m_attrDir, srcData);
+                
+                // Move both files
+                System.IO.File.Move(srcData, Path.Combine(to.m_dataDir, Path.GetFileName(srcData)));
+                System.IO.File.Move(srcAttr, Path.Combine(to.m_attrDir, Path.GetFileName(srcAttr)));
+
+                moved++;
+            }
+
+            // Delete the directories from the source, if it was requested
+            if (deleteFromFoldersWhenDone)
+            {
+                System.IO.Directory.Delete(from.m_dataDir, true);
+                System.IO.Directory.Delete(from.m_attrDir, true);
+            }
+
+            return moved;
+        }
+
         public Stream OpenFileRead(string fileName)
         {
             string path = Path.Combine(DataFilesPath, fileName);
@@ -341,6 +373,20 @@ namespace OSBLE.Models.FileSystem
             catch (Exception) { return null; }
 
             return fs;
+        }
+
+        public void ReplaceSysAttrAll(string name, string oldValue, string newValue)
+        {
+            string[] files = System.IO.Directory.GetFiles(m_dataDir);
+            foreach (string dataFile in files)
+            {
+                AttributableFile af = GetFile(dataFile);
+                if (af.ContainsSysAttr(name, oldValue))
+                {
+                    af.SetSysAttr(name, newValue);
+                    af.SaveAttrs();
+                }
+            }
         }
 
         /// <summary>
@@ -443,16 +489,15 @@ namespace OSBLE.Models.FileSystem
                 return removeCounter;
             }
 
-            public static string GetAttrFileName(string attrFileDir, string fileName)
+            public static string GetAttrFileName(string attrFileDir, string dataFileName)
             {
-                int i = fileName.LastIndexOf(Path.DirectorySeparatorChar);
-                if (-1 == i)
+                if (!Path.IsPathRooted(dataFileName))
                 {
-                    return Path.Combine(attrFileDir, "attr_" + fileName + ".xml");
+                    return Path.Combine(attrFileDir, "attr_" + dataFileName + ".xml");
                 }
 
                 return Path.Combine(attrFileDir,
-                    "attr_" + fileName.Substring(i + 1) + ".xml");
+                    "attr_" + Path.GetFileName(dataFileName) + ".xml");
             }
         }
     }
