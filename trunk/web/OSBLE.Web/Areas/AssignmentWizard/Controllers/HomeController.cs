@@ -164,6 +164,11 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 manager.GetComponentByType(typeof(DeliverablesController)).IsSelected = true;
             }
+
+            if (null != assignment.ABETDepartment)
+            {
+                manager.GetComponentByType(typeof(ABETController)).IsSelected = true;
+            }
         }
 
         private void ActivateSelectedComponents()
