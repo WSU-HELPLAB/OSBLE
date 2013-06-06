@@ -14,7 +14,12 @@
 @Html.ActionLink("Manage Schools", "Index", "School")
 <br />
 @Html.ActionLink("Manage Departments", "Index", "Departments")
-
+@if (ViewBag.ShowABETOutcomesLink)
+{
+    @Html.Raw("<br />");
+    @Html.ActionLink("Manage ABET Outcomes for Departments", "Index", "ABETOutcomesAdmin");
+}
+<br /><br />
 <table>
     <tr>
         <th>

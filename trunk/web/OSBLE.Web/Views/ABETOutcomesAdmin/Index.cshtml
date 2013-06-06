@@ -1,0 +1,57 @@
+﻿@{
+    ViewBag.Title = "ABET Outcome Administration";
+}
+
+@section Header
+{
+<script>
+    function abetoutcomeadmin_deptchanged() {
+        var slct = document.getElementById("slctDepartment");
+        var theDIV = document.getElementById(slct.value);
+        if (theDIV) {
+            document.getElementById("taOptions").value = theDIV.innerText;
+            document.getElementById("taOptions").disabled = false;
+        }
+    }
+</script>
+}
+
+<h2>ABET Outcome Editor</h2>
+
+@if (null == ViewBag.DepartmentList)
+{
+    Html.Raw("The list of departments has not yet been created. ");
+    Html.Raw("Please use the administrative interface to create this list before setting ABET outcomes.");
+    return;
+}
+
+@using (Html.BeginForm("Save", "ABETOutcomesAdmin", FormMethod.Post))
+{
+    // Make a pulldown menu for the list of departments
+    @Html.Raw("Department: <select name=\"slctDepartment\" id=\"slctDepartment\" onchange=\"abetoutcomeadmin_deptchanged()\">");
+    for (int i = 0; i < ViewBag.DepartmentList.Length; i++)
+    {    
+        @Html.Raw(string.Format("<option value=\"{0}\">{0}</option>", ViewBag.DepartmentList[i]));
+    }
+    @Html.Raw("</select>");
+
+    // Create the text area where the actual outcomes will go
+    @Html.Raw("<br />");
+    @Html.Raw("<textarea id=\"taOptions\" name=\"taOptions\" rows=\"10\" cols=\"60\">");
+    // Put the first department's outcomes in it
+    if (ViewBag.DepartmentList.Length > 0)
+    {
+        @Html.Encode(ViewBag.OptionsDictionary[ViewBag.DepartmentList[0]]);
+    }
+    @Html.Raw("</textarea>");
+
+    // Make hidden DIVs for the existing options
+    foreach (KeyValuePair<string, string> kvp in ViewBag.OptionsDictionary)
+    {
+        @Html.Raw("<div id=\"" + kvp.Key + "\" style=\"display: none;\" >");
+        @Html.Encode(kvp.Value);
+        @Html.Raw("</div>");    
+    }
+    @Html.Raw("<br />");
+    @Html.Raw("<input type=\"submit\" value=\"Save\" />");
+}

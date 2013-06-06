@@ -25,6 +25,17 @@ namespace OSBLE.Controllers
 
         public ViewResult Index()
         {
+            // We'll check for the existence of the departments list file and 
+            // show or hide the ABET outcomes link based on this
+            OSBLE.Models.FileSystem.FileSystem fs = 
+                new Models.FileSystem.FileSystem();
+            bool showLink = false;
+            if (fs.File("departments.txt").Count > 0)
+            {
+                showLink = true;
+            }
+            ViewBag.ShowABETOutcomesLink = showLink;
+            
             // Get list of users (other than current user) ordered by last name, who are not pending
             List<UserProfile> userprofiles = db.UserProfiles.Where(u => u.ID != CurrentUser.ID && u.UserName != null).OrderBy(u => u.LastName).Include(u => u.School).ToList();
             // Add pending users to bottom of list.

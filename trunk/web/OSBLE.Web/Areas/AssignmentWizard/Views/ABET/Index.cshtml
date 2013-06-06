@@ -9,7 +9,7 @@
 }
 
 <script>
-    var currentABETDIVShown = "placeHolder";
+    var currentABETDIVShown = null;
     function departmentChanged() {
         // Hide the old set of options
         if (null != currentABETDIVShown) {
@@ -26,7 +26,6 @@
 <!-- Add the options for ABET department -->
 Please select the department for ABET assessment:
 <select id="slctABETDepartment" name="slctABETDepartment" onchange="departmentChanged();">
-    <option>-</option>
     @{
         foreach(string str in ViewBag.DepartmentsList)
         {
@@ -37,5 +36,7 @@ Please select the department for ABET assessment:
 
 <br /><br />
 Select the ABET outcomes that are addressed in this course:<br />
-<div id="placeHolder">(please selected a department to see outcome options)</div>
 @Html.Raw(ViewBag.OptionsDIVsHTML)
+<script>
+    departmentChanged();
+</script>

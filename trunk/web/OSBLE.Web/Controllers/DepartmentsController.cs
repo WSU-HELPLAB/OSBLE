@@ -34,7 +34,7 @@ namespace OSBLE.Controllers
             return View();
         }
 
-        [HttpPost]
+        [HttpPost, IsAdmin]
         public ActionResult Save()
         {
             // Get the list of departments from the form data

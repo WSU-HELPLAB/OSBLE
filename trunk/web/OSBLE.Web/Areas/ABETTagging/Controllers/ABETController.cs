@@ -26,14 +26,11 @@ namespace OSBLE.Areas.ABETTagging.Controllers
             ABETTaggingViewModel model = new ABETTaggingViewModel(
                 assignment, ActiveCourseUser.AbstractRoleID);
 
-            // TODO: Figure out how to use this. We don't want students getting 
-            // access to assignments that haven't been released.
-            /*
+            // We don't want students getting access to assignments that haven't been released.
             if (assignment.ReleaseDate > DateTime.UtcNow && ActiveCourseUser.AbstractRoleID == (int)OSBLE.Models.Courses.CourseRole.CourseRoles.Student)
             {
-                model.TestValue = "Assignment has not yet been released";
+                throw new Exception("Assignment has not yet been released");
             }
-            */
 
             return View(model);
         }

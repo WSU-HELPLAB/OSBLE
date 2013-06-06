@@ -6,18 +6,22 @@
 
 @using (Html.BeginForm("Save", "Departments", FormMethod.Post))
 {
-    <textarea rows="20" cols="60" name="taDepts">
-    @if (null != ViewBag.DepartmentList)
+    @Html.Raw("<textarea rows=\"20\" cols=\"60\" name=\"taDepts\">");
+    if (null != ViewBag.DepartmentList)
     {
         foreach (string dept in ViewBag.DepartmentList)
         {
             @Html.Raw(dept + "\r\n");
         }
     }
-    </textarea>
+    @Html.Raw("</textarea>");
     
     <br />
     
-    <p>Please enter a list of school departments in the text area above. Put one department name per line.</p>
-    <input type="submit" value="Save" />    
+    <p>Please enter a list of school departments in the text area above.</p>
+    <ul>
+        <li>Put one department name per line</li>
+        <li>Do not use quotes or special characters</li>
+    </ul>
+    <input type="submit" value="Save" />
 }

@@ -246,6 +246,7 @@
     <Compile Include="Attributes\NotForCommunity.cs" />
     <Compile Include="Attributes\OsbleAuthorize.cs" />
     <Compile Include="Attributes\RequireActiveCourse.cs" />
+    <Compile Include="Controllers\ABETOutcomesAdminController.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\AssignmentController.cs" />
@@ -823,6 +824,7 @@
     <Content Include="Views\Weight\Edit.cshtml" />
     <Content Include="Views\Weight\Index.cshtml" />
     <Content Include="Views\Departments\Index.cshtml" />
+    <Content Include="Views\ABETOutcomesAdmin\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
