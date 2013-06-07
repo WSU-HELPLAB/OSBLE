@@ -226,6 +226,12 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     assignment.Deliverables = null;
                 }
 
+                //ABET
+                if (manager.UnselectedComponents.Contains(manager.GetComponentByType(typeof(ABETController))))
+                {
+                    assignment.ABETDepartment = null;
+                }
+
                 db.Entry(assignment).State = System.Data.EntityState.Modified;
                 db.SaveChanges();
             }

@@ -55,9 +55,11 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                         "<div id=\"" + dept + "\" style=\"display: none;\">");
                     foreach (string line in fileLines)
                     {
+                        bool isChecked = ContainsOutcome(Assignment.ABETOutcomes, line);
                         sb.AppendFormat(
-                            "  <input type=\"checkbox\" id={0} name={0} value=\"{1}\" />{1}<br />",
-                            "cb" + dept + (i++).ToString(), line);
+                            "  <input type=\"checkbox\" id=\"{0}\" name=\"{0}\" value=\"{1}\" {2}/>{1}<br />",
+                            "cb" + dept + (i++).ToString(), line,
+                            isChecked ? "checked " : string.Empty);
                     }
                     sb.AppendLine("</div>");
                 }
@@ -76,6 +78,22 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             return View(Assignment);
         }
 
+        private static bool ContainsOutcome(IList<AbetAssignmentOutcome> outcomes, string outcomeName)
+        {
+            if (null != outcomes)
+            {
+                foreach (AbetAssignmentOutcome outcome in outcomes)
+                {
+                    if (outcome.Outcome == outcomeName)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
         [HttpPost]
         public ActionResult Index(Assignment model)
         {
@@ -86,6 +104,13 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 dept = null;
             }
             Assignment.ABETDepartment = dept;
+
+            // Delete all outcomes first (they will be reset below)
+            while (Assignment.ABETOutcomes.Count > 0)
+            {
+                db.AbetSubmissionOutcomes.Remove(Assignment.ABETOutcomes[0]);
+            }
+            db.SaveChanges();
 
             // Look for all keys in form that start with "cb" and add their 
             // corresponding values to the list of ABET outcomes for the course.

@@ -1,0 +1,22 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+    IAssignmentTeam currentTeam = dataModel.AssignmentTeam as IAssignmentTeam;       
+}
+<td>
+@if (currentTeam is AssignmentTeam)
+{
+    @Html.Raw("<select name=\"slctProficiency" + currentTeam.TeamID + "\">");
+    @Html.Raw("<option value=\"None\">None</option>");
+    @Html.Raw("<option value=\"Low\">Low</option>");
+    @Html.Raw("<option value=\"Middle\">Middle</option>");
+    @Html.Raw("<option value=\"High\">High</option>");
+    @Html.Raw("</select>");
+}
+else
+{
+    @:(not available)
+}
+</td>
