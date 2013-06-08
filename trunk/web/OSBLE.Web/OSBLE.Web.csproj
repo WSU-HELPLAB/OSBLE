@@ -166,9 +166,6 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Areas\ABETTagging\ABETTaggingAreaRegistration.cs" />
-    <Compile Include="Areas\ABETTagging\Controllers\ABETController.cs" />
-    <Compile Include="Areas\ABETTagging\Models\ABETTaggingViewModel.cs" />
     <Compile Include="Areas\AssignmentDetails\AssignmentDetailsAreaRegistration.cs" />
     <Compile Include="Areas\AssignmentDetails\Controllers\ContentController.cs" />
     <Compile Include="Areas\AssignmentDetails\Controllers\HomeController.cs" />
@@ -638,8 +635,6 @@
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\TeamEvaluationProgressTableDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\_Layout.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\ABET\Index.cshtml" />
-    <Content Include="Areas\ABETTagging\Views\Web.config" />
-    <Content Include="Areas\ABETTagging\Views\Shared\Index.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\ABETProficiencyDecorator.cshtml" />
     <None Include="Scripts\jquery-1.8.2.intellisense.js" />
     <Content Include="Resources\CSVReader\CSVCellReaderStateMachine.png" />

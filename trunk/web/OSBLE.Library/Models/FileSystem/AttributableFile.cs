@@ -134,7 +134,7 @@ namespace OSBLE.Models.FileSystem
             return true;
         }
 
-        public bool ContainsAttribute(string category, string attributeName, string attributeValue)
+        private bool ContainsAttribute(string category, string attributeName, string attributeValue)
         {
             // Find the system or user attributes first. The category is expected to be 
             // either "systemattributes" or "userattributes".
@@ -244,6 +244,29 @@ namespace OSBLE.Models.FileSystem
                     i--;
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets a system attribute by name. If the attribute does not exist then 
+        /// null is returned. However, if the attribute does exist but has a null 
+        /// value, then null is also returned. To check to see if a system 
+        /// attribute exists when you don't care about the value, use the 
+        /// <see cref="ContainsSysAttr(string attributeName)"/> function instead.
+        /// </summary>
+        public string GetSysAttr(string attrName)
+        {
+            // Search through all children and try to find a child node with 
+            // a matching name
+            foreach (XmlNode child in m_sys.ChildNodes)
+            {
+                if (child.LocalName == attrName)
+                {
+                    return child.InnerText;
+                }
+            }
+
+            // Coming here implies that the attribute doesn't exist
+            return null;
         }
 
         /// <summary>

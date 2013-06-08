@@ -22,6 +22,7 @@
         @Html.Partial(viewLocation, headerData);
     }
 }
+
 @section TableData
 {
     @if (Model.Client.AbstractRole.CanGrade)
@@ -43,7 +44,7 @@
             <tr @Html.Raw(rowText)>
                 <th class="StudentName">
                     @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", 
-                          id = assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUserID });
+                            id = assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUserID });
                     }
                     <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
                     @assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(Model.Client.AbstractRoleID, false)

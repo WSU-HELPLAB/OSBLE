@@ -8,6 +8,7 @@ using OSBLE.Models.Assignments;
 using OSBLE.Controllers;
 using OSBLE.Areas.AssignmentDetails.ViewModels;
 using OSBLE.Attributes;
+using OSBLE.Models.FileSystem;
 
 namespace OSBLE.Areas.AssignmentDetails.Controllers
 {
@@ -90,6 +91,46 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
             Assignment assignment = db.Assignments.Find(assignmentId);
             db.Assignments.Remove(assignment);
             db.SaveChanges();
+            return RedirectToRoute(new { action = "Index", controller = "Assignment", area = "" });
+        }
+
+        [HttpPost]
+        public ActionResult SaveABET()
+        {
+            // Get the file storage for this assignment's submissions
+            OSBLE.Models.FileSystem.FileSystem fsMain = 
+                new OSBLE.Models.FileSystem.FileSystem();
+            OSBLE.Models.FileSystem.AssignmentFilePath afs = fsMain.
+                Course(Convert.ToInt32(Request.Form["hdnCourseID"])).
+                Assignment(Convert.ToInt32(Request.Form["hdnAssignmentID"]));
+
+            foreach (string key in Request.Form.AllKeys)
+            {
+                if (key.StartsWith("slctProficiency"))
+                {
+                    // The key will end with the team ID
+                    int teamID;
+                    if (!int.TryParse(key.Substring(key.IndexOf('y') + 1), out teamID))
+                    {
+                        continue;
+                    }
+
+                    // Get the submission for the team
+                    OSBLE.Models.FileSystem.AttributableFilesFilePath attrFP =
+                        afs.Submission(teamID) as OSBLE.Models.FileSystem.AttributableFilesFilePath;
+                    AttributableFile file = attrFP.FirstFile;
+                    if (null == file)
+                    {
+                        continue;
+                    }
+
+                    // Update the attribute for the submission and save
+                    file.SetSysAttr("ABETProficiencyLevel", Request.Form[key]);
+                    file.SaveAttrs();
+                }
+            }
+
+            // Send the user back to the assignments index page
             return RedirectToRoute(new { action = "Index", controller = "Assignment", area = "" });
         }
     }

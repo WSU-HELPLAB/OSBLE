@@ -147,19 +147,34 @@ else
 </table>
 @if (Model.Client.AbstractRole.CanGrade)
 {
-    <table  id="StudentsTable">
-        <tr>
-            <th>
-                Name
-            </th>
-            @foreach (string key in Model.TableColumnHeaders.Keys)
-            {
-                <th>@Model.TableColumnHeaders[key]
+    // There will (potentially) be ABET options in the table that need to 
+    // be within a form so that they can be saved.
+    using (Html.BeginForm("SaveABET", "Home", FormMethod.Post))
+    {
+        <input type="hidden" name="hdnCourseID" value="@Model.CurrentAssignment.CourseID.Value" />
+        <input type="hidden" name="hdnAssignmentID" value="@Model.CurrentAssignment.ID" />
+        
+        <table id="StudentsTable">
+            <tr>
+                <th>
+                    Name
                 </th>
-            }
-        </tr>
-        @RenderSection("TableData", false)
-    </table>
+                @foreach (string key in Model.TableColumnHeaders.Keys)
+                {
+                    <th>@Model.TableColumnHeaders[key]
+                    </th>
+                }
+            </tr>
+            @RenderSection("TableData", false)
+        </table>
+    
+        if (null != Model.CurrentAssignment.ABETDepartment)
+        {
+            <!-- Button to save changes to ABET stuff -->
+            <br />
+            <input type="submit" value="Save" />
+        }
+    }
     
     <!--Element for modal confirmation box-->
     <div id="confirmDeleteWindow" style="display: none;" title="Delete Assignment">

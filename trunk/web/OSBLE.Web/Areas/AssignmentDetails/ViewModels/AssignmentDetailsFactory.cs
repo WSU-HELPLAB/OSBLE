@@ -349,6 +349,14 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                         vm.TableColumnHeaders["LatePenaltyTableDecorator"] = "Late Penalty";
                     }
                 }
+
+                // ABET stuff
+                if (assignment.HasDeliverables && null != assignment.ABETDepartment)
+                {
+                    vm.TeamTableBuilders[assignmentTeam] = new ABETProficiencyDecorator(
+                        vm.TeamTableBuilders[assignmentTeam]);
+                    vm.TableColumnHeaders["ABETProficiencyDecorator"] = "ABET Proficiency";
+                }
             }
             return vm;
         }

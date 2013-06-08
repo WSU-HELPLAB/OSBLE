@@ -15,7 +15,6 @@
     <th style="font-size:larger">Due Date</th>
     <th style="font-size:larger">Student Activity</th>
     <th style="font-size:larger; padding-left: 20px">Grading Progress</th>
-    <th style="font-size:larger; padding-left: 20px">ABET</th>
 </tr>
 
     @{
@@ -142,20 +141,6 @@
                             @: @assignments[i].GetSavedAsDraftCount() saved as draft.&nbsp @Html.ActionLink("Publish All", "PublishAllRubrics", "Assignment", new { area = "", assignmentId = assignments[i].ID }, new { })
                     
                     }
-                </td>
-
-                <!-- Cell for ABET tagging link -->
-                <td style="padding-left: 20px">
-                @{
-                    if (null == assignments[i].ABETDepartment)
-                    {
-                        @Html.Raw("(not available)");
-                    }
-                    else
-                    {
-                        <a title="Tag..." href="@Url.Action("Index", "ABET", new { area = "ABETTagging", assignmentId = assignments[i].ID }, null)">Tag...</a>
-                    }
-                }
                 </td>
             </tr>                
         }

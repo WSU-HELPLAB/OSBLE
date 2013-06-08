@@ -8,12 +8,22 @@
 <td>
 @if (currentTeam is AssignmentTeam)
 {
-    @Html.Raw("<select name=\"slctProficiency" + currentTeam.TeamID + "\">");
-    @Html.Raw("<option value=\"None\">None</option>");
-    @Html.Raw("<option value=\"Low\">Low</option>");
-    @Html.Raw("<option value=\"Middle\">Middle</option>");
-    @Html.Raw("<option value=\"High\">High</option>");
-    @Html.Raw("</select>");
+    if (string.IsNullOrEmpty(dataModel.ABETProficiency))
+    {
+        @Html.Raw("N/A");
+    }
+    else
+    {
+        @Html.Raw("<select name=\"slctProficiency" + currentTeam.TeamID + "\">");
+        string[] opts = new string[] { "None", "Low", "Medium", "High" };
+        foreach (string opt in opts)
+        {    
+            @Html.Raw(string.Format(
+                "<option value=\"{0}\" {1}>{0}</option>", opt,
+                (opt == dataModel.ABETProficiency) ? "selected" : string.Empty));
+        }
+        @Html.Raw("</select>");
+    }
 }
 else
 {
