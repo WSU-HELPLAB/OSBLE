@@ -20,15 +20,16 @@
     <ServiceContractMappings />
   </ClientOptions>
   <MetadataSources>
-    <MetadataSource Address="https://www.osble.org/Services/UploaderWebService.svc/mex" Protocol="mex" SourceId="1" />
+    <MetadataSource Address="https://www.osble.org/Services/UploaderWebService.svc" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="service.wsdl" MetadataType="Wsdl" ID="bfc2eaf7-a404-4c73-8fee-b0417403a202" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
-    <MetadataFile FileName="service22.wsdl" MetadataType="Wsdl" ID="9f81a38b-d578-4c07-9b03-f07822e9d856" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
-    <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="8e1e16af-51c9-4b89-a465-02e4be2e5399" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
-    <MetadataFile FileName="service22.xsd" MetadataType="Schema" ID="2a082c29-0f37-4158-a7b9-5fe3e3a6eccd" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
-    <MetadataFile FileName="OSBLE.Models.Services.Uploader12.xsd" MetadataType="Schema" ID="5a4b08b1-1faf-462a-96df-9d6a38ed7d2a" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
-    <MetadataFile FileName="Arrays12.xsd" MetadataType="Schema" ID="a3784e4c-1f44-4bb8-99f4-8e6e740e672f" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
+    <MetadataFile FileName="UploaderWebService.xsd" MetadataType="Schema" ID="8b5927c8-c776-4a79-8a94-053b36788f90" SourceId="1" SourceUrl="http://www.osble.org/Services/UploaderWebService.svc?xsd=xsd1" />
+    <MetadataFile FileName="UploaderWebService.disco" MetadataType="Disco" ID="6f75e5da-856b-4c6a-9010-69b21f13668e" SourceId="1" SourceUrl="http://www.osble.org/Services/UploaderWebService.svc?disco" />
+    <MetadataFile FileName="UploaderWebService1.xsd" MetadataType="Schema" ID="71fb5512-d561-4607-b245-83c50543b0bb" SourceId="1" SourceUrl="http://www.osble.org/Services/UploaderWebService.svc?xsd=xsd3" />
+    <MetadataFile FileName="UploaderWebService.wsdl" MetadataType="Wsdl" ID="6beb6a0e-e8b1-41cc-826e-0c18788bc6d1" SourceId="1" SourceUrl="http://www.osble.org/Services/UploaderWebService.svc?wsdl" />
+    <MetadataFile FileName="UploaderWebService2.xsd" MetadataType="Schema" ID="6aab62d4-2636-4f57-bfe2-ff716277bb11" SourceId="1" SourceUrl="http://www.osble.org/Services/UploaderWebService.svc?xsd=xsd0" />
+    <MetadataFile FileName="UploaderWebService1.wsdl" MetadataType="Wsdl" ID="c31e2b15-d8e8-4266-a66e-ffb60888faa4" SourceId="1" SourceUrl="http://www.osble.org/Services/UploaderWebService.svc?wsdl=wsdl0" />
+    <MetadataFile FileName="UploaderWebService3.xsd" MetadataType="Schema" ID="e75aa3b2-0a01-48e5-9ef4-39935094ecb7" SourceId="1" SourceUrl="http://www.osble.org/Services/UploaderWebService.svc?xsd=xsd2" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
