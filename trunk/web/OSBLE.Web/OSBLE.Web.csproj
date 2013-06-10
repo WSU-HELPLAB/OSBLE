@@ -170,6 +170,7 @@
     <Compile Include="Areas\AssignmentDetails\Controllers\ContentController.cs" />
     <Compile Include="Areas\AssignmentDetails\Controllers\HomeController.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\DefaultBuilder.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\ABETOutcomesDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\CriticalReviewStudentDownloadDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\CriticalReviewSubmissionDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\DiscussionTeamMemberDecorator.cs" />
@@ -636,6 +637,7 @@
     <Content Include="Areas\AssignmentDetails\Views\Shared\_Layout.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\ABET\Index.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\ABETProficiencyDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\ABETOutcomesDecorator.cshtml" />
     <None Include="Scripts\jquery-1.8.2.intellisense.js" />
     <Content Include="Resources\CSVReader\CSVCellReaderStateMachine.png" />
     <Content Include="Scripts\CourseFilesUploader.js" />

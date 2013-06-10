@@ -113,7 +113,13 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.HeaderViews.Add("PublishCriticalReviewDecorator");
                 }
 
-
+                // ABET outcomes - the ABETDepartment property being non-null indicates that 
+                // this assignment was labeled for ABET outcomes and assessment.
+                if (null != assignment.ABETDepartment)
+                {
+                    vm.HeaderBuilder = new ABETOutcomesDecorator(vm.HeaderBuilder);
+                    vm.HeaderViews.Add("ABETOutcomesDecorator");
+                }
             }
             else if (vm.Client.AbstractRole.CanSubmit) //students
             {
