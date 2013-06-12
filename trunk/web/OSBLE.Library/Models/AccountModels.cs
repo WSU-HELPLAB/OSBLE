@@ -100,6 +100,15 @@ namespace OSBLE.Models
         public string EmailAddress { get; set; }
     }
 
+    public class FindUsername
+    {
+        [Required]
+        [Email(ErrorMessage = "Email Address is not valid!")]
+        [DataType(DataType.EmailAddress)]
+        [Display(Name = "Email address")]
+        public string EmailAddress { get; set; }
+    }
+
     public class ContactUsModel
     {
         [Required(ErrorMessage = "Your name is required")]

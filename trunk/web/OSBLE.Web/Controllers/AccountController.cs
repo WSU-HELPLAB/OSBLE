@@ -541,6 +541,25 @@ namespace OSBLE.Controllers
             return View("ResetPasswordFailure");
         }
 
+        [HttpPost]
+        public ActionResult FindUsername(ResetPasswordModel model)
+        {
+            UserProfile osbleProfile = db.UserProfiles.Where(m => m.UserName.CompareTo(model.EmailAddress) == 0).FirstOrDefault();
+            if (osbleProfile != null)
+            {
+               string username = osbleProfile.UserName;
+               string message = "The OSBLE username associated with this is email is: " + username;
+               Email.Send("Your requested OSBLE username", message, new List<MailAddress>() { new MailAddress(model.EmailAddress) });
+               return View("FindUsernameSuccess");
+            }
+            return View("FindUsernameFailure");
+        }
+
+        public ActionResult FindUsername()
+        {
+            return View();
+        }
+
         [OsbleAuthorize]
         [Obsolete("Use UserController/Picture instead")]
         public ActionResult ProfilePicture()

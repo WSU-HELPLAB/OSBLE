@@ -78,6 +78,7 @@
             <div>
             Are you are robot trying to brute force someone's password? Prove it!<br />
             Forgot your password? @Html.ActionLink("Click Here", "ResetPassword").
+            <br />Forogot your username? @Html.ActionLink("Click Here", "SendUsername").
             <br />
             @Html.Partial("_ReCaptcha")
             </div>
@@ -94,6 +95,9 @@
     </p>
     <p>
         Forgot your password? @Html.ActionLink("Click Here", "ResetPassword").
+    </p>
+    <p>
+        Forogot your username? @Html.ActionLink("Click Here", "FindUsername").
     </p>
     <p>
         <!--Need help? <a href="#" tabindex="5">Click Here</a>.-->

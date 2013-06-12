@@ -824,6 +824,9 @@
     <Content Include="Views\Weight\Index.cshtml" />
     <Content Include="Views\Departments\Index.cshtml" />
     <Content Include="Views\ABETOutcomesAdmin\Index.cshtml" />
+    <Content Include="Views\Account\FindUsername.cshtml" />
+    <Content Include="Views\Account\FindUsernameSuccess.cshtml" />
+    <Content Include="Views\Account\FindUsernameFailure.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
