@@ -5,30 +5,25 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSBLE.Library", "OSBLE.Library\OSBLE.Library.csproj", "{6873CAF7-4914-4B62-AF7E-BFFFA0A9FFD4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSBLE.Library.Signed", "OSBLE.Library.Signed\OSBLE.Library.Signed.csproj", "{4766A7C5-5B3A-4440-B4F4-EC51D8D13624}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSBLE.Web", "OSBLE.Web\OSBLE.Web.csproj", "{A88C37D7-0144-490F-8101-BD30B14A48ED}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSBLE.Web.Tests", "OSBLE.Web.Tests\OSBLE.Web.Tests.csproj", "{4FC6D0F3-3063-4A25-83C0-79E466B6722C}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 5
+		SccNumberOfProjects = 4
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs25
 		SccLocalPath0 = .
 		SccProjectUniqueName1 = OSBLE.Library\\OSBLE.Library.csproj
 		SccProjectName1 = OSBLE.Library
 		SccLocalPath1 = OSBLE.Library
-		SccProjectUniqueName2 = OSBLE.Library.Signed\\OSBLE.Library.Signed.csproj
-		SccProjectName2 = OSBLE.Library.Signed
-		SccLocalPath2 = OSBLE.Library.Signed
-		SccProjectUniqueName3 = OSBLE.Web\\OSBLE.Web.csproj
-		SccProjectName3 = OSBLE.Web
-		SccLocalPath3 = OSBLE.Web
-		SccProjectUniqueName4 = OSBLE.Web.Tests\\OSBLE.Web.Tests.csproj
-		SccProjectName4 = OSBLE.Web.Tests
-		SccLocalPath4 = OSBLE.Web.Tests
+		SccProjectUniqueName2 = OSBLE.Web\\OSBLE.Web.csproj
+		SccProjectName2 = OSBLE.Web
+		SccLocalPath2 = OSBLE.Web
+		SccProjectUniqueName3 = OSBLE.Web.Tests\\OSBLE.Web.Tests.csproj
+		SccProjectName3 = OSBLE.Web.Tests
+		SccLocalPath3 = OSBLE.Web.Tests
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = OSBLE.vsmdi
@@ -48,14 +43,6 @@ Global
 		{6873CAF7-4914-4B62-AF7E-BFFFA0A9FFD4}.OSBLE Dev Server|Any CPU.Build.0 = Release|Any CPU
 		{6873CAF7-4914-4B62-AF7E-BFFFA0A9FFD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6873CAF7-4914-4B62-AF7E-BFFFA0A9FFD4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4766A7C5-5B3A-4440-B4F4-EC51D8D13624}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4766A7C5-5B3A-4440-B4F4-EC51D8D13624}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4766A7C5-5B3A-4440-B4F4-EC51D8D13624}.OSBLE Deployment|Any CPU.ActiveCfg = Release|Any CPU
-		{4766A7C5-5B3A-4440-B4F4-EC51D8D13624}.OSBLE Deployment|Any CPU.Build.0 = Release|Any CPU
-		{4766A7C5-5B3A-4440-B4F4-EC51D8D13624}.OSBLE Dev Server|Any CPU.ActiveCfg = Release|Any CPU
-		{4766A7C5-5B3A-4440-B4F4-EC51D8D13624}.OSBLE Dev Server|Any CPU.Build.0 = Release|Any CPU
-		{4766A7C5-5B3A-4440-B4F4-EC51D8D13624}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4766A7C5-5B3A-4440-B4F4-EC51D8D13624}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A88C37D7-0144-490F-8101-BD30B14A48ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A88C37D7-0144-490F-8101-BD30B14A48ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A88C37D7-0144-490F-8101-BD30B14A48ED}.OSBLE Deployment|Any CPU.ActiveCfg = Release|Any CPU
