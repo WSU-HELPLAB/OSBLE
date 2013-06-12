@@ -95,10 +95,10 @@ namespace OSBLE.Controllers
                             string randomHash = GenerateRandomString(40);
                             localUser.AuthenticationHash = randomHash;
                             db.SaveChanges();
-                            sendVerificationEmail(true, 
-                                "https://osble.org" + Url.Action("ActivateAccount", 
-                                new { hash = randomHash }), 
-                                localUser.FirstName, 
+                            sendVerificationEmail(true,
+                                "https://osble.org" + Url.Action("ActivateAccount",
+                                new { hash = randomHash }),
+                                localUser.FirstName,
                                 localUser.UserName,
                                 randomHash
                                 );
@@ -256,7 +256,7 @@ namespace OSBLE.Controllers
                                 }
                                 else
                                 {
-                                    ModelState.AddModelError("", "The authentication code \""+ hash +"\"");
+                                    ModelState.AddModelError("", "The authentication code \"" + hash + "\"");
                                 }
                             }
                             else
@@ -318,9 +318,9 @@ namespace OSBLE.Controllers
                     }
 
                     sendVerificationEmail(
-                        false, 
-                        "https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }), 
-                        model.FirstName, 
+                        false,
+                        "https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }),
+                        model.FirstName,
                         model.Email,
                         randomHash
                         );
@@ -382,7 +382,7 @@ namespace OSBLE.Controllers
                     UserProfile profile = new UserProfile();
                     try
                     {
-                        
+
 
                         profile.UserName = model.Email;
                         profile.Password = UserProfile.GetPasswordHash(model.Password);
@@ -422,9 +422,9 @@ namespace OSBLE.Controllers
                     }
 
                     sendVerificationEmail(
-                        true, "https://osble.org" + 
-                        Url.Action("ActivateAccount", new { hash = randomHash }), 
-                        profile.FirstName, 
+                        true, "https://osble.org" +
+                        Url.Action("ActivateAccount", new { hash = randomHash }),
+                        profile.FirstName,
                         profile.UserName,
                         randomHash
                         );
@@ -542,22 +542,46 @@ namespace OSBLE.Controllers
         }
 
         [HttpPost]
-        public ActionResult FindUsername(ResetPasswordModel model)
+        public ActionResult FindUsername(FindUsername model)
         {
-            UserProfile osbleProfile = db.UserProfiles.Where(m => m.UserName.CompareTo(model.EmailAddress) == 0).FirstOrDefault();
-            if (osbleProfile != null)
+            UserProfile osbleProfile = null;
+            List<UserProfile> PossibleProfiles = new List<UserProfile>();
+            PossibleProfiles = db.UserProfiles.Where(m => m.School.Name.CompareTo(model.SchoolName) == 0).ToList();
+
+            if (PossibleProfiles != null)
             {
-               string username = osbleProfile.UserName;
-               string message = "The OSBLE username associated with this is email is: " + username;
-               Email.Send("Your requested OSBLE username", message, new List<MailAddress>() { new MailAddress(model.EmailAddress) });
-               return View("FindUsernameSuccess");
+                foreach (UserProfile possibleUser in PossibleProfiles)
+                {
+                    if (possibleUser.SchoolID == model.SchoolID)
+                    {
+                        osbleProfile = possibleUser;
+                    }
+                    if (osbleProfile != null)
+                    {
+                        string username = osbleProfile.UserName;
+                        return PartialView("FindUsernameSuccess", username);
+                    }
+                }
             }
             return View("FindUsernameFailure");
         }
 
         public ActionResult FindUsername()
         {
-            return View();
+            List<School> schools = new List<School>();
+            FindUsername getSchools = new FindUsername();
+            schools = (from u in db.Schools select u).ToList();
+
+            if (schools != null)
+            {
+                getSchools.Schools = new List<string>();
+                foreach (School thisSchool in schools)
+                {
+                    getSchools.Schools.Add(thisSchool.Name);
+                }
+            }
+
+            return View(getSchools);
         }
 
         [OsbleAuthorize]

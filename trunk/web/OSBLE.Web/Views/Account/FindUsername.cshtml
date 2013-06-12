@@ -1,4 +1,4 @@
-﻿@model OSBLE.Models.ResetPasswordModel
+﻿@model OSBLE.Models.FindUsername
 
 @using OSBLE.Models
 
@@ -12,18 +12,23 @@
 @using (Html.BeginForm())
 {
     <div>
-
-            <div class="editor-label">
-                @Html.LabelFor(m => m.EmailAddress)
-            </div>
-            <div class="editor-label">
-                @Html.TextBoxFor(m => m.EmailAddress)
-            </div>
-            <div>
-                @*@Html.Partial("_ReCaptcha")*@
-            </div>
-            <p>
-                <input type="submit" value="Find Username" />
-            </p>
+        <div class="editor-label">
+            @Html.LabelFor(m => m.SchoolName)
+        </div>
+        <div class="editor-label">
+            @Html.DropDownListFor(m => m.SchoolName, new SelectList(Model.Schools))
+        </div>
+        <div class="editor-label">
+            @Html.LabelFor(m => m.SchoolID)
+        </div>
+        <div class="editor-label">
+            @Html.TextBoxFor(m => m.SchoolID)
+        </div>
+        <div>
+            @*@Html.Partial("_ReCaptcha")*@
+        </div>
+        <p>
+            <input type="submit" value="Find Username" />
+        </p>
     </div>
 }

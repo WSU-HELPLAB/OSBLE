@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 using OSBLE.Attributes;
+using System.Collections.Generic;
 
 namespace OSBLE.Models
 {
@@ -102,11 +103,15 @@ namespace OSBLE.Models
 
     public class FindUsername
     {
-        [Required]
-        [Email(ErrorMessage = "Email Address is not valid!")]
-        [DataType(DataType.EmailAddress)]
-        [Display(Name = "Email address")]
-        public string EmailAddress { get; set; }
+        public List<string> Schools { get; set; }
+
+        [Required(ErrorMessage = "Your school name is required")]
+        [Display(Name = "School Name")]
+        public string SchoolName { get; set; }
+
+        [Required(ErrorMessage = "Your school ID is required")]
+        [Display(Name = "School ID")]
+        public int SchoolID { get; set; }
     }
 
     public class ContactUsModel
