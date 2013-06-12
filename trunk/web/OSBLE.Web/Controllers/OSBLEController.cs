@@ -204,9 +204,23 @@ namespace OSBLE.Controllers
         /// </summary>
         private void setCourseListTitle()
         {
-            if (currentCourses.Where(c => c.AbstractCourse is Community).Count() > 0)
+            bool hasCommunities = (currentCourses.Where(c => c.AbstractCourse is Community).Count() > 0);
+            bool hasCommittees = (currentCourses.Where(c => c.AbstractCourse is AssessmentCommittee).Count() > 0);
+            
+            if (hasCommunities)
             {
-                ViewBag.CourseListTitle = "Course/Community";
+                if (hasCommittees)
+                {
+                    ViewBag.CourseListTitle = "Course/Community/Committee";
+                }
+                else
+                {
+                    ViewBag.CourseListTitle = "Course/Community";
+                }
+            }
+            else if (hasCommittees)
+            {
+                ViewBag.CourseListTitle = "Course/Committee";
             }
             else
             {
@@ -286,6 +300,9 @@ namespace OSBLE.Controllers
 
                 // Add communities under courses, ordered by name
                 currentCourses = currentCourses.Concat(allUsersCourses.Where(cu => cu.AbstractCourse is Community).OrderBy(cu => cu.AbstractCourse.Name).ToList()).ToList();
+
+                // Add committees under communities, ordered by name
+                currentCourses = currentCourses.Concat(allUsersCourses.Where(cu => cu.AbstractCourse is AssessmentCommittee).OrderBy(cu => cu.AbstractCourse.Name).ToList()).ToList();
 
                 // Only consider non-hidden courses as the active course.
                 List<CourseUser> activeCoursePool = currentCourses.Where(cu => cu.Hidden == false).ToList();

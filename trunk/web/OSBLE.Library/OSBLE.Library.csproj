@@ -69,6 +69,11 @@
     <Compile Include="IdenticonRenderer.cs" />
     <Compile Include="Models\AbstractCourses\AbstractCourse.cs" />
     <Compile Include="Models\AbstractCourses\AbstractRole.cs" />
+    <Compile Include="Models\AbstractCourses\AssessmentCommittee\ABETEvaluatorRole.cs" />
+    <Compile Include="Models\AbstractCourses\AssessmentCommittee\AssessmentCommittee.cs" />
+    <Compile Include="Models\AbstractCourses\AssessmentCommittee\AssessmentCommitteeChairRole.cs" />
+    <Compile Include="Models\AbstractCourses\AssessmentCommittee\AssessmentCommitteeMemberRole.cs" />
+    <Compile Include="Models\AbstractCourses\AssessmentCommittee\AssessmentCommitteeRole.cs" />
     <Compile Include="Models\AbstractCourses\Community\Community.cs" />
     <Compile Include="Models\AbstractCourses\Community\CommunityRole.cs" />
     <Compile Include="Models\AbstractCourses\CourseRubric.cs" />
