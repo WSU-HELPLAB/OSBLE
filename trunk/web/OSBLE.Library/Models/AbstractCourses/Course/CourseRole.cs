@@ -67,8 +67,7 @@ namespace OSBLE.Models.Courses
             Student,
             Moderator,
             Observer,
-            Withdrawn = 9  //AC: I ignored my note above and just decided to start at the next avialable number in order
-                           // to not have to update existing DB records in the live version of OSBLE.
+            Withdrawn 
         }
     }
 }
