@@ -166,6 +166,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Areas\AssessmentWizard\AssessmentWizardAreaRegistration.cs" />
     <Compile Include="Areas\AssignmentDetails\AssignmentDetailsAreaRegistration.cs" />
     <Compile Include="Areas\AssignmentDetails\Controllers\ContentController.cs" />
     <Compile Include="Areas\AssignmentDetails\Controllers\HomeController.cs" />
@@ -638,6 +639,7 @@
     <Content Include="Areas\AssignmentWizard\Views\ABET\Index.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\ABETProficiencyDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\ABETOutcomesDecorator.cshtml" />
+    <Content Include="Areas\AssessmentWizard\Views\Web.config" />
     <None Include="Scripts\jquery-1.8.2.intellisense.js" />
     <Content Include="Resources\CSVReader\CSVCellReaderStateMachine.png" />
     <Content Include="Scripts\CourseFilesUploader.js" />
@@ -830,6 +832,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Areas\AssessmentWizard\Controllers\" />
+    <Folder Include="Areas\AssessmentWizard\Models\" />
+    <Folder Include="Areas\AssessmentWizard\Views\Shared\" />
     <Folder Include="Areas\AssignmentWizard\Views\Deliverables\Deliverables\" />
     <Folder Include="Areas\AssignmentWizard\Views\Rubric\Rubric\" />
     <Folder Include="Models\" />
