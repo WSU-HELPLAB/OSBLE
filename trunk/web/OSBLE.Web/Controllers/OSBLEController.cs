@@ -59,6 +59,12 @@ namespace OSBLE.Controllers
 
         /// <summary>
         /// Defines a menu item tab
+        /// 
+        /// I don't know why the original author of this didn't just call it a "tab", 
+        /// but that's what this object represents, a tab in the OSBLE interface. Tabs 
+        /// show up for different users under different circumstances and such 
+        /// visibility is affected by the role of the viewer as well as the course 
+        /// type (course, commmunity, or assessment committee).
         /// </summary>
         public class MenuItem
         {
@@ -80,6 +86,10 @@ namespace OSBLE.Controllers
 
             public bool CommunityOnlyPage { get; set; }
 
+            public bool ShownInAssessmentCommittees { get; set; }
+
+            public bool ShownInAssessmentCommitteesOnly { get; set; }
+
             /// <summary>
             /// Creates a menu item that everyone can access.
             /// </summary>
@@ -97,6 +107,7 @@ namespace OSBLE.Controllers
                 this.AdminOnly = false;
                 this.NotInCommunityPage = false;
                 this.CommunityOnlyPage = false;
+                this.ShownInAssessmentCommittees = true;
             }
 
             /// <summary>
@@ -112,7 +123,10 @@ namespace OSBLE.Controllers
             /// <param name="adminOnly">Only admins can see this tab</param>
             /// <param name="notInCommunityPage">This tab should not appear in communities</param>
             /// <param name="communityOnlyPage">This tab should only appear on communities</param>
-            public MenuItem(string name, string controller, string action, bool modifierOnly, bool graderOnly, bool viewerOnly, bool adminOnly, bool notInCommunityPage, bool communityOnlyPage)
+            /// <param name="shownInAssessmentCommittees">This tab appears in assessment comittees</param>
+            public MenuItem(string name, string controller, string action, bool modifierOnly, bool graderOnly,
+                bool viewerOnly, bool adminOnly, bool notInCommunityPage, bool communityOnlyPage,
+                bool shownInAssessmentCommittees = false, bool assessmentComitteesOnly = false)
             {
                 this.Name = name;
                 this.Controller = controller;
@@ -124,6 +138,35 @@ namespace OSBLE.Controllers
                 this.AdminOnly = adminOnly;
                 this.NotInCommunityPage = notInCommunityPage;
                 this.CommunityOnlyPage = communityOnlyPage;
+                this.ShownInAssessmentCommittees = shownInAssessmentCommittees;
+                this.ShownInAssessmentCommitteesOnly = assessmentComitteesOnly;
+            }
+
+            public bool IsVisibleTo(UserProfile CurrentUser, CourseUser ActiveCourse)
+            {
+                // If the course is an assessment committee...
+                if (ActiveCourse.AbstractCourse is AssessmentCommittee)
+                {
+                    if (null == ActiveCourse) { return false; }
+                    return ShownInAssessmentCommittees;
+                }
+                else if (((CurrentUser != null) && (!AdminOnly || CurrentUser.IsAdmin))
+                   &&
+                   (!ModifierOnly || ((ActiveCourse != null) && ActiveCourse.AbstractRole.CanModify))
+                   &&
+                   (!GraderOnly || ((ActiveCourse != null) && ActiveCourse.AbstractRole.CanGrade))
+                   &&
+                   (!ViewerOnly || ((ActiveCourse != null) && ActiveCourse.AbstractRole.CanSeeAll))
+                   &&
+                   ((!CommunityOnlyPage && !NotInCommunityPage) ||
+                   (NotInCommunityPage && ActiveCourse != null && !(ActiveCourse.AbstractCourse is Community)
+                   || (CommunityOnlyPage && ActiveCourse != null && ActiveCourse.AbstractCourse is Community)))
+                  )
+                {
+                    return !ShownInAssessmentCommitteesOnly;
+                }
+
+                return false;
             }
         }
 
@@ -263,12 +306,14 @@ namespace OSBLE.Controllers
             List<MenuItem> menu = new List<MenuItem>();
 
             menu.Add(new MenuItem("Dashboard", "Home", "Index"));
-            menu.Add(new MenuItem("Assignments", "Assignment", "Index", false, false, false, false, true, false));
-            menu.Add(new MenuItem("Grades", "Gradebook", "Index", false, false, false, false, true, false));
-            menu.Add(new MenuItem("Users", "Roster", "Index", true, false, false, false, false, false));
-            menu.Add(new MenuItem("Course Settings", "Course", "Edit", true, true, true, false, true, false));
-            menu.Add(new MenuItem("Community Settings", "Community", "Edit", true, true, true, false, false, true));
-            menu.Add(new MenuItem("Administration", "Admin", "Index", false, false, false, true, false, false));
+            menu.Add(new MenuItem("Assignments", "Assignment", "Index", false, false, false, false, true, false, false, false));
+            menu.Add(new MenuItem("Assessments", "Committee", "Index", false, false, false, false, true, false, true, true));
+            menu.Add(new MenuItem("Grades", "Gradebook", "Index", false, false, false, false, true, false, false));
+            menu.Add(new MenuItem("Users", "Roster", "Index", true, false, false, false, false, false, true));
+            menu.Add(new MenuItem("Course Settings", "Course", "Edit", true, true, true, false, true, false, false, false));
+            menu.Add(new MenuItem("Community Settings", "Community", "Edit", true, true, true, false, false, true, false, false));
+            menu.Add(new MenuItem("Committee Settings", "Committee", "Edit", true, true, true, false, false, true, true, true));
+            menu.Add(new MenuItem("Administration", "Admin", "Index", false, false, false, true, false, false, false));
 
             ViewBag.Menu = menu;
         }

@@ -21,6 +21,19 @@ namespace OSBLE.Controllers
         [CanCreateCourses]
         public ActionResult Create()
         {
+            // Make a list of schools
+            List<System.Web.Mvc.SelectListItem> schoolNames = 
+                new List<System.Web.Mvc.SelectListItem>();
+            foreach (OSBLE.Models.School s in db.Schools)
+            {
+                schoolNames.Add(new System.Web.Mvc.SelectListItem()
+                {
+                    Text = s.Name,
+                    Value = s.ID.ToString()
+                });
+            }
+            ViewBag.SchoolList = schoolNames;
+            
             return View(new AssessmentCommittee());
         }
 

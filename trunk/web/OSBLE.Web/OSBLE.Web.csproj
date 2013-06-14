@@ -250,6 +250,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\AssignmentController.cs" />
+    <Compile Include="Controllers\CommitteeController.cs" />
     <Compile Include="Controllers\CommunityController.cs" />
     <Compile Include="Controllers\CookieTestController.cs" />
     <Compile Include="Controllers\CourseController.cs" />
@@ -829,6 +830,7 @@
     <Content Include="Views\Account\FindUsername.cshtml" />
     <Content Include="Views\Account\FindUsernameSuccess.cshtml" />
     <Content Include="Views\Account\FindUsernameFailure.cshtml" />
+    <Content Include="Views\Committee\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
