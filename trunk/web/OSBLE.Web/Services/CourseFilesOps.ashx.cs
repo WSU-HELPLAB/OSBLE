@@ -153,6 +153,92 @@ namespace OSBLE.Services
                 context.Response.TransmitFile(af.DataFileName);
                 return;
             }
+            else if ("create_folder" == cmdParam)
+            {
+                // Make sure they have access to this course. Right now we only let 
+                // people who can modify the course have access to this service.
+                if (!VerifyModifyPermissions(context, up, courseID)) { return; }
+
+                // Make sure the folder name parameter is present
+                string folderName = string.Empty;
+                if (!VerifyStringParam(context, "folder_name", ref folderName)) { return; }
+
+                if (string.IsNullOrEmpty(folderName))
+                {
+                    WriteErrorResponse(context,
+                        "The following parameter cannot be an empty string: folder_name");
+                    return;
+                }
+
+                // If it starts with / or \ just strip that off
+                while (folderName.StartsWith("\\"))
+                {
+                    folderName = folderName.Substring(1);
+                }
+                while (folderName.StartsWith("/"))
+                {
+                    folderName = folderName.Substring(1);
+                }
+
+                // Folder name can't have ..\ or ../
+                if (folderName.Contains("..\\") || folderName.Contains("../"))
+                {
+                    WriteErrorResponse(
+                        context, "Specified folder name was not allowed.");
+                    return;
+                }
+
+                // It also cannot have invalid path characters
+                char[] invalid = System.IO.Path.GetInvalidPathChars();
+                foreach (char ic in invalid)
+                {
+                    if (folderName.Contains(ic))
+                    {
+                        WriteErrorResponse(
+                            context, "File name contains invalid character: " + ic.ToString());
+                        return;
+                    }
+                }
+
+                // Get the attributable file storage
+                AttributableFilesFilePath attrFiles =
+                    (new Models.FileSystem.FileSystem()).Course(courseID).CourseDocs as 
+                    OSBLE.Models.FileSystem.AttributableFilesFilePath;
+                if (null == attrFiles)
+                {
+                    WriteErrorResponse(context,
+                        "Internal error: could not get attributable files manager for course files.");
+                    return;
+                }
+
+                // The path can have subdirectories, but must be relative to the starting 
+                // folder location.
+                string path;
+                if ("/" == folderName || "\\" == folderName)
+                {
+                    path = attrFiles.GetPath();
+                }
+                else if (folderName.StartsWith("\\") || folderName.StartsWith("/"))
+                {
+                    path = System.IO.Path.Combine(
+                        attrFiles.GetPath(), folderName.Substring(1));
+                }
+                else
+                {
+                    path = System.IO.Path.Combine(attrFiles.GetPath(), folderName);
+                }
+                if (!System.IO.Directory.Exists(path))
+                {
+                    System.IO.Directory.CreateDirectory(path);
+                }
+
+                // Return success message
+                context.Response.Write(
+                    "<CourseFilesOpsResponse success=\"true\">" +
+                    attrFiles.GetXMLListing() +
+                    "</CourseFilesOpsResponse>");
+                return;
+            }
             
             // Coming here implies an unknown command
             WriteErrorResponse(context, "Unknown command: " + cmdParam);
@@ -228,6 +314,21 @@ namespace OSBLE.Services
                 return false;
             }
 
+            return true;
+        }
+
+        private static bool VerifyStringParam(HttpContext context, string paramName, ref string value)
+        {
+            string paramString = context.Request.Params[paramName];
+            if (string.IsNullOrEmpty(paramString))
+            {
+                WriteErrorResponse(context, string.Format(
+                    "Missing required parameter: \"{0}\".",
+                    paramName));
+                return false;
+            }
+
+            value = paramString;
             return true;
         }
 

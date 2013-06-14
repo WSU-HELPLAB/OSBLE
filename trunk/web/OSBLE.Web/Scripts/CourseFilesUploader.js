@@ -6,22 +6,23 @@
 //   String for the name (both id and name) of the <input type="file" ...> object.
 // allowMultiple:
 //   Boolean value indicating whether or not multiple files can be selected for upload.
-// extraServiceArgs:
-//   String of the form: "&arg1=val1&arg2=val2" that represents additional arguments to 
-//   be passed to the upload service. The course ID will be auto-determined so this does 
-//   not need to be provided. This argument can be null if desired.
+// onGetExtraServiceArgs:
+//   Function that returns a string of the form: "&arg1=val1&arg2=val2". This string 
+//   represents additional arguments to be passed to the upload service. The course ID 
+//   will be auto-determined so this does not need to be provided. This argument can be 
+//   null if desired.
 // onCompletion:
 //   Code to execute when upload is complete. If this is null then the page will be refreshed 
 //   when the upload completes. If non-null, this string must not contain single or double 
 //   quotes.
-function fileuploader_getcontrolshtml(inputNameString, allowMultiple, extraServiceArgs, onCompletion)
+function fileuploader_getcontrolshtml(inputNameString, allowMultiple, onGetExtraServiceArgs, onCompletion)
 {
     var divName = "uploadProgressDIV_" + inputNameString;
-    if (null == extraServiceArgs) {
-        extraServiceArgs = "null";
+    if (null == onGetExtraServiceArgs) {
+        onGetExtraServiceArgs = "null";
     }
     else {
-        extraServiceArgs = "\"" + extraServiceArgs + "\"";
+        onGetExtraServiceArgs = "\"" + onGetExtraServiceArgs + "\"";
     }
     if (null == onCompletion) {
         onCompletion = "document.location.reload();";
@@ -32,23 +33,20 @@ function fileuploader_getcontrolshtml(inputNameString, allowMultiple, extraServi
     if (allowMultiple) { code += "multiple />"; }
     else { code += "/>"; }
     code += "<input type='button' value='Upload' onclick='fileuploader_uploadfiles(\"";
-    code += inputNameString + "\", \"" + divName + "\", " + extraServiceArgs + ", ";
+    code += inputNameString + "\", \"" + divName + "\", " + onGetExtraServiceArgs + ", ";
     code += "\"" + onCompletion + "\");' />";
     code += "</form> <div id='" + divName + "'></div>";
     return code;
 }
 
-function fileuploader_writecontrolsauto() {
-    if (XMLHttpRequest) {
-        document.write(fileuploader_getcontrolshtml("file_src", true, null, null));
-    }
-    else {
-        document.write("File upload not supported. Please upgrade your web browser.");
-    }
-}
-
-function fileuploader_uploadfiles(fileSourceElementName, progressDIVName, extraServiceArgs, onCompletion)
+function fileuploader_uploadfiles(fileSourceElementName, progressDIVName, onGetExtraServiceArgs, onCompletion)
 {
+    // If there's a function to call to get extra service arguments, then call it
+    var extraServiceArgs = null;
+    if (null != onGetExtraServiceArgs) {
+        extraServiceArgs = eval(onGetExtraServiceArgs);
+    }
+
     var files = document.getElementById(fileSourceElementName).files;
     if (0 == files.length) { return; }
 

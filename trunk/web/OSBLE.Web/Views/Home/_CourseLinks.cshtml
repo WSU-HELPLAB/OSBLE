@@ -14,17 +14,35 @@
 			
 		</script>
 <ul id="collapser">
+    <li><span onclick="if (filemanager_folderselected) { filemanager_folderselected('/', this); }">Files and Links</span>
+        <ul>
         @{
             DirectoryListing root = ViewBag.CourseLinks as DirectoryListing;
-       }
-       @BuildDirectoryListing(root, true)
+        }
+        @BuildDirectoryListing(root, true)
+        </ul>
+    </li>
 </ul>
 
 @helper BuildDirectoryListing(DirectoryListing listing, bool isFirstRun = false)
 {
     if(!isFirstRun)
     {
-    @:<li>@listing.Name
+        string path = listing.AbsolutePath;
+        if (path.EndsWith("CourseDocs"))
+        {
+            path = string.Empty;
+        }
+        else
+        {
+            int index = path.IndexOf("CourseDocs");
+            path = path.Substring(index + ("CourseDocs").Length);
+            path = path.Replace('\\', '/');    
+        }
+        string clickJS = "if (filemanager_folderselected) { filemanager_folderselected(\"";
+        clickJS += path;
+        clickJS += "\", this); }";
+    @:<li><span onclick='@clickJS'>@listing.Name</span>
         @:<ul>
     }
         foreach(DirectoryListing subListing in listing.Directories)

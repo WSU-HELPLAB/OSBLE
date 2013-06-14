@@ -55,6 +55,9 @@ namespace OSBLE.Services
                 return;
             }
 
+            // There might be an optional "target_folder" parameter
+            string targetFolderParam = context.Request.Params["target_folder"];
+
             // Try to get the current OSBLE user
             Models.Users.UserProfile up = OSBLE.Utility.OsbleAuthentication.CurrentUser;
             if (null == up)
@@ -107,7 +110,31 @@ namespace OSBLE.Services
             // Save based on the usage
             if ("generic" == fileUsage)
             {
-                FileSystemBase location = (new Models.FileSystem.FileSystem()).Course(courseID).CourseDocs;
+                IFileSystem location = (new Models.FileSystem.FileSystem()).Course(courseID).CourseDocs;
+                
+                // For now the target folder parameter is only allowed for generic files
+                if (!string.IsNullOrEmpty(targetFolderParam) &&
+                    "\\" != targetFolderParam &&
+                    "/" != targetFolderParam)
+                {
+                    // We can't let it start with / or \
+                    while (targetFolderParam.StartsWith("\\"))
+                    {
+                        targetFolderParam = targetFolderParam.Substring(1);
+                    }
+                    while (targetFolderParam.StartsWith("/"))
+                    {
+                        targetFolderParam = targetFolderParam.Substring(1);
+                    }
+                    
+                    location = location.Directory(targetFolderParam);
+                    if (null == location)
+                    {
+                        WriteErrorResponse(context,
+                            "Could not upload to target folder: " + targetFolderParam);
+                        return;
+                    }
+                }
                 
                 // Save each file to the target directory
                 for (int i = 0; i < coll.Count; i++)

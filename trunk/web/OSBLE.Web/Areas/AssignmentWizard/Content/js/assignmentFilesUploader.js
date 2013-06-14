@@ -4,7 +4,8 @@
 // The actual uploading code isn't here, that's in the generic uploader 
 // script. This is just to manage upload related things on the assignment 
 // description page.
-
+var srvcArgsDesc = "";
+var srvcArgsSol = "";
 function assignmentfilemanager_update(assignmentID)
 {
     // Reset status to loading
@@ -93,13 +94,21 @@ function assignmentfilemanager_listcompletion(args, assignmentID, descDIVName)
         var onCompletion = "assignmentfilemanager_update(" + assignmentID.toString() + ");";
 
         // Add the upload controls HTML too
-        var srvcArgsDesc = "&assignmentID=" + assignmentID + "&fileusage=assignment_description";
-        var srvcArgsSol = "&assignmentID=" + assignmentID + "&fileusage=assignment_solution";
-        descHTML += fileuploader_getcontrolshtml("src_assignment_description", false, srvcArgsDesc, onCompletion);
-        solHTML += fileuploader_getcontrolshtml("src_assignment_solution", false, srvcArgsSol, onCompletion);
+        srvcArgsDesc = "&assignmentID=" + assignmentID + "&fileusage=assignment_description";
+        srvcArgsSol = "&assignmentID=" + assignmentID + "&fileusage=assignment_solution";
+        descHTML += fileuploader_getcontrolshtml("src_assignment_description", false, "assignmentfilemanager_getDescSrvcArgs();", onCompletion);
+        solHTML += fileuploader_getcontrolshtml("src_assignment_solution", false, "assignmentfilemanager_getSolSrvcArgs();", onCompletion);
 
         // Put the upload controls in
         document.getElementById(descDIVName).innerHTML = descHTML;
         document.getElementById("solutionFilesDIV").innerHTML = solHTML;
     }
+}
+
+function assignmentfilemanager_getDescSrvcArgs() {
+    return srvcArgsDesc;
+}
+
+function assignmentfilemanager_getSolSrvcArgs() {
+    return srvcArgsSol;
 }

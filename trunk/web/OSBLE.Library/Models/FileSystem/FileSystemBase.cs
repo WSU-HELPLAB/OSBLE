@@ -95,7 +95,7 @@ namespace OSBLE.Models.FileSystem
             return collection;
         }
 
-        public IFileSystem Directory(string name)
+        public virtual IFileSystem Directory(string name)
         {
             return new GenericFilePath(this, name);
         }

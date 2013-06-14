@@ -166,12 +166,24 @@ namespace OSBLE.Models.FileSystem
             }
         }
 
+        public override IFileSystem Directory(string name)
+        {
+            string path = Path.Combine(m_dataDir, name);
+            if (!System.IO.Directory.Exists(path))
+            {
+                return null;
+            }
+
+            return new AttributableFilesFilePath(
+                this, path, Path.Combine(m_attrDir, name));
+        }
+
         /// <summary>
         /// Gets a collection of files whose names satisfy the predicate.
         /// </summary>
         public override FileCollection File(Func<string, bool> predicate)
         {
-            return new AttributableFileCollection(DataFilesPath, AttrFilesPath, predicate);
+            return new AttributableFileCollection(m_dataDir, AttrFilesPath, predicate);
         }
 
         /// <summary>
