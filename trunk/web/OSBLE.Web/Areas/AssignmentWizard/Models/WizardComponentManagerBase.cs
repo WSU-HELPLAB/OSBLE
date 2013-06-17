@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using OSBLE.Models.Assignments;
-using OSBLE.Areas.AssignmentWizard.Controllers;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Caching;
@@ -15,53 +13,47 @@ using OSBLE.Models.Users;
 
 namespace OSBLE.Areas.AssignmentWizard.Models
 {
-    //TODO: Properly evaluate the change to FileCache (see note below)
-    //AC: We were having issues with the selected assignment type randomly defaulting to "Basic."  Previously,
-    //    I had been using JS cookies to track component settings.  I think that this might have been part of
-    //    the problem so I converted the WCM over fo the FileCache.  However, the conversion was mostly a
-    //    replacement of Cookie[value] to Cache[value].  This might need to be revisited in a future date.
     [Serializable]
-    public class WizardComponentManager
+    public abstract class WizardComponentManagerBase
     {
-        private const string assignmentKey = "ComponentManagerStudioAssignmentKey";
-        private const string activeComponentIndexKey = "ComponentManagerActiveComponentIndex";
-        private const string instance = "_wcm_instance";
-        private const string activeAssignmentTypeKey = "_wcm_activeAssignmentType";
-        private const string isNewAssignmentKey = "_wcm_isNewAssignment";
-        private const string componentsCacheString = "sortedComponents";
-        private const string managerCookieString = "_wcm_managerCookie";
-        private const string cacheRegion = "OSBLE.Areas.AssignmentWizard.Models.WizardComponentManager";
-        private const string allComponentsKey = "_wcm_allComponents";
-        private const string selectedComponentsKey = "_wcm_selectedComponents";
-        private const string unselectedComponentsKey = "_wcm_unselectedComponents";
-        private const string cacheIdKey = "_wcm_cacheIdString";
+        protected const string activeComponentIndexKey = "ComponentManagerActiveComponentIndex";
+        protected const string instance = "_wcm_instance";
+        protected const string componentsCacheString = "sortedComponents";
+        protected const string managerCookieString = "_wcm_managerCookie";
+        protected const string allComponentsKey = "_wcm_allComponents";
+        protected const string selectedComponentsKey = "_wcm_selectedComponents";
+        protected const string unselectedComponentsKey = "_wcm_unselectedComponents";
+        protected const string cacheIdKey = "_wcm_cacheIdString";
+
+        protected abstract string CacheRegion { get; }
+        protected abstract string WizardComponentNamespace { get; }
 
         [NonSerialized]
-        private FileCache managerCache;
+        protected FileCache ManagerCache;
 
         [NonSerialized]
-        private ObservableCollection<WizardBaseController> _selectedComponents = new ObservableCollection<WizardBaseController>();
+        private ObservableCollection<IWizardBaseController> _selectedComponents = new ObservableCollection<IWizardBaseController>();
 
         [NonSerialized]
-        private ObservableCollection<WizardBaseController> _unselectedComponents = new ObservableCollection<WizardBaseController>();
+        private ObservableCollection<IWizardBaseController> _unselectedComponents = new ObservableCollection<IWizardBaseController>();
 
         #region constructor
 
-        public WizardComponentManager(UserProfile profile)
+        public WizardComponentManagerBase(UserProfile profile)
         {
-            managerCache = FileCacheHelper.GetCacheInstance(profile);
-            managerCache.DefaultRegion = Path.Combine(managerCache.DefaultRegion, "assignmentWizard");
-            AllComponents = new List<WizardBaseController>();
-            SelectedComponents = new ObservableCollection<WizardBaseController>();
-            UnselectedComponents = new ObservableCollection<WizardBaseController>();
+            ManagerCache = FileCacheHelper.GetCacheInstance(profile);
+            ManagerCache.DefaultRegion = Path.Combine(ManagerCache.DefaultRegion, CacheRegion);
+            AllComponents = new List<IWizardBaseController>();
+            SelectedComponents = new ObservableCollection<IWizardBaseController>();
+            UnselectedComponents = new ObservableCollection<IWizardBaseController>();
             RegisterComponents();
-            if (managerCache[selectedComponentsKey] != null)
+            if (ManagerCache[selectedComponentsKey] != null)
             {
-                SelectedComponents = new ObservableCollection<WizardBaseController>(ComponentsFromString(managerCache[selectedComponentsKey].ToString(), "|"));
+                SelectedComponents = new ObservableCollection<IWizardBaseController>(ComponentsFromString(ManagerCache[selectedComponentsKey].ToString(), "|"));
             }
-            if (managerCache[unselectedComponentsKey] != null)
+            if (ManagerCache[unselectedComponentsKey] != null)
             {
-                UnselectedComponents = new ObservableCollection<WizardBaseController>(ComponentsFromString(managerCache[unselectedComponentsKey].ToString(), "|"));
+                UnselectedComponents = new ObservableCollection<IWizardBaseController>(ComponentsFromString(ManagerCache[unselectedComponentsKey].ToString(), "|"));
             }
 
 
@@ -71,12 +63,12 @@ namespace OSBLE.Areas.AssignmentWizard.Models
 
         #region properties
 
-        public List<WizardBaseController> AllComponents { get; private set; }
+        public List<IWizardBaseController> AllComponents { get; private set; }
 
         /// <summary>
         /// A list of the currently selected wizard components.  DO NOT directly modify this list.
         /// </summary>
-        public ObservableCollection<WizardBaseController> SelectedComponents
+        public ObservableCollection<IWizardBaseController> SelectedComponents
         {
             get
             {
@@ -96,7 +88,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         /// <summary>
         /// A list of unselected wizard components.  DO NOT directly modify this list.
         /// </summary>
-        public ObservableCollection<WizardBaseController> UnselectedComponents
+        public ObservableCollection<IWizardBaseController> UnselectedComponents
         {
             get
             {
@@ -121,91 +113,23 @@ namespace OSBLE.Areas.AssignmentWizard.Models
                 string selectedComponentPieces = string.Join("|", _selectedComponents);
                 string unselectedComponentsPieces = string.Join("|", _unselectedComponents);
 
-                managerCache[selectedComponentsKey] = selectedComponentPieces;
-                managerCache[unselectedComponentsKey] = unselectedComponentsPieces;
+                ManagerCache[selectedComponentsKey] = selectedComponentPieces;
+                ManagerCache[unselectedComponentsKey] = unselectedComponentsPieces;
             }
         }
 
-        public bool IsNewAssignment
-        {
-            get
-            {
-                if (managerCache[isNewAssignmentKey] != null)
-                {
-                    return Convert.ToBoolean(managerCache[isNewAssignmentKey]);
-                }
-                else
-                {
-                    managerCache[isNewAssignmentKey] = true.ToString();
-                    return true;
-                }
-            }
-            set
-            {
-                if (HttpContext.Current != null)
-                {
-                    managerCache[isNewAssignmentKey] = value.ToString();
-                }
-            }
-        }
-
-        public int ActiveAssignmentId
-        {
-            get
-            {
-                if (managerCache[assignmentKey] != null)
-                {
-                    return Convert.ToInt32(managerCache[assignmentKey]);
-                }
-                else
-                {
-                    managerCache[assignmentKey] = "0";
-                    return 0;
-                }
-            }
-            set
-            {
-                if (HttpContext.Current != null)
-                {
-                    managerCache[assignmentKey] = value.ToString();
-                }
-            }
-        }
-
-        public AssignmentTypes ActiveAssignmentType
-        {
-            get
-            {
-                if (managerCache[activeAssignmentTypeKey] != null)
-                {
-                    return (AssignmentTypes)Convert.ToInt32(managerCache[activeAssignmentTypeKey]);
-                }
-                else
-                {
-                    managerCache[activeAssignmentTypeKey] = ((int)AssignmentTypes.Basic).ToString();
-                    return AssignmentTypes.Basic;
-                }
-            }
-            private set
-            {
-                if (HttpContext.Current != null)
-                {
-                    managerCache[activeAssignmentTypeKey] = ((int)value).ToString();
-                }
-            }
-        }
-
+        
         private int ActiveComponentIndex
         {
             get
             {
-                if (managerCache[activeComponentIndexKey] != null)
+                if (ManagerCache[activeComponentIndexKey] != null)
                 {
-                    return Convert.ToInt32(managerCache[activeComponentIndexKey]);
+                    return Convert.ToInt32(ManagerCache[activeComponentIndexKey]);
                 }
                 else
                 {
-                    managerCache[activeComponentIndexKey] = "0";
+                    ManagerCache[activeComponentIndexKey] = "0";
                     return 0;
                 }
             }
@@ -213,12 +137,12 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             {
                 if (HttpContext.Current != null)
                 {
-                    managerCache[activeComponentIndexKey] = value.ToString();
+                    ManagerCache[activeComponentIndexKey] = value.ToString();
                 }
             }
         }
 
-        public WizardBaseController ActiveComponent
+        public IWizardBaseController ActiveComponent
         {
             get
             {
@@ -234,28 +158,28 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         {
             if (AllComponents[0].SortOrder != 0)
             {
-                List<WizardBaseController> selectedAsList = SelectedComponents.ToList();
+                List<IWizardBaseController> selectedAsList = SelectedComponents.ToList();
                 selectedAsList.Sort(new WizardSortOrderComparer());
-                SelectedComponents = new ObservableCollection<WizardBaseController>(selectedAsList);
+                SelectedComponents = new ObservableCollection<IWizardBaseController>(selectedAsList);
 
-                List<WizardBaseController> unselectedAsList = UnselectedComponents.ToList();
+                List<IWizardBaseController> unselectedAsList = UnselectedComponents.ToList();
                 unselectedAsList.Sort(new WizardSortOrderComparer());
-                UnselectedComponents = new ObservableCollection<WizardBaseController>(unselectedAsList);
+                UnselectedComponents = new ObservableCollection<IWizardBaseController>(unselectedAsList);
             }
             else
             {
-                List<WizardBaseController> selectedAsList = SortComponents(SelectedComponents.ToList());
-                SelectedComponents = new ObservableCollection<WizardBaseController>(selectedAsList);
+                List<IWizardBaseController> selectedAsList = SortComponents(SelectedComponents.ToList());
+                SelectedComponents = new ObservableCollection<IWizardBaseController>(selectedAsList);
 
-                List<WizardBaseController> unselectedAsList = SortComponents(UnselectedComponents.ToList());
-                UnselectedComponents = new ObservableCollection<WizardBaseController>(unselectedAsList);
+                List<IWizardBaseController> unselectedAsList = SortComponents(UnselectedComponents.ToList());
+                UnselectedComponents = new ObservableCollection<IWizardBaseController>(unselectedAsList);
             }
 
             //The collectionChanged event won't get called to save our sort, so we have to do it manually
             ComponentsCollectionChanged(this, new System.Collections.Specialized.NotifyCollectionChangedEventArgs(System.Collections.Specialized.NotifyCollectionChangedAction.Reset));
         }
 
-        public WizardBaseController GetNextComponent()
+        public IWizardBaseController GetNextComponent()
         {
             if (ActiveComponentIndex < SelectedComponents.Count - 1)
             {
@@ -265,7 +189,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             return null;
         }
 
-        public WizardBaseController GetPreviousComponent()
+        public IWizardBaseController GetPreviousComponent()
         {
             if (ActiveComponentIndex > 0)
             {
@@ -275,24 +199,18 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             return null;
         }
 
-        public ICollection<WizardBaseController> GetComponentsForAssignmentType(AssignmentTypes type)
-        {
-            return AllComponents
-                .Where(a => a.ValidAssignmentTypes.Contains(type))
-                .ToList();
-        }
 
-        public WizardBaseController GetComponentByName(string name)
+        public IWizardBaseController GetComponentByName(string name)
         {
-            WizardBaseController component = (from c in AllComponents
+            IWizardBaseController component = (from c in AllComponents
                                               where c.ControllerName.CompareTo(name) == 0
                                               select c).FirstOrDefault();
             return component;
         }
 
-        public WizardBaseController GetComponentByType(Type type)
+        public IWizardBaseController GetComponentByType(Type type)
         {
-            WizardBaseController component = (from c in AllComponents
+            IWizardBaseController component = (from c in AllComponents
                                               where c.GetType() == type
                                               select c).FirstOrDefault();
             return component;
@@ -304,7 +222,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         /// </summary>
         public void DeactivateAllComponents()
         {
-            foreach (WizardBaseController component in AllComponents)
+            foreach (IWizardBaseController component in AllComponents)
             {
                 component.IsSelected = false;
             }
@@ -312,56 +230,24 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             SelectedComponents.Clear();
         }
 
-        /// <summary>
-        /// Sets the active assignment type by trying to match the supplied parameter with possible assignment types
-        /// listed in the AssignmentTypes enumeration.  Will default to AssignmentTypes.Basic if no match was found.
-        /// </summary>
-        /// <param name="assignmentType"></param>
-        /// <returns>True if a good match was found, false otherwise.</returns>
-        public bool SetActiveAssignmentType(string assignmentType)
-        {
-            IList<AssignmentTypes> possibleTypes = Assignment.AllAssignmentTypes;
-            foreach (AssignmentTypes type in possibleTypes)
-            {
-                if (assignmentType == type.ToString())
-                {
-                    return SetActiveAssignmentType(type);
-                }
-            }
-
-            //default to basic
-            SetActiveAssignmentType(AssignmentTypes.Basic);
-            return false;
-        }
-
-        /// <summary>
-        /// Sets the active assignment type based on the supplied parameter.
-        /// </summary>
-        /// <param name="assignmentType"></param>
-        /// <returns>Always true</returns>
-        public bool SetActiveAssignmentType(AssignmentTypes assignmentType)
-        {
-            ActiveAssignmentType = assignmentType;
-            return true;
-        }
 
         #endregion
 
         #region private helpers
 
         /// <summary>
-        /// Converts a delimited string into a list of <see cref="WizardBaseController "/> objects.
+        /// Converts a delimited string into a list of <see cref="IWizardBaseController"/> objects.
         /// </summary>
         /// <param name="itemString"></param>
         /// <param name="delimiter">The token used to delimit each entry</param>
         /// <returns></returns>
-        private List<WizardBaseController> ComponentsFromString(string itemString, string delimiter)
+        private List<IWizardBaseController> ComponentsFromString(string itemString, string delimiter)
         {
-            List<WizardBaseController> components = new List<WizardBaseController>();
+            List<IWizardBaseController> components = new List<IWizardBaseController>();
             string[] items = itemString.Split(delimiter.ToCharArray());
             foreach (string item in items)
             {
-                WizardBaseController component = AllComponents.Find(c => c.ControllerName == item);
+                IWizardBaseController component = AllComponents.Find(c => c.ControllerName == item);
                 if (component != null)
                 {
                     components.Add(component);
@@ -380,7 +266,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             //presently, we only care about selection change
             if (e.PropertyName.CompareTo("IsSelected") == 0)
             {
-                WizardBaseController component = sender as WizardBaseController;
+                IWizardBaseController component = sender as IWizardBaseController;
                 if (component.IsSelected)
                 {
                     if (UnselectedComponents.Contains(component))
@@ -413,10 +299,10 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         private void RegisterComponents()
         {
             //use reflection to find all available components
-            string componentNamespace = "OSBLE.Areas.AssignmentWizard.Controllers";
+            string componentNamespace = WizardComponentNamespace;
             List<Type> componentObjects = (from type in Assembly.GetExecutingAssembly().GetTypes()
                                            where
-                                           type.IsSubclassOf(typeof(WizardBaseController))
+                                           type.GetInterfaces().Contains(typeof(IWizardBaseController))
                                            &&
                                            !type.IsAbstract
                                            &&
@@ -425,14 +311,14 @@ namespace OSBLE.Areas.AssignmentWizard.Models
 
             foreach (Type component in componentObjects)
             {
-                WizardBaseController controller = Activator.CreateInstance(component) as WizardBaseController;
+                IWizardBaseController controller = Activator.CreateInstance(component) as IWizardBaseController;
                 AllComponents.Add(controller);
             }
 
             //pull from the cache if possible
             FileCache cache = FileCacheHelper.GetGlobalCacheInstance();
             bool loadedFromCache = false;
-            string[] sorted = (string[])cache.Get(componentsCacheString, cacheRegion);
+            string[] sorted = (string[])cache.Get(componentsCacheString, CacheRegion);
             if (sorted != null)
             {
                 //set loaded to true for now
@@ -445,7 +331,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
                 }
 
                 //make sure all components are represented in the cache
-                foreach (WizardBaseController component in AllComponents)
+                foreach (IWizardBaseController component in AllComponents)
                 {
                     if (!sorted.Contains(component.ControllerName))
                     {
@@ -457,10 +343,10 @@ namespace OSBLE.Areas.AssignmentWizard.Models
                 //if we're still clear to load from the cache, then do so
                 if (loadedFromCache)
                 {
-                    WizardBaseController[] tempComponentList = new WizardBaseController[sorted.Length];
+                    IWizardBaseController[] tempComponentList = new IWizardBaseController[sorted.Length];
                     for (int i = 0; i < sorted.Length; i++)
                     {
-                        WizardBaseController component = AllComponents.Find(c => c.ControllerName == sorted[i]);
+                        IWizardBaseController component = AllComponents.Find(c => c.ControllerName == sorted[i]);
                         if (component != null)
                         {
                             tempComponentList[i] = component;
@@ -475,7 +361,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             //if caching failed, do it the long way
             if (!loadedFromCache)
             {
-                List<WizardBaseController> components = SortComponents(AllComponents);
+                List<IWizardBaseController> components = SortComponents(AllComponents);
                 AllComponents = components;
 
                 //save sorted component information to cache
@@ -484,13 +370,13 @@ namespace OSBLE.Areas.AssignmentWizard.Models
                 {
                     sortedComponents[i] = AllComponents[i].ControllerName;
                 }
-                cache.Add(componentsCacheString, sortedComponents, cache.DefaultPolicy, cacheRegion);
+                cache.Add(componentsCacheString, sortedComponents, cache.DefaultPolicy, CacheRegion);
             }
 
             //attach event listeners to selection change
             //and apply a sort order for faster sorting in the future
             int counter = 1;
-            foreach (WizardBaseController component in AllComponents)
+            foreach (IWizardBaseController component in AllComponents)
             {
                 component.SortOrder = counter;
                 component.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(ComponentPropertyChanged);
@@ -498,20 +384,20 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             }
         }
 
-        private List<WizardBaseController> SortComponents(List<WizardBaseController> unsorted)
+        private List<IWizardBaseController> SortComponents(List<IWizardBaseController> unsorted)
         {
-            List<WizardBaseController> components = new List<WizardBaseController>();
-            Dictionary<string, NTree<WizardBaseController>> nodes = new Dictionary<string, NTree<WizardBaseController>>();
-            NTree<WizardBaseController> rootNode = null;
+            List<IWizardBaseController> components = new List<IWizardBaseController>();
+            Dictionary<string, NTree<IWizardBaseController>> nodes = new Dictionary<string, NTree<IWizardBaseController>>();
+            NTree<IWizardBaseController> rootNode = null;
 
             //build the tree
-            foreach (WizardBaseController component in unsorted)
+            foreach (IWizardBaseController component in unsorted)
             {
 
-                NTree<WizardBaseController> node = null;
+                NTree<IWizardBaseController> node = null;
                 if (!nodes.ContainsKey(component.ControllerName))
                 {
-                    node = new NTree<WizardBaseController>(component);
+                    node = new NTree<IWizardBaseController>(component);
                     nodes.Add(component.ControllerName, node);
                 }
                 else
@@ -522,14 +408,14 @@ namespace OSBLE.Areas.AssignmentWizard.Models
                 //check for null prereq before we contine.  Null prereq denotes root node
                 if (component.Prerequisite != null)
                 {
-                    NTree<WizardBaseController> parentNode = null;
+                    NTree<IWizardBaseController> parentNode = null;
                     if (nodes.ContainsKey(component.Prerequisite.ControllerName))
                     {
                         parentNode = nodes[component.Prerequisite.ControllerName];
                     }
                     else
                     {
-                        parentNode = new NTree<WizardBaseController>(component.Prerequisite as WizardBaseController);
+                        parentNode = new NTree<IWizardBaseController>(component.Prerequisite as IWizardBaseController);
                         nodes.Add(component.Prerequisite.ControllerName, parentNode);
                     }
                     parentNode.addChild(node);

@@ -6,9 +6,9 @@ using OSBLE.Areas.AssignmentWizard.Controllers;
 
 namespace OSBLE.Areas.AssignmentWizard.Models
 {
-    public class WizardSortOrderComparer : IComparer<WizardBaseController>
+    public class WizardSortOrderComparer : IComparer<IWizardBaseController>
     {
-        public int Compare(WizardBaseController x, WizardBaseController y)
+        public int Compare(IWizardBaseController x, IWizardBaseController y)
         {
             return x.SortOrder.CompareTo(y.SortOrder);
         }

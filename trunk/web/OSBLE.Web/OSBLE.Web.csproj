@@ -230,7 +230,8 @@
     <Compile Include="Areas\AssignmentWizard\Controllers\WizardBaseController.cs" />
     <Compile Include="Areas\AssignmentWizard\Models\IWizardBaseController.cs" />
     <Compile Include="Areas\AssignmentWizard\Models\WizardComparer.cs" />
-    <Compile Include="Areas\AssignmentWizard\Models\WizardComponentManager.cs" />
+    <Compile Include="Areas\AssignmentWizard\Models\AssignmentWizardComponentManager.cs" />
+    <Compile Include="Areas\AssignmentWizard\Models\WizardComponentManagerBase.cs" />
     <Compile Include="Areas\AssignmentWizard\Models\WizardSortOrderComparer.cs" />
     <Compile Include="Areas\AssignmentWizard\ViewModels\RubricSelectionViewModel.cs" />
     <Compile Include="Attributes\CanCreateCourses.cs" />

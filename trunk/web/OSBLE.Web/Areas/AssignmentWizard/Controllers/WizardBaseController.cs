@@ -25,7 +25,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
     public abstract class WizardBaseController : OSBLEController, IWizardBaseController
     {
-        protected WizardComponentManager manager;
+        protected AssignmentWizardComponentManager manager;
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
         /// <summary>
@@ -177,7 +177,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public virtual ActionResult Index()
         {
             Assignment = new Assignment();
-            manager = new WizardComponentManager(CurrentUser);
+            manager = new AssignmentWizardComponentManager(CurrentUser);
             if (manager.ActiveAssignmentId != 0)
             {
                 Assignment = db.Assignments.Find(manager.ActiveAssignmentId);
@@ -193,7 +193,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         [HttpPost]
         protected ActionResult PostBack(dynamic model)
         {
-            manager = new WizardComponentManager(CurrentUser);
+            manager = new AssignmentWizardComponentManager(CurrentUser);
             if (WasUpdateSuccessful)
             {
                 //update the assignment ID.  Probably not necessary when working
@@ -212,7 +212,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 string errorPath = "Home";
                 string action = "ContextLost";
                 int id = Assignment.ID;
-                WizardBaseController comp = null;
+                IWizardBaseController comp = null;
                 if (Request.Form.AllKeys.Contains(WizardNavButtons.PreviousButton.ToString()))
                 {
                     comp = manager.GetPreviousComponent();
@@ -278,8 +278,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public ActionResult QuickNav()
         {
             string componentName = Request.Form["ComponentName"];
-            manager = new WizardComponentManager(CurrentUser);
-            WizardBaseController componentToFind = manager.GetComponentByName(componentName);
+            manager = new AssignmentWizardComponentManager(CurrentUser);
+            IWizardBaseController componentToFind = manager.GetComponentByName(componentName);
 
             //start at the beginning
             while (manager.GetPreviousComponent() != null) ;

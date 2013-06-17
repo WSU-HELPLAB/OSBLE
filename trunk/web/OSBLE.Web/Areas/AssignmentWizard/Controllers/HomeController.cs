@@ -13,13 +13,13 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
     [CanCreateCourses]
     public class HomeController : OSBLEController
     {
-        private WizardComponentManager manager;
+        private AssignmentWizardComponentManager manager;
         public static string beginWizardButton = "StartWizardButton";
 
         public HomeController()
         {
             ViewBag.AssignmentTypeRadioName = "AssignmentType";
-            manager = new WizardComponentManager(CurrentUser);
+            manager = new AssignmentWizardComponentManager(CurrentUser);
         }
 
         #region action results
@@ -179,7 +179,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 if (key.Substring(0, componentPrefix.Length) == componentPrefix)
                 {
-                    WizardBaseController comp = manager.GetComponentByName(Request.Form[key]);
+                    IWizardBaseController comp = manager.GetComponentByName(Request.Form[key]);
                     comp.IsSelected = true;
                 }
             }
