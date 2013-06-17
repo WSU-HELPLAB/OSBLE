@@ -9,6 +9,7 @@ using OSBLE.Models.Courses;
 using OSBLE.Utility;
 using System;
 using OSBLE.Models.HomePage;
+using OSBLE.Areas.AssignmentWizard.Models;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -32,7 +33,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
-        public override WizardBaseController Prerequisite
+        public override IWizardBaseController Prerequisite
         {
             get
             {

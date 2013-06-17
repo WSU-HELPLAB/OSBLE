@@ -7,6 +7,7 @@ using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Controllers;
 using OSBLE.Models.HomePage;
+using OSBLE.Areas.AssignmentWizard.Models;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -31,7 +32,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             get { return "This assignment has students discuss one or more topics."; }
         }
 
-        public override WizardBaseController Prerequisite
+        public override IWizardBaseController Prerequisite
         {
             get
             {

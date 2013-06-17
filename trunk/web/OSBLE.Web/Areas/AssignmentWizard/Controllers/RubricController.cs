@@ -10,6 +10,7 @@ using OSBLE.Models.Courses;
 using OSBLE.Areas.AssignmentWizard.ViewModels;
 using System.IO;
 using OSBLE.Resources;
+using OSBLE.Areas.AssignmentWizard.Models;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -25,7 +26,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             get { return "The instructor will use a grading rubric"; }
         }
 
-        public override WizardBaseController Prerequisite
+        public override IWizardBaseController Prerequisite
         {
             get
             {

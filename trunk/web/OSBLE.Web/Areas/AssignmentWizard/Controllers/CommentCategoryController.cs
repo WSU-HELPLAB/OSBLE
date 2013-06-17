@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.AbstractCourses;
 using OSBLE.Models.Courses;
+using OSBLE.Areas.AssignmentWizard.Models;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -32,7 +33,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             get { return "The instructor can mark-up student submissions with annotations"; }
         }
 
-        public override WizardBaseController Prerequisite
+        public override IWizardBaseController Prerequisite
         {
             get
             {

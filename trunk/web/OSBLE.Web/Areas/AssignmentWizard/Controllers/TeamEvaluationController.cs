@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using OSBLE.Models.Assignments;
 using System.Web.Mvc;
+using OSBLE.Areas.AssignmentWizard.Models;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -20,7 +21,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             get { return "This assignment contains a team evaluation."; }
         }
 
-        public override WizardBaseController Prerequisite
+        public override IWizardBaseController Prerequisite
         {
             get
             {

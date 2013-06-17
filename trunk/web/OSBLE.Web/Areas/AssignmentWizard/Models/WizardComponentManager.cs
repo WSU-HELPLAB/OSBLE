@@ -529,7 +529,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
                     }
                     else
                     {
-                        parentNode = new NTree<WizardBaseController>(component.Prerequisite);
+                        parentNode = new NTree<WizardBaseController>(component.Prerequisite as WizardBaseController);
                         nodes.Add(component.Prerequisite.ControllerName, parentNode);
                     }
                     parentNode.addChild(node);

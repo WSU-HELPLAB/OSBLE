@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using OSBLE.Models.Assignments;
 using System.Data.Entity.Validation;
 using System.Diagnostics;
+using OSBLE.Areas.AssignmentWizard.Models;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -21,7 +22,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             get { return "This assignment requires that students submit one or more files"; }
         }
 
-        public override WizardBaseController Prerequisite
+        public override IWizardBaseController Prerequisite
         {
             get
             {

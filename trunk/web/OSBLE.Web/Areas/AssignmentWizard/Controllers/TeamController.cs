@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
+using OSBLE.Areas.AssignmentWizard.Models;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -29,7 +30,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             get { return "The assignment is team-based"; }
         }
 
-        public override WizardBaseController Prerequisite
+        public override IWizardBaseController Prerequisite
         {
             get 
             {

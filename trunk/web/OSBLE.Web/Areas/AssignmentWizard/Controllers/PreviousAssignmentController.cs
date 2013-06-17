@@ -29,7 +29,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             get { return "This assignment depends on a previous assignment."; }
         }
 
-        public override WizardBaseController Prerequisite
+        public override IWizardBaseController Prerequisite
         {
             get
             {

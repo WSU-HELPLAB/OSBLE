@@ -23,7 +23,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         QuickNavButton
     }
 
-    public abstract class WizardBaseController : OSBLEController, IComparable, INotifyPropertyChanged, IEquatable<WizardBaseController>
+    public abstract class WizardBaseController : OSBLEController, IWizardBaseController
     {
         protected WizardComponentManager manager;
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
@@ -59,7 +59,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         /// "Basics" controller handles setting up assignment basics and so other controllers should
         /// list "Basics" as being a prerequisite.
         /// </summary>
-        public abstract WizardBaseController Prerequisite { get; }
+        public abstract IWizardBaseController Prerequisite { get; }
 
         /// <summary>
         /// Provides a list of assignment types in which the current component is relevant.  Several
@@ -343,7 +343,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
-        public bool Equals(WizardBaseController other)
+        public bool Equals(IWizardBaseController other)
         {
             if (this.ControllerName.CompareTo(other.ControllerName) == 0)
             {
