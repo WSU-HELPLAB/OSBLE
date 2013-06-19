@@ -5,9 +5,12 @@
     {
         foreach (OSBLEController.MenuItem m in ViewBag.Menu)
         {
-            if (m.IsVisibleTo(ViewBag.CurrentUser, ViewBag.ActiveCourse))
+            if (ViewBag.CurrentUser != null && ViewBag.ActiveCourse != null)
             {
-            @Html.ActionLink(@m.Name, @m.Action, @m.Controller, new { area = "" }, new { Class = ViewBag.CurrentTab == @m.Name ? "tab_current" : "" })
+                if (m.IsVisibleTo(ViewBag.CurrentUser, ViewBag.ActiveCourse))
+                {
+        @Html.ActionLink(@m.Name, @m.Action, @m.Controller, new { area = "" }, new { Class = ViewBag.CurrentTab == @m.Name ? "tab_current" : "" })
+                }
             }
         }
     }

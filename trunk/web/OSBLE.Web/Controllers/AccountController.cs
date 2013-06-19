@@ -542,7 +542,7 @@ namespace OSBLE.Controllers
         }
 
         [HttpPost]
-        public ActionResult FindUsername(FindUsername model)
+        public ActionResult FindUsername(OSBLE.Models.FindUsername model)
         {
             UserProfile osbleProfile = null;
             List<UserProfile> PossibleProfiles = new List<UserProfile>();
