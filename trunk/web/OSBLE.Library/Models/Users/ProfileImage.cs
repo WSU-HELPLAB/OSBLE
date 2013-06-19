@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace OSBLE.Models.Users
 {
+    [Serializable]
     public class ProfileImage : INotifyPropertyChanged, IModelBuilderExtender 
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
