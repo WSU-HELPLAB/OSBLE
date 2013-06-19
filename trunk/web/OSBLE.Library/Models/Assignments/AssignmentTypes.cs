@@ -12,6 +12,10 @@ namespace OSBLE.Models.Assignments
         DiscussionAssignment = 3,
         TeamEvaluation = 4,
         CriticalReviewDiscussion = 5,
+        CommitteeDiscussion = 6,
+        ReviewOfStudentWork = 7,
+        CommitteeDiscussionOfStudentWorkReview = 8,
+        AggregateAssessment = 9
     };
 
 	public static class AssignmentTypeExtensions
@@ -64,6 +68,18 @@ namespace OSBLE.Models.Assignments
                     break;
                 case AssignmentTypes.CriticalReviewDiscussion:
                     description = "Student reviews from a previous critical review assignment are merged into a single document and/or rubric, which then become the focus for an online group discussion that considers their similarities and differences. Critical review discussion teams consist of the original set of reviewers, plus the submission author(s). Critical review discussion assignments require that a critical review assignment already exists.";
+                    break;
+                case AssignmentTypes.CommitteeDiscussion:
+                    description = "Committee chair uploads a document or set of documents (usually a PDF, e.g., an exit survey summary) to be discussed by committee asynchronously.";
+                    break;
+                case AssignmentTypes.ReviewOfStudentWork:
+                    description = "A course instructor or committee chair uploads (if work does not exist in OSBLE), or flags in OSBLE (if work exists in OSBLE) student work for assessment. Either course instructor or the assessment committee then review the work against an assessment rubric specifying one or more target outcomes";
+                    break;
+                case AssignmentTypes.CommitteeDiscussionOfStudentWorkReview:
+                    description = "Committee engages in online discussion of their previous (independent) reviews of student work. (This assessment must be linked to a “Committee Review of Student Work” assessement).";
+                    break;
+                case AssignmentTypes.AggregateAssessment:
+                    description = "Merges all reviews of student work for a given year, and reports average assessment ratings by outcome and student achievement level (low, medium, high).";
                     break;
                 default:
                     description = "This assignment does not yet have a description. You should not see this message!.";

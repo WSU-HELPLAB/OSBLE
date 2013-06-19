@@ -214,6 +214,8 @@
     <Compile Include="Areas\AssignmentWizard\Controllers\ABETController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\BasicsController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\CommentCategoryController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\AssessmentBasicsController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\CommitteeDiscussionController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\ContentController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\CriticalReviewController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\CriticalReviewDiscussionTeamsController.cs" />
@@ -221,10 +223,14 @@
     <Compile Include="Areas\AssignmentWizard\Controllers\DiscussionController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\DiscussionTeamsController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\HomeController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\LinkToPreviousReviewController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\PreviousAssignmentController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\RubricBaseController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\RubricController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\StudentRubricController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\StudentWorkReviewController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\StudentWorkReviewReminderController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\StudentWorkReviewSettingsController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\TeamController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\TeamEvaluationController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\WizardBaseController.cs" />
@@ -643,6 +649,11 @@
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\ABETProficiencyDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\ABETOutcomesDecorator.cshtml" />
     <Content Include="Areas\AssessmentWizard\Views\Web.config" />
+    <Content Include="Areas\AssignmentWizard\Views\AssessmentBasics\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\CommitteeDiscussion\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\StudentWorkReview\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\StudentWorkReviewSettings\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\StudentWorkReviewReminder\Index.cshtml" />
     <None Include="Scripts\jquery-1.8.2.intellisense.js" />
     <Content Include="Resources\CSVReader\CSVCellReaderStateMachine.png" />
     <Content Include="Scripts\CourseFilesUploader.js" />
@@ -838,7 +849,6 @@
     <Folder Include="App_Data\" />
     <Folder Include="Areas\AssessmentWizard\Controllers\" />
     <Folder Include="Areas\AssessmentWizard\Models\" />
-    <Folder Include="Areas\AssessmentWizard\Views\Shared\" />
     <Folder Include="Areas\AssignmentWizard\Views\Deliverables\Deliverables\" />
     <Folder Include="Areas\AssignmentWizard\Views\Rubric\Rubric\" />
     <Folder Include="Models\" />
