@@ -54,20 +54,8 @@ namespace OSBLE.Models.Users
         [DataMember]
         public int DefaultCourse { get; set; }
 
-        private ProfileImage _profileImage { get; set; }
-
         [IgnoreDataMember]
-        public virtual ProfileImage ProfileImage
-        {
-            get
-            {
-                return _profileImage;
-            }
-            set
-            {
-                _profileImage = value;
-            }
-        }
+        public virtual ProfileImage ProfileImage { get; set; }
 
         // User E-mail Notification Settings
 
