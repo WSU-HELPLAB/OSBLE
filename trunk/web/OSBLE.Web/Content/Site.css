@@ -582,6 +582,8 @@ body#layoutLogOn
 	margin-bottom: 1em;
 }
 
+/* Redoing file manager and need to take this out for testing purposes */
+/*
 #course_links ul
 {
 	margin: 0;
@@ -601,6 +603,7 @@ body#layoutLogOn
 	left: -25px;
 	padding-left: 25px;
 }
+*/
 
 .jqcNode
 {

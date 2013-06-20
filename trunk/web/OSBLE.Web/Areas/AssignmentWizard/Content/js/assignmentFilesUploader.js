@@ -96,8 +96,8 @@ function assignmentfilemanager_listcompletion(args, assignmentID, descDIVName)
         // Add the upload controls HTML too
         srvcArgsDesc = "&assignmentID=" + assignmentID + "&fileusage=assignment_description";
         srvcArgsSol = "&assignmentID=" + assignmentID + "&fileusage=assignment_solution";
-        descHTML += fileuploader_getcontrolshtml("src_assignment_description", false, "assignmentfilemanager_getDescSrvcArgs();", onCompletion);
-        solHTML += fileuploader_getcontrolshtml("src_assignment_solution", false, "assignmentfilemanager_getSolSrvcArgs();", onCompletion);
+        descHTML += fileuploader_getcontrolshtml("src_assignment_description", true, "assignmentfilemanager_getDescSrvcArgs();", onCompletion);
+        solHTML += fileuploader_getcontrolshtml("src_assignment_solution", true, "assignmentfilemanager_getSolSrvcArgs();", onCompletion);
 
         // Put the upload controls in
         document.getElementById(descDIVName).innerHTML = descHTML;

@@ -50,13 +50,33 @@ namespace OSBLE.Services
                 return;
             }
 
+            // The permissions for service actions depend on the course user
+            OSBLEContext db = new OSBLEContext();
+            CourseUser courseUser =
+                (from cu in db.CourseUsers
+                 where cu.UserProfileID == up.ID &&
+                 cu.AbstractCourse is Course &&
+                 cu.AbstractCourseID == courseID
+                 select cu).FirstOrDefault();
+            if (null == courseUser)
+            {
+                WriteErrorResponse(context,
+                    "User does not have permission to perform this action.");
+                return;
+            }
+
             // Now look at the command and handle it appropriately
-            if ("assignment_files_list" == cmdParam)
+            if ("course_files_list" == cmdParam)
+            {
+                HandleCourseFileListingRequest(context, up, courseID);
+                return;
+            }
+            else if ("assignment_files_list" == cmdParam)
             {
                 // Make sure they have access to this course. Right now we only let 
                 // people who can modify the course have access to this service.
                 if (!VerifyModifyPermissions(context, up, courseID)) { return; }
-                
+
                 // The client wants a list of files from the attributable storage location 
                 // for the assignment.
 
@@ -66,7 +86,7 @@ namespace OSBLE.Services
                 {
                     return;
                 }
-                
+
                 // Get the attributable file storage
                 AttributableFilesFilePath attrFiles =
                     (new Models.FileSystem.FileSystem()).Course(courseID).Assignment(aID).AttributableFiles;
@@ -80,7 +100,7 @@ namespace OSBLE.Services
                 // Get XML file listing packaged up and return it to the client
                 context.Response.Write(
                     "<CourseFilesOpsResponse success=\"true\">" +
-                    attrFiles.GetXMLListing() +
+                    attrFiles.GetXMLListing(courseUser, false) +
                     "</CourseFilesOpsResponse>");
                 return;
             }
@@ -122,16 +142,6 @@ namespace OSBLE.Services
                 }
 
                 // Make sure the user has permission to download
-                OSBLEContext db = new OSBLEContext();
-                CourseUser courseUser = (
-                                      from cu in db.CourseUsers
-                                      where cu.UserProfileID == up.ID
-                                      &&
-                                      cu.AbstractCourse is Course
-                                      &&
-                                      cu.AbstractCourseID == courseID
-                                      select cu
-                                      ).FirstOrDefault();
                 if (null == courseUser || !af.CanUserDownload(courseUser))
                 {
                     WriteErrorResponse(context,
@@ -195,14 +205,24 @@ namespace OSBLE.Services
                     if (folderName.Contains(ic))
                     {
                         WriteErrorResponse(
-                            context, "File name contains invalid character: " + ic.ToString());
+                            context, "Folder name contains invalid character: '" + 
+                            ic.ToString() + "'");
                         return;
                     }
                 }
 
+                // Tests show that the array of invalid characters checked above will not 
+                // contain the ':' character, so we check for that here.
+                if (folderName.Contains(':'))
+                {
+                    WriteErrorResponse(
+                        context, "Folder name contains invalid character: ':'");
+                    return;
+                }
+
                 // Get the attributable file storage
                 AttributableFilesFilePath attrFiles =
-                    (new Models.FileSystem.FileSystem()).Course(courseID).CourseDocs as 
+                    (new Models.FileSystem.FileSystem()).Course(courseID).CourseDocs as
                     OSBLE.Models.FileSystem.AttributableFilesFilePath;
                 if (null == attrFiles)
                 {
@@ -235,7 +255,7 @@ namespace OSBLE.Services
                 // Return success message
                 context.Response.Write(
                     "<CourseFilesOpsResponse success=\"true\">" +
-                    attrFiles.GetXMLListing() +
+                    attrFiles.GetXMLListing(courseUser, false) +
                     "</CourseFilesOpsResponse>");
                 return;
             }
@@ -346,6 +366,42 @@ namespace OSBLE.Services
             {
                 return false;
             }
+        }
+
+        private void HandleCourseFileListingRequest(HttpContext context, 
+            Models.Users.UserProfile up, int courseID)
+        {
+            // Get the attributable file storage
+            AttributableFilesFilePath attrFiles =
+                (new Models.FileSystem.FileSystem()).Course(courseID).CourseDocs as
+                OSBLE.Models.FileSystem.AttributableFilesFilePath;
+            if (null == attrFiles)
+            {
+                WriteErrorResponse(context,
+                    "Internal error: could not get attributable files manager for course files.");
+                return;
+            }
+
+            // The permission-oriented attributes depend on the course user
+            OSBLEContext db = new OSBLEContext();
+            CourseUser courseUser =
+                (from cu in db.CourseUsers
+                 where cu.UserProfileID == up.ID &&
+                 cu.AbstractCourse is Course &&
+                 cu.AbstractCourseID == courseID
+                 select cu).FirstOrDefault();
+            if (null == courseUser)
+            {
+                WriteErrorResponse(context,
+                    "User does not have permission to see files in this course.");
+                return;
+            }
+
+            // Get XML file listing packaged up and return it to the client
+            context.Response.Write(
+                "<CourseFilesOpsResponse success=\"true\">" +
+                attrFiles.GetXMLListing(courseUser, true) +
+                "</CourseFilesOpsResponse>");
         }
     }
 }

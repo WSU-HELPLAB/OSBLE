@@ -50,8 +50,6 @@ function fileuploader_uploadfiles(fileSourceElementName, progressDIVName, onGetE
     var files = document.getElementById(fileSourceElementName).files;
     if (0 == files.length) { return; }
 
-    // TODO: Use onCompletion argument
-
     // We upload one file at a time
     var progressDIV = document.getElementById(progressDIVName);    
     progressDIV.innerHTML = "Uploading (1 of " + files.length + "): 0%";

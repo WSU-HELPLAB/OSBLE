@@ -421,6 +421,7 @@
     <Content Include="Content\images\fileextimages\zip.png" />
     <Content Include="Content\images\fileextimages\_blank.png" />
     <Content Include="Content\images\fileextimages\_page.png" />
+    <Content Include="Content\images\folder_plus.png" />
     <Content Include="Content\images\gradebookexamples\DblExclimationExample.png" />
     <Content Include="Content\images\gradebookexamples\ExclimationExample.png" />
     <Content Include="Content\images\gradebookexamples\PoundExample.png" />
@@ -656,6 +657,7 @@
     <Content Include="Areas\AssignmentWizard\Views\StudentWorkReviewReminder\Index.cshtml" />
     <None Include="Scripts\jquery-1.8.2.intellisense.js" />
     <Content Include="Resources\CSVReader\CSVCellReaderStateMachine.png" />
+    <Content Include="Scripts\CourseFileManager.js" />
     <Content Include="Scripts\CourseFilesUploader.js" />
     <None Include="Properties\PublishProfiles\filesystem.pubxml" />
     <None Include="Scripts\jquery-2.0.1.intellisense.js" />
@@ -788,7 +790,6 @@
     <Content Include="Views\Home\ViewThread.cshtml" />
     <Content Include="Views\Home\_ActivityFeed.cshtml" />
     <Content Include="Views\Home\_AjaxEmpty.cshtml" />
-    <Content Include="Views\Home\_CourseLinks.cshtml" />
     <Content Include="Views\Home\_DashboardPost.cshtml" />
     <Content Include="Views\Home\_ImportantDates.cshtml" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />

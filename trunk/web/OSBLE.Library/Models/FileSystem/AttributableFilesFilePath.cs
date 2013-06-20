@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Models.FileSystem
 {
@@ -315,14 +316,69 @@ namespace OSBLE.Models.FileSystem
         ///   &lt;/file&gt;
         /// &lt;/file_list&gt;
         /// </summary>
-        public string GetXMLListing()
+        public string GetXMLListing(CourseUser courseUser, bool recurse = false)
         {
+            // Determine what permissions this user has, since permission attributes 
+            // will be put in the listing.
+            bool canDeleteFolders;
+            if (null == courseUser)
+            {
+                canDeleteFolders = false;
+            }
+            else
+            {
+                canDeleteFolders = courseUser.AbstractRole.CanModify;
+            }
+
             StringBuilder sb = new StringBuilder("<file_list>");
-            string[] dataFiles = System.IO.Directory.GetFiles(DataFilesPath);
+
+            // We'll have a folder node for the root
+            sb.AppendFormat("<folder name=\"/\" can_delete=\"{0}\" can_upload_to=\"{0}\">",
+                canDeleteFolders.ToString());
+
+            GetXMLListing(courseUser, m_dataDir, recurse, sb);
+            sb.Append("</folder></file_list>");
+            return sb.ToString();
+        }
+
+        private void GetXMLListing(CourseUser courseUser, string dir, bool recurse, StringBuilder sb)
+        {
+            // Determine what permissions this user has, since permission attributes 
+            // will be put in the listing.
+            bool canDeleteFolders;
+            if (null == courseUser)
+            {
+                canDeleteFolders = false;
+            }
+            else
+            {
+                canDeleteFolders = courseUser.AbstractRole.CanModify;
+            }
+            
+            string[] dataFiles = System.IO.Directory.GetFiles(dir);
+
+            // Do directories first if we've been asked to recurse
+            if (recurse)
+            {
+                foreach (string folder in System.IO.Directory.GetDirectories(dir))
+                {
+                    sb.AppendFormat("<folder name=\"{0}\" can_delete=\"{1}\" can_upload_to=\"{1}\">", 
+                        folder.Substring(folder.LastIndexOf(Path.DirectorySeparatorChar) + 1),
+                        canDeleteFolders.ToString());
+                    GetXMLListing(courseUser, folder, recurse, sb);
+                    sb.Append("</folder>");
+                }
+            }
+
+            // Determine the directory for the attribute XML files
+            if (!dir.StartsWith(m_dataDir)) { return; }
+            string attrDir = m_attrDir + dir.Substring(m_dataDir.Length);            
+
+            // Now do the actual files
             foreach (string file in dataFiles)
             {
-                // Get the name for the attribute file
-                string attrFileName = AttributableFileCollection.GetAttrFileName(AttrFilesPath, file);
+                // Get the file name for the attribute file
+                string attrFileName = AttributableFileCollection.GetAttrFileName(attrDir, file);
                 if (string.IsNullOrEmpty(attrFileName) ||
                     !System.IO.File.Exists(attrFileName))
                 {
@@ -338,8 +394,6 @@ namespace OSBLE.Models.FileSystem
                 sb.AppendFormat("<file name=\"{0}\">{1}</file>",
                     System.IO.Path.GetFileName(file), xml);
             }
-            sb.Append("</file_list>");
-            return sb.ToString();
         }
 
         /// <summary>

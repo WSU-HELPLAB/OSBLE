@@ -49,130 +49,25 @@
 
 <div id="dashboard_right">
 
-<div id="course_links">
-@Html.Partial("_CourseLinks")
+<!-- File manager for course files -->
+<div id="divFileManager">
+    (Please wait, loading files...)
 </div>
 
-@{
-    if (ViewBag.CanEditCourseLinks)
-    {
-        <!-- File uploader -->
-        <div style="padding: 5px; border-top: 1px solid #074974; border-left: 1px solid #074974; border-right: 1px solid #074974; background: linear-gradient( to bottom, white, #f0f0f0);">
-            Upload Files
-        </div>
-        <div style="border: 1px solid #074974;">
-            <script src="../../Scripts/CourseFilesUploader.js" type="text/javascript"></script>
-            <script type="text/javascript">
-                var prevFolderSPAN = null;
-                var fm_targetDir = "/";
-                
-                // Write the HTML for the uploader control
-                if (XMLHttpRequest)
-                {
-                    document.write(fileuploader_getcontrolshtml("file_src", true, "filemanager_getServiceArgs();", null));
-                }
-                else {
-                    document.write("File upload not supported. Please upgrade your web browser.");
-                }
-
-                function filemanager_getServiceArgs() {
-                    return "&target_folder=" + fm_targetDir;
-                }
-
-                function filemanager_createfolder()
-                {
-                    var fldrname = document.getElementById("tbNewFolderName").value;
-                    if (null == fldrname || 0 == fldrname.length)
-                    {
-                        // Can't create a folder with no name
-                        document.getElementById("tbNewFolderName").focus();
-                        return;
-                    }
-
-                    // Concat the target dir
-                    if ("\\" == fldrname.substr(0, 1) || "/" == fldrname.substr(0, 1)) {
-                        fldrname = fm_targetDir + fldrname.substr(1);
-                    }
-                    else {
-                        fldrname = fm_targetDir + fldrname;
-                    }
-
-                    // Get the current course ID
-                    var selectCourseObj = document.getElementById("course_select");
-                    var courseID = selectCourseObj.value;
-
-                    // Make an XML HTTP request to the service
-                    var req = new XMLHttpRequest();
-                    req.addEventListener("load",
-                        function (args) { document.location.reload(); },
-                        false);
-                    req.addEventListener("error",
-                        function (args) { alert("Folder creation error"); },
-                        false);
-                    req.open("POST", "../Services/CourseFilesOps.ashx?cmd=create_folder&courseID=" +
-                        courseID + "&folder_name=" + fldrname);
-                    req.send();
-                }
-
-                function filemanager_folderselected(foldername, theSPAN)
-                {
-                    if (null != prevFolderSPAN)
-                    {
-                        prevFolderSPAN.style.background = null;
-                        prevFolderSPAN.style.border = null;
-                    }
-                    theSPAN.style.cssText = "border-radius: 5px; border: 1px solid #074974; background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, rgb(220,235,252)), color-stop(1.0, rgb(193,219,252))); background-image: -moz-linear-gradient(-90deg, rgb(220,235,252), rgb(193,219,252)); background-image: linear-gradient(to bottom, rgb(220,235,252), rgb(193,219,252));";
-                    prevFolderSPAN = theSPAN;
-
-                    // Set the current target directory
-                    fm_targetDir = foldername;
-
-                    // Make sure it ends with / or \
-                    if (fm_targetDir.substr(fm_targetDir.length - 1) != "/" &&
-                        fm_targetDir.substr(fm_targetDir.length - 1) != "\\")
-                    {
-                        fm_targetDir += "/";
-                    }
-                }
-
-                function filemanager_getFolderName()
-                {
-                    var theTB = document.getElementById("tbNewFolderName");
-                    if (null == theTB) { return ""; }
-                    var full = theTB.value;
-                    
-                    // We want to parse out just the folder name. So if the 
-                    // text is something like "/a/b/folder" we just return 
-                    // "folder".
-                    var index = full.lastIndexOf("/");
-                    
-                    // If the string ends with "/" then we return an empty string
-                    if (index == full.length - 1) { return ""; }
-                    // If the "/" doesn't occur at all then we look for the other slash
-                    if (-1 == index)
-                    {
-                        index = full.lastIndexOf("\\");
-
-                        // If that doesn't occur either then we return the whole string
-                        if (-1 == index) { return full; }
-
-                        // If the string ends with the slash then we return an empty string
-                        if (index == full.length - 1) { return ""; }
-                    }
-
-                    return full.substr(index + 1, full.length - (index + 1));
-                }
-            </script>
-        </div>
-        <div style="padding: 5px; border-left: 1px solid #074974; border-right: 1px solid #074974; background: linear-gradient( to bottom, white, #f0f0f0);">
-            Create Folder
-        </div>
-        <div style="border: 1px solid #074974; background: linear-gradient( to bottom, white, #f0f0f0 50%, white);">
-            <input type="text" id="tbNewFolderName" />
-            <input type="button" value="Create" onclick="filemanager_createfolder();" />
-        </div>
-    }
-}
+    <!-- Scripts for file manager -->
+    <script src="../../Scripts/CourseFilesUploader.js" type="text/javascript"></script>
+    <script src="../../Scripts/CourseFileManager.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        // Write the HTML for the file manager control
+        if (XMLHttpRequest)
+        {
+            cfm_getListing("divFileManager");
+        }
+        else
+        {
+            document.write("File upload not supported. Please upgrade your web browser.");
+        }
+    </script>
 
 <h3>Advanced File Manager (Silverlight)
 @{if (ViewBag.CanEditCourseLinks)
