@@ -34,7 +34,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             get
             {
-                return new BasicsController();
+                return new AssessmentBasicsController();
             }
         }
 

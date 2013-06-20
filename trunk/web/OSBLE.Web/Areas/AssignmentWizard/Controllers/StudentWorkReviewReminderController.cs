@@ -14,12 +14,12 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
         public override string PrettyName
         {
-            get { return "Student Work Review Settings"; }
+            get { return "Student Work Review Reminder"; }
         }
 
         public override string ControllerName
         {
-            get { return "StudentWorkReviewSettings"; }
+            get { return "StudentWorkReviewReminderController"; }
         }
 
         public override string ControllerDescription
