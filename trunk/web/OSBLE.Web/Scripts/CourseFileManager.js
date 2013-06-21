@@ -161,17 +161,18 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, allowCollapse, parentSt
         if (stateObj.allowsUploads)
         {
             // Need a button to upload files (makes uploader control appear when clicked)
-            result += "<img style=\"cursor: pointer;\" align=\"right\" " +
-                "src=\"/Content/images/add_up.png\" " +
-                "onclick='cfm_AddUploader(" + stateObjIndex.toString() + ");' " +
-                "alt=\"Upload files to this folder...\">";
+            result += "<a onclick='cfm_AddUploader(" + stateObjIndex.toString() + ");' " +
+                "title=\"Upload files to this folder...\">" + 
+                "<img style=\"cursor: pointer;\" align=\"right\" " +
+                "src=\"/Content/images/add_up.png\"></a>";
 
             // Right now we're assuming that if they can upload files then they can also 
             // create subfolders. These two concepts might need to end up being separate 
             // permission values later on.
-            result += "<img style=\"cursor: pointer;\" align=\"right\" src=\"/Content/images/folder_plus.png\" " +
-                "onclick='cfm_CreateFolderIconClicked(" + stateObjIndex.toString() + ");' " +
-                "alt=\"Create a subfolder within this folder...\">";
+            result += "<a onclick='cfm_CreateFolderIconClicked(" + stateObjIndex.toString() + ");' " +
+                "title=\"Create a subfolder within this folder...\">" +
+                "<img style=\"cursor: pointer;\" align=\"right\" " +
+                "src=\"/Content/images/folder_plus.png\"></a>";
         }
         // There's another DIV within for dynamically created controls
         result += "<div id=\"folder_controls_" + stateObjIndex.toString() +"\"></div>";
@@ -319,6 +320,13 @@ function cfm_CreateFolder(stateObjectIndex)
     {
         // Problem, but we can't do much about it
         cfm_hideControls(stateObjectIndex);
+        return;
+    }
+
+    // Folder name cannot be empty
+    if (0 == tb.value.length)
+    {
+        tb.focus();
         return;
     }
 
