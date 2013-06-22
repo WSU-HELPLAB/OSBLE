@@ -235,12 +235,27 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         {
             ext = fileName.substr(lastDotIndex);
         }
+        ext = ext.toLowerCase();
 
         // Determine an icon based on the file extension
-        if (".c" == ext || ".C" == ext) {
-            imgSrc = "/Content/images/fileextimages/c.png";
+        if (".aac" == ext || ".ai" == ext || ".aiff" == ext || ".avi" == ext ||
+            ".bmp" == ext || ".c" == ext || ".cpp" == ext || ".css" == ext ||
+            ".dat" == ext || ".dmg" == ext || ".doc" == ext || ".dotx" == ext || 
+            ".dwg" == ext || ".dxf" == ext || ".eps" == ext || ".exe" == ext || 
+            ".flv" == ext || ".gif" == ext || ".h" == ext || ".hpp" == ext ||
+            ".html" == ext || ".ics" == ext || ".iso" == ext || ".java" == ext ||
+            ".jpg" == ext || ".key" == ext || ".mid" == ext || ".mp3" == ext ||
+            ".mp4" == ext || ".mpg" == ext || ".odf" == ext || ".ods" == ext || 
+            ".odt" == ext || ".otp" == ext || ".ots" == ext || ".ott" == ext || 
+            ".pdf" == ext || ".php" == ext || ".png" == ext || ".ppt" == ext ||
+            ".psd" == ext || ".py" == ext || ".qt" == ext || ".rar" == ext ||
+            ".rb" == ext || ".rtf" == ext || ".sql" == ext || ".tga" == ext ||
+            ".tgz" == ext || ".tiff" == ext || ".txt" == ext || ".wav" == ext ||
+            ".xls" == ext || ".xlsx" == ext || ".xml" == ext || ".yml" == ext || 
+            ".zip" == ext)
+        {
+            imgSrc = "/Content/images/fileextimages/" + ext.substr(1) + ".png";
         }
-        // TODO: Many more of these
 
         // Determine an ID for the file's DIV that has both the index of the parent 
         // folder's state object and the index of this file
