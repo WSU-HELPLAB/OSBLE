@@ -166,7 +166,7 @@ namespace OSBLE.Services
             else if ("create_folder" == cmdParam)
             {
                 // Make sure they have access to this course. Right now we only let 
-                // people who can modify the course have access to this service.
+                // people who can modify the course have access to this service function.
                 if (!VerifyModifyPermissions(context, up, courseID)) { return; }
 
                 // Make sure the folder name parameter is present
@@ -180,45 +180,8 @@ namespace OSBLE.Services
                     return;
                 }
 
-                // If it starts with / or \ just strip that off
-                while (folderName.StartsWith("\\"))
-                {
-                    folderName = folderName.Substring(1);
-                }
-                while (folderName.StartsWith("/"))
-                {
-                    folderName = folderName.Substring(1);
-                }
-
-                // Folder name can't have ..\ or ../
-                if (folderName.Contains("..\\") || folderName.Contains("../"))
-                {
-                    WriteErrorResponse(
-                        context, "Specified folder name was not allowed.");
-                    return;
-                }
-
-                // It also cannot have invalid path characters
-                char[] invalid = System.IO.Path.GetInvalidPathChars();
-                foreach (char ic in invalid)
-                {
-                    if (folderName.Contains(ic))
-                    {
-                        WriteErrorResponse(
-                            context, "Folder name contains invalid character: '" + 
-                            ic.ToString() + "'");
-                        return;
-                    }
-                }
-
-                // Tests show that the array of invalid characters checked above will not 
-                // contain the ':' character, so we check for that here.
-                if (folderName.Contains(':'))
-                {
-                    WriteErrorResponse(
-                        context, "Folder name contains invalid character: ':'");
-                    return;
-                }
+                // Make sure the folder name is OK
+                if (!VerifyFolderPath(context, ref folderName)) { return; }
 
                 // Get the attributable file storage
                 AttributableFilesFilePath attrFiles =
@@ -231,22 +194,9 @@ namespace OSBLE.Services
                     return;
                 }
 
-                // The path can have subdirectories, but must be relative to the starting 
-                // folder location.
-                string path;
-                if ("/" == folderName || "\\" == folderName)
-                {
-                    path = attrFiles.GetPath();
-                }
-                else if (folderName.StartsWith("\\") || folderName.StartsWith("/"))
-                {
-                    path = System.IO.Path.Combine(
-                        attrFiles.GetPath(), folderName.Substring(1));
-                }
-                else
-                {
-                    path = System.IO.Path.Combine(attrFiles.GetPath(), folderName);
-                }
+                // Combine the relative path from the request (which has been checked 
+                // to make sure it's ok) with the path of the course files.
+                string path = System.IO.Path.Combine(attrFiles.GetPath(), folderName);
                 if (!System.IO.Directory.Exists(path))
                 {
                     System.IO.Directory.CreateDirectory(path);
@@ -259,9 +209,119 @@ namespace OSBLE.Services
                     "</CourseFilesOpsResponse>");
                 return;
             }
+            else if ("rename_folder" == cmdParam)
+            {
+                // Make sure they have access to this course. Right now we only let 
+                // people who can modify the course have access to this service function.
+                if (!VerifyModifyPermissions(context, up, courseID)) { return; }
+
+                // Make sure the folder name parameter is present
+                string folderName = string.Empty;
+                if (!VerifyStringParam(context, "folder_name", ref folderName)) { return; }
+
+                if (string.IsNullOrEmpty(folderName))
+                {
+                    WriteErrorResponse(context,
+                        "The following parameter cannot be an empty string: folder_name");
+                    return;
+                }
+
+                // Make sure the folder name is OK
+                if (!VerifyFolderPath(context, ref folderName)) { return; }
+
+                // Get the attributable file storage
+                AttributableFilesFilePath attrFiles =
+                    (new Models.FileSystem.FileSystem()).Course(courseID).CourseDocs as
+                    OSBLE.Models.FileSystem.AttributableFilesFilePath;
+                if (null == attrFiles)
+                {
+                    WriteErrorResponse(context,
+                        "Internal error: could not get attributable files manager for course files.");
+                    return;
+                }
+
+                // Combine the relative path from the request (which has been checked 
+                // to make sure it's ok) with the path of the course files.
+                string path = System.IO.Path.Combine(attrFiles.GetPath(), folderName);
+                if (!System.IO.Directory.Exists(path))
+                {
+                    // We can't rename a directory that doesn't exist
+                    WriteErrorResponse(context,
+                        "Error: Could not find folder to rename: " + folderName);
+                    return;
+                }
+
+                // Now make sure we have the new_name parameter
+                string newName = string.Empty;
+                if (!VerifyStringParam(context, "new_name", ref newName)) { return; }
+
+                // Verify that it's OK
+                if (!VerifyFolderPath(context, ref newName)) { return; }
+                // Also it must be just the folder name and not have / or \
+                if (newName.Contains('/') || newName.Contains('\\'))
+                {
+                    WriteErrorResponse(context,
+                        "New folder name must not contain a path, just the new folder name.");
+                    return;
+                }
+                // Lastly, it must not be empty
+                if (string.IsNullOrEmpty(newName))
+                {
+                    WriteErrorResponse(context,
+                        "New folder name cannot be empty.");
+                    return;
+                }
+
+                string newNameFull = System.IO.Path.Combine(
+                    System.IO.Path.GetDirectoryName(path), newName);
+
+                // Do the actual rename (move)
+                System.IO.Directory.Move(path, newNameFull);
+
+                // Do the same for the corresponding folder in the attributable 
+                // files directory
+                path = System.IO.Path.Combine(attrFiles.AttrFilesPath, folderName);
+                if (System.IO.Directory.Exists(path))
+                {
+                    newNameFull = System.IO.Path.Combine(
+                        System.IO.Path.GetDirectoryName(path), newName);
+                    System.IO.Directory.Move(path, newNameFull);
+                }
+
+                // Return success message
+                context.Response.Write(
+                    "<CourseFilesOpsResponse success=\"true\">" +
+                    attrFiles.GetXMLListing(courseUser, false) +
+                    "</CourseFilesOpsResponse>");
+                return;
+            }
             
             // Coming here implies an unknown command
             WriteErrorResponse(context, "Unknown command: " + cmdParam);
+        }
+
+        private static bool VerifyCoursePermissions(HttpContext context, Models.Users.UserProfile up,
+            int courseID)
+        {
+            OSBLEContext _db = new OSBLEContext();
+            CourseUser courseUser = (
+                                      from cu in _db.CourseUsers
+                                      where cu.UserProfileID == up.ID
+                                      &&
+                                      cu.AbstractCourse is Course
+                                      &&
+                                      cu.AbstractCourseID == courseID
+                                      select cu
+                                      ).FirstOrDefault();
+            if (null == courseUser)
+            {
+                WriteErrorResponse(context,
+                    "The specified user does not have access to course with ID=" +
+                    courseID.ToString() + ".");
+                return false;
+            }
+
+            return true;
         }
 
         private static bool VerifyIntParam(HttpContext context, string paramName, ref int value)
@@ -288,24 +348,53 @@ namespace OSBLE.Services
             return true;
         }
 
-        private static bool VerifyCoursePermissions(HttpContext context, Models.Users.UserProfile up,
-            int courseID)
+        /// <summary>
+        /// Verifies that a specific folder path would be ok to have in the 
+        /// file system. Note that this is NOT a check to see if the specified 
+        /// folder exists. It is a check to make sure the folder path has 
+        /// valid characters, doesn't go up to prior directories, etc.
+        /// If the string starts with the / or \ character then this will be 
+        /// removed.
+        /// </summary>
+        private bool VerifyFolderPath(HttpContext context, ref string folderPath)
         {
-            OSBLEContext _db = new OSBLEContext();
-            CourseUser courseUser = (
-                                      from cu in _db.CourseUsers
-                                      where cu.UserProfileID == up.ID
-                                      &&
-                                      cu.AbstractCourse is Course
-                                      &&
-                                      cu.AbstractCourseID == courseID
-                                      select cu
-                                      ).FirstOrDefault();
-            if (null == courseUser)
+            // If it starts with / or \ just strip that off
+            while (folderPath.StartsWith("\\"))
             {
-                WriteErrorResponse(context,
-                    "The specified user does not have access to course with ID=" +
-                    courseID.ToString() + ".");
+                folderPath = folderPath.Substring(1);
+            }
+            while (folderPath.StartsWith("/"))
+            {
+                folderPath = folderPath.Substring(1);
+            }
+
+            // Folder name can't have ..\ or ../
+            if (folderPath.Contains("..\\") || folderPath.Contains("../"))
+            {
+                WriteErrorResponse(
+                    context, "Specified folder name was not allowed.");
+                return false;
+            }
+
+            // It also cannot have invalid path characters
+            char[] invalid = System.IO.Path.GetInvalidPathChars();
+            foreach (char ic in invalid)
+            {
+                if (folderPath.Contains(ic))
+                {
+                    WriteErrorResponse(
+                        context, "Folder name contains invalid character: '" +
+                        ic.ToString() + "'");
+                    return  false;
+                }
+            }
+
+            // Tests show that the array of invalid characters checked above will not 
+            // contain the ':' character, so we check for that here.
+            if (folderPath.Contains(':'))
+            {
+                WriteErrorResponse(
+                    context, "Folder name contains invalid character: ':'");
                 return false;
             }
 

@@ -151,7 +151,7 @@ namespace OSBLE.Models.FileSystem
             return new AttributableFileCollection(DataFilesPath, AttrFilesPath, true);
         }
 
-        private string AttrFilesPath
+        public string AttrFilesPath
         {
             get
             {
@@ -382,17 +382,22 @@ namespace OSBLE.Models.FileSystem
                 if (string.IsNullOrEmpty(attrFileName) ||
                     !System.IO.File.Exists(attrFileName))
                 {
-                    continue;
+                    // Add a file with no attributes
+                    sb.AppendFormat("<file name=\"{0}\"></file>",
+                        System.IO.Path.GetFileName(file));
                 }
-
-                string xml = System.IO.File.ReadAllText(attrFileName);
-                if (xml.StartsWith("<?xml"))
+                else
                 {
-                    int i = xml.IndexOf("?>");
-                    xml = xml.Substring(i + 2);
+                    // Add a file with attributes from its attribute XML file
+                    string xml = System.IO.File.ReadAllText(attrFileName);
+                    if (xml.StartsWith("<?xml"))
+                    {
+                        int i = xml.IndexOf("?>");
+                        xml = xml.Substring(i + 2);
+                    }
+                    sb.AppendFormat("<file name=\"{0}\">{1}</file>",
+                        System.IO.Path.GetFileName(file), xml);
                 }
-                sb.AppendFormat("<file name=\"{0}\">{1}</file>",
-                    System.IO.Path.GetFileName(file), xml);
             }
         }
 
