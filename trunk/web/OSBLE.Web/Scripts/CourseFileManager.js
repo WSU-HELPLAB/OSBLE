@@ -34,6 +34,7 @@ function cfm_getListing(targetDIVID)
         false);
     //req.addEventListener("abort", assignmentfilemanager_canceled, false);
     req.open("GET", "../Services/CourseFilesOps.ashx?cmd=course_files_list&courseID=" + courseID);
+    req.setRequestHeader("Cache-control", "no-cache");
     req.send();
 }
 
@@ -174,23 +175,14 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         else { result += folderName; }
         if (stateObj.allowsUploads)
         {
-            // Right now we're assuming that if they can upload files then they can also 
-            // create subfolders. These two concepts might need to end up being separate 
-            // permission values later on.
-            result += "<a onclick='cfm_CreateFolderIconClicked(" + stateObjIndex.toString() + ");' " +
-                "title=\"Create a subfolder within this folder...\">" +
-                "<img style=\"cursor: pointer;\" align=\"right\" " +
-                "src=\"/Content/images/folder_plus.png\"></a>";
-
-            // Need a button to upload files (makes uploader control appear when clicked)
-            result += "<a onclick='cfm_AddUploader(" + stateObjIndex.toString() + ");' " +
-                "title=\"Upload files to this folder...\">" +
-                "<img style=\"cursor: pointer;\" align=\"right\" " +
-                "src=\"/Content/images/add_up.png\"></a>";
-
-            // Can only rename if not root
+            // Can only rename and delete if not root
             if ("/" != folderPath)
             {
+                result += "<a onclick='cfm_DeleteFolderIconClicked(" + stateObjIndex.toString() + ");' " +
+                    "title=\"Delete this folder...\">" +
+                    "<img style=\"cursor: pointer;\" align=\"right\" " +
+                    "src=\"/Content/images/delete_up.png\"></a>";
+
                 // Again we're assuming that if they can upload files then they can also 
                 // rename folders. These two concepts might need to end up being separate 
                 // permission values later on.
@@ -199,6 +191,20 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
                     "<img style=\"cursor: pointer;\" align=\"right\" " +
                     "src=\"/Content/images/edit_up.png\"></a>";
             }
+
+            // Need a button to upload files (makes uploader control appear when clicked)
+            result += "<a onclick='cfm_AddUploader(" + stateObjIndex.toString() + ");' " +
+                "title=\"Upload files to this folder...\">" +
+                "<img style=\"cursor: pointer;\" align=\"right\" " +
+                "src=\"/Content/images/add_up.png\"></a>";
+
+            // Right now we're assuming that if they can upload files then they can also 
+            // create subfolders. These two concepts might need to end up being separate 
+            // permission values later on.
+            result += "<a onclick='cfm_CreateFolderIconClicked(" + stateObjIndex.toString() + ");' " +
+                "title=\"Create a subfolder within this folder...\">" +
+                "<img style=\"cursor: pointer;\" align=\"right\" " +
+                "src=\"/Content/images/folder_plus.png\"></a>";
         }
         // There's another DIV within for dynamically created controls
         result += "<div id=\"folder_controls_" + stateObjIndex.toString() +"\"></div>";
@@ -280,6 +286,8 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
     return result;
 }
 
+// Functions below here are in alphabetical order. Keep them that way.
+
 // Counts the number of child nodes under listNode that have a node type of 1 and 
 // a node name that matches node_name.
 function cfm_CountChildrenWithName(listNode, node_name)
@@ -308,37 +316,6 @@ function cfm_AddUploader(stateObjectIndex)
     targetDIV.innerHTML = "<br />" + fileuploader_getcontrolshtml(
         "cfm_files", true, "cfm_GetExtraServiceArgs(" + stateObjectIndex.toString() + ");", 
         "cfm_uploadComplete(" + stateObjectIndex.toString() + ");");
-
-    // Mark the controls as visible
-    state.controlsVisible = true;
-}
-
-// Function that gets the extra service arguments for the file uploader web service. We 
-// need to add an argument that indicates what the target folder is.
-function cfm_GetExtraServiceArgs(stateObjectIndex)
-{
-    // Get the state object at the specified index
-    var state = cfm_states[stateObjectIndex];
-
-    // The state object has the target folder information
-    return "&target_folder=" + state.targetFolder;
-}
-
-function cfm_CreateFolderIconClicked(stateObjectIndex)
-{
-    // Get the state object at the specified index
-    var state = cfm_states[stateObjectIndex];
-
-    // Find the appropriate DIV
-    var targetDIV = document.getElementById("folder_controls_" + stateObjectIndex.toString());
-
-    // Add the creation controls into the DIV
-    targetDIV.innerHTML = "<br />Create Folder:&nbsp;" +
-        "<input type=\"text\" id=\"tbSubfolder_" + stateObjectIndex.toString() + "\" />" +
-        "<br /><input type=\"button\" value=\"Create\" style=\"width: 100%;\" " +
-        "onclick=\"cfm_CreateFolder(" + stateObjectIndex.toString() + ");\" />" +
-        "<br /><input type=\"button\" value=\"Cancel\" style=\"width: 100%;\" " + 
-        "onclick=\"cfm_hideControls(" + stateObjectIndex.toString() + ");\" />";
 
     // Mark the controls as visible
     state.controlsVisible = true;
@@ -378,12 +355,14 @@ function cfm_CreateFolder(stateObjectIndex)
     }
     name += tb.value;
 
-    // Make an XML HTTP request to the service
+    // Make an XML HTTP request to the service. The service will return an 
+    // updated file listing in response to the folder creation request, 
+    // provided it succeeds.
     var req = new XMLHttpRequest();
     req.addEventListener("load",
         function (args)
         {
-            cfm_getListing(state.fm_div_ID);
+            cfm_listcompletion(args, state.fm_div_ID);
         },
         false);
     req.addEventListener("error",
@@ -392,6 +371,70 @@ function cfm_CreateFolder(stateObjectIndex)
     req.open("POST", "../Services/CourseFilesOps.ashx?cmd=create_folder&courseID=" +
         courseID + "&folder_name=" + name);
     req.send();
+}
+
+function cfm_CreateFolderIconClicked(stateObjectIndex)
+{
+    // Get the state object at the specified index
+    var state = cfm_states[stateObjectIndex];
+
+    // Find the appropriate DIV
+    var targetDIV = document.getElementById("folder_controls_" + stateObjectIndex.toString());
+
+    // Add the creation controls into the DIV
+    targetDIV.innerHTML = "<br />Create Folder:&nbsp;" +
+        "<input type=\"text\" id=\"tbSubfolder_" + stateObjectIndex.toString() + "\" />" +
+        "<br /><input type=\"button\" value=\"Create\" style=\"width: 100%;\" " +
+        "onclick=\"cfm_CreateFolder(" + stateObjectIndex.toString() + ");\" />" +
+        "<br /><input type=\"button\" value=\"Cancel\" style=\"width: 100%;\" " +
+        "onclick=\"cfm_hideControls(" + stateObjectIndex.toString() + ");\" />";
+
+    // Mark the controls as visible
+    state.controlsVisible = true;
+}
+
+function cfm_DeleteFolder(stateObjectIndex)
+{
+    // Get the state object at the specified index
+    var state = cfm_states[stateObjectIndex];
+
+    // Get the current course ID
+    var selectCourseObj = document.getElementById("course_select");
+    var courseID = selectCourseObj.value;
+
+    // Make an XML HTTP request to the service
+    var req = new XMLHttpRequest();
+    req.addEventListener("load",
+        function (args)
+        {
+            cfm_listcompletion(args, state.fm_div_ID);
+        },
+        false);
+    req.addEventListener("error",
+        function (args) { alert("Folder creation error"); },
+        false);
+    req.open("POST", "../Services/CourseFilesOps.ashx?cmd=delete_folder&courseID=" +
+        courseID + "&folder_name=" + state.targetFolder);
+    req.send();
+}
+
+function cfm_DeleteFolderIconClicked(stateObjectIndex)
+{
+    // Get the state object at the specified index
+    var state = cfm_states[stateObjectIndex];
+
+    // Find the appropriate DIV
+    var targetDIV = document.getElementById("folder_controls_" + stateObjectIndex.toString());
+
+    // Add the confirmation controls into the DIV
+    targetDIV.innerHTML = "<br />Are you sure you want to delete this folder and all its contents?" +
+        "<br /><input type=\"button\" value=\"Yes, delete\" style=\"width: 100%;\" " +
+        "onclick=\"cfm_DeleteFolder(" + stateObjectIndex.toString() + ");\" />" +
+        "<br /><input type=\"button\" value=\"No, cancel\" style=\"width: 100%;\" " +
+        "onclick=\"cfm_hideControls(" + stateObjectIndex.toString() + ");\" />";
+
+    // Mark the controls as visible
+    state.controlsVisible = true;
 }
 
 function cfm_expand_collapse(stateObjectIndex)
@@ -473,6 +516,17 @@ function cfm_expand_collapse(stateObjectIndex)
     if (null != theIMG) { theIMG.src = state.getExpanderImgSrc(); }
 }
 
+// Function that gets the extra service arguments for the file uploader web service. We 
+// need to add an argument that indicates what the target folder is.
+function cfm_GetExtraServiceArgs(stateObjectIndex)
+{
+    // Get the state object at the specified index
+    var state = cfm_states[stateObjectIndex];
+
+    // The state object has the target folder information
+    return "&target_folder=" + state.targetFolder;
+}
+
 function cfm_hideControls(stateObjectIndex)
 {
     var cntrls = document.getElementById("folder_controls_" + stateObjectIndex.toString());
@@ -509,7 +563,7 @@ function cfm_RenameFolder(stateObjectIndex)
     req.addEventListener("load",
         function (args)
         {
-            cfm_getListing(state.fm_div_ID);
+            cfm_listcompletion(args, state.fm_div_ID);
         },
         false);
     req.addEventListener("error",
@@ -529,9 +583,10 @@ function cfm_RenameFolderIconClicked(stateObjectIndex)
     var targetDIV = document.getElementById("folder_controls_" + stateObjectIndex.toString());
 
     // Add the rename controls into the DIV
-    targetDIV.innerHTML = "<br /><input type=\"text\" id=\"tbRenameFolder_" + stateObjectIndex.toString() +
-        "\"  value=\"" + state.name + "\" >" +
-        "<br /><input type=\"button\" value=\"Rename\" style=\"width: 100%;\" " +
+    targetDIV.innerHTML = "<br /><div><input type=\"text\" id=\"tbRenameFolder_" +
+        stateObjectIndex.toString() + "\" value=\"" + state.name +
+        "\" style=\"width: 100%; box-sizing: border-box;\"></div>" +
+        "<input type=\"button\" value=\"Rename\" style=\"width: 100%;\" " +
         "onclick=\"cfm_RenameFolder(" + stateObjectIndex.toString() + ");\" />" +
         "<br /><input type=\"button\" value=\"Cancel\" style=\"width: 100%;\" " +
         "onclick=\"cfm_hideControls(" + stateObjectIndex.toString() + ");\" />";
