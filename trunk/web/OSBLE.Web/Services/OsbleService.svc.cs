@@ -198,20 +198,26 @@ namespace OSBLE.Services
                 }
             }
 
+            //AC: The rules listed below are too convoluted for the average instructor to
+            //remember.  As a simple workaround, if we were passed a CRD by accident (see above IF check)
+            //then we can assume that instructors now want students to be able to access the merged review.
+            //In this case, bypass all of these checks.  Otherwise, proceed as normal.
 
-            //only continue if:
-            // a: the assignment's due date has passed
-            // b: the assignment is set up to release critical reviews to students after
-            //    the due date.
-            // c: the instructor has clicked the "Publish All Reviews" link on the 
-            //    assignment details page. (turned off for now)
-            if (criticalReviewAssignment.DueDate > DateTime.UtcNow
-                || 
-                (criticalReviewAssignment.CriticalReviewSettings != null && criticalReviewAssignment.CriticalReviewSettings.AllowDownloadAfterPublish == false)
-                //&& criticalReviewAssignment.CriticalReviewPublishDate != null
-                )
+            if (criticalReviewAssignment.Type != AssignmentTypes.CriticalReviewDiscussion)
             {
-                return new byte[0];
+                //only continue if:
+                // a: the assignment's due date has passed
+                // b: the assignment is set up to release critical reviews to students after
+                //    the due date.
+                // c: the instructor has clicked the "Publish All Reviews" link on the 
+                //    assignment details page. (turned off for now)
+                if (criticalReviewAssignment.DueDate > DateTime.UtcNow
+                    ||
+                    (criticalReviewAssignment.CriticalReviewSettings != null && criticalReviewAssignment.CriticalReviewSettings.AllowDownloadAfterPublish == false)
+                    )
+                {
+                    return new byte[0];
+                }
             }
 
             //make sure that the user is enrolled in the course
@@ -233,12 +239,12 @@ namespace OSBLE.Services
             //   so that everything in a review team will also be inside a discussion team.  Pulling 
             //   from discussion teams allows us to capture moderators and other observer-type
             //   people that have been attached to the review process.
-            
+
             //step 1: check to see if the critical review assignment has any discussion assignments attached
             Assignment discussionAssignment = (from a in _db.Assignments
-                                              where a.PrecededingAssignmentID == criticalReviewAssignmentId
-                                              && a.AssignmentTypeID == (int)AssignmentTypes.CriticalReviewDiscussion
-                                              select a
+                                               where a.PrecededingAssignmentID == criticalReviewAssignmentId
+                                               && a.AssignmentTypeID == (int)AssignmentTypes.CriticalReviewDiscussion
+                                               select a
                                               ).FirstOrDefault();
 
             IList<IReviewTeam> authorTeams = new List<IReviewTeam>();
@@ -443,7 +449,7 @@ namespace OSBLE.Services
                                     .Assignment(submissionAssignment.ID)
                                     .Submission(teamToReview.AuthorTeamID)
                                     .AllFiles();
-                
+
                 //don't create a zip if we have have nothing to zip.
                 if (fc.Count > 0)
                 {
