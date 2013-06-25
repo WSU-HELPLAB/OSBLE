@@ -88,7 +88,7 @@ namespace OSBLE.Services
                 }
 
                 // Get the attributable file storage
-                AttributableFilesFilePath attrFiles =
+                AttributableFilesPath attrFiles =
                     (new Models.FileSystem.FileSystem()).Course(courseID).Assignment(aID).AttributableFiles;
                 if (null == attrFiles)
                 {
@@ -123,7 +123,7 @@ namespace OSBLE.Services
                 fileName = System.IO.Path.GetFileName(fileName);
 
                 // Get the attributable file storage
-                AttributableFilesFilePath attrFiles =
+                AttributableFilesPath attrFiles =
                     (new Models.FileSystem.FileSystem()).Course(courseID).Assignment(aID).AttributableFiles;
                 if (null == attrFiles)
                 {
@@ -184,9 +184,9 @@ namespace OSBLE.Services
                 if (!VerifyFolderPath(context, ref folderName)) { return; }
 
                 // Get the attributable file storage
-                AttributableFilesFilePath attrFiles =
+                AttributableFilesPath attrFiles =
                     (new Models.FileSystem.FileSystem()).Course(courseID).CourseDocs as
-                    OSBLE.Models.FileSystem.AttributableFilesFilePath;
+                    OSBLE.Models.FileSystem.AttributableFilesPath;
                 if (null == attrFiles)
                 {
                     WriteErrorResponse(context,
@@ -235,9 +235,9 @@ namespace OSBLE.Services
                 if (!VerifyFolderPath(context, ref folderName)) { return; }
 
                 // Get the attributable file storage
-                AttributableFilesFilePath attrFiles =
+                AttributableFilesPath attrFiles =
                     (new Models.FileSystem.FileSystem()).Course(courseID).CourseDocs as
-                    OSBLE.Models.FileSystem.AttributableFilesFilePath;
+                    OSBLE.Models.FileSystem.AttributableFilesPath;
                 if (null == attrFiles)
                 {
                     WriteErrorResponse(context,
@@ -466,9 +466,9 @@ namespace OSBLE.Services
             Models.Users.UserProfile up, int courseID)
         {
             // Get the attributable file storage
-            AttributableFilesFilePath attrFiles =
+            AttributableFilesPath attrFiles =
                 (new Models.FileSystem.FileSystem()).Course(courseID).CourseDocs as
-                OSBLE.Models.FileSystem.AttributableFilesFilePath;
+                OSBLE.Models.FileSystem.AttributableFilesPath;
             if (null == attrFiles)
             {
                 WriteErrorResponse(context,
@@ -544,9 +544,9 @@ namespace OSBLE.Services
             if (!VerifyFolderPath(context, ref folderName)) { return; }
 
             // Get the attributable file storage
-            AttributableFilesFilePath attrFiles =
+            AttributableFilesPath attrFiles =
                 (new Models.FileSystem.FileSystem()).Course(courseID).CourseDocs as
-                OSBLE.Models.FileSystem.AttributableFilesFilePath;
+                OSBLE.Models.FileSystem.AttributableFilesPath;
             if (null == attrFiles)
             {
                 WriteErrorResponse(context,

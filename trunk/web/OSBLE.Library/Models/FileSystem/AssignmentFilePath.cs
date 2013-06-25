@@ -26,7 +26,7 @@ namespace OSBLE.Models.FileSystem
             // a diagram of the file system.
 
             string p = this.GetPath();
-            return new AttributableFilesFilePath(
+            return new AttributableFilesPath(
                 this, // For compatibility
                 Path.Combine(p, "Submissions", teamID.ToString()),
                 Path.Combine(p, "SubmissionsAttr", teamID.ToString()));
@@ -59,12 +59,12 @@ namespace OSBLE.Models.FileSystem
         /// like files for detailed descriptions of the assignment requirements, files 
         /// for assignment solutions, and so on.
         /// </summary>
-        public AttributableFilesFilePath AttributableFiles
+        public AttributableFilesPath AttributableFiles
         {
             get
             {
                 string path = this.GetPath();
-                return new AttributableFilesFilePath(
+                return new AttributableFilesPath(
                     new FileSystem(Path.Combine(path, "AssignmentDocs")),
                     Path.Combine(path, "AssignmentDocs"),
                     Path.Combine(path, "AssignmentDocsAttr"));

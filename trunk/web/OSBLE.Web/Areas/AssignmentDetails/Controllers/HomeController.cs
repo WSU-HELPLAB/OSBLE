@@ -33,7 +33,7 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
             if (assignment.CourseID.HasValue)
             {
                 OSBLE.Models.FileSystem.FileSystem fs = new OSBLE.Models.FileSystem.FileSystem();
-                OSBLE.Models.FileSystem.AttributableFilesFilePath attrFiles =
+                OSBLE.Models.FileSystem.AttributableFilesPath attrFiles =
                     fs.Course(assignment.CourseID.Value).Assignment(assignmentId).AttributableFiles;
                 OSBLE.Models.FileSystem.FileCollection files = 
                     attrFiles.GetFilesWithSystemAttribute("assignment_description", assignmentId.ToString());
@@ -116,8 +116,8 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
                     }
 
                     // Get the submission for the team
-                    OSBLE.Models.FileSystem.AttributableFilesFilePath attrFP =
-                        afs.Submission(teamID) as OSBLE.Models.FileSystem.AttributableFilesFilePath;
+                    OSBLE.Models.FileSystem.AttributableFilesPath attrFP =
+                        afs.Submission(teamID) as OSBLE.Models.FileSystem.AttributableFilesPath;
                     AttributableFile file = attrFP.FirstFile;
                     if (null == file)
                     {

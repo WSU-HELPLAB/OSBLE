@@ -159,11 +159,11 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 OSBLE.Models.FileSystem.CourseFilePath cfp =
                     (new OSBLE.Models.FileSystem.FileSystem()).Course(Assignment.CourseID.Value);
-                OSBLE.Models.FileSystem.AttributableFilesFilePath temp =
+                OSBLE.Models.FileSystem.AttributableFilesPath temp =
                     cfp.Assignment(tempID).AttributableFiles;
-                OSBLE.Models.FileSystem.AttributableFilesFilePath perm =
+                OSBLE.Models.FileSystem.AttributableFilesPath perm =
                     cfp.Assignment(Assignment.ID).AttributableFiles;
-                OSBLE.Models.FileSystem.AttributableFilesFilePath.MoveAll(temp, perm, true);
+                OSBLE.Models.FileSystem.AttributableFilesPath.MoveAll(temp, perm, true);
 
                 // After the move, we need to make sure that we update attributes because 
                 // the attributes will label the files as assignment descriptions/solutions 

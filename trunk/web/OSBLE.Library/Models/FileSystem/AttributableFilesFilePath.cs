@@ -22,13 +22,13 @@ namespace OSBLE.Models.FileSystem
     ///   data file that has no accompanying XML attribute file and thus implicitly has no 
     ///   attributes.
     /// </summary>
-    public class AttributableFilesFilePath : FileSystemBase
+    public class AttributableFilesPath : FileSystemBase
     {
         private string m_attrDir;
         
         private string m_dataDir;
         
-        public AttributableFilesFilePath(IFileSystem pathBuilder, string dataPath, string attrPath)
+        public AttributableFilesPath(IFileSystem pathBuilder, string dataPath, string attrPath)
             : base(pathBuilder)
         {
             m_dataDir = dataPath;
@@ -175,7 +175,7 @@ namespace OSBLE.Models.FileSystem
                 return null;
             }
 
-            return new AttributableFilesFilePath(
+            return new AttributableFilesPath(
                 this, path, Path.Combine(m_attrDir, name));
         }
 
@@ -406,8 +406,8 @@ namespace OSBLE.Models.FileSystem
         /// empty folders remaining from the source storage can optionally be 
         /// removed when the move is completed.
         /// </summary>
-        public static int MoveAll(AttributableFilesFilePath from,
-            AttributableFilesFilePath to, bool deleteFromFoldersWhenDone)
+        public static int MoveAll(AttributableFilesPath from,
+            AttributableFilesPath to, bool deleteFromFoldersWhenDone)
         {
             int moved = 0;
             string[] srcFiles = System.IO.Directory.GetFiles(from.m_dataDir);

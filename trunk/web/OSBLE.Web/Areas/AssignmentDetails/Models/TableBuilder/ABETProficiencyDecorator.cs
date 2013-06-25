@@ -28,10 +28,10 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
             {
                 OSBLE.Models.FileSystem.FileSystem fs =
                 new OSBLE.Models.FileSystem.FileSystem();
-                AttributableFilesFilePath fp = fs.
+                AttributableFilesPath fp = fs.
                     Course(assignmentTeam.Assignment.Course).
                     Assignment(assignmentTeam.AssignmentID).
-                    Submission(assignmentTeam.TeamID) as AttributableFilesFilePath;
+                    Submission(assignmentTeam.TeamID) as AttributableFilesPath;
                 AttributableFile af = fp.FirstFile;
                 if (null == af)
                 {

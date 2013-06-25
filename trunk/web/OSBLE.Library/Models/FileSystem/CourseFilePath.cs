@@ -41,7 +41,7 @@ namespace OSBLE.Models.FileSystem
             get
             {
                 string path = this.GetPath();
-                return new AttributableFilesFilePath(
+                return new AttributableFilesPath(
                     new FileSystem(Path.Combine(GetPath(), "CourseDocs")), // For compatibility
                     Path.Combine(path, "CourseDocs"),
                     Path.Combine(path, "CourseDocsAttr"));

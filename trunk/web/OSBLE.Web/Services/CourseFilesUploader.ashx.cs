@@ -183,7 +183,7 @@ namespace OSBLE.Services
                 }
 
                 // Get the attributable files storage for this assignment
-                OSBLE.Models.FileSystem.AttributableFilesFilePath attrFiles = afs.AttributableFiles;
+                OSBLE.Models.FileSystem.AttributableFilesPath attrFiles = afs.AttributableFiles;
                 if (null == attrFiles)
                 {
                     WriteErrorResponse(context,
