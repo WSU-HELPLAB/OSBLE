@@ -119,7 +119,7 @@
     <Compile Include="Models\DiscussionAssignment\DiscussionPost.cs" />
     <Compile Include="Models\FileSystem\AssignmentFilePath.cs" />
     <Compile Include="Models\FileSystem\AttributableFile.cs" />
-    <Compile Include="Models\FileSystem\AttributableFilesFilePath.cs" />
+    <Compile Include="Models\FileSystem\AttributableFilesPath.cs" />
     <Compile Include="Models\FileSystem\CourseFilePath.cs" />
     <Compile Include="Models\FileSystem\EmptyFilePathDecorator.cs" />
     <Compile Include="Models\FileSystem\FileCollection.cs" />

@@ -383,8 +383,8 @@ namespace OSBLE.Models.FileSystem
                     !System.IO.File.Exists(attrFileName))
                 {
                     // Add a file with no attributes
-                    sb.AppendFormat("<file name=\"{0}\"></file>",
-                        System.IO.Path.GetFileName(file));
+                    sb.AppendFormat("<file name=\"{0}\" can_delete=\"{1}\"></file>",
+                        System.IO.Path.GetFileName(file), canDeleteFolders);
                 }
                 else
                 {
@@ -395,8 +395,8 @@ namespace OSBLE.Models.FileSystem
                         int i = xml.IndexOf("?>");
                         xml = xml.Substring(i + 2);
                     }
-                    sb.AppendFormat("<file name=\"{0}\">{1}</file>",
-                        System.IO.Path.GetFileName(file), xml);
+                    sb.AppendFormat("<file name=\"{0}\" can_delete=\"{2}\">{1}</file>",
+                        System.IO.Path.GetFileName(file), xml, canDeleteFolders);
                 }
             }
         }
@@ -444,6 +444,40 @@ namespace OSBLE.Models.FileSystem
             catch (Exception) { return null; }
 
             return fs;
+        }
+
+        /// <summary>
+        /// Renames a file and its corresponding attribute file. The existing 
+        /// file name must be an absolute (rooted) path name.
+        /// </summary>
+        public bool RenameFile(string rootedFileName, string newFileName)
+        {
+            // Two possible cases:
+            // 1. fileName starts with m_dataDir, indicating that the file name
+            //    is absolute.
+            // 2. fileName does not start with m_dataDir, in which case we  
+            //    return false.
+
+            if (!rootedFileName.StartsWith(m_dataDir))
+            {
+                return false;
+            }
+
+            // Quick security check
+            if (rootedFileName.Contains("../") || rootedFileName.Contains("..\\"))
+            {
+                return false;
+            }
+
+            // First rename data file
+            System.IO.File.Move(rootedFileName, Path.Combine(m_dataDir, newFileName));
+
+            // Now the attribute file
+            System.IO.File.Move(
+                AttributableFileCollection.GetAttrFileName(m_attrDir, rootedFileName),
+                Path.Combine(m_attrDir, "attr_" + newFileName + ".xml"));
+
+            return true;
         }
 
         public void ReplaceSysAttrAll(string name, string oldValue, string newValue)

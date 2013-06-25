@@ -33,7 +33,8 @@ function cfm_getListing(targetDIVID)
         function (args) { document.getElementById(targetDIVID).innerHTML = "(error)"; },
         false);
     //req.addEventListener("abort", assignmentfilemanager_canceled, false);
-    req.open("GET", "../Services/CourseFilesOps.ashx?cmd=course_files_list&courseID=" + courseID);
+    req.open("GET", "../Services/CourseFilesOps.ashx?cmd=course_files_list&courseID=" + courseID +
+        "&force_nocache=" + (new Date()).toString());
     req.setRequestHeader("Cache-control", "no-cache");
     req.send();
 }
@@ -120,20 +121,23 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         var canUploadTo = tempNode.getAttribute("can_upload_to");
         if (null != canUploadTo && "true" == canUploadTo.toLowerCase()) { canUploadTo = true; }
         else { canUploadTo = false; }
+        var canDelete = tempNode.getAttribute("can_delete");
+        if (null != canDelete && "true" == canDelete.toLowerCase()) { canDelete = true; }
+        else { canDelete = false; }
 
         // Each folder has a state object associate with it
         var stateObj = {
             arrayIndex: cfm_states.length,
+            allowsDeletion: canDelete,
             allowsUploads: canUploadTo,
             allowsCollapsing: true, // For now everything can be collapsed
             controlsVisible: false,
             expanded: false,
-            existsOnServer: true,
             fm_div_ID: targetDIVID,
+            isFolder: true,
             name: folderName,
             parentIndex: parentStateIndex,
             targetFolder: folderPath,
-            getServiceArgs: function () { return this.targetFolder; },
             getExpanderImgSrc: function() {
                 if (this.expanded)
                 {
@@ -178,10 +182,13 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
             // Can only rename and delete if not root
             if ("/" != folderPath)
             {
-                result += "<a onclick='cfm_DeleteFolderIconClicked(" + stateObjIndex.toString() + ");' " +
-                    "title=\"Delete this folder...\">" +
-                    "<img style=\"cursor: pointer;\" align=\"right\" " +
-                    "src=\"/Content/images/delete_up.png\"></a>";
+                if (stateObj.allowsDeletion)
+                {
+                    result += "<a onclick='cfm_DeleteFolderIconClicked(" + stateObjIndex.toString() + ");' " +
+                        "title=\"Delete this folder...\">" +
+                        "<img style=\"cursor: pointer;\" align=\"right\" " +
+                        "src=\"/Content/images/delete_up.png\"></a>";
+                }
 
                 // Again we're assuming that if they can upload files then they can also 
                 // rename folders. These two concepts might need to end up being separate 
@@ -223,15 +230,11 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
     }
 
     // Go through the list of files
-    var hasFiles = false;
     j = 0;
     for (var i = 0; i < listNode.childNodes.length; i++)
     {
         var tempNode = listNode.childNodes[i];
         if (null == tempNode || 1 != tempNode.nodeType || "file" != tempNode.nodeName) { continue; }
-
-        // We've encountered a file
-        hasFiles = true;
 
         var fileName = tempNode.getAttribute("name");
         var imgSrc = "/Content/images/fileextimages/_blank.png";
@@ -242,6 +245,40 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
             ext = fileName.substr(lastDotIndex);
         }
         ext = ext.toLowerCase();
+
+        // Determine relevant permissions
+        var canDelete = tempNode.getAttribute("can_delete");
+        if (null != canDelete && "true" == canDelete.toLowerCase()) { canDelete = true; }
+        else { canDelete = false; }
+
+        var theFullPath = relativeDir;
+        if (null == theFullPath || 0 == theFullPath.length)
+        {
+            theFullPath = "/" + fileName;
+        }
+        else
+        {
+            theFullPath = relativeDir + "/" + fileName;
+        }
+
+        // Each file also has a state object associated with it. The states are very 
+        // similar to the folder object states, but not identical. They do however 
+        // go in the same global array.
+        var fileStateObj = {
+            arrayIndex: cfm_states.length,
+            allowsDeletion: canDelete,
+            controlsVisible: false,
+            fm_div_ID: targetDIVID,
+            fullPath: theFullPath,
+            isFolder: false,
+            name: fileName,
+            parentIndex: parentStateIndex,
+            targetFolder: relativeDir
+        };
+
+        // Put it in the global array
+        var stateObjIndex = cfm_states.length;
+        cfm_states[stateObjIndex] = fileStateObj;
 
         // Determine an icon based on the file extension
         if (".aac" == ext || ".ai" == ext || ".aiff" == ext || ".avi" == ext ||
@@ -271,7 +308,7 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         // Make a link for the file downloader service
         // Note that we need relative path in filename for files in folders
         var linkURL = "/FileHandler/CourseDocument?courseId=" + 
-            courseID.toString() + "&filePath=" + relativeDir + "/" + fileName;
+            courseID.toString() + "&filePath=" + fileStateObj.fullPath;
 
         result += "<div id=\"" + theID + "\" style=\"padding: 3px; background-color: ";
         if (0 == i % 2) { result += "#dfdfdf; "; }
@@ -279,6 +316,21 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         result += "border: 1px solid #074974; border-top: 0;";
         result += "\">";
         result += ("<a href=\"" + linkURL + "\"><img src=\"" + imgSrc + "\" />" + fileName + "</a>");
+
+        // I'm going to go with the approach of having a single edit button per file that, 
+        // when clicked, brings up options for further actions. This button will only appear 
+        // if the user has deletion permissions.
+        if (fileStateObj.allowsDeletion)
+        {
+            result += "<a onclick='cfm_FileRenameIconClicked(" + stateObjIndex.toString() + ");' " +
+                "title=\"Rename this file...\">" +
+                "<img style=\"cursor: pointer;\" align=\"right\" " +
+                "src=\"/Content/images/edit_up.png\"></a>";
+        }
+
+        // There's another DIV for controls for the file, which is empty by default
+        result += "<div id=\"file_controls_" + stateObjIndex.toString() + "\"></div>";
+
         result += "</div>";
     }
     result += "</div>";
@@ -287,6 +339,23 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
 }
 
 // Functions below here are in alphabetical order. Keep them that way.
+
+function cfm_AddUploader(stateObjectIndex)
+{
+    // Get the state object at the specified index
+    var state = cfm_states[stateObjectIndex];
+
+    // Find the appropriate DIV
+    var targetDIV = document.getElementById("folder_controls_" + stateObjectIndex.toString());
+
+    // Add the uploader control into the DIV
+    targetDIV.innerHTML = "<br />" + fileuploader_getcontrolshtml(
+        "cfm_files", true, "cfm_GetExtraServiceArgs(" + stateObjectIndex.toString() + ");",
+        "cfm_uploadComplete(" + stateObjectIndex.toString() + ");");
+
+    // Mark the controls as visible
+    state.controlsVisible = true;
+}
 
 // Counts the number of child nodes under listNode that have a node type of 1 and 
 // a node name that matches node_name.
@@ -302,23 +371,6 @@ function cfm_CountChildrenWithName(listNode, node_name)
         }
     }
     return count;
-}
-
-function cfm_AddUploader(stateObjectIndex)
-{
-    // Get the state object at the specified index
-    var state = cfm_states[stateObjectIndex];
-
-    // Find the appropriate DIV
-    var targetDIV = document.getElementById("folder_controls_" + stateObjectIndex.toString());
-
-    // Add the uploader control into the DIV
-    targetDIV.innerHTML = "<br />" + fileuploader_getcontrolshtml(
-        "cfm_files", true, "cfm_GetExtraServiceArgs(" + stateObjectIndex.toString() + ");", 
-        "cfm_uploadComplete(" + stateObjectIndex.toString() + ");");
-
-    // Mark the controls as visible
-    state.controlsVisible = true;
 }
 
 function cfm_CreateFolder(stateObjectIndex)
@@ -465,14 +517,17 @@ function cfm_expand_collapse(stateObjectIndex)
         //       case the first such file needs a 1-pixel thick top border.
         // 2. We just collapsed a folder (similar to 1 but we remove borders)
 
-        // Need to search in array and check for states with == parent index.
+        // Need to search in array and check for folder states with == parent index.
         var nextFolderIndex = -1;
         for (var i = stateObjectIndex + 1; i < cfm_states.length; i++)
         {
-            if (cfm_states[i].parentIndex == state.parentIndex)
+            if (true === cfm_states[i].isFolder)
             {
-                nextFolderIndex = i;
-                break;
+                if (cfm_states[i].parentIndex == state.parentIndex)
+                {
+                    nextFolderIndex = i;
+                    break;
+                }
             }
         }
         if (-1 != nextFolderIndex)
@@ -516,6 +571,24 @@ function cfm_expand_collapse(stateObjectIndex)
     if (null != theIMG) { theIMG.src = state.getExpanderImgSrc(); }
 }
 
+function cfm_FileRenameIconClicked(stateObjectIndex)
+{
+    // Get the state object at the specified index
+    var state = cfm_states[stateObjectIndex];
+
+    // Find the appropriate DIV
+    var targetDIV = document.getElementById("file_controls_" + stateObjectIndex.toString());
+
+    // Add the rename controls into the DIV
+    targetDIV.innerHTML = "<br /><div><input type=\"text\" id=\"tbRenameFile_" +
+        stateObjectIndex.toString() + "\" value=\"" + state.name +
+        "\" style=\"width: 100%; box-sizing: border-box;\"></div>" +
+        "<input type=\"button\" value=\"Rename\" style=\"width: 100%;\" " +
+        "onclick=\"cfm_RenameFile(" + stateObjectIndex.toString() + ");\" />" +
+        "<br /><input type=\"button\" value=\"Cancel\" style=\"width: 100%;\" " +
+        "onclick=\"cfm_hideControls(" + stateObjectIndex.toString() + ");\" />";
+}
+
 // Function that gets the extra service arguments for the file uploader web service. We 
 // need to add an argument that indicates what the target folder is.
 function cfm_GetExtraServiceArgs(stateObjectIndex)
@@ -524,13 +597,63 @@ function cfm_GetExtraServiceArgs(stateObjectIndex)
     var state = cfm_states[stateObjectIndex];
 
     // The state object has the target folder information
-    return "&target_folder=" + state.targetFolder;
+    return "&target_folder=" + state.targetFolder + "&uploadLocalTime=" +
+        (new Date()).toString();
 }
 
 function cfm_hideControls(stateObjectIndex)
 {
-    var cntrls = document.getElementById("folder_controls_" + stateObjectIndex.toString());
+    var cntrls = null;
+    if (cfm_states[stateObjectIndex].isFolder)
+    {
+        cntrls = document.getElementById("folder_controls_" + stateObjectIndex.toString());
+    }
+    else
+    {
+        cntrls = document.getElementById("file_controls_" + stateObjectIndex.toString());
+    }
     if (cntrls) { cntrls.innerHTML = ""; }
+}
+
+function cfm_RenameFile(stateObjectIndex)
+{
+    // Get the state object at the specified index
+    var state = cfm_states[stateObjectIndex];
+
+    // Get the current course ID
+    var selectCourseObj = document.getElementById("course_select");
+    var courseID = selectCourseObj.value;
+
+    // Find the textbox and get the folder name
+    var tb = document.getElementById("tbRenameFile_" + stateObjectIndex.toString());
+    if (null == tb)
+    {
+        // Problem, but we can't do much about it
+        cfm_hideControls(stateObjectIndex);
+        return;
+    }
+
+    // New file name cannot be empty
+    if (0 == tb.value.length)
+    {
+        tb.focus();
+        return;
+    }
+
+    // Make an XML HTTP request to the service
+    var req = new XMLHttpRequest();
+    req.addEventListener("load",
+        function (args)
+        {
+            cfm_listcompletion(args, state.fm_div_ID);
+        },
+        false);
+    req.addEventListener("error",
+        function (args) { alert("Error renaming file"); },
+        false);
+    req.open("POST", "../Services/CourseFilesOps.ashx?cmd=rename_file&courseID=" +
+        courseID + "&file_name=" + state.fullPath + "&new_name=" + tb.value);
+    req.send();
 }
 
 function cfm_RenameFolder(stateObjectIndex)
@@ -567,7 +690,7 @@ function cfm_RenameFolder(stateObjectIndex)
         },
         false);
     req.addEventListener("error",
-        function (args) { alert("Folder creation error"); },
+        function (args) { alert("Error renaming folder"); },
         false);
     req.open("POST", "../Services/CourseFilesOps.ashx?cmd=rename_folder&courseID=" +
         courseID + "&folder_name=" + state.targetFolder + "&new_name=" + tb.value);

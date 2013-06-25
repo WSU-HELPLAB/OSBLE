@@ -11,11 +11,90 @@ namespace OSBLE.Services
 {
     /// <summary>
     /// "Service" handler for various file operations such as getting the list of files 
-    /// associated with an assignment, TODO: deleting files
+    /// associated with an assignment, deleting files, renaming files, and so on.
     /// Does NOT handle file uploads. See CourseFilesUploader for that.
     /// </summary>
     public class CourseFilesOps : IHttpHandler
     {
+        private void HandleFileRenameRequest(HttpContext context, Models.Users.UserProfile up,
+            int courseID, CourseUser courseUser)
+        {
+            // Make sure they have access to this course. Right now we only let 
+            // people who can modify the course have access to this service function.
+            if (!VerifyModifyPermissions(context, up, courseID)) { return; }
+
+            // Make sure the file name parameter is present
+            string fileName = string.Empty;
+            if (!VerifyStringParam(context, "file_name", ref fileName)) { return; }
+
+            if (string.IsNullOrEmpty(fileName))
+            {
+                WriteErrorResponse(context,
+                    "The following parameter cannot be an empty string: file_name");
+                return;
+            }
+
+            // Make sure the path name is OK
+            if (!VerifyPath(context, ref fileName)) { return; }
+
+            // Get the attributable file storage
+            AttributableFilesPath attrFiles =
+                (new Models.FileSystem.FileSystem()).Course(courseID).CourseDocs as
+                OSBLE.Models.FileSystem.AttributableFilesPath;
+            if (null == attrFiles)
+            {
+                WriteErrorResponse(context,
+                    "Internal error: could not get attributable files manager for course files.");
+                return;
+            }
+
+            // Combine the relative path from the request (which has been checked 
+            // to make sure it's ok) with the path of the course files.
+            string path = System.IO.Path.Combine(attrFiles.GetPath(), fileName);
+            if (!System.IO.File.Exists(path))
+            {
+                // We can't rename a file that doesn't exist
+                WriteErrorResponse(context,
+                    "Error: Could not find file to rename: " + fileName);
+                return;
+            }
+
+            // Now make sure we have the new_name parameter
+            string newName = string.Empty;
+            if (!VerifyStringParam(context, "new_name", ref newName)) { return; }
+
+            // Verify that it's OK
+            if (!VerifyPath(context, ref newName)) { return; }
+            // Also it must be just the folder name and not have / or \
+            if (newName.Contains('/') || newName.Contains('\\'))
+            {
+                WriteErrorResponse(context,
+                    "New file name must not contain a path, just the new file name.");
+                return;
+            }
+            // Lastly, it must not be empty
+            if (string.IsNullOrEmpty(newName))
+            {
+                WriteErrorResponse(context,
+                    "New file name cannot be empty.");
+                return;
+            }
+
+            // Tell the file storage to do the rename
+            if (attrFiles.RenameFile(path, newName))
+            {
+                // Return success message with new file listing
+                context.Response.Write(
+                    "<CourseFilesOpsResponse success=\"true\">" +
+                    attrFiles.GetXMLListing(courseUser, true) +
+                    "</CourseFilesOpsResponse>");
+            }
+            else
+            {
+                WriteErrorResponse(context, "Failed to rename file.");
+            }
+        }
+        
         public void ProcessRequest(HttpContext context)
         {
             // This web service returns XML in most cases
@@ -181,7 +260,7 @@ namespace OSBLE.Services
                 }
 
                 // Make sure the folder name is OK
-                if (!VerifyFolderPath(context, ref folderName)) { return; }
+                if (!VerifyPath(context, ref folderName)) { return; }
 
                 // Get the attributable file storage
                 AttributableFilesPath attrFiles =
@@ -214,6 +293,10 @@ namespace OSBLE.Services
                 HandleFolderDeletionRequest(context, up, courseID);
                 return;
             }
+            else if ("rename_file" == cmdParam)
+            {
+                HandleFileRenameRequest(context, up, courseID, courseUser);
+            }
             else if ("rename_folder" == cmdParam)
             {
                 // Make sure they have access to this course. Right now we only let 
@@ -232,7 +315,7 @@ namespace OSBLE.Services
                 }
 
                 // Make sure the folder name is OK
-                if (!VerifyFolderPath(context, ref folderName)) { return; }
+                if (!VerifyPath(context, ref folderName)) { return; }
 
                 // Get the attributable file storage
                 AttributableFilesPath attrFiles =
@@ -261,7 +344,7 @@ namespace OSBLE.Services
                 if (!VerifyStringParam(context, "new_name", ref newName)) { return; }
 
                 // Verify that it's OK
-                if (!VerifyFolderPath(context, ref newName)) { return; }
+                if (!VerifyPath(context, ref newName)) { return; }
                 // Also it must be just the folder name and not have / or \
                 if (newName.Contains('/') || newName.Contains('\\'))
                 {
@@ -300,9 +383,11 @@ namespace OSBLE.Services
                     "</CourseFilesOpsResponse>");
                 return;
             }
-            
-            // Coming here implies an unknown command
-            WriteErrorResponse(context, "Unknown command: " + cmdParam);
+            else
+            {
+                // Coming here implies an unknown command
+                WriteErrorResponse(context, "Unknown command: " + cmdParam);
+            }
         }
 
         private static bool VerifyCoursePermissions(HttpContext context, Models.Users.UserProfile up,
@@ -354,27 +439,27 @@ namespace OSBLE.Services
         }
 
         /// <summary>
-        /// Verifies that a specific folder path would be ok to have in the 
-        /// file system. Note that this is NOT a check to see if the specified 
-        /// folder exists. It is a check to make sure the folder path has 
-        /// valid characters, doesn't go up to prior directories, etc.
+        /// Verifies that a specific path would be ok to have in the file system. 
+        /// Note that this is NOT a check to see if the specified file or folder 
+        /// exists. It is a check to make sure the path has valid characters, 
+        /// doesn't go up to prior directories, etc.
         /// If the string starts with the / or \ character then this will be 
         /// removed.
         /// </summary>
-        private bool VerifyFolderPath(HttpContext context, ref string folderPath)
+        private bool VerifyPath(HttpContext context, ref string fileOrFolderPath)
         {
             // If it starts with / or \ just strip that off
-            while (folderPath.StartsWith("\\"))
+            while (fileOrFolderPath.StartsWith("\\"))
             {
-                folderPath = folderPath.Substring(1);
+                fileOrFolderPath = fileOrFolderPath.Substring(1);
             }
-            while (folderPath.StartsWith("/"))
+            while (fileOrFolderPath.StartsWith("/"))
             {
-                folderPath = folderPath.Substring(1);
+                fileOrFolderPath = fileOrFolderPath.Substring(1);
             }
 
             // Folder name can't have ..\ or ../
-            if (folderPath.Contains("..\\") || folderPath.Contains("../"))
+            if (fileOrFolderPath.Contains("..\\") || fileOrFolderPath.Contains("../"))
             {
                 WriteErrorResponse(
                     context, "Specified folder name was not allowed.");
@@ -385,10 +470,10 @@ namespace OSBLE.Services
             char[] invalid = System.IO.Path.GetInvalidPathChars();
             foreach (char ic in invalid)
             {
-                if (folderPath.Contains(ic))
+                if (fileOrFolderPath.Contains(ic))
                 {
                     WriteErrorResponse(
-                        context, "Folder name contains invalid character: '" +
+                        context, "Path name contains invalid character: '" +
                         ic.ToString() + "'");
                     return  false;
                 }
@@ -396,10 +481,10 @@ namespace OSBLE.Services
 
             // Tests show that the array of invalid characters checked above will not 
             // contain the ':' character, so we check for that here.
-            if (folderPath.Contains(':'))
+            if (fileOrFolderPath.Contains(':'))
             {
                 WriteErrorResponse(
-                    context, "Folder name contains invalid character: ':'");
+                    context, "Path name contains invalid character: ':'");
                 return false;
             }
 
@@ -541,7 +626,7 @@ namespace OSBLE.Services
 
             // Make sure the folder name is OK (doesn't go up a level with ../ or 
             // other things like that)
-            if (!VerifyFolderPath(context, ref folderName)) { return; }
+            if (!VerifyPath(context, ref folderName)) { return; }
 
             // Get the attributable file storage
             AttributableFilesPath attrFiles =
