@@ -69,16 +69,28 @@
         }
     </script>
 
-<h3>Advanced File Manager (Silverlight)
-@{if (ViewBag.CanEditCourseLinks)
-  {
-      <span id="file_upload_silverlight_span">
-      @{ SilverlightObject so = ViewBag.Uploader as SilverlightObject; }
-      @Html.DisplayFor(m => so, "SilverlightObject")
-      </span>
-  }
+@if (false)
+{
+    // Obviously this code will not be hit because of the if-false above. This is 
+    // intentional. The new JavaScript-based file manager should make it so that 
+    // this is no longer needed. In the case that we might need to revert to the 
+    // old Silverlight uploaded in the future, I figured it would be easier to 
+    // comment this out than just delete it. In the future if the new file manager 
+    // has been holding up well for a long enough time then this block can be 
+    // removed entirely.
+    /*
+    <h3>Advanced File Manager (Silverlight)
+    @{if (ViewBag.CanEditCourseLinks)
+      {
+          <span id="file_upload_silverlight_span">
+          @{ SilverlightObject so = ViewBag.Uploader as SilverlightObject; }
+          @Html.DisplayFor(m => so, "SilverlightObject")
+          </span>
+      }
+    }
+    </h3>
+     * */
 }
-</h3>
 
 </div>
 

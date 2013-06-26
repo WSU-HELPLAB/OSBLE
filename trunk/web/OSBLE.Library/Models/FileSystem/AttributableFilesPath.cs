@@ -167,6 +167,37 @@ namespace OSBLE.Models.FileSystem
             }
         }
 
+        /// <summary>
+        /// Deletes the specified directory and all its contents. The directory 
+        /// must exist within this file path.
+        /// </summary>
+        public bool DeleteDir(string localDirName)
+        {
+            if (localDirName.Contains("../") || localDirName.Contains("..\\"))
+            {
+                // We won't allow going up a directory
+                return false;
+            }
+
+            string fullDirName = Path.Combine(m_dataDir, localDirName);
+            if (!System.IO.Directory.Exists(fullDirName))
+            {
+                return false;
+            }
+
+            // Delete the data directory
+            System.IO.Directory.Delete(fullDirName, true);
+
+            // Delete the attribute directory too, if it exists
+            fullDirName = Path.Combine(m_attrDir, localDirName);
+            if (System.IO.Directory.Exists(fullDirName))
+            {
+                System.IO.Directory.Delete(fullDirName, true);
+            }
+
+            return true;
+        }
+
         public bool DeleteFile(string localFileName)
         {
             if (localFileName.Contains("../") || localFileName.Contains("..\\"))
@@ -490,34 +521,36 @@ namespace OSBLE.Models.FileSystem
 
         /// <summary>
         /// Renames a file and its corresponding attribute file. The existing 
-        /// file name must be an absolute (rooted) path name.
+        /// file name must be just a file name with no subdirs and not an 
+        /// absolute (rooted) path. The same goes for the new file name.
         /// </summary>
-        public bool RenameFile(string rootedFileName, string newFileName)
+        public bool RenameFile(string fileName, string newFileName)
         {
-            // Two possible cases:
-            // 1. fileName starts with m_dataDir, indicating that the file name
-            //    is absolute.
-            // 2. fileName does not start with m_dataDir, in which case we  
-            //    return false.
-
-            if (!rootedFileName.StartsWith(m_dataDir))
-            {
-                return false;
-            }
-
             // Quick security check
-            if (rootedFileName.Contains("../") || rootedFileName.Contains("..\\"))
+            if (fileName.Contains('/') || fileName.Contains('\\') ||
+                newFileName.Contains('/') || newFileName.Contains('\\'))
             {
                 return false;
             }
 
             // First rename data file
-            System.IO.File.Move(rootedFileName, Path.Combine(m_dataDir, newFileName));
+            string dataFile = Path.Combine(m_dataDir, fileName);
+            string dataFileNew = Path.Combine(m_dataDir, newFileName);
+            if (!System.IO.File.Exists(dataFile))
+            {
+                return false;
+            }
+            System.IO.File.Move(dataFile, dataFileNew);
 
             // Now the attribute file
-            System.IO.File.Move(
-                AttributableFileCollection.GetAttrFileName(m_attrDir, rootedFileName),
-                Path.Combine(m_attrDir, "attr_" + newFileName + ".xml"));
+            string attrFile = AttributableFileCollection.GetAttrFileName(
+                m_attrDir, fileName);
+            string attrFileNew = AttributableFileCollection.GetAttrFileName(
+                m_attrDir, newFileName);
+            if (System.IO.File.Exists(attrFile))
+            {
+                System.IO.File.Move(attrFile, attrFileNew);
+            }
 
             return true;
         }

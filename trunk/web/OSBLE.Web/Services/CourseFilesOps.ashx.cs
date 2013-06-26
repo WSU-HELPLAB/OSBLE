@@ -148,9 +148,10 @@ namespace OSBLE.Services
             if (!VerifyPath(context, ref fileName)) { return; }
 
             // Get the attributable file storage
-            AttributableFilesPath attrFiles =
+            AttributableFilesPath courseFiles =
                 (new Models.FileSystem.FileSystem()).Course(courseID).CourseDocs as
                 OSBLE.Models.FileSystem.AttributableFilesPath;
+            AttributableFilesPath attrFiles = courseFiles;
             if (null == attrFiles)
             {
                 WriteErrorResponse(context,
@@ -158,15 +159,19 @@ namespace OSBLE.Services
                 return;
             }
 
-            // Combine the relative path from the request (which has been checked 
-            // to make sure it's ok) with the path of the course files.
-            string path = System.IO.Path.Combine(attrFiles.GetPath(), fileName);
-            if (!System.IO.File.Exists(path))
+            int slashIndex = fileName.LastIndexOf('\\');
+            if (-1 == slashIndex)
             {
-                // We can't rename a file that doesn't exist
-                WriteErrorResponse(context,
-                    "Error: Could not find file to rename: " + fileName);
-                return;
+                slashIndex = fileName.LastIndexOf('/');
+            }
+            if (-1 != slashIndex)
+            {
+                // If the file exists in some nested folders then get the 
+                // correct directory object first.
+                attrFiles = attrFiles.GetDir(fileName.Substring(0, slashIndex));
+
+                // Also remove the path from the beginning of the file name
+                fileName = fileName.Substring(slashIndex + 1);
             }
 
             // Now make sure we have the new_name parameter
@@ -175,7 +180,7 @@ namespace OSBLE.Services
 
             // Verify that it's OK
             if (!VerifyPath(context, ref newName)) { return; }
-            // Also it must be just the folder name and not have / or \
+            // Also it must be just the new file name and not have / or \
             if (newName.Contains('/') || newName.Contains('\\'))
             {
                 WriteErrorResponse(context,
@@ -191,12 +196,12 @@ namespace OSBLE.Services
             }
 
             // Tell the file storage to do the rename
-            if (attrFiles.RenameFile(path, newName))
+            if (attrFiles.RenameFile(fileName, newName))
             {
                 // Return success message with new file listing
                 context.Response.Write(
                     "<CourseFilesOpsResponse success=\"true\">" +
-                    attrFiles.GetXMLListing(courseUser, true) +
+                    courseFiles.GetXMLListing(courseUser, true) +
                     "</CourseFilesOpsResponse>");
             }
             else
@@ -251,9 +256,10 @@ namespace OSBLE.Services
             if (!VerifyPath(context, ref folderName)) { return; }
 
             // Get the attributable file storage
-            AttributableFilesPath attrFiles =
+            AttributableFilesPath courseFiles =
                 (new Models.FileSystem.FileSystem()).Course(courseID).CourseDocs as
                 OSBLE.Models.FileSystem.AttributableFilesPath;
+            AttributableFilesPath attrFiles = courseFiles;
             if (null == attrFiles)
             {
                 WriteErrorResponse(context,
@@ -261,24 +267,40 @@ namespace OSBLE.Services
                 return;
             }
 
-            // Combine the relative path from the request (which has been checked 
-            // to make sure it's ok) with the path of the course files.
-            string path = System.IO.Path.Combine(attrFiles.GetPath(), folderName);
-            if (!System.IO.Directory.Exists(path))
+            // Get the subdirectory, if there is one
+            int slashIndex = folderName.LastIndexOf('\\');
+            if (-1 == slashIndex)
+            {
+                slashIndex = folderName.LastIndexOf('/');
+            }
+            if (-1 != slashIndex)
+            {
+                attrFiles = attrFiles.GetDir(folderName.Substring(0, slashIndex));
+
+                // Also remove the path from the beginning of the folder name
+                folderName = folderName.Substring(slashIndex + 1);
+            }
+            if (null == attrFiles)
             {
                 WriteErrorResponse(context,
-                    "Folder could not be deleted because it does not exist on the server.");
+                    "Could not find directory: " + folderName);
                 return;
             }
 
-            // Delete this folder and everything inside it
-            System.IO.Directory.Delete(path, true);
-
-            // Return success message with new file listing
-            context.Response.Write(
-                "<CourseFilesOpsResponse success=\"true\">" +
-                attrFiles.GetXMLListing(courseUser, true) +
-                "</CourseFilesOpsResponse>");
+            // Delete the folder and everything inside it
+            if (attrFiles.DeleteDir(folderName))
+            {
+                // Return success message with new file listing
+                context.Response.Write(
+                    "<CourseFilesOpsResponse success=\"true\">" +
+                    courseFiles.GetXMLListing(courseUser, true) +
+                    "</CourseFilesOpsResponse>");
+            }
+            else
+            {
+                WriteErrorResponse(context,
+                    "Failed to delete folder.");
+            }
         }
         
         public void ProcessRequest(HttpContext context)
