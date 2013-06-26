@@ -167,6 +167,34 @@ namespace OSBLE.Models.FileSystem
             }
         }
 
+        public bool DeleteFile(string localFileName)
+        {
+            if (localFileName.Contains("../") || localFileName.Contains("..\\"))
+            {
+                // We won't allow going up a directory
+                return false;
+            }
+            
+            string fullFileName = Path.Combine(m_dataDir, localFileName);
+            if (!System.IO.File.Exists(fullFileName))
+            {
+                return false;
+            }
+
+            // Delete the data file
+            System.IO.File.Delete(fullFileName);
+
+            // Delete the attribute file too, if it exists
+            fullFileName = AttributableFileCollection.GetAttrFileName(
+                m_attrDir, localFileName);
+            if (System.IO.File.Exists(fullFileName))
+            {
+                System.IO.File.Delete(fullFileName);
+            }
+
+            return true;
+        }
+
         public override IFileSystem Directory(string name)
         {
             string path = Path.Combine(m_dataDir, name);
@@ -205,6 +233,20 @@ namespace OSBLE.Models.FileSystem
                     Path.Combine(m_dataDir, firstName),
                     AttributableFileCollection.GetAttrFileName(m_attrDir, firstName));
             }
+        }
+
+        /// <summary>
+        /// Adding this in favor of the Directory method for a few reasons.
+        /// 1. Directory is the name of a class in the System.IO namespace and 
+        ///    it's cleaner if we don't naming ambiguities in all the IO code.
+        /// 2. If it's getting something, having "Get" in the name is more 
+        ///    intuitive and descriptive of the function's action.
+        /// </summary>
+        public AttributableFilesPath GetDir(string subdirName)
+        {
+            string dataPath = Path.Combine(m_dataDir, subdirName);
+            string attrPath = Path.Combine(m_attrDir, subdirName);
+            return new AttributableFilesPath(this, dataPath, attrPath);
         }
 
         public AttributableFile GetFile(string fileName)

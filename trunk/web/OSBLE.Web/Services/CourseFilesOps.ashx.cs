@@ -16,6 +16,116 @@ namespace OSBLE.Services
     /// </summary>
     public class CourseFilesOps : IHttpHandler
     {
+        private void HandleCourseFileListingRequest(HttpContext context,
+            Models.Users.UserProfile up, int courseID)
+        {
+            // Get the attributable file storage
+            AttributableFilesPath attrFiles =
+                (new Models.FileSystem.FileSystem()).Course(courseID).CourseDocs as
+                OSBLE.Models.FileSystem.AttributableFilesPath;
+            if (null == attrFiles)
+            {
+                WriteErrorResponse(context,
+                    "Internal error: could not get attributable files manager for course files.");
+                return;
+            }
+
+            // The permission-oriented attributes depend on the course user
+            OSBLEContext db = new OSBLEContext();
+            CourseUser courseUser =
+                (from cu in db.CourseUsers
+                 where cu.UserProfileID == up.ID &&
+                 cu.AbstractCourse is Course &&
+                 cu.AbstractCourseID == courseID
+                 select cu).FirstOrDefault();
+            if (null == courseUser)
+            {
+                WriteErrorResponse(context,
+                    "User does not have permission to see files in this course.");
+                return;
+            }
+
+            // Get XML file listing packaged up and return it to the client
+            context.Response.Write(
+                "<CourseFilesOpsResponse success=\"true\">" +
+                attrFiles.GetXMLListing(courseUser, true) +
+                "</CourseFilesOpsResponse>");
+        }
+
+        private void HandleFileDeletionRequest(HttpContext context,
+            Models.Users.UserProfile up, int courseID)
+        {
+            // Make sure they have access to this course. Right now we only let 
+            // people who can modify the course have access to this service function.
+            if (!VerifyModifyPermissions(context, up, courseID)) { return; }
+
+            // The permission-oriented attributes depend on the course user
+            OSBLEContext db = new OSBLEContext();
+            CourseUser courseUser =
+                (from cu in db.CourseUsers
+                 where cu.UserProfileID == up.ID &&
+                 cu.AbstractCourse is Course &&
+                 cu.AbstractCourseID == courseID
+                 select cu).FirstOrDefault();
+            if (null == courseUser)
+            {
+                WriteErrorResponse(context,
+                    "User does not have permission to view or modify files in this course.");
+                return;
+            }
+
+            // Make sure the file name parameter is present
+            string fileName = string.Empty;
+            if (!VerifyStringParam(context, "file_name", ref fileName)) { return; }
+
+            if (string.IsNullOrEmpty(fileName))
+            {
+                WriteErrorResponse(context,
+                    "The following parameter cannot be an empty string: file_name");
+                return;
+            }
+
+            // Make sure the file path name is OK (doesn't go up a level with ../ or 
+            // other things like that)
+            if (!VerifyPath(context, ref fileName)) { return; }
+
+            // Get the attributable file storage
+            AttributableFilesPath courseFiles =
+                (new Models.FileSystem.FileSystem()).Course(courseID).CourseDocs as
+                OSBLE.Models.FileSystem.AttributableFilesPath;
+            AttributableFilesPath attrFiles = courseFiles;
+            if (null == attrFiles)
+            {
+                WriteErrorResponse(context,
+                    "Internal error: could not get attributable files manager for course files.");
+                return;
+            }
+
+            int slashIndex = fileName.LastIndexOf('\\');
+            if (-1 == slashIndex)
+            {
+                slashIndex = fileName.LastIndexOf('/');
+            }
+            if (-1 != slashIndex)
+            {
+                // If the file exists in some nested folders then get the 
+                // correct directory object first.
+                attrFiles = attrFiles.GetDir(fileName.Substring(0, slashIndex));
+
+                // Also remove the path from the beginning of the file name
+                fileName = fileName.Substring(slashIndex + 1);
+            }
+
+            // Perform the actual deletion
+            attrFiles.DeleteFile(fileName);
+
+            // Return success message with new file listing
+            context.Response.Write(
+                "<CourseFilesOpsResponse success=\"true\">" +
+                courseFiles.GetXMLListing(courseUser, true) +
+                "</CourseFilesOpsResponse>");
+        }
+        
         private void HandleFileRenameRequest(HttpContext context, Models.Users.UserProfile up,
             int courseID, CourseUser courseUser)
         {
@@ -93,6 +203,82 @@ namespace OSBLE.Services
             {
                 WriteErrorResponse(context, "Failed to rename file.");
             }
+        }
+
+        private void HandleFolderDeletionRequest(HttpContext context,
+            Models.Users.UserProfile up, int courseID)
+        {
+            // Make sure they have access to this course. Right now we only let 
+            // people who can modify the course have access to this service function.
+            if (!VerifyModifyPermissions(context, up, courseID)) { return; }
+
+            // The permission-oriented attributes depend on the course user
+            OSBLEContext db = new OSBLEContext();
+            CourseUser courseUser =
+                (from cu in db.CourseUsers
+                 where cu.UserProfileID == up.ID &&
+                 cu.AbstractCourse is Course &&
+                 cu.AbstractCourseID == courseID
+                 select cu).FirstOrDefault();
+            if (null == courseUser)
+            {
+                WriteErrorResponse(context,
+                    "User does not have permission to view or modify files in this course.");
+                return;
+            }
+
+            // Make sure the folder name parameter is present
+            string folderName = string.Empty;
+            if (!VerifyStringParam(context, "folder_name", ref folderName)) { return; }
+
+            if (string.IsNullOrEmpty(folderName))
+            {
+                WriteErrorResponse(context,
+                    "The following parameter cannot be an empty string: folder_name");
+                return;
+            }
+
+            // Can't delete the "root"
+            if ("/" == folderName || "\\" == folderName)
+            {
+                WriteErrorResponse(context,
+                    "Cannot delete the primary course files folder.");
+                return;
+            }
+
+            // Make sure the folder name is OK (doesn't go up a level with ../ or 
+            // other things like that)
+            if (!VerifyPath(context, ref folderName)) { return; }
+
+            // Get the attributable file storage
+            AttributableFilesPath attrFiles =
+                (new Models.FileSystem.FileSystem()).Course(courseID).CourseDocs as
+                OSBLE.Models.FileSystem.AttributableFilesPath;
+            if (null == attrFiles)
+            {
+                WriteErrorResponse(context,
+                    "Internal error: could not get attributable files manager for course files.");
+                return;
+            }
+
+            // Combine the relative path from the request (which has been checked 
+            // to make sure it's ok) with the path of the course files.
+            string path = System.IO.Path.Combine(attrFiles.GetPath(), folderName);
+            if (!System.IO.Directory.Exists(path))
+            {
+                WriteErrorResponse(context,
+                    "Folder could not be deleted because it does not exist on the server.");
+                return;
+            }
+
+            // Delete this folder and everything inside it
+            System.IO.Directory.Delete(path, true);
+
+            // Return success message with new file listing
+            context.Response.Write(
+                "<CourseFilesOpsResponse success=\"true\">" +
+                attrFiles.GetXMLListing(courseUser, true) +
+                "</CourseFilesOpsResponse>");
         }
         
         public void ProcessRequest(HttpContext context)
@@ -287,6 +473,10 @@ namespace OSBLE.Services
                     attrFiles.GetXMLListing(courseUser, true) +
                     "</CourseFilesOpsResponse>");
                 return;
+            }
+            else if ("delete_file" == cmdParam)
+            {
+                HandleFileDeletionRequest(context, up, courseID);
             }
             else if ("delete_folder" == cmdParam)
             {
@@ -545,118 +735,6 @@ namespace OSBLE.Services
             {
                 return false;
             }
-        }
-
-        private void HandleCourseFileListingRequest(HttpContext context, 
-            Models.Users.UserProfile up, int courseID)
-        {
-            // Get the attributable file storage
-            AttributableFilesPath attrFiles =
-                (new Models.FileSystem.FileSystem()).Course(courseID).CourseDocs as
-                OSBLE.Models.FileSystem.AttributableFilesPath;
-            if (null == attrFiles)
-            {
-                WriteErrorResponse(context,
-                    "Internal error: could not get attributable files manager for course files.");
-                return;
-            }
-
-            // The permission-oriented attributes depend on the course user
-            OSBLEContext db = new OSBLEContext();
-            CourseUser courseUser =
-                (from cu in db.CourseUsers
-                 where cu.UserProfileID == up.ID &&
-                 cu.AbstractCourse is Course &&
-                 cu.AbstractCourseID == courseID
-                 select cu).FirstOrDefault();
-            if (null == courseUser)
-            {
-                WriteErrorResponse(context,
-                    "User does not have permission to see files in this course.");
-                return;
-            }
-
-            // Get XML file listing packaged up and return it to the client
-            context.Response.Write(
-                "<CourseFilesOpsResponse success=\"true\">" +
-                attrFiles.GetXMLListing(courseUser, true) +
-                "</CourseFilesOpsResponse>");
-        }
-
-        private void HandleFolderDeletionRequest(HttpContext context,
-            Models.Users.UserProfile up, int courseID)
-        {
-            // Make sure they have access to this course. Right now we only let 
-            // people who can modify the course have access to this service function.
-            if (!VerifyModifyPermissions(context, up, courseID)) { return; }
-
-            // The permission-oriented attributes depend on the course user
-            OSBLEContext db = new OSBLEContext();
-            CourseUser courseUser =
-                (from cu in db.CourseUsers
-                 where cu.UserProfileID == up.ID &&
-                 cu.AbstractCourse is Course &&
-                 cu.AbstractCourseID == courseID
-                 select cu).FirstOrDefault();
-            if (null == courseUser)
-            {
-                WriteErrorResponse(context,
-                    "User does not have permission to view or modify files in this course.");
-                return;
-            }
-
-            // Make sure the folder name parameter is present
-            string folderName = string.Empty;
-            if (!VerifyStringParam(context, "folder_name", ref folderName)) { return; }
-
-            if (string.IsNullOrEmpty(folderName))
-            {
-                WriteErrorResponse(context,
-                    "The following parameter cannot be an empty string: folder_name");
-                return;
-            }
-
-            // Can't delete the "root"
-            if ("/" == folderName || "\\" == folderName)
-            {
-                WriteErrorResponse(context,
-                    "Cannot delete the primary course files folder.");
-                return;
-            }
-
-            // Make sure the folder name is OK (doesn't go up a level with ../ or 
-            // other things like that)
-            if (!VerifyPath(context, ref folderName)) { return; }
-
-            // Get the attributable file storage
-            AttributableFilesPath attrFiles =
-                (new Models.FileSystem.FileSystem()).Course(courseID).CourseDocs as
-                OSBLE.Models.FileSystem.AttributableFilesPath;
-            if (null == attrFiles)
-            {
-                WriteErrorResponse(context,
-                    "Internal error: could not get attributable files manager for course files.");
-                return;
-            }
-
-            // Combine the relative path from the request (which has been checked 
-            // to make sure it's ok) with the path of the course files.
-            string path = System.IO.Path.Combine(attrFiles.GetPath(), folderName);
-            if (!System.IO.Directory.Exists(path))
-            {
-                WriteErrorResponse(context,
-                    "Folder could not be deleted because it does not exist on the server.");
-                return;
-            }
-
-            // Delete this folder and everything inside it
-            System.IO.Directory.Delete(path, true);
-
-            // Return success message with new file listing
-            context.Response.Write(
-                "<CourseFilesOpsResponse success=\"true\">" +
-                attrFiles.GetXMLListing(courseUser, true) +
-                "</CourseFilesOpsResponse>");
         }
     }
 }

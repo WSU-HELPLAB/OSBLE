@@ -322,6 +322,11 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         // if the user has deletion permissions.
         if (fileStateObj.allowsDeletion)
         {
+            result += "<a onclick='cfm_FileDeleteIconClicked(" + stateObjIndex.toString() + ");' " +
+                "title=\"Delete this file\">" +
+                "<img style=\"cursor: pointer;\" align=\"right\" " +
+                "src=\"/Content/images/delete_up.png\"></a>";
+
             result += "<a onclick='cfm_FileRenameIconClicked(" + stateObjIndex.toString() + ");' " +
                 "title=\"Rename this file...\">" +
                 "<img style=\"cursor: pointer;\" align=\"right\" " +
@@ -445,6 +450,31 @@ function cfm_CreateFolderIconClicked(stateObjectIndex)
     state.controlsVisible = true;
 }
 
+function cfm_DeleteFile(stateObjectIndex)
+{
+    // Get the state object at the specified index
+    var state = cfm_states[stateObjectIndex];
+
+    // Get the current course ID
+    var selectCourseObj = document.getElementById("course_select");
+    var courseID = selectCourseObj.value;
+
+    // Make an XML HTTP request to the service
+    var req = new XMLHttpRequest();
+    req.addEventListener("load",
+        function (args)
+        {
+            cfm_listcompletion(args, state.fm_div_ID);
+        },
+        false);
+    req.addEventListener("error",
+        function (args) { alert("File deletion error"); },
+        false);
+    req.open("POST", "../Services/CourseFilesOps.ashx?cmd=delete_file&courseID=" +
+        courseID + "&file_name=" + state.fullPath);
+    req.send();
+}
+
 function cfm_DeleteFolder(stateObjectIndex)
 {
     // Get the state object at the specified index
@@ -463,7 +493,7 @@ function cfm_DeleteFolder(stateObjectIndex)
         },
         false);
     req.addEventListener("error",
-        function (args) { alert("Folder creation error"); },
+        function (args) { alert("Folder deletion error"); },
         false);
     req.open("POST", "../Services/CourseFilesOps.ashx?cmd=delete_folder&courseID=" +
         courseID + "&folder_name=" + state.targetFolder);
@@ -569,6 +599,22 @@ function cfm_expand_collapse(stateObjectIndex)
 
     // Update the source of the image now that the new state is set
     if (null != theIMG) { theIMG.src = state.getExpanderImgSrc(); }
+}
+
+function cfm_FileDeleteIconClicked(stateObjectIndex)
+{
+    // Get the state object at the specified index
+    var state = cfm_states[stateObjectIndex];
+
+    // Find the appropriate DIV
+    var targetDIV = document.getElementById("file_controls_" + stateObjectIndex.toString());
+
+    // Add the rename controls into the DIV
+    targetDIV.innerHTML = "<br /><div>Are you sure you want to delete this file?</div>" +
+        "<input type=\"button\" value=\"Yes, delete\" style=\"width: 100%;\" " +
+        "onclick=\"cfm_DeleteFile(" + stateObjectIndex.toString() + ");\" />" +
+        "<br /><input type=\"button\" value=\"No, Cancel\" style=\"width: 100%;\" " +
+        "onclick=\"cfm_hideControls(" + stateObjectIndex.toString() + ");\" />";
 }
 
 function cfm_FileRenameIconClicked(stateObjectIndex)
