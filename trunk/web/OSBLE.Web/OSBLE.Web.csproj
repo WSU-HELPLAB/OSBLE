@@ -224,13 +224,11 @@
     <Compile Include="Areas\AssignmentWizard\Controllers\DiscussionTeamsController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\CommitteeReviewController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\HomeController.cs" />
-    <Compile Include="Areas\AssignmentWizard\Controllers\LinkToPreviousReviewController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\PreviousAssignmentController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\RubricBaseController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\RubricController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\StudentRubricController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\ReviewOfStudentWorkController.cs" />
-    <Compile Include="Areas\AssignmentWizard\Controllers\StudentWorkReviewReminderController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\TeamController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\TeamEvaluationController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\WizardBaseController.cs" />
