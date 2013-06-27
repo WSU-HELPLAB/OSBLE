@@ -1,6 +1,6 @@
 ﻿@using OSBLE.Models.Assignments;
 @model Assignment
-
+@Html.HiddenFor(m => m.ID)
 @section Header
 {
 
@@ -8,11 +8,11 @@
 
 <table class="wizard_entry_table">
     <tr>
-        <th>Committee members must make initial post before viewing posts of others</th>
+        <td>Committee members must make initial post before viewing posts of others</td>
         <td>@Html.CheckBox(" ")</td>
     </tr>
     <tr>
-        <th>Committee chair must make initial post before viewing posts of others</th>
+        <td>Committee chair must make initial post before viewing posts of others</td>
         <td>@Html.CheckBox(" ")</td>
     </tr>
     <tr>
@@ -21,11 +21,11 @@
         <td>@Html.ValidationMessageFor(m => m.ReleaseDate)</td>
     </tr>
     <tr>
-        <th>Anonymize names of committee members to each other</th>
+        <td>Anonymize names of committee members to each other</td>
         <td>@Html.CheckBox(" ")</td>
     </tr>
     <tr>
-        <th>Anonymize names of committee members to committee chair</th>
+        <td>Anonymize names of committee members to committee chair</td>
         <td>@Html.CheckBox(" ")</td>
     </tr>
 </table>

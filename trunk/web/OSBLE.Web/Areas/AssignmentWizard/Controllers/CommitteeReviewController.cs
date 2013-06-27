@@ -9,24 +9,23 @@ using OSBLE.Models.Courses;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
-    public class StudentWorkReviewSettingsController : WizardBaseController
+    public class CommitteeReviewController : WizardBaseController
     {
-
         public override string PrettyName
         {
-            get { return "Student Work Review Settings"; }
+            get { return "Committee Review"; }
         }
 
         public override string ControllerName
         {
-            get { return "StudentWorkReviewSettings"; }
+            get { return "CommitteeReview"; }
         }
 
         public override string ControllerDescription
         {
             get
             {
-                return "More detailed information about the current student work review settings.";
+                return "Specific information on the committee review being created";
             }
         }
 
@@ -34,7 +33,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             get
             {
-                return new StudentWorkReviewController();
+                return new AssessmentBasicsController();
             }
         }
 
@@ -43,7 +42,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             get
             {
                 List<AssignmentTypes> Assessments = new List<AssignmentTypes>();
-                Assessments.Add(AssignmentTypes.ReviewOfStudentWork);
+                Assessments.Add(AssignmentTypes.CommitteeReview);
                 return Assessments;
             }
         }
@@ -60,13 +59,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             base.Index();
             Assignment.Type = manager.ActiveAssignmentType;
+            ViewBag.TemporaryID = Assignment.ID;
             return View(Assignment);
         }
 
         [HttpPost]
         public ActionResult Index(Assignment model)
         {
-            Assignment = model;
+            Assignment = db.Assignments.Find(model.ID);
             return base.PostBack(Assignment);
         }
     }

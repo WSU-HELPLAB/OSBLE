@@ -44,7 +44,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 List<AssignmentTypes> Assessments = new List<AssignmentTypes>();
                 Assessments.Add(AssignmentTypes.CommitteeDiscussion);
                 Assessments.Add(AssignmentTypes.ReviewOfStudentWork);
-                Assessments.Add(AssignmentTypes.CommitteeDiscussionOfStudentWorkReview);
+                Assessments.Add(AssignmentTypes.CommitteeReview);
                 Assessments.Add(AssignmentTypes.AggregateAssessment);
                 return Assessments;
             }
@@ -62,13 +62,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             base.Index();
             Assignment.Type = manager.ActiveAssignmentType;
+            ViewBag.TemporaryID = Assignment.ID;
             return View(Assignment);
         }
 
         [HttpPost]
         public ActionResult Index(Assignment model)
         {
-            Assignment = model;
+            Assignment = db.Assignments.Find(model.ID);
             return base.PostBack(Assignment);
         }
     }

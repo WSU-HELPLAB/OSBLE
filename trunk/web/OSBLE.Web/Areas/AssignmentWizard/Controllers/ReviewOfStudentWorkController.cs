@@ -9,17 +9,17 @@ using OSBLE.Models.Courses;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
-    public class StudentWorkReviewController : WizardBaseController
+    public class ReviewOfStudentWorkController : WizardBaseController
     {
 
         public override string PrettyName
         {
-            get { return "Student Work Review"; }
+            get { return "Review Of Student Work"; }
         }
 
         public override string ControllerName
         {
-            get { return "StudentWorkReview"; }
+            get { return "ReviewOfStudentWork"; }
         }
 
         public override string ControllerDescription
@@ -66,7 +66,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         [HttpPost]
         public ActionResult Index(Assignment model)
         {
-            Assignment = model;
+            Assignment = db.Assignments.Find(model.ID);
             return base.PostBack(Assignment);
         }
     }

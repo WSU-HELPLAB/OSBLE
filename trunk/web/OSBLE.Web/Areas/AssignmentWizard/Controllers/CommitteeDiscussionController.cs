@@ -44,7 +44,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 List<AssignmentTypes> Assessments = new List<AssignmentTypes>();
                 Assessments.Add(AssignmentTypes.CommitteeDiscussion);
-                Assessments.Add(AssignmentTypes.CommitteeDiscussionOfStudentWorkReview);
+                Assessments.Add(AssignmentTypes.CommitteeReview);
                 return Assessments;
             }
         }
@@ -67,8 +67,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         [HttpPost]
         public ActionResult Index(Assignment model)
         {
-            Assignment = model;
-            return base.PostBack(Assignment);
+            Assignment = db.Assignments.Find(model.ID);
+            return base.PostBack(model);
         }
     }
 }

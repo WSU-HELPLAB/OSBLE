@@ -14,7 +14,7 @@ namespace OSBLE.Models.Assignments
         CriticalReviewDiscussion = 5,
         CommitteeDiscussion = 6,
         ReviewOfStudentWork = 7,
-        CommitteeDiscussionOfStudentWorkReview = 8,
+        CommitteeReview = 8,
         AggregateAssessment = 9
     };
 
@@ -75,7 +75,7 @@ namespace OSBLE.Models.Assignments
                 case AssignmentTypes.ReviewOfStudentWork:
                     description = "A course instructor or committee chair uploads (if work does not exist in OSBLE), or flags in OSBLE (if work exists in OSBLE) student work for assessment. Either course instructor or the assessment committee then review the work against an assessment rubric specifying one or more target outcomes";
                     break;
-                case AssignmentTypes.CommitteeDiscussionOfStudentWorkReview:
+                case AssignmentTypes.CommitteeReview:
                     description = "Committee engages in online discussion of their previous (independent) reviews of student work. (This assessment must be linked to a “Committee Review of Student Work” assessement).";
                     break;
                 case AssignmentTypes.AggregateAssessment:
