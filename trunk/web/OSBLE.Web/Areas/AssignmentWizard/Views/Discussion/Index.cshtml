@@ -31,6 +31,10 @@
         <th>@Html.LabelFor(m => m.InitialPostDueDate):</th>
         <td>@Html.EditorFor(m => m.InitialPostDueDate) at @Html.EditorFor(m => m.InitialPostDueDueTime)</td>
     </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.WillEmailInstructorsOnModeratorPost):</th>
+        <td>@Html.CheckBoxFor(m => m.WillEmailInstructorsOnModeratorPost)</td>
+    </tr>
     <tr><td style="height:15px"></td></tr>
     <tr>
         <th>Anonymization Settings:</th>

@@ -11,6 +11,9 @@ using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
 using OSBLE.Models.FileSystem;
 using Ionic.Zip;
+using OSBLE.Utility;
+using System.Net.Mail;
+using System.Text;
 
 namespace OSBLE.Controllers
 {
@@ -368,6 +371,7 @@ namespace OSBLE.Controllers
                 newPost.CourseUserID = ActiveCourseUser.ID;
                 db.DiscussionPosts.Add(newPost);
                 db.SaveChanges();
+                SendModeratorEmail(assignment, newPost);
             }
             return Redirect(Request.UrlReferrer.ToString());
         }
@@ -381,8 +385,61 @@ namespace OSBLE.Controllers
                 reply.CourseUserID = ActiveCourseUser.ID;
                 db.DiscussionPosts.Add(reply);
                 db.SaveChanges();
+                SendModeratorEmail(assignment, reply);
             }
             return Redirect(Request.UrlReferrer.ToString());
+        }
+
+        private void SendModeratorEmail(Assignment assignment, DiscussionPost newPost)
+        {
+            if (assignment.DiscussionSettings != null)
+            {
+                if (assignment.DiscussionSettings.WillEmailInstructorsOnModeratorPost == true)
+                {
+                    if (newPost.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA || newPost.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
+                    {
+                        //mail all instructors
+                        List<MailAddress> to = new List<MailAddress>();
+                        List<string> emailAddresses = db.CourseUsers
+                            .Where(cu => cu.AbstractRole.CanGrade == true)
+                            .Where(cu => cu.AbstractCourseID == assignment.CourseID)
+                            .Select(cu => cu.UserProfile.UserName)
+                            .ToList();
+                        foreach (string address in emailAddresses)
+                        {
+                            //AC: sometimes this fails.  Not sure why
+                            try
+                            {
+                                to.Add(new MailAddress(address));
+                            }
+                            catch (Exception)
+                            {
+                            }
+                        }
+                        string subject = "[OSBLE] New Moderator Post";
+                        string linkUrl = string.Format("http://osble.org{0}", Url.Action("TeacherIndex", "DiscussionAssignment", new { assignmentID = assignment.ID, discussionTeamID = newPost.DiscussionTeamID }));
+                        string body = @"
+Greetings,
+
+{0} has posted the following message on the discussion assignment ""{1}."":
+{2}
+
+You may view the discussion on OSBLE by visiting the following link: <a href=""{3}"">{4}</a>.
+
+Thanks,
+The OSBLE Team
+";
+                        body = string.Format(body,
+                            ActiveCourseUser.UserProfile.DisplayName((int)CourseRole.CourseRoles.Instructor, true),
+                            assignment.AssignmentName,
+                            newPost.Content,
+                            linkUrl,
+                            linkUrl
+                            );
+                        Email.Send(subject, body, to);
+                    }
+                }
+            }
         }
 
         [HttpGet, FileCache(Duration = 3600)]

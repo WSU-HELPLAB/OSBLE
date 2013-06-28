@@ -22,7 +22,8 @@ namespace OSBLE.Models.Assignments
         AnonymizeStudentsToModerators = 8,
         HideCourseRoles = 16,
         RequiresPostBeforeView = 32,
-        TAsCanPostToAllDiscussions = 64
+        TAsCanPostToAllDiscussions = 64,
+        EmailInstructorOnModeratorPost = 128
 
     };
 
@@ -119,6 +120,27 @@ namespace OSBLE.Models.Assignments
             get
             {
                 return AnonymitySettings == 0;
+            }
+        }
+
+        [NotMapped]
+        [Display(Name = "Email instructors on moderator post")]
+        public bool WillEmailInstructorsOnModeratorPost
+        {
+            get
+            {
+                return HasAnonymityLevel(DiscussionSettings.EmailInstructorOnModeratorPost);
+            }
+            set
+            {
+                if (value == true)
+                {
+                    AddAnonymityLevel(DiscussionSettings.EmailInstructorOnModeratorPost);
+                }
+                else
+                {
+                    RemoveAnonymityLevel(DiscussionSettings.EmailInstructorOnModeratorPost);
+                }
             }
         }
 

@@ -161,7 +161,7 @@ namespace OSBLE.Controllers
                         if (destinationAssignment.CourseID != null)
                         {
                             HomeController hc = new HomeController();
-                            hc.SetCourse((int) destinationAssignment.CourseID);
+                            hc.SetCourseID((int) destinationAssignment.CourseID);
                         }
                     }
                 }
