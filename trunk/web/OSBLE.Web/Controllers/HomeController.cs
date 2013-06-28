@@ -340,12 +340,20 @@ namespace OSBLE.Controllers
             {
                 try
                 {
-                    SetCourse(Convert.ToInt32(Request.Form["course"]));
+                    int courseId = 0;
+                    if (Int32.TryParse(Request.Form["course"].ToString(), out courseId))
+                    {
+                        SetCourseID(courseId);
+                    }
+                    else
+                    {
+                        return RedirectToAction("Index"); 
+                    }
                 }
                 catch (System.FormatException)
                 {
                     // Non-integer entered. Ignore and redirect to root.
-                    return RedirectToAction("Index"); ;
+                    return RedirectToAction("Index"); 
                 }
             }
 
@@ -365,7 +373,7 @@ namespace OSBLE.Controllers
         /// </summary>
         /// <param name="courseId"></param>
         /// <returns></returns>
-        public bool SetCourse(int courseId)
+        public bool SetCourseID(int courseId)
         {
             try
             {
