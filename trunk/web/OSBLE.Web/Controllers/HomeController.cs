@@ -340,7 +340,7 @@ namespace OSBLE.Controllers
             {
                 try
                 {
-                    Cache["ActiveCourse"] = Convert.ToInt32(Request.Form["course"]);
+                    SetCourse(Convert.ToInt32(Request.Form["course"]));
                 }
                 catch (System.FormatException)
                 {
@@ -358,6 +358,24 @@ namespace OSBLE.Controllers
             {
                 return RedirectToAction("Index");
             }
+        }
+
+        /// <summary>
+        /// Sets the course for the current user
+        /// </summary>
+        /// <param name="courseId"></param>
+        /// <returns></returns>
+        public bool SetCourse(int courseId)
+        {
+            try
+            {
+                Cache["ActiveCourse"] = courseId;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
         }
 
         /// <summary>

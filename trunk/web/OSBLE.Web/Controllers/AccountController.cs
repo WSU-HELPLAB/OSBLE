@@ -140,6 +140,33 @@ namespace OSBLE.Controllers
                 return RedirectToAction("LogOn", "Account");
             }
             OsbleAuthentication.LogIn(profile);
+
+            //AC: Token logins are mostly commonly redirects to assignment pages, usually through external
+            //services such as ChemProV.  Unfortunately, these redirect URLs don't work if the user
+            //was last logged into a different course.  In these situations, we need to automatically
+            //switch to the relevant assignment for the user.
+            string[] pieces = destinationUrl.Split('/');
+            
+            //is the user trying to get to the assignment details page?
+            if (pieces[pieces.Length - 2].ToLower().CompareTo("assignmentdetails") == 0)
+            {
+                int assignmentId = 0;
+
+                //is the last nugget an assignment ID?
+                if (Int32.TryParse(pieces[pieces.Length - 1], out assignmentId))
+                {
+                    Assignment destinationAssignment = db.Assignments.Where(a => a.ID == assignmentId).FirstOrDefault();
+                    if (destinationAssignment != null)
+                    {
+                        if (destinationAssignment.CourseID != null)
+                        {
+                            HomeController hc = new HomeController();
+                            hc.SetCourse((int) destinationAssignment.CourseID);
+                        }
+                    }
+                }
+            }
+
             return Redirect(destinationUrl);
         }
 
