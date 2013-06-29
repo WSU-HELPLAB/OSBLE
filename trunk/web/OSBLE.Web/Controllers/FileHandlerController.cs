@@ -31,12 +31,11 @@ namespace OSBLE.Controllers
             if (course != null)
             {
                 //build the file path
-                OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
                 string[] pathPieces = filePath.Split('/');
-                IFileSystem fsPath = fs.Course(courseId).CourseDocs;
+                OSBLEDirectory fsPath = Models.FileSystem.Directories.GetCourseDocs(courseId);
                 for (int i = 0; i < pathPieces.Length - 1; i++)
                 {
-                    fsPath = fsPath.Directory(pathPieces[i]);
+                    fsPath = fsPath.GetDir(pathPieces[i]);
                 }
                 string fullPath = fsPath.File(pathPieces[pathPieces.Length - 1]).FirstOrDefault();
                 string fileName = Path.GetFileName(fullPath);
@@ -203,11 +202,11 @@ namespace OSBLE.Controllers
                 foreach (ReviewTeam reviewTeam in reviewTeams)
                 {
                     string key = reviewTeam.AuthorTeam.Name;
-                    OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
-                    OSBLE.Models.FileSystem.FileCollection fc = fs.Course(ActiveCourseUser.AbstractCourseID)
-                                                                .Assignment(assignmentId)
-                                                                .Review(reviewTeam.AuthorTeam, reviewTeam.ReviewingTeam)
-                                                                .AllFiles();
+                    OSBLE.Models.FileSystem.FileCollection fc =
+                        Models.FileSystem.Directories.GetAssignment(
+                            ActiveCourseUser.AbstractCourseID, assignmentId)
+                        .Review(reviewTeam.AuthorTeam, reviewTeam.ReviewingTeam)
+                        .AllFiles();
 
                     //don't create a zip if we don't have have anything to zip.
                     if (fc.Count > 0)
@@ -232,11 +231,12 @@ namespace OSBLE.Controllers
             }
             else //Basic Assigment, only need to get submissions
             {
-                submission = (new OSBLE.Models.FileSystem.FileSystem()).Course(ActiveCourseUser.AbstractCourseID)
-                                                                 .Assignment(assignmentId)
-                                                                 .Submission(teamId)
-                                                                 .AllFiles()
-                                                                 .ToZipStream();
+                submission = 
+                    OSBLE.Models.FileSystem.Directories.GetAssignment(
+                        ActiveCourseUser.AbstractCourseID, assignmentId)
+                    .Submission(teamId)
+                    .AllFiles()
+                    .ToZipStream();
             }
 
             string ZipName = assignment.AssignmentName + " by " + team.Name + ".zip";
@@ -309,11 +309,11 @@ namespace OSBLE.Controllers
                 }
 
                 //Document not handled by Annotate, must collect author teams preceding assignment's submission
-                OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
-                OSBLE.Models.FileSystem.FileCollection AuthorTeamSubmission = fs.Course(ActiveCourseUser.AbstractCourseID)
-                                                                                .Assignment(CRAssignment.PrecededingAssignmentID.Value)
-                                                                                .Submission(authorTeamId)
-                                                                                .AllFiles();
+                OSBLE.Models.FileSystem.FileCollection AuthorTeamSubmission =
+                    Models.FileSystem.Directories.GetAssignment(
+                        ActiveCourseUser.AbstractCourseID, CRAssignment.PrecededingAssignmentID.Value)
+                    .Submission(authorTeamId)
+                    .AllFiles();
 
                 //Checking if author should be anonymized. 
                 string displayName = authorTeam.Name;
@@ -523,11 +523,11 @@ namespace OSBLE.Controllers
             foreach (AssignmentTeam reviewTeam in reviewingTeams)
             {
                 //Get Reviews for AutuhorTeam from ReviewTeam.
-                OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
-                string reviewTeamSubmissionPath = fs.Course(ActiveCourseUser.AbstractCourseID)
-                                                                .Assignment(CRAssignment)
-                                                                .Review(authorTeam.ID, reviewTeam.TeamID)
-                                                                .GetPath();
+                string reviewTeamSubmissionPath = 
+                    Models.FileSystem.Directories.GetAssignment(
+                        ActiveCourseUser.AbstractCourseID, CRAssignment.ID)
+                    .Review(authorTeam.ID, reviewTeam.TeamID)
+                    .GetPath();
 
 
                 //Directory might not exist, check to avoid runtime error.
@@ -553,8 +553,9 @@ namespace OSBLE.Controllers
                             //Only want to add the original file to the stream once.
                             if (FirstTime == true)
                             {
-                                string originalFile = fs.Course(ActiveCourseUser.AbstractCourseID)
-                                    .Assignment(basicAssignment)
+                                string originalFile =
+                                    OSBLE.Models.FileSystem.Directories.GetAssignment(
+                                        ActiveCourseUser.AbstractCourseID, basicAssignment.ID)
                                     .Submission(authorTeam)
                                     .GetPath();
                                 FileStream filestream = System.IO.File.OpenRead(originalFile + "\\" + basicAssignment.Deliverables[0].Name + ".cpml");
@@ -612,11 +613,12 @@ namespace OSBLE.Controllers
             Team authorTeam = db.Teams.Find(authorTeamId);
             Team currentUsersTeam = GetAssignmentTeam(CRAssignment, ActiveCourseUser).Team;
 
-            Stream returnValue = (new OSBLE.Models.FileSystem.FileSystem()).Course(ActiveCourseUser.AbstractCourseID)
-                                                                .Assignment(CRAssignment)
-                                                                .Review(authorTeam, currentUsersTeam)
-                                                                .AllFiles()
-                                                                .ToZipStream();
+            Stream returnValue = 
+                OSBLE.Models.FileSystem.Directories.GetAssignment(
+                    ActiveCourseUser.AbstractCourseID, CRAssignment.ID)
+                .Review(authorTeam, currentUsersTeam)
+                .AllFiles()
+                .ToZipStream();
 
             //Checking if author should be anonymized. 
             string displayName = authorTeam.Name;

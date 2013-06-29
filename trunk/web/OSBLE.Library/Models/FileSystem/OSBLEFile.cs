@@ -18,9 +18,9 @@ namespace OSBLE.Models.FileSystem
     /// is recommended that attribute files ONLY ever get modified through the use of this 
     /// class, so as to keep attribute meaning consistent.
     /// All attributable files are meant to exist within an attributed file storage location.
-    /// See the <see cref="AttributableFilesPath"/> class.
+    /// See the <see cref="OSBLEDirectory"/> class.
     /// </summary>
-    public class AttributableFile
+    public class OSBLEFile
     {
         private const string c_emptyAttr = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
 @"<osblefileattributes>
@@ -45,7 +45,7 @@ namespace OSBLE.Models.FileSystem
         /// </summary>
         /// <param name="dataFullPath">Full path and file name for the data file.</param>
         /// <param name="attrFullPath">Full path and file name for the attribute file.</param>
-        private AttributableFile(string dataFullPath, string attrFullPath)
+        private OSBLEFile(string dataFullPath, string attrFullPath)
         {
             m_dataFileName = dataFullPath;
             m_attrFileName = attrFullPath;
@@ -87,6 +87,32 @@ namespace OSBLE.Models.FileSystem
 
             // Everything is in memory and nothing is modified yet
             m_modified = false;
+        }
+
+        /// <summary>
+        /// Gets or sets the ABET proficiency level attribute for the file. Note that 
+        /// setting this property will NOT update the file on disk. You must call 
+        /// the <see cref="SaveAttrs"/> method to save changes after setting in order 
+        /// for the changes to be written to disk.
+        /// </summary>
+        public string ABETProficiencyLevel
+        {
+            get
+            {
+                return GetSysAttr("ABETProficiencyLevel");
+            }
+            set
+            {
+                // Special case when setting to null: delete the attribute entirely
+                if (null == value)
+                {
+                    DeleteSysAttrs("ABETProficiencyLevel");
+                }
+                else
+                {
+                    SetSysAttr("ABETProficiencyLevel", value);
+                }
+            }
         }
 
         /// <summary>
@@ -212,19 +238,10 @@ namespace OSBLE.Models.FileSystem
             return ContainsAttribute("userattributes", attributeName, attributeValue);
         }
 
-        public static AttributableFile CreateFromExisting(string dataFullPath, string attrFullPath)
+        public static OSBLEFile CreateFromExisting(string dataFullPath, string attrFullPath)
         {
-            return new AttributableFile(dataFullPath, attrFullPath);
+            return new OSBLEFile(dataFullPath, attrFullPath);
         }
-
-        // TODO: Decide how I want to implement this (auto-create system attributes?)
-        /*
-        public static AttributableFile CreateNew(System.IO.Stream fileData, string dataFullPath,
-            string attrFullPath)
-        {
-            return new AttributableFile(dataFullPath, attrFullPath);
-        }
-        */
 
         public string DataFileName
         {
@@ -252,6 +269,8 @@ namespace OSBLE.Models.FileSystem
         /// value, then null is also returned. To check to see if a system 
         /// attribute exists when you don't care about the value, use the 
         /// <see cref="ContainsSysAttr(string attributeName)"/> function instead.
+        /// IMPORTANT NOTE: This function is going to be made private. All system 
+        /// attributes will be exposed through through properties in this class.
         /// </summary>
         public string GetSysAttr(string attrName)
         {

@@ -116,7 +116,7 @@ namespace OSBLE.Services
             }
 
             //upload the gradebook zip and return the result
-            GradebookFilePath gfp = new Models.FileSystem.FileSystem().Course(courseUser.AbstractCourseID).Gradebook();
+            GradebookFilePath gfp = Models.FileSystem.Directories.Course(courseUser.AbstractCourseID).Gradebook();
             GradebookController gc = new GradebookController();
             try
             {
@@ -205,19 +205,19 @@ namespace OSBLE.Services
 
             if (criticalReviewAssignment.Type != AssignmentTypes.CriticalReviewDiscussion)
             {
-                //only continue if:
-                // a: the assignment's due date has passed
-                // b: the assignment is set up to release critical reviews to students after
-                //    the due date.
-                // c: the instructor has clicked the "Publish All Reviews" link on the 
-                //    assignment details page. (turned off for now)
-                if (criticalReviewAssignment.DueDate > DateTime.UtcNow
-                    ||
-                    (criticalReviewAssignment.CriticalReviewSettings != null && criticalReviewAssignment.CriticalReviewSettings.AllowDownloadAfterPublish == false)
-                    )
-                {
-                    return new byte[0];
-                }
+            //only continue if:
+            // a: the assignment's due date has passed
+            // b: the assignment is set up to release critical reviews to students after
+            //    the due date.
+            // c: the instructor has clicked the "Publish All Reviews" link on the 
+            //    assignment details page. (turned off for now)
+            if (criticalReviewAssignment.DueDate > DateTime.UtcNow
+                || 
+                (criticalReviewAssignment.CriticalReviewSettings != null && criticalReviewAssignment.CriticalReviewSettings.AllowDownloadAfterPublish == false)
+                )
+            {
+                return new byte[0];
+            }
             }
 
             //make sure that the user is enrolled in the course
@@ -239,12 +239,12 @@ namespace OSBLE.Services
             //   so that everything in a review team will also be inside a discussion team.  Pulling 
             //   from discussion teams allows us to capture moderators and other observer-type
             //   people that have been attached to the review process.
-
+            
             //step 1: check to see if the critical review assignment has any discussion assignments attached
             Assignment discussionAssignment = (from a in _db.Assignments
-                                               where a.PrecededingAssignmentID == criticalReviewAssignmentId
-                                               && a.AssignmentTypeID == (int)AssignmentTypes.CriticalReviewDiscussion
-                                               select a
+                                              where a.PrecededingAssignmentID == criticalReviewAssignmentId
+                                              && a.AssignmentTypeID == (int)AssignmentTypes.CriticalReviewDiscussion
+                                              select a
                                               ).FirstOrDefault();
 
             IList<IReviewTeam> authorTeams = new List<IReviewTeam>();
@@ -289,8 +289,8 @@ namespace OSBLE.Services
 
                     //get original document
                     MemoryStream finalStream = new MemoryStream();
-                    OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
-                    string originalFile = fs.Course((int)criticalReviewAssignment.CourseID)
+                    string originalFile =
+                        OSBLE.Models.FileSystem.Directories.Course((int)criticalReviewAssignment.CourseID)
                                             .Assignment((int)criticalReviewAssignment.PrecededingAssignmentID)
                                             .Submission(authorTeam.AuthorTeamID)
                                             .AllFiles()
@@ -313,9 +313,11 @@ namespace OSBLE.Services
                         {
                             teamName = string.Format("Anonymous {0}", reviewer.ReviewTeamID);
                         }
-                        FileCollection allFiles = fs.Course((int)criticalReviewAssignment.CourseID)
-                                                    .Assignment(criticalReviewAssignmentId)
-                                                    .Review(authorTeam.AuthorTeamID, reviewer.ReviewTeamID)
+                        FileCollection allFiles =
+                            OSBLE.Models.FileSystem.Directories.GetReview(
+                                (int)criticalReviewAssignment.CourseID,
+                                criticalReviewAssignmentId,
+                                authorTeam.AuthorTeamID, reviewer.ReviewTeamID)
                                                     .AllFiles();
                         foreach (string file in allFiles)
                         {
@@ -430,7 +432,6 @@ namespace OSBLE.Services
             }
 
             //Find all review documents
-            OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
             Dictionary<string, dynamic> originalStreams = new Dictionary<string, dynamic>();
             Dictionary<string, dynamic> reviewStreams = new Dictionary<string, dynamic>();
             foreach (ReviewTeam teamToReview in teamsToReview)
@@ -445,11 +446,12 @@ namespace OSBLE.Services
                 string key = string.Format("{0};{1}", teamToReview.AuthorTeamID, zipName);
 
                 //get the original, unedited document
-                FileCollection fc = fs.Course(courseUser.AbstractCourseID)
-                                    .Assignment(submissionAssignment.ID)
+                FileCollection fc =
+                    OSBLE.Models.FileSystem.Directories.GetAssignment(
+                        courseUser.AbstractCourseID, submissionAssignment.ID)
                                     .Submission(teamToReview.AuthorTeamID)
                                     .AllFiles();
-
+                
                 //don't create a zip if we have have nothing to zip.
                 if (fc.Count > 0)
                 {
@@ -458,8 +460,8 @@ namespace OSBLE.Services
                 }
 
                 //get any user modified document
-                fc = fs.Course(courseUser.AbstractCourseID)
-                       .Assignment(criticalReviewAssignment.ID)
+                fc = OSBLE.Models.FileSystem.Directories.GetAssignment(
+                        courseUser.AbstractCourseID, criticalReviewAssignment.ID)
                        .Review(teamToReview.AuthorTeamID, teamToReview.ReviewTeamID)
                        .AllFiles();
 
@@ -536,7 +538,6 @@ namespace OSBLE.Services
                                    where tm.CourseUserID == courseUser.ID
                                    && rt.AssignmentID == assignmentId
                                    select tm.Team).FirstOrDefault();
-                OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
                 MemoryStream ms = new MemoryStream(zippedReviewData);
                 ms.Position = 0;
                 using (ZipFile file = ZipFile.Read(ms))
@@ -548,18 +549,15 @@ namespace OSBLE.Services
                             entry.Extract(extractStream);
                             extractStream.Position = 0;
 
-                            //delete existing
-                            fs.Course((int)assignment.CourseID)
-                                            .Assignment(assignmentId)
-                                            .Review(authorId, reviewTeam.ID)
-                                            .File(entry.FileName)
-                                            .Delete();
+                            // Get the storage object for the review
+                            OSBLEDirectory fs = Models.FileSystem.Directories.GetReview(
+                                (int)assignment.CourseID, assignmentId, authorId, reviewTeam.ID);
+
+                            // Delete existing first
+                            fs.DeleteContents(true, true);
 
                             //add the extracted file to the file system
-                            bool result = fs.Course((int)assignment.CourseID)
-                                            .Assignment(assignmentId)
-                                            .Review(authorId, reviewTeam.ID)
-                                            .AddFile(entry.FileName, extractStream);
+                            bool result = fs.AddFile(entry.FileName, extractStream);
                             if (result == false)
                             {
                                 return false;
@@ -615,10 +613,10 @@ namespace OSBLE.Services
             }
 
 
-            OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
-            Stream stream = fs.Course(courseUser.AbstractCourseID)
-                              .Assignment(assignmentId)
-                              .Submission(team.ID)
+            OSBLE.Models.FileSystem.AssignmentFilePath fs =
+                Models.FileSystem.Directories.GetAssignment(
+                    courseUser.AbstractCourseID, assignmentId);
+            Stream stream = fs.Submission(team.ID)
                               .AllFiles()
                               .ToZipStream();
             MemoryStream ms = new MemoryStream();
@@ -690,7 +688,10 @@ namespace OSBLE.Services
                              where tm.CourseUserID == courseUser.ID
                              && at.AssignmentID == assignmentId
                              select tm.Team).FirstOrDefault();
-                OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
+
+                OSBLE.Models.FileSystem.AssignmentFilePath fs =
+                    Models.FileSystem.Directories.GetAssignment(
+                        (int)assignment.CourseID, assignmentId);
 
                 MemoryStream ms = new MemoryStream(zipData);
                 ms.Position = 0;
@@ -703,16 +704,12 @@ namespace OSBLE.Services
                         extractStream.Position = 0;
 
                         //delete existing
-                        fs.Course((int)assignment.CourseID)
-                            .Assignment(assignmentId)
-                            .Submission(team.ID)
+                        fs.Submission(team.ID)
                             .File(entry.FileName)
                             .Delete();
 
                         //add the extracted file to the file system
-                        bool result = fs.Course((int)assignment.CourseID)
-                                        .Assignment(assignmentId)
-                                        .Submission(team.ID)
+                        bool result = fs.Submission(team.ID)
                                         .AddFile(entry.FileName, extractStream);
                         if (result == false)
                         {

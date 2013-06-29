@@ -157,13 +157,15 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             int tempID = Convert.ToInt32(Request.Form["temporaryAssignmentID"]);
             if (0 != Assignment.ID && Assignment.ID != tempID)
             {
-                OSBLE.Models.FileSystem.CourseFilePath cfp =
-                    (new OSBLE.Models.FileSystem.FileSystem()).Course(Assignment.CourseID.Value);
-                OSBLE.Models.FileSystem.AttributableFilesPath temp =
-                    cfp.Assignment(tempID).AttributableFiles;
-                OSBLE.Models.FileSystem.AttributableFilesPath perm =
-                    cfp.Assignment(Assignment.ID).AttributableFiles;
-                OSBLE.Models.FileSystem.AttributableFilesPath.MoveAll(temp, perm, true);
+                OSBLE.Models.FileSystem.OSBLEDirectory temp =
+                    OSBLE.Models.FileSystem.Directories.GetAssignment(
+                        Assignment.CourseID.Value, tempID)
+                    .AttributableFiles;
+                OSBLE.Models.FileSystem.OSBLEDirectory perm =
+                    OSBLE.Models.FileSystem.Directories.GetAssignment(
+                        Assignment.CourseID.Value, Assignment.ID)
+                    .AttributableFiles;
+                OSBLE.Models.FileSystem.OSBLEDirectory.MoveAll(temp, perm, true);
 
                 // After the move, we need to make sure that we update attributes because 
                 // the attributes will label the files as assignment descriptions/solutions 

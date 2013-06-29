@@ -24,7 +24,7 @@ function assignmentfilemanager_update(assignmentID)
     //req.addEventListener("error", assignmentfilemanager_fail, false);
     //req.addEventListener("abort", assignmentfilemanager_canceled, false);
     req.open("GET", "../Services/CourseFilesOps.ashx?cmd=assignment_files_list&courseID=" +
-        courseID + "&assignmentID=" + assignmentID);
+        courseID + "&assignmentID=" + assignmentID + "&forceNoCache=" + (new Date()).toString());
     req.send();
 }
 

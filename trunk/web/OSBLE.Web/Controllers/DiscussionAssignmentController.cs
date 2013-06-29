@@ -81,7 +81,6 @@ namespace OSBLE.Controllers
 
             Assignment criticalReviewAssignment = currentAssignment.PreceedingAssignment;
             Assignment basicAssignment = criticalReviewAssignment.PreceedingAssignment;
-            OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
 
             ZipFile zipFile = new ZipFile();
 
@@ -96,10 +95,11 @@ namespace OSBLE.Controllers
                 string authorDisplayName = reviewTeam.AuthorTeam.Name;
 
                 //get all files
-                FileCollection files =  fs.Course((int)currentAssignment.CourseID)
-                                        .Assignment(criticalReviewAssignment)
-                                        .Review(reviewTeam.AuthorTeam, reviewTeam.ReviewingTeam)
-                                        .AllFiles();
+                FileCollection files =
+                    Models.FileSystem.Directories.GetAssignment(
+                        (int)currentAssignment.CourseID, criticalReviewAssignment.ID)
+                    .Review(reviewTeam.AuthorTeam, reviewTeam.ReviewingTeam)
+                    .AllFiles();
                 foreach (string file in files)
                 {
                     //cpml files need to be merged and not added individually
@@ -111,8 +111,9 @@ namespace OSBLE.Controllers
                         //Only want to add the original file to the stream once.
                         if(parentStreams.ContainsKey(reviewTeam.AuthorTeamID) == false)
                         {
-                            string originalFile = fs.Course(ActiveCourseUser.AbstractCourseID)
-                                .Assignment(basicAssignment)
+                            string originalFile =
+                                Models.FileSystem.Directories.GetAssignment(
+                                    ActiveCourseUser.AbstractCourseID, basicAssignment.ID)
                                 .Submission(reviewTeam.AuthorTeam)
                                 .GetPath();
                             FileStream filestream = System.IO.File.OpenRead(originalFile + "\\" + basicAssignment.Deliverables[0].Name + ".cpml");

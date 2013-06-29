@@ -18,8 +18,8 @@ namespace OSBLE.Controllers
             // The list of departments is stored in a plain text file in the 
             // root directory of the file system.
             string[] depts = null;
-            OSBLE.Models.FileSystem.FileSystem fs = 
-                new Models.FileSystem.FileSystem();
+            OSBLE.Models.FileSystem.OSBLEDirectory fs =
+                Models.FileSystem.Directories.GetAdmin();
             string path = fs.GetPath();
             if (System.IO.Directory.Exists(path))
             {
@@ -42,14 +42,10 @@ namespace OSBLE.Controllers
 
             if (null != allDepts)
             {
-                OSBLE.Models.FileSystem.FileSystem fs = 
-                new Models.FileSystem.FileSystem();
-                string path = fs.GetPath();
-                if (System.IO.Directory.Exists(path))
-                {
-                    path = System.IO.Path.Combine(path, "departments.txt");
-                    System.IO.File.WriteAllText(path, allDepts);
-                }
+                OSBLE.Models.FileSystem.OSBLEDirectory fs =
+                    Models.FileSystem.Directories.GetAdmin();
+                fs.AddFile("departments.txt",
+                    System.Text.Encoding.UTF8.GetBytes(allDepts));
             }
 
             return RedirectToAction("Index", "Admin");

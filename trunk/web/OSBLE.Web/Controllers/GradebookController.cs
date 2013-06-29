@@ -23,7 +23,7 @@ namespace OSBLE.Controllers
         public ActionResult Index(string gradebookName = null)
         {
             //Get the GradebookFilePath for current course
-            GradebookFilePath gfp = new Models.FileSystem.FileSystem().Course(ActiveCourseUser.AbstractCourseID).Gradebook();
+            GradebookFilePath gfp = Models.FileSystem.Directories.GetGradebook(ActiveCourseUser.AbstractCourseID);
 
             //get last upload time
             DirectoryInfo directoryInfo = new DirectoryInfo(gfp.GetPath());
@@ -153,7 +153,7 @@ namespace OSBLE.Controllers
         public ActionResult UploadGradebook(HttpPostedFileBase file)
         {
             //Get the GradebookFilePath for current course
-            GradebookFilePath gfp = new Models.FileSystem.FileSystem().Course(ActiveCourseUser.AbstractCourseID).Gradebook();
+            GradebookFilePath gfp = Models.FileSystem.Directories.GetGradebook(ActiveCourseUser.AbstractCourseID);
 
             //delete old items in gradebook
             int filesInGradebookFolder = gfp.AllFiles().Count;
@@ -232,7 +232,8 @@ namespace OSBLE.Controllers
         private void SetUpViewBagForGradebook(string gradebookName)
         {
             //Get the GradebookFilePath for current course, then the FileCollection for the given gradebookName
-            GradebookFilePath gfp = gfp = new Models.FileSystem.FileSystem().Course(ActiveCourseUser.AbstractCourseID).Gradebook();
+            GradebookFilePath gfp = Models.FileSystem.Directories.GetGradebook(
+                ActiveCourseUser.AbstractCourseID);
             FileCollection gradebook = gfp.File(gradebookName + ".csv"); ;
 
             //Getting the filePath, which is the filename in the file collction

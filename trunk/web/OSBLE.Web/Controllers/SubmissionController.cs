@@ -136,14 +136,14 @@ namespace OSBLE.Controllers
                                             //critical review assignments must use different file system functions
 
                                             //remove all prior files
-                                            OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
-                                            fs.Course(ActiveCourseUser.AbstractCourseID)
-                                                .Assignment(assignment.ID)
-                                                .Review(authorTeam.TeamID, reviewTeam.ReviewTeamID)
+                                            OSBLE.Models.FileSystem.AssignmentFilePath fs = 
+                                                Models.FileSystem.Directories.GetAssignment(
+                                                    ActiveCourseUser.AbstractCourseID, assignment.ID); 
+                                            fs.Review(authorTeam.TeamID, reviewTeam.ReviewTeamID)
                                                 .File(deliverableName)
                                                 .Delete();
 
-                                            //We need to remove the zipfile corrisponding to the authorTeamId being sent in as well as the regularly cached zip. 
+                                            //We need to remove the zipfile corresponding to the authorTeamId being sent in as well as the regularly cached zip. 
                                             AssignmentTeam precedingAuthorAssignmentTeam = (from at in assignment.PreceedingAssignment.AssignmentTeams
                                                                                             where at.TeamID == authorTeamID
                                                                                             select at).FirstOrDefault();
@@ -151,17 +151,16 @@ namespace OSBLE.Controllers
                                             FileSystem.RemoveZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, assignmentTeam);
 
                                             //add in the new file
-                                            fs.Course(ActiveCourseUser.AbstractCourseID)
-                                                .Assignment(assignment.ID)
-                                                .Review(authorTeam.TeamID, reviewTeam.ReviewTeamID)
+                                            fs.Review(authorTeam.TeamID, reviewTeam.ReviewTeamID)
                                                 .AddFile(deliverableName, file.InputStream);
 
                                             //unzip and rezip xps files because some XPS generators don't do it right
                                             if (extension.ToLower().CompareTo(".xps") == 0)
                                             {
                                                 //XPS documents require the actual file path, so get that.
-                                                OSBLE.Models.FileSystem.FileCollection fileCollection = fs.Course(ActiveCourseUser.AbstractCourseID)
-                                                    .Assignment(assignment.ID)
+                                                OSBLE.Models.FileSystem.FileCollection fileCollection =
+                                                    OSBLE.Models.FileSystem.Directories.GetAssignment(
+                                                        ActiveCourseUser.AbstractCourseID, assignment.ID)
                                                     .Review(authorTeam.TeamID, reviewTeam.ReviewTeamID)
                                                     .File(deliverables[i].Name);
                                                 string path = fileCollection.FirstOrDefault();

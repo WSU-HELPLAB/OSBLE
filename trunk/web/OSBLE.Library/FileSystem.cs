@@ -528,9 +528,8 @@ namespace OSBLE
             //    Directory.CreateDirectory(path);
             //}
 
-            OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
-            string path = fs.Course(course.ID)
-                .Assignment(assignmentID)
+            string path = OSBLE.Models.FileSystem.Directories.GetAssignment(
+                course.ID, assignmentID)
                 .Review(authorTeam.ID, submitterTeam.TeamID)
                 .GetPath();
 

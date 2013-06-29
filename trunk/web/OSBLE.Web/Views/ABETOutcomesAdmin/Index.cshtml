@@ -4,16 +4,29 @@
 
 @section Header
 {
-<script>
-    function abetoutcomeadmin_deptchanged() {
-        var slct = document.getElementById("slctDepartment");
-        var theDIV = document.getElementById(slct.value);
-        if (theDIV) {
-            document.getElementById("taOptions").value = theDIV.innerText;
+    <script>
+        // Write JS arrays for the existing options
+        @Html.Raw(ViewBag.JSDeptOpts)
+
+        function abetoutcomeadmin_deptchanged()
+        {
+            var slct = document.getElementById("slctDepartment");
+            
+            var optsArr = ABET_existing_outcomes[slct.selectedIndex];
+            var totalOpts = "";
+            for (var i = 0; i < optsArr.length; i++)
+            {
+                totalOpts += optsArr[i];
+                if (i < optsArr.length - 1)
+                {
+                    totalOpts += "\n";
+                }
+            }
+            document.getElementById("taOptions").value = totalOpts;
             document.getElementById("taOptions").disabled = false;
         }
-    }
-</script>
+    
+    </script>
 }
 
 <h2>ABET Outcome Editor</h2>
@@ -41,17 +54,10 @@
     // Put the first department's outcomes in it
     if (ViewBag.DepartmentList.Length > 0)
     {
-        @Html.Encode(ViewBag.OptionsDictionary[ViewBag.DepartmentList[0]]);
+        @Html.Raw(ViewBag.OptionsDictionary[ViewBag.DepartmentList[0]]);
     }
     @Html.Raw("</textarea>");
 
-    // Make hidden DIVs for the existing options
-    foreach (KeyValuePair<string, string> kvp in ViewBag.OptionsDictionary)
-    {
-        @Html.Raw("<div id=\"" + kvp.Key + "\" style=\"display: none;\" >");
-        @Html.Encode(kvp.Value);
-        @Html.Raw("</div>");    
-    }
     @Html.Raw("<br />");
     @Html.Raw("<input type=\"submit\" value=\"Save\" />");
 }

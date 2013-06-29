@@ -10,29 +10,63 @@ using OSBLE.Models.Courses;
 
 namespace OSBLE.Models.FileSystem
 {
+    // Information about the two directories used in representing an OSBLEDirectory:
+    // There are two folders associated with a collection of attributable files: data and attr
+    // data:
+    //   This folder contains the actual data files that were uploaded.
+    //   Each file can have an accompanying XML file for attributes for this file, 
+    //   but this file is in the attr folder.
+    // attr:
+    //   Contains XML files for file attributes. There should be a one-to-one correspondence 
+    //   of data files to XML attribute files, with the exception of the possibility of a 
+    //   data file that has no accompanying XML attribute file and thus implicitly has no 
+    //   attributes.
+    
     /// <summary>
-    /// There are two folders associated with a collection of attributable files: data and attr
-    /// data:
-    ///   This folder contains the actual data files that were uploaded.
-    ///   Each file can have an accompanying XML file for attributes for this file, 
-    ///   but this file is in the attr folder.
-    /// attr:
-    ///   Contains XML files for file attributes. There should be a one-to-one correspondence 
-    ///   of data files to XML attribute files, with the exception of the possibility of a 
-    ///   data file that has no accompanying XML attribute file and thus implicitly has no 
-    ///   attributes.
+    /// Represents a virtual directory of files and subdirectories in the OSBLE file system. 
+    /// An OSBLE directory is usually designated for a specific purpose, see FileSystem.cs 
+    /// for the details about what types of folders are in the file system hierarchy.
     /// </summary>
-    public class AttributableFilesPath : FileSystemBase
+    public class OSBLEDirectory
     {
         private string m_attrDir;
         
         private string m_dataDir;
         
-        public AttributableFilesPath(IFileSystem pathBuilder, string dataPath, string attrPath)
-            : base(pathBuilder)
+        protected string m_path;
+
+        /// <summary>
+        /// Constructs an OSBLEDirectory object from an existing folder on disk. The 
+        /// specified folder must exist or else an exception will be thrown.
+        /// </summary>
+        public OSBLEDirectory(string dataPath)
+        {
+            if (!System.IO.Directory.Exists(dataPath))
+            {
+                throw new System.IO.DirectoryNotFoundException(
+                    "Directory not found: " + dataPath);
+            }
+
+            m_dataDir = m_path = dataPath;
+            m_attrDir = Path.Combine(
+                Path.GetDirectoryName(dataPath),
+                Path.GetFileName(dataPath) + "Attr");
+
+            // The data directory must already exist in order to use this constructor, 
+            // but the attribute directory need not exist (before construction). It 
+            // does have to exist after construction though so we create it here if 
+            // we need to.
+            if (!System.IO.Directory.Exists(m_attrDir))
+            {
+                System.IO.Directory.CreateDirectory(AttrFilesPath);
+            }
+        }
+        
+        public OSBLEDirectory(string dataPath, string attrPath)
         {
             m_dataDir = dataPath;
             m_attrDir = attrPath;
+            m_path = dataPath;
             
             if (!System.IO.Directory.Exists(DataFilesPath))
             {
@@ -45,10 +79,22 @@ namespace OSBLE.Models.FileSystem
         }
 
         /// <summary>
+        /// Adds a file to the directory and writes all the bytes in the 
+        /// array to its contents.
+        /// </summary>
+        public bool AddFile(string fileName, byte[] data)
+        {
+            MemoryStream ms = new MemoryStream();
+            ms.Write(data, 0, data.Length);
+            ms.Position = 0;
+            return AddFile(fileName, ms);
+        }
+
+        /// <summary>
         /// Adds a file from the specified stream data. No user attributes are created 
         /// and a few auto-system attributes are added.
         /// </summary>
-        public override bool AddFile(string fileName, Stream data)
+        public virtual bool AddFile(string fileName, Stream data)
         {
             Dictionary<string, string> sys = new Dictionary<string, string>();
             sys.Add("created", DateTime.Now.ToString());
@@ -146,7 +192,7 @@ namespace OSBLE.Models.FileSystem
             return retVal;
         }
 
-        public override FileCollection AllFiles()
+        public virtual FileCollection AllFiles()
         {
             return new AttributableFileCollection(DataFilesPath, AttrFilesPath, true);
         }
@@ -159,11 +205,65 @@ namespace OSBLE.Models.FileSystem
             }
         }
 
+        public bool CreateDir(string localDirName)
+        {
+            if (localDirName.Contains("../") || localDirName.Contains("..\\"))
+            {
+                // We won't allow going up a directory
+                return false;
+            }
+
+            // Create the data directory
+            string fullDirName = Path.Combine(m_dataDir, localDirName);
+            if (!System.IO.Directory.Exists(fullDirName))
+            {
+                System.IO.Directory.CreateDirectory(fullDirName);
+            }
+
+            // Create the directory in the attribute path too
+            fullDirName = Path.Combine(m_attrDir, localDirName);
+            if (!System.IO.Directory.Exists(fullDirName))
+            {
+                System.IO.Directory.CreateDirectory(fullDirName);
+            }
+
+            return true;
+        }
+
         private string DataFilesPath
         {
             get
             {
                 return m_dataDir;
+            }
+        }
+
+        /// <summary>
+        /// Deletes either all files and/or all folders within this directory, potentially 
+        /// leaving it empty when finished. Use with caution, there are only a few instances 
+        /// in the OSBLE code where this should really be needed.
+        /// </summary>
+        public void DeleteContents(bool deleteFiles, bool deleteDirectories)
+        {
+            // Files first
+            if (deleteFiles)
+            {
+                string[] files = Directory.GetFiles(m_path);
+                foreach (string file in files)
+                {
+                    System.IO.File.Delete(file);
+                }
+            }
+
+            // Now directories
+            if (deleteDirectories)
+            {
+                string[] dirs = Directory.GetDirectories(m_path);
+                foreach (string dir in dirs)
+                {
+                    // Perform a recursive deletion
+                    Directory.Delete(dir, true);
+                }
             }
         }
 
@@ -226,30 +326,23 @@ namespace OSBLE.Models.FileSystem
             return true;
         }
 
-        public override IFileSystem Directory(string name)
-        {
-            string path = Path.Combine(m_dataDir, name);
-            if (!System.IO.Directory.Exists(path))
-            {
-                return null;
-            }
-
-            return new AttributableFilesPath(
-                this, path, Path.Combine(m_attrDir, name));
-        }
-
         /// <summary>
         /// Gets a collection of files whose names satisfy the predicate.
         /// </summary>
-        public override FileCollection File(Func<string, bool> predicate)
+        public virtual FileCollection File(Func<string, bool> predicate)
         {
             return new AttributableFileCollection(m_dataDir, AttrFilesPath, predicate);
+        }
+
+        public FileCollection File(string name)
+        {
+            return File(s => s == name);
         }
 
         /// <summary>
         /// Gets the first file in the path or null if there are no files.
         /// </summary>
-        public AttributableFile FirstFile
+        public OSBLEFile FirstFile
         {
             get
             {
@@ -260,27 +353,41 @@ namespace OSBLE.Models.FileSystem
                 }
 
                 string firstName = Path.GetFileName(dfNames[0]);
-                return AttributableFile.CreateFromExisting(
+                return OSBLEFile.CreateFromExisting(
                     Path.Combine(m_dataDir, firstName),
                     AttributableFileCollection.GetAttrFileName(m_attrDir, firstName));
             }
         }
 
         /// <summary>
-        /// Adding this in favor of the Directory method for a few reasons.
-        /// 1. Directory is the name of a class in the System.IO namespace and 
-        ///    it's cleaner if we don't naming ambiguities in all the IO code.
-        /// 2. If it's getting something, having "Get" in the name is more 
-        ///    intuitive and descriptive of the function's action.
+        /// Gets a subdirectory. Returns null if not found.
         /// </summary>
-        public AttributableFilesPath GetDir(string subdirName)
+        public virtual OSBLEDirectory GetDir(string subdirName)
         {
+            // Despite its simple implementation, the details of getting a subdirectory 
+            // are very important. Each OSBLE "directory" is two directories in reality. 
+            // What we DON'T want to do is have extra attribute folders pop up inside 
+            // places where they shouldn't be. For example:
+            //   Assume folders exists: /A and /A/B
+            //   If this object represents the 'A' folder and this method is called to 
+            //   get the 'B' subdirectory, then there should only be ONE attribute
+            //   folder: /AAttr and that will have within it: /AAttr/B. If the default 
+            //   constructor were used, then it would create /A/BAttr, which is NOT 
+            //   what we want.
+            
             string dataPath = Path.Combine(m_dataDir, subdirName);
             string attrPath = Path.Combine(m_attrDir, subdirName);
-            return new AttributableFilesPath(this, dataPath, attrPath);
+
+            // Data path must exist
+            if (!Directory.Exists(dataPath))
+            {
+                return null;
+            }
+
+            return new OSBLEDirectory(dataPath, attrPath);
         }
 
-        public AttributableFile GetFile(string fileName)
+        public OSBLEFile GetFile(string fileName)
         {            
             // If the file doesn't exist then we'll assume it's a relative path and 
             // try combining it with the data files path.
@@ -292,7 +399,7 @@ namespace OSBLE.Models.FileSystem
                     return null;
                 }
             }
-            return AttributableFile.CreateFromExisting(
+            return OSBLEFile.CreateFromExisting(
                 fileName,
                 AttributableFileCollection.GetAttrFileName(
                     AttrFilesPath, Path.GetFileName(fileName)));
@@ -322,7 +429,7 @@ namespace OSBLE.Models.FileSystem
                     continue;
                 }
 
-                AttributableFile af = AttributableFile.CreateFromExisting(file, attrFileName);
+                OSBLEFile af = OSBLEFile.CreateFromExisting(file, attrFileName);
 
                 if ("systemattributes" == attrClass)
                 {
@@ -373,10 +480,11 @@ namespace OSBLE.Models.FileSystem
         {
             return GetFilesWithAttribute("userattributes", attrName, attrValue);
         }
-        
-        public override string GetPath()
+
+        [Obsolete("Unsafe. The file system is being redesigned so that the \"outside world\" isn't aware of any paths on disk and can perform all operations without even knowing the path.")]
+        public string GetPath()
         {
-            return DataFilesPath;
+            return m_path;
         }
 
         /// <summary>
@@ -479,8 +587,8 @@ namespace OSBLE.Models.FileSystem
         /// empty folders remaining from the source storage can optionally be 
         /// removed when the move is completed.
         /// </summary>
-        public static int MoveAll(AttributableFilesPath from,
-            AttributableFilesPath to, bool deleteFromFoldersWhenDone)
+        public static int MoveAll(OSBLEDirectory from,
+            OSBLEDirectory to, bool deleteFromFoldersWhenDone)
         {
             int moved = 0;
             string[] srcFiles = System.IO.Directory.GetFiles(from.m_dataDir);
@@ -517,6 +625,21 @@ namespace OSBLE.Models.FileSystem
             catch (Exception) { return null; }
 
             return fs;
+        }
+
+        /// <summary>
+        /// Reads all the lines from a text file and returns them as an array of 
+        /// strings. If the file is not found then null is returned.
+        /// </summary>
+        public string[] ReadFileLines(string fileName)
+        {
+            string path = System.IO.Path.Combine(m_path, fileName);
+            if (!System.IO.File.Exists(path))
+            {
+                return null;
+            }
+
+            return System.IO.File.ReadAllLines(path);
         }
 
         /// <summary>
@@ -560,11 +683,11 @@ namespace OSBLE.Models.FileSystem
             string[] files = System.IO.Directory.GetFiles(m_dataDir);
             foreach (string dataFile in files)
             {
-                AttributableFile af = GetFile(dataFile);
-                if (af.ContainsSysAttr(name, oldValue))
+                OSBLEFile of = GetFile(dataFile);
+                if (of.ContainsSysAttr(name, oldValue))
                 {
-                    af.SetSysAttr(name, newValue);
-                    af.SaveAttrs();
+                    of.SetSysAttr(name, newValue);
+                    of.SaveAttrs();
                 }
             }
         }

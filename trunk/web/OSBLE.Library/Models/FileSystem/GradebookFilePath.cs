@@ -6,19 +6,15 @@ using System.IO;
 
 namespace OSBLE.Models.FileSystem
 {
-    public class GradebookFilePath : FileSystemBase
+    public class GradebookFilePath : OSBLEDirectory
     {
-        private string _gradebookPrefix = "Gradebook";
-        public GradebookFilePath(IFileSystem pathBuilder)
-            :base(pathBuilder)
-        {
+        public GradebookFilePath(string path)
+            : base(path) { }
 
-        }
-
-        public override string GetPath()
+        public override OSBLEDirectory GetDir(string subdirName)
         {
-            string returnPath = Path.Combine(PathBuilder.GetPath(), _gradebookPrefix);
-            return returnPath;
+            throw new NotSupportedException(
+                "Subdirectories are not supported within the gradebook directory.");
         }
     }
 }

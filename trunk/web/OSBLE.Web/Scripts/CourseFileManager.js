@@ -258,7 +258,14 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         }
         else
         {
-            theFullPath = relativeDir + "/" + fileName;
+            if ("/" == relativeDir)
+			{
+				theFullPath = "/" + fileName;
+			}
+			else 
+			{
+				theFullPath = relativeDir + "/" + fileName;
+			}
         }
 
         // Each file also has a state object associated with it. The states are very 

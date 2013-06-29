@@ -8,50 +8,14 @@ using OSBLE.Models.Courses;
 
 namespace OSBLE.Models.FileSystem
 {
-    public class AssignmentFilePath : FileSystemBase
+    public class AssignmentFilePath : OSBLEDirectory
     {
         private int _assignmentId;
-        private string _assignmentPathPrefix = "Assignments";
 
-        public AssignmentFilePath(IFileSystem pathBuilder, int id)
-            : base(pathBuilder)
+        public AssignmentFilePath(string path, int id)
+            : base(path)
         {
             _assignmentId = id;
-        }
-
-        public IFileSystem Submission(int teamID)
-        {
-            // Within this assignment folder is a "Submissions" subdirectory and 
-            // folders named with team IDs within that. See FileSystem.cs for 
-            // a diagram of the file system.
-
-            string p = this.GetPath();
-            return new AttributableFilesPath(
-                this, // For compatibility
-                Path.Combine(p, "Submissions", teamID.ToString()),
-                Path.Combine(p, "SubmissionsAttr", teamID.ToString()));
-        }
-
-        public IFileSystem Submission(Team team)
-        {
-            return Submission(team.ID);
-        }
-
-        public IFileSystem Review(int authorTeamID, int reviewerTeamID)
-        {
-            ReviewFilePath review = new ReviewFilePath(this, authorTeamID, reviewerTeamID);
-            return review;
-        }
-
-        public IFileSystem Review(Team authorTeam, Team reviewerTeam)
-        {
-            return Review(authorTeam.ID, reviewerTeam.ID);
-        }
-
-        public override string GetPath()
-        {
-            string returnPath = Path.Combine(PathBuilder.GetPath(), _assignmentPathPrefix, _assignmentId.ToString());
-            return returnPath;
         }
 
         /// <summary>
@@ -59,16 +23,42 @@ namespace OSBLE.Models.FileSystem
         /// like files for detailed descriptions of the assignment requirements, files 
         /// for assignment solutions, and so on.
         /// </summary>
-        public AttributableFilesPath AttributableFiles
+        public OSBLEDirectory AttributableFiles
         {
             get
             {
-                string path = this.GetPath();
-                return new AttributableFilesPath(
-                    new FileSystem(Path.Combine(path, "AssignmentDocs")),
-                    Path.Combine(path, "AssignmentDocs"),
-                    Path.Combine(path, "AssignmentDocsAttr"));
+                return new OSBLEDirectory(
+                    Path.Combine(m_path, "AssignmentDocs"),
+                    Path.Combine(m_path, "AssignmentDocsAttr"));
             }
+        }
+
+        public OSBLEDirectory Review(int authorTeamID, int reviewerTeamID)
+        {
+            return new OSBLEDirectory(
+                Path.Combine(m_path, "Reviews", authorTeamID.ToString(), reviewerTeamID.ToString()),
+                Path.Combine(m_path, "ReviewsAttr", authorTeamID.ToString(), reviewerTeamID.ToString()));
+        }
+
+        public OSBLEDirectory Review(Team authorTeam, Team reviewerTeam)
+        {
+            return Review(authorTeam.ID, reviewerTeam.ID);
+        }
+
+        public OSBLEDirectory Submission(int teamID)
+        {
+            // Within this assignment folder is a "Submissions" subdirectory and 
+            // folders named with team IDs within that. See FileSystem.cs for 
+            // a diagram of the file system.
+
+            return new OSBLEDirectory(
+                Path.Combine(m_path, "Submissions", teamID.ToString()),
+                Path.Combine(m_path, "SubmissionsAttr", teamID.ToString()));
+        }
+
+        public OSBLEDirectory Submission(Team team)
+        {
+            return Submission(team.ID);
         }
     }
 }

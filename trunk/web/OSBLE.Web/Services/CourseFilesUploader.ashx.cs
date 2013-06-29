@@ -110,7 +110,7 @@ namespace OSBLE.Services
             // Save based on the usage
             if ("generic" == fileUsage)
             {
-                IFileSystem location = (new Models.FileSystem.FileSystem()).Course(courseID).CourseDocs;
+                OSBLEDirectory location = Models.FileSystem.Directories.GetCourseDocs(courseID);
                 
                 // For now the target folder parameter is only allowed for generic files
                 if (!string.IsNullOrEmpty(targetFolderParam) &&
@@ -127,7 +127,7 @@ namespace OSBLE.Services
                         targetFolderParam = targetFolderParam.Substring(1);
                     }
                     
-                    location = location.Directory(targetFolderParam);
+                    location = location.GetDir(targetFolderParam);
                     if (null == location)
                     {
                         WriteErrorResponse(context,
@@ -174,7 +174,7 @@ namespace OSBLE.Services
 
                 // Assignment must exist
                 Models.FileSystem.AssignmentFilePath afs =
-                    (new Models.FileSystem.FileSystem()).Course(courseID).Assignment(aID);
+                    Models.FileSystem.Directories.GetAssignment(courseID, aID);
                 if (null == afs)
                 {
                     WriteErrorResponse(context,
@@ -183,7 +183,7 @@ namespace OSBLE.Services
                 }
 
                 // Get the attributable files storage for this assignment
-                OSBLE.Models.FileSystem.AttributableFilesPath attrFiles = afs.AttributableFiles;
+                OSBLE.Models.FileSystem.OSBLEDirectory attrFiles = afs.AttributableFiles;
                 if (null == attrFiles)
                 {
                     WriteErrorResponse(context,

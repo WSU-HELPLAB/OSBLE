@@ -32,9 +32,10 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
             ViewBag.DescFilesHTML = string.Empty;
             if (assignment.CourseID.HasValue)
             {
-                OSBLE.Models.FileSystem.FileSystem fs = new OSBLE.Models.FileSystem.FileSystem();
-                OSBLE.Models.FileSystem.AttributableFilesPath attrFiles =
-                    fs.Course(assignment.CourseID.Value).Assignment(assignmentId).AttributableFiles;
+                OSBLE.Models.FileSystem.AssignmentFilePath fs =
+                    OSBLE.Models.FileSystem.Directories.GetAssignment(
+                        assignment.CourseID.Value, assignmentId);
+                OSBLEDirectory attrFiles = fs.AttributableFiles;
                 OSBLE.Models.FileSystem.FileCollection files = 
                     attrFiles.GetFilesWithSystemAttribute("assignment_description", assignmentId.ToString());
                 if (files.Count > 0)
@@ -98,11 +99,10 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
         public ActionResult SaveABET()
         {
             // Get the file storage for this assignment's submissions
-            OSBLE.Models.FileSystem.FileSystem fsMain = 
-                new OSBLE.Models.FileSystem.FileSystem();
-            OSBLE.Models.FileSystem.AssignmentFilePath afs = fsMain.
-                Course(Convert.ToInt32(Request.Form["hdnCourseID"])).
-                Assignment(Convert.ToInt32(Request.Form["hdnAssignmentID"]));
+            OSBLE.Models.FileSystem.AssignmentFilePath afs =
+                OSBLE.Models.FileSystem.Directories.GetAssignment(
+                    Convert.ToInt32(Request.Form["hdnCourseID"]),
+                    Convert.ToInt32(Request.Form["hdnAssignmentID"]));
 
             foreach (string key in Request.Form.AllKeys)
             {
@@ -116,16 +116,16 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
                     }
 
                     // Get the submission for the team
-                    OSBLE.Models.FileSystem.AttributableFilesPath attrFP =
-                        afs.Submission(teamID) as OSBLE.Models.FileSystem.AttributableFilesPath;
-                    AttributableFile file = attrFP.FirstFile;
+                    OSBLE.Models.FileSystem.OSBLEDirectory attrFP =
+                        afs.Submission(teamID) as OSBLE.Models.FileSystem.OSBLEDirectory;
+                    OSBLEFile file = attrFP.FirstFile;
                     if (null == file)
                     {
                         continue;
                     }
 
                     // Update the attribute for the submission and save
-                    file.SetSysAttr("ABETProficiencyLevel", Request.Form[key]);
+                    file.ABETProficiencyLevel = Request.Form[key];
                     file.SaveAttrs();
                 }
             }

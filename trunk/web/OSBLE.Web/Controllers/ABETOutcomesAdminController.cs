@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text;
 using System.Web.Mvc;
 using OSBLE.Models.HomePage;
 using OSBLE.Attributes;
@@ -20,11 +21,14 @@ namespace OSBLE.Controllers
             // Although the administrative link for the ABET outcomes editor 
             // shouldn't even appear if the departments list isn't made, we 
             // check for that here anyway.
+            StringBuilder jsArr = new StringBuilder("var ABET_existing_outcomes = new Array();");
+            jsArr.AppendLine();
             string[] depts = null;
             Dictionary<string, string> existing = new Dictionary<string, string>();
-            OSBLE.Models.FileSystem.FileSystem fs = 
-                new Models.FileSystem.FileSystem();
+            OSBLE.Models.FileSystem.OSBLEDirectory fs =
+                OSBLE.Models.FileSystem.Directories.GetAdmin();
             string path = fs.GetPath();
+            int i = 0;
             if (System.IO.Directory.Exists(path))
             {
                 path = System.IO.Path.Combine(path, "departments.txt");
@@ -35,6 +39,11 @@ namespace OSBLE.Controllers
                     foreach (string dept in depts)
                     {
                         existing[dept] = LoadABETOptions(dept);
+
+                        jsArr.AppendFormat(
+                            "ABET_existing_outcomes[{0}] = {1};",
+                            i++, MakeJSLinesArray(existing[dept]));
+                        jsArr.AppendLine();
                     }
                 }
             }
@@ -43,14 +52,15 @@ namespace OSBLE.Controllers
             // that the view can use it
             ViewBag.DepartmentList = depts;
             ViewBag.OptionsDictionary = existing;
+            ViewBag.JSDeptOpts = jsArr.ToString();
             
             return View();
         }
 
         private string LoadABETOptions(string departmentName)
         {
-            OSBLE.Models.FileSystem.FileSystem fs =
-                new Models.FileSystem.FileSystem();
+            OSBLE.Models.FileSystem.OSBLEDirectory fs =
+                Models.FileSystem.Directories.GetAdmin();
             string path = fs.GetPath();
             if (System.IO.Directory.Exists(path))
             {
@@ -65,6 +75,29 @@ namespace OSBLE.Controllers
             }
 
             return string.Empty;
+        }
+
+        private static string MakeJSLinesArray(string linesString)
+        {
+            StringBuilder sb = new StringBuilder("new Array(");
+            string[] lines;
+            if (linesString.Contains("\r\n"))
+            {
+                lines = linesString.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+            }
+            else
+            {
+                lines = linesString.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            }
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                sb.AppendFormat("\"{0}\"{1}", lines[i].Replace("\"", "\\\""), 
+                    (lines.Length - 1 == i) ? string.Empty : ", ");
+            }
+            sb.Append(")");
+
+            return sb.ToString();
         }
 
         [HttpPost, IsAdmin]
@@ -93,14 +126,10 @@ namespace OSBLE.Controllers
             }
 
             // Write the file
-            OSBLE.Models.FileSystem.FileSystem fs =
-                new Models.FileSystem.FileSystem();
-            string path = fs.GetPath();
-            if (System.IO.Directory.Exists(path))
-            {
-                path = System.IO.Path.Combine(path, dept + "_abet_outcomes.txt");
-                System.IO.File.WriteAllText(path, opts);
-            }
+            OSBLE.Models.FileSystem.OSBLEDirectory fs =
+                Models.FileSystem.Directories.GetAdmin();
+            fs.AddFile(dept + "_abet_outcomes.txt",
+                System.Text.Encoding.UTF8.GetBytes(opts));
 
             // Go back to the main admin page
             return RedirectToAction("Index", "Admin");

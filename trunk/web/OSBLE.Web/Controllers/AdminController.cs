@@ -27,8 +27,8 @@ namespace OSBLE.Controllers
         {
             // We'll check for the existence of the departments list file and 
             // show or hide the ABET outcomes link based on this
-            OSBLE.Models.FileSystem.FileSystem fs = 
-                new Models.FileSystem.FileSystem();
+            OSBLE.Models.FileSystem.OSBLEDirectory fs =
+                Models.FileSystem.Directories.GetAdmin();
             bool showLink = false;
             if (fs.File("departments.txt").Count > 0)
             {

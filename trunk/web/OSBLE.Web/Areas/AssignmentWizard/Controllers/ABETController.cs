@@ -24,7 +24,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
             // Make a list of departments
             List<string> depts = new List<string>();
-            OSBLE.Models.FileSystem.FileSystem fs = new OSBLE.Models.FileSystem.FileSystem();
+            OSBLE.Models.FileSystem.OSBLEDirectory fs = OSBLE.Models.FileSystem.Directories.GetAdmin();
             OSBLE.Models.FileSystem.FileCollection fc = fs.File("departments.txt");
             if (0 == fc.Count)
             {
