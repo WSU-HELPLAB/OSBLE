@@ -224,10 +224,10 @@ namespace OSBLE.Controllers
             ViewBag.DraftCount = Draft.Count();
 
             //Combine back into one list.
-            Past.AddRange(Present);
-            Past.AddRange(Future);
-            Past.AddRange(Draft);
-            List<Assignment> AllAssignments = Past;
+            Present.AddRange(Past);
+            Present.AddRange(Future);
+            Present.AddRange(Draft);
+            List<Assignment> AllAssignments = Present;
 
 
             ViewBag.Assignments = AllAssignments;

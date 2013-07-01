@@ -101,7 +101,7 @@ namespace OSBLE.Models
         public string EmailAddress { get; set; }
     }
 
-    public class FindUsername
+    public class FindUserNameModel
     {
         public List<string> Schools { get; set; }
 

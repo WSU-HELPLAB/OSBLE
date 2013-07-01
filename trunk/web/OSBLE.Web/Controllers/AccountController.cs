@@ -569,7 +569,7 @@ namespace OSBLE.Controllers
         }
 
         [HttpPost]
-        public ActionResult FindUsername(OSBLE.Models.FindUsername model)
+        public ActionResult FindUsername(OSBLE.Models.FindUserNameModel model)
         {
             UserProfile osbleProfile = null;
             List<UserProfile> PossibleProfiles = new List<UserProfile>();
@@ -596,7 +596,7 @@ namespace OSBLE.Controllers
         public ActionResult FindUsername()
         {
             List<School> schools = new List<School>();
-            FindUsername getSchools = new FindUsername();
+            FindUserNameModel getSchools = new FindUserNameModel();
             schools = (from u in db.Schools select u).ToList();
 
             if (schools != null)
