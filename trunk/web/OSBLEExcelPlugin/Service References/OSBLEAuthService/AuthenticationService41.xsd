@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import schemaLocation="https://osble.org/Services/AuthenticationService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Users" />
+  <xs:import schemaLocation="http://osble.org/Services/AuthenticationService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Users" />
   <xs:element name="GetActiveUser">
     <xs:complexType>
       <xs:sequence>

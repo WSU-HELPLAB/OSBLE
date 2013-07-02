@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import schemaLocation="https://www.osble.org/Services/OsbleService.svc?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments" />
-  <xs:import schemaLocation="https://www.osble.org/Services/OsbleService.svc?xsd=xsd4" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Users" />
+  <xs:import schemaLocation="http://osble.org/Services/OsbleService.svc?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments" />
+  <xs:import schemaLocation="http://osble.org/Services/OsbleService.svc?xsd=xsd4" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Users" />
   <xs:complexType name="ArrayOfCourse">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="Course" nillable="true" type="tns:Course" />

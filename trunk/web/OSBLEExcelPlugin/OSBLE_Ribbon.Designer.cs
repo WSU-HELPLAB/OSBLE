@@ -109,6 +109,7 @@
             // 
             this.ddCourses.Label = "Course:";
             this.ddCourses.Name = "ddCourses";
+            this.ddCourses.SelectionChanged += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.ddCourses_SelectionChanged);
             // 
             // lblLastSave
             // 

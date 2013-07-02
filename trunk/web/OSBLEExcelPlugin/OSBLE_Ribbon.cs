@@ -14,7 +14,7 @@ namespace OSBLEExcelPlugin
         private OSBLEState m_state = null;
 
         private void OSBLE_Ribbon_Load(object sender, RibbonUIEventArgs e) { }
-
+        
         private void btnErrorMsg_Click(object sender, RibbonControlEventArgs e)
         {
             string s = btnErrorMsg.Tag as string;
@@ -61,6 +61,9 @@ namespace OSBLEExcelPlugin
                 ddCourses.Visible = true;
                 btnSaveToOSBLE.Visible = true;
                 lblLastSave.Label = "Last save: (none since login)";
+
+                // Update stuff
+                ddCourses_SelectionChanged(null, null);
             }
             else // No courses that can be graded
             {
@@ -113,6 +116,32 @@ namespace OSBLEExcelPlugin
             grpError.Visible = false;
 
             lblLastSave.Label = "Last Save: " + DateTime.Now.ToString();
+        }
+
+        private void ddCourses_SelectionChanged(object sender, RibbonControlEventArgs e)
+        {
+            // Right now nothing needs to happen. There was going to 
+            // be course-specific options shown in the ribbon but this 
+            // was discarded.
+            /*
+            if (null == ddCourses.SelectedItem)
+            {
+                grpSelectedCourse.Visible = false;
+                return;
+            }
+
+            string label = ddCourses.SelectedItem.ToString();
+
+            if (string.IsNullOrEmpty(label))
+            {
+                grpSelectedCourse.Visible = false;
+                return;
+            }
+            
+            // Put the selected course name in the group and show it
+            grpSelectedCourse.Label = label;
+            grpSelectedCourse.Visible = true;
+            */
         }
     }
 }

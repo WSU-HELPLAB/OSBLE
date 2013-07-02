@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import schemaLocation="https://www.osble.org/Services/OsbleService.svc?xsd=xsd6" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.HomePage" />
-  <xs:import schemaLocation="https://www.osble.org/Services/OsbleService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" />
-  <xs:import schemaLocation="https://www.osble.org/Services/OsbleService.svc?xsd=xsd8" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" />
-  <xs:import schemaLocation="https://www.osble.org/Services/OsbleService.svc?xsd=xsd7" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
-  <xs:import schemaLocation="https://www.osble.org/Services/OsbleService.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+  <xs:import schemaLocation="http://osble.org/Services/OsbleService.svc?xsd=xsd6" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.HomePage" />
+  <xs:import schemaLocation="http://osble.org/Services/OsbleService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" />
+  <xs:import schemaLocation="http://osble.org/Services/OsbleService.svc?xsd=xsd8" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" />
+  <xs:import schemaLocation="http://osble.org/Services/OsbleService.svc?xsd=xsd7" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+  <xs:import schemaLocation="http://osble.org/Services/OsbleService.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
   <xs:complexType name="ArrayOfAssignment">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="Assignment" nillable="true" type="tns:Assignment" />
@@ -13,6 +13,8 @@
   <xs:element name="ArrayOfAssignment" nillable="true" type="tns:ArrayOfAssignment" />
   <xs:complexType name="Assignment">
     <xs:sequence>
+      <xs:element minOccurs="0" name="ABETDepartment" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ABETOutcomes" nillable="true" type="tns:ArrayOfAbetAssignmentOutcome" />
       <xs:element minOccurs="0" name="AssignmentDescription" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="AssignmentName" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="AssignmentTeams" nillable="true" type="tns:ArrayOfAssignmentTeam" />
@@ -50,6 +52,20 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="Assignment" nillable="true" type="tns:Assignment" />
+  <xs:complexType name="ArrayOfAbetAssignmentOutcome">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="AbetAssignmentOutcome" nillable="true" type="tns:AbetAssignmentOutcome" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfAbetAssignmentOutcome" nillable="true" type="tns:ArrayOfAbetAssignmentOutcome" />
+  <xs:complexType name="AbetAssignmentOutcome">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Assignment" nillable="true" type="tns:Assignment" />
+      <xs:element minOccurs="0" name="AssignmentID" type="xs:int" />
+      <xs:element minOccurs="0" name="Outcome" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="AbetAssignmentOutcome" nillable="true" type="tns:AbetAssignmentOutcome" />
   <xs:complexType name="ArrayOfAssignmentTeam">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="AssignmentTeam" nillable="true" type="tns:AssignmentTeam" />
@@ -187,6 +203,7 @@
       <xs:element minOccurs="0" name="MinimumFirstPostLength" type="xs:int" />
       <xs:element minOccurs="0" name="RequiresPostBeforeView" type="xs:boolean" />
       <xs:element minOccurs="0" name="TAsCanPostToAllDiscussions" type="xs:boolean" />
+      <xs:element minOccurs="0" name="WillEmailInstructorsOnModeratorPost" type="xs:boolean" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="DiscussionSetting" nillable="true" type="tns:DiscussionSetting" />
@@ -274,6 +291,34 @@
         <xs:annotation>
           <xs:appinfo>
             <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">5</EnumerationValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CommitteeDiscussion">
+        <xs:annotation>
+          <xs:appinfo>
+            <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">6</EnumerationValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ReviewOfStudentWork">
+        <xs:annotation>
+          <xs:appinfo>
+            <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">7</EnumerationValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CommitteeReview">
+        <xs:annotation>
+          <xs:appinfo>
+            <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">8</EnumerationValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AggregateAssessment">
+        <xs:annotation>
+          <xs:appinfo>
+            <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">9</EnumerationValue>
           </xs:appinfo>
         </xs:annotation>
       </xs:enumeration>

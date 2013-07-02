@@ -13,6 +13,13 @@ namespace OSBLEExcelPlugin
     internal class OSBLEState
     {
         private Course[] m_courses = null;
+
+        /// <summary>
+        /// Dictionary that maps a course ID to an array of users for that course. This 
+        /// collection is empty by default and rosters have to be refreshed individually 
+        /// per course through the <see cref="RefreshRosterAsync"/> function.
+        /// </summary>
+        private Dictionary<int, CourseUser[]> m_rosters = new Dictionary<int, CourseUser[]>();
         
         private string m_user, m_pass;
 
@@ -28,6 +35,46 @@ namespace OSBLEExcelPlugin
         {
             get { return m_courses; }
         }
+
+        /*
+        /// <summary>
+        /// Synchronous roster retrieval for a course with the specified ID.
+        /// </summary>
+        private CourseUser[] GetCourseRoster(int courseID)
+        {
+            // First login
+            AuthenticationServiceClient authClient = new AuthenticationServiceClient();
+            string authToken = null;
+            try
+            {
+                authToken = authClient.ValidateUser(m_user, m_pass);
+            }
+            catch (System.ServiceModel.EndpointNotFoundException)
+            {
+                authClient.Close();
+                m_onComplete(this, new OSBLEStateEventArgs(false,
+                    "Could not connect to the OSBLE server. " +
+                    "Please contact support if this problem persists."));
+                return null;
+            }
+            authClient.Close();
+            authClient = null;
+
+            if (string.IsNullOrEmpty(authToken))
+            {
+                m_onComplete(this, new OSBLEStateEventArgs(false,
+                    "Could not log in to OSBLE. " +
+                    "Please check your user name and password."));
+                return null;
+            }
+
+            // Now get the roster list of courses
+            OsbleServiceClient osc = new OsbleServiceClient();
+            m_courses = osc.GetCourses(authToken);
+
+            return osc.GetCourseRoster(courseID, authToken);
+        }
+        */
 
         public string Password
         {
@@ -46,7 +93,19 @@ namespace OSBLEExcelPlugin
         {
             // First login
             AuthenticationServiceClient authClient = new AuthenticationServiceClient();
-            string authToken = authClient.ValidateUser(m_user, m_pass);
+            string authToken = null;
+            try
+            {
+                authToken = authClient.ValidateUser(m_user, m_pass);
+            }
+            catch (System.ServiceModel.EndpointNotFoundException)
+            {
+                authClient.Close();
+                m_onComplete(this, new OSBLEStateEventArgs(false,
+                    "Could not connect to the OSBLE server. " +
+                    "Please contact support if this problem persists."));
+                return;
+            }
             authClient.Close();
             authClient = null;
 
@@ -92,13 +151,13 @@ namespace OSBLEExcelPlugin
         }
     }
 
-    public class OSBLEStateEventArgs : EventArgs
+    internal class OSBLEStateEventArgs : EventArgs
     {
         private bool m_success = false;
 
         private string m_message;
 
-        private Stream m_stream = null;
+        private OSBLEState m_state = null;
 
         public OSBLEStateEventArgs(bool success, string message)
         {
@@ -106,11 +165,11 @@ namespace OSBLEExcelPlugin
             m_success = success;
         }
 
-        public OSBLEStateEventArgs(bool success, string message, Stream stream)
+        public OSBLEStateEventArgs(bool success, string message, OSBLEState state)
         {
             m_message = message;
             m_success = success;
-            m_stream = stream;
+            m_state = state;
         }
 
         public static readonly OSBLEStateEventArgs Empty = new OSBLEStateEventArgs(true, string.Empty);
@@ -123,11 +182,11 @@ namespace OSBLEExcelPlugin
             }
         }
 
-        public Stream Stream
+        public OSBLEState State
         {
             get
             {
-                return m_stream;
+                return m_state;
             }
         }
 

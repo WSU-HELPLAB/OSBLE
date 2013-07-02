@@ -55,14 +55,22 @@ namespace OSBLEExcelPlugin
         private void btnOK_Click(object sender, EventArgs e)
         {
             // Ignore the click if we have an empty user name or password
-            if (0 == tbUserName.TextLength || 0 == tbPassword.TextLength)
+            if (0 == tbUserName.TextLength)
             {
+                tbUserName.Focus();
+                return;
+            }
+            if (0 == tbPassword.TextLength)
+            {
+                tbPassword.Focus();
                 return;
             }
             
             // Disable the buttons while we're processing
             btnOK.Enabled = false;
             btnCancel.Enabled = false;
+            // Also show the progress bar
+            progressBar1.Visible = true;
 
             // Save user name and password if needed
             if (cbRemember.Checked)
@@ -115,6 +123,7 @@ namespace OSBLEExcelPlugin
 
         private void LoginAttemptCompleted(object sender, EventArgs e)
         {
+            progressBar1.Visible = false;
             btnOK.Enabled = true;
             btnCancel.Enabled = true;
             

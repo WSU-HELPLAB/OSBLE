@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/OSBLE.Models.Users" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Users" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import schemaLocation="https://osble.org/Services/AuthenticationService.svc?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models" />
+  <xs:import schemaLocation="http://osble.org/Services/AuthenticationService.svc?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models" />
   <xs:complexType name="UserProfile">
     <xs:sequence>
       <xs:element minOccurs="0" name="AuthenticationHash" nillable="true" type="xs:string" />

@@ -36,6 +36,7 @@
             this.btnOK = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.cbRemember = new System.Windows.Forms.CheckBox();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -123,6 +124,15 @@
             this.cbRemember.Text = "Remember my user name and password";
             this.cbRemember.UseVisualStyleBackColor = true;
             // 
+            // progressBar1
+            // 
+            this.progressBar1.Location = new System.Drawing.Point(12, 125);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(108, 23);
+            this.progressBar1.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
+            this.progressBar1.TabIndex = 4;
+            this.progressBar1.Visible = false;
+            // 
             // LoginForm
             // 
             this.AcceptButton = this.btnOK;
@@ -130,6 +140,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
             this.ClientSize = new System.Drawing.Size(294, 160);
+            this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.cbRemember);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOK);
@@ -155,5 +166,6 @@
         private System.Windows.Forms.Button btnOK;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.CheckBox cbRemember;
+        private System.Windows.Forms.ProgressBar progressBar1;
     }
 }
