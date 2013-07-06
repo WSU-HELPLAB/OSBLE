@@ -203,7 +203,7 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
             result += "<a onclick='cfm_AddUploader(" + stateObjIndex.toString() + ");' " +
                 "title=\"Upload files to this folder...\">" +
                 "<img style=\"cursor: pointer;\" align=\"right\" " +
-                "src=\"/Content/images/add_up.png\"></a>";
+                "src=\"/Content/images/publish.png\"></a>";
 
             // Right now we're assuming that if they can upload files then they can also 
             // create subfolders. These two concepts might need to end up being separate 
@@ -362,8 +362,18 @@ function cfm_AddUploader(stateObjectIndex)
 
     // Add the uploader control into the DIV
     targetDIV.innerHTML = "<br />" + fileuploader_getcontrolshtml(
-        "cfm_files", true, "cfm_GetExtraServiceArgs(" + stateObjectIndex.toString() + ");",
-        "cfm_uploadComplete(" + stateObjectIndex.toString() + ");");
+        "cfm_files_" + stateObjectIndex.toString(), true,
+        "cfm_GetExtraServiceArgs(" + stateObjectIndex.toString() + ");",
+        "cfm_uploadComplete(" + stateObjectIndex.toString() + ");") +
+        "<input type=\"button\" value=\"Cancel\" style=\"width: 100%;\" " +
+        "onclick=\"cfm_hideControls(" + stateObjectIndex.toString() + ");\" />";
+
+    // Find the submit button and make its width 100%
+    var btnUpload = document.getElementById("btnSubmit_cfm_files_" + stateObjectIndex.toString());
+    if (btnUpload)
+    {
+        btnUpload.style.width = "100%";
+    }
 
     // Mark the controls as visible
     state.controlsVisible = true;

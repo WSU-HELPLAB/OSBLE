@@ -32,7 +32,8 @@ function fileuploader_getcontrolshtml(inputNameString, allowMultiple, onGetExtra
     code += "<input id='" + inputNameString + "' name='" + inputNameString + "' type='file' ";
     if (allowMultiple) { code += "multiple />"; }
     else { code += "/>"; }
-    code += "<input type='button' value='Upload' onclick='fileuploader_uploadfiles(\"";
+    code += "<input type='button' value='Upload' id='btnSubmit_" + inputNameString;
+    code += "' onclick='fileuploader_uploadfiles(\"";
     code += inputNameString + "\", \"" + divName + "\", " + onGetExtraServiceArgs + ", ";
     code += "\"" + onCompletion + "\");' />";
     code += "</form> <div id='" + divName + "'></div>";
