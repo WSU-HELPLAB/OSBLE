@@ -447,7 +447,7 @@ The OSBLE Team
         public FileStreamResult ProfilePictureForDiscussion(int course, int userProfile)
         {
             // File Stream that will ultimately contain profile picture.
-            FileStream pictureStream;
+            Stream pictureStream;
 
             // User Profile object of user we are trying to get a picture of
             UserProfile u = db.UserProfiles.Find(userProfile);

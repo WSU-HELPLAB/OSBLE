@@ -612,19 +612,15 @@ namespace OSBLE.Controllers
         }
 
         [OsbleAuthorize]
-        [Obsolete("Use UserController/Picture instead")]
-        public ActionResult ProfilePicture()
-        {
-            return new FileStreamResult(FileSystem.GetProfilePictureOrDefault(CurrentUser), "image/jpeg");
-        }
-
-        [OsbleAuthorize]
         [HttpPost]
         public ActionResult UploadPicture(HttpPostedFileBase file)
         {
             if (Request.Params["remove"] != null) // Delete Picture
             {
-                FileSystem.DeleteProfilePicture(CurrentUser);
+                // We just set the profile image to null and save
+                UserProfile profile = db.UserProfiles.Where(u => u.ID == CurrentUser.ID).FirstOrDefault();
+                profile.SetProfileImage(null);
+                db.SaveChanges();
                 return RedirectToAction("Profile");
             }
 

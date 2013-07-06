@@ -147,6 +147,16 @@ namespace OSBLE.Models.Users
 
         public void SetProfileImage(System.Drawing.Bitmap bmp)
         {
+            if (null == bmp)
+            {
+                if (null == ProfileImage)
+                {
+                    ProfileImage = new ProfileImage();
+                }
+                ProfileImage.Picture = null;
+                return;
+            }
+            
             if (ProfileImage == null)
             {
                 ProfileImage = new ProfileImage();

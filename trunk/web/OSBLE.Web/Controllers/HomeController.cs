@@ -704,41 +704,6 @@ namespace OSBLE.Controllers
             return View("_AjaxEmpty");
         }
 
-        [HttpGet, FileCache(Duration = 3600)]
-        public FileStreamResult ProfilePictureForDashboard(int course, int userProfile)
-        {
-            // File Stream that will ultimately contain profile picture.
-            FileStream pictureStream;
-
-            // User Profile object of user we are trying to get a picture of
-            UserProfile u = db.UserProfiles.Find(userProfile);
-
-            // A role for both our current user and
-            // the one we're trying to see
-            AbstractRole ourRole = currentCourses.Where(c => c.AbstractCourseID == course).Select(c => c.AbstractRole).FirstOrDefault();
-            AbstractRole theirRole = db.CourseUsers.Where(c => (c.AbstractCourseID == course) && (c.UserProfileID == userProfile)).Select(c => c.AbstractRole).FirstOrDefault();
-
-            // Show picture if user is requesting their own profile picture or they have the right to view the profile picture
-            if (userProfile == CurrentUser.ID ||
-                // Current user's CourseRole
-                ourRole != null &&
-                // Target user's CourseRole
-                theirRole != null &&
-                // If current user is not anonymous or other user is instructor/TA, show picture
-                (!(ourRole.Anonymized) || theirRole.CanGrade)
-               )
-            {
-                pictureStream = FileSystem.GetProfilePictureOrDefault(u);
-            }
-            else
-            {
-                // Default to blue OSBLE guy picture.
-                pictureStream = FileSystem.GetDefaultProfilePicture();
-            }
-
-            return new FileStreamResult(pictureStream, "image/jpeg");
-        }
-
         [OsbleAuthorize]
         public ActionResult Time()
         {

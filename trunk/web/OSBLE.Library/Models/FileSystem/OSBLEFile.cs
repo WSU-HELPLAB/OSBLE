@@ -17,8 +17,7 @@ namespace OSBLE.Models.FileSystem
     /// Some system attributes have reserved meaning, and map to properties in this class. It 
     /// is recommended that attribute files ONLY ever get modified through the use of this 
     /// class, so as to keep attribute meaning consistent.
-    /// All attributable files are meant to exist within an attributed file storage location.
-    /// See the <see cref="OSBLEDirectory"/> class.
+    /// All attributable files are meant to exist within an <see cref="OSBLEDirectory"/>.
     /// </summary>
     public class OSBLEFile
     {

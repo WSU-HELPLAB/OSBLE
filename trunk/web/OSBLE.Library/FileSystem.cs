@@ -9,6 +9,10 @@ using OSBLE.Models.Services.Uploader;
 using OSBLE.Models.Users;
 using OSBLE.Models.Assignments;
 
+// *** DO NOT USE THIS CLASS. IT IS IN THE PROCESS OF BEING REMOVED, 
+// BUT THIS IS A LARGE TASK SO SOME CODE STILL LINGERS UNTIL THE 
+// REFACTORING IS COMPLETE ***
+
 //the following is a diagram of our file system.  Items in brackets [] indicate
 //using a key of sorts (e.g. the user id).  Items in curly braces {} indicate
 //the intended use of the folder
@@ -44,41 +48,25 @@ using OSBLE.Models.Assignments;
 
 namespace OSBLE
 {
+    // *** DO NOT USE THIS CLASS. IT IS IN THE PROCESS OF BEING REMOVED, 
+    // BUT THIS IS A LARGE TASK SO SOME CODE STILL LINGERS UNTIL THE 
+    // REFACTORING IS COMPLETE ***
+    [Obsolete("Use objects in the Models.FileSystem namespace")]
     public class FileSystem
     { 
 
         #region old FileSystem Code (deprecated)
-        private static string getRootPath()
-        {
-            return HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
-        }
 
         public static string GetCachePath()
         {
             return Path.Combine(HttpContext.Current.Server.MapPath("~\\App_Data\\"), "Cache");
         }
 
-        private static string getCoursePath(AbstractCourse course)
-        {
-            return getRootPath() + "Courses\\" + course.ID + "\\";
-        }
-
-
-        private static string getUserPath(UserProfile userprofile)
-        {
-            return getRootPath() + "Users\\" + userprofile.ID + "\\";
-        }
-
-        private static string getProfilePicturePath(UserProfile userProfile)
-        {
-            return getUserPath(userProfile) + "profile.jpg";
-        }
-
         public static string RootPath
         {
             get
             {
-                return getRootPath();
+                return HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
             }
         }
 
@@ -179,7 +167,7 @@ namespace OSBLE
 
         private static string getZipFolderLocation(Course course)
         {
-            return getCoursePath(course) + "ZipFolder";
+            return OSBLE.Models.FileSystem.Directories.GetCourseZipFolder(course.ID).GetPath();
         }
 
         private static string getZipFilesRecords(Course course)
@@ -318,11 +306,6 @@ namespace OSBLE
             }
         }
 
-        private static void deleteFile(string path)
-        {
-            new FileInfo(path).Delete();
-        }
-
         private static string getRealFileZipName(Assignment activity, AssignmentTeam team = null)
         {
             string s = "assignmentID = " + activity.ID.ToString();
@@ -341,7 +324,7 @@ namespace OSBLE
             if (pathTeamUser != null)
             {
                 foundTeamUserZip = true;
-                deleteFile(pathTeamUser);
+                File.Delete(pathTeamUser);
             }
 
             string pathActivity = FindZipFileLocation(course, getRealFileZipName(assignment));
@@ -349,7 +332,7 @@ namespace OSBLE
             if (pathActivity != null)
             {
                 foundActivityZip = true;
-                deleteFile(pathActivity);
+                File.Delete(pathActivity);
             }
 
             if (foundActivityZip || foundTeamUserZip)
@@ -362,7 +345,7 @@ namespace OSBLE
                     recordFile = sr.ReadToEnd();
                 }
 
-                deleteFile(getZipFilesRecords(course));
+                File.Delete(getZipFilesRecords(course));
 
                 string assignmentRealname = getRealFileZipName(assignment);
                 string teamRealname = getRealFileZipName(assignment, team);
@@ -452,39 +435,18 @@ namespace OSBLE
         /// <returns></returns>
         public static DirectoryListing GetCourseDocumentsFileList(AbstractCourse course, bool includeParentLink = true)
         {
-            string path = GetCourseDocumentsPath(course);
+            string path = Models.FileSystem.Directories.GetCourseDocs(course.ID).GetPath();
             return BuildFileList(path, includeParentLink);
-        }
-
-        public static string GetCourseDocumentsPath(AbstractCourse course)
-        {
-            string location = string.Format("{0}\\CourseDocs", getCoursePath(course));
-
-            //make sure that the directory exists
-            if (!Directory.Exists(location))
-            {
-                Directory.CreateDirectory(location);
-            }
-            return location;
         }
 
         public static string GetCourseDocumentsPath(int courseId)
         {
-            Course c = new Course() { ID = courseId };
-            return GetCourseDocumentsPath(c);
+            return Models.FileSystem.Directories.GetCourseDocs(courseId).GetPath();
         }
 
-        public static string GetAssignmentsFolder(Course course)
-        {
-            return string.Format("{0}Assignments\\", getCoursePath(course));
-        }
-
-        //AH: Will probably no longer need, commenting out until we find out for sure.
         public static string GetAssignmentIDFolder(Course course, int assignmentID)
         {
-            string path = GetAssignmentsFolder(course);
-            path += "\\" + assignmentID;
-            return path;
+            return OSBLE.Models.FileSystem.Directories.GetAssignment(course.ID, assignmentID).GetPath();
         }
 
         public static string GetAssignmentSubmissionFolder(Course course, int assignmentID)
@@ -505,15 +467,6 @@ namespace OSBLE
             return path;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="createPathIfNotExists"></param>
-        /// <param name="course"></param>
-        /// <param name="assignmentID"></param>
-        /// <param name="submitterTeam"></param>
-        /// <param name="authorTeam"></param>
-        /// <returns></returns>
         public static string GetTeamUserSubmissionFolderForAuthorID(bool createPathIfNotExists, 
             Course course, 
             int assignmentID, 
@@ -544,35 +497,6 @@ namespace OSBLE
         public static string GetDeliverable(Course course, int assignmentID, AssignmentTeam subbmitterTeam, string fileName, string[] possibleFileExtensions)
         {
             string path = GetTeamUserSubmissionFolder(false, course, assignmentID, subbmitterTeam) + "\\";
-
-            if (Directory.Exists(path))
-            {
-                string[] files = Directory.GetFiles(path);
-
-                foreach (string extension in possibleFileExtensions)
-                {
-                    if (files.Contains(path + fileName + extension))
-                    {
-                        return (path + fileName + extension);
-                    }
-                }
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// Alternative to getDeliverable, used accessing location of critical review assignments
-        /// </summary>
-        /// <param name="course"></param>
-        /// <param name="assignmentID"></param>
-        /// <param name="subbmitterTeam"></param>
-        /// <param name="fileName"></param>
-        /// <param name="possibleFileExtensions"></param>
-        /// <param name="authorTeam"></param>
-        /// <returns></returns>
-        public static string GetCriticalReviewDeliverable(Course course, int assignmentID, AssignmentTeam subbmitterTeam, string fileName, string[] possibleFileExtensions, AssignmentTeam authorTeam)
-        {
-            string path = GetTeamUserSubmissionFolderForAuthorID(false, course, assignmentID, subbmitterTeam, authorTeam.Team) + "\\";
 
             if (Directory.Exists(path))
             {
@@ -654,33 +578,14 @@ namespace OSBLE
             return ordering;
         }
 
-        public static FileStream GetProfilePictureOrDefault(UserProfile userProfile)
+        public static Stream GetProfilePictureOrDefault(UserProfile userProfile)
         {
-            if (File.Exists(getProfilePicturePath(userProfile)))
+            if (null != userProfile.ProfileImage)
             {
-                return new FileStream(getProfilePicturePath(userProfile), FileMode.Open, FileAccess.Read);
+                return new System.IO.MemoryStream(userProfile.ProfileImage.Picture);
             }
-            else
-            {
-                return GetDefaultProfilePicture();
-            }
-        }
-
-        public static FileStream GetProfilePictureForWrite(UserProfile userProfile)
-        {
-            if (!Directory.Exists(getUserPath(userProfile)))
-            {
-                Directory.CreateDirectory(getUserPath(userProfile));
-            }
-            return new FileStream(getProfilePicturePath(userProfile), FileMode.Create, FileAccess.Write);
-        }
-
-        public static void DeleteProfilePicture(UserProfile userProfile)
-        {
-            if (File.Exists(getProfilePicturePath(userProfile)))
-            {
-                File.Delete(getProfilePicturePath(userProfile));
-            }
+            
+            return GetDefaultProfilePicture();
         }
 
         public static void EmptyFolder(string path)
@@ -702,17 +607,6 @@ namespace OSBLE
             }
         }
 
-        public static int GetFolderDocumentCount(AbstractCourse course, int assignmentId)
-        {
-            int returnVal = 0;
-            string path = GetAssignmentIDFolder(course as Course, assignmentId) + "\\Submissions";
-            if (Directory.Exists(path))
-            {
-                string[] dirs = Directory.GetDirectories(path);
-                returnVal = dirs.Count();
-            }
-            return returnVal;
-        }
         public static void PrepCourseDocuments(DirectoryListing listing, int courseId, string previousPath = "")
         {
             string coursePath = GetCourseDocumentsPath(courseId);
@@ -814,7 +708,7 @@ namespace OSBLE
         public static void WipeOutFileSystem()
         {
 #if DEBUG
-            EmptyFolder(getRootPath());
+            EmptyFolder(RootPath);
 #endif
         }
     }

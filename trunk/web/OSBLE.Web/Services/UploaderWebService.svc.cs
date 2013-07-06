@@ -12,6 +12,7 @@ using System.Web.Security;
 
 using OSBLE;
 using OSBLE.Models;
+using OSBLE.Models.FileSystem;
 using OSBLE.Models.Services.Uploader;
 using OSBLE.Models.Users;
 using OSBLE.Models.Courses;
@@ -118,29 +119,33 @@ namespace OSBLE.Services
                                           select cu).FirstOrDefault();
 
             //make sure that we got something back
-            if (currentCourse != null)
+            if (null == currentCourse) { return false; }
+
+            //only allow those that can modify the course (probably instructors) to remove
+            //files
+            if (!currentCourse.AbstractRole.CanModify && !currentCourse.AbstractRole.CanUploadFiles)
             {
-                //only allow those that can modify the course (probably instructors) to remove
-                //files
-                if (currentCourse.AbstractRole.CanModify == true || currentCourse.AbstractRole.CanUploadFiles == true)
+                return false;
+            }
+
+            // Get the course documents
+            OSBLEDirectory dir = Directories.GetCourseDocs(courseId);
+
+            //do a simple pattern match to make sure that the file to be uploaded is in
+            //the correct course folder
+            string coursePath = dir.GetPath();
+            if (file.IndexOf(coursePath) > -1)
+            {
+                if (Directory.Exists(file))
                 {
-                    //do a simple pattern match to make sure that the file to be uploaded is in
-                    //the correct course folder
-                    string coursePath = FileSystem.GetCourseDocumentsPath(courseId);
-                    if (file.IndexOf(coursePath) > -1)
-                    {
-                        if (Directory.Exists(file))
-                        {
-                            FileSystem.EmptyFolder(file);
-                            Directory.Delete(file);
-                            return true;
-                        }
-                        else if (File.Exists(file))
-                        {
-                            File.Delete(file);
-                            return true;
-                        }
-                    }
+                    FileSystem.EmptyFolder(file);
+                    Directory.Delete(file);
+                    return true;
+                }
+                else if (File.Exists(file))
+                {
+                    File.Delete(file);
+                    return true;
                 }
             }
             return false;

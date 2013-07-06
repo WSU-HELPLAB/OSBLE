@@ -232,9 +232,8 @@ namespace OSBLE.Controllers
             else //Basic Assigment, only need to get submissions
             {
                 submission = 
-                    OSBLE.Models.FileSystem.Directories.GetAssignment(
-                        ActiveCourseUser.AbstractCourseID, assignmentId)
-                    .Submission(teamId)
+                    OSBLE.Models.FileSystem.Directories.GetAssignmentSubmission(
+                        ActiveCourseUser.AbstractCourseID, assignmentId, teamId)
                     .AllFiles()
                     .ToZipStream();
             }

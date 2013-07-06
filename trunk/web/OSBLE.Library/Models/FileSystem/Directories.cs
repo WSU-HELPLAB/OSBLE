@@ -89,10 +89,47 @@ namespace OSBLE.Models.FileSystem
             return new AssignmentFilePath(path, assignmentID);
         }
 
+        /// <summary>
+        /// Gets the directory for an assignment submission or null if a submission has not 
+        /// been made by the specified team.
+        /// </summary>
+        public static OSBLEDirectory GetAssignmentSubmission(int courseID, int assignmentID, int teamID)
+        {
+            string root = HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
+            string data = System.IO.Path.Combine(root, "Courses", courseID.ToString(),
+                "Assignments", assignmentID.ToString(), "Submissions", teamID.ToString());
+            string attr = System.IO.Path.Combine(root, "Courses", courseID.ToString(),
+                "Assignments", assignmentID.ToString(), "SubmissionsAttr", teamID.ToString());
+
+            // Make sure the data directory exists
+            if (!System.IO.Directory.Exists(data))
+            {
+                return null;
+            }
+
+            return new OSBLEDirectory(data, attr);
+        }
+
         public static OSBLEDirectory GetCourseDocs(int courseID)
         {
             string path = HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
-            path = System.IO.Path.Combine(path, "Courses", courseID.ToString(), "CourseDocs");
+            path = System.IO.Path.Combine(path, "Courses", courseID.ToString(), 
+                "CourseDocs");
+
+            // Make sure the directory exists
+            if (!System.IO.Directory.Exists(path))
+            {
+                System.IO.Directory.CreateDirectory(path);
+            }
+
+            return new OSBLEDirectory(path);
+        }
+
+        public static OSBLEDirectory GetCourseZipFolder(int courseID)
+        {
+            string path = HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
+            path = System.IO.Path.Combine(path, "Courses", courseID.ToString(),
+                "ZipFolder");
 
             // Make sure the directory exists
             if (!System.IO.Directory.Exists(path))
@@ -131,6 +168,29 @@ namespace OSBLE.Models.FileSystem
             }
 
             return new OSBLEDirectory(path);
+        }
+
+        /// <summary>
+        /// Gets the directory that's used to store content specific to 
+        /// a user.
+        /// TODO: See if this is needed. It looks like user profile pictures used to be 
+        /// stored here but are now in the database and nothing else is written here.
+        /// </summary>
+        public static OSBLEDirectory GetUser(int userID)
+        {
+            string root = HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
+            
+            // Get the data and attribute paths
+            string dataPath = System.IO.Path.Combine(root, "Users", userID.ToString());
+            string attrPath = System.IO.Path.Combine(root, "UsersAttr", userID.ToString());
+
+            // Make sure the data directory exists
+            if (!System.IO.Directory.Exists(dataPath))
+            {
+                System.IO.Directory.CreateDirectory(dataPath);
+            }
+
+            return new OSBLEDirectory(dataPath, attrPath);
         }
     }
 }
