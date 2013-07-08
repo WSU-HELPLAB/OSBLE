@@ -120,7 +120,6 @@
     <Compile Include="Models\FileSystem\AssignmentFilePath.cs" />
     <Compile Include="Models\FileSystem\OSBLEFile.cs" />
     <Compile Include="Models\FileSystem\OSBLEDirectory.cs" />
-    <Compile Include="Models\FileSystem\CourseFilePath.cs" />
     <Compile Include="Models\FileSystem\FileCollection.cs" />
     <Compile Include="Models\FileSystem\Directories.cs" />
     <Compile Include="Models\FileSystem\GradebookFilePath.cs" />

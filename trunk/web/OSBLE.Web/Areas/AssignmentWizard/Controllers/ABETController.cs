@@ -25,18 +25,15 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             // Make a list of departments
             List<string> depts = new List<string>();
             OSBLE.Models.FileSystem.OSBLEDirectory fs = OSBLE.Models.FileSystem.Directories.GetAdmin();
-            OSBLE.Models.FileSystem.FileCollection fc = fs.File("departments.txt");
-            if (0 == fc.Count)
+            OSBLE.Models.FileSystem.OSBLEFile file = fs.GetFile("departments.txt");
+            if (null == file)
             {
                 // Administrator hasn't created the departments list yet. Leave the list 
                 // empty so that the option will show up as disabled on the page.
             }
             else
             {
-                IEnumerator<string> e = fc.GetEnumerator();
-                e.MoveNext();
-                string[] lines = System.IO.File.ReadAllLines(e.Current);
-                depts.AddRange(lines);
+                depts.AddRange(file.ReadAllLines());
             }
             ViewBag.DepartmentsList = depts;
 

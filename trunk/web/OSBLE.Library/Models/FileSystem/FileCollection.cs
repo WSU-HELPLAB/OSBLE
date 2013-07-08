@@ -8,12 +8,15 @@ using System.IO;
 
 namespace OSBLE.Models.FileSystem
 {
+    /// <summary>
+    /// It is recommended that this class eventually be phased out and OSBLEDirectory 
+    /// objects used for everything. An OSBLEDirectory object represents a collection 
+    /// of files itself, so we shouldn't really need a FileCollection class on top of 
+    /// that. Some significant refactoring is needed to make this happen which is why 
+    /// this class is still lingering at this point.
+    /// </summary>
     public class FileCollection : IEnumerable<string>, ICollection<string>
     {
-        // 5-15-13 E.O.
-        // Changed this from private to protected. If another developer has a 
-        // convincing reason why this shouldn't be done then they need to 
-        // contact me.
         protected List<string> _fileNames = new List<string>();
         
         public string Directory { get; private set; }

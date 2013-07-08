@@ -116,7 +116,7 @@ namespace OSBLE.Services
             }
 
             //upload the gradebook zip and return the result
-            GradebookFilePath gfp = Models.FileSystem.Directories.Course(courseUser.AbstractCourseID).Gradebook();
+            GradebookFilePath gfp = Models.FileSystem.Directories.GetGradebook(courseUser.AbstractCourseID);
             GradebookController gc = new GradebookController();
             try
             {
@@ -290,11 +290,10 @@ namespace OSBLE.Services
                     //get original document
                     MemoryStream finalStream = new MemoryStream();
                     string originalFile =
-                        OSBLE.Models.FileSystem.Directories.Course((int)criticalReviewAssignment.CourseID)
-                                            .Assignment((int)criticalReviewAssignment.PrecededingAssignmentID)
-                                            .Submission(authorTeam.AuthorTeamID)
-                                            .AllFiles()
-                                            .FirstOrDefault();
+                        OSBLE.Models.FileSystem.Directories.GetAssignmentSubmission(
+                            (int)criticalReviewAssignment.CourseID,
+                            (int)criticalReviewAssignment.PrecededingAssignmentID,
+                            authorTeam.AuthorTeamID).AllFiles().FirstOrDefault();
                     if (originalFile == null)
                     {
                         //author didn't submit a document to be reviewed.  Skip the rest.

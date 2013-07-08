@@ -46,14 +46,6 @@ namespace OSBLE.Models.FileSystem
     /// </summary>
     public static class Directories
     {
-        [Obsolete("Use a method starting with \"Get\". This gives the folder for a course which shouldn't be needed anywhere in the OSBLE code. You should go directly to course documents, a specific assignment, or some other such thing.")]
-        public static CourseFilePath Course(int id)
-        {
-            string path = HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
-            return new CourseFilePath(
-                System.IO.Path.Combine(path, "Courses", id.ToString()), id);
-        }
-
         /// <summary>
         /// Gets the storage directory for data files related to administrative actions 
         /// and content. Currently these are OSBLE-wide settings. That is, there is not 

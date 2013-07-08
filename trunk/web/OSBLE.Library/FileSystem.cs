@@ -9,43 +9,6 @@ using OSBLE.Models.Services.Uploader;
 using OSBLE.Models.Users;
 using OSBLE.Models.Assignments;
 
-// *** DO NOT USE THIS CLASS. IT IS IN THE PROCESS OF BEING REMOVED, 
-// BUT THIS IS A LARGE TASK SO SOME CODE STILL LINGERS UNTIL THE 
-// REFACTORING IS COMPLETE ***
-
-//the following is a diagram of our file system.  Items in brackets [] indicate
-//using a key of sorts (e.g. the user id).  Items in curly braces {} indicate
-//the intended use of the folder
-/*
- *
- *                                 FileSystem  
- *                         /                    \  
- *                        /                      \  
- *                    Courses                    Users                                 
- *                     /                            \                                 
- *                [courseID]                        [userId]
- *               /     |  \ \                           \
- *              /      |   \ \__________              {global user content}
- *     CourseDocs      |    ZipFolder   \
- *          |    Assignments     \     Gradebook
- *          |          |          \        |
- *  {course docs}      |           \    {gradebook.zip/gradebook file}
- *                     |            \
- *                     |          Records.txt { %random number%.zip}
- *               [AssignmentId]
- *           /       \          \
- *          /         \          \
- *       AADocs   Submissions    Reviews
- *          |          |             \
- *      {aa docs}      |          [CourseUserId]
- *                     |                 |
- *                  [TeamID]             |
- *               /        \           {reviews}
- *    {team submissions}  [AuthorTeamID*]                       *This is only for critical review assignments
- *                          |
- *                         {team submissions}
- * */
-
 namespace OSBLE
 {
     // *** DO NOT USE THIS CLASS. IT IS IN THE PROCESS OF BEING REMOVED, 
@@ -388,18 +351,6 @@ namespace OSBLE
             {
                 info.Create();
             }
-            return path;
-        }
-
-        public static string GetTeamUserPeerReviewDraft(bool createPathIfNotExists, Course course, int assignmentID, int teamID)
-        {
-            return GetTeamUserReviewFolderLocation(createPathIfNotExists, course, assignmentID, teamID) + "\\PeerReviewDraft.xml";
-        }
-
-        public static string GetTeamUserPeerReview(bool createPathIfNotExists, Course course, int assignmentID, int teamID)
-        {
-            string path = GetTeamUserReviewFolderLocation(createPathIfNotExists, course, assignmentID, teamID);
-            path += "\\PeerReview.xml";
             return path;
         }
 

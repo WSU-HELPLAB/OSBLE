@@ -298,6 +298,16 @@ namespace OSBLE.Models.FileSystem
             get { return m_modified; }
         }
 
+        public byte[] ReadAllBytes()
+        {
+            return System.IO.File.ReadAllBytes(m_dataFileName);
+        }
+
+        public string[] ReadAllLines()
+        {
+            return System.IO.File.ReadAllLines(m_dataFileName);
+        }
+
         public void SaveAttrs()
         {
             m_doc.Save(m_attrFileName);
