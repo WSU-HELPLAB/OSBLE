@@ -579,7 +579,7 @@ namespace OSBLE.Controllers
             {
                 foreach (UserProfile possibleUser in PossibleProfiles)
                 {
-                    if (possibleUser.SchoolID == model.SchoolID)
+                    if (possibleUser.Identification == (model.SchoolID.ToString()))
                     {
                         osbleProfile = possibleUser;
                     }
