@@ -76,7 +76,7 @@ namespace OSBLE.Services
                                       from cu in _db.CourseUsers
                                       where cu.UserProfileID == up.ID
                                       &&
-                                      cu.AbstractCourse is Course
+                                      cu.AbstractCourse is AbstractCourse
                                       &&
                                       cu.AbstractCourseID == courseID
                                       select cu

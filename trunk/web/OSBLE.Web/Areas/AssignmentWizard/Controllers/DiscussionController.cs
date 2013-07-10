@@ -118,6 +118,18 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     }
 
                 }
+
+                //account for local client time, reset to UTC
+                int utcOffset = 0;
+                try
+                {
+                    Int32.TryParse(Request.Form["utc-offset"].ToString(), out utcOffset);
+                }
+                catch (Exception)
+                {
+                }
+                Assignment.DiscussionSettings.InitialPostDueDate = Assignment.DiscussionSettings.InitialPostDueDate.AddMinutes(utcOffset);
+
                 db.SaveChanges();
                 WasUpdateSuccessful = true;
             }

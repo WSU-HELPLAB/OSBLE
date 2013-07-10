@@ -342,6 +342,7 @@
     <Content Include="Areas\AssignmentWizard\Content\js\assignmentFilesUploader.js" />
     <Content Include="Areas\AssignmentWizard\Content\js\basics.js" />
     <Content Include="Areas\AssignmentWizard\Content\js\commentCategories.js" />
+    <Content Include="Areas\AssignmentWizard\Content\js\discussion.js" />
     <Content Include="Areas\AssignmentWizard\Content\js\criticalReview.js" />
     <Content Include="Areas\AssignmentWizard\Content\js\criticalReviewDiscussionTeams.js" />
     <Content Include="Areas\AssignmentWizard\Content\js\deliverables.js" />

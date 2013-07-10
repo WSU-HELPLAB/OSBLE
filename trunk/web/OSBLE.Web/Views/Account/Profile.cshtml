@@ -85,6 +85,12 @@
     </p>
     
     <p>
+        <input type="checkbox" value="True" name="EmailNewDiscussionPosts" @if (ViewBag.CurrentUser.EmailNewDiscussionPosts)
+                                                                         {<text>checked="checked"</text>} />
+        <text>Send all discussion posts to my e-mail.</text>
+    </p>
+    
+    <p>
         <input type="submit" value="Update Email Settings" />
     </p>
 
@@ -116,9 +122,9 @@
         <tr>
             <td class="coursemenu_option">
                 <input type="radio" name="defaultCourse" value="@cu.AbstractCourseID" @if ((cu.AbstractCourseID == ViewBag.CurrentUser.DefaultCourse) || ((ViewBag.CurrentCourses as List<CourseUser>).Where(c => c.AbstractCourseID == ViewBag.CurrentUser.DefaultCourse).Count() == 0 && firstCourse))
-                                                                              {
+                                                                                      {
                     <text>checked="checked"</text>
-                                                                              } />
+                                                                                      } />
             </td>
 
             <td>
@@ -137,11 +143,11 @@
             </td>
             <td class="coursemenu_option">
             <input type="checkbox" value="True" name="cu_hidden_@(cu.AbstractCourseID)" @if (cu.Hidden)
-                                                                                {<text>checked="checked"</text>} />
+                                                                                        {<text>checked="checked"</text>} />
             </td>
 
         </tr>
-                                                                                firstCourse = false;
+                                                                                        firstCourse = false;
     }
 </table>
 <p>

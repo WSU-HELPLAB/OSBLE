@@ -68,6 +68,12 @@ namespace OSBLE.Models.Users
         [DataMember]
         public bool EmailAllActivityPosts { get; set; }
 
+        /// <summary>
+        /// If set, will email any new discussion posts
+        /// </summary>
+        [DataMember]
+        public bool EmailNewDiscussionPosts { get; set; }
+
         public enum sortEmailBy
         {
             POSTED = 0,
@@ -97,6 +103,8 @@ namespace OSBLE.Models.Users
             this.CanCreateCourses = up.CanCreateCourses;
             this.DefaultCourse = up.DefaultCourse;
             this.EmailAllNotifications = up.EmailAllNotifications;
+            this.EmailAllActivityPosts = up.EmailAllActivityPosts;
+            this.EmailNewDiscussionPosts = up.EmailNewDiscussionPosts;
             this.FirstName = up.FirstName;
             this.ID = up.ID;
             this.Identification = up.Identification;

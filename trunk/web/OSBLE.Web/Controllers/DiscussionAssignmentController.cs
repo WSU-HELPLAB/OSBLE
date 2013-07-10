@@ -373,6 +373,7 @@ namespace OSBLE.Controllers
                 db.DiscussionPosts.Add(newPost);
                 db.SaveChanges();
                 SendModeratorEmail(assignment, newPost);
+                SendUserEmail(assignment, newPost);
             }
             return Redirect(Request.UrlReferrer.ToString());
         }
@@ -387,6 +388,7 @@ namespace OSBLE.Controllers
                 db.DiscussionPosts.Add(reply);
                 db.SaveChanges();
                 SendModeratorEmail(assignment, reply);
+                SendUserEmail(assignment, reply);
             }
             return Redirect(Request.UrlReferrer.ToString());
         }
@@ -441,6 +443,60 @@ The OSBLE Team
                     }
                 }
             }
+        }
+
+        private void SendUserEmail(Assignment assignment, DiscussionPost newPost)
+        {
+            //mail all users in the course with mail new discussion post setting set as true
+            List<MailAddress> to = new List<MailAddress>();
+            List<string> emailAddresses = db.CourseUsers
+                .Where(cu => cu.AbstractCourseID == assignment.CourseID)
+                .Where(cu => cu.UserProfileID != ActiveCourseUser.UserProfileID)
+                .Where(cu => cu.UserProfile.EmailNewDiscussionPosts == true)
+                .Select(cu => cu.UserProfile.UserName)
+                .ToList();
+
+            foreach (string address in emailAddresses)
+            {
+                //AC: sometimes this fails.  Not sure why
+                try
+                {
+                    to.Add(new MailAddress(address));
+                }
+                catch (Exception)
+                {
+                }
+            }
+
+            bool anonSettings = false;
+            if (assignment.DiscussionSettings.AnonymitySettings > 0)
+            {
+                anonSettings = true;
+            }
+
+            string subject = "[OSBLE] New Discussion Post";
+            string linkUrl = string.Format("http://osble.org{0}", Url.Action("TeacherIndex", "DiscussionAssignment", new { assignmentID = assignment.ID, discussionTeamID = newPost.DiscussionTeamID }));
+            string body = @"
+Greetings,
+
+{0} has posted the following message on the discussion assignment ""{1}."":
+{2}
+
+You may view the discussion on OSBLE by visiting the following link: <a href=""{3}"">{4}</a>.
+
+Thanks,
+The OSBLE Team
+";
+
+            body = string.Format(body,
+    ActiveCourseUser.UserProfile.DisplayName(ActiveCourseUser.AbstractRoleID, true, anonSettings),
+    assignment.AssignmentName,
+    newPost.Content,
+    linkUrl,
+    linkUrl
+    );
+            Email.Send(subject, body, to);
+
         }
 
         [HttpGet, FileCache(Duration = 3600)]

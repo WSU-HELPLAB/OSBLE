@@ -187,6 +187,7 @@ namespace OSBLE.Controllers
         {
             CurrentUser.EmailAllNotifications = Convert.ToBoolean(Request.Params["EmailallNotifications"]);
             CurrentUser.EmailAllActivityPosts = Convert.ToBoolean(Request.Params["EmailAllActivityPosts"]);
+            CurrentUser.EmailNewDiscussionPosts = Convert.ToBoolean(Request.Params["EmailNewDiscussionPosts"]);
 
             db.Entry(CurrentUser).State = EntityState.Modified;
             db.SaveChanges();

@@ -26,7 +26,8 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
             {
                 if (assignment.CriticalReviewPublishDate != null)
                 {
-                    header.PublishCR.PublishStatus = "Published " + assignment.CriticalReviewPublishDate.ToString();
+                    header.PublishCR.PublishStatus = "Published";
+                    header.PublishDate = assignment.CriticalReviewPublishDate;
                     header.PublishCR.PublishButtonDisplayValue = "Republish All Reviews";
                 }
             }

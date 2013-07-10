@@ -140,7 +140,13 @@ else
             Released:
         </th>
             <td>
-                @Model.CurrentAssignment.ReleaseDate
+                     <time 
+                class="utc-time"
+                datetime="@Helpers.DateAsUnixTime(Model.CurrentAssignment.ReleaseDate)" 
+                data-original-date="@Helpers.RawDate(Model.CurrentAssignment.ReleaseDate)" 
+                data-date-format="MM/DD/YYYY hh:mm A">
+                @Model.CurrentAssignment.ReleaseDate.ToShortDateString() @Model.CurrentAssignment.ReleaseDate.ToShortTimeString() (UTC)
+                         </time>
             </td>
     </tr>
     @RenderSection("AssignmentDetails", true)

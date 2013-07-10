@@ -13,7 +13,14 @@
         <th>
             Due:
         </th>
-        <td>@Model.CurrentAssignment.DueDate
+        <td>
+             <time 
+                class="utc-time"
+                datetime="@Helpers.DateAsUnixTime(Model.CurrentAssignment.DueDate)" 
+                data-original-date="@Helpers.RawDate(Model.CurrentAssignment.DueDate)" 
+                data-date-format="MM/DD/YYYY hh:mm A">
+            @Model.CurrentAssignment.DueDate.ToShortDateString() @Model.CurrentAssignment.DueDate.ToShortTimeString() (UTC)
+                 </time>
         </td>
     </tr>
     @foreach (string view in Model.HeaderViews)

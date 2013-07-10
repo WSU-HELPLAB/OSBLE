@@ -34,7 +34,7 @@ namespace OSBLE.Services
             CourseUser courseUser =
                 (from cu in db.CourseUsers
                  where cu.UserProfileID == up.ID &&
-                 cu.AbstractCourse is Course &&
+                 cu.AbstractCourse is AbstractCourse &&
                  cu.AbstractCourseID == courseID
                  select cu).FirstOrDefault();
             if (null == courseUser)
@@ -63,7 +63,7 @@ namespace OSBLE.Services
             CourseUser courseUser =
                 (from cu in db.CourseUsers
                  where cu.UserProfileID == up.ID &&
-                 cu.AbstractCourse is Course &&
+                 cu.AbstractCourse is AbstractCourse &&
                  cu.AbstractCourseID == courseID
                  select cu).FirstOrDefault();
             if (null == courseUser)
@@ -219,7 +219,7 @@ namespace OSBLE.Services
             CourseUser courseUser =
                 (from cu in db.CourseUsers
                  where cu.UserProfileID == up.ID &&
-                 cu.AbstractCourse is Course &&
+                 cu.AbstractCourse is AbstractCourse &&
                  cu.AbstractCourseID == courseID
                  select cu).FirstOrDefault();
             if (null == courseUser)
@@ -338,7 +338,7 @@ namespace OSBLE.Services
             CourseUser courseUser =
                 (from cu in db.CourseUsers
                  where cu.UserProfileID == up.ID &&
-                 cu.AbstractCourse is Course &&
+                 cu.AbstractCourse is AbstractCourse &&
                  cu.AbstractCourseID == courseID
                  select cu).FirstOrDefault();
             if (null == courseUser)
@@ -599,7 +599,7 @@ namespace OSBLE.Services
                                       from cu in _db.CourseUsers
                                       where cu.UserProfileID == up.ID
                                       &&
-                                      cu.AbstractCourse is Course
+                                      cu.AbstractCourse is AbstractCourse
                                       &&
                                       cu.AbstractCourseID == courseID
                                       select cu
@@ -700,7 +700,7 @@ namespace OSBLE.Services
                                       from cu in _db.CourseUsers
                                       where cu.UserProfileID == up.ID
                                       &&
-                                      cu.AbstractCourse is Course
+                                      cu.AbstractCourse is AbstractCourse
                                       &&
                                       cu.AbstractCourseID == courseID
                                       select cu
