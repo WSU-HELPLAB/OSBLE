@@ -162,10 +162,10 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         // action occurs.
         var theStyle
         if ("/" == folderPath) {
-            theStyle = "padding: 3px; border: 1px solid #074974; background: linear-gradient( to bottom, white, #f0f0f0);";
+            theStyle = "padding: 3px; border: 0px; background: white;";
         }
         else {
-            theStyle = "padding: 3px; border: 1px solid #074974; border-top: 0; background: linear-gradient( to bottom, white, #f0f0f0);";
+            theStyle = "padding: 3px; border: 0px; background: white;";
         }
 
         // One new DIV for the folder name and control buttons
@@ -320,7 +320,7 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         result += "<div id=\"" + theID + "\" style=\"padding: 3px; background-color: ";
         if (0 == i % 2) { result += "#dfdfdf; "; }
         else { result += "#ffffff; "; }
-        result += "border: 1px solid #074974; border-top: 0;";
+        result += "border: 0px;";
         result += "\">";
         result += ("<a href=\"" + linkURL + "\"><img src=\"" + imgSrc + "\" />" + fileName + "</a>");
 
@@ -585,7 +585,7 @@ function cfm_expand_collapse(stateObjectIndex)
                 if (!state.expanded)
                 {
                     // Case 1a. It wasn't expanded and now it is, meaning the folder below it needs a border
-                    nextFolder.style.borderTop = "1px solid #074974";
+                    nextFolder.style.borderTop = "0px";
                 }
                 else
                 {
@@ -601,7 +601,7 @@ function cfm_expand_collapse(stateObjectIndex)
                 if (!state.expanded)
                 {
                     // Case 1b. It wasn't expanded and now it is, meaning the file below it needs a border
-                    firstFile.style.borderTop = "1px solid #074974";
+                    firstFile.style.borderTop = "0px";
                 }
                 else
                 {

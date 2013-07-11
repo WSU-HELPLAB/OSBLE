@@ -40,7 +40,6 @@
                             $('#latest_reply_@((Model as DashboardReply).Parent.ID)').val(Math.max($('#latest_reply_@((Model as DashboardReply).Parent.ID)').val(),@(Model.ID)));
                         });
                     </script>
-
                 }
 
                 @* Profile Picture *@
@@ -105,8 +104,14 @@
                 <br />
                 @* Posting Date *@
 
-                <time class="utc-time dp_posted" datetime="@Helpers.DateAsUnixTime(Model.Posted)" data-original-date="@Helpers.RawDate(Model.Posted)" data-date-format="dddd, MMMM DD, YYYY hh:mm A">@Helpers.DisplayDate(Model.Posted) (UTC)</time>
-            </div>
+                 <time 
+                class="utc-time"
+                datetime="@Helpers.DateAsUnixTime(Model.Posted)" 
+                data-original-date="@Helpers.RawDate(Model.Posted)" 
+                data-date-format="MM/DD/YYYY hh:mm A">
+                     @Model.Posted.ToShortDateString() @Model.Posted.ToShortTimeString()
+                     </time>
+               </div>
 
             @* Post Content *@
             <div class="dp_content">
@@ -120,13 +125,13 @@
             @if (Model is DashboardPost)
             {
             @* Post Replies *@
-            <div class="dp_replies">
-                <div id="dp_replies_for_@(Model.ID)">
-                @foreach (DashboardReply dr in (Model as DashboardPost).Replies)
-                {
-                    @Html.Partial("_DashboardPost",dr);
-                }
-                </div>
+                <div class="dp_replies">
+                    <div id="dp_replies_for_@(Model.ID)">
+                        @foreach (DashboardReply dr in (Model as DashboardPost).Replies)
+                        {
+                            @Html.Partial("_DashboardPost", dr);
+                        }
+                    </div>
 
                 @* New Reply Box *@
 
@@ -142,7 +147,7 @@
                         data-ajax-begin="$('#reply_@(Model.ID)_button').attr('disabled', 'disabled')"
                         data-ajax-failure="alert('There was an error sending your reply.')"
                         data-ajax-complete="$('#reply_@(Model.ID)_button').removeAttr('disabled'); $('body').css('cursor', 'default');"
-                        data-ajax-success="$('.dp_new_post').show('blind',{},'slow',function(){$(this).removeClass('dp_new_post');}); $('#dp_replybox_content_@(Model.ID)').val('')"
+                        data-ajax-success="$('.dp_new_post').show('blind',{},'slow',function(){$(this).removeClass('dp_new_post');}); $('#dp_replybox_content_@(Model.ID)').val(''); parseDates()"
                         data-ajax-mode="after"
                         method="post">
                         <input type="hidden" name="reply_to" value="@Model.ID" />

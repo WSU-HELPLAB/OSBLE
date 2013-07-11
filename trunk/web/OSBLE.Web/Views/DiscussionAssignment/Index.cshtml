@@ -264,7 +264,14 @@
                 @displayPicture
                 @displayName
                 <br />
-                @dpvm.Posted
+
+                <time 
+                class="utc-time"
+                datetime="@Helpers.DateAsUnixTime(dpvm.Posted)" 
+                data-original-date="@Helpers.RawDate(dpvm.Posted)" 
+                data-date-format="MM/DD/YYYY hh:mm A">
+                    @dpvm.Posted.ToShortDateString() @dpvm.Posted.ToShortTimeString()
+                </time>
                 <br />
                 <br />
             </div>
@@ -295,7 +302,13 @@
                             <div class="dp_post_header">
                                 @displayPicture
                                 @displayName<br />
-                                @reply.Posted
+                                <time 
+                class="utc-time"
+                datetime="@Helpers.DateAsUnixTime(reply.Posted)" 
+                data-original-date="@Helpers.RawDate(reply.Posted)" 
+                data-date-format="MM/DD/YYYY hh:mm A">
+                                    @reply.Posted.ToShortDateString() @reply.Posted.ToShortTimeString()
+                                </time>
                                 <br />
                                 <br />
                             </div>

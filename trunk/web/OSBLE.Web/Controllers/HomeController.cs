@@ -618,6 +618,8 @@ namespace OSBLE.Controllers
                             setupPostDisplay(r);
                         }
 
+                        replys.Clear();
+                        replys.Add(dr);
                         ViewBag.DashboardReplies = replys;
 
                         // Post notification to other thread participants

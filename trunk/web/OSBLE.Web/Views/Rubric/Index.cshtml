@@ -386,7 +386,13 @@ function create_and_open_downloading_submission_dialog() {
                     <td></td>
                     <th style="text-align:right">Published:</th>
                     <td style="text-align:right">
-                        @publishTime.Value.ToString("g")
+                         <time 
+                class="utc-time"
+                datetime="@Helpers.DateAsUnixTime(publishTime.Value)" 
+                data-original-date="@Helpers.RawDate(publishTime.Value)" 
+                data-date-format="MM/DD/YYYY hh:mm A">
+                        @publishTime.Value.ToShortDateString() @publishTime.Value.ToShortTimeString()
+                             </time>
                     </td>
                 </tr>
                 }
@@ -397,7 +403,13 @@ function create_and_open_downloading_submission_dialog() {
                     <td></td>
                     <th style="text-align:right">Draft:</th>
                     <td style="text-align:right">
-                        @publishTime.Value.ToString("g")
+                        <time 
+                class="utc-time"
+                datetime="@Helpers.DateAsUnixTime(publishTime.Value)" 
+                data-original-date="@Helpers.RawDate(publishTime.Value)" 
+                data-date-format="MM/DD/YYYY hh:mm A">
+                            @publishTime.Value.ToShortDateString() @publishTime.Value.ToShortTimeString()
+                        </time>
                     </td>
                 </tr>
                 }
