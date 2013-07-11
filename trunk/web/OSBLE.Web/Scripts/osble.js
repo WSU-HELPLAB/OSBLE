@@ -15,6 +15,8 @@ function parseDates() {
         var localOffset = localDate.getTimezoneOffset();
         currentDate = currentDate.subtract('minutes', localOffset);
         $(this).html(currentDate.format(formatString));
+        $(this).removeClass("utc-time");
+        $(this).addClass("local-time");
     });
 }
 
