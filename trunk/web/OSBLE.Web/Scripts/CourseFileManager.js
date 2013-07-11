@@ -318,7 +318,7 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
             courseID.toString() + "&filePath=" + fileStateObj.fullPath;
 
         result += "<div id=\"" + theID + "\" style=\"padding: 3px; background-color: ";
-        if (0 == i % 2) { result += "#dfdfdf; "; }
+        if (0 == i % 2) { result += "#ffffff; "; }
         else { result += "#ffffff; "; }
         result += "border: 0px;";
         result += "\">";
