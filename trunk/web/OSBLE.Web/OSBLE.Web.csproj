@@ -167,6 +167,9 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Areas\AssessmentWizard\AssessmentWizardAreaRegistration.cs" />
+    <Compile Include="Areas\AssessmentWizard\Controllers\AssessmentBaseController.cs" />
+    <Compile Include="Areas\AssessmentWizard\Controllers\HomeController.cs" />
+    <Compile Include="Areas\AssessmentWizard\Models\AssessmentWizardComponentManager.cs" />
     <Compile Include="Areas\AssignmentDetails\AssignmentDetailsAreaRegistration.cs" />
     <Compile Include="Areas\AssignmentDetails\Controllers\ContentController.cs" />
     <Compile Include="Areas\AssignmentDetails\Controllers\HomeController.cs" />
@@ -653,7 +656,6 @@
     <Content Include="Areas\AssignmentWizard\Views\CommitteeDiscussion\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\ReviewOfStudentWork\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\CommitteeReview\Index.cshtml" />
-    <None Include="Scripts\jquery-1.8.2.intellisense.js" />
     <Content Include="Resources\CSVReader\CSVCellReaderStateMachine.png" />
     <Content Include="Scripts\CourseFileManager.js" />
     <Content Include="Scripts\CourseFilesUploader.js" />
@@ -846,8 +848,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Areas\AssessmentWizard\Controllers\" />
-    <Folder Include="Areas\AssessmentWizard\Models\" />
     <Folder Include="Areas\AssignmentWizard\Views\Deliverables\Deliverables\" />
     <Folder Include="Areas\AssignmentWizard\Views\Rubric\Rubric\" />
     <Folder Include="Models\" />

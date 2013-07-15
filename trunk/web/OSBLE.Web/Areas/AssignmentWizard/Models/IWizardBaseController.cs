@@ -7,10 +7,17 @@ using System.Web.Mvc;
 
 namespace OSBLE.Areas.AssignmentWizard.Models
 {
+    public enum WizardNavButtons
+    {
+        PreviousButton,
+        NextButton,
+        SaveAndExitButton,
+        ResetFormButton,
+        QuickNavButton
+    }
+
     public interface IWizardBaseController : IComparable, INotifyPropertyChanged, IEquatable<IWizardBaseController>
     {
-        event PropertyChangedEventHandler PropertyChanged;
-
         /// <summary>
         /// Returns the controller's name.  Must be unique.  The GET method should
         /// return a static string.

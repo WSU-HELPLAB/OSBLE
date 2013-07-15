@@ -16,6 +16,7 @@ using System.Data.Objects;
 using OSBLE.Models.Annotate;
 using System.Reflection;
 using OSBLE.Models.Triggers;
+using OSBLE.Models.Assessments;
 
 namespace OSBLE.Models
 {
@@ -184,6 +185,9 @@ namespace OSBLE.Models
         public DbSet<AbetSubmissionTag> AbetSubmissionLevels { get; set; }
 
         public DbSet<AbetAssignmentOutcome> AbetSubmissionOutcomes { get; set; }
+
+        // Assessments
+        public DbSet<Assessment> Assessments { get; set; }
 
         // Annotate stuff
         public DbSet<AnnotateDocumentReference> AnnotateDocumentReferences { get; set; }
