@@ -1,0 +1,187 @@
+﻿h1
+{
+    margin-bottom:0;
+    padding-bottom:0;
+}
+
+#AssignmentDetailsTable
+{
+    border-collapse:collapse;
+    margin-bottom:15px;
+}
+
+#AssignmentDetailsTable th
+{
+    text-align:left;
+}
+
+#AssignmentDetailsTable td
+{
+    border-left:1px solid gray;
+}
+
+#AssignmentDetailsTable th, #AssignmentDetailsTable td
+{
+    padding:4px; 
+    vertical-align:middle;
+    border-top:1px solid gray;
+}
+
+#AssignmentDetailsTableFirstRow th, #AssignmentDetailsTableFirstRow td
+{
+    border-top:none;
+}
+
+#AssignmentLinksList
+{
+    margin:0;
+    padding:0;
+    list-style:none;
+    padding-bottom:10px;
+}
+
+#AssignmentLinksList li
+{
+    display:inline;
+    padding-right:5px;
+}
+
+.AltRow
+{
+    background:#DFDFDF;
+}
+
+#CriticalReviews
+{
+    border-collapse:collapse;
+}
+
+#CriticalReviews td, #CriticalReviews th
+{
+    border:none;
+}
+
+
+#MultiTeamList
+{
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+
+.MultiTeamListItem
+{
+    display:inline-block;
+    margin-left:0;
+    padding-right:7px;
+}
+
+#StudentsTable
+{
+    border-collapse:collapse;
+    font-size:.8em;
+    border:none;
+}
+
+.StudentName
+{
+    text-align:left;
+}
+
+#StudentsTable th, #StudentsTable td
+{
+    border:1px solid gray;
+    padding:4px;
+}
+
+#ReviewsItems
+{
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+
+#ReviewsItems li
+{
+    padding-right:7px;
+}
+
+.TableRowCriticalReview
+{
+    border-bottom:1px solid black;
+}
+
+#SubmissionItems
+{
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+
+#SubmissionItems li
+{
+    display:inline;
+    padding-right:7px;
+}
+
+#SubmissionReceivedText
+{
+    font-weight:bold;
+    color:Gray;
+}
+
+.TeamHeader
+{
+    background: #DFDFDF;
+    text-align:left;
+}
+
+/* Users Page */
+.UserList li
+{
+	list-style: none;
+	width: 230px;
+	border-bottom: 1px solid #aaccff;
+	border: 1px solid #eeeeff;
+	border-bottom: 3px solid #eeeeff;
+	min-height: 43px;
+	padding-top: 4px;
+	margin-bottom: 7px;
+	font-size: 10pt;
+}
+
+.UserList li form
+{
+	display: none;
+	margin: 0;
+	padding: 0;
+}
+
+.UserList input
+{
+	position: relative;
+}
+
+.UserList li:hover
+{
+	background-color: #fafaff;
+	border: 1px solid #aaaadd;
+	border-bottom: 3px solid #aaaadd;
+}
+
+.UserList li:hover div.UserControls
+{
+	display: block;
+}
+
+.UserList li div.UserControls
+{
+	display: none;
+	float: right;
+	padding-right: 3px;
+}
+
+.UserControls img:hover
+{
+	cursor: pointer;
+}

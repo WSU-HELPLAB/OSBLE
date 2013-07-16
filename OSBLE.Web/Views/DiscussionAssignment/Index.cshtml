@@ -1,0 +1,372 @@
+﻿@using OSBLE.Models
+@using OSBLE.Models.Courses
+@using OSBLE.Models.HomePage
+@using OSBLE.Models.DiscussionAssignment
+@using OSBLE.Models.Assignments
+@using OSBLE.Models.ViewModels
+@{
+
+    Assignment assignment = ViewBag.Assignment;
+    int minWordCount = 0;
+    int maxWordCount = 0;
+    if (ViewBag.IsFirstPost && ViewBag.CanPost)
+    {
+        //Only give a value if its their first post. 
+        maxWordCount = assignment.DiscussionSettings.MaximumFirstPostLength;
+        minWordCount = assignment.DiscussionSettings.MinimumFirstPostLength;
+    }
+    ViewBag.Title = "Discussion Assignment: " + assignment.AssignmentName;
+    List<DiscussionPostViewModel> DiscussionPostViewModelList = ViewBag.DiscussionPostViewModelList;
+    int discussionTeamID = ViewBag.DiscussionTeamID;
+    string selectBoxID = "dtStudentSelect";
+    DiscussionTeam discussionTeam = ViewBag.DiscussionTeam;
+    if (ViewBag.ActiveCourse.AbstractRole.CanGrade)
+    {
+        selectBoxID = "dtInstructorSelect";
+    }
+
+    List<Poster> DiscussionMembers = ViewBag.Posters;
+}
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('#dtInstructorSelect').change(function () {
+            var dtID = $('#dtInstructorSelect').val();
+            window.location.replace("TeacherIndex?assignmentId=" + @assignment.ID + "&courseUserId=" + 0 + "&discussionTeamID=" + dtID + "&hightlightValue=None");
+
+        });
+        $('#dtStudentSelect').change(function () {
+            var dtID = $('#dtStudentSelect').val();
+            window.location.replace("DiscussionAssignment?assignmentId=" + @assignment.ID + "&discussionTeamId=" + dtID);
+
+        });
+
+        wordCount();
+    });
+
+    
+    var SubmittedPost = false;
+    function postBtnClick(){
+        //This function stops the "Post" button from being spammed, which causes duplicate messages.
+        if(SubmittedPost == false)
+        {
+            SubmittedPost = true;
+            $("#Postform").submit();
+        }
+    }
+
+    function wordCount(){
+        
+        //match regex is finding non-apostrophe punctuation (including new line) to find end of words.
+        //It does a look ahead "(?![a-zA-Z][ .,!\n])" to avoid picking up abbreviations as words. So "I.e.", "A.A.A." counts as 0 words.
+        var wordArray = $('#ActivityFeed').val().match(/[ .,!\n]+(?![a-zA-Z][ .,!\n])/g)
+        var wordCount = null;
+        if(wordArray != null)
+        {
+            wordCount = wordArray.length
+        }
+        else
+        {
+            wordCount = 0;
+        }   
+
+        $('#wordCount').html(wordCount);     
+
+        if(@maxWordCount != 0 && wordCount > @maxWordCount)
+        {
+            $('#maxWords').css('background-color', '#FC5151');
+    }
+    else
+    {
+            $('#maxWords').css('background-color', 'white');
+    }
+
+    if(@minWordCount != 0 && wordCount < @minWordCount)
+            {
+                $('#minWords').css('background-color', '#FC5151');
+            }
+            else
+            {
+                $('#minWords').css('background-color', 'white');
+            }
+
+            if(@maxWordCount > 0 || @minWordCount > 0)
+        {
+            if((@minWordCount == 0 || wordCount >= @minWordCount) && (@maxWordCount == 0 || wordCount <= @maxWordCount))
+            {
+                //valid
+                $("#postNewDiscussion").removeAttr("disabled")
+            }
+            else
+            {
+                $("#postNewDiscussion").attr("disabled", "disabled")
+            }
+        }
+        }
+
+</script>
+
+
+
+<div>
+    <table>
+        <tr>
+            <td>
+                <h2>@ViewBag.DiscussionHeader</h2>
+            </td>
+        </tr>
+        @if (ViewBag.ActiveCourseUser.AbstractRole.CanGrade)
+        {
+            <tr>
+                <td>@Html.ActionLink("Toggle Anonymity", "TeacherIndex", new { assignmentId = assignment.ID, discussionTeamID = discussionTeamID, anonymous = !ViewBag.IsAnonymous }, new { })</td>
+            </tr>
+        }
+        <!--Select Discussion Dropdown-->
+        @if (ViewBag.DiscussionTeamList != null && ViewBag.DiscussionTeamList.Count > 1)
+        {
+          
+            <tr>
+                <td>
+                    <text style="font-weight: bold">Select Discussion: </text>
+
+                    <select id="@selectBoxID">
+                        @foreach (DiscussionTeam dt in ViewBag.DiscussionTeamList)
+                        {
+@*generating select box*@
+                            string optionText = "<option value=\"{0}\"{1}>{2}</option>";
+                            string selectValue = "";
+                            if (dt.ID == ViewBag.DiscussionTeamID)
+                            {
+                                selectValue = "selected=\"selected\"";
+                            }
+                            @Html.Raw(String.Format(optionText, dt.ID, selectValue, dt.TeamName));
+                        }
+                    </select>
+                </td>
+            </tr>       
+        }
+    </table>
+</div>
+
+<div id="activity_feed" style="max-width: 1200px">
+    <!--Fielddset for prompt & Critical Review Discussion prompt-->
+    <div class="promptText">
+        @Html.Raw(HttpUtility.HtmlDecode(Helpers.WikiUrlLinking(assignment.AssignmentDescription).ToString()))
+        <br />
+
+        @if (assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
+        {
+            @Html.ActionLink("Access reviewed items to discuss",
+                     "GetDocumentsForCriticalReviewDiscussion",
+                "FileHandler",
+                new { area = "", discussionTeamID = discussionTeamID },
+                new { onclick = "create_and_open_downloading_submission_dialog()" })
+
+            if (assignment.PreceedingAssignment != null)
+            {
+                if (assignment.PreceedingAssignment.Type == AssignmentTypes.CriticalReview)
+                {
+                    if (assignment.PreceedingAssignment.HasStudentRubric == true)
+                    {
+                            @:&nbsp-&nbsp 
+                            @Html.ActionLink("View merged rubric",
+                                            "ViewForCriticalReview",
+                                            "Rubric",
+                                            new
+                                            {
+                                                assignmentId = assignment.PrecededingAssignmentID,
+                                                authorTeamId = discussionTeam.AuthorTeamID,
+                                                area = ""
+                                            },
+                                            new { })
+                        }
+                }
+            }
+        }
+    </div>
+    <br />
+
+    @{
+        <!--div for new post-->
+        if (ViewBag.CanPost)
+        {
+            using (Html.BeginForm("NewPost", "DiscussionAssignment", FormMethod.Post, new { id = "Postform" }))
+            {
+        <input type="hidden" name="DiscussionTeamID" value="@discussionTeamID" />
+        <input type="hidden" name="AssignmentID" value="@ViewBag.Assignment.ID" />
+        <textarea id="ActivityFeed" name="Content" rows="10" style="width: 100%; height: 100px" placeholder="Enter new discussion post here..." onkeyup="wordCount()"></textarea><br />
+                    
+        <table style="float: right" cellspacing="0">
+            <tr>
+                <td>Word Count:</td>
+                <td><span id="wordCount">0</span><br />
+                </td>
+            </tr>
+            @if (minWordCount > 0)
+            {
+                <tr id="minWords" style="border-collapse: collapse; padding: ">
+                    <td>Min Words:</td>
+                    <td>@minWordCount</td>
+                </tr>
+            }
+            @if (maxWordCount > 0)
+            {
+                <tr id="maxWords">
+                    <td>Max Words:</td>
+                    <td>@maxWordCount</td>
+                </tr>
+            }
+
+        </table>
+        <input id="postNewDiscussion" type="button" onclick="postBtnClick()" name="post_active" value="Post" />
+            }
+        }
+        else
+        {
+        @:You cannot post in this discussion.<br /><br />
+        }
+    }
+    @if (DiscussionPostViewModelList != null && (ViewBag.IsFirstPost == false || assignment.DiscussionSettings.RequiresPostBeforeView == false))
+    {
+        HelperResult DefaultProfilePicture = Helpers.DefaultProfilePicture();
+        HelperResult displayPicture;
+        string displayName = "";
+
+        <!--Generating posts-->
+        foreach (DiscussionPostViewModel dpvm in DiscussionPostViewModelList)
+        {
+            displayName = dpvm.poster.DisplayName;
+            if (dpvm.poster.Anonymize == false)
+            {
+                displayPicture = Helpers.ProfilePicture(Url.Action("ProfilePictureForDiscussion", new { course = dpvm.poster.CourseUser.AbstractCourseID, userprofile = dpvm.poster.CourseUser.UserProfileID }));
+            }
+            else
+            {
+                displayPicture = DefaultProfilePicture;
+            }
+        <div class="dp_post" id="dp_post_@(dpvm.DiscussionPostId)" style="background:white;">
+            @if ((ViewBag.LastVisit != null && ViewBag.HighlightValue == OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.NewPosts
+                    && dpvm.Posted >= ViewBag.LastVisit && ViewBag.ActiveCourseUser.ID != dpvm.poster.CourseUser.ID)
+                || (ViewBag.Student != null
+                    && ViewBag.Student.ID == dpvm.poster.CourseUser.ID
+                    && (ViewBag.HighlightValue == OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.Posts
+                        || ViewBag.HighlightValue == OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.PostsAndReplies)
+                    && (ViewBag.ActiveCourse.AbstractRole.CanGrade)))
+            {
+                <!--display as highlighted if there is a student selected, and this is that student. 
+                        OR the post is new and highlight value is set to new posts-->
+                <script type="text/javascript">
+                    $('#dp_post_@(dpvm.DiscussionPostId)').css("background", "#FFF8C6");
+                </script>
+            }
+            <div class="dp_post_header">
+                @displayPicture
+                @displayName
+                <br />
+
+                <time 
+                class="utc-time"
+                datetime="@Helpers.DateAsUnixTime(dpvm.Posted)" 
+                data-original-date="@Helpers.RawDate(dpvm.Posted)" 
+                data-date-format="MM/DD/YYYY hh:mm A">
+                    @dpvm.Posted.ToShortDateString() @dpvm.Posted.ToShortTimeString()
+                </time>
+                <br />
+                <br />
+            </div>
+            <div class="dp_content">
+                @{
+            string content = HttpUtility.HtmlDecode(Helpers.Linkify(dpvm.Content).ToHtmlString());
+            content = content.Replace("\n", "<br />");
+                }
+                @Html.Raw(content)
+            </div>
+            <div class="dp_replies">
+                <div id="dp_replies_for_@(dpvm.DiscussionPostId)">
+                    <!--Generating replies under each post-->
+                    @foreach (ReplyViewModel reply in dpvm.Replies)
+                    {
+                        displayName = reply.poster.DisplayName; //reusing displayName/displayPicture as theyre not used further down the post
+                        if (reply.poster.Anonymize == false)
+                        {
+                            displayPicture = Helpers.ProfilePicture(Url.Action("ProfilePictureForDiscussion", new { course = reply.poster.CourseUser.AbstractCourseID, userprofile = reply.poster.CourseUser.UserProfileID }));
+                        }
+                        else
+                        {
+                            ;
+                            displayPicture = DefaultProfilePicture;
+                        }
+                        
+                        <div class="dp_post" id="dp_post_@(reply.DiscussionPostId)" style="background:white;">
+                            <div class="dp_post_header">
+                                @displayPicture
+                                @displayName<br />
+                                <time 
+                class="utc-time"
+                datetime="@Helpers.DateAsUnixTime(reply.Posted)" 
+                data-original-date="@Helpers.RawDate(reply.Posted)" 
+                data-date-format="MM/DD/YYYY hh:mm A">
+                                    @reply.Posted.ToShortDateString() @reply.Posted.ToShortTimeString()
+                                </time>
+                                <br />
+                                <br />
+                            </div>
+                            <div class="dp_content">
+                                @{
+                        content = HttpUtility.HtmlDecode(Helpers.Linkify(reply.Content).ToHtmlString());
+                        content = content.Replace("\n", "<br />");
+                                }
+                                @Html.Raw(content)
+                            </div>
+                        </div>
+                        
+                        if ((ViewBag.LastVisit != null && ViewBag.HighlightValue == OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.NewPosts
+                                && reply.Posted >= ViewBag.LastVisit && ViewBag.ActiveCourseUser.ID != reply.poster.CourseUser.ID)
+                            || (ViewBag.Student != null
+                                && ViewBag.Student.ID == reply.poster.CourseUser.ID
+                                && (ViewBag.HighlightValue == OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.Replies
+                                    || ViewBag.HighlightValue == OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.PostsAndReplies)
+                                && (ViewBag.ActiveCourse.AbstractRole.CanGrade)))
+                        {
+                        <!--display as highlighted if there is a student selected, and this is that student
+                                    OR the post is new and highlight value is set to new posts-->
+                        <script type="text/javascript">
+                            $('#dp_post_@(reply.DiscussionPostId)').css("background", "#FFF8C6");
+                        </script>
+                        }
+                    }
+                </div>
+            </div>
+            @if (assignment.DueDate > DateTime.UtcNow)
+            {
+                <div class="dp_replylink"><a href="#" id="reply_@(dpvm.DiscussionPostId)">Reply</a></div>
+            }
+            <div class="dp_replybox" id="replybox_@(dpvm.DiscussionPostId)" style="padding-left:23px;">
+                @using (Html.BeginForm("NewReply", "DiscussionAssignment", FormMethod.Post))
+                {
+                    <input type="hidden" name="DiscussionTeamID" value="@discussionTeamID" />
+                    <input type="hidden" name="AssignmentID" value="@ViewBag.Assignment.ID" />
+                    <input type="hidden" name="ParentPostID" value="@dpvm.DiscussionPostId" />
+                    <textarea name="Content" rows="5" cols="40" id="dp_replybox_content_@(dpvm.DiscussionPostId)" placeholder="Enter reply here..."></textarea><br />
+                    <input id="reply @(dpvm.DiscussionPostId) button" type="submit" name="post_reply" value="Post Reply" onclick="refreshCount()" />
+                }
+                <br />
+                <div class="dp_replylink"><a href="#" id="replycancel_@(dpvm.DiscussionPostId)">Cancel</a></div>
+            </div>
+            <script type="text/javascript">
+                $("#reply_@(dpvm.DiscussionPostId)").click(function () {
+                    $("#reply_@(dpvm.DiscussionPostId)").hide();
+                        $("#replybox_@(dpvm.DiscussionPostId)").show('blind'); return false;
+                    });
+                    $("#replycancel_@(dpvm.DiscussionPostId)").click(function () {
+                    $("#reply_@(dpvm.DiscussionPostId)").show('highlight'); $("#replybox_@(dpvm.DiscussionPostId)").hide('blind');
+                        return false;
+                    }); 
+            </script>
+        </div>
+        }
+    }
+</div>
+<p>
+</p>

@@ -1,0 +1,192 @@
+﻿@using OSBLE.Models
+@using OSBLE.Models.Assignments
+@{
+    List<Assignment> assignments = ViewBag.Assignments;
+    List<TeamEvaluation> teamEvals = ViewBag.TeamEvaluations;
+    int PastCount = ViewBag.PastCount;
+    int PresentCount = ViewBag.PresentCount;
+    int FutureCount = ViewBag.FutureCount;
+    bool isFutureAssignment = false;
+    AjaxOptions options = new AjaxOptions()
+    {
+        LoadingElementId = "Loading",
+        HttpMethod = "Get",
+        UpdateTargetId = "submitFiles",
+        OnComplete = "SubmissionLoaded"
+    };
+    
+}
+
+<table class="assignTable" cellspacing="0">
+    <th style="font-size: larger; padding-right:20px;">
+        Assignment
+    </th>
+    <th style="font-size: larger">
+        Due Date
+    </th>
+    <th style="font-size: larger; padding-right:20px">
+        Available Actions
+    </th>
+    <th style="font-size: larger">
+        Latest Activity
+    </th>
+    @{
+        for (int i = 0; i < assignments.Count; i++)
+        {
+            //if/else blocks used to for adding rows as headers between Past, Present, Future
+            if (i == 0 && PresentCount > 0)
+            {
+                <tr>
+                    <td colspan="100%" style="padding-right: 0; font-size: large" class="osbleColorBold">
+                        Present (@PresentCount)
+                    </td>
+                </tr>
+            }
+            
+            else if (i == (PresentCount) && PastCount > 0)
+            {            
+                if (PresentCount > 0)
+                {
+                    //Only put a an empty row if there is something above this category
+                    <tr>
+                        <td style="padding-bottom: 10px">
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td colspan="100%" style="padding-right: 0; font-size: large" class="osbleColorBold">
+                        Past (@PastCount)
+                    </td>
+                </tr>
+            }
+            else if (i == (PastCount + PresentCount) && FutureCount > 0)
+            {
+                isFutureAssignment = true;
+                if ((PastCount + PresentCount) > 0)
+                {
+                    //Only put a an empty row if there is something above this category
+                    <tr>
+                        <td style="padding-bottom: 10px">
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td colspan="100%" style="padding-right: 0; font-size: large" class="osbleColorBold">
+                        Future (@FutureCount)
+                    </td>
+                </tr>
+            }
+        <tr class="checkeredRow">
+            <!--Cell for name-->
+            <td>
+                @if (isFutureAssignment)
+                {
+                    @assignments[i].AssignmentName
+                }
+                else
+                {
+                    @Html.ActionLink(assignments[i].AssignmentName, "Index", "Home", new { area = "AssignmentDetails", assignmentId = assignments[i].ID }, null)
+                }
+            </td>
+
+            <!--Cell for duedate-->
+            <td>
+                <time 
+                class="utc-time"
+                datetime="@Helpers.DateAsUnixTime(assignments[i].DueDate)" 
+                data-original-date="@Helpers.RawDate(assignments[i].DueDate)" 
+                data-date-format="MM/DD/YYYY hh:mm A">
+                    @assignments[i].DueDate.ToShortDateString() @assignments[i].DueDate.ToShortTimeString() (UTC)
+                </time>
+            </td>
+
+            @{
+                //Used in two areas.
+                DiscussionTeam dt = null;
+                try
+                {
+                    dt = ViewBag.dtInfo[assignments[i].ID];
+                }
+                catch (Exception)
+                {
+                }
+            }
+
+            <!--Cell for Available Actions-->
+            <td>
+                @if (assignments[i].Type == AssignmentTypes.DiscussionAssignment || assignments[i].Type == AssignmentTypes.CriticalReviewDiscussion)
+                {
+                    //Discussion Based Assignment: Display "View Discussion" 
+                    if (dt != null)
+                    {
+                        @:@Html.ActionLink("View Discussion",
+                                        "Index",
+                                        "DiscussionAssignment",
+                                              new { assignmentId = assignments[i].ID, discussionTeamId = dt.ID, area = "" },
+                                        new { }
+                                    )
+                    }
+                }
+                else if (assignments[i].HasDeliverables)
+                {
+                    //Assignment with Deliverables: Display "Resubmit"  or "Submit" depending on current submission status
+                    string submissionString = "Submit";
+                    if (ViewBag.SubmissionInfoDictionary[assignments[i].ID] != "No Submission")
+                    {
+                        submissionString = "Resubmit";
+                    }
+                    @Ajax.ActionLink(submissionString, "Create", "Submission", new { id = assignments[i].ID }, options, new object())
+                    
+                }
+                else if (assignments[i].Type == AssignmentTypes.TeamEvaluation)
+                {
+                    //Team Evaluation Assignment: Display "View/Edit Team Evalution" or "Submit Team Evaluation" depending if an evaluation exists
+                    if (teamEvals.Any(te => te.TeamEvaluationAssignmentID == assignments[i].ID))
+                    {
+                        @Html.ActionLink("View/Edit Team Evaluation", "StudentTeamEvaluation", "Assignment", new { assignmentId = assignments[i].ID }, new { })
+                    }
+                    else
+                    {
+                        @Html.ActionLink("Submit Team Evaluation", "StudentTeamEvaluation", "Assignment", new { assignmentId = assignments[i].ID }, new { })
+                    }
+                }
+            </td>
+
+            <!--Cell for Latest Activity-->
+            <td>
+                @if (assignments[i].Type == AssignmentTypes.DiscussionAssignment || assignments[i].Type == AssignmentTypes.CriticalReviewDiscussion)
+                {
+                    //Discussion Based Assignment: Display "X Unread Posts" with link. Or "No Unread Posts"
+                    if (dt != null)
+                    {
+                        int newPosts = dt.GetNewPostsCount(ViewBag.ActiveCourseUser.ID);
+                        if (newPosts > 0)
+                        {
+                            @:@Html.ActionLink(newPosts.ToString() + " Unread Posts",
+                                        "Index",
+                                        "DiscussionAssignment",
+                                              new { assignmentId = assignments[i].ID, discussionTeamId = dt.ID, displayNewPosts = true, area = "" },
+                                        new { }
+                                    )
+                        }
+                        else
+                        {
+                            @:No Unread Posts
+                        }
+                    }
+                }
+                else if (assignments[i].HasDeliverables)
+                {
+                    //Assignment with Deliverables: Display "Submitted X/XX/XXXX" if there is a submission.
+                    if (ViewBag.SubmissionInfoDictionary[assignments[i].ID] != "No Submission")
+                    {
+                        string displayValue = "Submitted " + ViewBag.SubmissionInfoDictionary[assignments[i].ID];
+                        @(Html.ActionLink(displayValue, "getCurrentUsersZip", "FileHandler", new { assignmentID = assignments[i].ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
+                    }
+                }
+                
+            </td>
+        </tr>
+        }
+    }
+</table>

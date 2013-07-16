@@ -1,0 +1,120 @@
+﻿@using OSBLE.Models.Courses;
+@using OSBLE.Models.Assignments;
+@using System.Collections.Generic;
+@using OSBLE.Models;
+@model Assignment          
+@{
+    List<CourseUser> unassignedUsers = ViewBag.UnassignedUsers;
+    List<IAssignmentTeam> teams = ViewBag.Teams;
+    List<CourseUser> allUsers = ViewBag.AllUsers;
+    List<Assignment> previousTeamAssignments = ViewBag.PreviousTeamAssignments;
+    ViewBag.Title = "Assignment Wizard";
+}
+
+@section Header
+{
+    <link href="@Url.Content("~/areas/AssignmentWizard/Content/css/team.css")" type="text/css" rel="Stylesheet" />
+    <script src="@Url.Content("~/areas/AssignmentWizard/Content/js/team.js")" type="text/javascript"></script>
+}
+<div id="teamDiv" >
+<p>
+    @Html.Raw(ToolTips.BasicAssignmentIsTeam)
+</p> 
+@Html.HiddenFor(m => m.ID)
+<div>
+<h3>Auto Generation Options</h3>
+<ul>
+    <li>
+        Create a configuration with at least <input type="text" id="AutoGenByStudentTextBox"  /> students per team
+        <button type="button" id="AutoGenByStudentButton" onclick="generateTeamsByNumberOfStudents()">Go</button>
+    </li>
+    <li>
+        Create a configuration with <input type="text" id="AutoGenByteamTextBox" size="3" /> total teams
+        <button type="button" id="AutoGenByTeamButton" onclick="generateTeamsByNumberOfTeams()">Go</button>
+    </li>
+    <li>
+        Use a layout from the previous assignment: 
+        <select id="AutoGenFromPastSelect" name="AutoGenFromPastSelect">
+            @foreach (Assignment assignment in previousTeamAssignments)
+            {
+                <option value="@assignment.ID">@assignment.AssignmentName</option>
+            }
+        </select>
+        <button type="submit" name="AutoGenFromPastButton" id="AutoGenFromPastButton">Go</button>
+    </li>
+</ul>
+</div>
+<div id="TeamContent">
+<div id="TeamCreationOptions">
+    <a id="CreateTeamLink" class="NoDecoration">
+        <img src="@Url.Content("~/Content/images/add_up.png")" alt="Create New Team" title="Create New Team" />
+        Create New Team </a>
+</div>
+    
+<div id="AvailableStudentList">
+    <h3>
+        Unassigned Students</h3>
+    <ul id="AvailableStudent" class="TeamSortable">
+        @foreach (CourseUser cu in unassignedUsers)
+        {
+            <li id="cu_@(cu.ID)" class="ui-state-default Student">@cu.UserProfile.LastName, @cu.UserProfile.FirstName</li>
+        }
+    </ul>
+</div>
+    
+<div id="TeamsDiv">
+    <h3>Teams</h3>
+
+    @{int counter = 0;}
+    @foreach (IAssignmentTeam aTeam in teams.OrderBy(t => t.Team.Name))
+    {
+        counter++;
+        <div id="teamDiv_@(counter)_@(aTeam.TeamID)" class="TeamDiv">
+            <input type="text" class="TeamNameTextBox" value="@aTeam.Team.Name" />
+            <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" alt="remove team" title="remove team" onclick="removeTeam('teamDiv_@(counter)_@(aTeam.TeamID)')" />
+            <ul id="team_@(counter)_@(@aTeam.TeamID)" class="TeamSortable">
+                @foreach (TeamMember member in aTeam.Team.TeamMembers)
+                {
+                    <li id="cu_@(member.CourseUserID)" class="ui-state-default Student">@member.CourseUser.UserProfile.LastName, @member.CourseUser.UserProfile.FirstName</li>
+                }
+            </ul>
+        </div>
+                if (counter % 3 == 0)
+                {
+            <div style="clear:both;"></div>
+                }
+    }
+</div>
+
+<!-- hidden form values needed for team assignment -->
+@foreach (CourseUser cu in allUsers)
+{
+    <input type="hidden" id="student_@(cu.ID)" name="student_@(cu.ID)" value="@(cu.UserProfile.FirstName) @(cu.UserProfile.LastName)" />
+}
+@foreach (IAssignmentTeam team in teams)
+{
+    //we only care about teams that already have DB values
+    if (team.TeamID == 0)
+    {
+        continue;
+    }
+    <input type="hidden" id="team_@(team.TeamID)" name="team_@(team.TeamID)" value="@team.Team.Name" />
+}
+
+</div>
+<br />
+<br />
+<!-- end TeamContent div -->
+</div>
+<script type="text/javascript">
+
+    $('input[name=teamRadio]').change(function () {
+        if ($('#radioYes').attr('checked')) {
+            $('#teamDiv').show();
+        }
+        else {
+            $('#teamDiv').hide();
+        }
+    });
+
+</script>

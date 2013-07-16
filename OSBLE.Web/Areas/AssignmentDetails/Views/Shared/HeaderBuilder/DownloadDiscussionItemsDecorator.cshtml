@@ -1,0 +1,12 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+    int assignmentID = dataModel.AssignmentID;
+}
+
+<tr>
+<th>Documents:</th>
+<td>@Html.ActionLink("Download all discussion documents", "GetAllDiscussionItems", "DiscussionAssignment", new { area = "", assignmentId = assignmentID }, null)</td>
+</tr>
