@@ -1,0 +1,141 @@
+﻿@using OSBLE.Controllers;
+@using OSBLE.Models.Courses;
+@using OSBLE.Models
+@model IEnumerable<OSBLE.Models.Courses.CourseUser>
+@{
+    ViewBag.Title = "Index";
+}
+<h2>
+    Roster</h2>
+<h4>@ViewBag.Notice</h4>
+@if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+{
+    if (!(ViewBag.ActiveCourse.AbstractCourse is Community))
+    {
+    <div>
+        <a href="#" onclick="$('#add_update_users').toggle('blind'); return false;">Add/Update
+            Users</a>
+    </div>
+    <div id="add_update_users">
+        <h4>
+            Add Single User @Helpers.CreateToolTip(ToolTips.RosterSingleUser)
+        </h4>
+        <div>
+            @Html.ActionLink("Add By School ID", "Create")&nbsp;&nbsp;
+            @Html.ActionLink("Add By Email", "CreateByEmail")&nbsp;&nbsp;
+        </div>
+        <h4>
+            Import Roster @Helpers.CreateToolTip(ToolTips.RosterImport)
+        </h4>
+        <div>
+            Upload a comma-separated (CSV) roster of students in this course:<br />
+            @using (Html.BeginForm("ImportRoster", "Roster", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                <input type="file" name="file" />
+                <input type="submit" value="Upload Roster" />
+            }
+        </div>
+    </div>
+    }
+    else
+    {
+    <div>
+        @Html.ActionLink("Add By Email", "CreateByEmail")&nbsp;&nbsp;
+    </div>
+    }
+}
+<div>
+    <br />
+    Quick Filter By Name: @Helpers.CreateToolTip(ToolTips.RosterQuickFilter)
+    <input type="text" id="roster_find" />
+</div>
+@* Hides anything that doesn't match search filter *@
+<script type="text/javascript">
+    if ("Cat".match(".*as")) alert('hi');
+    $('#roster_find').keyup(function () {
+        // Get search string and remove all non-alphanumeric characters (or dashes)
+        var search = $('#roster_find').val().toLowerCase().replace(/[^a-z0-9\-\ ]*/gi, "");
+
+        // Animation function. tries to avoid overlap.
+        $('.roster_name').each(function () {
+            if ($(this).html().toLowerCase().match(search)) {
+                if (($(this).parent().data("showing") != true) && ($(this).parent().css("display") == "none")) {
+                    $(this).parent().data("showing", true);
+                    $(this).parent().show('highlight', {}, "slow", function () { $(this).data("showing", false); });
+                }
+            } else {
+                if (($(this).parent().data("hiding") != true) && ($(this).parent().css("display") != "none")) {
+                    $(this).parent().data("hiding", true);
+                    $(this).parent().hide('highlight', {}, "slow", function () { $(this).data("hiding", false); });
+                }
+            }
+        });
+
+    });
+</script>
+@foreach (RosterController.UsersBySection usersBySection in ViewBag.UsersBySections)
+{
+    <h3>@Helpers.DisplaySection(usersBySection.SectionNumber)
+    </h3>
+    <table class="roster_table">
+        <tr>
+            @foreach (RosterController.UsersByRole userByRole in usersBySection.UsersByRole)
+            {
+                if (userByRole.Count > 0)
+                {
+                <td>
+                    <h3>
+                        @userByRole.RoleName (<span id="roleheader_@(usersBySection.SectionNumber)_@(userByRole.RoleName)">@userByRole.Count.ToString()</span>)
+                        @try
+                        {
+                            @Helpers.CreateToolTip(ToolTips.RosterRolesDictionary[userByRole.RoleName]);
+                        }
+                        catch (KeyNotFoundException e)
+                        {
+                            @Helpers.CreateToolTip("Key not found: " + e);
+                        }
+                    </h3>
+                    <ul class="user_list">
+                        @foreach (OSBLE.Models.Users.UserProfile user in userByRole.Users)
+                        {
+                            <li id="user_item_@(user.ID)">
+                                @if ((user != ViewBag.CurrentUser) || ViewBag.CanEditSelf == true)
+                                {
+                                    <div class="user_controls">
+                                        @if (user.UserName != null)
+                                        {
+                                            <a title="Mail This User" href="@Url.Action("CreateUserProfileId", "Mail", new { id = user.ID })">@Helpers.MailButton()</a>
+                                        }
+                                        @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                                        {
+                                            <a title="Modify This User" href="@Url.Action("Edit", "Roster", new { userProfileID = user.ID })">@Helpers.EditButton()</a>
+
+                                            <form action="@Url.Action("Delete")"
+                                style="display: inline;"
+                                data-ajax="true"
+                                data-ajax-success="$('#user_item_@(user.ID)').hide('highlight',{},'slow',function(){
+                                        $('#roleheader_@(usersBySection.SectionNumber)_@(userByRole.RoleName)').html(
+                                            parseInt($('#roleheader_@(usersBySection.SectionNumber)_@(userByRole.RoleName)').html())-1);
+                                            if(parseInt($('#roleheader_@(usersBySection.SectionNumber)_@(userByRole.RoleName)').html()) == 0) {
+                                                $(this).parent().parent().remove();
+                                            }
+                                        $(this).remove();
+                                    });"
+                                data-ajax-confirm="Are you sure you want to remove this user from the course?"
+                                method="post">
+                                            <input type="hidden" name="userProfileID" value="@user.ID" />
+                                            @Helpers.DeleteSubmit("Remove This User")
+                                            </form>
+                                        }
+                                    </div>
+                                }
+                                @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", new { userProfile = user.ID }))
+                                <span class="roster_name">@Helpers.DisplayFullNameOrPending(user)</span> </li>
+                        }
+                    </ul>
+                </td>
+                }
+            }
+        </tr>
+    </table>
+}

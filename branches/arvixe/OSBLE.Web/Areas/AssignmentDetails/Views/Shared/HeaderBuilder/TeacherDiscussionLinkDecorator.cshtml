@@ -1,0 +1,32 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+    int newPosts = dataModel.NewPosts;
+}
+<tr>
+    <th>Discussion:</th>
+    <td>
+        @Html.ActionLink("View Discussion", "TeacherIndex", "DiscussionAssignment",
+        new { 
+            assignmentId = dataModel.ID,
+            courseUserId = 0, 
+            discussionTeamID = dataModel.DiscussionTeamID,
+            hightlightValue = OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.None,
+            area = "" 
+            }, new { })
+        @if (newPosts > 0)
+        {
+            @:&nbsp-&nbsp
+            @:@Html.ActionLink("View " + newPosts.ToString() + " Unread Posts", "TeacherIndex", "DiscussionAssignment",
+            new { 
+                assignmentId = dataModel.ID,
+                courseUserId = 0, 
+                discussionTeamID = dataModel.DiscussionTeamID,
+                hightlightValue = OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.NewPosts,
+                area = "" 
+                }, new { })    
+        }
+    </td>
+</tr>

@@ -1,0 +1,27 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+    IAssignmentTeam currentTeam = dataModel.AssignmentTeam as IAssignmentTeam;       
+}
+<td>
+@if (currentTeam is AssignmentTeam)
+{
+    AssignmentTeam at = currentTeam as AssignmentTeam;
+    if (at.GetSubmissionTime() != null)
+    {
+        @(Html.ActionLink(at.GetSubmissionTime().ToString(), "GetSubmissionZip", "FileHandler", new { area = "", assignmentID = currentTeam.Assignment.ID, teamID = currentTeam.Team.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
+    }
+    else
+    {
+        @:Nothing Received
+    }
+}
+else
+{
+    //currently only handling submissions for assignment teams.  May need to be reworked in the
+    //future.
+    @:not supported
+}
+</td>
