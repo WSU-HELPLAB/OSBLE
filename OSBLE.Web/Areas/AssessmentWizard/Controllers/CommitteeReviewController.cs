@@ -6,10 +6,11 @@ using System.Web.Mvc;
 using OSBLE.Areas.AssignmentWizard.Models;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
+using OSBLE.Models.Assessments;
 
-namespace OSBLE.Areas.AssignmentWizard.Controllers
+namespace OSBLE.Areas.AssessmentWizard.Controllers
 {
-    public class CommitteeReviewController : WizardBaseController
+    public class CommitteeReviewController : AssessmentBaseController
     {
         public override string PrettyName
         {
@@ -37,12 +38,12 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
-        public override ICollection<AssignmentTypes> ValidAssignmentTypes
+        public override ICollection<AssessmentType> ValidAssessmentTypes
         {
             get
             {
-                List<AssignmentTypes> Assessments = new List<AssignmentTypes>();
-                Assessments.Add(AssignmentTypes.CommitteeReview);
+                List<AssessmentType> Assessments = new List<AssessmentType>();
+                Assessments.Add(AssessmentType.CommitteeReview);
                 return Assessments;
             }
         }
@@ -58,16 +59,15 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public override ActionResult Index()
         {
             base.Index();
-            Assignment.Type = manager.ActiveAssignmentType;
-            ViewBag.TemporaryID = Assignment.ID;
-            return View(Assignment);
+            Assessment.Type = manager.ActiveAssessmentType;
+            return View(Assessment);
         }
 
         [HttpPost]
-        public ActionResult Index(Assignment model)
+        public ActionResult Index(Assessment model)
         {
-            Assignment = db.Assignments.Find(model.ID);
-            return base.PostBack(Assignment);
+            Assessment = db.Assessments.Find(model.ID);
+            return base.PostBack(model);
         }
     }
 }

@@ -22,7 +22,7 @@ namespace OSBLE.Areas.AssessmentWizard.Models
 
         protected override string WizardComponentNamespace
         {
-            get { return "OSBLE.Areas.AssessmentWizard"; }
+            get { return "OSBLE.Areas.AssessmentWizard.Controllers"; }
         }
 
         public AssessmentWizardComponentManager(UserProfile profile)
