@@ -6,27 +6,28 @@ using System.Web.Mvc;
 using OSBLE.Areas.AssignmentWizard.Models;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
+using OSBLE.Models.Assessments;
 
-namespace OSBLE.Areas.AssignmentWizard.Controllers
+namespace OSBLE.Areas.AssessmentWizard.Controllers
 {
-    public class ReviewOfStudentWorkController : WizardBaseController
+    public class CommitteeDiscussionController : AssessmentBaseController
     {
 
         public override string PrettyName
         {
-            get { return "Review Of Student Work"; }
+            get { return "Committee Discussion"; }
         }
 
         public override string ControllerName
         {
-            get { return "ReviewOfStudentWork"; }
+            get { return "CommitteeDiscussion"; }
         }
 
         public override string ControllerDescription
         {
             get
             {
-                return "More detailed information about a student work review.";
+                return "More detailed information about a committee discussion.";
             }
         }
 
@@ -38,12 +39,13 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
-        public override ICollection<AssignmentTypes> ValidAssignmentTypes
+        public override ICollection<AssessmentType> ValidAssessmentTypes
         {
             get
             {
-                List<AssignmentTypes> Assessments = new List<AssignmentTypes>();
-                Assessments.Add(AssignmentTypes.ReviewOfStudentWork);
+                List<AssessmentType> Assessments = new List<AssessmentType>();
+                Assessments.Add(AssessmentType.CommitteeDiscussion);
+                Assessments.Add(AssessmentType.CommitteeReview);
                 return Assessments;
             }
         }
@@ -59,15 +61,15 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public override ActionResult Index()
         {
             base.Index();
-            Assignment.Type = manager.ActiveAssignmentType;
-            return View(Assignment);
+            Assessment.Type = manager.ActiveAssessmentType;
+            return View(Assessment);
         }
 
         [HttpPost]
-        public ActionResult Index(Assignment model)
+        public ActionResult Index(Assessment model)
         {
-            Assignment = db.Assignments.Find(model.ID);
-            return base.PostBack(Assignment);
+            Assessment = db.Assessments.Find(model.ID);
+            return base.PostBack(model);
         }
     }
 }

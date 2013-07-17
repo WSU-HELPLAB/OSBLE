@@ -6,10 +6,11 @@ using System.Web.Mvc;
 using OSBLE.Areas.AssignmentWizard.Models;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
+using OSBLE.Models.Assessments;
 
-namespace OSBLE.Areas.AssignmentWizard.Controllers
+namespace OSBLE.Areas.AssessmentWizard.Controllers
 {
-    public class AssessmentBasicsController : WizardBaseController
+    public class AssessmentBasicsController : AssessmentBaseController
     {
         public override string PrettyName
         {
@@ -33,19 +34,19 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             get
             {
-                return new BasicsController();
+                return null;
             }
         }
 
-        public override ICollection<AssignmentTypes> ValidAssignmentTypes
+        public override ICollection<AssessmentType> ValidAssessmentTypes
         {
             get
             {
-                List<AssignmentTypes> Assessments = new List<AssignmentTypes>();
-                Assessments.Add(AssignmentTypes.CommitteeDiscussion);
-                Assessments.Add(AssignmentTypes.ReviewOfStudentWork);
-                Assessments.Add(AssignmentTypes.CommitteeReview);
-                Assessments.Add(AssignmentTypes.AggregateAssessment);
+                List<AssessmentType> Assessments = new List<AssessmentType>();
+                Assessments.Add(AssessmentType.CommitteeDiscussion);
+                Assessments.Add(AssessmentType.ReviewOfStudentWork);
+                Assessments.Add(AssessmentType.CommitteeReview);
+                Assessments.Add(AssessmentType.AggregateAssessment);
                 return Assessments;
             }
         }
@@ -61,16 +62,16 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public override ActionResult Index()
         {
             base.Index();
-            Assignment.Type = manager.ActiveAssignmentType;
-            ViewBag.TemporaryID = Assignment.ID;
-            return View(Assignment);
+            Assessment.Type = manager.ActiveAssessmentType;
+            return View(Assessment);
         }
 
         [HttpPost]
-        public ActionResult Index(Assignment model)
+        public ActionResult Index(Assessment model)
         {
-            Assignment = db.Assignments.Find(model.ID);
-            return base.PostBack(Assignment);
+            Assessment = db.Assessments.Find(model.ID);
+            return base.PostBack(model);
         }
+
     }
 }
