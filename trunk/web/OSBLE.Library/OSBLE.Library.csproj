@@ -45,8 +45,10 @@
     <Reference Include="Ionic.Zip">
       <HintPath>..\packages\DotNetZip.1.9.1.8\lib\net20\Ionic.Zip.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.WindowsAzure.Storage, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Drawing" />
@@ -120,6 +122,7 @@
     <Compile Include="Models\ContextBase.cs" />
     <Compile Include="Models\DiscussionAssignment\DiscussionPost.cs" />
     <Compile Include="Models\FileSystem\AssignmentFilePath.cs" />
+    <Compile Include="Models\FileSystem\BlobFileSystem.cs" />
     <Compile Include="Models\FileSystem\OSBLEFile.cs" />
     <Compile Include="Models\FileSystem\OSBLEDirectory.cs" />
     <Compile Include="Models\FileSystem\FileCollection.cs" />

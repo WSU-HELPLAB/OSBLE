@@ -141,7 +141,12 @@ namespace OSBLE.Services
                 {
                     HttpPostedFile postedFile = coll[i];
                     string fileName = Path.GetFileName(postedFile.FileName);
+
+                    string BlobFileName = location.getmPath() + "/" + fileName;
+                    BlobFileSystem.addFile(BlobFileName, postedFile.InputStream);
+
                     location.AddFile(fileName, postedFile.InputStream);
+
                 }
 
                 context.Response.Write(string.Format(

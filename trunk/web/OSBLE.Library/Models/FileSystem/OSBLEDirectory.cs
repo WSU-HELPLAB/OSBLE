@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Web;
 using System.Xml;
 using OSBLE.Models.Courses;
 
@@ -32,7 +33,7 @@ namespace OSBLE.Models.FileSystem
         private string m_attrDir;
         
         private string m_dataDir;
-        
+
         protected string m_path;
 
         /// <summary>
@@ -77,6 +78,20 @@ namespace OSBLE.Models.FileSystem
                 System.IO.Directory.CreateDirectory(AttrFilesPath);
             }
         }
+        
+        /// <summary>
+        /// Returns the path to the current directory, this is for uploading a Blob to Azure, it accepts a specific file name format
+        /// This is for the Blob name
+        /// </summary>
+        public string getmPath()
+        {
+            string Drop = HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
+            string Path = m_path.Replace(Drop, "");
+            Path = Path.Replace("//", "/");
+            Path = Path.Replace("\\", "/");
+            return Path;
+        }
+
 
         /// <summary>
         /// Adds a file to the directory and writes all the bytes in the 
@@ -98,6 +113,8 @@ namespace OSBLE.Models.FileSystem
         {
             Dictionary<string, string> sys = new Dictionary<string, string>();
             sys.Add("created", DateTime.Now.ToString());
+
+            
 
             return AddFile(fileName, data, sys, null);
         }
@@ -169,10 +186,12 @@ namespace OSBLE.Models.FileSystem
             bool retVal = true;
             try
             {
+                
                 FileStream output = System.IO.File.Open(filePath, FileMode.Create);
                 data.CopyTo(output);
                 output.Close();
                 output.Dispose();
+
             }
             catch (Exception)
             {

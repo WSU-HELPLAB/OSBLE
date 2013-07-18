@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -6,6 +7,9 @@ using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using Microsoft.WindowsAzure;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace OSBLE
 {
@@ -28,6 +32,16 @@ namespace OSBLE
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            ConnectionStringSettings mySetting = ConfigurationManager.ConnectionStrings["StorageConnectionString"];
+            string connection = mySetting.ToString();
+            
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connection);
+            CloudBlobClient cloudBlobClient = storageAccount.CreateCloudBlobClient();
+            CloudBlobContainer filesystem = cloudBlobClient.GetContainerReference("filesystem");
+
+            filesystem.CreateIfNotExists();
+
         }
     }
 }
