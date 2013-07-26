@@ -8,6 +8,9 @@ using OSBLE.Models.Courses;
 using OSBLE.Models.Services.Uploader;
 using OSBLE.Models.Users;
 using OSBLE.Models.Assignments;
+using Microsoft.WindowsAzure;
+using Microsoft.WindowsAzure.StorageClient;
+using OSBLE.Models.FileSystem;
 
 namespace OSBLE
 {
@@ -48,82 +51,84 @@ namespace OSBLE
         /// <returns></returns>
         private static DirectoryListing BuildFileList(string path, bool includeParentLink = true)
         {
-            //see if we have an ordering file for the supplied path
-            Dictionary<string, int> ordering = new Dictionary<string, int>();
-            string orderingPath = Path.Combine(path, OrderingFileName);
-            if (File.Exists(orderingPath))
-            {
-                ordering = GetFileOrdering(orderingPath);
-            }
+            ////see if we have an ordering file for the supplied path
+            //Dictionary<string, int> ordering = new Dictionary<string, int>();
+            //string orderingPath = Path.Combine(path, OrderingFileName);
+            //if (File.Exists(orderingPath))
+            //{
+            //    ordering = GetFileOrdering(orderingPath);
+            //}
 
-            //build a new listing, set some initial values
+            ////build a new listing, set some initial values
+            //DirectoryListing listing = new DirectoryListing();
+            //listing.AbsolutePath = path;
+            //listing.Name = path.Substring(path.LastIndexOf('\\') + 1);
+            //listing.LastModified = File.GetLastWriteTime(path);
+
+            ////handle files
+            //int defaultOrderingCount = 1000;
+            //foreach (string file in Directory.GetFiles(path))
+            //{
+            //    //the ordering file is used to denote ordering of files and should not be
+            //    //displayed in the file list.
+            //    if (Path.GetFileName(file).CompareTo(OrderingFileName) == 0)
+            //    {
+            //        continue;
+            //    }
+            //    FileListing fList = new FileListing();
+            //    fList.AbsolutePath = file;
+            //    fList.Name = Path.GetFileName(file);
+            //    fList.LastModified = File.GetLastWriteTime(file);
+            //    fList.FileUrl = FileSystem.CourseDocumentPathToWebUrl(file);
+
+            //    //set file ordering if it exists
+            //    if (ordering.ContainsKey(fList.Name))
+            //    {
+            //        fList.SortOrder = ordering[fList.Name];
+            //    }
+            //    else
+            //    {
+            //        defaultOrderingCount++;
+            //        while (ordering.ContainsValue(defaultOrderingCount))
+            //        {
+            //            defaultOrderingCount++;
+            //        }
+            //        fList.SortOrder = defaultOrderingCount;
+            //    }
+            //    listing.Files.Add(fList);
+            //}
+
+            ////Add a parent directory "..." at the top of every directory listing if requested
+            //if (includeParentLink)
+            //{
+            //    listing.Directories.Add(new ParentDirectoryListing());
+            //}
+
+            ////handle other directories
+            //foreach (string folder in Directory.EnumerateDirectories(path))
+            //{
+            //    //recursively build the directory's subcontents.  Note that we have
+            //    //to pass only the folder's name and not the complete path
+            //    DirectoryListing dlisting = BuildFileList(folder, includeParentLink);
+            //    if (ordering.ContainsKey(dlisting.Name))
+            //    {
+            //        dlisting.SortOrder = ordering[dlisting.Name];
+            //    }
+            //    else
+            //    {
+            //        defaultOrderingCount++;
+            //        while (ordering.ContainsValue(defaultOrderingCount))
+            //        {
+            //            defaultOrderingCount++;
+            //        }
+            //        dlisting.SortOrder = defaultOrderingCount;
+            //        defaultOrderingCount++;
+            //    }
+            //    listing.Directories.Add(dlisting);
+            //}
+
+
             DirectoryListing listing = new DirectoryListing();
-            listing.AbsolutePath = path;
-            listing.Name = path.Substring(path.LastIndexOf('\\') + 1);
-            listing.LastModified = File.GetLastWriteTime(path);
-
-            //handle files
-            int defaultOrderingCount = 1000;
-            foreach (string file in Directory.GetFiles(path))
-            {
-                //the ordering file is used to denote ordering of files and should not be
-                //displayed in the file list.
-                if (Path.GetFileName(file).CompareTo(OrderingFileName) == 0)
-                {
-                    continue;
-                }
-                FileListing fList = new FileListing();
-                fList.AbsolutePath = file;
-                fList.Name = Path.GetFileName(file);
-                fList.LastModified = File.GetLastWriteTime(file);
-                fList.FileUrl = FileSystem.CourseDocumentPathToWebUrl(file);
-
-                //set file ordering if it exists
-                if (ordering.ContainsKey(fList.Name))
-                {
-                    fList.SortOrder = ordering[fList.Name];
-                }
-                else
-                {
-                    defaultOrderingCount++;
-                    while (ordering.ContainsValue(defaultOrderingCount))
-                    {
-                        defaultOrderingCount++;
-                    }
-                    fList.SortOrder = defaultOrderingCount;
-                }
-                listing.Files.Add(fList);
-            }
-
-            //Add a parent directory "..." at the top of every directory listing if requested
-            if (includeParentLink)
-            {
-                listing.Directories.Add(new ParentDirectoryListing());
-            }
-
-            //handle other directories
-            foreach (string folder in Directory.EnumerateDirectories(path))
-            {
-                //recursively build the directory's subcontents.  Note that we have
-                //to pass only the folder's name and not the complete path
-                DirectoryListing dlisting = BuildFileList(folder, includeParentLink);
-                if (ordering.ContainsKey(dlisting.Name))
-                {
-                    dlisting.SortOrder = ordering[dlisting.Name];
-                }
-                else
-                {
-                    defaultOrderingCount++;
-                    while (ordering.ContainsValue(defaultOrderingCount))
-                    {
-                        defaultOrderingCount++;
-                    }
-                    dlisting.SortOrder = defaultOrderingCount;
-                    defaultOrderingCount++;
-                }
-                listing.Directories.Add(dlisting);
-            }
-
             //return the completed listing
             return listing;
         }

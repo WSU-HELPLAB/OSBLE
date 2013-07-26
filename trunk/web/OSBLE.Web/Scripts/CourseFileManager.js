@@ -49,7 +49,7 @@ function cfm_listcompletion(args, targetDIVID)
     if (null == doc)
     {
         theDIV.innerHTML = "Error: XML document from service response is null! " + 
-            "Please contact support for help with this issue.";
+            "Please contact support for help with this issue.  error 1";
         return;
     }
 
@@ -60,7 +60,7 @@ function cfm_listcompletion(args, targetDIVID)
     if (null == doc)
     {
         theDIV.innerHTML = "Error: Root element in XML document from service is null! " +
-            "Please contact support for help with this issue.";
+            "Please contact support for help with this issue. error 2";
         return;
     }
 
@@ -83,8 +83,7 @@ function cfm_listcompletion(args, targetDIVID)
         var listNode = lists[0];
         theDIV.innerHTML = cfm_MakeDIV(listNode, "", "padding: 0px;", -1, targetDIVID);
 
-        // Expand the root by default
-        cfm_expand_collapse(0);
+       
     }
 }
 
@@ -162,14 +161,17 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         // action occurs.
         var theStyle
         if ("/" == folderPath) {
-            theStyle = "padding: 3px; border: 0px; background: white;";
+            theStyle = "padding: 3px; border: 0px; background: white; ";
         }
         else {
-            theStyle = "padding: 3px; border: 0px; background: white;";
+            theStyle = "padding: 3px; border: 0px; background: white; ";
         }
 
         // One new DIV for the folder name and control buttons
         result += "<div id=\"folder_div_" + ss + "\" style=\"" + theStyle + "\">";
+        result += "<table width=100%; id=\"folder_text_" + ss + "\" style=\"" + " table-layout: fixed; " + "\">";
+        result += "<tr>";
+        result += "<td style=\"" + " width: 75%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; " + "\">";
         if (stateObj.allowsCollapsing)
         {
             result += "<a style=\"cursor: pointer;\" onclick=\"cfm_expand_collapse(" + ss + ");\">";
@@ -177,17 +179,20 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
             result += "</a>";
         }
         else { result += folderName; }
+        result += "</td>";
+        result += "<td style=\"" + " width: 50%; overflow: hidden; " + "\">";
         if (stateObj.allowsUploads)
         {
             // Can only rename and delete if not root
             if ("/" != folderPath)
             {
+           
                 if (stateObj.allowsDeletion)
-                {
+                {                  
                     result += "<a onclick='cfm_DeleteFolderIconClicked(" + stateObjIndex.toString() + ");' " +
                         "title=\"Delete this folder...\">" +
                         "<img style=\"cursor: pointer;\" align=\"right\" " +
-                        "src=\"/Content/images/delete_up.png\"></a>";
+                        "src=\"/Content/images/delete_up.png\"></a>";                 
                 }
 
                 // Again we're assuming that if they can upload files then they can also 
@@ -214,8 +219,13 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
                 "src=\"/Content/images/folder_plus.png\"></a>";
         }
         // There's another DIV within for dynamically created controls
-        result += "<div id=\"folder_controls_" + stateObjIndex.toString() +"\"></div>";
+        result += "</td>";
+        result += "</tr>";
+        result += "</table>";
+        result += "<div id=\"folder_controls_" + stateObjIndex.toString() + "\"></div>";
         result += "</div>";
+      
+
 
         // Then the recursive call makes another DIV for the files (provided there are some)
         if (cfm_CountChildrenWithName(tempNode, "file") > 0 ||
@@ -322,7 +332,16 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         else { result += "#ffffff; "; }
         result += "border: 0px;";
         result += "\">";
+
+        result += "<table width=100%; id=\"folder_text_" + ss + "\" style=\"" + " table-layout: fixed; " + "\">";
+        result += "<tr>";
+        result += "<td style=\"" + " width: 85%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; " + "\">";
+
+
         result += ("<a href=\"" + linkURL + "\"><img src=\"" + imgSrc + "\" />" + fileName + "</a>");
+
+        result += "</td>";
+        result += "<td>";
 
         // I'm going to go with the approach of having a single edit button per file that, 
         // when clicked, brings up options for further actions. This button will only appear 
@@ -339,6 +358,10 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
                 "<img style=\"cursor: pointer;\" align=\"right\" " +
                 "src=\"/Content/images/edit_up.png\"></a>";
         }
+
+        result += "</td>";
+        result += "</tr>";
+        result += "</table>";
 
         // There's another DIV for controls for the file, which is empty by default
         result += "<div id=\"file_controls_" + stateObjIndex.toString() + "\"></div>";

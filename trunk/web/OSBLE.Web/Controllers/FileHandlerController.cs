@@ -15,6 +15,7 @@ using OSBLE.Utility;
 using OSBLE.Models.Annotate;
 using OSBLE.Services;
 using OSBLE.Models.FileSystem;
+using Microsoft.WindowsAzure.StorageClient;
 
 namespace OSBLE.Controllers
 {
@@ -30,57 +31,65 @@ namespace OSBLE.Controllers
 
             if (course != null)
             {
-                //build the file path
+                //Get the file name
                 string[] pathPieces = filePath.Split('/');
+                
+                //Find the file
                 OSBLEDirectory fsPath = Models.FileSystem.Directories.GetCourseDocs(courseId);
-                for (int i = 0; i < pathPieces.Length - 1; i++)
-                {
-                    fsPath = fsPath.GetDir(pathPieces[i]);
-                }
-                string fullPath = fsPath.File(pathPieces[pathPieces.Length - 1]).FirstOrDefault();
-                string fileName = Path.GetFileName(fullPath);
 
-                //if the file ends in a ".link", then we need to treat it as a web link
-                if (Path.GetExtension(fileName).ToLower().CompareTo(".link") == 0)
-                {
-                    string url = "";
+                //Get the file
+                Response.AddHeader("Content-Disposition", "attachment; filename=" + pathPieces.Last()); // force download
+                BlobFileSystem.GetBlobContainer().GetBlobReference(fsPath.DownloadFile(filePath)).DownloadToStream(Response.OutputStream);
+                return new EmptyResult();
 
-                    //open the file to get at the link stored inside
-                    using (TextReader tr = new StreamReader(fullPath))
-                    {
-                        url = tr.ReadLine();
-                    }
-                    Response.Redirect(url);
+                //for (int i = 0; i < pathPieces.Length - 1; i++)
+                //{
+                //    fsPath = fsPath.GetDir(pathPieces[i]);
+                //}
+                //string fullPath = fsPath.File(pathPieces[pathPieces.Length - 1]).FirstOrDefault();
+                //string fileName = Path.GetFileName(fullPath);
 
-                    //this will never be reached, but the function requires an actionresult to be returned
-                    return Json("");
-                }
-                else
-                {
-                    Stream fileStream = null;
-                    try
-                    {
-                        fileStream = fsPath.File(pathPieces[pathPieces.Length - 1]).ToStreams().FirstOrDefault().Value;
-                    }
-                    catch (Exception)
-                    {
-                        //file not found
-                    }
-                    if (fileStream == null)
-                    {
-                        return RedirectToAction("Index", "Home");
-                    }
+                ////if the file ends in a ".link", then we need to treat it as a web link
+                //if (Path.GetExtension(fileName).ToLower().CompareTo(".link") == 0)
+                //{
+                //    string url = "";
 
-                    //else just return the file
-                    if (Path.GetExtension(filePath).ToLower() == "pdf")
-                    {
-                        return new FileStreamResult(fileStream, "application/pdf") { FileDownloadName = fileName };
-                    }
-                    else
-                    {
-                        return new FileStreamResult(fileStream, "application/octet-stream") { FileDownloadName = fileName };
-                    }
-                }
+                //    //open the file to get at the link stored inside
+                //    using (TextReader tr = new StreamReader(fullPath))
+                //    {
+                //        url = tr.ReadLine();
+                //    }
+                //    Response.Redirect(url);
+
+                //    //this will never be reached, but the function requires an actionresult to be returned
+                //    return Json("");
+                //}
+                //else
+                //{
+                //    Stream fileStream = null;
+                //    try
+                //    {
+                //        fileStream = fsPath.File(pathPieces[pathPieces.Length - 1]).ToStreams().FirstOrDefault().Value;
+                //    }
+                //    catch (Exception)
+                //    {
+                //        //file not found
+                //    }
+                //    if (fileStream == null)
+                //    {
+                //        return RedirectToAction("Index", "Home");
+                //    }
+
+                //    //else just return the file
+                //    if (Path.GetExtension(filePath).ToLower() == "pdf")
+                //    {
+                //        return new FileStreamResult(fileStream, "application/pdf") { FileDownloadName = fileName };
+                //    }
+                //    else
+                //    {
+                //        return new FileStreamResult(fileStream, "application/octet-stream") { FileDownloadName = fileName };
+                //    }
+                //}
             }
             return RedirectToAction("Index", "Home");
         }

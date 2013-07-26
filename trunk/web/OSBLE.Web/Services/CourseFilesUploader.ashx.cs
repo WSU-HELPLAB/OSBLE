@@ -111,7 +111,7 @@ namespace OSBLE.Services
             if ("generic" == fileUsage)
             {
                 OSBLEDirectory location = Models.FileSystem.Directories.GetCourseDocs(courseID);
-                
+
                 // For now the target folder parameter is only allowed for generic files
                 if (!string.IsNullOrEmpty(targetFolderParam) &&
                     "\\" != targetFolderParam &&
@@ -141,12 +141,7 @@ namespace OSBLE.Services
                 {
                     HttpPostedFile postedFile = coll[i];
                     string fileName = Path.GetFileName(postedFile.FileName);
-
-                    string BlobFileName = location.getmPath() + "/" + fileName;
-                    BlobFileSystem.addFile(BlobFileName, postedFile.InputStream);
-
                     location.AddFile(fileName, postedFile.InputStream);
-
                 }
 
                 context.Response.Write(string.Format(

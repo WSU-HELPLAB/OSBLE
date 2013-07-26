@@ -8,6 +8,7 @@ using System.Text;
 using System.Web;
 using System.Xml;
 using OSBLE.Models.Courses;
+using Microsoft.WindowsAzure.StorageClient;
 
 namespace OSBLE.Models.FileSystem
 {
@@ -42,25 +43,39 @@ namespace OSBLE.Models.FileSystem
         /// </summary>
         public OSBLEDirectory(string dataPath)
         {
-            if (!System.IO.Directory.Exists(dataPath))
-            {
-                throw new System.IO.DirectoryNotFoundException(
-                    "Directory not found: " + dataPath);
-            }
+            //if (!System.IO.Directory.Exists(dataPath))
+            //{
+            //    throw new System.IO.DirectoryNotFoundException(
+            //        "Directory not found: " + dataPath);
+            //}
+
+            //if ((BlobFileSystem.CheckDirExists(BlobPath)) == false)
+            //{
+            //    throw new System.IO.DirectoryNotFoundException(
+            //        "Directory not found: " + BlobPath);
+            //}
 
             m_dataDir = m_path = dataPath;
             m_attrDir = Path.Combine(
                 Path.GetDirectoryName(dataPath),
                 Path.GetFileName(dataPath) + "Attr");
 
+            //if ((BlobFileSystem.CheckDirExists(BlobAttrPath)) == false)
+            //{
+            //    string CreateBlobPath = BlobFileSystem.FixPath(m_attrDir);
+            //    CreateBlobPath += "/";
+            //    BlobFileSystem.CreateFolder(CreateBlobPath);
+            //}
+
+
             // The data directory must already exist in order to use this constructor, 
             // but the attribute directory need not exist (before construction). It 
             // does have to exist after construction though so we create it here if 
             // we need to.
-            if (!System.IO.Directory.Exists(m_attrDir))
-            {
-                System.IO.Directory.CreateDirectory(AttrFilesPath);
-            }
+            //if (!System.IO.Directory.Exists(m_attrDir))
+            //{
+            //    System.IO.Directory.CreateDirectory(AttrFilesPath);
+            //}
         }
         
         public OSBLEDirectory(string dataPath, string attrPath)
@@ -78,20 +93,6 @@ namespace OSBLE.Models.FileSystem
                 System.IO.Directory.CreateDirectory(AttrFilesPath);
             }
         }
-        
-        /// <summary>
-        /// Returns the path to the current directory, this is for uploading a Blob to Azure, it accepts a specific file name format
-        /// This is for the Blob name
-        /// </summary>
-        public string getmPath()
-        {
-            string Drop = HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
-            string Path = m_path.Replace(Drop, "");
-            Path = Path.Replace("//", "/");
-            Path = Path.Replace("\\", "/");
-            return Path;
-        }
-
 
         /// <summary>
         /// Adds a file to the directory and writes all the bytes in the 
@@ -111,12 +112,17 @@ namespace OSBLE.Models.FileSystem
         /// </summary>
         public virtual bool AddFile(string fileName, Stream data)
         {
-            Dictionary<string, string> sys = new Dictionary<string, string>();
-            sys.Add("created", DateTime.Now.ToString());
+            string filenamePath = m_path;
+            filenamePath += "/" + fileName;
+            string remove = "filesystem/";
+            filenamePath = filenamePath.Replace(remove, "");
 
-            
+            BlobFileSystem.UploadFile(filenamePath, data, fileName);
+            return true;
 
-            return AddFile(fileName, data, sys, null);
+            //Dictionary<string, string> sys = new Dictionary<string, string>();
+            //sys.Add("created", DateTime.Now.ToString());
+            //return AddFile(fileName, data, sys, null);
         }
 
         /// <summary>
@@ -211,6 +217,16 @@ namespace OSBLE.Models.FileSystem
             return retVal;
         }
 
+        //Get a specific file in a OSBLE Directory
+        public string DownloadFile(string fileName)
+        {
+            string filePath = m_path;
+            fileName = fileName.Replace("//", "/");
+            filePath += fileName;
+            filePath = filePath.Replace("filesystem/", "");
+            return filePath;
+        }
+
         public virtual FileCollection AllFiles()
         {
             return new AttributableFileCollection(DataFilesPath, AttrFilesPath, true);
@@ -298,21 +314,39 @@ namespace OSBLE.Models.FileSystem
                 return false;
             }
 
-            string fullDirName = Path.Combine(m_dataDir, localDirName);
-            if (!System.IO.Directory.Exists(fullDirName))
+            string pathToDir = m_path;
+            pathToDir += "/" + localDirName + "/";
+            pathToDir = pathToDir.Replace("filesystem/", "");
+            string truePath = "filesystem/" + pathToDir;
+
+            CloudBlobContainer container = BlobFileSystem.GetBlobContainer();
+            List<IListBlobItem> BlobDataFiles = BlobFileSystem.GetBlobClient().ListBlobsWithPrefix(truePath).ToList();
+
+            foreach (var BlobFile in BlobDataFiles.OfType<CloudBlob>())
             {
-                return false;
+                BlobFile.Delete();
             }
 
-            // Delete the data directory
-            System.IO.Directory.Delete(fullDirName, true);
-
-            // Delete the attribute directory too, if it exists
-            fullDirName = Path.Combine(m_attrDir, localDirName);
-            if (System.IO.Directory.Exists(fullDirName))
+            foreach (var BlobDir in BlobDataFiles.OfType<CloudBlobDirectory>())
             {
-                System.IO.Directory.Delete(fullDirName, true);
+                DeleteDir(localDirName + "/" + BlobFileSystem.GetDirectoryPrefix(BlobDir));
             }
+
+            //string fullDirName = Path.Combine(m_dataDir, localDirName);
+            //if (!System.IO.Directory.Exists(fullDirName))
+            //{
+            //    return false;
+            //}
+
+            //// Delete the data directory
+            //System.IO.Directory.Delete(fullDirName, true);
+
+            //// Delete the attribute directory too, if it exists
+            //fullDirName = Path.Combine(m_attrDir, localDirName);
+            //if (System.IO.Directory.Exists(fullDirName))
+            //{
+            //    System.IO.Directory.Delete(fullDirName, true);
+            //}
 
             return true;
         }
@@ -324,23 +358,35 @@ namespace OSBLE.Models.FileSystem
                 // We won't allow going up a directory
                 return false;
             }
-            
-            string fullFileName = Path.Combine(m_dataDir, localFileName);
-            if (!System.IO.File.Exists(fullFileName))
-            {
-                return false;
-            }
 
-            // Delete the data file
-            System.IO.File.Delete(fullFileName);
+            string filePath = m_path;
+            filePath += "/";
+            filePath += localFileName;
+            filePath = filePath.Replace("filesystem/", "");
 
-            // Delete the attribute file too, if it exists
-            fullFileName = AttributableFileCollection.GetAttrFileName(
-                m_attrDir, localFileName);
-            if (System.IO.File.Exists(fullFileName))
-            {
-                System.IO.File.Delete(fullFileName);
-            }
+            CloudBlobContainer blobContainer = BlobFileSystem.GetBlobContainer();
+            var blobContainerUri = blobContainer.Uri.AbsoluteUri;
+
+            var sourceBlockBlob = blobContainer.GetBlobReference(filePath);
+
+            sourceBlockBlob.Delete();
+
+            //string fullFileName = Path.Combine(m_dataDir, localFileName);
+            //if (!System.IO.File.Exists(fullFileName))
+            //{
+            //    return false;
+            //}
+
+            //// Delete the data file
+            //System.IO.File.Delete(fullFileName);
+
+            //// Delete the attribute file too, if it exists
+            //fullFileName = AttributableFileCollection.GetAttrFileName(
+            //    m_attrDir, localFileName);
+            //if (System.IO.File.Exists(fullFileName))
+            //{
+            //    System.IO.File.Delete(fullFileName);
+            //}
 
             return true;
         }
@@ -393,17 +439,22 @@ namespace OSBLE.Models.FileSystem
             //   folder: /AAttr and that will have within it: /AAttr/B. If the default 
             //   constructor were used, then it would create /A/BAttr, which is NOT 
             //   what we want.
+
+            string filenamePath = m_dataDir;
+            filenamePath += "/" + subdirName;
+            string remove = "filesystem/";
+            filenamePath = filenamePath.Replace(remove, "");
             
-            string dataPath = Path.Combine(m_dataDir, subdirName);
-            string attrPath = Path.Combine(m_attrDir, subdirName);
+            //string dataPath = Path.Combine(m_dataDir, subdirName);
+            //string attrPath = Path.Combine(m_attrDir, subdirName);
 
-            // Data path must exist
-            if (!Directory.Exists(dataPath))
-            {
-                return null;
-            }
+            //// Data path must exist
+            //if (!Directory.Exists(dataPath))
+            //{
+            //    return null;
+            //}
 
-            return new OSBLEDirectory(dataPath, attrPath);
+            return new OSBLEDirectory(filenamePath);
         }
 
         public OSBLEFile GetFile(string fileName)
@@ -530,19 +581,28 @@ namespace OSBLE.Models.FileSystem
                 canDeleteFolders = courseUser.AbstractRole.CanModify;
             }
 
-            StringBuilder sb = new StringBuilder("<file_list>");
-
-            // We'll have a folder node for the root
-            sb.AppendFormat("<folder name=\"/\" can_delete=\"{0}\" can_upload_to=\"{0}\">",
+            //StringBuilder sb = new StringBuilder("<file_list>");
+            
+            StringBuilder sbTest = new StringBuilder("<file_list>");
+            sbTest.AppendFormat("<folder name=\"/\" can_delete=\"{0}\" can_upload_to=\"{0}\">",
                 canDeleteFolders.ToString());
 
-            GetXMLListing(courseUser, m_dataDir, recurse, sb);
-            sb.Append("</folder></file_list>");
-            return sb.ToString();
+            // We'll have a folder node for the root
+            //sb.AppendFormat("<folder name=\"/\" can_delete=\"{0}\" can_upload_to=\"{0}\">",
+            //    canDeleteFolders.ToString());
+
+            // Get the data directory to the OSBLE storage on Azure
+            string BlobDirectory = BlobFileSystem.FixPath(m_dataDir);
+            BlobDirectory += "/";
+
+            GetXMLListing(courseUser, m_dataDir, recurse, sbTest);
+            //sb.Append("</folder></file_list>");
+            sbTest.Append("</folder></file_list>");
+            return sbTest.ToString();
         }
 
-        private void GetXMLListing(CourseUser courseUser, string dir, bool recurse, StringBuilder sb)
-        {
+        private void GetXMLListing(CourseUser courseUser, string dir, bool recurse, StringBuilder sbTest)
+        {            
             // Determine what permissions this user has, since permission attributes 
             // will be put in the listing.
             bool canDeleteFolders;
@@ -555,50 +615,74 @@ namespace OSBLE.Models.FileSystem
                 canDeleteFolders = courseUser.AbstractRole.CanModify;
             }
             
-            string[] dataFiles = System.IO.Directory.GetFiles(dir);
+            //string[] dataFiles = System.IO.Directory.GetFiles(dir);
 
+            //Get a list of BlotItems(files) in the given directory path
+            string BlobDirectory = BlobFileSystem.FixPath(dir);
+            List<IListBlobItem> BlobDataFiles = BlobFileSystem.GetDirectoryList(BlobDirectory);
+           
             // Do directories first if we've been asked to recurse
             if (recurse)
             {
-                foreach (string folder in System.IO.Directory.GetDirectories(dir))
-                {
-                    sb.AppendFormat("<folder name=\"{0}\" can_delete=\"{1}\" can_upload_to=\"{1}\">", 
-                        folder.Substring(folder.LastIndexOf(Path.DirectorySeparatorChar) + 1),
+                //foreach (string folder in System.IO.Directory.GetDirectories(dir))
+                //{
+                //    sb.AppendFormat("<folder name=\"{0}\" can_delete=\"{1}\" can_upload_to=\"{1}\">", 
+                //        folder.Substring(folder.LastIndexOf(Path.DirectorySeparatorChar) + 1),
+                //        canDeleteFolders.ToString());
+                //    GetXMLListing(courseUser, folder, recurse, sb, sbTest);
+                //    sb.Append("</folder>");
+                //}
+
+                foreach (var BlobDir in BlobDataFiles.OfType<CloudBlobDirectory>())
+                {                 
+                    sbTest.AppendFormat("<folder name=\"{0}\" can_delete=\"{1}\" can_upload_to=\"{1}\">",
+                        BlobFileSystem.GetDirectoryPrefix(BlobDir),
                         canDeleteFolders.ToString());
-                    GetXMLListing(courseUser, folder, recurse, sb);
-                    sb.Append("</folder>");
+                    GetXMLListing(courseUser, BlobFileSystem.FixURIPath((BlobDir.Uri.Segments), BlobDir), recurse, sbTest);
+                    sbTest.Append("</folder>");
                 }
             }
 
-            // Determine the directory for the attribute XML files
-            if (!dir.StartsWith(m_dataDir)) { return; }
-            string attrDir = m_attrDir + dir.Substring(m_dataDir.Length);            
+            //// Determine the directory for the attribute XML files
+            //if (!dir.StartsWith(m_dataDir)) { return; }
+            //string attrDir = m_attrDir + dir.Substring(m_dataDir.Length);
 
-            // Now do the actual files
-            foreach (string file in dataFiles)
+            foreach (var BlobFile in BlobDataFiles.OfType<CloudBlob>())
             {
-                // Get the file name for the attribute file
-                string attrFileName = AttributableFileCollection.GetAttrFileName(attrDir, file);
-                if (string.IsNullOrEmpty(attrFileName) ||
-                    !System.IO.File.Exists(attrFileName))
+                BlobFile.FetchAttributes();
+                if (BlobFile.Metadata["FileName"] != "dir.osble")
                 {
-                    // Add a file with no attributes
-                    sb.AppendFormat("<file name=\"{0}\" can_delete=\"{1}\"></file>",
-                        System.IO.Path.GetFileName(file), canDeleteFolders);
-                }
-                else
-                {
-                    // Add a file with attributes from its attribute XML file
-                    string xml = System.IO.File.ReadAllText(attrFileName);
-                    if (xml.StartsWith("<?xml"))
-                    {
-                        int i = xml.IndexOf("?>");
-                        xml = xml.Substring(i + 2);
-                    }
-                    sb.AppendFormat("<file name=\"{0}\" can_delete=\"{2}\">{1}</file>",
-                        System.IO.Path.GetFileName(file), xml, canDeleteFolders);
+                    sbTest.AppendFormat("<file name=\"{0}\" can_delete=\"{1}\"></file>",
+                        BlobFile.Metadata["FileName"].ToString(),
+                        canDeleteFolders.ToString());
                 }
             }
+
+            //// Now do the actual files
+            //foreach (string file in dataFiles)
+            //{
+            //    // Get the file name for the attribute file
+            //    string attrFileName = AttributableFileCollection.GetAttrFileName(attrDir, file);
+            //    if (string.IsNullOrEmpty(attrFileName) ||
+            //        !System.IO.File.Exists(attrFileName))
+            //    {
+            //        // Add a file with no attributes
+            //        sb.AppendFormat("<file name=\"{0}\" can_delete=\"{1}\"></file>",
+            //            System.IO.Path.GetFileName(file), canDeleteFolders);
+            //    }
+            //    else
+            //    {
+            //        // Add a file with attributes from its attribute XML file
+            //        string xml = System.IO.File.ReadAllText(attrFileName);
+            //        if (xml.StartsWith("<?xml"))
+            //        {
+            //            int i = xml.IndexOf("?>");
+            //            xml = xml.Substring(i + 2);
+            //        }
+            //        sb.AppendFormat("<file name=\"{0}\" can_delete=\"{2}\">{1}</file>",
+            //            System.IO.Path.GetFileName(file), xml, canDeleteFolders);
+            //    }
+            //}
         }
 
         /// <summary>
@@ -662,6 +746,49 @@ namespace OSBLE.Models.FileSystem
         }
 
         /// <summary>
+        /// Rename's a blob by creating a new blob with the new name and copy the contents of the old blob
+        /// data over to the new copy.
+        /// </summary>
+        public void RenameBlobDir(string folderPath, string trueOldName, string newName)
+        {
+
+            string pathToDir = m_path;
+            pathToDir += "/" + folderPath + "/";
+            pathToDir = pathToDir.Replace("filesystem/", "");
+            string truePath = "filesystem/" + pathToDir;
+
+            CloudBlobContainer container = BlobFileSystem.GetBlobContainer();
+            List<IListBlobItem> BlobDataFiles = BlobFileSystem.GetBlobClient().ListBlobsWithPrefix(truePath).ToList();
+
+            foreach (var BlobFile in BlobDataFiles.OfType<CloudBlob>())
+            {
+                var sourceBlockBlob = BlobFile as CloudBlob;
+                string newBlobName = sourceBlockBlob.Name.ToString().Replace(trueOldName, newName);
+                var newBlob = container.GetBlockBlobReference(newBlobName);
+                newBlob.CopyFromBlob(sourceBlockBlob);
+                sourceBlockBlob.Delete();
+            }
+
+            foreach (var BlobDir in BlobDataFiles.OfType<CloudBlobDirectory>())
+            {
+                RenameBlobDir(folderPath + "/" + BlobFileSystem.GetDirectoryPrefix(BlobDir), trueOldName, newName);
+            }
+        }
+
+        /// <summary>
+        /// Checks to see if a blob directory exists
+        /// </summary>
+        public bool CheckIfBlobExists(string pathtofolder)
+        {
+            string filePath = m_path;
+            pathtofolder = pathtofolder.Replace("//", "/");
+            filePath += "/";
+            filePath += pathtofolder;
+
+            return BlobFileSystem.CheckDirExists(filePath);
+        }
+
+        /// <summary>
         /// Renames a file and its corresponding attribute file. The existing 
         /// file name must be just a file name with no subdirs and not an 
         /// absolute (rooted) path. The same goes for the new file name.
@@ -675,24 +802,45 @@ namespace OSBLE.Models.FileSystem
                 return false;
             }
 
-            // First rename data file
-            string dataFile = Path.Combine(m_dataDir, fileName);
-            string dataFileNew = Path.Combine(m_dataDir, newFileName);
-            if (!System.IO.File.Exists(dataFile))
-            {
-                return false;
-            }
-            System.IO.File.Move(dataFile, dataFileNew);
+            string filePath = m_path;
+            fileName = fileName.Replace("//", "/");
+            filePath += "/";
+            filePath += fileName;
+            filePath = filePath.Replace("filesystem/", "");
 
-            // Now the attribute file
-            string attrFile = AttributableFileCollection.GetAttrFileName(
-                m_attrDir, fileName);
-            string attrFileNew = AttributableFileCollection.GetAttrFileName(
-                m_attrDir, newFileName);
-            if (System.IO.File.Exists(attrFile))
-            {
-                System.IO.File.Move(attrFile, attrFileNew);
-            }
+            CloudBlobContainer blobContainer = BlobFileSystem.GetBlobContainer();
+            var blobContainerUri = blobContainer.Uri.AbsoluteUri;
+
+            var sourceBlockBlob = blobContainer.GetBlobReference(filePath);
+
+            string newBlobName = m_path + "/" + newFileName;
+            newBlobName = newBlobName.Replace("filesystem/", "");
+
+            var newBlob = blobContainer.GetBlockBlobReference(newBlobName);
+
+            newBlob.CopyFromBlob(sourceBlockBlob);
+            newBlob.Metadata["FileName"] = newFileName;
+            newBlob.SetMetadata();
+            sourceBlockBlob.Delete();
+
+            // First rename data file
+            //string dataFile = Path.Combine(m_dataDir, fileName);
+            //string dataFileNew = Path.Combine(m_dataDir, newFileName);
+            //if (!System.IO.File.Exists(dataFile))
+            //{
+            //    return false;
+            //}
+            //System.IO.File.Move(dataFile, dataFileNew);
+
+            //// Now the attribute file
+            //string attrFile = AttributableFileCollection.GetAttrFileName(
+            //    m_attrDir, fileName);
+            //string attrFileNew = AttributableFileCollection.GetAttrFileName(
+            //    m_attrDir, newFileName);
+            //if (System.IO.File.Exists(attrFile))
+            //{
+            //    System.IO.File.Move(attrFile, attrFileNew);
+            //}
 
             return true;
         }

@@ -8,8 +8,7 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using Microsoft.WindowsAzure;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
+using Microsoft.WindowsAzure.StorageClient;
 
 namespace OSBLE
 {
@@ -40,7 +39,7 @@ namespace OSBLE
             CloudBlobClient cloudBlobClient = storageAccount.CreateCloudBlobClient();
             CloudBlobContainer filesystem = cloudBlobClient.GetContainerReference("filesystem");
 
-            filesystem.CreateIfNotExists();
+            filesystem.CreateIfNotExist();
 
         }
     }

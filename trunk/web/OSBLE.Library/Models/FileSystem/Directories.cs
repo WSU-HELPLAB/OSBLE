@@ -108,13 +108,16 @@ namespace OSBLE.Models.FileSystem
             path = System.IO.Path.Combine(path, "Courses", courseID.ToString(), 
                 "CourseDocs");
 
-            // Make sure the directory exists
-            if (!System.IO.Directory.Exists(path))
-            {
-                System.IO.Directory.CreateDirectory(path);
-            }
+            //// Make sure the directory exists
+            //if (!System.IO.Directory.Exists(path))
+            //{
+            //    System.IO.Directory.CreateDirectory(path);
+            //}
 
-            return new OSBLEDirectory(path);
+            string BlobDirectory = "filesystem/";
+            BlobDirectory += BlobFileSystem.FixPath(path);
+
+            return new OSBLEDirectory(BlobDirectory);
         }
 
         public static OSBLEDirectory GetCourseZipFolder(int courseID)

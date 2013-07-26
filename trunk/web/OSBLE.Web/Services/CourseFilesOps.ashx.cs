@@ -475,9 +475,15 @@ namespace OSBLE.Services
                         "Internal error: could not get attributable files manager for course files.");
                     return;
                 }
-
+              
+                string BlobFolderName = "Courses/" + courseID + "/CourseDocs/";
+                BlobFolderName += folderName + "/";
+                BlobFolderName = BlobFolderName.Replace("//", "/");
+                BlobFolderName = BlobFolderName.Replace("\\", "/");
+                BlobFileSystem.CreateFolder(BlobFolderName, folderName);
+         
                 // Create the directory
-                attrFiles.CreateDir(folderName);
+                //attrFiles.CreateDir(folderName);
 
                 // Return success message with new file listing
                 context.Response.Write(
@@ -529,10 +535,12 @@ namespace OSBLE.Services
                     return;
                 }
 
-                // Combine the relative path from the request (which has been checked 
-                // to make sure it's ok) with the path of the course files.
+                //// Combine the relative path from the request (which has been checked 
+                //// to make sure it's ok) with the path of the course files.
                 string path = System.IO.Path.Combine(attrFiles.GetPath(), folderName);
-                if (!System.IO.Directory.Exists(path))
+
+
+                if ((attrFiles.CheckIfBlobExists(folderName)) == false)
                 {
                     // We can't rename a directory that doesn't exist
                     WriteErrorResponse(context,
@@ -561,21 +569,30 @@ namespace OSBLE.Services
                     return;
                 }
 
-                string newNameFull = System.IO.Path.Combine(
-                    System.IO.Path.GetDirectoryName(path), newName);
 
-                // Do the actual rename (move)
-                System.IO.Directory.Move(path, newNameFull);
 
-                // Do the same for the corresponding folder in the attributable 
-                // files directory
-                path = System.IO.Path.Combine(attrFiles.AttrFilesPath, folderName);
-                if (System.IO.Directory.Exists(path))
-                {
-                    newNameFull = System.IO.Path.Combine(
-                        System.IO.Path.GetDirectoryName(path), newName);
-                    System.IO.Directory.Move(path, newNameFull);
-                }
+                string[] separators = { "/" };
+                string value = folderName;
+                string[] seperatedFileName = value.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+                string trueOldName = seperatedFileName.Last();
+
+                attrFiles.RenameBlobDir(folderName, trueOldName, newName);
+
+                //string newNameFull = System.IO.Path.Combine(
+                //    System.IO.Path.GetDirectoryName(path), newName);
+
+                //// Do the actual rename (move)
+                //System.IO.Directory.Move(path, newNameFull);
+
+                //// Do the same for the corresponding folder in the attributable 
+                //// files directory
+                //path = System.IO.Path.Combine(attrFiles.AttrFilesPath, folderName);
+                //if (System.IO.Directory.Exists(path))
+                //{
+                //    newNameFull = System.IO.Path.Combine(
+                //        System.IO.Path.GetDirectoryName(path), newName);
+                //    System.IO.Directory.Move(path, newNameFull);
+                //}
 
                 // Return success message with new file listing
                 context.Response.Write(
