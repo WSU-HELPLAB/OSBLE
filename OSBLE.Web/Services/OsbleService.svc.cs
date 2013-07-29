@@ -199,10 +199,8 @@ namespace OSBLE.Services
             }
 
             //AC: The rules listed below are too convoluted for the average instructor to
-            //remember.  As a simple workaround, if we were passed a CRD by accident (see above IF check)
-            //then we can assume that instructors now want students to be able to access the merged review.
-            //In this case, bypass all of these checks.  Otherwise, proceed as normal.
-
+            //remember.  Commenting out for now.
+            /*
             if (criticalReviewAssignment.Type != AssignmentTypes.CriticalReviewDiscussion)
             {
             //only continue if:
@@ -219,6 +217,7 @@ namespace OSBLE.Services
                 return new byte[0];
             }
             }
+             * */
 
             //make sure that the user is enrolled in the course
             CourseUser courseUser = (from cu in _db.CourseUsers
