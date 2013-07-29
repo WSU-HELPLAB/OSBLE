@@ -153,10 +153,12 @@ namespace OSBLE.Services
                 return new Assignment[0];
             }
 
-            //get all non-draft assignments
+            //get all non-draft assignments that have started
+            DateTime today = DateTime.Now;
             var query = from assignment in _db.Assignments
                         where assignment.CourseID == courseId
                         && assignment.IsDraft == false
+                        && assignment.ReleaseDate >= today
                         orderby assignment.DueDate ascending
                         select assignment;
             List<Assignment> efAssignments = query.ToList();
