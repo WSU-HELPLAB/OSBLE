@@ -154,7 +154,7 @@ namespace OSBLE.Services
             }
 
             //get all non-draft assignments that have started
-            DateTime today = DateTime.Now;
+            DateTime today = DateTime.UtcNow;
             var query = from assignment in _db.Assignments
                         where assignment.CourseID == courseId
                         && assignment.IsDraft == false
