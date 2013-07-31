@@ -449,23 +449,50 @@ The OSBLE Team
         {
             //mail all users in the course with mail new discussion post setting set as true
             List<MailAddress> to = new List<MailAddress>();
-            List<string> emailAddresses = db.CourseUsers
-                .Where(cu => cu.AbstractCourseID == assignment.CourseID)
-                .Where(cu => cu.UserProfileID != ActiveCourseUser.UserProfileID)
-                .Where(cu => cu.UserProfile.EmailNewDiscussionPosts == true)
-                .Select(cu => cu.UserProfile.UserName)
-                .ToList();
+            List<string> emailAddresses = new List<string>();
+
+            if (assignment.DiscussionSettings.RequiresPostBeforeView == true)
+            {
+                Dictionary<int, string> PossibleUsers = db.CourseUsers
+                    .Where(cu => cu.AbstractCourseID == assignment.CourseID)
+                    .Where(cu => cu.UserProfileID != ActiveCourseUser.UserProfileID)
+                    .Where(cu => cu.AbstractRoleID == 3)
+                    .Where(cu => cu.UserProfile.EmailNewDiscussionPosts == true)
+                    .Select(cu => new { cu.ID, cu.UserProfile.UserName })
+                    .ToDictionary(cu => cu.ID, cu => cu.UserName);
+
+                foreach (DiscussionPost post in db.DiscussionPosts)
+                {
+                    if (PossibleUsers.ContainsKey(post.CourseUserID) && !(emailAddresses.Contains(PossibleUsers[post.CourseUserID].ToString())))
+                    {
+                        emailAddresses.Add(PossibleUsers[post.CourseUserID].ToString());
+                    }
+                }
+
+            }
+            else
+            {
+                emailAddresses = db.CourseUsers
+                    .Where(cu => cu.AbstractCourseID == assignment.CourseID)
+                    .Where(cu => cu.UserProfileID != ActiveCourseUser.UserProfileID)
+                    .Where(cu => cu.AbstractRoleID == 3)
+                    .Where(cu => cu.UserProfile.EmailNewDiscussionPosts == true)
+                    .Select(cu => cu.UserProfile.UserName)
+                    .ToList();
+            }
 
             foreach (string address in emailAddresses)
             {
-                //AC: sometimes this fails.  Not sure why
-                try
-                {
-                    to.Add(new MailAddress(address));
-                }
-                catch (Exception)
-                {
-                }
+            
+                    //AC: sometimes this fails.  Not sure why
+                    try
+                    {
+                        to.Add(new MailAddress(address));
+                    }
+                    catch (Exception)
+                    {
+                    }
+                
             }
 
             bool anonSettings = false;

@@ -181,7 +181,7 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         }
         else { result += folderName; }
         result += "</td>";
-        result += "<td>";
+        result += "<td style=\"" + " width: 50%; overflow: hidden; " + "\">";
         if (stateObj.allowsUploads)
         {
             // Can only rename and delete if not root
@@ -342,7 +342,7 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         result += ("<a href=\"" + linkURL + "\"><img src=\"" + imgSrc + "\" />" + fileName + "</a>");
 
         result += "</td>";
-        result += "<td>";
+        result += "<td style=\"" + " width: 35%; overflow: hidden; " + "\">";
 
         // I'm going to go with the approach of having a single edit button per file that, 
         // when clicked, brings up options for further actions. This button will only appear 

@@ -10,8 +10,7 @@ var cfm_states = new Array();
 // Call this function to start the asynchronous request for a file listing.
 // When the request completes the inner HTML of the DIV with the specified 
 // ID will be set.
-function cfm_getListing(targetDIVID)
-{
+function cfm_getListing(targetDIVID) {
     // Get the current course ID
     var selectCourseObj = document.getElementById("course_select");
     var courseID = selectCourseObj.value;
@@ -29,7 +28,7 @@ function cfm_getListing(targetDIVID)
     req.addEventListener("load",
         function (args) { cfm_listcompletion(args, targetDIVID); },
         false);
-    req.addEventListener("error", 
+    req.addEventListener("error",
         function (args) { document.getElementById(targetDIVID).innerHTML = "(error)"; },
         false);
     //req.addEventListener("abort", assignmentfilemanager_canceled, false);
@@ -39,16 +38,14 @@ function cfm_getListing(targetDIVID)
     req.send();
 }
 
-function cfm_listcompletion(args, targetDIVID)
-{
+function cfm_listcompletion(args, targetDIVID) {
     // Find the DIV
     var theDIV = document.getElementById(targetDIVID);
 
     // Make sure the service returned valid XML
     var doc = args.target.responseXML;
-    if (null == doc)
-    {
-        theDIV.innerHTML = "Error: XML document from service response is null! " + 
+    if (null == doc) {
+        theDIV.innerHTML = "Error: XML document from service response is null! " +
             "Please contact support for help with this issue.  error 1";
         return;
     }
@@ -57,38 +54,35 @@ function cfm_listcompletion(args, targetDIVID)
     //alert(args.target.responseText);
 
     var root = doc.firstChild;
-    if (null == doc)
-    {
+    if (null == doc) {
         theDIV.innerHTML = "Error: Root element in XML document from service is null! " +
             "Please contact support for help with this issue. error 2";
         return;
     }
 
     // The root will have a success="true" attribute if everything went ok
-    if ("true" != root.getAttribute("success"))
-    {
+    if ("true" != root.getAttribute("success")) {
         theDIV.innerHTML = "(update failed, please refresh the page and contact support if the problem persists)";
         return;
     }
-    else
-    {
+    else {
         // Find the <file_list> node
         var lists = doc.getElementsByTagName("file_list");
-        if (0 == lists.length)
-        {
+        if (0 == lists.length) {
             alert("Update failed (invalid XML returned)");
             return;
         }
 
         var listNode = lists[0];
         theDIV.innerHTML = cfm_MakeDIV(listNode, "", "padding: 0px;", -1, targetDIVID);
+    }
 
-       
+    for (var i = 0; i < cfm_states.length; i++) {
+        cfm_expand_collapse(i);
     }
 }
 
-function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targetDIVID)
-{
+function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targetDIVID) {
     var rArrowImg = "<img src=\"/Content/images/arrow_right.png\" />";
     //var rArrowImg = "<img src=\"/Content/images/arrow_down.png\" />";
 
@@ -104,16 +98,14 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
     var j = 0;
 
     // Go through any folders (subdirectories) first
-    for (var i = 0; i < listNode.childNodes.length; i++)
-    {
+    for (var i = 0; i < listNode.childNodes.length; i++) {
         var tempNode = listNode.childNodes[i];
         if (null == tempNode || 1 != tempNode.nodeType || "folder" != tempNode.nodeName) { continue; }
 
         var folderName = tempNode.getAttribute("name");
         var folderPath = relativeDir + "/" + folderName;
         // Special case for root
-        if ("/" == folderName)
-        {
+        if ("/" == folderName) {
             folderName = "Files and Links";
             folderPath = "/";
         }
@@ -137,13 +129,11 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
             name: folderName,
             parentIndex: parentStateIndex,
             targetFolder: folderPath,
-            getExpanderImgSrc: function() {
-                if (this.expanded)
-                {
+            getExpanderImgSrc: function () {
+                if (this.expanded) {
                     return "/Content/images/arrow_down.png";
                 }
-                else
-                {
+                else {
                     return "/Content/images/arrow_right.png";
                 }
             }
@@ -172,8 +162,7 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         result += "<table width=100%; id=\"folder_text_" + ss + "\" style=\"" + " table-layout: fixed; " + "\">";
         result += "<tr>";
         result += "<td style=\"" + " width: 75%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; " + "\">";
-        if (stateObj.allowsCollapsing)
-        {
+        if (stateObj.allowsCollapsing) {
             result += "<a style=\"cursor: pointer;\" onclick=\"cfm_expand_collapse(" + ss + ");\">";
             result += "<img id=\"expander_img_" + ss + "\" src=\"" + stateObj.getExpanderImgSrc() + "\" />&nbsp;" + folderName;
             result += "</a>";
@@ -181,18 +170,15 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         else { result += folderName; }
         result += "</td>";
         result += "<td style=\"" + " width: 50%; overflow: hidden; " + "\">";
-        if (stateObj.allowsUploads)
-        {
+        if (stateObj.allowsUploads) {
             // Can only rename and delete if not root
-            if ("/" != folderPath)
-            {
-           
-                if (stateObj.allowsDeletion)
-                {                  
+            if ("/" != folderPath) {
+
+                if (stateObj.allowsDeletion) {
                     result += "<a onclick='cfm_DeleteFolderIconClicked(" + stateObjIndex.toString() + ");' " +
                         "title=\"Delete this folder...\">" +
                         "<img style=\"cursor: pointer;\" align=\"right\" " +
-                        "src=\"/Content/images/delete_up.png\"></a>";                 
+                        "src=\"/Content/images/delete_up.png\"></a>";
                 }
 
                 // Again we're assuming that if they can upload files then they can also 
@@ -224,13 +210,12 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         result += "</table>";
         result += "<div id=\"folder_controls_" + stateObjIndex.toString() + "\"></div>";
         result += "</div>";
-      
+
 
 
         // Then the recursive call makes another DIV for the files (provided there are some)
         if (cfm_CountChildrenWithName(tempNode, "file") > 0 ||
-            cfm_CountChildrenWithName(tempNode, "folder") > 0)
-        {
+            cfm_CountChildrenWithName(tempNode, "folder") > 0) {
             result += cfm_MakeDIV(tempNode, folderPath,
                 "padding: 0px; margin-left: 10px; display: none;",
                 stateObjIndex, targetDIVID);
@@ -241,8 +226,7 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
 
     // Go through the list of files
     j = 0;
-    for (var i = 0; i < listNode.childNodes.length; i++)
-    {
+    for (var i = 0; i < listNode.childNodes.length; i++) {
         var tempNode = listNode.childNodes[i];
         if (null == tempNode || 1 != tempNode.nodeType || "file" != tempNode.nodeName) { continue; }
 
@@ -250,8 +234,7 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         var imgSrc = "/Content/images/fileextimages/_blank.png";
         var lastDotIndex = fileName.lastIndexOf(".");
         var ext = "";
-        if (-1 != lastDotIndex)
-        {
+        if (-1 != lastDotIndex) {
             ext = fileName.substr(lastDotIndex);
         }
         ext = ext.toLowerCase();
@@ -262,20 +245,16 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         else { canDelete = false; }
 
         var theFullPath = relativeDir;
-        if (null == theFullPath || 0 == theFullPath.length)
-        {
+        if (null == theFullPath || 0 == theFullPath.length) {
             theFullPath = "/" + fileName;
         }
-        else
-        {
-            if ("/" == relativeDir)
-			{
-				theFullPath = "/" + fileName;
-			}
-			else 
-			{
-				theFullPath = relativeDir + "/" + fileName;
-			}
+        else {
+            if ("/" == relativeDir) {
+                theFullPath = "/" + fileName;
+            }
+            else {
+                theFullPath = relativeDir + "/" + fileName;
+            }
         }
 
         // Each file also has a state object associated with it. The states are very 
@@ -300,20 +279,19 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         // Determine an icon based on the file extension
         if (".aac" == ext || ".ai" == ext || ".aiff" == ext || ".avi" == ext ||
             ".bmp" == ext || ".c" == ext || ".cpp" == ext || ".css" == ext ||
-            ".dat" == ext || ".dmg" == ext || ".doc" == ext || ".dotx" == ext || 
-            ".dwg" == ext || ".dxf" == ext || ".eps" == ext || ".exe" == ext || 
+            ".dat" == ext || ".dmg" == ext || ".doc" == ext || ".dotx" == ext ||
+            ".dwg" == ext || ".dxf" == ext || ".eps" == ext || ".exe" == ext ||
             ".flv" == ext || ".gif" == ext || ".h" == ext || ".hpp" == ext ||
             ".html" == ext || ".ics" == ext || ".iso" == ext || ".java" == ext ||
             ".jpg" == ext || ".key" == ext || ".mid" == ext || ".mp3" == ext ||
-            ".mp4" == ext || ".mpg" == ext || ".odf" == ext || ".ods" == ext || 
-            ".odt" == ext || ".otp" == ext || ".ots" == ext || ".ott" == ext || 
+            ".mp4" == ext || ".mpg" == ext || ".odf" == ext || ".ods" == ext ||
+            ".odt" == ext || ".otp" == ext || ".ots" == ext || ".ott" == ext ||
             ".pdf" == ext || ".php" == ext || ".png" == ext || ".ppt" == ext ||
             ".psd" == ext || ".py" == ext || ".qt" == ext || ".rar" == ext ||
             ".rb" == ext || ".rtf" == ext || ".sql" == ext || ".tga" == ext ||
             ".tgz" == ext || ".tiff" == ext || ".txt" == ext || ".wav" == ext ||
-            ".xls" == ext || ".xlsx" == ext || ".xml" == ext || ".yml" == ext || 
-            ".zip" == ext)
-        {
+            ".xls" == ext || ".xlsx" == ext || ".xml" == ext || ".yml" == ext ||
+            ".zip" == ext) {
             imgSrc = "/Content/images/fileextimages/" + ext.substr(1) + ".png";
         }
 
@@ -324,7 +302,7 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
 
         // Make a link for the file downloader service
         // Note that we need relative path in filename for files in folders
-        var linkURL = "/FileHandler/CourseDocument?courseId=" + 
+        var linkURL = "/FileHandler/CourseDocument?courseId=" +
             courseID.toString() + "&filePath=" + fileStateObj.fullPath;
 
         result += "<div id=\"" + theID + "\" style=\"padding: 3px; background-color: ";
@@ -346,8 +324,7 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         // I'm going to go with the approach of having a single edit button per file that, 
         // when clicked, brings up options for further actions. This button will only appear 
         // if the user has deletion permissions.
-        if (fileStateObj.allowsDeletion)
-        {
+        if (fileStateObj.allowsDeletion) {
             result += "<a onclick='cfm_FileDeleteIconClicked(" + stateObjIndex.toString() + ");' " +
                 "title=\"Delete this file\">" +
                 "<img style=\"cursor: pointer;\" align=\"right\" " +
@@ -375,8 +352,7 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
 
 // Functions below here are in alphabetical order. Keep them that way.
 
-function cfm_AddUploader(stateObjectIndex)
-{
+function cfm_AddUploader(stateObjectIndex) {
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
 
@@ -393,8 +369,7 @@ function cfm_AddUploader(stateObjectIndex)
 
     // Find the submit button and make its width 100%
     var btnUpload = document.getElementById("btnSubmit_cfm_files_" + stateObjectIndex.toString());
-    if (btnUpload)
-    {
+    if (btnUpload) {
         btnUpload.style.width = "100%";
     }
 
@@ -404,22 +379,18 @@ function cfm_AddUploader(stateObjectIndex)
 
 // Counts the number of child nodes under listNode that have a node type of 1 and 
 // a node name that matches node_name.
-function cfm_CountChildrenWithName(listNode, node_name)
-{
+function cfm_CountChildrenWithName(listNode, node_name) {
     var count = 0;
-    for (var i = 0; i < listNode.childNodes.length; i++)
-    {
+    for (var i = 0; i < listNode.childNodes.length; i++) {
         var tempNode = listNode.childNodes[i];
-        if (null != tempNode && 1 == tempNode.nodeType && node_name == tempNode.nodeName)
-        {
+        if (null != tempNode && 1 == tempNode.nodeType && node_name == tempNode.nodeName) {
             count++;
         }
     }
     return count;
 }
 
-function cfm_CreateFolder(stateObjectIndex)
-{
+function cfm_CreateFolder(stateObjectIndex) {
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
 
@@ -429,16 +400,14 @@ function cfm_CreateFolder(stateObjectIndex)
 
     // Find the textbox and get the folder name
     var tb = document.getElementById("tbSubfolder_" + stateObjectIndex.toString());
-    if (null == tb)
-    {
+    if (null == tb) {
         // Problem, but we can't do much about it
         cfm_hideControls(stateObjectIndex);
         return;
     }
 
     // Folder name cannot be empty
-    if (0 == tb.value.length)
-    {
+    if (0 == tb.value.length) {
         tb.focus();
         return;
     }
@@ -446,8 +415,7 @@ function cfm_CreateFolder(stateObjectIndex)
     // Get the "full" path for the folder to be created
     var name = state.targetFolder;
     if ("/" != name.substr(name.length - 1) &&
-        "\\" != name.substr(name.length - 1))
-    {
+        "\\" != name.substr(name.length - 1)) {
         name += "/";
     }
     name += tb.value;
@@ -457,8 +425,7 @@ function cfm_CreateFolder(stateObjectIndex)
     // provided it succeeds.
     var req = new XMLHttpRequest();
     req.addEventListener("load",
-        function (args)
-        {
+        function (args) {
             cfm_listcompletion(args, state.fm_div_ID);
         },
         false);
@@ -470,8 +437,7 @@ function cfm_CreateFolder(stateObjectIndex)
     req.send();
 }
 
-function cfm_CreateFolderIconClicked(stateObjectIndex)
-{
+function cfm_CreateFolderIconClicked(stateObjectIndex) {
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
 
@@ -490,8 +456,7 @@ function cfm_CreateFolderIconClicked(stateObjectIndex)
     state.controlsVisible = true;
 }
 
-function cfm_DeleteFile(stateObjectIndex)
-{
+function cfm_DeleteFile(stateObjectIndex) {
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
 
@@ -502,8 +467,7 @@ function cfm_DeleteFile(stateObjectIndex)
     // Make an XML HTTP request to the service
     var req = new XMLHttpRequest();
     req.addEventListener("load",
-        function (args)
-        {
+        function (args) {
             cfm_listcompletion(args, state.fm_div_ID);
         },
         false);
@@ -515,8 +479,7 @@ function cfm_DeleteFile(stateObjectIndex)
     req.send();
 }
 
-function cfm_DeleteFolder(stateObjectIndex)
-{
+function cfm_DeleteFolder(stateObjectIndex) {
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
 
@@ -527,8 +490,7 @@ function cfm_DeleteFolder(stateObjectIndex)
     // Make an XML HTTP request to the service
     var req = new XMLHttpRequest();
     req.addEventListener("load",
-        function (args)
-        {
+        function (args) {
             cfm_listcompletion(args, state.fm_div_ID);
         },
         false);
@@ -540,8 +502,7 @@ function cfm_DeleteFolder(stateObjectIndex)
     req.send();
 }
 
-function cfm_DeleteFolderIconClicked(stateObjectIndex)
-{
+function cfm_DeleteFolderIconClicked(stateObjectIndex) {
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
 
@@ -559,8 +520,7 @@ function cfm_DeleteFolderIconClicked(stateObjectIndex)
     state.controlsVisible = true;
 }
 
-function cfm_expand_collapse(stateObjectIndex)
-{
+function cfm_expand_collapse(stateObjectIndex) {
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
 
@@ -568,7 +528,7 @@ function cfm_expand_collapse(stateObjectIndex)
 
     // Get the expander image
     var theIMG = document.getElementById("expander_img_" + ss);
-    
+
     var display = "block";
     if (state.expanded) {
         display = "none";
@@ -589,45 +549,34 @@ function cfm_expand_collapse(stateObjectIndex)
 
         // Need to search in array and check for folder states with == parent index.
         var nextFolderIndex = -1;
-        for (var i = stateObjectIndex + 1; i < cfm_states.length; i++)
-        {
-            if (true === cfm_states[i].isFolder)
-            {
-                if (cfm_states[i].parentIndex == state.parentIndex)
-                {
+        for (var i = stateObjectIndex + 1; i < cfm_states.length; i++) {
+            if (true === cfm_states[i].isFolder) {
+                if (cfm_states[i].parentIndex == state.parentIndex) {
                     nextFolderIndex = i;
                     break;
                 }
             }
         }
-        if (-1 != nextFolderIndex)
-        {
+        if (-1 != nextFolderIndex) {
             var nextFolder = document.getElementById("folder_div_" + nextFolderIndex.toString());
-            if (null != nextFolder)
-            {
-                if (!state.expanded)
-                {
+            if (null != nextFolder) {
+                if (!state.expanded) {
                     // Case 1a. It wasn't expanded and now it is, meaning the folder below it needs a border
                     nextFolder.style.borderTop = "0px";
                 }
-                else
-                {
+                else {
                     nextFolder.style.borderTop = 0;
                 }
             }
         }
-        else
-        {
+        else {
             var firstFile = document.getElementById("file0_folderState" + state.parentIndex.toString());
-            if (null != firstFile)
-            {
-                if (!state.expanded)
-                {
+            if (null != firstFile) {
+                if (!state.expanded) {
                     // Case 1b. It wasn't expanded and now it is, meaning the file below it needs a border
                     firstFile.style.borderTop = "0px";
                 }
-                else
-                {
+                else {
                     firstFile.style.borderTop = 0;
                 }
             }
@@ -641,8 +590,7 @@ function cfm_expand_collapse(stateObjectIndex)
     if (null != theIMG) { theIMG.src = state.getExpanderImgSrc(); }
 }
 
-function cfm_FileDeleteIconClicked(stateObjectIndex)
-{
+function cfm_FileDeleteIconClicked(stateObjectIndex) {
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
 
@@ -657,8 +605,7 @@ function cfm_FileDeleteIconClicked(stateObjectIndex)
         "onclick=\"cfm_hideControls(" + stateObjectIndex.toString() + ");\" />";
 }
 
-function cfm_FileRenameIconClicked(stateObjectIndex)
-{
+function cfm_FileRenameIconClicked(stateObjectIndex) {
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
 
@@ -677,8 +624,7 @@ function cfm_FileRenameIconClicked(stateObjectIndex)
 
 // Function that gets the extra service arguments for the file uploader web service. We 
 // need to add an argument that indicates what the target folder is.
-function cfm_GetExtraServiceArgs(stateObjectIndex)
-{
+function cfm_GetExtraServiceArgs(stateObjectIndex) {
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
 
@@ -687,22 +633,18 @@ function cfm_GetExtraServiceArgs(stateObjectIndex)
         (new Date()).toString();
 }
 
-function cfm_hideControls(stateObjectIndex)
-{
+function cfm_hideControls(stateObjectIndex) {
     var cntrls = null;
-    if (cfm_states[stateObjectIndex].isFolder)
-    {
+    if (cfm_states[stateObjectIndex].isFolder) {
         cntrls = document.getElementById("folder_controls_" + stateObjectIndex.toString());
     }
-    else
-    {
+    else {
         cntrls = document.getElementById("file_controls_" + stateObjectIndex.toString());
     }
     if (cntrls) { cntrls.innerHTML = ""; }
 }
 
-function cfm_RenameFile(stateObjectIndex)
-{
+function cfm_RenameFile(stateObjectIndex) {
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
 
@@ -712,16 +654,14 @@ function cfm_RenameFile(stateObjectIndex)
 
     // Find the textbox and get the folder name
     var tb = document.getElementById("tbRenameFile_" + stateObjectIndex.toString());
-    if (null == tb)
-    {
+    if (null == tb) {
         // Problem, but we can't do much about it
         cfm_hideControls(stateObjectIndex);
         return;
     }
 
     // New file name cannot be empty
-    if (0 == tb.value.length)
-    {
+    if (0 == tb.value.length) {
         tb.focus();
         return;
     }
@@ -729,8 +669,7 @@ function cfm_RenameFile(stateObjectIndex)
     // Make an XML HTTP request to the service
     var req = new XMLHttpRequest();
     req.addEventListener("load",
-        function (args)
-        {
+        function (args) {
             cfm_listcompletion(args, state.fm_div_ID);
         },
         false);
@@ -742,8 +681,7 @@ function cfm_RenameFile(stateObjectIndex)
     req.send();
 }
 
-function cfm_RenameFolder(stateObjectIndex)
-{
+function cfm_RenameFolder(stateObjectIndex) {
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
 
@@ -753,16 +691,14 @@ function cfm_RenameFolder(stateObjectIndex)
 
     // Find the textbox and get the folder name
     var tb = document.getElementById("tbRenameFolder_" + stateObjectIndex.toString());
-    if (null == tb)
-    {
+    if (null == tb) {
         // Problem, but we can't do much about it
         cfm_hideControls(stateObjectIndex);
         return;
     }
 
     // New folder name cannot be empty
-    if (0 == tb.value.length)
-    {
+    if (0 == tb.value.length) {
         tb.focus();
         return;
     }
@@ -770,8 +706,7 @@ function cfm_RenameFolder(stateObjectIndex)
     // Make an XML HTTP request to the service
     var req = new XMLHttpRequest();
     req.addEventListener("load",
-        function (args)
-        {
+        function (args) {
             cfm_listcompletion(args, state.fm_div_ID);
         },
         false);
@@ -783,8 +718,7 @@ function cfm_RenameFolder(stateObjectIndex)
     req.send();
 }
 
-function cfm_RenameFolderIconClicked(stateObjectIndex)
-{
+function cfm_RenameFolderIconClicked(stateObjectIndex) {
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
 
@@ -804,8 +738,7 @@ function cfm_RenameFolderIconClicked(stateObjectIndex)
     state.controlsVisible = true;
 }
 
-function cfm_uploadComplete(stateObjectIndex)
-{
+function cfm_uploadComplete(stateObjectIndex) {
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
     // Refresh the listing
