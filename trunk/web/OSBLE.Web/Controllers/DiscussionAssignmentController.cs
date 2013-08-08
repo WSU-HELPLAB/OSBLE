@@ -14,6 +14,8 @@ using Ionic.Zip;
 using OSBLE.Utility;
 using System.Net.Mail;
 using System.Text;
+using Microsoft.WindowsAzure.StorageClient;
+using Microsoft.WindowsAzure.ServiceRuntime;
 
 namespace OSBLE.Controllers
 {
@@ -95,35 +97,48 @@ namespace OSBLE.Controllers
                 string authorDisplayName = reviewTeam.AuthorTeam.Name;
 
                 //get all files
-                FileCollection files =
+                //FileCollection files =
+                //    Models.FileSystem.Directories.GetAssignment(
+                //        (int)currentAssignment.CourseID, criticalReviewAssignment.ID)
+                //    .Review(reviewTeam.AuthorTeam, reviewTeam.ReviewingTeam)
+                //    .AllFiles();
+
+                OSBLEDirectory reviewTeamSubmissionPath =
                     Models.FileSystem.Directories.GetAssignment(
                         (int)currentAssignment.CourseID, criticalReviewAssignment.ID)
-                    .Review(reviewTeam.AuthorTeam, reviewTeam.ReviewingTeam)
-                    .AllFiles();
-                foreach (string file in files)
+                    .Review(reviewTeam.AuthorTeam, reviewTeam.ReviewingTeam);
+
+                List<IListBlobItem> allBlobs = reviewTeamSubmissionPath.GetAllBlobs(null);
+
+                foreach (var Item in allBlobs.OfType<CloudBlob>())
                 {
                     //cpml files need to be merged and not added individually
-                    if (Path.GetExtension(file) == ".cpml")
+                    if (Path.GetExtension(Item.Name.ToString()) == ".cpml")
                     {
                         //temporary stream used for ".cpml" Merging.
                         MemoryStream outputStream = new MemoryStream();
 
+                        //Get blob and create a tmp file name
+                        byte[] fileBytes = Item.DownloadByteArray();
+                        System.IO.File.WriteAllBytes(Item.Name.ToString(), fileBytes);
+
                         //Only want to add the original file to the stream once.
                         if(parentStreams.ContainsKey(reviewTeam.AuthorTeamID) == false)
                         {
-                            string originalFile =
-                                Models.FileSystem.Directories.GetAssignment(
-                                    ActiveCourseUser.AbstractCourseID, basicAssignment.ID)
-                                .Submission(reviewTeam.AuthorTeam)
-                                .GetPath();
-                            FileStream filestream = System.IO.File.OpenRead(originalFile + "\\" + basicAssignment.Deliverables[0].Name + ".cpml");
+                            //string originalFile =
+                            //    Models.FileSystem.Directories.GetAssignment(
+                            //        ActiveCourseUser.AbstractCourseID, basicAssignment.ID)
+                            //    .Submission(reviewTeam.AuthorTeam)
+                            //    .GetPath();
+
+                            FileStream filestream = System.IO.File.OpenRead(Item.Name.ToString());
                             parentStreams.Add(reviewTeam.AuthorTeamID, new MemoryStream());
                             parentStreamNames.Add(reviewTeam.AuthorTeamID, reviewTeam.AuthorTeam.Name);
                             filestream.CopyTo(parentStreams[reviewTeam.AuthorTeamID]);
                         }
 
                         //Merge the FileStream from filename + parentStream into outputStream.
-                        ChemProV.Core.CommentMerger.Merge(parentStreams[reviewTeam.AuthorTeamID], authorDisplayName, System.IO.File.OpenRead(file), reviewerDisplayName, outputStream);
+                        ChemProV.Core.CommentMerger.Merge(parentStreams[reviewTeam.AuthorTeamID], authorDisplayName, System.IO.File.OpenRead(Item.Name.ToString()), reviewerDisplayName, outputStream);
 
                         //close old parent stream before writing over it
                         parentStreams[reviewTeam.AuthorTeamID].Close();
@@ -133,10 +148,17 @@ namespace OSBLE.Controllers
                         outputStream.Seek(0, SeekOrigin.Begin);
                         outputStream.CopyTo(parentStreams[reviewTeam.AuthorTeamID]);
                         outputStream = new MemoryStream();
+
+                        System.IO.File.Delete(Item.Name.ToString());
                     }
                     else
                     {
-                        zipFile.AddFile(file, zipPath);
+                        Item.FetchAttributes();
+                        byte[] fileBytes = Item.DownloadByteArray();
+                        string file = Item.Metadata["FileName"].ToString();
+                        string location = string.Format(file);
+                        zipFile.AddEntry(file, fileBytes);
+                        //zipFile.AddFile(file, zipPath);
                     }
                 }
             }
@@ -219,7 +241,6 @@ namespace OSBLE.Controllers
                 ViewBag.IsFirstPost = (from dpvm in dvm.DiscussionPostViewModels
                                        where dpvm.poster.CourseUser.ID == ActiveCourseUser.ID
                                        select dpvm).Count() == 0;
-
 
                 //assigning a header value.
                 if (assignment.HasDiscussionTeams)

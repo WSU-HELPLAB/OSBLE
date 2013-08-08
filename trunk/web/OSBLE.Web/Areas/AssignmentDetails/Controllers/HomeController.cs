@@ -9,6 +9,8 @@ using OSBLE.Controllers;
 using OSBLE.Areas.AssignmentDetails.ViewModels;
 using OSBLE.Attributes;
 using OSBLE.Models.FileSystem;
+using Microsoft.WindowsAzure;
+using Microsoft.WindowsAzure.StorageClient;
 
 namespace OSBLE.Areas.AssignmentDetails.Controllers
 {
@@ -35,21 +37,31 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
                 OSBLE.Models.FileSystem.AssignmentFilePath fs =
                     OSBLE.Models.FileSystem.Directories.GetAssignment(
                         assignment.CourseID.Value, assignmentId);
+                
                 OSBLEDirectory attrFiles = fs.AttributableFiles;
-                OSBLE.Models.FileSystem.FileCollection files = 
-                    attrFiles.GetFilesWithSystemAttribute("assignment_description", assignmentId.ToString());
+                
+                //OSBLE.Models.FileSystem.FileCollection files = 
+                //    attrFiles.GetFilesWithSystemAttribute("assignment_description", assignmentId.ToString());
+
+                List<IListBlobItem> files = new List<IListBlobItem>();
+                files = fs.GetAssignmentBlobs();
+
                 if (files.Count > 0)
                 {
                     StringBuilder sb = new StringBuilder("<ul>");
-                    foreach (string fileName in files)
+                    foreach (var BlobFile in files.OfType<CloudBlob>())
                     {
-                        // Make a link for the file
-                        sb.AppendFormat(
-                            "<li><a href=\"/Services/CourseFilesOps.ashx?cmd=assignment_file_download" + 
-                            "&courseID={0}&assignmentID={1}&filename={2}\">{2}</li>",
-                            assignment.CourseID.Value,
-                            assignment.ID,
-                            System.IO.Path.GetFileName(fileName));
+                        BlobFile.FetchAttributes();
+                        if (BlobFile.Metadata["FileName"] != "dir.osble" && (BlobFile.Metadata["assignment_solution"] == null))
+                        {
+                            // Make a link for the file
+                            sb.AppendFormat(
+                                "<li><a href=\"/Services/CourseFilesOps.ashx?cmd=assignment_file_download" +
+                                "&courseID={0}&assignmentID={1}&filename={2}\">{2}</li>",
+                                assignment.CourseID.Value,
+                                assignment.ID,
+                                BlobFile.Metadata["FileName"].ToString());
+                        }
                     }
                     sb.Append("</ul>");
                     ViewBag.DescFilesHTML = sb.ToString();

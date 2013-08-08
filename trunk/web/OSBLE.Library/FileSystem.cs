@@ -415,10 +415,10 @@ namespace OSBLE
             string path = GetAssignmentSubmissionFolder(course, assignmentID);
             path += "\\" + submitterTeam.TeamID.ToString();
 
-            if (!Directory.Exists(path) && createPathIfNotExists)
-            {
-                Directory.CreateDirectory(path);
-            }
+            //if (!Directory.Exists(path) && createPathIfNotExists)
+            //{
+            //    Directory.CreateDirectory(path);
+            //}
 
             return path;
         }
@@ -588,41 +588,49 @@ namespace OSBLE
             DateTime? timeSubmitted = null;
             if (team != null)
             {
-                
+                OSBLEDirectory submission = null;
 
-                DirectoryInfo submissionFolder;
                 if (team.Assignment.Type == AssignmentTypes.CriticalReview && authorTeam != null)
                 {
-                    submissionFolder = new DirectoryInfo
-                                                (FileSystem.GetTeamUserSubmissionFolderForAuthorID
-                                                    (false, team.Assignment.Course, team.AssignmentID, team, authorTeam)
-                                                );
+                    //submissionFolder = new DirectoryInfo
+                    //                            (FileSystem.GetTeamUserSubmissionFolderForAuthorID
+                    //                                (false, team.Assignment.Course, team.AssignmentID, team, authorTeam)
+                    //                            );
+                    submission = Directories.GetReview(team.Assignment.CourseID.Value, team.AssignmentID, authorTeam.ID, team.TeamID);
+                 
                 }
                 else
                 {
-                    submissionFolder = new DirectoryInfo
-                                            (FileSystem.GetTeamUserSubmissionFolder
-                                                (
-                                                    false,
-                                                    team.Assignment.Course,
-                                                    team.Assignment.ID,
-                                                    team
-                                                )
-                                            );
-                }
+                    //submissionFolder = new DirectoryInfo
+                    //                        (FileSystem.GetTeamUserSubmissionFolder
+                    //                            (
+                    //                                false,
+                    //                                team.Assignment.Course,
+                    //                                team.Assignment.ID,
+                    //                                team
+                    //                            )
+                    //                        );
 
-                if (submissionFolder != null && submissionFolder.Exists && submissionFolder.GetFiles().Count() > 0)
+                    submission = Directories.GetAssignmentSubmission(team.Assignment.CourseID.Value, team.Assignment.ID, team.TeamID);
+                }
+                   
+                //if (submission != null && BlobFileSystem.CheckDirExists(su && submissionFolder.GetFiles().Count() > 0)
+                //{
+                //    //unfortunately LastWriteTime for a directory does not take into account it's file or
+                //    //sub directories and these we need to check to see when the last file was written too.
+                //    timeSubmitted = submissionFolder.LastWriteTime;
+                //    foreach (FileInfo file in submissionFolder.GetFiles())
+                //    {
+                //        if (file.LastWriteTime > timeSubmitted)
+                //        {
+                //            timeSubmitted = file.LastWriteTime;
+                //        }
+                //    }
+                //}
+
+                if (submission != null)
                 {
-                    //unfortunately LastWriteTime for a directory does not take into account it's file or
-                    //sub directories and these we need to check to see when the last file was written too.
-                    timeSubmitted = submissionFolder.LastWriteTime;
-                    foreach (FileInfo file in submissionFolder.GetFiles())
-                    {
-                        if (file.LastWriteTime > timeSubmitted)
-                        {
-                            timeSubmitted = file.LastWriteTime;
-                        }
-                    }
+                    timeSubmitted = submission.GetSubmissionTime();
                 }
             }
             return timeSubmitted;

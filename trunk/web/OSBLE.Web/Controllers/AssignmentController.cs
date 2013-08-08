@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web.Mvc;
 using OSBLE.Attributes;
 using OSBLE.Models;
+using OSBLE.Models.FileSystem;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.Rubrics;
@@ -39,6 +40,10 @@ namespace OSBLE.Controllers
                 return RedirectToAction("Index");
             }
 
+            //Clean up file storage 
+            OSBLEDirectory deleteAssignment = Directories.GetAssignment(assignment.CourseID.Value, assignment.ID);
+            deleteAssignment.DeleteDir(null);
+
             db.Assignments.Remove(assignment);
             db.SaveChanges();
             return Index(id);
@@ -64,7 +69,6 @@ namespace OSBLE.Controllers
 
             List<Assignment> Assignments = new List<Assignment>();
             //Getting the assginment list, without draft assignments.
-
 
             if (ActiveCourseUser.AbstractRole.CanGrade)
             {
@@ -100,7 +104,10 @@ namespace OSBLE.Controllers
                     if (a.HasDeliverables)
                     {
                         AssignmentTeam at = GetAssignmentTeam(a, ActiveCourseUser);
-                        DateTime? subTime = FileSystem.GetSubmissionTime(at);
+                        OSBLEDirectory submission = Directories.GetAssignmentSubmission(ActiveCourseUser.AbstractCourseID, a.ID, at.TeamID);
+                        //DateTime? subTime = FileSystem.GetSubmissionTime(at);
+                        DateTime? subTime = submission.GetSubmissionTime();
+
                         string submissionTime = "No Submission";
                         if (subTime != null) //found a submission time, Reassign submissionTime
                         {

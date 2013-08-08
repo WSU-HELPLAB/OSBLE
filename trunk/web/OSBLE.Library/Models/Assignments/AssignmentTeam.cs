@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using OSBLE.Models.FileSystem;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -39,7 +40,8 @@ namespace OSBLE.Models.Assignments
             if (renew == true || _submissionTimeAccessed == false)
             {
                 _submissionTimeAccessed = true;
-                _submissionTime = OSBLE.FileSystem.GetSubmissionTime(this);
+                OSBLEDirectory submission = Directories.GetAssignmentSubmission((int)this.Assignment.CourseID, this.AssignmentID, this.TeamID);
+                _submissionTime = submission.GetSubmissionTime();
             }
             return _submissionTime;
         }

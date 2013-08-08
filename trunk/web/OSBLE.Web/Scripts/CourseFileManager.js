@@ -161,7 +161,7 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         result += "<div id=\"folder_div_" + ss + "\" style=\"" + theStyle + "\">";
         result += "<table width=100%; id=\"folder_text_" + ss + "\" style=\"" + " table-layout: fixed; " + "\">";
         result += "<tr>";
-        result += "<td style=\"" + " width: 75%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; " + "\">";
+        result += "<td style=\"" + " width: 85%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; " + "\">";
         if (stateObj.allowsCollapsing) {
             result += "<a style=\"cursor: pointer;\" onclick=\"cfm_expand_collapse(" + ss + ");\">";
             result += "<img id=\"expander_img_" + ss + "\" src=\"" + stateObj.getExpanderImgSrc() + "\" />&nbsp;" + folderName;
@@ -319,7 +319,7 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         result += ("<a href=\"" + linkURL + "\"><img src=\"" + imgSrc + "\" />" + fileName + "</a>");
 
         result += "</td>";
-        result += "<td>";
+        result += "<td style=\"" + " width: 50%; overflow: hidden; " + "\">";
 
         // I'm going to go with the approach of having a single edit button per file that, 
         // when clicked, brings up options for further actions. This button will only appear 

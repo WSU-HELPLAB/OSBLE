@@ -43,7 +43,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             get
             {
                 List<AssignmentTypes> Assessments = new List<AssignmentTypes>();
-                Assessments.Add(AssignmentTypes.ReviewOfStudentWork);
+                //Assessments.Add(AssignmentTypes.ReviewOfStudentWork);
                 return Assessments;
             }
         }

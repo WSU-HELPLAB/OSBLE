@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Caching;
 using OSBLE.Utility;
+using OSBLE.Models.FileSystem;
 using System.IO;
 
 namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
@@ -40,8 +41,12 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
                 //if the team matches with the student
                 if (team.TeamID == member.TeamID)
                 {
-                    submissionTime = team.GetSubmissionTime();
-                    break;
+                    OSBLEDirectory submission = Directories.GetAssignmentSubmission(Student.AbstractCourseID, assignment.ID, team.TeamID);
+                    if (submission.GetSubmissionTime() != null)
+                    {
+                        submissionTime = submission.GetSubmissionTime();
+                        break;
+                    }
                 }
             }
 

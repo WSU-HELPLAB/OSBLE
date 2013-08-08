@@ -66,17 +66,21 @@ namespace OSBLE.Models.FileSystem
             return new OSBLEDirectory(path);
         }
 
+        /// <summary>
+        /// Get a course assignment directory in blob storage.
+        /// </summary>
+        /// <param name="courseID"></param>
+        /// <param name="assignmentID"></param>
+        /// <returns></returns>
         public static AssignmentFilePath GetAssignment(int courseID, int assignmentID)
         {
             string path = HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
             path = System.IO.Path.Combine(path, "Courses", courseID.ToString(),
                 "Assignments", assignmentID.ToString());
 
-            // Make sure the directory exists
-            if (!System.IO.Directory.Exists(path))
-            {
-                System.IO.Directory.CreateDirectory(path);
-            }
+            string BlobDirectory = "filesystem/";
+            BlobDirectory += BlobFileSystem.FixPath(path);
+            path = BlobDirectory;
 
             return new AssignmentFilePath(path, assignmentID);
         }
@@ -93,26 +97,44 @@ namespace OSBLE.Models.FileSystem
             string attr = System.IO.Path.Combine(root, "Courses", courseID.ToString(),
                 "Assignments", assignmentID.ToString(), "SubmissionsAttr", teamID.ToString());
 
-            // Make sure the data directory exists
-            if (!System.IO.Directory.Exists(data))
-            {
-                return null;
-            }
+            string BlobDirectory = "filesystem/";
+            BlobDirectory += BlobFileSystem.FixPath(data);
+            data = BlobDirectory;
 
-            return new OSBLEDirectory(data, attr);
+            return new OSBLEDirectory(data);
         }
 
+        /// <summary>
+        /// Overload method for getting assignment files.  This is used when downloading an entire
+        /// assignment's submission directory and not a specific team's submission.
+        /// </summary>
+        /// <param name="courseID"></param>
+        /// <param name="assignmentID"></param>
+        /// <returns></returns>
+        public static OSBLEDirectory GetAssignmentSubmission(int courseID, int assignmentID)
+        {
+            string root = HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
+            string data = System.IO.Path.Combine(root, "Courses", courseID.ToString(),
+                "Assignments", assignmentID.ToString(), "Submissions");
+
+            string BlobDirectory = "filesystem/";
+            BlobDirectory += BlobFileSystem.FixPath(data);
+            data = BlobDirectory;
+
+            return new OSBLEDirectory(data);
+        }
+
+        /// <summary>
+        /// Get a course's related documents.  This is seperate from assignment files,
+        /// these are general files.  This is the directory for the Files & Links area on the course dashboard.
+        /// </summary>
+        /// <param name="courseID"></param>
+        /// <returns></returns>
         public static OSBLEDirectory GetCourseDocs(int courseID)
         {
             string path = HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
             path = System.IO.Path.Combine(path, "Courses", courseID.ToString(), 
                 "CourseDocs");
-
-            //// Make sure the directory exists
-            //if (!System.IO.Directory.Exists(path))
-            //{
-            //    System.IO.Directory.CreateDirectory(path);
-            //}
 
             string BlobDirectory = "filesystem/";
             BlobDirectory += BlobFileSystem.FixPath(path);
@@ -149,6 +171,9 @@ namespace OSBLE.Models.FileSystem
             return new GradebookFilePath(path);
         }
 
+        /// <summary>
+        /// Gets the directory that's used to store content specific to Critical Reviews in an a assignment
+        /// </summary>
         public static OSBLEDirectory GetReview(int courseID, int assignmentID, int authorTeamID, int reviewerTeamID)
         {
             string path = HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
@@ -157,12 +182,10 @@ namespace OSBLE.Models.FileSystem
                 reviewerTeamID.ToString());
 
             // Make sure the directory exists
-            if (!System.IO.Directory.Exists(path))
-            {
-                System.IO.Directory.CreateDirectory(path);
-            }
+            string BlobDirectory = "filesystem/";
+            BlobDirectory += BlobFileSystem.FixPath(path);
 
-            return new OSBLEDirectory(path);
+            return new OSBLEDirectory(BlobDirectory);
         }
 
         /// <summary>

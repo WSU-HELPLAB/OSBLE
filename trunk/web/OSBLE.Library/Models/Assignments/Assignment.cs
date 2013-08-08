@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using OSBLE.Models.FileSystem;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.Rubrics;
 using System.ComponentModel.DataAnnotations;
@@ -309,11 +310,12 @@ namespace OSBLE.Models.Assignments
         /// Returns an int with the amount of submissions received for the assignment
         /// </summary>
         public int GetSubmissionCount()
-        {
+        {         
             int returnVal = 0;
             foreach (AssignmentTeam team in this.AssignmentTeams)
             {
-                if (team.GetSubmissionTime() != null)
+                OSBLEDirectory submissionDir = Directories.GetAssignmentSubmission((int)this.CourseID, this.ID, team.TeamID);
+                if (submissionDir.GetSubmissionTime() != null)
                 {
                     returnVal++;
                 }

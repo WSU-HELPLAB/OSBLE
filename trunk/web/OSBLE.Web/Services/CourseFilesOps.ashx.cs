@@ -416,21 +416,21 @@ namespace OSBLE.Services
                 }
 
                 // Make sure the file exists
-                OSBLEFile af = attrFiles.GetFile(fileName);
-                if (null == af)
-                {
-                    WriteErrorResponse(context,
-                        "Internal error: could not get attributable file");
-                    return;
-                }
+                attrFiles.GetFile(fileName, fileName);
+                //if (null == af)
+                //{
+                //    WriteErrorResponse(context,
+                //        "Internal error: could not get attributable file");
+                //    return;
+                //}
 
-                // Make sure the user has permission to download
-                if (null == courseUser || !af.CanUserDownload(courseUser))
-                {
-                    WriteErrorResponse(context,
-                        "User does not have permission to download this file");
-                    return;
-                }
+                //// Make sure the user has permission to download
+                //if (null == courseUser || !af.CanUserDownload(courseUser))
+                //{
+                //    WriteErrorResponse(context,
+                //        "User does not have permission to download this file");
+                //    return;
+                //}
 
                 if (fileName.ToLower().EndsWith(".pdf"))
                 {
@@ -442,8 +442,8 @@ namespace OSBLE.Services
                 }
                 context.Response.AddHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
 
-                // Transmit file data
-                context.Response.TransmitFile(af.DataFileName);
+                //// Transmit file data
+                //context.Response.TransmitFile(af.DataFileName);
                 return;
             }
             else if ("create_folder" == cmdParam)
@@ -568,8 +568,6 @@ namespace OSBLE.Services
                         "New folder name cannot be empty.");
                     return;
                 }
-
-
 
                 string[] separators = { "/" };
                 string value = folderName;

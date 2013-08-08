@@ -43,8 +43,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             get
             {
                 List<AssignmentTypes> Assessments = new List<AssignmentTypes>();
-                Assessments.Add(AssignmentTypes.CommitteeDiscussion);
-                Assessments.Add(AssignmentTypes.CommitteeReview);
+                //Assessments.Add(AssignmentTypes.CommitteeDiscussion);
+                //Assessments.Add(AssignmentTypes.CommitteeReview);
                 return Assessments;
             }
         }

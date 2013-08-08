@@ -161,19 +161,15 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     OSBLE.Models.FileSystem.Directories.GetAssignment(
                         Assignment.CourseID.Value, tempID)
                     .AttributableFiles;
-                OSBLE.Models.FileSystem.OSBLEDirectory perm =
-                    OSBLE.Models.FileSystem.Directories.GetAssignment(
-                        Assignment.CourseID.Value, Assignment.ID)
-                    .AttributableFiles;
-                OSBLE.Models.FileSystem.OSBLEDirectory.MoveAll(temp, perm, true);
+                OSBLE.Models.FileSystem.OSBLEDirectory.MoveAll(temp, Assignment.ID, tempID.ToString());
 
                 // After the move, we need to make sure that we update attributes because 
                 // the attributes will label the files as assignment descriptions/solutions 
                 // for an assignment with the temporary ID.
-                perm.ReplaceSysAttrAll("assignment_description",
-                    tempID.ToString(), Assignment.ID.ToString());
-                perm.ReplaceSysAttrAll("assignment_solution",
-                    tempID.ToString(), Assignment.ID.ToString());
+                //perm.ReplaceSysAttrAll("assignment_description",
+                //    tempID.ToString(), Assignment.ID.ToString());
+                //perm.ReplaceSysAttrAll("assignment_solution",
+                //    tempID.ToString(), Assignment.ID.ToString());
             }
 
             return base.PostBack(Assignment);

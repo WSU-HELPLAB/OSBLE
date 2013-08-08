@@ -115,8 +115,6 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
             SetUpViewBag();
 
-            
-
             return base.PostBack(Assignment);
         }
 

@@ -16,6 +16,7 @@ using OSBLE.Models.Annotate;
 using OSBLE.Services;
 using OSBLE.Models.FileSystem;
 using Microsoft.WindowsAzure.StorageClient;
+using Microsoft.WindowsAzure.ServiceRuntime;
 
 namespace OSBLE.Controllers
 {
@@ -42,58 +43,9 @@ namespace OSBLE.Controllers
                 BlobFileSystem.GetBlobContainer().GetBlobReference(fsPath.DownloadFile(filePath)).DownloadToStream(Response.OutputStream);
                 return new EmptyResult();
 
-                //for (int i = 0; i < pathPieces.Length - 1; i++)
-                //{
-                //    fsPath = fsPath.GetDir(pathPieces[i]);
-                //}
-                //string fullPath = fsPath.File(pathPieces[pathPieces.Length - 1]).FirstOrDefault();
-                //string fileName = Path.GetFileName(fullPath);
-
-                ////if the file ends in a ".link", then we need to treat it as a web link
-                //if (Path.GetExtension(fileName).ToLower().CompareTo(".link") == 0)
-                //{
-                //    string url = "";
-
-                //    //open the file to get at the link stored inside
-                //    using (TextReader tr = new StreamReader(fullPath))
-                //    {
-                //        url = tr.ReadLine();
-                //    }
-                //    Response.Redirect(url);
-
-                //    //this will never be reached, but the function requires an actionresult to be returned
-                //    return Json("");
-                //}
-                //else
-                //{
-                //    Stream fileStream = null;
-                //    try
-                //    {
-                //        fileStream = fsPath.File(pathPieces[pathPieces.Length - 1]).ToStreams().FirstOrDefault().Value;
-                //    }
-                //    catch (Exception)
-                //    {
-                //        //file not found
-                //    }
-                //    if (fileStream == null)
-                //    {
-                //        return RedirectToAction("Index", "Home");
-                //    }
-
-                //    //else just return the file
-                //    if (Path.GetExtension(filePath).ToLower() == "pdf")
-                //    {
-                //        return new FileStreamResult(fileStream, "application/pdf") { FileDownloadName = fileName };
-                //    }
-                //    else
-                //    {
-                //        return new FileStreamResult(fileStream, "application/octet-stream") { FileDownloadName = fileName };
-                //    }
-                //}
             }
             return RedirectToAction("Index", "Home");
         }
-
 
         /// <summary>
         /// Returns all the submissions for the given assignmentId
@@ -112,53 +64,11 @@ namespace OSBLE.Controllers
             {
                 if (assignment.CourseID == ActiveCourseUser.AbstractCourseID)
                 {
-                    Stream stream = FileSystem.FindZipFile(ActiveCourseUser.AbstractCourse as Course, assignment);
 
-                    string zipFileName = assignment.AssignmentName + ".zip";
-
-                    if (stream != null)
-                    {
-                        return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
-                    }
-
-                    string submissionfolder = FileSystem.GetAssignmentSubmissionFolder(assignment.Course, assignment.ID);
-
-                    using (ZipFile zipfile = new ZipFile())
-                    {
-                        DirectoryInfo acitvityDirectory = new DirectoryInfo(submissionfolder);
-
-                        if (!acitvityDirectory.Exists)
-                        {
-                            FileSystem.CreateZipFolder(ActiveCourseUser.AbstractCourse as Course, zipfile, assignment);
-                        }
-                        else
-                        {
-                            foreach (DirectoryInfo submissionDirectory in acitvityDirectory.GetDirectories())
-                            {
-                                Team currentTeam = (from c in assignment.AssignmentTeams where c.TeamID.ToString() == submissionDirectory.Name select c.Team).FirstOrDefault();
-
-                                if (currentTeam != null)
-                                {
-                                    string folderName = "";
-                                    if (assignment.HasTeams)
-                                    {
-                                        folderName = currentTeam.Name;
-                                    }
-                                    else
-                                    {
-                                        folderName = currentTeam.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ActiveCourseUser.AbstractRoleID);
-                                    }
-
-                                    zipfile.AddDirectory(submissionDirectory.FullName, folderName);
-                                }
-                            }
-
-                            FileSystem.CreateZipFolder(ActiveCourseUser.AbstractCourse as Course, zipfile, assignment);
-                        }
-                        stream = FileSystem.GetDocumentForRead(zipfile.Name);
-
-                        return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
-                    }
+                    OSBLEDirectory download = Directories.GetAssignmentSubmission(ActiveCourseUser.AbstractCourseID, assignmentID);
+                    string ZipName = assignment.AssignmentName + ".zip";                                
+                    Stream stream = download.DownloadDirectory();
+                    return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = ZipName };
                 }
             }
             catch (Exception e)
@@ -211,26 +121,38 @@ namespace OSBLE.Controllers
                 foreach (ReviewTeam reviewTeam in reviewTeams)
                 {
                     string key = reviewTeam.AuthorTeam.Name;
-                    OSBLE.Models.FileSystem.FileCollection fc =
-                        Models.FileSystem.Directories.GetAssignment(
+
+                    OSBLEDirectory download = Models.FileSystem.Directories.GetAssignment(
                             ActiveCourseUser.AbstractCourseID, assignmentId)
-                        .Review(reviewTeam.AuthorTeam, reviewTeam.ReviewingTeam)
-                        .AllFiles();
+                        .Review(reviewTeam.AuthorTeam, reviewTeam.ReviewingTeam);
+
+                    List<IListBlobItem> SubmissionsList = download.GetBlobs(null);
 
                     //don't create a zip if we don't have have anything to zip.
-                    if (fc.Count > 0)
+                    if (SubmissionsList.Count > 0)
                     {
-                        var bytes = fc.ToBytes();
-                        reviewStreams[key] = bytes;
+                        reviewStreams[key] = SubmissionsList;
                     }
+
                 }
 
                 foreach (string author in reviewStreams.Keys)
                 {
-                    foreach (string file in reviewStreams[author].Keys)
+                    List<IListBlobItem> tmpList = reviewStreams[author];
+                    foreach (var Item in tmpList.OfType<CloudBlob>())
                     {
-                        string location = string.Format("{0}/{1}", "Review of " + author, file);
-                        zipfile.AddEntry(location, reviewStreams[author][file]);
+
+                        byte[] fileBytes = Item.DownloadByteArray();
+                        try
+                        {
+                            Item.FetchAttributes();
+                            string file = Item.Metadata["FileName"].ToString();
+                            string location = string.Format("{0}/{1}", "Review of " + author, file);
+                            zipfile.AddEntry(location, fileBytes);
+                        }
+                        catch (Exception)
+                        {
+                        }
                     }
                 }
 
@@ -240,11 +162,8 @@ namespace OSBLE.Controllers
             }
             else //Basic Assigment, only need to get submissions
             {
-                submission = 
-                    OSBLE.Models.FileSystem.Directories.GetAssignmentSubmission(
-                        ActiveCourseUser.AbstractCourseID, assignmentId, teamId)
-                    .AllFiles()
-                    .ToZipStream();
+                OSBLEDirectory download = Directories.GetAssignmentSubmission(ActiveCourseUser.AbstractCourseID, assignmentId, teamId);
+                submission = download.DownloadDirectory();
             }
 
             string ZipName = assignment.AssignmentName + " by " + team.Name + ".zip";
@@ -316,12 +235,7 @@ namespace OSBLE.Controllers
                     return RedirectToRoute(new { controller = "PdfCriticalReview", action = "Review", assignmentID = assignmentId, authorTeamID = authorTeamId });
                 }
 
-                //Document not handled by Annotate, must collect author teams preceding assignment's submission
-                OSBLE.Models.FileSystem.FileCollection AuthorTeamSubmission =
-                    Models.FileSystem.Directories.GetAssignment(
-                        ActiveCourseUser.AbstractCourseID, CRAssignment.PrecededingAssignmentID.Value)
-                    .Submission(authorTeamId)
-                    .AllFiles();
+                ////Document not handled by Annotate, must collect author teams preceding assignment's submission
 
                 //Checking if author should be anonymized. 
                 string displayName = authorTeam.Name;
@@ -329,14 +243,14 @@ namespace OSBLE.Controllers
                 {
                     displayName = "Anonymous " + authorTeamId;
                 }
-                string zipFileName = string.Format("{0}'s submission for {1}.zip", displayName, CRAssignment.PreceedingAssignment.AssignmentName);
 
-                return new FileStreamResult(AuthorTeamSubmission.ToZipStream(), "application/octet-stream") { FileDownloadName = zipFileName };
+                OSBLEDirectory download = Directories.GetAssignmentSubmission(ActiveCourseUser.AbstractCourseID, CRAssignment.PrecededingAssignmentID.Value, authorTeamId);
+                string zipFileName = string.Format("{0}'s submission for {1}.zip", displayName, CRAssignment.PreceedingAssignment.AssignmentName);
+                Stream stream = download.DownloadDirectory();                           
+                return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
             }
             return RedirectToAction("Index", "Home");
         }
-
-
 
         /// <summary>
         /// This gets all the documents for a critical review discussion. This is used by students and instructors
@@ -495,6 +409,7 @@ namespace OSBLE.Controllers
         private ActionResult GetAllReviewedDocuments(Assignment CRAssignment, Team authorTeam, string zipFileName, DiscussionSetting discussionSetting = null)
         {
             Assignment basicAssignment = CRAssignment.PreceedingAssignment;
+
             //If the BasicAssignment was a PDF, then use annotate to view discussion items
             if (basicAssignment.HasDeliverables && basicAssignment.Deliverables[0].DeliverableType == DeliverableType.PDF)
             {
@@ -531,61 +446,67 @@ namespace OSBLE.Controllers
             foreach (AssignmentTeam reviewTeam in reviewingTeams)
             {
                 //Get Reviews for AutuhorTeam from ReviewTeam.
-                string reviewTeamSubmissionPath = 
-                    Models.FileSystem.Directories.GetAssignment(
-                        ActiveCourseUser.AbstractCourseID, CRAssignment.ID)
-                    .Review(authorTeam.ID, reviewTeam.TeamID)
-                    .GetPath();
+                //string reviewTeamSubmissionPath =
+                //    Models.FileSystem.Directories.GetAssignment(
+                //        ActiveCourseUser.AbstractCourseID, CRAssignment.ID)
+                //    .Review(authorTeam.ID, reviewTeam.TeamID)
+                //    .GetPath();
 
+                OSBLEDirectory reviewTeamSubmissionPath = Models.FileSystem.Directories
+                    .GetAssignment(ActiveCourseUser.AbstractCourseID, CRAssignment.ID)
+                    .Review(authorTeam.ID, reviewTeam.TeamID);
 
-                //Directory might not exist, check to avoid runtime error.
-                if (new DirectoryInfo(reviewTeamSubmissionPath).Exists)
+                //Checking anonmous settings to determine name of folder
+                string reviewerDisplayName = reviewTeam.Team.Name;
+                if (AnonymizeReviewer(CRAssignment, reviewTeam.Team, discussionSetting))
                 {
+                    //Change displayName if Reviewer is to be anonymized
+                    reviewerDisplayName = "Anonymous " + reviewTeam.Team.ID;
+                }
+                string folderName = "Review from " + reviewerDisplayName;
 
-                    //Checking anonmous settings to determine name of folder
-                    string reviewerDisplayName = reviewTeam.Team.Name;
-                    if (AnonymizeReviewer(CRAssignment, reviewTeam.Team, discussionSetting))
+                List<IListBlobItem> EnumerateDirectory = reviewTeamSubmissionPath.GetBlobs(null); 
+
+                //Check each file to see it s a .cpml. If it is, handle merging them into one .cpml
+                foreach (var Item in EnumerateDirectory.OfType<CloudBlob>())
+                {
+                    if (Path.GetExtension(Item.Name.ToString()) == ".cpml")
                     {
-                        //Change displayName if Reviewer is to be anonymized
-                        reviewerDisplayName = "Anonymous " + reviewTeam.Team.ID;
-                    }
-                    string folderName = "Review from " + reviewerDisplayName;
+                        //Get blob and create a tmp file name
+                        byte[] fileBytes = Item.DownloadByteArray();
+                        System.IO.File.WriteAllBytes(Item.Name.ToString(), fileBytes);
 
-                    zipFile.AddDirectory(reviewTeamSubmissionPath, folderName);
-
-                    //Check each file to see it s a .cpml. If it is, handle merging them into one .cpml
-                    foreach (string filename in Directory.EnumerateFiles(reviewTeamSubmissionPath))
-                    {
-                        if (Path.GetExtension(filename) == ".cpml")
+                        //Only want to add the original file to the stream once.
+                        if (FirstTime == true)
                         {
-                            //Only want to add the original file to the stream once.
-                            if (FirstTime == true)
-                            {
-                                string originalFile =
-                                    OSBLE.Models.FileSystem.Directories.GetAssignment(
-                                        ActiveCourseUser.AbstractCourseID, basicAssignment.ID)
-                                    .Submission(authorTeam)
-                                    .GetPath();
-                                FileStream filestream = System.IO.File.OpenRead(originalFile + "\\" + basicAssignment.Deliverables[0].Name + ".cpml");
-                                filestream.CopyTo(parentStream);
-                                FirstTime = false;
-                            }
-
-                            //Merge the FileStream from filename + parentStream into outputStream.
-                            ChemProV.Core.CommentMerger.Merge(parentStream, authorDisplayName, System.IO.File.OpenRead(filename), reviewerDisplayName, outputStream);
-
-                            //close old parent stream before writing over it
-                            parentStream.Close();
-
-                            //Copy outputStream to parentStream, creating new outputStream
-                            parentStream = new MemoryStream();
-                            outputStream.Seek(0, SeekOrigin.Begin);
-                            outputStream.CopyTo(parentStream);
-                            outputStream = new MemoryStream();
+                            FileStream filestream = System.IO.File.OpenRead(Item.Name.ToString());
+                            filestream.CopyTo(parentStream);
+                            FirstTime = false;
                         }
+                        //Merge the FileStream from filename + parentStream into outputStream.
+                        ChemProV.Core.CommentMerger.Merge(parentStream, authorDisplayName, System.IO.File.OpenRead(Item.Name.ToString()), reviewerDisplayName, outputStream);
+
+                        //close old parent stream before writing over it
+                        parentStream.Close();
+
+                        //Copy outputStream to parentStream, creating new outputStream
+                        parentStream = new MemoryStream();
+                        outputStream.Seek(0, SeekOrigin.Begin);
+                        outputStream.CopyTo(parentStream);
+                        outputStream = new MemoryStream();
+
+                        System.IO.File.Delete(Item.Name.ToString());
+                    }
+                    else
+                    {
+                        Item.FetchAttributes();
+                        byte[] fileBytes = Item.DownloadByteArray();
+                        string file = Item.Metadata["FileName"].ToString();
+                        string location = string.Format(file);
+                        zipFile.AddEntry(location, fileBytes);
+                        //zipFile.AddDirectory(reviewTeamSubmissionPath, folderName);
                     }
                 }
-
             }
 
             //Adding merged document to Zip if there was every a .cpml
@@ -624,9 +545,7 @@ namespace OSBLE.Controllers
             Stream returnValue = 
                 OSBLE.Models.FileSystem.Directories.GetAssignment(
                     ActiveCourseUser.AbstractCourseID, CRAssignment.ID)
-                .Review(authorTeam, currentUsersTeam)
-                .AllFiles()
-                .ToZipStream();
+                .Review(authorTeam, currentUsersTeam).DownloadDirectory();
 
             //Checking if author should be anonymized. 
             string displayName = authorTeam.Name;
@@ -685,29 +604,12 @@ namespace OSBLE.Controllers
                                                  select a).FirstOrDefault();//db.AssignmentTeams.Find(teamID);
                 if (assignment.CourseID == ActiveCourseUser.AbstractCourseID && assignment.AssignmentTeams.Contains(assignmentTeam))
                 {
-                    Stream stream = FileSystem.FindZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, assignmentTeam);
+                    Stream stream = null;
+                    OSBLEDirectory download = Directories.GetAssignmentSubmission(ActiveCourseUser.AbstractCourseID, assignmentID, assignmentTeam.TeamID);
+                    stream = download.DownloadDirectory();
 
-                    string zipFileName = assignment.AssignmentName + " by " + assignmentTeam.Team.Name + ".zip";
-
-                    if (stream != null)
-                    {
-                        return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
-                    }
-
-                    string submissionfolder = FileSystem.GetTeamUserSubmissionFolder(false, (ActiveCourseUser.AbstractCourse as Course), assignmentID, assignmentTeam);
-
-                    using (ZipFile zipfile = new ZipFile())
-                    {
-                        if (new DirectoryInfo(submissionfolder).Exists)
-                        {
-                            zipfile.AddDirectory(submissionfolder);
-                        }
-                        FileSystem.CreateZipFolder(ActiveCourseUser.AbstractCourse as Course, zipfile, assignment, assignmentTeam);
-
-                        stream = FileSystem.GetDocumentForRead(zipfile.Name);
-
-                        return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
-                    }
+                    string ZipName = assignment.AssignmentName + " by " + assignmentTeam.Team.Name + ".zip";
+                    return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = ZipName };
                 }
             }
             catch (Exception e)
