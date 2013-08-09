@@ -572,6 +572,14 @@ body#layoutLogOn
 	height: 32px;
 }
 
+.custom-menu {
+    z-index:1000;
+    position: absolute;
+    background-color:#C0C0C0;
+    border: 1px solid black;
+    padding: 2px;
+}
+
 #picture_upload input
 {
 	margin-right: 0.25em;

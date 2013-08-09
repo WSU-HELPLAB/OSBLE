@@ -175,7 +175,12 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         result += "<td style=\"" + " width: 75%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; " + "\">";
         if (stateObj.allowsCollapsing)
         {
-            result += "<a style=\"cursor: pointer;\" onclick=\"cfm_expand_collapse(" + ss + ");\">";
+            if (folderName == "Files and Links") {
+                result += "<a class=\"context-menu-three box menu-1\" style=\"cursor: pointer;\" onclick=\"cfm_expand_collapse(" + ss + ");\">";
+            }
+            else {
+                result += "<a class=\"context-menu-one box menu-1\" style=\"cursor: pointer;\" onclick=\"cfm_expand_collapse(" + ss + ");\">";
+            }
             result += "<img id=\"expander_img_" + ss + "\" src=\"" + stateObj.getExpanderImgSrc() + "\" />&nbsp;" + folderName;
             result += "</a>";
         }
@@ -328,7 +333,7 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         var linkURL = "/FileHandler/CourseDocument?courseId=" + 
             courseID.toString() + "&filePath=" + fileStateObj.fullPath;
 
-        result += "<div id=\"" + theID + "\" style=\"padding: 3px; background-color: ";
+        result += "<div class=\"context-menu-two box menu-1\" state-obj=\"" + stateObjIndex.toString() + "\" id=\"" + theID + "\" style=\"padding: 3px; background-color: ";
         if (0 == i % 2) { result += "#ffffff; "; }
         else { result += "#ffffff; "; }
         result += "border: 0px;";
@@ -349,15 +354,15 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         // if the user has deletion permissions.
         if (fileStateObj.allowsDeletion)
         {
-            result += "<a onclick='cfm_FileDeleteIconClicked(" + stateObjIndex.toString() + ");' " +
-                "title=\"Delete this file\">" +
-                "<img style=\"cursor: pointer;\" align=\"right\" " +
-                "src=\"/Content/images/delete_up.png\"></a>";
+            //result += "<a onclick='cfm_FileDeleteIconClicked(" + stateObjIndex.toString() + ");' " +
+            //    "title=\"Delete this file\">" +
+            //    "<img style=\"cursor: pointer;\" align=\"right\" " +
+            //    "src=\"/Content/images/delete_up.png\"></a>";
 
-            result += "<a onclick='cfm_FileRenameIconClicked(" + stateObjIndex.toString() + ");' " +
-                "title=\"Rename this file...\">" +
-                "<img style=\"cursor: pointer;\" align=\"right\" " +
-                "src=\"/Content/images/edit_up.png\"></a>";
+            //result += "<a onclick='cfm_FileRenameIconClicked(" + stateObjIndex.toString() + ");' " +
+            //    "title=\"Rename this file...\">" +
+            //    "<img style=\"cursor: pointer;\" align=\"right\" " +
+            //    "src=\"/Content/images/edit_up.png\"></a>";
         }
 
         result += "</td>";
@@ -514,6 +519,7 @@ function cfm_DeleteFile(stateObjectIndex)
     req.open("POST", "../Services/CourseFilesOps.ashx?cmd=delete_file&courseID=" +
         courseID + "&file_name=" + state.fullPath);
     req.send();
+    removePopUp();
 }
 
 function cfm_DeleteFolder(stateObjectIndex)
@@ -650,12 +656,37 @@ function cfm_FileDeleteIconClicked(stateObjectIndex)
     // Find the appropriate DIV
     var targetDIV = document.getElementById("file_controls_" + stateObjectIndex.toString());
 
-    // Add the rename controls into the DIV
-    targetDIV.innerHTML = "<br /><div>Are you sure you want to delete this file?</div>" +
+    //// Add the rename controls into the DIV
+    //targetDIV.innerHTML = "<br /><div>Are you sure you want to delete this file?</div>" +
+    //    "<input type=\"button\" value=\"Yes, delete\" style=\"width: 100%;\" " +
+    //    "onclick=\"cfm_DeleteFile(" + stateObjectIndex.toString() + ");\" />" +
+    //    "<br /><input type=\"button\" value=\"No, Cancel\" style=\"width: 100%;\" " +
+    //    "onclick=\"cfm_hideControls(" + stateObjectIndex.toString() + ");\" />";
+
+    $('body').append(
+"<div id=\"input_dialog\" title=\"Delete\"> \
+        <br /><div>Are you sure you want to delete?</div>" +
         "<input type=\"button\" value=\"Yes, delete\" style=\"width: 100%;\" " +
         "onclick=\"cfm_DeleteFile(" + stateObjectIndex.toString() + ");\" />" +
         "<br /><input type=\"button\" value=\"No, Cancel\" style=\"width: 100%;\" " +
-        "onclick=\"cfm_hideControls(" + stateObjectIndex.toString() + ");\" />";
+        "onclick=\"removePopUp()\");\" />\
+</div>");
+
+
+    //"onclick=\"cfm_hideControls(" + stateObjectIndex.toString() + ");\" />\
+    //make the div we just created into a dialog box
+
+    $('#input_dialog').dialog({
+        modal: true,
+        autoOpen: true,
+        resizable: false,
+        width: 245,
+        height: 225,
+        closeOnEscape: true,
+        close: removePopUp
+    });
+
+    $('#input_dialog').dialog('open');
 }
 
 function cfm_FileRenameIconClicked(stateObjectIndex)
@@ -666,14 +697,49 @@ function cfm_FileRenameIconClicked(stateObjectIndex)
     // Find the appropriate DIV
     var targetDIV = document.getElementById("file_controls_" + stateObjectIndex.toString());
 
-    // Add the rename controls into the DIV
-    targetDIV.innerHTML = "<br /><div><input type=\"text\" id=\"tbRenameFile_" +
+    //// Add the rename controls into the DIV
+    //targetDIV.innerHTML = "<br /><div><input type=\"text\" id=\"tbRenameFile_" +
+    //    stateObjectIndex.toString() + "\" value=\"" + state.name +
+    //    "\" style=\"width: 100%; box-sizing: border-box;\"></div>" +
+    //    "<input type=\"button\" value=\"Rename\" style=\"width: 100%;\" " +
+    //    "onclick=\"cfm_RenameFile(" + stateObjectIndex.toString() + ");\" />" +
+    //    "<br /><input type=\"button\" value=\"Cancel\" style=\"width: 100%;\" " +
+    //    "onclick=\"cfm_hideControls(" + stateObjectIndex.toString() + ");\" />";
+
+
+    $('body').append(
+"<div id=\"input_dialog\" title=\"Rename\"> \
+        <br /><div><input type=\"text\" id=\"tbRenameFile_" +
         stateObjectIndex.toString() + "\" value=\"" + state.name +
         "\" style=\"width: 100%; box-sizing: border-box;\"></div>" +
         "<input type=\"button\" value=\"Rename\" style=\"width: 100%;\" " +
         "onclick=\"cfm_RenameFile(" + stateObjectIndex.toString() + ");\" />" +
         "<br /><input type=\"button\" value=\"Cancel\" style=\"width: 100%;\" " +
-        "onclick=\"cfm_hideControls(" + stateObjectIndex.toString() + ");\" />";
+        "onclick=\"removePopUp()\");\" />\
+</div>");
+
+
+    //"onclick=\"cfm_hideControls(" + stateObjectIndex.toString() + ");\" />\
+    //make the div we just created into a dialog box
+
+    $('#input_dialog').dialog({
+        modal: true,
+        autoOpen: true,
+        resizable: false,
+        width: 225,
+        height: 225,
+        closeOnEscape: true,
+        close: removePopUp
+    });
+
+    $('#input_dialog').dialog('open');
+}
+
+//Remove popup controls
+function removePopUp() {
+    $('#input_dialog').dialog("destroy");
+    //then remove the div
+    $('#input_dialog').remove();
 }
 
 // Function that gets the extra service arguments for the file uploader web service. We 
@@ -741,6 +807,8 @@ function cfm_RenameFile(stateObjectIndex)
     req.open("POST", "../Services/CourseFilesOps.ashx?cmd=rename_file&courseID=" +
         courseID + "&file_name=" + state.fullPath + "&new_name=" + tb.value);
     req.send();
+
+    removePopUp();
 }
 
 function cfm_RenameFolder(stateObjectIndex)
@@ -812,3 +880,74 @@ function cfm_uploadComplete(stateObjectIndex)
     // Refresh the listing
     cfm_getListing(state.fm_div_ID);
 }
+
+// Context menu stuff
+
+// A context menu with full functionality, this is a folder which is not the root of the directory.
+$(function () {
+    $.contextMenu({
+        selector: '.context-menu-one',
+        callback: function (key, options) {
+            var m = "clicked: " + key;
+            window.console && console.log(m) || alert(m);
+        },
+        items: {
+            "Rename": { name: "Rename", icon: "edit" },
+            "Delete": { name: "Delete", icon: "delete" },
+            "Upload": { name: "Upload", icon: "add" },
+            "New Folder": { name: "NewFolder", icon: "add2" },
+        }
+    });
+
+    $('.context-menu-one').on('click', function (e) {
+        console.log('clicked', this);
+    })
+});
+
+// This is a typical file that is uploaded to the file system like a .PDF
+$(function () {
+    $.contextMenu({
+        selector: '.context-menu-two',
+        items: {
+            "Rename": {
+                name: "Rename",
+                icon: "edit",
+                callback: function (key, opt) {
+                    // get the state object id of the clicked div and call the rename function
+                    var m = opt.$trigger.attr('state-obj');
+                    cfm_FileRenameIconClicked(m);
+                }
+
+            },
+            "Delete": {
+                name: "Delete",
+                icon: "delete",
+                callback: function (key, opt) {
+                    // get the state object id of the clicked div and call the rename function
+                    var m = opt.$trigger.attr('state-obj');
+                    cfm_FileDeleteIconClicked(m);
+                }
+
+            }
+        }
+    });
+});
+
+// This is the functionality for a root directory
+$(function () {
+    $.contextMenu({
+        selector: '.context-menu-three',
+        callback: function (key, options) {
+            var m = "clicked: " + key;
+            window.console && console.log(m) || alert(m);
+        },
+        items: {
+            "Upload": { name: "Upload", icon: "add" },
+            "New Folder": { name: "NewFolder", icon: "add2" },
+        }
+    });
+
+    $('.context-menu-three').on('click', function (e) {
+        console.log('clicked', this);
+    })
+});
