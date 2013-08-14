@@ -423,6 +423,7 @@
     <Content Include="Content\images\fileextimages\zip.png" />
     <Content Include="Content\images\fileextimages\_blank.png" />
     <Content Include="Content\images\fileextimages\_page.png" />
+    <Content Include="Content\images\Folder-icon.png" />
     <Content Include="Content\images\folder_plus.png" />
     <Content Include="Content\images\gradebookexamples\DblExclimationExample.png" />
     <Content Include="Content\images\gradebookexamples\ExclimationExample.png" />
@@ -558,6 +559,7 @@
     <Content Include="Content\themes\base\jquery.ui.theme.css" />
     <Content Include="Content\themes\base\jquery.ui.tooltip.css" />
     <Content Include="Content\themes\base\minified\images\animated-overlay.gif" />
+    <Content Include="Content\themes\base\minified\images\page_white_paste.png" />
     <Content Include="Content\themes\base\minified\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Content\themes\base\minified\images\ui-bg_flat_75_ffffff_40x100.png" />
     <Content Include="Content\themes\base\minified\images\ui-bg_glass_55_fbf9ee_1x400.png" />
@@ -681,6 +683,7 @@
     <Content Include="Scripts\jquery-ui-1.10.3.min.js" />
     <Content Include="Scripts\jquery.collapse.js" />
     <Content Include="Scripts\jquery.contextMenu.js" />
+    <Content Include="Scripts\jquery.cookie.js" />
     <Content Include="Scripts\jquery.easing.js" />
     <Content Include="Scripts\jquery.selectboxes.js" />
     <Content Include="Scripts\jquery.tmpl.min.js" />

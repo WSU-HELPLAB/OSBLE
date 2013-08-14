@@ -130,6 +130,7 @@ function fileuploader_completion(args, filesArray, nextIndex, progressDIV, extra
 
     // Start the next upload if there is one
     fileuploader_uploadRemaining(filesArray, nextIndex, progressDIV, extraServiceArgs, onCompletion);
+    removePopUp();
 }
 
 function fileuploader_fail(args, progressDIV)
