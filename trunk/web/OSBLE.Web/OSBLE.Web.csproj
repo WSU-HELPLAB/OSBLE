@@ -425,6 +425,7 @@
     <Content Include="Content\images\fileextimages\zip.png" />
     <Content Include="Content\images\fileextimages\_blank.png" />
     <Content Include="Content\images\fileextimages\_page.png" />
+    <Content Include="Content\images\Folder-icon.png" />
     <Content Include="Content\images\folder_plus.png" />
     <Content Include="Content\images\gradebookexamples\DblExclimationExample.png" />
     <Content Include="Content\images\gradebookexamples\ExclimationExample.png" />
@@ -489,6 +490,10 @@
     <Content Include="Content\images\mail_up.png" />
     <Content Include="Content\images\move_down.png" />
     <Content Include="Content\images\move_up.png" />
+    <Content Include="Content\images\page_white_add.png" />
+    <Content Include="Content\images\page_white_delete.png" />
+    <Content Include="Content\images\page_white_edit.png" />
+    <Content Include="Content\images\page_white_paste.png" />
     <Content Include="Content\images\publish.png" />
     <Content Include="Content\images\tooltip\109_AllAnnotations_Help_16x16_72.png" />
     <Content Include="Content\images\tooltip\bubble-1.png" />
@@ -523,6 +528,7 @@
     <Content Include="Content\jquery-tooltip.css" />
     <Content Include="Content\jquery-ui-1.8.13.custom.css" />
     <Content Include="Content\jquery-ui-timepicker.css" />
+    <Content Include="Content\jquery.contextMenu.css" />
     <Content Include="Content\themes\base\images\animated-overlay.gif" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
@@ -659,6 +665,7 @@
     <Content Include="Areas\AssignmentWizard\Views\ReviewOfStudentWork\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\CommitteeReview\Index.cshtml" />
     <Content Include="Resources\CSVReader\CSVCellReaderStateMachine.png" />
+    <Content Include="Scripts\contextMenu.js" />
     <Content Include="Scripts\CourseFileManager.js" />
     <Content Include="Scripts\CourseFilesUploader.js" />
     <None Include="Properties\PublishProfiles\filesystem.pubxml" />
@@ -671,9 +678,11 @@
     <Content Include="Scripts\jquery-ui-1.10.3.js" />
     <Content Include="Scripts\jquery-ui-1.10.3.min.js" />
     <Content Include="Scripts\jquery.collapse.js" />
+    <Content Include="Scripts\jquery.contextMenu.js" />
     <Content Include="Scripts\jquery.easing.js" />
     <Content Include="Scripts\jquery.selectboxes.js" />
     <Content Include="Scripts\jquery.tmpl.min.js" />
+    <Content Include="Scripts\jquery.ui.position.js" />
     <Content Include="Scripts\jquery.ui.timepicker.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
