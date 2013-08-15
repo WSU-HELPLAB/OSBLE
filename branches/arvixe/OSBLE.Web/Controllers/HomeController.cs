@@ -169,6 +169,11 @@ namespace OSBLE.Controllers
             int eventDays = 7 * ActiveCourseUser.AbstractCourse.CalendarWindowOfTime;
 
             DateTime today = DateTime.UtcNow.Date;
+
+            DateTime converted = DateTime.SpecifyKind(DateTime.Parse(today.ToString()), DateTimeKind.Utc);
+            var kind = converted.Kind;
+            today = converted.ToLocalTime();
+
             DateTime upto = today.AddDays(eventDays);
 
             using (EventController ec = new EventController())
