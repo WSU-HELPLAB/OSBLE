@@ -668,7 +668,7 @@
     <Content Include="Scripts\contextMenu.js" />
     <Content Include="Scripts\CourseFileManager.js" />
     <Content Include="Scripts\CourseFilesUploader.js" />
-    <None Include="Properties\PublishProfiles\filesystem.pubxml" />
+    <None Include="Properties\PublishProfiles\osble.pubxml" />
     <None Include="Scripts\jquery-2.0.1.intellisense.js" />
     <Content Include="Scripts\jquery-2.0.1.js" />
     <Content Include="Scripts\jquery-2.0.1.min.js" />
@@ -679,6 +679,7 @@
     <Content Include="Scripts\jquery-ui-1.10.3.min.js" />
     <Content Include="Scripts\jquery.collapse.js" />
     <Content Include="Scripts\jquery.contextMenu.js" />
+    <Content Include="Scripts\jquery.cookie.js" />
     <Content Include="Scripts\jquery.easing.js" />
     <Content Include="Scripts\jquery.selectboxes.js" />
     <Content Include="Scripts\jquery.tmpl.min.js" />

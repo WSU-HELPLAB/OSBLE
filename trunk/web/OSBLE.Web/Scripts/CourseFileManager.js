@@ -4,8 +4,15 @@
 // Important notes:
 //    Only one file manager per page is currently allowed
 
+
+
 // Global array for state objects
 var cfm_states = new Array();
+
+//For user selection purposes
+var cfm_statesSelected = new Array();
+var cfm_boolMultipleSelected = false;
+var firstListing = true;
 
 // Call this function to start the asynchronous request for a file listing.
 // When the request completes the inner HTML of the DIV with the specified 
@@ -36,9 +43,11 @@ function cfm_getListing(targetDIVID) {
         "&force_nocache=" + (new Date()).toString());
     req.setRequestHeader("Cache-control", "no-cache");
     req.send();
+
 }
 
 function cfm_listcompletion(args, targetDIVID) {
+
     // Find the DIV
     var theDIV = document.getElementById(targetDIVID);
 
@@ -46,7 +55,7 @@ function cfm_listcompletion(args, targetDIVID) {
     var doc = args.target.responseXML;
     if (null == doc) {
         theDIV.innerHTML = "Error: XML document from service response is null! " +
-            "Please contact support for help with this issue.  error 1";
+            "Please contact support for help with this issue.";
         return;
     }
 
@@ -56,7 +65,7 @@ function cfm_listcompletion(args, targetDIVID) {
     var root = doc.firstChild;
     if (null == doc) {
         theDIV.innerHTML = "Error: Root element in XML document from service is null! " +
-            "Please contact support for help with this issue. error 2";
+            "Please contact support for help with this issue.";
         return;
     }
 
@@ -75,10 +84,15 @@ function cfm_listcompletion(args, targetDIVID) {
 
         var listNode = lists[0];
         theDIV.innerHTML = cfm_MakeDIV(listNode, "", "padding: 0px;", -1, targetDIVID);
-    }
 
-    for (var i = 0; i < cfm_states.length; i++) {
-        cfm_expand_collapse(i);
+        var cookieExists = $.cookie('fileSystemCookie');
+        if (cookieExists == null) {
+            $.cookie('fileSystemCookie', "root");
+        }
+
+        //// Expand the root by default
+        cfm_expand_collapseRoot();
+        cfm_retrieveListingStatus();
     }
 }
 
@@ -151,68 +165,54 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         // action occurs.
         var theStyle
         if ("/" == folderPath) {
-            theStyle = "padding: 3px; border: 0px; background: white; ";
+            theStyle = "padding: 3px; border: 0px;";
         }
         else {
-            theStyle = "padding: 3px; border: 0px; background: white; ";
+            theStyle = "padding: 3px; border: 0px;";
         }
 
         // One new DIV for the folder name and control buttons
-        result += "<div id=\"folder_div_" + ss + "\" style=\"" + theStyle + "\">";
+        if (folderName == "Files and Links") {
+            if (canUploadTo == true && canDelete == true) {
+                result += "<div class=\"context-menu-three box menu-1\" state-obj=\"" + stateObjIndex.toString() + "\" id=\"folder_div_" + ss + "\" style=\"" + theStyle + "\" name=\"Files and Links\">";
+            }
+            else {
+                result += "<div state-obj=\"" + stateObjIndex.toString() + "\" id=\"folder_div_" + ss + "\" style=\"" + theStyle + "\" name=\"Files and Links\">";
+            }
+        }
+        else {
+            if (canUploadTo == true && canDelete == true) {
+                result += "<div class=\"context-menu-one box menu-1\" state-obj=\"" + stateObjIndex.toString() + "\" id=\"folder_div_" + ss + "\" style=\"" + theStyle + "\" name=\"Folders\" folder-name=\"" + folderName + "\">";
+                result += "<div id=\"stateSelectID_" + stateObjIndex.toString() + "\" class=\"itemSelection\" state-obj-select=\"" + stateObjIndex.toString() + "\" file-or-folder=\"folder\" folder-name=\"" + folderName + "\">";
+            }
+            else {
+                result += "<div state-obj=\"" + stateObjIndex.toString() + "\" id=\"folder_div_" + ss + "\" style=\"" + theStyle + "\" name=\"Folders\" folder-name=\"" + folderName + "\">";
+                result += "<div id=\"stateSelectID_" + stateObjIndex.toString() + "\" class=\"itemSelection\" state-obj-select=\"" + stateObjIndex.toString() + "\" file-or-folder=\"folder\" folder-name=\"" + folderName + "\">";
+            }
+        }
+
         result += "<table width=100%; id=\"folder_text_" + ss + "\" style=\"" + " table-layout: fixed; " + "\">";
         result += "<tr>";
-        result += "<td style=\"" + " width: 85%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; " + "\">";
+        result += "<td style=\"" + " width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; " + "\">";
         if (stateObj.allowsCollapsing) {
-            result += "<a style=\"cursor: pointer;\" onclick=\"cfm_expand_collapse(" + ss + ");\">";
-            result += "<img id=\"expander_img_" + ss + "\" src=\"" + stateObj.getExpanderImgSrc() + "\" />&nbsp;" + folderName;
-            result += "</a>";
+            if (folderName == "Files and Links") {
+                result += "<h3 style=\"-webkit-margin-before: .60em; -webkit-margin-after: .5em;\">Files and Links</h3>";
+            } else {
+                result += "<a style=\"cursor: pointer;\" title=\"" + folderName + "\" onclick=\"cfm_expand_collapse(" + ss + ");\">";
+                result += "<img id=\"expander_img_" + ss + "\" src=\"" + stateObj.getExpanderImgSrc() + "\" />&nbsp;" + folderName;
+                result += "</a>";
+            }
         }
         else { result += folderName; }
         result += "</td>";
-        result += "<td style=\"" + " width: 50%; overflow: hidden; " + "\">";
-        if (stateObj.allowsUploads) {
-            // Can only rename and delete if not root
-            if ("/" != folderPath) {
-
-                if (stateObj.allowsDeletion) {
-                    result += "<a onclick='cfm_DeleteFolderIconClicked(" + stateObjIndex.toString() + ");' " +
-                        "title=\"Delete this folder...\">" +
-                        "<img style=\"cursor: pointer;\" align=\"right\" " +
-                        "src=\"/Content/images/delete_up.png\"></a>";
-                }
-
-                // Again we're assuming that if they can upload files then they can also 
-                // rename folders. These two concepts might need to end up being separate 
-                // permission values later on.
-                result += "<a onclick='cfm_RenameFolderIconClicked(" + stateObjIndex.toString() + ");' " +
-                    "title=\"Rename this folder...\">" +
-                    "<img style=\"cursor: pointer;\" align=\"right\" " +
-                    "src=\"/Content/images/edit_up.png\"></a>";
-            }
-
-            // Need a button to upload files (makes uploader control appear when clicked)
-            result += "<a onclick='cfm_AddUploader(" + stateObjIndex.toString() + ");' " +
-                "title=\"Upload files to this folder...\">" +
-                "<img style=\"cursor: pointer;\" align=\"right\" " +
-                "src=\"/Content/images/publish.png\"></a>";
-
-            // Right now we're assuming that if they can upload files then they can also 
-            // create subfolders. These two concepts might need to end up being separate 
-            // permission values later on.
-            result += "<a onclick='cfm_CreateFolderIconClicked(" + stateObjIndex.toString() + ");' " +
-                "title=\"Create a subfolder within this folder...\">" +
-                "<img style=\"cursor: pointer;\" align=\"right\" " +
-                "src=\"/Content/images/folder_plus.png\"></a>";
-        }
-        // There's another DIV within for dynamically created controls
-        result += "</td>";
         result += "</tr>";
         result += "</table>";
-        result += "<div id=\"folder_controls_" + stateObjIndex.toString() + "\"></div>";
         result += "</div>";
 
-
-
+        if (folderName != "Files and Links") {
+            result += "</div>";
+        }
+     
         // Then the recursive call makes another DIV for the files (provided there are some)
         if (cfm_CountChildrenWithName(tempNode, "file") > 0 ||
             cfm_CountChildrenWithName(tempNode, "folder") > 0) {
@@ -304,46 +304,29 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         // Note that we need relative path in filename for files in folders
         var linkURL = "/FileHandler/CourseDocument?courseId=" +
             courseID.toString() + "&filePath=" + fileStateObj.fullPath;
-
-        result += "<div id=\"" + theID + "\" style=\"padding: 3px; background-color: ";
-        if (0 == i % 2) { result += "#ffffff; "; }
-        else { result += "#ffffff; "; }
+        if (canUploadTo == true && canDelete == true) {
+            result += "<div id=\"stateSelectID_" + stateObjIndex.toString() + "\" class=\"itemSelection\" state-obj-select=\"" + stateObjIndex.toString() + "\" file-or-folder=\"file\"  >";
+            result += "<div class=\"context-menu-two box menu-1\" state-obj=\"" + stateObjIndex.toString() + "\" id=\"" + theID + "\" style=\"padding: 3px; ";
+        }
+        else {
+            result += "<div id=\"stateSelectID_" + stateObjIndex.toString() + "\" class=\"itemSelection\" state-obj-select=\"" + stateObjIndex.toString() + "\" file-or-folder=\"file\"  >";
+            result += "<div state-obj=\"" + stateObjIndex.toString() + "\" id=\"" + theID + "\" style=\"padding: 3px; ";
+        }
+            //if (0 == i % 2) { result += "#ffffff; "; }
+        //else { result += "#ffffff; "; }
         result += "border: 0px;";
         result += "\">";
 
         result += "<table width=100%; id=\"folder_text_" + ss + "\" style=\"" + " table-layout: fixed; " + "\">";
-        result += "<tr>";
-        result += "<td style=\"" + " width: 85%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; " + "\">";
-
-
-        result += ("<a href=\"" + linkURL + "\"><img src=\"" + imgSrc + "\" />" + fileName + "</a>");
-
-        result += "</td>";
-        result += "<td style=\"" + " width: 50%; overflow: hidden; " + "\">";
-
-        // I'm going to go with the approach of having a single edit button per file that, 
-        // when clicked, brings up options for further actions. This button will only appear 
-        // if the user has deletion permissions.
-        if (fileStateObj.allowsDeletion) {
-            result += "<a onclick='cfm_FileDeleteIconClicked(" + stateObjIndex.toString() + ");' " +
-                "title=\"Delete this file\">" +
-                "<img style=\"cursor: pointer;\" align=\"right\" " +
-                "src=\"/Content/images/delete_up.png\"></a>";
-
-            result += "<a onclick='cfm_FileRenameIconClicked(" + stateObjIndex.toString() + ");' " +
-                "title=\"Rename this file...\">" +
-                "<img style=\"cursor: pointer;\" align=\"right\" " +
-                "src=\"/Content/images/edit_up.png\"></a>";
-        }
-
+        result += "<tr class=\"selector\">";
+        result += "<td style=\"" + " width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; " + "\">";
+        result += ("<a title=\"" + fileName + "\" href=\"" + linkURL + "\"><img src=\"" + imgSrc + "\" />" + fileName + "</a>");
         result += "</td>";
         result += "</tr>";
         result += "</table>";
-
-        // There's another DIV for controls for the file, which is empty by default
-        result += "<div id=\"file_controls_" + stateObjIndex.toString() + "\"></div>";
-
         result += "</div>";
+        result += "</div>";
+
     }
     result += "</div>";
 
@@ -360,12 +343,27 @@ function cfm_AddUploader(stateObjectIndex) {
     var targetDIV = document.getElementById("folder_controls_" + stateObjectIndex.toString());
 
     // Add the uploader control into the DIV
-    targetDIV.innerHTML = "<br />" + fileuploader_getcontrolshtml(
+    $('body').append(
+"<div id=\"input_dialog\" title=\"Upload File(s)\"> \
+    <br />" + fileuploader_getcontrolshtml(
         "cfm_files_" + stateObjectIndex.toString(), true,
         "cfm_GetExtraServiceArgs(" + stateObjectIndex.toString() + ");",
         "cfm_uploadComplete(" + stateObjectIndex.toString() + ");") +
         "<input type=\"button\" value=\"Cancel\" style=\"width: 100%;\" " +
-        "onclick=\"cfm_hideControls(" + stateObjectIndex.toString() + ");\" />";
+        "onclick=\"removePopUp()\");\" />" +
+"</div>");
+
+    $('#input_dialog').dialog({
+        modal: true,
+        autoOpen: true,
+        resizable: false,
+        width: 350,
+        height: 225,
+        closeOnEscape: true,
+        close: removePopUp
+    });
+
+    $('#input_dialog').dialog('open');
 
     // Find the submit button and make its width 100%
     var btnUpload = document.getElementById("btnSubmit_cfm_files_" + stateObjectIndex.toString());
@@ -435,6 +433,9 @@ function cfm_CreateFolder(stateObjectIndex) {
     req.open("POST", "../Services/CourseFilesOps.ashx?cmd=create_folder&courseID=" +
         courseID + "&folder_name=" + name);
     req.send();
+    removePopUp();
+    cfm_expand_collapseRoot();
+    cfm_retrieveListingStatus();
 }
 
 function cfm_CreateFolderIconClicked(stateObjectIndex) {
@@ -444,13 +445,28 @@ function cfm_CreateFolderIconClicked(stateObjectIndex) {
     // Find the appropriate DIV
     var targetDIV = document.getElementById("folder_controls_" + stateObjectIndex.toString());
 
-    // Add the creation controls into the DIV
-    targetDIV.innerHTML = "<br />Create Folder:&nbsp;" +
+    //// Add the creation controls into the DIV
+    $('body').append(
+"<div id=\"input_dialog\" title=\"Create Folder\"> \
+    <br />Create Folder:&nbsp;" +
         "<input type=\"text\" id=\"tbSubfolder_" + stateObjectIndex.toString() + "\" />" +
         "<br /><input type=\"button\" value=\"Create\" style=\"width: 100%;\" " +
         "onclick=\"cfm_CreateFolder(" + stateObjectIndex.toString() + ");\" />" +
         "<br /><input type=\"button\" value=\"Cancel\" style=\"width: 100%;\" " +
-        "onclick=\"cfm_hideControls(" + stateObjectIndex.toString() + ");\" />";
+        "onclick=\"removePopUp()\");\" />" +
+"</div>");
+
+    $('#input_dialog').dialog({
+        modal: true,
+        autoOpen: true,
+        resizable: false,
+        width: 225,
+        height: 225,
+        closeOnEscape: true,
+        close: removePopUp
+    });
+
+    $('#input_dialog').dialog('open');
 
     // Mark the controls as visible
     state.controlsVisible = true;
@@ -477,11 +493,17 @@ function cfm_DeleteFile(stateObjectIndex) {
     req.open("POST", "../Services/CourseFilesOps.ashx?cmd=delete_file&courseID=" +
         courseID + "&file_name=" + state.fullPath);
     req.send();
+    removePopUp();
+    cfm_expand_collapseRoot();
+    cfm_retrieveListingStatus();
 }
 
 function cfm_DeleteFolder(stateObjectIndex) {
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
+
+    var element = document.getElementById("stateSelectID_" + stateObjectIndex);
+    var elementTitle = $(element).attr("folder-name");
 
     // Get the current course ID
     var selectCourseObj = document.getElementById("course_select");
@@ -500,30 +522,154 @@ function cfm_DeleteFolder(stateObjectIndex) {
     req.open("POST", "../Services/CourseFilesOps.ashx?cmd=delete_folder&courseID=" +
         courseID + "&folder_name=" + state.targetFolder);
     req.send();
+
+    removePopUp();
+    cfm_expand_collapseRoot();
+    cfm_removeCookie(elementTitle);
+    cfm_retrieveListingStatus();
 }
 
 function cfm_DeleteFolderIconClicked(stateObjectIndex) {
+
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
 
     // Find the appropriate DIV
     var targetDIV = document.getElementById("folder_controls_" + stateObjectIndex.toString());
 
-    // Add the confirmation controls into the DIV
-    targetDIV.innerHTML = "<br />Are you sure you want to delete this folder and all its contents?" +
+    //// Add the confirmation controls into the DIV
+    $('body').append(
+"<div id=\"input_dialog\" title=\"Delete Folder\"> \
+        <br />Are you sure you want to delete this folder and all its contents?" +
         "<br /><input type=\"button\" value=\"Yes, delete\" style=\"width: 100%;\" " +
         "onclick=\"cfm_DeleteFolder(" + stateObjectIndex.toString() + ");\" />" +
         "<br /><input type=\"button\" value=\"No, cancel\" style=\"width: 100%;\" " +
-        "onclick=\"cfm_hideControls(" + stateObjectIndex.toString() + ");\" />";
+        "onclick=\"removePopUp()\" />" +
+"</div>");
+
+    $('#input_dialog').dialog({
+        modal: true,
+        autoOpen: true,
+        resizable: false,
+        width: 225,
+        height: 225,
+        closeOnEscape: true,
+        close: removePopUp
+    });
+
+    $('#input_dialog').dialog('open');
 
     // Mark the controls as visible
     state.controlsVisible = true;
 }
 
-function cfm_expand_collapse(stateObjectIndex) {
+//This function finds and expands the root, used for making it always expanded.
+function cfm_expand_collapseRoot() {
+
+    var elements = document.getElementsByName('Files and Links');
+    var root = elements[0];
+
+    var rootNum = $(root).attr('state-obj');
+
+    cfm_expand_collapse(rootNum, true);
+
+}
+
+//This function retrieves how the files and links folder was last listed
+//and resets the layout of files and links to this.
+function cfm_retrieveListingStatus() {
+
+    //Check to see if a user has a cookies file 
+    var cookieExists = $.cookie('fileSystemCookie');
+
+    if (cookieExists == null) {
+        $.cookie('fileSystemCookie');
+    }
+    else {
+        var elements = document.getElementsByName("Folders");
+        var tmpString = $.cookie('fileSystemCookie');
+        tmpString = tmpString.toString();
+        var boolFound = false;
+        var tmpArray = tmpString.split(',');
+
+        for (var j = 0; j < tmpArray.length; j++) {
+            boolFound = false;
+            if (tmpArray[j] != "" && tmpArray[j] != "root") {
+                var cookieElement = tmpArray[j];
+
+                for (var i = 0; i < elements.length; i++) {
+                    var tmpElement = elements[i];
+                    var tmpName = $(tmpElement).attr('folder-name');
+                    if (tmpName == cookieElement) {
+                        var foundElementId = $(tmpElement).attr('state-obj');
+                        cfm_expand_collapse(foundElementId, true);
+                        boolFound = true;
+                    }
+                }
+
+                if (boolFound != true) {
+                    cfm_removeCookie(cookieElement);
+                }
+
+            }
+        }
+    }
+}
+
+function cfm_addCookie(cookieName) {
+    //Check to see if a user has a cookies file 
+    var cookieExists = $.cookie('fileSystemCookie');
+    if (cookieExists != null) {
+        var tmpString = $.cookie('fileSystemCookie');
+        tmpString = tmpString.toString();
+        tmpString = tmpString + "," + cookieName;
+        $.removeCookie('fileSystemCookie');
+        $.cookie('fileSystemCookie', tmpString);
+    }
+
+}
+
+function cfm_removeCookie(cookieName) {
+    //Check to see if a user has a cookies file 
+    var cookieExists = $.cookie('fileSystemCookie');
+    if (cookieExists != null) {
+        var tmpString = $.cookie('fileSystemCookie');
+        tmpString = tmpString.toString();
+        var tmpArray = tmpString.split(',');
+        var indexOfCookie = tmpArray.indexOf(cookieName);
+
+
+        if (indexOfCookie > -1) {
+            tmpArray.splice(indexOfCookie, 1);
+            
+            if(tmpArray[1] != "" && tmpArray[0] != null) {
+                if(tmpArray[0] == "" && tmpArray[1] != null)
+                {
+                    var finalCookie = tmpArray[1];
+                }
+                else
+                {
+                    var finalCookie = tmpArray[0];
+                }              
+            }
+            
+            for (var i = 0; i < tmpArray.length; i++) {
+                if (tmpArray[i] != "") {
+                    if (tmpArray[i] != "root") {
+                        finalCookie = finalCookie + "," + tmpArray[i];
+                    }
+                }
+            }
+            $.removeCookie('fileSystemCookie');
+            $.cookie('fileSystemCookie', finalCookie);
+        }
+    }
+
+}
+
+function cfm_expand_collapse(stateObjectIndex, cookies) {
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
-
     var ss = stateObjectIndex.toString();
 
     // Get the expander image
@@ -536,50 +682,16 @@ function cfm_expand_collapse(stateObjectIndex) {
     var contentDIV = document.getElementById("content_of_" + ss);
     if (null != contentDIV) {
         contentDIV.style.display = display;
+    }
 
-        // We want to be consistent and clean with border styles, so there are many 
-        // states we have to handle.
-        // 1. We just expanded a folder "F" that has parent "P"
-        //   1a. There's another folder G within P that is below F. In this case G needs 
-        //       a 1-pixel thick top border.
-        //   1b. There is not another folder within P and below F, but there are files 
-        //       in P (one or more) that come directly below F in the listing. In this 
-        //       case the first such file needs a 1-pixel thick top border.
-        // 2. We just collapsed a folder (similar to 1 but we remove borders)
+    var cookieElement = document.getElementById("stateSelectID_" + ss);
+    var cookieTitle = $(cookieElement).attr('folder-name');
 
-        // Need to search in array and check for folder states with == parent index.
-        var nextFolderIndex = -1;
-        for (var i = stateObjectIndex + 1; i < cfm_states.length; i++) {
-            if (true === cfm_states[i].isFolder) {
-                if (cfm_states[i].parentIndex == state.parentIndex) {
-                    nextFolderIndex = i;
-                    break;
-                }
-            }
-        }
-        if (-1 != nextFolderIndex) {
-            var nextFolder = document.getElementById("folder_div_" + nextFolderIndex.toString());
-            if (null != nextFolder) {
-                if (!state.expanded) {
-                    // Case 1a. It wasn't expanded and now it is, meaning the folder below it needs a border
-                    nextFolder.style.borderTop = "0px";
-                }
-                else {
-                    nextFolder.style.borderTop = 0;
-                }
-            }
-        }
-        else {
-            var firstFile = document.getElementById("file0_folderState" + state.parentIndex.toString());
-            if (null != firstFile) {
-                if (!state.expanded) {
-                    // Case 1b. It wasn't expanded and now it is, meaning the file below it needs a border
-                    firstFile.style.borderTop = "0px";
-                }
-                else {
-                    firstFile.style.borderTop = 0;
-                }
-            }
+    if (cookies == null && cookieTitle != "Files and Links" && cookieTitle != null) {
+        if (state.expanded == false) {
+            cfm_addCookie(cookieTitle);
+        } else {
+            cfm_removeCookie(cookieTitle);
         }
     }
 
@@ -597,12 +709,31 @@ function cfm_FileDeleteIconClicked(stateObjectIndex) {
     // Find the appropriate DIV
     var targetDIV = document.getElementById("file_controls_" + stateObjectIndex.toString());
 
-    // Add the rename controls into the DIV
-    targetDIV.innerHTML = "<br /><div>Are you sure you want to delete this file?</div>" +
+    //// Add the rename controls into the DIV
+    $('body').append(
+"<div id=\"input_dialog\" title=\"Delete\"> \
+        <br /><div>Are you sure you want to delete?</div>" +
         "<input type=\"button\" value=\"Yes, delete\" style=\"width: 100%;\" " +
         "onclick=\"cfm_DeleteFile(" + stateObjectIndex.toString() + ");\" />" +
         "<br /><input type=\"button\" value=\"No, Cancel\" style=\"width: 100%;\" " +
-        "onclick=\"cfm_hideControls(" + stateObjectIndex.toString() + ");\" />";
+        "onclick=\"removePopUp()\");\" />\
+</div>");
+
+
+    //"onclick=\"cfm_hideControls(" + stateObjectIndex.toString() + ");\" />\
+    //make the div we just created into a dialog box
+
+    $('#input_dialog').dialog({
+        modal: true,
+        autoOpen: true,
+        resizable: false,
+        width: 245,
+        height: 225,
+        closeOnEscape: true,
+        close: removePopUp
+    });
+
+    $('#input_dialog').dialog('open');
 }
 
 function cfm_FileRenameIconClicked(stateObjectIndex) {
@@ -612,14 +743,39 @@ function cfm_FileRenameIconClicked(stateObjectIndex) {
     // Find the appropriate DIV
     var targetDIV = document.getElementById("file_controls_" + stateObjectIndex.toString());
 
-    // Add the rename controls into the DIV
-    targetDIV.innerHTML = "<br /><div><input type=\"text\" id=\"tbRenameFile_" +
+    $('body').append(
+"<div id=\"input_dialog\" title=\"Rename\"> \
+        <br /><div><input type=\"text\" id=\"tbRenameFile_" +
         stateObjectIndex.toString() + "\" value=\"" + state.name +
         "\" style=\"width: 100%; box-sizing: border-box;\"></div>" +
         "<input type=\"button\" value=\"Rename\" style=\"width: 100%;\" " +
         "onclick=\"cfm_RenameFile(" + stateObjectIndex.toString() + ");\" />" +
         "<br /><input type=\"button\" value=\"Cancel\" style=\"width: 100%;\" " +
-        "onclick=\"cfm_hideControls(" + stateObjectIndex.toString() + ");\" />";
+        "onclick=\"removePopUp()\");\" />\
+</div>");
+
+
+    //"onclick=\"cfm_hideControls(" + stateObjectIndex.toString() + ");\" />\
+    //make the div we just created into a dialog box
+
+    $('#input_dialog').dialog({
+        modal: true,
+        autoOpen: true,
+        resizable: false,
+        width: 225,
+        height: 225,
+        closeOnEscape: true,
+        close: removePopUp
+    });
+
+    $('#input_dialog').dialog('open');
+}
+
+//Remove popup controls
+function removePopUp() {
+    $('#input_dialog').dialog("destroy");
+    //then remove the div
+    $('#input_dialog').remove();
 }
 
 // Function that gets the extra service arguments for the file uploader web service. We 
@@ -679,11 +835,19 @@ function cfm_RenameFile(stateObjectIndex) {
     req.open("POST", "../Services/CourseFilesOps.ashx?cmd=rename_file&courseID=" +
         courseID + "&file_name=" + state.fullPath + "&new_name=" + tb.value);
     req.send();
+
+    removePopUp();
+    cfm_expand_collapseRoot();
+    cfm_retrieveListingStatus();
 }
 
 function cfm_RenameFolder(stateObjectIndex) {
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
+
+    //Get the old file name to remove cookies
+    var element = document.getElementById("stateSelectID_" + stateObjectIndex);
+    var elementTitle = $(element).attr("folder-name");
 
     // Get the current course ID
     var selectCourseObj = document.getElementById("course_select");
@@ -716,6 +880,17 @@ function cfm_RenameFolder(stateObjectIndex) {
     req.open("POST", "../Services/CourseFilesOps.ashx?cmd=rename_folder&courseID=" +
         courseID + "&folder_name=" + state.targetFolder + "&new_name=" + tb.value);
     req.send();
+
+    removePopUp();
+    cfm_expand_collapseRoot();
+
+    if (state.expanded == true) {
+        cfm_removeCookie(elementTitle);
+        cfm_addCookie(tb.value.toString());
+    }
+    else {
+        cfm_retrieveListingStatus();
+    }
 }
 
 function cfm_RenameFolderIconClicked(stateObjectIndex) {
@@ -725,14 +900,40 @@ function cfm_RenameFolderIconClicked(stateObjectIndex) {
     // Find the appropriate DIV
     var targetDIV = document.getElementById("folder_controls_" + stateObjectIndex.toString());
 
-    // Add the rename controls into the DIV
-    targetDIV.innerHTML = "<br /><div><input type=\"text\" id=\"tbRenameFolder_" +
+    //// Add the rename controls into the DIV
+    //targetDIV.innerHTML = "<br /><div><input type=\"text\" id=\"tbRenameFolder_" +
+    //    stateObjectIndex.toString() + "\" value=\"" + state.name +
+    //    "\" style=\"width: 100%; box-sizing: border-box;\"></div>" +
+    //    "<input type=\"button\" value=\"Rename\" style=\"width: 100%;\" " +
+    //    "onclick=\"cfm_RenameFolder(" + stateObjectIndex.toString() + ");\" />" +
+    //    "<br /><input type=\"button\" value=\"Cancel\" style=\"width: 100%;\" " +
+    //    "onclick=\"cfm_hideControls(" + stateObjectIndex.toString() + ");\" />";
+
+    $('body').append(
+"<div id=\"input_dialog\" title=\"Rename Folder\"> \
+        <br /><div><input type=\"text\" id=\"tbRenameFolder_" +
         stateObjectIndex.toString() + "\" value=\"" + state.name +
         "\" style=\"width: 100%; box-sizing: border-box;\"></div>" +
         "<input type=\"button\" value=\"Rename\" style=\"width: 100%;\" " +
         "onclick=\"cfm_RenameFolder(" + stateObjectIndex.toString() + ");\" />" +
         "<br /><input type=\"button\" value=\"Cancel\" style=\"width: 100%;\" " +
-        "onclick=\"cfm_hideControls(" + stateObjectIndex.toString() + ");\" />";
+        "onclick=\"removePopUp()\" />" +
+"</div>");
+
+    //"onclick=\"cfm_hideControls(" + stateObjectIndex.toString() + ");\" />\
+    //make the div we just created into a dialog box
+
+    $('#input_dialog').dialog({
+        modal: true,
+        autoOpen: true,
+        resizable: false,
+        width: 225,
+        height: 225,
+        closeOnEscape: true,
+        close: removePopUp
+    });
+
+    $('#input_dialog').dialog('open');
 
     // Mark the controls as visible
     state.controlsVisible = true;
@@ -744,3 +945,239 @@ function cfm_uploadComplete(stateObjectIndex) {
     // Refresh the listing
     cfm_getListing(state.fm_div_ID);
 }
+
+//When multiple files are selected and delete is called
+function cfm_multipleFileDelete() {
+
+
+
+    $('body').append(
+"<div id=\"input_dialog\" title=\"Delete Files\"> " +
+     "<br /><div>Are you sure you want to delete (" + cfm_statesSelected.length.toString() + ") files?</div>" +
+        "<input type=\"button\" value=\"Yes, delete\" style=\"width: 100%;\" " +
+        "onclick=\"cfm_PartitionDeleteCalls();\" />" +
+        "<br /><input type=\"button\" value=\"No, Cancel\" style=\"width: 100%;\" " +
+        "onclick=\"removePopUp()\");\" />\ " +
+"</div>");
+
+    $('#input_dialog').dialog({
+        modal: true,
+        autoOpen: true,
+        resizable: false,
+        width: 225,
+        height: 225,
+        closeOnEscape: true,
+        close: removePopUp
+    });
+
+    $('#input_dialog').dialog('open');
+
+    // Mark the controls as visible
+    state.controlsVisible = true;
+}
+
+//When multiple files and/or folders have been selected we need to 
+//divide up the delete calls depending on whether or not
+//the item is a folder or file
+function cfm_PartitionDeleteCalls() {
+    for (var i = 0; i < cfm_statesSelected.length; i++) {
+        elem = document.getElementById('stateSelectID_' + cfm_statesSelected[i]);
+
+        var m = $(elem).attr('state-obj-select');
+        var type = $(elem).attr('file-or-folder');
+        var index = cfm_statesSelected.indexOf(m);
+
+        if (index > -1) {
+
+            if (type == "file") {
+                cfm_DeleteFile(m);
+                cfm_statesSelected.splice(m, 1);
+            }
+            else if (type == "folder") {
+                cfm_DeleteFolder(m);
+                cfm_statesSelected.splice(m, 1);
+            }
+
+        }
+    }
+}
+
+// Context menu stuff
+// A context menu with full functionality, this is a folder which is not the root of the directory.
+$(function () {
+    $.contextMenu({
+        selector: '.context-menu-one',
+        callback: function (key, options) {
+            var m = "clicked: " + key;
+            window.console && console.log(m) || alert(m);
+        },
+        items: {
+            "Rename": {
+                name: "Rename",
+                icon: "edit",
+                callback: function (key, opt) {
+                    // get the state object id of the clicked div and call the rename function
+                    var m = opt.$trigger.attr('state-obj');
+                    cfm_RenameFolderIconClicked(m);
+                }
+
+            },
+            "Delete": {
+                name: "Delete",
+                icon: "delete",
+                callback: function (key, opt) {
+                    // get the state object id of the clicked div and call the rename function
+                    var m = opt.$trigger.attr('state-obj');
+
+                    if (cfm_boolMultipleSelected == true) {
+                        cfm_multipleFileDelete();
+                    }
+                    else {
+                        cfm_DeleteFolderIconClicked(m);
+                    }
+                }
+
+            },
+            "Upload File": {
+                name: "Upload File(s)",
+                icon: "add",
+                callback: function (key, opt) {
+                    // get the state object id of the clicked div and call the rename function
+                    var m = opt.$trigger.attr('state-obj');
+                    cfm_AddUploader(m);
+                }
+
+            },
+            "Create Folder": {
+                name: "Create Folder",
+                icon: "add2",
+                callback: function (key, opt) {
+                    // get the state object id of the clicked div and call the rename function
+                    var m = opt.$trigger.attr('state-obj');
+                    cfm_CreateFolderIconClicked(m);
+                }
+
+            }
+        }
+    });
+});
+
+// This is a typical file that is uploaded to the file system like a .PDF
+$(function () {
+    $.contextMenu({
+        selector: '.context-menu-two',
+        items: {
+            "Rename": {
+                name: "Rename",
+                icon: "edit",
+                callback: function (key, opt) {
+                    // get the state object id of the clicked div and call the rename function
+                    var m = opt.$trigger.attr('state-obj');
+                    cfm_FileRenameIconClicked(m);
+                }
+
+            },
+            "Delete": {
+                name: "Delete",
+                icon: "delete",
+                callback: function (key, opt) {
+                    // get the state object id of the clicked div and call the rename function
+                    var m = opt.$trigger.attr('state-obj');
+                    if (cfm_boolMultipleSelected == true) {
+                        cfm_multipleFileDelete();
+                    }
+                    else {
+                        cfm_FileDeleteIconClicked(m);
+                    }
+                }
+
+            }
+        }
+    });
+});
+
+// This is the functionality for a root directory
+$(function () {
+    $.contextMenu({
+        selector: '.context-menu-three',
+        callback: function (key, options) {
+            var m = "clicked: " + key;
+            window.console && console.log(m) || alert(m);
+        },
+        items: {
+            "Upload File": {
+                name: "Upload File(s)",
+                icon: "add",
+                callback: function (key, opt) {
+                    // get the state object id of the clicked div and call the rename function
+                    var m = opt.$trigger.attr('state-obj');
+                    cfm_AddUploader(m);
+                }
+
+            },
+            "Create Folder": {
+                name: "Create Folder",
+                icon: "add2",
+                callback: function (key, opt) {
+                    // get the state object id of the clicked div and call the rename function
+                    var m = opt.$trigger.attr('state-obj');
+                    cfm_CreateFolderIconClicked(m);
+                }
+
+            }
+        }
+    });
+});
+
+//Add selected divs to the selected div array
+//This function handles the user selecting multiple items 
+$(document).on('click', '.itemSelection', function (e) {
+
+    var m = $(this).attr('state-obj-select');
+    var index = cfm_statesSelected.indexOf(m);
+
+    if (e.ctrlKey) {
+        if (index > -1) {
+            cfm_statesSelected.splice(index, 1);
+            $(this).css("background", "white");
+        }
+        else {
+            cfm_statesSelected.push(m);
+            $(this).css("background", "#dfdfdf");
+        }
+    }
+    else {
+        if (index > -1) {
+            $(this).css("background", "#dfdfdf");
+
+            for (var i = 0; i < cfm_statesSelected.length; i++) {
+                if (cfm_statesSelected[i] != m) {
+                    elem = document.getElementById('stateSelectID_' + cfm_statesSelected[i]);
+                    $(elem).css("background", "white");
+                    cfm_statesSelected.splice(i, 1);
+                }
+            }
+        }
+        else {
+            cfm_statesSelected.push(m);
+            $(this).css("background", "#dfdfdf");
+
+            for (var i = 0; i < cfm_statesSelected.length; i++) {
+                if (cfm_statesSelected[i] != m) {
+                    elem = document.getElementById('stateSelectID_' + cfm_statesSelected[i]);
+                    $(elem).css("background", "white");
+                    cfm_statesSelected.splice(i, 1);
+                }
+            }
+        }
+    }
+
+    if (cfm_statesSelected.length > 1) {
+        cfm_boolMultipleSelected = true;
+    }
+    else {
+        cfm_boolMultipleSelected = false;
+    }
+
+    //e.preventDefault();
+});
