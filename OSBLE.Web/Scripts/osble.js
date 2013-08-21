@@ -3,6 +3,41 @@
 //Called when the document has finished loading and is safe to make DOM calls
 function documentReady() {
     parseDates();
+    updateTimezoneOffsets();
+}
+
+//updates all time-related elements with proper UTC offset information
+function updateTimezoneOffsets()
+{
+    var localDate = new Date();
+    var localOffset = localDate.getTimezoneOffset();
+
+    //update all of our UTC offset information that gets sent to the server
+    $('input.utc-offset').each(function () {
+        $(this).val(localOffset);
+    });
+    
+    /*
+    var localDate = new Date();
+    var localOffset = localDate.getTimezoneOffset();
+    var releaseDateStr = $("#ReleaseDate").val() + " " + $("#ReleaseTime").val();
+    var dueDateStr = $("#DueDate").val() + " " + $("#DueTime").val();
+    var releaseMoment = moment(releaseDateStr, "MM/DD/YYYY hh:mm A");
+    var dueMoment = moment(dueDateStr, "MM/DD/YYYY hh:mm A");
+
+    //record the local offset
+    $("#utc-offset").val(localOffset);
+
+    //adjust our moments by the local offset
+    releaseMoment = releaseMoment.subtract('minutes', localOffset);
+    dueMoment = dueMoment.subtract('minutes', localOffset);
+
+    //republish modified times to the browser
+    $("#ReleaseDate").val(releaseMoment.format('MM/DD/YYYY'));
+    $("#ReleaseTime").val(releaseMoment.format('hh:mm A'));
+
+    $("#DueDate").val(dueMoment.format('MM/DD/YYYY'));
+    $("#DueTime").val(dueMoment.format('hh:mm A'));*/
 }
 
 //converts UTC times to local (browser) times
@@ -20,60 +55,60 @@ function parseDates() {
     });
 }
 
-// Ready function for date/time pickers
-function setupDateTime() {
-    setupDate('.date_picker');
-    setupTime('.time_picker');
-}
+    // Ready function for date/time pickers
+    function setupDateTime() {
+        setupDate('.date_picker');
+        setupTime('.time_picker');
+    }
 
-// Used to set up dynamically created time pickers.
-function setupTime(element) {
-    $(element).timepicker({
-        showPeriod: true,
-        showLeadingZero: false
+    // Used to set up dynamically created time pickers.
+    function setupTime(element) {
+        $(element).timepicker({
+            showPeriod: true,
+            showLeadingZero: false
+        });
+    }
+
+    // Used to set up dynamically created date pickers.
+    function setupDate(element) {
+        $(element).datepicker();
+    }
+
+    $(function () {
+        setupDateTime();
     });
-}
 
-// Used to set up dynamically created date pickers.
-function setupDate(element) {
-    $(element).datepicker();
-}
+    function onSilverlightError(sender, args) {
+        var appSource = "";
+        if (sender != null && sender != 0) {
+            appSource = sender.getHost().Source;
+        }
 
-$(function () {
-    setupDateTime();
-});
+        var errorType = args.ErrorType;
+        var iErrorCode = args.ErrorCode;
 
-function onSilverlightError(sender, args) {
-    var appSource = "";
-    if (sender != null && sender != 0) {
-        appSource = sender.getHost().Source;
-    }
+        if (errorType == "ImageError" || errorType == "MediaError") {
+            return;
+        }
 
-    var errorType = args.ErrorType;
-    var iErrorCode = args.ErrorCode;
+        var errMsg = "Unhandled Error in Silverlight Application " + appSource + "\n";
 
-    if (errorType == "ImageError" || errorType == "MediaError") {
-        return;
-    }
+        errMsg += "Code: " + iErrorCode + "    \n";
+        errMsg += "Category: " + errorType + "       \n";
+        errMsg += "Message: " + args.ErrorMessage + "     \n";
 
-    var errMsg = "Unhandled Error in Silverlight Application " + appSource + "\n";
-
-    errMsg += "Code: " + iErrorCode + "    \n";
-    errMsg += "Category: " + errorType + "       \n";
-    errMsg += "Message: " + args.ErrorMessage + "     \n";
-
-    if (errorType == "ParserError") {
-        errMsg += "File: " + args.xamlFile + "     \n";
-        errMsg += "Line: " + args.lineNumber + "     \n";
-        errMsg += "Position: " + args.charPosition + "     \n";
-    }
-    else if (errorType == "RuntimeError") {
-        if (args.lineNumber != 0) {
+        if (errorType == "ParserError") {
+            errMsg += "File: " + args.xamlFile + "     \n";
             errMsg += "Line: " + args.lineNumber + "     \n";
             errMsg += "Position: " + args.charPosition + "     \n";
         }
-        errMsg += "MethodName: " + args.methodName + "     \n";
+        else if (errorType == "RuntimeError") {
+            if (args.lineNumber != 0) {
+                errMsg += "Line: " + args.lineNumber + "     \n";
+                errMsg += "Position: " + args.charPosition + "     \n";
+            }
+            errMsg += "MethodName: " + args.methodName + "     \n";
+        }
+        //alert(errMsg);
+        //omthrow new Error(errMsg);
     }
-    //alert(errMsg);
-    //omthrow new Error(errMsg);
-}
