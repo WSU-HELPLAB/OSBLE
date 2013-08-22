@@ -173,7 +173,7 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
 
         // One new DIV for the folder name and control buttons
         if (folderName == "Files and Links") {
-            if (canUploadTo == true && canDelete == true) {
+            if (canUploadTo == true) {
                 result += "<div class=\"context-menu-three box menu-1\" state-obj=\"" + stateObjIndex.toString() + "\" id=\"folder_div_" + ss + "\" style=\"" + theStyle + "\" name=\"Files and Links\">";
             }
             else {
@@ -305,7 +305,7 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         var linkURL = "/FileHandler/CourseDocument?courseId=" +
             courseID.toString() + "&filePath=" + fileStateObj.fullPath;
 
-        if (canUploadTo == true && canDelete == true) {
+        if (fileStateObj.allowsDeletion) {
             result += "<div id=\"stateSelectID_" + stateObjIndex.toString() + "\" class=\"itemSelection\" state-obj-select=\"" + stateObjIndex.toString() + "\" file-or-folder=\"file\"  >";
             result += "<div class=\"context-menu-two box menu-1\" state-obj=\"" + stateObjIndex.toString() + "\" id=\"" + theID + "\" style=\"padding: 3px; ";
         }
