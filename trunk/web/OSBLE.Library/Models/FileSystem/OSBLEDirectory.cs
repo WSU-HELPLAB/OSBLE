@@ -490,10 +490,23 @@ namespace OSBLE.Models.FileSystem
         public ActionResult GetFile(string fileName, string Test)
         {            
             //Get the file
-            HttpContext.Current.Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName); // force download
-            BlobFileSystem.GetBlobContainer().GetBlobReference(this.DownloadFile("/"+fileName)).DownloadToStream(HttpContext.Current.Response.OutputStream);
-            HttpContext.Current.Response.End();         
-            return new EmptyResult();
+         
+            CloudBlobContainer blobCont = BlobFileSystem.GetBlobContainer();
+
+            CloudBlob blob = blobCont.GetBlobReference(this.DownloadFile("/" + fileName));
+
+            byte[] fileBytes = blob.DownloadByteArray();
+            try
+            {
+                blob.FetchAttributes();
+            }
+            catch (Exception)
+            {
+            }
+
+            string blobfileName = blob.Metadata["FileName"].ToString();
+            MemoryStream stream = new MemoryStream(fileBytes);
+            return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = fileName };             
         }
 
         private FileCollection GetFilesWithAttribute(string attrClass, string attrName, string attrValue)

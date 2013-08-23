@@ -18,7 +18,7 @@
     <script src="@Url.Content("~/areas/AssignmentWizard/Content/js/discussionTeam.js")" type="text/javascript"></script>
 }
 
-<table>
+@*<table>
     <tr>
         <td>
             Will the class participate in this discussion as a whole?
@@ -37,7 +37,7 @@
                 
         </td>
     </tr>
-</table>
+</table>*@
 
 @if (Model.HasDiscussionTeams)
 {
@@ -45,7 +45,14 @@
 }
 else
 {
-    @:<div id="teamDiv" style="display:none;">
+    if (ViewBag.displayTeamSetUp == true)
+    {
+        @:<div id="teamDiv">
+    }
+    else
+    {
+        @:<div id="teamDiv" >
+    }
 }
 <p>
 </p> 

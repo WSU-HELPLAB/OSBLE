@@ -169,6 +169,10 @@ namespace OSBLE.Controllers
             int eventDays = 7 * ActiveCourseUser.AbstractCourse.CalendarWindowOfTime;
 
             DateTime today = DateTime.UtcNow.Date;
+
+            DateTime converted = DateTime.SpecifyKind(DateTime.Parse(today.ToString()), DateTimeKind.Utc);
+            today = converted.ToLocalTime();
+
             DateTime upto = today.AddDays(eventDays);
 
             using (EventController ec = new EventController())
@@ -482,7 +486,7 @@ namespace OSBLE.Controllers
                         }
                         body += "<br /><br />";
                         body += dp.Content.Replace("\n", "<br />");
-                        body += string.Format("<br /><br /><a href=\"http://osble.org/Home/Course?courseId={0}&postId={1}\">View and reply to post in OSBLE</a>",
+                        body += string.Format("<br /><br /><a href=\"http://osble.azurewebsites.net/Home/Course?courseId={0}&postId={1}\">View and reply to post in OSBLE</a>",
                             newDp.CourseUser.AbstractCourseID,
                             newDp.ID
                             );
@@ -590,7 +594,7 @@ namespace OSBLE.Controllers
                         }
                         body += "<br /><br />";
                         body += dr.Content.Replace("\n", "<br />");
-                        body += string.Format("<br /><br /><a href=\"http://osble.org/Home/Course?courseId={0}&postId={1}\">View and reply to post in OSBLE</a>",
+                        body += string.Format("<br /><br /><a href=\"http://osble.azurewebsites.net/Home/Course?courseId={0}&postId={1}\">View and reply to post in OSBLE</a>",
                             dr.CourseUser.AbstractCourseID,
                             dr.ID
                             );

@@ -39,7 +39,8 @@
             @if (!e.NoDateTime)
             {
                 <div class="event_time">
-                    <time class="utc-time"
+                    <!-- turn off <time> tags as they don't work quite right for this page
+                        <time class="utc-time"
                 style="font-size:small;"
                 datetime="@Helpers.DateAsUnixTime(e.StartDate)" 
                 data-original-date="@Helpers.RawDate(e.StartDate)" 
@@ -64,6 +65,19 @@
                 >
                             @ShowEventTime(e.StartDate, e) (UTC)
                         </time>
+                    }
+                        -->
+                    <span style="font-size:small;">@ShowEventTime(e.StartDate, e)</span>
+                    @if ((e.EndDate != null))
+                    {
+                        DateTime endDate = (DateTime)e.EndDate;
+                        string dateFormatString = "hh:mm A";
+                        if (endDate.Date.CompareTo(e.StartDate.Date) != 0)
+                        {
+                            dateFormatString = "dddd hh:mm A";
+                        }
+                        @:&mdash;
+                        <span style="font-size:small">@ShowEventTime(endDate, e)</span>
                     }
                 </div>
             }

@@ -17,7 +17,7 @@
 @using (Html.BeginForm("Edit", "Course", FormMethod.Post, new { id = "course_submit" }))
 {
     @Html.ValidationSummary(true)
-
+    <input type="hidden" class="utc-offset" value="0" />
     <h3>Course Information </h3>
     
     <table>
