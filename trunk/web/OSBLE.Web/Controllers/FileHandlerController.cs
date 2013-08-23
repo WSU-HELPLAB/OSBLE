@@ -38,11 +38,22 @@ namespace OSBLE.Controllers
                 //Find the file
                 OSBLEDirectory fsPath = Models.FileSystem.Directories.GetCourseDocs(courseId);
 
-                //Get the file
-                Response.AddHeader("Content-Disposition", "attachment; filename=" + pathPieces.Last()); // force download
-                BlobFileSystem.GetBlobContainer().GetBlobReference(fsPath.DownloadFile(filePath)).DownloadToStream(Response.OutputStream);
-                return new EmptyResult();
+                CloudBlobContainer blobCont = BlobFileSystem.GetBlobContainer();
 
+                CloudBlob blob = blobCont.GetBlobReference(fsPath.DownloadFile(filePath));
+
+                byte[] fileBytes = blob.DownloadByteArray();
+                try
+                {
+                    blob.FetchAttributes();                  
+                }
+                catch (Exception)
+                {
+                }
+
+                string fileName = blob.Metadata["FileName"].ToString();
+                MemoryStream stream = new MemoryStream(fileBytes);
+                return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = fileName };                     
             }
             return RedirectToAction("Index", "Home");
         }
