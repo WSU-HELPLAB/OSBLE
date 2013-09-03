@@ -421,6 +421,9 @@ namespace OSBLE.Controllers
                         profile.SchoolID = model.SchoolID;
                         profile.School = db.Schools.Find(model.SchoolID);
 
+                        //AC: turned off email valiation as it didn't work a lot of the time
+                        profile.IsApproved = true;
+
                         //check for stubs (accounts created through roster import function)
                         UserProfile up = db.UserProfiles.Where(c => c.SchoolID == profile.SchoolID && c.Identification == profile.Identification).FirstOrDefault();
                         if (up != null)
@@ -449,6 +452,7 @@ namespace OSBLE.Controllers
                         return AcademiaRegister();
                     }
 
+                    /*
                     sendVerificationEmail(
                         true, "https://osble.org" +
                         Url.Action("ActivateAccount", new { hash = randomHash }),
@@ -456,7 +460,7 @@ namespace OSBLE.Controllers
                         profile.UserName,
                         randomHash
                         );
-
+                    */
                     return RedirectToAction("AccountCreated");
                 }
             }
