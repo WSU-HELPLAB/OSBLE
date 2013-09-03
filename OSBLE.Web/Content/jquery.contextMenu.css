@@ -91,7 +91,7 @@
  */
 .context-menu-item.icon { min-height: 18px; background-repeat: no-repeat; background-position: 4px 5px; }
 .context-menu-item.icon-edit { background-image: url(images/page_white_edit.png); }
-.context-menu-item.icon-cut { background-image: url(images/cut.png); }
+.context-menu-item.icon-cut { background-image: url(images/cut_context.png); }
 .context-menu-item.icon-copy { background-image: url(images/page_white_copy.png); }
 .context-menu-item.icon-paste { background-image: url(images/page_white_paste.png); }
 .context-menu-item.icon-delete { background-image: url(images/page_white_delete.png); }

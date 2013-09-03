@@ -361,6 +361,7 @@
     <Content Include="Content\images\arrow_down.png" />
     <Content Include="Content\images\arrow_left.png" />
     <Content Include="Content\images\arrow_right.png" />
+    <Content Include="Content\images\cut_context.png" />
     <Content Include="Content\images\default.jpg" />
     <Content Include="Content\images\delete_up.png" />
     <Content Include="Content\images\edit_up.png" />
