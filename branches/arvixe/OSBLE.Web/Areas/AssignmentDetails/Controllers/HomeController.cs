@@ -43,13 +43,32 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
                     StringBuilder sb = new StringBuilder("<ul>");
                     foreach (string fileName in files)
                     {
-                        // Make a link for the file
-                        sb.AppendFormat(
-                            "<li><a href=\"/Services/CourseFilesOps.ashx?cmd=assignment_file_download" + 
+                        //Check to see if the user is an admin
+                        if (CurrentUser.CanCreateCourses == true)
+                        {                                  
+                            //Build the URL action for deleting
+                            //Assignment file deletion is handled different.
+                            string UrlAction = Url.Action("DeleteAssignmentFile", "Home", new { courseID = assignment.CourseID.Value, assignmentID = assignment.ID, fileName = System.IO.Path.GetFileName(fileName) });
+                            
+                            // Make a link for the file
+                            sb.AppendFormat(
+                                "<li><a href=\"/Services/CourseFilesOps.ashx?cmd=assignment_file_download" +
+                                "&courseID={0}&assignmentID={1}&filename={2}\">{2}      </a>" + 
+                                "<a href=\"" + UrlAction + "\"><img src=\"/Content/images/delete_up.png\" alt=\"Delete Button\"></img></a>" +                             
+                                "</li>",
+                                assignment.CourseID.Value,
+                                assignment.ID,
+                                System.IO.Path.GetFileName(fileName));
+                        }
+                        else
+                        {
+                            sb.AppendFormat(
+                            "<li><a href=\"/Services/CourseFilesOps.ashx?cmd=assignment_file_download" +
                             "&courseID={0}&assignmentID={1}&filename={2}\">{2}</li>",
                             assignment.CourseID.Value,
                             assignment.ID,
                             System.IO.Path.GetFileName(fileName));
+                        }
                     }
                     sb.Append("</ul>");
                     ViewBag.DescFilesHTML = sb.ToString();
@@ -84,6 +103,45 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
         {
             new AssignmentController().ToggleDraft(assignmentId);
             return Index(assignmentId);
+        }
+
+        //For deleting an assignment file.
+        [CanModifyCourse]
+        public ActionResult DeleteAssignmentFile(int courseID, int assignmentID, string fileName)
+        {
+            //Get the filename from the path
+            fileName = System.IO.Path.GetFileName(fileName);
+
+            // Get the attributable file storage
+            OSBLEDirectory attrFiles =
+               OSBLE.Models.FileSystem.Directories.GetAssignment(courseID, assignmentID).AttributableFiles;
+            
+            //If no files exist return to the assignment details page.
+            if (null == attrFiles)
+            {
+                return Index(assignmentID);
+            }
+
+            int slashIndex = fileName.LastIndexOf('\\');
+            if (-1 == slashIndex)
+            {
+                slashIndex = fileName.LastIndexOf('/');
+            }
+            if (-1 != slashIndex)
+            {
+                // If the file exists in some nested folders then get the 
+                // correct directory object first.
+                attrFiles = (OSBLEDirectory)attrFiles.GetDir(fileName.Substring(0, slashIndex));
+
+                // Also remove the path from the beginning of the file name
+                fileName = fileName.Substring(slashIndex + 1);
+            }
+
+            // Perform the actual deletion
+            attrFiles.DeleteFile(fileName);
+
+            //Return to the assignment details page
+            return Index(assignmentID);
         }
 
         [CanModifyCourse]
