@@ -218,7 +218,7 @@ namespace OSBLE.Controllers
             //if the user clicked continue, then we should continue
             if (Request.Form.AllKeys.Contains("continue"))
             {
-                db.AbstractCourses.Remove(ActiveCourseUser.AbstractCourse);
+                ActiveCourseUser.AbstractCourse.IsDeleted = true;
                 db.SaveChanges();
             }
 

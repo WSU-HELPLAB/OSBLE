@@ -18,6 +18,9 @@ namespace OSBLE.Models.Courses
         [StringLength(100)]
         public string Name { get; set; }
 
+        [Required]
+        public bool IsDeleted {get;set;}
+
         public abstract bool AllowEventPosting { get; set; }
 
         [Display(Name = "Allow students to post new threads in activity feed")]
@@ -30,6 +33,7 @@ namespace OSBLE.Models.Courses
             : base()
         {
             CalendarWindowOfTime = 2;
+            IsDeleted = false;
         }
     }
 }
