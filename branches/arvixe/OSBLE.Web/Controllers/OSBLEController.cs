@@ -333,7 +333,10 @@ namespace OSBLE.Controllers
                 List<CourseUser> allUsersCourses = db.CourseUsers.Where(cu => cu.UserProfileID == CurrentUser.ID).ToList();
 
                 // Get list of courses this user is connected to. Remove inactive (for anyone other than instructors or observers) or hidden (for all) courses.
-                currentCourses = allUsersCourses.Where(cu => (cu.AbstractCourse is Course) &&
+                currentCourses = allUsersCourses.Where(cu => (cu.AbstractCourse is Course) 
+                    &&
+                    cu.AbstractCourse.IsDeleted == false
+                    &&
                     (((cu.AbstractCourse as Course).Inactive == false) ||
                     (cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor) ||
                     (cu.AbstractRoleID == (int)CourseRole.CourseRoles.Observer)))
@@ -344,10 +347,24 @@ namespace OSBLE.Controllers
                         .OrderBy(cu => (cu.AbstractCourse as Course).Inactive).ToList();
 
                 // Add communities under courses, ordered by name
-                currentCourses = currentCourses.Concat(allUsersCourses.Where(cu => cu.AbstractCourse is Community).OrderBy(cu => cu.AbstractCourse.Name).ToList()).ToList();
+                currentCourses = currentCourses
+                    .Concat(allUsersCourses
+                    .Where(cu => cu.AbstractCourse is Community
+                        && cu.AbstractCourse.IsDeleted == false
+                    )
+                    .OrderBy(cu => cu.AbstractCourse.Name)
+                    .ToList())
+                    .ToList();
 
                 // Add committees under communities, ordered by name
-                currentCourses = currentCourses.Concat(allUsersCourses.Where(cu => cu.AbstractCourse is AssessmentCommittee).OrderBy(cu => cu.AbstractCourse.Name).ToList()).ToList();
+                currentCourses = currentCourses
+                    .Concat(allUsersCourses
+                    .Where(cu => cu.AbstractCourse is AssessmentCommittee
+                        && cu.AbstractCourse.IsDeleted == false
+                    )
+                    .OrderBy(cu => cu.AbstractCourse.Name)
+                    .ToList())
+                    .ToList();
 
                 // Only consider non-hidden courses as the active course.
                 List<CourseUser> activeCoursePool = currentCourses.Where(cu => cu.Hidden == false).ToList();
