@@ -9,6 +9,7 @@ using OSBLE.Models.HomePage;
 using OSBLE.Models.Assignments;
 using OSBLE.Models;
 
+
 namespace OSBLE.Controllers
 {
     [OsbleAuthorize]
@@ -84,6 +85,15 @@ namespace OSBLE.Controllers
         [CanPostEvent]
         public ActionResult Create(Event e)
         {
+            //Account for utcOffset
+            int utcOffset = 0;
+            try
+            {
+                Int32.TryParse(Request.Form["utc-offset"].ToString(), out utcOffset);
+            }
+            catch (Exception)
+            {
+            }
 
             // Set to current user and poster
             e.Poster = ActiveCourseUser;
@@ -116,6 +126,10 @@ namespace OSBLE.Controllers
 
             if (ModelState.IsValid)
             {
+                //Account for utc time before saved
+                e.EndDate = e.EndDate.Value.AddMinutes(utcOffset);
+                e.StartDate = e.StartDate.AddMinutes(utcOffset);
+
                 db.Events.Add(e);
                 db.SaveChanges();
 
