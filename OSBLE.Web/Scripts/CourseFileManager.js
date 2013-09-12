@@ -380,6 +380,15 @@ function cfm_AddUploader(stateObjectIndex) {
     state.controlsVisible = true;
 }
 
+//Once the upload finsishes
+function cfm_uploadComplete(stateObjectIndex) {
+    // Get the state object at the specified index
+    var state = cfm_states[stateObjectIndex];
+    // Refresh the listing
+    cfm_getListing(state.fm_div_ID);
+}
+
+
 // Counts the number of child nodes under listNode that have a node type of 1 and 
 // a node name that matches node_name.
 function cfm_CountChildrenWithName(listNode, node_name) {

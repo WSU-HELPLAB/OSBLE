@@ -1,8 +1,9 @@
 ﻿@model List<OSBLE.Models.HomePage.Event>
 @using OSBLE.Models.HomePage
+@using OSBLE.Resources
 @{
     DateTime lastDate = DateTime.Parse("1/1/1990");
-    /*
+    
 }
 <ul id="event_list">
     @foreach (Event e in Model)
@@ -40,8 +41,7 @@
             @if (!e.NoDateTime)
             {
                 <div class="event_time">
-                    <!-- turn off <time> tags as they don't work quite right for this page
-                        <time class="utc-time"
+                    <time class="utc-time"
                 style="font-size:small;"
                 datetime="@Helpers.DateAsUnixTime(e.StartDate)" 
                 data-original-date="@Helpers.RawDate(e.StartDate)" 
@@ -64,11 +64,18 @@
                 data-original-date="@Helpers.RawDate(endDate)" 
                 data-date-format="@dateFormatString"
                 >
-                            @ShowEventTime(e.StartDate, e) (UTC)
-                        </time>
+                            @ShowEventTime(endDate, e) (UTC)
+                       </time>
                     }
-                        -->
-                    <span style="font-size:small;">@ShowEventTime(e.StartDate, e)</span>
+
+@*                                            <time class="utc-time"
+                style="font-size:small;"
+                datetime="@Helpers.DateAsUnixTime(e.StartDate)" 
+                data-original-date="@Helpers.RawDate(e.StartDate)" 
+                data-date-format="hh:mm A"
+                >
+                    <span style="font-size: small;">@ShowEventTime(e.StartDate, e)</span>
+                                                </time>
                     @if ((e.EndDate != null))
                     {
                         DateTime endDate = (DateTime)e.EndDate;
@@ -78,8 +85,16 @@
                             dateFormatString = "dddd hh:mm A";
                         }
                         @:&mdash;
-                        <span style="font-size:small">@ShowEventTime(endDate, e)</span>
-                    }
+
+                        <time class="utc-time"
+                style="font-size:small;"
+                datetime="@Helpers.DateAsUnixTime(endDate)" 
+                data-original-date="@Helpers.RawDate(endDate)" 
+                data-date-format="@dateFormatString"
+                >
+                            <span style="font-size: small">@ShowEventTime(endDate, e) Test</span>
+                        </time>
+                    }*@
                 </div>
             }
             <div>
@@ -90,18 +105,15 @@
                 <div class="event_description">
                     @{
                 //@Html.Raw(HttpUtility.HtmlDecode(Helpers.WikiUrlLinking(e.Description.Replace("\n", "<br />").ToString()))
-
                 string description = e.Description;
                 description = description.Replace("\n", "<br />");
                     }
-                    <small>@Html.Raw(HttpUtility.HtmlDecode(Helpers.WikiUrlLinking(description).ToString()))</small>
+                    <small>@Html.Raw(HttpUtility.HtmlDecode(Helpers.WikiUrlLinking(e.Description).ToString()))</small>
                 </div>
             }
         </li>
     }
 </ul>
-    */
-    }
 
 @helper ShowDayAndTime(DateTime dt)
 {
@@ -114,12 +126,13 @@
 }
 @helper ShowEventTime(DateTime dt, Event e)
 {
-        if (!e.HideTime)
-        {
+    if (!e.HideTime)
+    {
     @dt.ToString("h:mm tt");
-        }
+    }
 }
 @helper ShowDate(DateTime dt)
 {
+
     @dt.ToString("dddd, MMMMM d, yyyy");
 }

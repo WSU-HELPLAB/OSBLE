@@ -37,8 +37,10 @@ namespace OSBLE.Controllers
             return View(new Course());
         }
 
-        private void createMeetingTimes(Course course)
+        private void createMeetingTimes(Course course, int utcOffset)
         {
+
+
             int count = Convert.ToInt32(Request.Params["meetings_max"]);
             if (course.CourseMeetings == null)
             {
@@ -58,8 +60,9 @@ namespace OSBLE.Controllers
                     cm.Name = Request.Params["meeting_name_" + i.ToString()];
                     cm.Location = Request.Params["meeting_location_" + i.ToString()];
                     cm.StartTime = DateTime.Parse(Request.Params["meeting_start_" + i.ToString()]);
+                    cm.StartTime = cm.StartTime.AddMinutes(utcOffset);
                     cm.EndTime = DateTime.Parse(Request.Params["meeting_end_" + i.ToString()]);
-
+                    cm.EndTime = cm.EndTime.AddMinutes(utcOffset);
                     cm.Sunday = Convert.ToBoolean(Request.Params["meeting_sunday_" + i.ToString()]);
                     cm.Monday = Convert.ToBoolean(Request.Params["meeting_monday_" + i.ToString()]);
                     cm.Tuesday = Convert.ToBoolean(Request.Params["meeting_tuesday_" + i.ToString()]);
@@ -115,7 +118,16 @@ namespace OSBLE.Controllers
                 db.Courses.Add(course);
                 db.SaveChanges();
 
-                createMeetingTimes(course);
+                int utcOffset = 0;
+                try
+                {
+                    Int32.TryParse(Request.Form["utc-offset"].ToString(), out utcOffset);
+                }
+                catch (Exception)
+                {
+                }
+
+                createMeetingTimes(course, utcOffset);
                 createBreaks(course);
 
                 // Make current user an instructor on new course.
@@ -146,6 +158,13 @@ namespace OSBLE.Controllers
         {
             ViewBag.CurrentTab = "Course Settings";
             Course course = (Course)db.Courses.Find(ActiveCourseUser.AbstractCourseID);
+
+            foreach (CourseMeeting meeting in course.CourseMeetings)
+            {
+                meeting.StartTime = meeting.StartTime.ToLocalTime();
+                meeting.EndTime = meeting.EndTime.ToLocalTime();
+            }
+
             return View(course);
         }
 
@@ -163,6 +182,15 @@ namespace OSBLE.Controllers
             if (course.ID != ActiveCourseUser.AbstractCourseID)
             {
                 return RedirectToAction("Home");
+            }
+
+            int utcOffset = 0;
+            try
+            {
+                Int32.TryParse(Request.Form["utc-offset"].ToString(), out utcOffset);
+            }
+            catch (Exception)
+            {
             }
 
             NameValueCollection parameters = Request.Params;
@@ -190,7 +218,8 @@ namespace OSBLE.Controllers
             updateCourse.HoursLateUntilZero = course.HoursLateUntilZero;
             updateCourse.PercentPenalty = course.PercentPenalty;
 
-            createMeetingTimes(updateCourse);
+            createMeetingTimes(updateCourse, utcOffset);
+
             createBreaks(updateCourse);
 
             if (ModelState.IsValid)
