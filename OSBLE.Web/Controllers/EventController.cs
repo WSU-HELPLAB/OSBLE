@@ -333,6 +333,15 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult Edit(Event e)
         {
+            int utcOffset = 0;
+            try
+            {
+                Int32.TryParse(Request.Form["utc-offset"].ToString(), out utcOffset);
+            }
+            catch (Exception)
+            {
+            }
+
             // Validate original event. make sure it exists and is part of the active course.
             Event originalEvent = db.Events.Find(e.ID);
             originalEvent.Title = e.Title;
@@ -364,6 +373,8 @@ namespace OSBLE.Controllers
 
             if (ModelState.IsValid)
             {
+                originalEvent.StartTime = originalEvent.StartTime.AddMinutes(utcOffset);
+                originalEvent.EndTime = originalEvent.EndTime.Value.AddMinutes(utcOffset);
                 db.Entry(originalEvent).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
