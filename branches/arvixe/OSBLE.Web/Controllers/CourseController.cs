@@ -158,13 +158,6 @@ namespace OSBLE.Controllers
         {
             ViewBag.CurrentTab = "Course Settings";
             Course course = (Course)db.Courses.Find(ActiveCourseUser.AbstractCourseID);
-
-            foreach (CourseMeeting meeting in course.CourseMeetings)
-            {
-                meeting.StartTime = meeting.StartTime.ToLocalTime();
-                meeting.EndTime = meeting.EndTime.ToLocalTime();
-            }
-
             return View(course);
         }
 
