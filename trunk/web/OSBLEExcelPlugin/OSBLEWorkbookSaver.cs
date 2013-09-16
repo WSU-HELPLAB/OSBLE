@@ -164,11 +164,11 @@ namespace OSBLEExcelPlugin
                 {
                     if (y == colCount)
                     {
-                        sb.AppendLine(used.Cells[x, y].Text);
+                        sb.AppendLine(string.Format("\"{0}\"", used.Cells[x, y].Text));
                     }
                     else
                     {
-                        sb.Append(used.Cells[x, y].Text + ",");
+                        sb.Append(string.Format("\"{0}\"", used.Cells[x, y].Text) + ",");
                     }
                 }
             }
