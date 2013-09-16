@@ -79,9 +79,15 @@ namespace OSBLE.Resources.CSVReader
 
                         //If the last charcter in the line is a ',' that means there was one more empty cell to append to the 
                         //row. 
-                        if (currentLine[currentLinePos - 1] == ',')
+                        try
                         {
-                            _currentRow.Add("");
+                            if (currentLine[currentLinePos - 1] == ',')
+                            {
+                                _currentRow.Add("");
+                            }
+                        }
+                        catch (Exception)
+                        {
                         }
 
 
@@ -113,8 +119,17 @@ namespace OSBLE.Resources.CSVReader
         /// <returns></returns>
         public char GetNextCharacter()
         {
-            char returnVal = this.currentLine[this.currentLinePos];
-            this.currentLinePos++;
+            char returnVal = ' ';
+            try
+            {
+                returnVal = this.currentLine[this.currentLinePos];
+                this.currentLinePos++;
+            }
+            catch(Exception)
+            {
+
+            }
+            
             return returnVal;
         }
 
