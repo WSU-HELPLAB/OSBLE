@@ -346,8 +346,9 @@ namespace OSBLE.Controllers
             Event originalEvent = db.Events.Find(e.ID);
             originalEvent.Title = e.Title;
             originalEvent.Description = e.Description;
-            originalEvent.StartDate = e.StartDate;
-            originalEvent.StartTime = e.StartTime;
+
+            originalEvent.StartDate = e.StartDate.AddMinutes(utcOffset);
+            originalEvent.StartTime = e.StartTime.AddMinutes(utcOffset);
 
             if (!Request.Form.AllKeys.Contains("IncludeEndDate"))
             {
@@ -355,17 +356,14 @@ namespace OSBLE.Controllers
             }
             else
             {
-                originalEvent.EndDate = e.EndDate;
-                originalEvent.EndDate = e.EndTime;
+                originalEvent.EndDate = e.EndDate.Value.AddMinutes(utcOffset);
+                originalEvent.EndDate = e.EndTime.Value.AddMinutes(utcOffset) ;
                 //make sure that the end date happens after the start
                 if ((DateTime)originalEvent.EndDate < originalEvent.StartDate)
                 {
                     ModelState.AddModelError("badDates", "The starting time must occur before the ending time");
-                }
-                
-
+                }             
             }
-
             if ((originalEvent == null) || (originalEvent.Poster.AbstractCourseID != ActiveCourseUser.AbstractCourseID))
             {
                 return RedirectToAction("Index", "Home");
@@ -373,8 +371,6 @@ namespace OSBLE.Controllers
 
             if (ModelState.IsValid)
             {
-                originalEvent.StartTime = originalEvent.StartTime.AddMinutes(utcOffset);
-                originalEvent.EndTime = originalEvent.EndTime.Value.AddMinutes(utcOffset);
                 db.Entry(originalEvent).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
@@ -500,6 +496,7 @@ namespace OSBLE.Controllers
                             // Do not show Course meetings outside of course start/end date and breaks.
                             if ((e.StartDate.Date >= course.StartDate.Date) && (e.StartDate.Date <= course.EndDate.Date) && (course.CourseBreaks.Where(b => (current >= b.StartDate) && (current <= b.EndDate)).Count() < 1))
                             {
+                                
                                 events.Add(e);
                             }
                         }
