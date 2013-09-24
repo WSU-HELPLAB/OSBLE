@@ -8,16 +8,14 @@
 <ul id="event_list">
     @foreach (Event e in Model)
     {
-        if (lastDate.Date != e.StartDate.Date)
+        if (lastDate != e.StartDate)
         {
             lastDate = e.StartDate;   
         <li class="event_date">
             <time class="utc-time"
-                style="font-size:small;"
                 datetime="@Helpers.DateAsUnixTime(lastDate)" 
                 data-original-date="@Helpers.RawDate(lastDate)" 
-                data-date-format="dddd, MMMM D, YYYY"
-                >
+                data-date-format="dddd, MMMM D, YYYY">
                 @ShowDate(lastDate)
             </time>
         </li>
@@ -41,7 +39,6 @@
                         data-ajax-confirm="Are you sure you want to delete this event?"
                         method="post">
                         <input type="hidden" name="ID" value="@e.ID" />
-
                         @Helpers.DeleteSubmit("Delete This Event")
                     </form>
                 }
@@ -53,8 +50,7 @@
                 style="font-size:small;"
                 datetime="@Helpers.DateAsUnixTime(e.StartDate)" 
                 data-original-date="@Helpers.RawDate(e.StartDate)" 
-                data-date-format="hh:mm A"
-                >
+                data-date-format="hh:mm A">
                         @ShowEventTime(e.StartDate, e) (UTC)
                     </time>
              
@@ -73,8 +69,7 @@
                 style="font-size:small;"
                 datetime="@Helpers.DateAsUnixTime(endDate)" 
                 data-original-date="@Helpers.RawDate(endDate)" 
-                data-date-format="@dateFormatString"
-                >
+                data-date-format="@dateFormatString">
                             @ShowEventTime(endDate, e) (UTC)
                        </time>
                     }
@@ -144,7 +139,5 @@
 }
 @helper ShowDate(DateTime dt)
 {
-    <p>
     @dt.ToString("dddd, MMMM D, YYYY");
-    </p>
 }
