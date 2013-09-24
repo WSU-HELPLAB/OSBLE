@@ -673,6 +673,7 @@
     <Content Include="Areas\AssessmentWizard\Views\Home\Index.cshtml" />
     <Content Include="Areas\AssessmentWizard\Views\Home\SelectComponent.cshtml" />
     <Content Include="Areas\AssessmentWizard\Views\Home\Summary.cshtml" />
+    <Content Include="Content\gradebook.zip" />
     <None Include="Properties\PublishProfiles\filesystem.pubxml" />
     <None Include="Scripts\jquery-2.0.1.intellisense.js" />
     <Content Include="Scripts\jquery-2.0.1.js" />
