@@ -277,7 +277,6 @@ namespace OSBLE.Controllers
 
         //
         // GET: /Course/Edit/5
-
         [RequireActiveCourse]
         [CanModifyCourse]
         [NotForCommunity]
@@ -285,6 +284,57 @@ namespace OSBLE.Controllers
         {
             ViewBag.CurrentTab = "Course Settings";
             Course course = (Course)db.Courses.Find(ActiveCourseUser.AbstractCourseID);
+
+            //Get the user's time zone cookie and convert it to int
+            System.Web.HttpCookie cookieOffset = new System.Web.HttpCookie("utcOffset");
+            cookieOffset = Request.Cookies["utcOffset"];
+            int utcOffset;
+            if (cookieOffset != null)
+            {
+                string UtcOffsetString = cookieOffset.Value;
+                utcOffset = Convert.ToInt32(UtcOffsetString);
+            }
+            else
+            {
+                utcOffset = 0;
+            }
+
+            //If it exists, which it should update all of the meetings to reflect the correct utc adjusted time.
+            if (utcOffset != 0)
+            {
+                ICollection<CourseMeeting> Meetings = course.CourseMeetings;
+                foreach (CourseMeeting meeting in Meetings)
+                {
+                    DateTime beforeUtcStartTime = meeting.StartTime;
+
+                    meeting.StartTime = meeting.StartTime.AddMinutes(-utcOffset);
+                    meeting.EndTime = meeting.EndTime.AddMinutes(-utcOffset);
+
+                    //Check to see if the utc offset will change the day if so adjust the Meeting's date
+                    if (beforeUtcStartTime.DayOfYear != meeting.StartTime.DayOfYear)
+                    {
+                        int difference = (beforeUtcStartTime.DayOfYear - meeting.StartTime.DayOfYear);
+                        correctDay(meeting, difference);
+                    }
+                }
+            }
+            else //Rare case where a cookie doesn't exist set the time to null essentially
+            {
+                ICollection<CourseMeeting> Meetings = course.CourseMeetings;
+                foreach (CourseMeeting meeting in Meetings)
+                {
+                    meeting.StartTime = DateTime.Parse("00:00");
+                    meeting.EndTime = DateTime.Parse("00:00");
+                    meeting.Sunday = false;
+                    meeting.Monday = false;
+                    meeting.Tuesday = false;
+                    meeting.Wednesday = false;
+                    meeting.Thursday = false;
+                    meeting.Friday = false;
+                    meeting.Saturday = false;
+                }
+            }
+
             return View(course);
         }
 
