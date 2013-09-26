@@ -2,15 +2,36 @@
 @using OSBLE.Models.HomePage
 @using OSBLE.Resources
 @{
+    //Get time zone cookie
     DateTime lastDate = DateTime.Parse("1/1/1990");
-    
+    HttpCookie cookieOffset = new HttpCookie("utcOffset");
+    cookieOffset = Request.Cookies["utcOffset"];
+    int utcOffset;
+    if(cookieOffset != null)
+    {
+        string UtcOffsetString = cookieOffset.Value;
+        utcOffset = Convert.ToInt32(UtcOffsetString);
+    }
+    else
+    {
+        utcOffset = 0;
+    }
 }
 <ul id="event_list">
+    @{
+        DateTime tmpLastDate = lastDate;
+    }
+
     @foreach (Event e in Model)
     {
-        if (lastDate != e.StartDate)
+        //Check to see if the utc adjusted times are different if they are
+        //then the event is truly on a new day in the user's time zone
+        DateTime tmpDateNew = e.StartDate.AddMinutes(-utcOffset);
+             
+        if (tmpLastDate.Date != tmpDateNew.Date)
         {
-            lastDate = e.StartDate;   
+            lastDate = e.StartDate;
+            tmpLastDate = tmpDateNew;           
         <li class="event_date">
             <time class="utc-time"
                 datetime="@Helpers.DateAsUnixTime(lastDate)" 

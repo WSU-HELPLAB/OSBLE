@@ -323,12 +323,30 @@ namespace OSBLE.Controllers
                 e.EndTime = e.StartTime;
             }
 
+            //Check to see if there is a time zone cookie
+            System.Web.HttpCookie cookieOffset = new System.Web.HttpCookie("utcOffset");
+            cookieOffset = Request.Cookies["utcOffset"];
+            int utcOffset;
+            if (cookieOffset != null)
+            {
+                //Adjust the time if there is
+                string UtcOffsetString = cookieOffset.Value;
+                utcOffset = Convert.ToInt32(UtcOffsetString);
+
+                e.StartDate = e.StartDate.AddMinutes(-utcOffset);
+                e.EndDate = e.EndDate.Value.AddMinutes(-utcOffset);
+            }
+            else
+            {
+                //If no cookie then the event's time is left to it's utc time
+                utcOffset = 0;
+            }
+         
             return View(e);
         }
 
         //
         // POST: /Event/Edit/5
-
         [CanModifyCourse]
         [HttpPost]
         public ActionResult Edit(Event e)
