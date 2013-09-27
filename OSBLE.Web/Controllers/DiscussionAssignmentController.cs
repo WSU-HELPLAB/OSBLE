@@ -450,6 +450,21 @@ The OSBLE Team
             //mail all users in the course with mail new discussion post setting set as true
             List<MailAddress> to = new List<MailAddress>();
             List<string> emailAddresses = new List<string>();
+            Dictionary<int, string> teamMembers = new Dictionary<int, string>();
+
+            List<Team> teams = db.DiscussionTeams
+               .Where(dt => dt.AssignmentID == assignment.ID)
+               .Where(dt => dt.ID == newPost.DiscussionTeamID)
+               .Select(dt => dt.Team)
+               .ToList();
+
+            if (teams != null)
+            {
+                foreach (TeamMember member in teams[0].TeamMembers)
+                {
+                    teamMembers.Add(member.CourseUserID, member.CourseUser.UserProfile.UserName.ToString());
+                }
+            }
 
             if (assignment.DiscussionSettings.RequiresPostBeforeView == true)
             {
@@ -461,10 +476,29 @@ The OSBLE Team
                     .Select(cu => new { cu.ID, cu.UserProfile.UserName })
                     .ToDictionary(cu => cu.ID, cu => cu.UserName);
 
+                Dictionary<int, String> RealTeammembers = new Dictionary<int, string>();
+
+                if (teams != null)
+                {
+                    foreach (KeyValuePair<int, string> possible_user in PossibleUsers)
+                    {
+                        if (!(teamMembers.ContainsKey(possible_user.Key)))
+                        {
+
+                        }
+                        else
+                        {
+                            RealTeammembers.Add(possible_user.Key, possible_user.Value);
+                        }
+                    }
+
+                    PossibleUsers = RealTeammembers;
+                }
+
                 foreach (DiscussionPost post in db.DiscussionPosts)
                 {
                     if (PossibleUsers.ContainsKey(post.CourseUserID) && !(emailAddresses.Contains(PossibleUsers[post.CourseUserID].ToString())))
-                    {
+                    {                      
                         emailAddresses.Add(PossibleUsers[post.CourseUserID].ToString());
                     }
                 }
@@ -472,13 +506,47 @@ The OSBLE Team
             }
             else
             {
-                emailAddresses = db.CourseUsers
-                    .Where(cu => cu.AbstractCourseID == assignment.CourseID)
-                    .Where(cu => cu.UserProfileID != ActiveCourseUser.UserProfileID)
-                    .Where(cu => cu.AbstractRoleID == 3)
-                    .Where(cu => cu.UserProfile.EmailNewDiscussionPosts == true)
-                    .Select(cu => cu.UserProfile.UserName)
-                    .ToList();
+
+                if (teams != null)
+                {
+                    Dictionary<int, string> PossibleUsers = db.CourseUsers
+                        .Where(cu => cu.AbstractCourseID == assignment.CourseID)
+                        .Where(cu => cu.UserProfileID != ActiveCourseUser.UserProfileID)
+                        .Where(cu => cu.AbstractRoleID == 3)
+                        .Where(cu => cu.UserProfile.EmailNewDiscussionPosts == true)
+                        .Select(cu => new { cu.ID, cu.UserProfile.UserName })
+                        .ToDictionary(cu => cu.ID, cu => cu.UserName);
+
+                    Dictionary<int, String> RealTeammembers = new Dictionary<int, string>();
+
+                    foreach (KeyValuePair<int, string> possible_user in PossibleUsers)
+                    {
+                        if (!(teamMembers.ContainsKey(possible_user.Key)))
+                        {
+
+                        }
+                        else
+                        {
+                            RealTeammembers.Add(possible_user.Key, possible_user.Value);
+                        }
+                    }
+
+                    foreach (KeyValuePair<int, string> possible_user in RealTeammembers)
+                    {
+                        emailAddresses.Add(possible_user.Value);
+                    }
+
+                }
+                else
+                {
+                    emailAddresses = db.CourseUsers
+                        .Where(cu => cu.AbstractCourseID == assignment.CourseID)
+                        .Where(cu => cu.UserProfileID != ActiveCourseUser.UserProfileID)
+                        .Where(cu => cu.AbstractRoleID == 3)
+                        .Where(cu => cu.UserProfile.EmailNewDiscussionPosts == true)
+                        .Select(cu => cu.UserProfile.UserName)
+                        .ToList();
+                }
             }
 
             foreach (string address in emailAddresses)
