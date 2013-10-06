@@ -27,7 +27,13 @@
             @Html.EditorFor(model => model.UserName)
             @Html.ValidationMessageFor(model => model.UserName)
         </div>
-
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Password)
+        </div>
+        <div class="editor-field">
+            @Html.PasswordFor(model => model.Password)
+            @Html.ValidationMessageFor(model => model.Password)
+        </div>
         <div class="editor-label">
             @Html.LabelFor(model => model.SchoolID, "School")
             @Helpers.CreateToolTip(ToolTips.AdminUserSchool) 

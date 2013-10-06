@@ -93,6 +93,7 @@ namespace OSBLE.Controllers
                          where user.UserName.ToLower().CompareTo(userprofile.UserName.ToLower()) == 0
                          && user.ID != userprofile.ID
                          select user).Count();
+
             if (count != 0)
             {
                 ModelState.AddModelError("UserName", "User name already taken.");
@@ -100,6 +101,18 @@ namespace OSBLE.Controllers
             
             if (ModelState.IsValid)
             {
+                UserProfile dbUser = db.UserProfiles.Where(u => u.ID == userprofile.ID).FirstOrDefault();
+                db.Entry(dbUser).State = EntityState.Detached;
+
+                if (userprofile.Password == null || userprofile.Password.Length == 0)
+                {
+                    userprofile.Password = dbUser.Password;
+                }
+                else
+                {
+                    userprofile.Password = UserProfile.GetPasswordHash(userprofile.Password);
+                }
+
                 db.Entry(userprofile).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
