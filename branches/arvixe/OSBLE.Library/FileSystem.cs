@@ -615,7 +615,7 @@ namespace OSBLE
                     {
                         if (file.LastWriteTime > timeSubmitted)
                         {
-                            timeSubmitted = file.LastWriteTime;
+                            timeSubmitted = file.LastWriteTimeUtc;
                         }
                     }
                 }

@@ -104,8 +104,29 @@ namespace OSBLE.Controllers
                         string submissionTime = "No Submission";
                         if (subTime != null) //found a submission time, Reassign submissionTime
                         {
+                            //Submission time comes back in UTC
+                            //Check to see if there is a time zone cookie
+                            System.Web.HttpCookie cookieOffset = new System.Web.HttpCookie("utcOffset");
+                            cookieOffset = Request.Cookies["utcOffset"];
+                            int utcOffset;
+                            if (cookieOffset != null)
+                            {
+                                //Adjust the time if there is
+                                string UtcOffsetString = cookieOffset.Value;
+                                utcOffset = Convert.ToInt32(UtcOffsetString);
+
+                                subTime = subTime.Value.AddMinutes(-utcOffset);
+                            }
+                            else
+                            {
+                                //If no cookie then the event's time is left to it's utc time
+                                utcOffset = 0;
+                            }
+
                             submissionTime = subTime.Value.ToString();
                         }
+
+                       
 
                         submissionInfo.Add(a.ID, submissionTime);
                     }
