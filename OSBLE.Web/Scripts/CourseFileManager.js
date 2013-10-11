@@ -7,6 +7,10 @@
 // Global array for state objects
 var cfm_states = new Array();
 
+// Check wether or not a files or links was clicked.
+var FilesAndLinksClick = false;
+var ContextMenu = false;
+
 //For user selection purposes
 var cfm_statesSelected = new Array();
 var cfm_boolMultipleSelected = false;
@@ -342,13 +346,17 @@ function cfm_AddUploader(stateObjectIndex) {
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
 
+    //To tell the highlighting that the context menu was clicked.
+    ContextMenu = true;
+
     // Find the appropriate DIV
     var targetDIV = document.getElementById("folder_controls_" + stateObjectIndex.toString());
 
     // Add the uploader control into the DIV
     $('body').append(
-"<div id=\"input_dialog\" title=\"Upload File(s)\"> \
-    <br />" + fileuploader_getcontrolshtml(
+"<div id=\"input_dialog\" title=\"Upload File(s)\"> \ " +
+    "Upload files to: " + state.name +
+    "<br />" + fileuploader_getcontrolshtml(
         "cfm_files_" + stateObjectIndex.toString(), true,
         "cfm_GetExtraServiceArgs(" + stateObjectIndex.toString() + ");",
         "cfm_uploadComplete(" + stateObjectIndex.toString() + ");") +
@@ -461,6 +469,9 @@ function cfm_CreateFolderIconClicked(stateObjectIndex) {
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
 
+    //To tell the highlighting that the context menu was clicked.
+    ContextMenu = true;
+
     // Find the appropriate DIV
     var targetDIV = document.getElementById("folder_controls_" + stateObjectIndex.toString());
 
@@ -563,6 +574,9 @@ function cfm_DeleteFolderIconClicked(stateObjectIndex) {
 
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
+
+    //To tell the highlighting that the context menu was clicked.
+    ContextMenu = true;
 
     // Find the appropriate DIV
     var targetDIV = document.getElementById("folder_controls_" + stateObjectIndex.toString());
@@ -763,6 +777,9 @@ function cfm_FileDeleteIconClicked(stateObjectIndex) {
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
 
+    //To tell the highlighting that the context menu was clicked.
+    ContextMenu = true;
+
     // Find the appropriate DIV
     var targetDIV = document.getElementById("file_controls_" + stateObjectIndex.toString());
 
@@ -795,6 +812,9 @@ function cfm_FileRenameIconClicked(stateObjectIndex) {
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
 
+    //To tell the highlighting that the context menu was clicked.
+    ContextMenu = true;
+
     // Find the appropriate DIV
     var targetDIV = document.getElementById("file_controls_" + stateObjectIndex.toString());
 
@@ -807,40 +827,6 @@ function cfm_FileRenameIconClicked(stateObjectIndex) {
         "<input type=\"button\" value=\"Rename\" style=\"width: 100%;\" " +
         "onclick=\"cfm_RenameFile(" + stateObjectIndex.toString() + ");\" />" +
         "<br /><input type=\"button\" value=\"Cancel\" style=\"width: 100%;\" " +
-        "onclick=\"removePopUp()\");\" />\
-</div>");
-
-    //make the div we just created into a dialog box
-    $('#input_dialog').dialog({
-        modal: true,
-        autoOpen: true,
-        resizable: false,
-        width: 225,
-        height: 225,
-        closeOnEscape: true,
-        close: removePopUp
-    });
-
-    //Create the dialog box
-    $('#input_dialog').dialog('open');
-}
-
-function cfm_CopyLinkClicked(stateObjectIndex) {
-    // Get the state object at the specified index
-    var state = cfm_states[stateObjectIndex];
-
-    // Find the appropriate DIV
-    var targetDIV = document.getElementById("stateSelectID_" + stateObjectIndex.toString());
-    var copyLink = "osble.org";
-    copyLink += $(targetDIV).attr("copy-link");
-    
-
-    //// Add the controls into the DIV
-    $('body').append(
-"<div id=\"input_dialog\" title=\"Copy File Link\"> \
-        <br /><div><input type=\"text\" value=\"" + copyLink +
-        "\" style=\"width: 100%; box-sizing: border-box;\"></div>" +      
-        "<br /><input type=\"button\" value=\"Ok\" style=\"width: 100%;\" " +
         "onclick=\"removePopUp()\");\" />\
 </div>");
 
@@ -994,6 +980,9 @@ function cfm_RenameFolderIconClicked(stateObjectIndex) {
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
 
+    //To tell the highlighting that the context menu was clicked.
+    ContextMenu = true;
+
     // Find the appropriate DIV
     var targetDIV = document.getElementById("folder_controls_" + stateObjectIndex.toString());
 
@@ -1040,6 +1029,9 @@ function cfm_RenameFolderIconClicked(stateObjectIndex) {
 //When multiple files are selected and delete is called
 function cfm_multipleFileDelete() {
 
+    //To tell the highlighting that the context menu was clicked.
+    ContextMenu = true;
+
     // Add the controls into the DIV
     // Different from deleting one file, the deletion calls will need to be partitioned to
     // appropriate deletion calls.  Function call is cfm_PartitionDeleteCalls()
@@ -1065,9 +1057,47 @@ function cfm_multipleFileDelete() {
 
     //Create the dialog box
     $('#input_dialog').dialog('open');
+}
 
-    // Mark the controls as visible
-    state.controlsVisible = true;
+function cfm_CopyLinkClicked(stateObjectIndex) {
+    // Get the state object at the specified index
+    var state = cfm_states[stateObjectIndex];
+
+    //To tell the highlighting that the context menu was clicked.
+    ContextMenu = true;
+
+    // Find the appropriate DIV
+    var targetDIV = document.getElementById("stateSelectID_" + stateObjectIndex.toString());
+    var copyLink = "osble.org";
+    copyLink += $(targetDIV).attr("copy-link");
+
+
+    //// Add the controls into the DIV
+    $('body').append(
+"<div id=\"input_dialog\" title=\"Copy File Link\"> \
+        <br /><div><input type=\"text\" value=\"" + copyLink +
+        "\" style=\"width: 100%; box-sizing: border-box;\"></div>" +
+        "<br /><input type=\"button\" value=\"Ok\" style=\"width: 100%;\" " +
+        "onclick=\"removePopUp()\");\" />\
+</div>");
+
+    //make the div we just created into a dialog box
+    $('#input_dialog').dialog({
+        modal: true,
+        autoOpen: true,
+        resizable: false,
+        width: 225,
+        height: 225,
+        closeOnEscape: true,
+        close: removePopUp
+    });
+
+    //Create the dialog box
+    $('#input_dialog').dialog('open');
+
+    //Referesh the listing for highlighting purposes
+    cfm_getListing(state.fm_div_ID);
+
 }
 
 //When multiple files and/or folders have been selected we need to 
@@ -1099,61 +1129,67 @@ function cfm_PartitionDeleteCalls() {
 // Context menu stuff
 // A context menu with full functionality, this is a folder which is not the root of the directory.
 $(function () {
-    $.contextMenu({
-        selector: '.context-menu-one',
-        callback: function (key, options) {
-            var m = "clicked: " + key;
-            window.console && console.log(m) || alert(m);
-        },
-        items: {
-            "Rename": {
-                name: "Rename",
-                icon: "edit",
-                callback: function (key, opt) {
-                    // get the state object id of the clicked div and call the rename function
-                    var m = opt.$trigger.attr('state-obj');
-                    cfm_RenameFolderIconClicked(m);
-                }
-
+    $.contextMenu(
+        {
+            selector: '.context-menu-one',
+            callback: function (key, options) {
+                alert("Test");
             },
-            "Delete": {
-                name: "Delete",
-                icon: "delete",
-                callback: function (key, opt) {
-                    // get the state object id of the clicked div and call the delete function
-                    var m = opt.$trigger.attr('state-obj');
-
-                    if (cfm_boolMultipleSelected == true) {
-                        cfm_multipleFileDelete();
+            items: {
+                "Rename": {
+                    name: "Rename",
+                    icon: "edit",
+                    callback: function (key, opt) {
+                        // get the state object id of the clicked div and call the rename function
+                        var m = opt.$trigger.attr('state-obj');
+                        cfm_RenameFolderIconClicked(m);
                     }
-                    else {
-                        cfm_DeleteFolderIconClicked(m);
+                },
+                "Delete": {
+                    name: "Delete",
+                    icon: "delete",
+                    callback: function (key, opt) {
+                        // get the state object id of the clicked div and call the delete function
+                        var m = opt.$trigger.attr('state-obj');
+                        
+                        if (cfm_boolMultipleSelected == true) {
+                            cfm_multipleFileDelete();
+                        }
+                        else {
+                            cfm_DeleteFolderIconClicked(m);
+                        }
+                    }
+                },
+                "Upload File": {
+                    name: "Upload File(s)",
+                    icon: "add",
+                    callback: function (key, opt) {
+                        // get the state object id of the clicked div and call the upload function
+                        var m = opt.$trigger.attr('state-obj');
+                        cfm_AddUploader(m);
+                    }
+                },
+                "Create Folder": {
+                    name: "Create Folder",
+                    icon: "add2",
+                    callback: function (key, opt) {
+                        // get the state object id of the clicked div and call the create  function
+                        var m = opt.$trigger.attr('state-obj');
+                        cfm_CreateFolderIconClicked(m);
                     }
                 }
-
             },
-            "Upload File": {
-                name: "Upload File(s)",
-                icon: "add",
-                callback: function (key, opt) {
-                    // get the state object id of the clicked div and call the upload function
-                    var m = opt.$trigger.attr('state-obj');
-                    cfm_AddUploader(m);
+            events: {
+                show: function (opt) {
+                    $(this).css("background", "#dfdfdf");
+                },
+                hide: function (opt) {
+                    $(this).css("background", "white");
                 }
-
-            },
-            "Create Folder": {
-                name: "Create Folder",
-                icon: "add2",
-                callback: function (key, opt) {
-                    // get the state object id of the clicked div and call the create  function
-                    var m = opt.$trigger.attr('state-obj');
-                    cfm_CreateFolderIconClicked(m);
-                }
-
             }
-        }
-    });
+        });
+
+
 });
 
 // This is a typical file that is uploaded to the file system like a .PDF
@@ -1196,6 +1232,14 @@ $(function () {
                 }
 
             }
+        },
+        events: {
+            show: function (opt) {
+                $(this).css("background", "#dfdfdf");
+            },
+            hide: function (opt) {
+                $(this).css("background", "white");
+            }
         }
     });
 });
@@ -1233,12 +1277,11 @@ $(function () {
     });
 });
 
-//Add selected divs to the selected div array
-//This function handles the user selecting multiple items 
+// Click highlighting on Files and Links
 $(document).on('click', '.itemSelection', function (e) {
-
     //Gets the element clicked and the divs that are currently selected
     var m = $(this).attr('state-obj-select');
+
     var index = cfm_statesSelected.indexOf(m);
 
     //If the user is holding down the ctrl key when a div is clicked
@@ -1257,39 +1300,22 @@ $(document).on('click', '.itemSelection', function (e) {
             $(this).css("background", "#dfdfdf");
         }
     }
-        //if the user just clicks the div with nothing else held down
-    else {
-        //If the div is selected (it is in the cfm_statesSelected array) change it's background color to white
-        if (index > -1) {
-            $(this).css("background", "#dfdfdf");
+    else { //if the user just clicks the div with nothing else held down
+        //Keep the color the same
+        $(this).css("background", "#dfdfdf");
 
-            // If multiple itmes are selected at the time of this event 
-            // remove all of them from the states selected array and change their background to white
-            // this is is suppose to mimic OS file operations.
-            for (var i = 0; i < cfm_statesSelected.length; i++) {
-                if (cfm_statesSelected[i] != m) {
-                    elem = document.getElementById('stateSelectID_' + cfm_statesSelected[i]);
-                    $(elem).css("background", "white");
-                    cfm_statesSelected.splice(i, 1);
-                }
+        // If multiple itmes are selected at the time of this event 
+        // remove all of them from the states selected array and change their background to white
+        // this is is suppose to mimic OS file operations.
+        for (var i = 0; i < cfm_statesSelected.length; i++) {
+            if (cfm_statesSelected[i] != m) {
+                elem = document.getElementById('stateSelectID_' + cfm_statesSelected[i]);
+                $(elem).css("background", "white");
             }
         }
-        else {
-            //Add the div to the states selected array if it is not currently selected.
-            cfm_statesSelected.push(m);
-            $(this).css("background", "#dfdfdf");
-
-            // If multiple itmes are selected at the time of this event 
-            // remove all of them from the states selected array and change their background to white
-            // this is is suppose to mimic OS file operations.
-            for (var i = 0; i < cfm_statesSelected.length; i++) {
-                if (cfm_statesSelected[i] != m) {
-                    elem = document.getElementById('stateSelectID_' + cfm_statesSelected[i]);
-                    $(elem).css("background", "white");
-                    cfm_statesSelected.splice(i, 1);
-                }
-            }
-        }
+        var stateSelected = new Array();
+        stateSelected.push(m);
+        cfm_statesSelected = stateSelected;
     }
 
     //Check to see if multiple divs are selected
@@ -1299,6 +1325,31 @@ $(document).on('click', '.itemSelection', function (e) {
     else {
         cfm_boolMultipleSelected = false;
     }
+
+    //An itemSelection was clicked
+    FilesAndLinksClick = 1;
+});
+
+//Check for all clicks
+$(document).on('click', 'html', function (e) {
+
+    //Check to see if files and links was clicked and if not remove all clicked
+    if (FilesAndLinksClick == 1  || ContextMenu == true) {
+        //Reset the files and links click
+        FilesAndLinksClick = 0;
+        ContextMenu = false;
+    }
+    else {
+        //If files and links not clicked remove all clicks and reset the links clicked check
+        for (var i = 0; i < cfm_statesSelected.length; i++) {
+            elem = document.getElementById('stateSelectID_' + cfm_statesSelected[i]);
+            $(elem).css("background", "white");
+        }
+        cfm_statesSelected = [];
+        FilesAndLinksClick = 0;
+        cfm_boolMultipleSelected = false;
+    }
+
 });
 
 //If the mouse hovers change the background color no matter what to gray
@@ -1319,6 +1370,4 @@ $(document).on('mouseleave', '.itemSelection', function () {
     else {
         $(this).css("background", "white");
     }
-
-
 });
