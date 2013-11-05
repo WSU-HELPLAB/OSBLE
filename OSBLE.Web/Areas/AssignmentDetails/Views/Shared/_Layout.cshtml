@@ -128,6 +128,19 @@ else
             }
         </td>
     </tr>
+    @* Check for solution files *@
+    @{if (!string.IsNullOrEmpty(ViewBag.SoluFilesHTML))
+      {
+          <tr>
+              <th>
+                  Solution:
+              </th>
+              <td>
+                  @Html.Raw(ViewBag.SoluFilesHTML)
+              </td>
+          </tr>
+      }
+    }
     <tr>
         <th>
             Type:

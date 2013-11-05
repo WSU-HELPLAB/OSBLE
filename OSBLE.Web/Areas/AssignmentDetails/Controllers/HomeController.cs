@@ -27,9 +27,10 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
             AssignmentDetailsFactory factory = new AssignmentDetailsFactory();
             AssignmentDetailsViewModel viewModel = factory.Bake(assignment, ActiveCourseUser);
 
-            // E.O.: There can be files associated with an assignment description. We look 
+            // E.O.: There can be files associated with an assignment description and solutions. We look 
             // for these now.
             ViewBag.DescFilesHTML = string.Empty;
+            ViewBag.SoluFilesHTML = string.Empty;
             if (assignment.CourseID.HasValue)
             {
                 OSBLE.Models.FileSystem.AssignmentFilePath fs =
@@ -71,8 +72,51 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
                         }
                     }
                     sb.Append("</ul>");
-                    ViewBag.DescFilesHTML = sb.ToString();
+                    ViewBag.DescFilesHTML = sb.ToString();                   
                 }
+                
+                //Check for solution files and if they exist create a string to send to the assignment details
+                attrFiles = fs.AttributableFiles;
+                files = attrFiles.GetFilesWithSystemAttribute("assignment_solution", assignmentId.ToString());
+
+                //Check active course user
+                if (files.Count > 0 && (ActiveCourseUser.AbstractCourseID == 1 || ActiveCourseUser.AbstractCourseID == 2 ||
+                    ActiveCourseUser.AbstractCourseID == 3 || ActiveCourseUser.AbstractCourseID == 5))
+                {
+                    StringBuilder sb = new StringBuilder("<ul>");
+                    foreach (string fileName in files)
+                    {
+                        //Check to see if the user is an admin
+                        if (ActiveCourseUser.AbstractCourseID == 1)
+                        {
+                            //Build the URL action for deleting
+                            //Assignment file deletion is handled different.
+                            string UrlAction = Url.Action("DeleteAssignmentFile", "Home", new { courseID = assignment.CourseID.Value, assignmentID = assignment.ID, fileName = System.IO.Path.GetFileName(fileName) });
+
+                            // Make a link for the file
+                            sb.AppendFormat(
+                                "<li><a href=\"/Services/CourseFilesOps.ashx?cmd=assignment_file_download" +
+                                "&courseID={0}&assignmentID={1}&filename={2}\">{2}      </a>" +
+                                "<a href=\"" + UrlAction + "\"><img src=\"/Content/images/delete_up.png\" alt=\"Delete Button\"></img></a>" +
+                                "</li>",
+                                assignment.CourseID.Value,
+                                assignment.ID,
+                                System.IO.Path.GetFileName(fileName));
+                        }
+                        else
+                        {
+                            sb.AppendFormat(
+                            "<li><a href=\"/Services/CourseFilesOps.ashx?cmd=assignment_file_download" +
+                            "&courseID={0}&assignmentID={1}&filename={2}\">{2}</li>",
+                            assignment.CourseID.Value,
+                            assignment.ID,
+                            System.IO.Path.GetFileName(fileName));
+                        }
+                    }
+                    sb.Append("</ul>");
+                    ViewBag.SoluFilesHTML = sb.ToString();
+                }
+
             }
 
             //discussion assignments and critical reviews require their own special view

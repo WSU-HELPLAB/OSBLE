@@ -6,6 +6,10 @@
 // description page.
 var srvcArgsDesc = "";
 var srvcArgsSol = "";
+
+//For downloading files
+var globlCourseID;
+
 function assignmentfilemanager_update(assignmentID)
 {
     // Reset status to loading
@@ -16,11 +20,16 @@ function assignmentfilemanager_update(assignmentID)
     var selectCourseObj = document.getElementById("course_select");
     var courseID = selectCourseObj.value;
 
+    globlCourseID = selectCourseObj.value;
+
+    globlAssignmentID = assignmentID;
+
     // Do the service request to get the file list for this assignment
     var req = new XMLHttpRequest();
     req.addEventListener("load",
         function (args) { assignmentfilemanager_listcompletion(args, assignmentID, "descriptionFilesDIV"); },
         false);
+
     //req.addEventListener("error", assignmentfilemanager_fail, false);
     //req.addEventListener("abort", assignmentfilemanager_canceled, false);
     req.open("GET", "../Services/CourseFilesOps.ashx?cmd=assignment_files_list&courseID=" +
@@ -71,7 +80,15 @@ function assignmentfilemanager_listcompletion(args, assignmentID, descDIVName)
                     // just makes it slightly more robust.
                     if (assignmentID == descNodes[0].childNodes[0].nodeValue)
                     {
-                        descHTML += ("<li>" + tempNode.getAttribute("name") + "</li>");
+                        //Add download and remove links
+                        descHTML += "<li><a href=\"/Services/CourseFilesOps.ashx?cmd=assignment_file_download" +
+                               "&courseID=" + globlCourseID + "&assignmentID=" + assignmentID + "&filename=" + tempNode.getAttribute("name") + "\">" + tempNode.getAttribute("name") + "</a>";
+                        //Delete file link
+                        descHTML += "<a id = \"deleteFile\" href=\"/Services/CourseFilesOps.ashx?cmd=assignment_file_delete" +
+                               "&courseID=" + globlCourseID + "&assignmentID=" + assignmentID + "&filename=" + tempNode.getAttribute("name") + "\"><img src=\"/Content/images/delete_up.png\" alt=\"Delete Button\"></img></a>" +
+                               "</li>";
+
+                        //descHTML += ("<li>" + tempNode.getAttribute("name") + "</li>");
                     }
                 }
 
@@ -81,7 +98,16 @@ function assignmentfilemanager_listcompletion(args, assignmentID, descDIVName)
                 {
                     if (assignmentID == solNodes[0].childNodes[0].nodeValue)
                     {
-                        solHTML += ("<li>" + tempNode.getAttribute("name") + "</li>");
+                        //Add download and remove links
+                        solHTML += "<li><a href=\"/Services/CourseFilesOps.ashx?cmd=assignment_file_download" +
+                               "&courseID=" + globlCourseID + "&assignmentID=" + assignmentID + "&filename=" + tempNode.getAttribute("name") + "\">" + tempNode.getAttribute("name") + "</a>";
+                        //Delete file link
+                        solHTML += "<a id = \"deleteFile\" href=\"/Services/CourseFilesOps.ashx?cmd=assignment_file_delete" +
+                               "&courseID=" + globlCourseID + "&assignmentID=" + assignmentID + "&filename=" + tempNode.getAttribute("name") + "\"><img src=\"/Content/images/delete_up.png\" alt=\"Delete Button\"></img></a>" +
+                               "</li>";
+
+
+                       // solHTML += ("<li>" + tempNode.getAttribute("name") + "</li>");
                     }
                 }
             }
