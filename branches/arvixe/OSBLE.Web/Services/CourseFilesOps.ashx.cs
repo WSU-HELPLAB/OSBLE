@@ -123,7 +123,7 @@ namespace OSBLE.Services
                 courseFiles.GetXMLListing(courseUser, true) +
                 "</CourseFilesOpsResponse>");
         }
-        
+
         private void HandleFileRenameRequest(HttpContext context, Models.Users.UserProfile up,
             int courseID, CourseUser courseUser)
         {
@@ -444,6 +444,54 @@ namespace OSBLE.Services
 
                 // Transmit file data
                 context.Response.TransmitFile(af.DataFileName);
+                return;
+            }
+            else if ("assignment_file_delete" == cmdParam)
+            {
+                // First make sure we have the "assignmentID" parameter
+                int aID = -1;
+                if (!VerifyIntParam(context, "assignmentID", ref aID))
+                {
+                    return;
+                }
+
+                // Now make sure we have the "filename" parameter
+                string fileName = context.Request.Params["filename"];
+                if (string.IsNullOrEmpty(fileName))
+                {
+                    WriteErrorResponse(context, "Missing required parameter: \"filename\"");
+                    return;
+                }
+                fileName = System.IO.Path.GetFileName(fileName);
+
+                // Get the attributable file storage
+                OSBLEDirectory attrFiles =
+                    Models.FileSystem.Directories.GetAssignment(courseID, aID).AttributableFiles;
+                if (null == attrFiles)
+                {
+                    WriteErrorResponse(context,
+                        "Internal error: could not get attributable files manager for assignment");
+                    return;
+                }
+
+                // Make sure the file exists
+                OSBLEFile af = attrFiles.GetFile(fileName);
+                if (null == af)
+                {
+                    WriteErrorResponse(context,
+                        "Internal error: could not get attributable file");
+                    return;
+                }
+
+                //Delete file
+                attrFiles.DeleteFile(fileName);
+
+                // Return success message with new file listing
+               /* context.Response.Write(
+                    "<CourseFilesOpsResponse success=\"true\">" +
+                    attrFiles.GetXMLListing(courseUser, true) +
+                    "</CourseFilesOpsResponse>");*/
+
                 return;
             }
             else if ("create_folder" == cmdParam)

@@ -93,14 +93,21 @@
 
         //handling delete button
         $('input[class=mailCheckBoxClass]').each(function () {
-            if ($(this).attr('checked') == "checked") {
+            if (document.getElementById(this.id).checked) {
                 checkBoxesChecked++;
             }
         });
         handleDeleteButton();
 
         //handling checkall button
-        if ($("#checkAll").attr('checked') == "checked") {
+        if (document.getElementById('checkAllBox').checked) {
+            $('input[class=mailCheckBoxClass]').each(function () {
+                if (document.getElementById(this.id).checked = false) {
+                    checkBoxesChecked++;
+                    document.getElementById(this.id).checked = true;
+                }
+
+            });
         }
     });
 
@@ -114,16 +121,16 @@
     }
 
     $("#checkAllBox").change(function () {
-        if ($("#checkAllBox").attr('checked') == "checked") {
+        if (document.getElementById(this.id).checked) {
             checkBoxesChecked = 0;
             $('input[class=mailCheckBoxClass]').each(function () {
-                $(this).attr('checked', true);
+                document.getElementById(this.id).checked = true;
                 checkBoxesChecked++;
             });
         }
         else {
             $('input[class=mailCheckBoxClass]').each(function () {
-                $(this).attr('checked', false);
+                document.getElementById(this.id).checked = false;
             });
             checkBoxesChecked = 0;
         }
@@ -132,7 +139,7 @@
 
 
     $(".mailCheckBoxClass").change(function () {
-        if ($(this).attr('checked') == "checked") {
+        if (document.getElementById(this.id).checked) {
             checkBoxesChecked++;
         }
         else {
