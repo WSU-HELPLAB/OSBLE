@@ -232,6 +232,9 @@ namespace OSBLE.Models
 
         public DbSet<Event> Events { get; set; }
 
+        //ical
+        public DbSet<icalEvent> icalEvents { get; set; }
+
         public DbSet<Notification> Notifications { get; set; }
 
         // Rubrics
