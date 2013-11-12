@@ -43,6 +43,12 @@ namespace OSBLE.Controllers
                 get;
                 set;
             }
+
+            public string Email
+            {
+                get;
+                set;
+            }
         }
 
         public class UsersBySection
@@ -192,6 +198,7 @@ namespace OSBLE.Controllers
                 string guessedIdentification = null;
                 string guessedName = null;
                 string guessedName2 = null;
+                string guessedEmail = null;
 
                 // Guess headers for section and identification
                 foreach (string header in headers)
@@ -229,6 +236,14 @@ namespace OSBLE.Controllers
                             guessedName2 = header;
                         }
                     }
+
+                    if (guessedEmail == null)
+                    {
+                        if (Regex.IsMatch(header, "email", RegexOptions.IgnoreCase) || Regex.IsMatch(header, "e-mail", RegexOptions.IgnoreCase))
+                        {
+                            guessedEmail = header;
+                        }
+                    }
                 }
 
                 ViewBag.Headers = headers;
@@ -236,6 +251,7 @@ namespace OSBLE.Controllers
                 ViewBag.GuessedIdentification = guessedIdentification;
                 ViewBag.GuessedName = guessedName;
                 ViewBag.GuessedName2 = guessedName2;
+                ViewBag.GuessedEmail = guessedEmail;
 
                 return View();
             }
@@ -246,7 +262,7 @@ namespace OSBLE.Controllers
         [HttpPost]
         [CanModifyCourse]
         [NotForCommunity]
-        public ActionResult ApplyRoster(string idColumn, string sectionColumn, string nameColumn, string name2Column)
+        public ActionResult ApplyRoster(string idColumn, string sectionColumn, string nameColumn, string name2Column, string emailColumn)
         {
             byte[] rosterContent = (byte[])Cache["RosterFile"];
             int rosterCount = 0;
@@ -257,7 +273,7 @@ namespace OSBLE.Controllers
                 memStream.Write(rosterContent, 0, rosterContent.Length);
                 memStream.Position = 0;
 
-                List<RosterEntry> rosterEntries = parseRoster(memStream, idColumn, sectionColumn, nameColumn, name2Column);
+                List<RosterEntry> rosterEntries = parseRoster(memStream, idColumn, sectionColumn, nameColumn, name2Column, emailColumn);
 
                 if (rosterEntries.Count > 0)
                 {
@@ -298,16 +314,21 @@ namespace OSBLE.Controllers
                                     c.AbstractRoleID == (int)CourseRole.CourseRoles.Student
                                     select c;
                     List<UserProfile> orphans = oldRoster.Select(cu => cu.UserProfile).ToList();
+                    
+                    
                     List<CourseUser> newRoster = new List<CourseUser>();
 
                     string[] names = new string[2];
                     // Attach to users or add new user profile stubs.
+                    List<WhiteTableUser> whiteTable = new List<WhiteTableUser>(); // create white table //this may have to be added course
+
                     foreach (RosterEntry entry in rosterEntries)
                     {
                         CourseUser courseUser = new CourseUser();
                         courseUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
                         courseUser.Section = entry.Section;
-                        courseUser.UserProfile = new UserProfile();
+                        //next line 
+                        courseUser.UserProfile = new UserProfile();//
                         courseUser.UserProfile.Identification = entry.Identification;
                         if (entry.Name != null)
                         {
@@ -560,7 +581,7 @@ namespace OSBLE.Controllers
             return csvReader.GetFieldHeaders().ToList();
         }
 
-        private List<RosterEntry> parseRoster(Stream roster, string idNumberColumnName, string sectionColumnName, string nameColumnName, string name2ColumnName)
+        private List<RosterEntry> parseRoster(Stream roster, string idNumberColumnName, string sectionColumnName, string nameColumnName, string name2ColumnName, string emailColumn)
         {
             StreamReader sr = new StreamReader(roster);
             CachedCsvReader csvReader = new CachedCsvReader(sr, true);
@@ -604,6 +625,11 @@ namespace OSBLE.Controllers
                 else
                 {
                     entry.Section = 0;
+                }
+
+                if (emailColumn != "" )
+                {
+                    entry.Email = csvReader[csvReader.GetFieldIndex(emailColumn)];
                 }
 
                 rosterData.Add(entry);
@@ -781,5 +807,39 @@ namespace OSBLE.Controllers
                 throw new Exception("This user is already in the course!");
             }
         }
+    }
+    public class WhiteTableUser
+    {
+        public int Section
+        {
+            get;
+            set;
+        }
+        public string ID
+        {
+            get;
+            set;
+        }
+        public string Name1
+        {
+            get;
+            set;
+        }
+        public string Name2
+        {
+            get;
+            set;
+        }
+        public string Email
+        {
+            get;
+            set;
+        }
+        public bool Verify
+        {
+            get;
+            set;
+        }
+
     }
 }

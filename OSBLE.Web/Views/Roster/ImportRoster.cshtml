@@ -22,13 +22,13 @@
 <div class="selector">
     <br />
     <h3>
-        Section Header <em>(optional)</em>:</h3>
-    <ul id="section_selector" class="selector">
-        <li class="@if (ViewBag.GuessedSection == null)
+        Student Email:</h3>
+    <ul id="email_selector" class="selector">
+        <li class="@if (ViewBag.GuessedEmail == null)
                    {<text>selected</text>}> none_select"><em>None</em></li>
         @foreach (string h in ViewBag.headers)
         {
-            <li @if (h == ViewBag.GuessedSection)
+            <li @if (h == ViewBag.GuessedEmail)
                 {<text>class="selected"</text>}>@h</li>
         }
     </ul>
@@ -91,11 +91,11 @@
             $('#id_column').val($(this).html());
         });
 
-        $('#section_selector > li').click(function () {
+        $('#email_selector > li').click(function () {
             if (!$(this).hasClass('none_select')) {
-                $('#section_column').val($(this).html());
+                $('#email_column').val($(this).html());
             } else {
-                $('#section_column').val(null);
+                $('#email_column').val(null);
             }
         });
 
@@ -115,6 +115,7 @@
             <input type="hidden" id="section_column" name="sectionColumn" value="@ViewBag.GuessedSection" />
             <input type="hidden" id="name_column" name="nameColumn" value="@ViewBag.GuessedName" />
             <input type="hidden" id="name2_column" name="name2Column" value="@ViewBag.GuessedName2" />
+            <input type="hidden" id="email_column" name="emailColumn" value="@ViewBag.GuessedEmail" />
             <input type="submit" value="Import Roster" />
 
         }
