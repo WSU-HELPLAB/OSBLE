@@ -43,12 +43,48 @@ namespace OSBLE.Controllers
                 get;
                 set;
             }
-
             public string Email
             {
                 get;
                 set;
             }
+        } // getters setters
+
+        public class WhiteTableUser
+        {
+           public int Section
+            {
+                get;
+                set;
+
+            }
+           public string ID
+            {
+                get;
+                set;
+            }
+           public string Name1
+            {
+                get;
+                set;
+            }
+           public string Name2
+            {
+                get;
+                set;
+            }
+           public string Email
+            {
+                get;
+                set;
+            }
+           public bool Verify
+            {
+                get;
+                set;
+            }
+         
+
         }
 
         public class UsersBySection
@@ -64,7 +100,7 @@ namespace OSBLE.Controllers
                 get;
                 set;
             }
-        }
+        } // getters setter
 
         public class UsersByRole
         {
@@ -85,7 +121,7 @@ namespace OSBLE.Controllers
                 get;
                 set;
             }
-        }
+        } // bunch of getters and setters
 
         //
         // GET: /Roster/
@@ -174,7 +210,7 @@ namespace OSBLE.Controllers
             }
 
             return View();
-        }
+        } 
 
         [HttpPost]
         [CanModifyCourse]
@@ -236,7 +272,6 @@ namespace OSBLE.Controllers
                             guessedName2 = header;
                         }
                     }
-
                     if (guessedEmail == null)
                     {
                         if (Regex.IsMatch(header, "email", RegexOptions.IgnoreCase) || Regex.IsMatch(header, "e-mail", RegexOptions.IgnoreCase))
@@ -279,6 +314,8 @@ namespace OSBLE.Controllers
                 {
                     rosterCount = rosterEntries.Count;
 
+                    
+                   
                     // First check to make sure there are no duplicates in the ID table.
                     List<string> usedIdentifications = new List<string>();
                     foreach (RosterEntry entry in rosterEntries)
@@ -314,30 +351,32 @@ namespace OSBLE.Controllers
                                     c.AbstractRoleID == (int)CourseRole.CourseRoles.Student
                                     select c;
                     List<UserProfile> orphans = oldRoster.Select(cu => cu.UserProfile).ToList();
-                    
-                    
                     List<CourseUser> newRoster = new List<CourseUser>();
 
                     string[] names = new string[2];
                     // Attach to users or add new user profile stubs.
-                    List<WhiteTableUser> whiteTable = new List<WhiteTableUser>(); // create white table //this may have to be added course
-
+                    List<WhiteTableUser> whiteTable = new List<WhiteTableUser>(); // the stuff below this line is the new stuff I added. forrest 
                     foreach (RosterEntry entry in rosterEntries)
                     {
-                        CourseUser courseUser = new CourseUser();
-                        courseUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
-                        courseUser.Section = entry.Section;
-                        //next line 
-                        courseUser.UserProfile = new UserProfile();//
-                        courseUser.UserProfile.Identification = entry.Identification;
+                        //CourseUser courseUser = new CourseUser();
+                        WhiteTableUser user = new WhiteTableUser();
+                        //courseUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+                        //courseUser.Section = entry.Section;
+                        user.Section = entry.Section;
+                        //courseUser.UserProfile = new UserProfile();
+                        //courseUser.UserProfile.Identification = entry.Identification;
+                        
+
                         if (entry.Name != null)
                         {
                             if (entry.Name.Contains(',')) //Assume "LastName, FirstName" format.
                             {
                                 names = entry.Name.Split(',');
                                 string[] parseFirstName = names[1].Trim().Split(' ');
-                                courseUser.UserProfile.FirstName = parseFirstName[0];
-                                courseUser.UserProfile.LastName = names[0].Trim();
+                                //courseUser.UserProfile.FirstName = parseFirstName[0];
+                                //courseUser.UserProfile.LastName = names[0].Trim();
+                                user.Name1 = parseFirstName[0];
+                                user.Name2 = names[0].Trim();
                             }
                             else //Assume "FirstName LastName" format. and No middle names.
                             {
@@ -345,30 +384,38 @@ namespace OSBLE.Controllers
                                 names = entry.Name.Trim().Split(' '); //Trimming trialing and leading spaces to avoid conflicts below
                                 if(names.Count() ==  1) //Assume only last name
                                 {
-                                    courseUser.UserProfile.FirstName = "";
-                                    courseUser.UserProfile.LastName = names[0];
+                                    //courseUser.UserProfile.FirstName = "";
+                                    //courseUser.UserProfile.LastName = names[0];
+                                    user.Name1 = string.Empty;
+                                    user.Name2 = names[0];
                                 }
                                 else if(names.Count() == 2) //Only first and last name exist
                                 {
-                                    courseUser.UserProfile.FirstName = names[0];
-                                    courseUser.UserProfile.LastName = names[1];
+                                    //courseUser.UserProfile.FirstName = names[0];
+                                    //courseUser.UserProfile.LastName = names[1];
+                                    user.Name1 = names[0];
+                                    user.Name2 = names[1];
                                 }
                                 else //at least 1 Middle name exists. Use first and last entries in names
                                 {
-                                    courseUser.UserProfile.FirstName = names[0];
-                                    courseUser.UserProfile.LastName = names[names.Count() - 1];
+                                    //courseUser.UserProfile.FirstName = names[0];
+                                    //courseUser.UserProfile.LastName = names[names.Count() - 1];
+                                    user.Name1 = names[0];
+                                    user.Name2 = names[names.Count() - 1];
                                 }
                             }
                         }
                         else
                         {
-                            courseUser.UserProfile.FirstName = "Pending";
-                            courseUser.UserProfile.LastName = string.Format("({0})", entry.Identification);
+                            //courseUser.UserProfile.FirstName = "Pending";
+                            //courseUser.UserProfile.LastName = string.Format("({0})", entry.Identification);
+                            user.Name1 = "Pending";
+                            user.Name2 = string.Format("({0})", entry.Identification);
                         }
-                        newRoster.Add(courseUser);
-                        createCourseUser(courseUser);
-                        orphans.Remove(courseUser.UserProfile);
-                    }
+                        //newRoster.Add(courseUser);
+                        //createCourseUser(courseUser);
+                        //orphans.Remove(courseUser.UserProfile);
+                    }// end foreach loop for whitetables
                     db.SaveChanges();
 
                     //withdraw all orphans
@@ -564,7 +611,7 @@ namespace OSBLE.Controllers
                                select c);
 
             if (courseUser.UserProfileID != CurrentUser.ID || diffTeacher.Count() > 0)
-            {
+            {   
                 return true;
             }
             else
@@ -626,8 +673,7 @@ namespace OSBLE.Controllers
                 {
                     entry.Section = 0;
                 }
-
-                if (emailColumn != "" )
+                if(emailColumn != "")
                 {
                     entry.Email = csvReader[csvReader.GetFieldIndex(emailColumn)];
                 }
@@ -807,39 +853,5 @@ namespace OSBLE.Controllers
                 throw new Exception("This user is already in the course!");
             }
         }
-    }
-    public class WhiteTableUser
-    {
-        public int Section
-        {
-            get;
-            set;
-        }
-        public string ID
-        {
-            get;
-            set;
-        }
-        public string Name1
-        {
-            get;
-            set;
-        }
-        public string Name2
-        {
-            get;
-            set;
-        }
-        public string Email
-        {
-            get;
-            set;
-        }
-        public bool Verify
-        {
-            get;
-            set;
-        }
-
     }
 }
