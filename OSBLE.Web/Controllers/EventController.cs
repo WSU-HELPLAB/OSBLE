@@ -60,6 +60,21 @@ namespace OSBLE.Controllers
         [CanPostEvent]
         public ActionResult Create()
         {
+
+            //Account for utcOffset
+            System.Web.HttpCookie cookieOffset = new System.Web.HttpCookie("utcOffset");
+            cookieOffset = Request.Cookies["utcOffset"];
+            int utcOffset;
+            if (cookieOffset != null)
+            {
+                string UtcOffsetString = cookieOffset.Value;
+                utcOffset = Convert.ToInt32(UtcOffsetString);
+            }
+            else
+            {
+                utcOffset = 0;
+            }
+
             Event e = new Event();
 
             string start = null;
@@ -71,9 +86,12 @@ namespace OSBLE.Controllers
                 e.StartDate = DateTime.Parse(start);
                 e.StartTime = e.StartDate;
             }
-
+             
             e.EndDate = e.StartDate;
             e.EndTime = e.StartTime.Add(new TimeSpan(0, 1, 0, 0, 0));
+
+            e.StartTime = e.StartTime.AddMinutes(-utcOffset);
+            e.EndTime = e.EndTime.Value.AddMinutes(-utcOffset);
 
             return View(e);
         }
