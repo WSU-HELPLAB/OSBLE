@@ -1,6 +1,7 @@
 ﻿using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.Rubrics;
+using OSBLE.Models.AbstractCourses.Course;
 using OSBLE.Models.HomePage;
 using System;
 using System.Collections.Generic;
@@ -36,6 +37,8 @@ namespace OSBLE
             modelBuilder.EntitySet<TeamEvaluationSettings>("TeamEvaluationSettings");
             modelBuilder.EntitySet<AbetAssignmentOutcome>("AbetOutcomes");
             modelBuilder.EntitySet<Event>("AssociatedEvent");
+            //is the following needed?
+            modelBuilder.EntitySet<CourseWhiteTable>("WhiteTable");
 
 
             modelBuilder.Namespace = "OSBLE.Controllers.Odata";

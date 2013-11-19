@@ -225,6 +225,8 @@ namespace OSBLE.Models
 
         public DbSet<CourseWhiteTable> CourseTable { get; set; }
 
+        public DbSet<WhiteTableUser> CourseTalbeUsers { get; set; }
+
         // HomePage
 
         public DbSet<AbstractDashboard> AbstractDashboards { get; set; }
