@@ -16,6 +16,12 @@ namespace OSBLE.Models.AbstractCourses.Course
             set;
             get;
         }
+        [Required]
+        public int CourseNum
+        {
+            set;
+            get;
+        }
         public string Name1
         {
             get;
