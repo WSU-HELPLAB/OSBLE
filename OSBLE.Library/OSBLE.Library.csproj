@@ -84,12 +84,14 @@
     <Compile Include="Models\AbstractCourses\Course\CourseMeeting.cs" />
     <Compile Include="Models\AbstractCourses\Course\CourseRole.cs" />
     <Compile Include="Models\AbstractCourses\Course\CourseUser.cs" />
+    <Compile Include="Models\AbstractCourses\Course\CourseWhiteTable.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\CellDescription.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\CriterionEvaluation.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\Criterion.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\Level.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\Rubric.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\RubricEvaluation.cs" />
+    <Compile Include="Models\AbstractCourses\Course\WhiteTableUser.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\ActivityLog.cs" />
     <Compile Include="Models\Annotate\AnnotateApi.cs" />
