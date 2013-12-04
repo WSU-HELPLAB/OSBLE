@@ -132,7 +132,9 @@ namespace OSBLE.Models
             // Withdrawn: The student has withdrawn from the course
             this.CourseRoles.Add(new CourseRole(CourseRole.CourseRoles.Withdrawn.ToString(), false, false, false, false, false, false));
 
+            
             // Community Roles
+            
 
             // Leader: Can Modify Community
             this.CommunityRoles.Add(new CommunityRole(CommunityRole.OSBLERoles.Leader.ToString(), true, true, true, true));

@@ -102,6 +102,24 @@ namespace OSBLE.Controllers
 
             List<UsersBySection> usersBySections = new List<UsersBySection>();
 
+            //Forrests code start
+            var WTusers = (from d in db.WhiteTableUsers
+                           where d.CourseID == ActiveCourseUser.AbstractCourseID
+                           select d);
+ 
+            var WTusersGroupedByCourseID = WTusers.GroupBy(WhiteTableUsers => WhiteTableUsers.CourseID).OrderBy(WhiteTableUsers => WhiteTableUsers.Key).ToList();
+
+            List<WhiteTableUser> WTusersByCourseID = new List<WhiteTableUser>();
+
+            foreach (var CourseID in WTusersGroupedByCourseID)
+            {
+                WTusersGroupedByCourseID.Add(CourseID);
+            }
+
+            ViewBag.WTUCourseID = WTusersGroupedByCourseID;
+
+           //Forrest code end
+
             foreach (var section in usersGroupedBySection)
             {
                 UsersBySection userBySection = new UsersBySection();
