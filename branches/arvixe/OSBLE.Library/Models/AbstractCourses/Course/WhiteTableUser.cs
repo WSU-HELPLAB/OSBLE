@@ -4,20 +4,27 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+using OSBLE.Models.Users;
 
 namespace OSBLE.Models.AbstractCourses.Course
 {
     public class WhiteTableUser
     {
-        [Required]
         [Key]
+        [Required]
         public int ID
         {
             set;
             get;
         }
         [Required]
-        public int CourseNum
+        public int CourseId
+        {
+            set;
+            get;
+        }
+        [Required]
+        public int SchoolId
         {
             set;
             get;
@@ -62,24 +69,7 @@ namespace OSBLE.Models.AbstractCourses.Course
         // do we need to add something there?
         public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
         {
-            /*
-            //The CourseUser class utilizes a custom trigger to handle the intricices of deleting users from courses.  As 
-            //a SQL Server requirement, all FK relations must not cascade on delete.
-            modelBuilder.Entity<CourseWhiteTable>()
-                .HasRequired(m => m.AbstractCourse)
-                .WithMany()
-                .WillCascadeOnDelete(false);
-
-            modelBuilder.Entity<CourseWhiteTable>()
-                .HasRequired(m => m.AbstractRole)
-                .WithMany()
-                .WillCascadeOnDelete(false);
-
-            modelBuilder.Entity<CourseUser>()
-                .HasRequired(m => m.UserProfile)
-                .WithMany()
-                .WillCascadeOnDelete(false);
-             */
+           
         }
     }
 }

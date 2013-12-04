@@ -11,6 +11,7 @@ using OSBLE.Attributes;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
+using OSBLE.Models.AbstractCourses;
 
 namespace OSBLE.Controllers
 {
@@ -352,7 +353,7 @@ namespace OSBLE.Controllers
                                     select c;
                     List<UserProfile> orphans = oldRoster.Select(cu => cu.UserProfile).ToList();
                     List<CourseUser> newRoster = new List<CourseUser>();
-
+                    List<WhiteTableUser> newTable = new List<WhiteTableUser>();
                     string[] names = new string[2];
                     // Attach to users or add new user profile stubs.
                     List<WhiteTableUser> whiteTable = new List<WhiteTableUser>(); // the stuff below this line is the new stuff I added. forrest 
@@ -413,7 +414,9 @@ namespace OSBLE.Controllers
                             user.Name2 = string.Format("({0})", entry.Identification);
                         }
                         //newRoster.Add(courseUser);
+                        newTable.Add(user);
                         //createCourseUser(courseUser);
+                        //createWhiteTableUser(user);
                         //orphans.Remove(courseUser.UserProfile);
                     }// end foreach loop for whitetables
                     db.SaveChanges();
@@ -754,7 +757,7 @@ namespace OSBLE.Controllers
                 addNewStudentToTeams(courseuser);
             }
         }
-
+       
         /// <summary>
         /// This method will add the new courseUser to all the various types of teams they need to be on for each assignment type.
         /// </summary>
