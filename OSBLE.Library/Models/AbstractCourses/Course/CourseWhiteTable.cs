@@ -30,7 +30,7 @@ namespace OSBLE.Models.AbstractCourses.Course
 
         public virtual AbstractCourse AbstractCourse { get; set; }
 
-
+        
 
         [Required]
         public int Section { get; set; }

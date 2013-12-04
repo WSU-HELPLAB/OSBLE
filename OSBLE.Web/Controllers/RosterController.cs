@@ -12,6 +12,7 @@ using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Models.AbstractCourses;
+using OSBLE.Models.AbstractCourses.Course;
 
 namespace OSBLE.Controllers
 {
@@ -50,43 +51,6 @@ namespace OSBLE.Controllers
                 set;
             }
         } // getters setters
-
-        public class WhiteTableUser
-        {
-           public int Section
-            {
-                get;
-                set;
-
-            }
-           public string ID
-            {
-                get;
-                set;
-            }
-           public string Name1
-            {
-                get;
-                set;
-            }
-           public string Name2
-            {
-                get;
-                set;
-            }
-           public string Email
-            {
-                get;
-                set;
-            }
-           public bool Verify
-            {
-                get;
-                set;
-            }
-         
-
-        }
 
         public class UsersBySection
         {
@@ -353,17 +317,17 @@ namespace OSBLE.Controllers
                                     select c;
                     List<UserProfile> orphans = oldRoster.Select(cu => cu.UserProfile).ToList();
                     List<CourseUser> newRoster = new List<CourseUser>();
-                    List<WhiteTableUser> newTable = new List<WhiteTableUser>();
+                    List<WhiteTable> newTable = new List<WhiteTable>();
                     string[] names = new string[2];
                     // Attach to users or add new user profile stubs.
-                    List<WhiteTableUser> whiteTable = new List<WhiteTableUser>(); // the stuff below this line is the new stuff I added. forrest 
+                    List<WhiteTable> whiteTable = new List<WhiteTable>(); // the stuff below this line is the new stuff I added. forrest 
                     foreach (RosterEntry entry in rosterEntries)
                     {
                         //CourseUser courseUser = new CourseUser();
-                        WhiteTableUser user = new WhiteTableUser();
+                        WhiteTable user = new WhiteTable();
                         //courseUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
                         //courseUser.Section = entry.Section;
-                        user.Section = entry.Section;
+                        user.Section = entry.Section; //will need to add section to whitetableuser later
                         //courseUser.UserProfile = new UserProfile();
                         //courseUser.UserProfile.Identification = entry.Identification;
                         
@@ -376,8 +340,8 @@ namespace OSBLE.Controllers
                                 string[] parseFirstName = names[1].Trim().Split(' ');
                                 //courseUser.UserProfile.FirstName = parseFirstName[0];
                                 //courseUser.UserProfile.LastName = names[0].Trim();
-                                user.Name1 = parseFirstName[0];
-                                user.Name2 = names[0].Trim();
+                                user.WhiteTableUser.Name1 = parseFirstName[0];
+                                user.WhiteTableUser.Name2 = names[0].Trim();
                             }
                             else //Assume "FirstName LastName" format. and No middle names.
                             {
@@ -387,22 +351,22 @@ namespace OSBLE.Controllers
                                 {
                                     //courseUser.UserProfile.FirstName = "";
                                     //courseUser.UserProfile.LastName = names[0];
-                                    user.Name1 = string.Empty;
-                                    user.Name2 = names[0];
+                                    user.WhiteTableUser.Name1 = string.Empty;
+                                    user.WhiteTableUser.Name2 = names[0];
                                 }
                                 else if(names.Count() == 2) //Only first and last name exist
                                 {
                                     //courseUser.UserProfile.FirstName = names[0];
                                     //courseUser.UserProfile.LastName = names[1];
-                                    user.Name1 = names[0];
-                                    user.Name2 = names[1];
+                                    user.WhiteTableUser.Name1 = names[0];
+                                    user.WhiteTableUser.Name2 = names[1];
                                 }
                                 else //at least 1 Middle name exists. Use first and last entries in names
                                 {
                                     //courseUser.UserProfile.FirstName = names[0];
                                     //courseUser.UserProfile.LastName = names[names.Count() - 1];
-                                    user.Name1 = names[0];
-                                    user.Name2 = names[names.Count() - 1];
+                                    user.WhiteTableUser.Name1 = names[0];
+                                    user.WhiteTableUser.Name2 = names[names.Count() - 1];
                                 }
                             }
                         }
@@ -410,13 +374,13 @@ namespace OSBLE.Controllers
                         {
                             //courseUser.UserProfile.FirstName = "Pending";
                             //courseUser.UserProfile.LastName = string.Format("({0})", entry.Identification);
-                            user.Name1 = "Pending";
-                            user.Name2 = string.Format("({0})", entry.Identification);
+                            user.WhiteTableUser.Name1 = "Pending";
+                            user.WhiteTableUser.Name2 = string.Format("({0})", entry.Identification);
                         }
                         //newRoster.Add(courseUser);
                         newTable.Add(user);
                         //createCourseUser(courseUser);
-                        //createWhiteTableUser(user);
+                        createWhiteTableUser(user);
                         //orphans.Remove(courseUser.UserProfile);
                     }// end foreach loop for whitetables
                     db.SaveChanges();
@@ -854,6 +818,57 @@ namespace OSBLE.Controllers
             else
             {
                 throw new Exception("This user is already in the course!");
+            }
+        }
+
+        private void createWhiteTableUser(WhiteTable whitetable)
+        {
+            //do the same thing as createCourseUser but make the function work with our whitetable
+            //This will return one if they exist already or null if they don't
+            var user = (from c in db.WhiteTableUsers
+                        where c.Identification == whitetable.WhiteTableUser.ID //courseuser.UserProfile.Identification
+                        && c.SchoolID == ActiveCourseUser.UserProfile.SchoolID
+                        select c).FirstOrDefault();
+            if (user == null)
+            {
+                //user doesn't exist so we got to make a new one
+                //Create userProfile with the new ID
+                WhiteTableUser up = new WhiteTableUser();
+                up.SchoolID = CurrentUser.SchoolID;
+                up.Identification = whitetable.WhiteTableUser.Identification; //courseuser.UserProfile.Identification;
+
+                if (whitetable.WhiteTableUser.Name1 != null)
+                {
+                    up.Name1 = whitetable.WhiteTableUser.Name1;
+                    if (whitetable.WhiteTableUser.Name2 != null)
+                        up.Name2 = whitetable.WhiteTableUser.Name2;
+                    else
+                        up.Name2 = null;
+                }
+                else
+                {
+                    up.Name1 = "Pending";
+                    up.Name2 = string.Format("({0})", up.Identification);
+                }
+                db.WhiteTableUsers.Add(up);
+                db.SaveChanges();
+
+                //Set the UserProfileID to point to our new student
+                whitetable.WhiteTableUser = up;
+                whitetable.WhiteTableUserID = up.ID;
+                whitetable.AbstractCourseID = ActiveCourseUser.AbstractCourseID;
+            }
+            else //If the CourseUser already has a UserProfile..
+            {
+                if (whitetable.WhiteTableUser.Name1 != null)
+                {
+                    user.Name1 = whitetable.WhiteTableUser.Name1;
+                    user.Name2 = whitetable.WhiteTableUser.Name2;
+                    db.SaveChanges();
+                }
+                whitetable.WhiteTableUser = user;
+                whitetable.WhiteTableUserID = user.ID;
+                db.SaveChanges();
             }
         }
     }

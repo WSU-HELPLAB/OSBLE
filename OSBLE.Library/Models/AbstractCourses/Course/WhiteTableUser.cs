@@ -18,13 +18,19 @@ namespace OSBLE.Models.AbstractCourses.Course
             get;
         }
         [Required]
-        public int CourseId
+        public int CourseID
         {
             set;
             get;
         }
         [Required]
-        public int SchoolId
+        public int SchoolID
+        {
+            set;
+            get;
+        }
+        [Required]
+        public int Identification // student identification number
         {
             set;
             get;
@@ -61,6 +67,15 @@ namespace OSBLE.Models.AbstractCourses.Course
             Verify = false;
             Name1 = "";
             Name2 = "";
+        }
+        //cpy constructor
+        public WhiteTableUser(WhiteTableUser cpyuser)
+            : this ()
+        {
+            this.Email = cpyuser.Email;
+            this.Verify = cpyuser.Verify;
+            this.Name1 = cpyuser.Name1;
+            this.Name2 = cpyuser.Name2;
         }
 
         // yc
