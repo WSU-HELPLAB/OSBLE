@@ -225,7 +225,7 @@ namespace OSBLE.Models
 
         public DbSet<WhiteTable> WhiteTable { get; set; }
 
-        public DbSet<WhiteTableUser> WhiteTalbeUsers { get; set; }
+        public DbSet<WhiteTableUser> WhiteTableUsers { get; set; }
 
         // HomePage
 
