@@ -326,11 +326,12 @@ namespace OSBLE.Controllers
                         //CourseUser courseUser = new CourseUser();
                         WhiteTable user = new WhiteTable();
                         //courseUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+                        user.WhiteTableUser = new WhiteTableUser();
                         //courseUser.Section = entry.Section;
                         user.Section = entry.Section; //will need to add section to whitetableuser later
                         //courseUser.UserProfile = new UserProfile();
                         //courseUser.UserProfile.Identification = entry.Identification;
-                        
+                        user.WhiteTableUser.Identification = Int32.Parse(entry.Identification);
 
                         if (entry.Name != null)
                         {
@@ -340,8 +341,16 @@ namespace OSBLE.Controllers
                                 string[] parseFirstName = names[1].Trim().Split(' ');
                                 //courseUser.UserProfile.FirstName = parseFirstName[0];
                                 //courseUser.UserProfile.LastName = names[0].Trim();
-                                user.WhiteTableUser.Name1 = parseFirstName[0];
-                                user.WhiteTableUser.Name2 = names[0].Trim();
+                                if (parseFirstName != null)
+                                {
+                                    user.WhiteTableUser.Name1 = parseFirstName[0];
+                                    user.WhiteTableUser.Name2 = names[0].Trim();
+                                }
+                                else
+                                {
+                                    user.WhiteTableUser.Name1 = names[1].Trim();
+                                    user.WhiteTableUser.Name2 = names[0].Trim();
+                                }
                             }
                             else //Assume "FirstName LastName" format. and No middle names.
                             {
@@ -376,6 +385,16 @@ namespace OSBLE.Controllers
                             //courseUser.UserProfile.LastName = string.Format("({0})", entry.Identification);
                             user.WhiteTableUser.Name1 = "Pending";
                             user.WhiteTableUser.Name2 = string.Format("({0})", entry.Identification);
+                        }
+                        //check for emails
+
+                        if (entry.Email != null)
+                        {
+                            user.WhiteTableUser.Email = entry.Email;
+                        }
+                        else
+                        {
+                            //NO EMAIL PROVIDED... so this is error checking
                         }
                         //newRoster.Add(courseUser);
                         newTable.Add(user);
@@ -717,7 +736,6 @@ namespace OSBLE.Controllers
             {
                 db.CourseUsers.Add(courseuser);
                 db.SaveChanges();
-
                 addNewStudentToTeams(courseuser);
             }
         }
@@ -836,6 +854,7 @@ namespace OSBLE.Controllers
                 WhiteTableUser up = new WhiteTableUser();
                 up.SchoolID = CurrentUser.SchoolID;
                 up.Identification = whitetable.WhiteTableUser.Identification; //courseuser.UserProfile.Identification;
+                up.CourseID = whitetable.WhiteTableUser.CourseID;
 
                 if (whitetable.WhiteTableUser.Name1 != null)
                 {
@@ -849,6 +868,12 @@ namespace OSBLE.Controllers
                 {
                     up.Name1 = "Pending";
                     up.Name2 = string.Format("({0})", up.Identification);
+                }
+                if (whitetable.WhiteTableUser.Email != null)
+                    up.Email = whitetable.WhiteTableUser.Email;
+                else
+                {
+                    //error check here
                 }
                 db.WhiteTableUsers.Add(up);
                 db.SaveChanges();

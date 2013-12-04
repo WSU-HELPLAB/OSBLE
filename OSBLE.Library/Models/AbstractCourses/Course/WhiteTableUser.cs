@@ -23,12 +23,15 @@ namespace OSBLE.Models.AbstractCourses.Course
             set;
             get;
         }
+        //is section needed with course id?
+
         [Required]
         public int SchoolID
         {
             set;
             get;
         }
+        public virtual School School { get; set; }
         [Required]
         public int Identification // student identification number
         {
@@ -53,18 +56,11 @@ namespace OSBLE.Models.AbstractCourses.Course
             set;
         }
 
-        [Required]
-        public bool Verify
-        {
-            get;
-            set;
-        }
-
+        //normal constructor
         public WhiteTableUser()
             : base ()
         {
             Email = "";
-            Verify = false;
             Name1 = "";
             Name2 = "";
         }
@@ -73,7 +69,6 @@ namespace OSBLE.Models.AbstractCourses.Course
             : this ()
         {
             this.Email = cpyuser.Email;
-            this.Verify = cpyuser.Verify;
             this.Name1 = cpyuser.Name1;
             this.Name2 = cpyuser.Name2;
         }
