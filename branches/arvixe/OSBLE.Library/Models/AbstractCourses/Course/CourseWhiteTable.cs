@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Models.AbstractCourses.Course
 {
-    public class CourseWhiteTable
+    public class WhiteTable
     {
         [Required]
         [Key]
@@ -27,7 +27,7 @@ namespace OSBLE.Models.AbstractCourses.Course
         public virtual IList<WhiteTableUser> entries { set; get; }
 
 
-        public CourseWhiteTable ()
+        public WhiteTable ()
             : base()
         {
             

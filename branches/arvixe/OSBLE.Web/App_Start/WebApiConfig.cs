@@ -38,7 +38,7 @@ namespace OSBLE
             modelBuilder.EntitySet<AbetAssignmentOutcome>("AbetOutcomes");
             modelBuilder.EntitySet<Event>("AssociatedEvent");
             //is the following needed?
-            modelBuilder.EntitySet<CourseWhiteTable>("WhiteTable");
+            modelBuilder.EntitySet<WhiteTable>("WhiteTable");
 
 
             modelBuilder.Namespace = "OSBLE.Controllers.Odata";
