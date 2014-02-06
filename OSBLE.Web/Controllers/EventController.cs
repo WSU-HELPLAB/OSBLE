@@ -24,14 +24,16 @@ namespace OSBLE.Controllers
             // Set range for all events
             DateTime StartDate = new DateTime();
             DateTime EndDate = new DateTime();
+            //yc set time
+ 
 
             if (ActiveCourseUser.AbstractCourse is Course)
             {
                 StartDate = (ActiveCourseUser.AbstractCourse as Course).StartDate;
-
                 //AC: ticket #435 asks that events that go beyond the end of the class be displayed.
                 //This is important for displaying final exam notices.
                 EndDate = (ActiveCourseUser.AbstractCourse as Course).EndDate.Add(new TimeSpan(30, 0, 0, 0, 0));
+ 
             }
             else if (ActiveCourseUser.AbstractCourse is Community)
             {
@@ -60,7 +62,8 @@ namespace OSBLE.Controllers
         [CanPostEvent]
         public ActionResult Create()
         {
-
+            DateTime StartTime = new DateTime();
+            DateTime Endtime = new DateTime();
             //Account for utcOffset
             System.Web.HttpCookie cookieOffset = new System.Web.HttpCookie("utcOffset");
             cookieOffset = Request.Cookies["utcOffset"];
@@ -84,9 +87,9 @@ namespace OSBLE.Controllers
             {
                 start = Request.Params["start"];
                 e.StartDate = DateTime.Parse(start);
-                e.StartTime = e.StartDate;
+                e.StartTime = (ActiveCourseUser.AbstractCourse as Course).CourseMeetings.FirstOrDefault().StartTime;
             }
-             
+            e.StartTime = (ActiveCourseUser.AbstractCourse as Course).CourseMeetings.FirstOrDefault().StartTime; 
             e.EndDate = e.StartDate;
             e.EndTime = e.StartTime.Add(new TimeSpan(0, 1, 0, 0, 0));
 
