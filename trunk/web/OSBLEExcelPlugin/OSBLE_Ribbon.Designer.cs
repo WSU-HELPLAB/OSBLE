@@ -36,23 +36,27 @@
         {
             this.tab1 = this.Factory.CreateRibbonTab();
             this.group1 = this.Factory.CreateRibbonGroup();
-            this.btnLogin = this.Factory.CreateRibbonButton();
-            this.btnLogOut = this.Factory.CreateRibbonButton();
             this.grpCourseGrades = this.Factory.CreateRibbonGroup();
-            this.btnSaveToOSBLE = this.Factory.CreateRibbonButton();
             this.ddCourses = this.Factory.CreateRibbonDropDown();
             this.lblLastSave = this.Factory.CreateRibbonLabel();
+            this.grpUtilities = this.Factory.CreateRibbonGroup();
             this.grpError = this.Factory.CreateRibbonGroup();
+            this.btnLogin = this.Factory.CreateRibbonButton();
+            this.btnLogOut = this.Factory.CreateRibbonButton();
+            this.btnSaveToOSBLE = this.Factory.CreateRibbonButton();
+            this.btnSaveAsZip = this.Factory.CreateRibbonButton();
             this.btnErrorMsg = this.Factory.CreateRibbonButton();
             this.tab1.SuspendLayout();
             this.group1.SuspendLayout();
             this.grpCourseGrades.SuspendLayout();
+            this.grpUtilities.SuspendLayout();
             this.grpError.SuspendLayout();
             // 
             // tab1
             // 
             this.tab1.ControlId.ControlIdType = Microsoft.Office.Tools.Ribbon.RibbonControlIdType.Office;
             this.tab1.Groups.Add(this.group1);
+            this.tab1.Groups.Add(this.grpUtilities);
             this.tab1.Groups.Add(this.grpCourseGrades);
             this.tab1.Groups.Add(this.grpError);
             this.tab1.Label = "OSBLE";
@@ -64,6 +68,39 @@
             this.group1.Items.Add(this.btnLogOut);
             this.group1.Label = "Account";
             this.group1.Name = "group1";
+            // 
+            // grpCourseGrades
+            // 
+            this.grpCourseGrades.Items.Add(this.btnSaveToOSBLE);
+            this.grpCourseGrades.Items.Add(this.ddCourses);
+            this.grpCourseGrades.Items.Add(this.lblLastSave);
+            this.grpCourseGrades.Label = "Course Grades";
+            this.grpCourseGrades.Name = "grpCourseGrades";
+            this.grpCourseGrades.Visible = false;
+            // 
+            // ddCourses
+            // 
+            this.ddCourses.Label = "Course:";
+            this.ddCourses.Name = "ddCourses";
+            this.ddCourses.SelectionChanged += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.ddCourses_SelectionChanged);
+            // 
+            // lblLastSave
+            // 
+            this.lblLastSave.Label = "Last save: (none since login)";
+            this.lblLastSave.Name = "lblLastSave";
+            // 
+            // grpUtilities
+            // 
+            this.grpUtilities.Items.Add(this.btnSaveAsZip);
+            this.grpUtilities.Label = "Utilities";
+            this.grpUtilities.Name = "grpUtilities";
+            // 
+            // grpError
+            // 
+            this.grpError.Items.Add(this.btnErrorMsg);
+            this.grpError.Label = "Error";
+            this.grpError.Name = "grpError";
+            this.grpError.Visible = false;
             // 
             // btnLogin
             // 
@@ -85,15 +122,6 @@
             this.btnLogOut.Visible = false;
             this.btnLogOut.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.btnLogOut_Click);
             // 
-            // grpCourseGrades
-            // 
-            this.grpCourseGrades.Items.Add(this.btnSaveToOSBLE);
-            this.grpCourseGrades.Items.Add(this.ddCourses);
-            this.grpCourseGrades.Items.Add(this.lblLastSave);
-            this.grpCourseGrades.Label = "Course Grades";
-            this.grpCourseGrades.Name = "grpCourseGrades";
-            this.grpCourseGrades.Visible = false;
-            // 
             // btnSaveToOSBLE
             // 
             this.btnSaveToOSBLE.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
@@ -105,23 +133,14 @@
     "ourse";
             this.btnSaveToOSBLE.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.btnSaveToOSBLE_Click);
             // 
-            // ddCourses
+            // btnSaveAsZip
             // 
-            this.ddCourses.Label = "Course:";
-            this.ddCourses.Name = "ddCourses";
-            this.ddCourses.SelectionChanged += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.ddCourses_SelectionChanged);
-            // 
-            // lblLastSave
-            // 
-            this.lblLastSave.Label = "Last save: (none since login)";
-            this.lblLastSave.Name = "lblLastSave";
-            // 
-            // grpError
-            // 
-            this.grpError.Items.Add(this.btnErrorMsg);
-            this.grpError.Label = "Error";
-            this.grpError.Name = "grpError";
-            this.grpError.Visible = false;
+            this.btnSaveAsZip.Image = global::OSBLEExcelPlugin.Properties.Resources.SaveAllHS;
+            this.btnSaveAsZip.Label = "Save as zip";
+            this.btnSaveAsZip.Name = "btnSaveAsZip";
+            this.btnSaveAsZip.ShowImage = true;
+            this.btnSaveAsZip.Visible = false;
+            this.btnSaveAsZip.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.btnSaveAsZip_Click);
             // 
             // btnErrorMsg
             // 
@@ -141,6 +160,8 @@
             this.group1.PerformLayout();
             this.grpCourseGrades.ResumeLayout(false);
             this.grpCourseGrades.PerformLayout();
+            this.grpUtilities.ResumeLayout(false);
+            this.grpUtilities.PerformLayout();
             this.grpError.ResumeLayout(false);
             this.grpError.PerformLayout();
 
@@ -158,6 +179,8 @@
         internal Microsoft.Office.Tools.Ribbon.RibbonGroup grpError;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton btnLogOut;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton btnErrorMsg;
+        internal Microsoft.Office.Tools.Ribbon.RibbonGroup grpUtilities;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton btnSaveAsZip;
     }
 
     partial class ThisRibbonCollection
