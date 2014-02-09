@@ -153,7 +153,7 @@ namespace OSBLEExcelPlugin
         private void btnSaveAsZip_Click(object sender, RibbonControlEventArgs e)
         {
             SaveFileDialog saveAs = new SaveFileDialog();
-            saveAs.Filter = "CSV ZIP (*.zip)";
+            saveAs.Filter = "CSV ZIP (*.zip)|*.zip";
             saveAs.RestoreDirectory = true;
             if (saveAs.ShowDialog() == DialogResult.OK)
             {
