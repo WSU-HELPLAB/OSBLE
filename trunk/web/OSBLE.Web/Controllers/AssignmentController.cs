@@ -17,6 +17,9 @@ namespace OSBLE.Controllers
     [OsbleAuthorize]
     [RequireActiveCourse]
     [NotForCommunity]
+#if !DEBUG
+    [RequireHttps]
+#endif
     public class AssignmentController : OSBLEController
     {
         public AssignmentController()

@@ -251,6 +251,7 @@
     <Compile Include="Attributes\CanSubmitAssignments.cs" />
     <Compile Include="Attributes\EmailAttribute.cs" />
     <Compile Include="Attributes\FileCacheAttribute.cs" />
+    <Compile Include="Attributes\ForceHttp.cs" />
     <Compile Include="Attributes\IsAdmin.cs" />
     <Compile Include="Attributes\IsCommunity.cs" />
     <Compile Include="Attributes\IsNotAnonymized.cs" />
