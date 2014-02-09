@@ -1,0 +1,98 @@
+﻿#AvailableStudentList
+{
+    float:left;
+    width:200px;
+    padding-top:15px;
+    padding-right:15px;
+    border-right:1px solid #CFCFCF;
+}
+
+#AvailableStudentList .RemoveTeamIcon
+{
+    display:none;
+}
+
+
+#ErrorBox
+{
+    margin-top:20px;
+    margin-bottom:20px;
+    padding: 10px 4px 10px 4px;
+    background:#FF9B9B;
+    border:2px solid #FF0000;
+    opacity:0.0;
+}
+
+.NoDecoration
+{
+    text-decoration: none;
+}
+
+.noDeliverable
+{
+    background-color:#FFCCCC;
+}
+
+.StudentListItem
+{
+    cursor:pointer;
+}
+
+.StudentListItem img
+{
+    display:none;
+}
+
+.StudentListItem:hover img
+{
+    display:block;
+}
+    
+#TeamCreationOptions
+{
+    margin-top:25px;
+}
+    
+.TeamDiv
+{
+    float:left;
+    margin:8px;
+    padding:8px;
+    width:200px;
+    border:1px solid #EEF;
+    border-bottom:3px solid #EEF;
+}
+    
+#TeamsDiv
+{
+    float:left;
+    padding-top:15px;
+    padding-left:15px;
+}
+    
+.TeamSortable
+{
+    min-height:25px;
+    cursor:pointer;
+}
+
+.ui-state-default
+{
+    padding:3px;
+    margin-top:2px;
+    margin-bottom:2px;
+}
+    
+.ui-state-highlight, .ui-sortable-placeholder
+{
+    display:block;
+    height: 2px; 
+    line-height: 2px; 
+}
+    
+#WizardContent ul
+{
+    list-style:none;
+    margin:0;
+    padding:0;
+}

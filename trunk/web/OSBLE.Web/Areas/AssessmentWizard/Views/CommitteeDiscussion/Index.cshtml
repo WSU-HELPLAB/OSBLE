@@ -1,0 +1,33 @@
+﻿@using OSBLE.Models.Assessments;
+@model Assessment
+@Html.HiddenFor(m => m.ID)
+@section Header
+{
+
+}
+
+<table class="wizard_entry_table">
+    <tr>
+        <td>Committee members must make initial post before viewing posts of others</td>
+        <td>@Html.CheckBox(" ")</td>
+    </tr>
+    <tr>
+        <td>Committee chair must make initial post before viewing posts of others</td>
+        <td>@Html.CheckBox(" ")</td>
+    </tr>
+    <tr>
+        <th>Due Date for initial post:</th>
+        <td>@Html.EditorFor(m => m.ReleaseDate) at @Html.EditorFor(m => m.ReleaseTime)</td>
+        <td>@Html.ValidationMessageFor(m => m.ReleaseDate)</td>
+    </tr>
+    <tr>
+        <td>Anonymize names of committee members to each other</td>
+        <td>@Html.CheckBox(" ")</td>
+    </tr>
+    <tr>
+        <td>Anonymize names of committee members to committee chair</td>
+        <td>@Html.CheckBox(" ")</td>
+    </tr>
+</table>
+
+

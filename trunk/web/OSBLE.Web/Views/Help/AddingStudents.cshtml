@@ -1,0 +1,38 @@
+﻿@{
+    ViewBag.Title = "Adding Students to a Course";
+}
+<h1>Adding Students to a Course</h1>
+<p>
+    This tutorial assumes that you have already gone through the steps of @Html.ActionLink("creating a course", "CreateCourse").  
+    If you have not already created a course in OSBLE, please do so first.  
+    To add users to your course, make sure that the desired course is selected in the Course/Community dropdown 
+    list near the top-right of the screen.  In our example, &quot;OSBLE 101 – My OSBLE Course&quot; is the selected course.
+    To add students to OSBLE 101, first click on the &quot;Users&quot; tab.  Currently, OSBLE 101 only has user, its instructor.  
+    To add additional students, click the &quot;Add/Update Users&quot; link.
+</p>
+<img src="@Url.Content("~/Content/images/help/roster_1.png")" alt="click the add/update users link" />
+<p>
+    Performing this action brings up a new dialog that allows you to add students by school ID number or email address.  
+    OSBLE also allows users to be added in bulk through the roster import functionality.  
+    As this is the most efficient method for adding students to the course, this tutorial explores this functionality.  
+</p>
+<img src="@Url.Content("~/Content/images/help/roster_2.png")" alt="uploading a roster" />
+<p>
+    OSBLE is capable of handling most comma separated value (*.CSV) files.  
+    To upload a file, click the &quot;Browse&quot; button, select your class' roster, and then click the &quot;Upload Roster&quot; button. 
+     OSBLE will then attempt to parse the uploaded file and select the relevant headers.  
+    Note that if OSBLE selects the wrong headers or was unable to detect the appropriate headers, you have the 
+    ability to manually select the correct header.  When you are satisfied with the selections, click the 
+    &quot;Import Roster&quot; button near the bottom of the page.
+</p>
+<img src="@Url.Content("~/Content/images/help/roster_3.png")" alt="importing a roster" />
+<p>
+    After clicking &quot;Import Roster,&quot; OSBLE finishes parsing the uploaded CSV file and returns you to the Users tab:
+</p>
+<img src="@Url.Content("~/Content/images/help/roster_4.png")" alt="roster import complete" />
+<p>
+    Note that any users that previously existed in the course that were not a part of the 
+    roster import will have their status switched from &quot;Student&quot; to &quot;Withdrawn.&quot;  
+    Any content produced by withdrawn students (e.g. discussion items) will remain intact for 
+    others to be seen.  Furthermore, withdrawn students will not be added to future assignments.  
+</p>

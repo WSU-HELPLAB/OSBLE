@@ -1,0 +1,20 @@
+﻿@model OSBLE.Models.Courses.Weight
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>Weight</legend>
+
+    <div class="display-label">Points</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Points)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.Name }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

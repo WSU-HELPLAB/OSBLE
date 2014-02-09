@@ -1,0 +1,19 @@
+﻿@using OSBLE.Models.Assessments;
+@model Assessment
+@Html.HiddenFor(m => m.ID)
+@section Header
+{
+
+}
+
+<table class="wizard_entry_table">
+    <tr>
+        <th>Which previous review of student work will be discussed?</th>
+        @{List<string> testList = new List<string>();
+          testList.Add("Review 1");
+          testList.Add("Review 2");}
+        <td>@Html.DropDownList("list", new SelectList(testList))</td>
+    </tr>
+</table>
+
+
