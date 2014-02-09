@@ -1,0 +1,86 @@
+﻿@model OSBLE.Models.HomePage.Event
+@using OSBLE.Models
+@using OSBLE.Utility;
+@{
+    ViewBag.Title = "Create Event";
+}
+<h2>
+    Create Event</h2>
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/areas/AssignmentWizard/Content/js/basics.js")" type="text/javascript"></script>
+
+
+@using (Html.BeginForm())
+{
+
+    @Html.ValidationSummary()
+
+    <div class="editor-label">
+        @Html.LabelFor(model => model.Title)
+    </div>
+    <div class="editor-field">
+        @Html.EditorFor(model => model.Title)
+        @Html.ValidationMessageFor(model => model.Title)
+    </div>
+    
+    <input id="utc-offset" name="utc-offset"  value="" type="hidden"/>
+    
+    <table>
+        <tr>
+            <td class="editor-label">@Html.LabelFor(model => model.StartDate)
+            </td>
+            <td class="editor-label">@Html.LabelFor(model => model.StartTime)
+            </td>
+        </tr>
+        <tr>
+            <td class="editor-field">@Html.EditorFor(model => model.StartDate)
+            </td>
+            <td class="editor-field">@Html.EditorFor(model => model.StartTime)
+            </td>
+        </tr>
+        <tr>
+            <td>@Html.ValidationMessageFor(model => model.StartDate)
+            </td>
+            <td>@Html.ValidationMessageFor(model => model.StartTime)
+            </td>
+        </tr>
+        <tr>
+            <td class="editor-label">@Html.LabelFor(model => model.EndDate)
+            </td>
+            <td class="editor-label">@Html.LabelFor(model => model.EndTime)
+            </td>
+        </tr>
+        <tr>
+            <td class="editor-field">@Html.EditorFor(model => model.EndDate)
+            </td>
+            <td class="editor-field">@Html.EditorFor(model => model.EndTime)
+            </td>
+        </tr>
+        <tr>
+            <td>@Html.ValidationMessageFor(model => model.EndDate)
+            </td>
+            <td>@Html.ValidationMessageFor(model => model.EndTime)
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2"><input type="checkbox" name="IncludeEndDate" id="IncludeEndDate" checked="checked" /><label for="IncludeEndDate">Show end date and time in calendar</label></td>
+        </tr>
+    </table>
+    <br />
+    <div class="editor-label">
+        @Html.LabelFor(model => model.Description)
+        @Helpers.CreateToolTip(ToolTips.EventDescription)
+    </div>
+    <div class="editor-field">
+        @Html.TextAreaFor(model => model.Description, new { rows = 5, cols = 50 })
+        @Html.ValidationMessageFor(model => model.Description)
+    </div>
+    
+    <p>
+        <input type="submit" value="Create Event" />
+    </p>
+}
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
