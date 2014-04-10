@@ -87,14 +87,16 @@ namespace OSBLE.Controllers
             {
                 start = Request.Params["start"];
                 e.StartDate = DateTime.Parse(start);
+              
                 e.StartTime = (ActiveCourseUser.AbstractCourse as Course).CourseMeetings.FirstOrDefault().StartTime;
+                e.EndTime = (ActiveCourseUser.AbstractCourse as Course).CourseMeetings.FirstOrDefault().EndTime;
             }
             e.StartTime = (ActiveCourseUser.AbstractCourse as Course).CourseMeetings.FirstOrDefault().StartTime; 
             e.EndDate = e.StartDate;
-            e.EndTime = e.StartTime.Add(new TimeSpan(0, 1, 0, 0, 0));
+            //e.EndTime = e.StartTime.Add(new TimeSpan(0, 1, 0, 0, 0));
 
-            e.StartTime = e.StartTime.AddMinutes(-utcOffset);
-            e.EndTime = e.EndTime.Value.AddMinutes(-utcOffset);
+            //e.StartTime = e.StartTime.AddMinutes(-utcOffset);
+            //e.EndTime = e.EndTime.Value.AddMinutes(-utcOffset);
 
             return View(e);
         }

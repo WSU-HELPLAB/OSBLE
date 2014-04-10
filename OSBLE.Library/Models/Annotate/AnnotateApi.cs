@@ -343,7 +343,8 @@ namespace OSBLE.Models.Annotate
         /// Generates an key for use with annotate
         /// </summary>
         /// <param name="phpFunction">The function that we're calling</param>
-        /// <param name="annotateUser">The user that is responsible for the call.  For example, if we want to log in as bob@smith.com, we'd send "bob@smith.com".</param>
+        /// <param name="annotateUser">The user that is responsible for the call.  For example, if we want to log in as 
+        /// @smith.com, we'd send "bob@smith.com".</param>
         /// <returns></returns>
         public string GenerateAnnotateKey(string phpFunction, string annotateUser, long unixEpoch)
         {

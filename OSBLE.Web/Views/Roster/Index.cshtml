@@ -139,3 +139,73 @@
         </tr>
     </table>
 }
+
+<!--white table begins here -->
+@foreach (RosterController.UsersBySection usersBySection in ViewBag.UsersBySections)
+{
+    <h3>
+        @Helpers.DisplaySection(usersBySection.SectionNumber)
+</h3>
+    <table class="roster_table">
+        <tr>
+            @foreach (RosterController.UsersByRole userByRole in usersBySection.UsersByRole)
+            {
+                if (userByRole.Count > 0)
+                {
+                    <td>
+                        <h3>
+                            @userByRole.RoleName (<span id="roleheader_@(usersBySection.SectionNumber)_@(userByRole.RoleName)">@userByRole.Count.ToString()</span>)
+                            @try
+                            {
+                                @Helpers.CreateToolTip(ToolTips.RosterRolesDictionary[userByRole.RoleName]);
+                            }
+                            catch (KeyNotFoundException e)
+                            {
+                                @Helpers.CreateToolTip("Key not found: " + e);
+                            }
+                        </h3>
+                        <ul class="user_list">
+                            @foreach (OSBLE.Models.Users.UserProfile user in userByRole.Users)
+                            {
+                                <li id="user_item_@(user.ID)">
+                                    @if ((user != ViewBag.CurrentUser) || ViewBag.CanEditSelf == true)
+                                    {
+                                        <div class="user_controls">
+                                            @if (user.UserName != null)
+                                            {
+                                                <a title="Mail This User" href="@Url.Action(" createuserprofileid", "Mail" , new { id=user.ID })">@Helpers.MailButton()</a>
+                                            }
+                                            @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                                            {
+                                                <a title="Modify This User" href="@Url.Action(" edit", "Roster" , new { userprofileid=user.ID })">@Helpers.EditButton()</a>
+
+                                                <form action="@Url.Action(" delete")"
+                                                      style="display: inline;"
+                                                      data-ajax="true"
+                                                      data-ajax-success="$('#user_item_@(user.ID)').hide('highlight',{},'slow',function(){
+                                        $('#roleheader_@(usersBySection.SectionNumber)_@(userByRole.RoleName)').html(
+                                            parseInt($('#roleheader_@(usersBySection.SectionNumber)_@(userByRole.RoleName)').html())-1);
+                                            if(parseInt($('#roleheader_@(usersBySection.SectionNumber)_@(userByRole.RoleName)').html()) == 0) {
+                                                $(this).parent().parent().remove();
+                                            }
+                                        $(this).remove();
+                                    });"
+                                                      data-ajax-confirm="Are you sure you want to remove this user from the course?"
+                                                      method="post">
+                                                    <input type="hidden" name="userProfileID" value="@user.ID" />
+                                                    @Helpers.DeleteSubmit("Remove This User")
+                                                </form>
+                                            }
+                                        </div>
+                                    }
+                                    @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", new { userProfile = user.ID }))
+                                    <span class="roster_name">@Helpers.DisplayFullNameOrPending(user)</span>
+                                </li>
+                            }
+                        </ul>
+                    </td>
+                }
+            }
+        </tr>
+    </table>
+}

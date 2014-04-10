@@ -30,6 +30,9 @@ namespace OSBLE.Models.Courses
         [Display(Name = "Year")]
         public string Year { get; set; }
 
+        
+
+
         // Course Options
 
         [Display(Name = "Allow students to reply to threads posted in activity feed")]
@@ -76,12 +79,16 @@ namespace OSBLE.Models.Courses
         [Display(Name = "Course Meeting Times")]
         public virtual ICollection<CourseMeeting> CourseMeetings { get; set; }
 
+        [Display(Name = "Course Time Zone offset")]
+        public int TimeZoneOffset { get; set; }
+        
         [Display(Name = "Course Breaks")]
         public virtual ICollection<CourseBreak> CourseBreaks { get; set; }
 
         [Display(Name = "Include course meetings and breaks in course calendar")]
         public bool ShowMeetings { get; set; }
 
+        
         public virtual IList<Assignment> Assignments { get; set; }
 
         public Course()
@@ -133,6 +140,7 @@ namespace OSBLE.Models.Courses
             this.ShowMeetings = copyCourse.ShowMeetings;
             this.StartDate = copyCourse.StartDate;
             this.Year = copyCourse.Year;
+            this.TimeZoneOffset = copyCourse.TimeZoneOffset;
         }
 
     }
