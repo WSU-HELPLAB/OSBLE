@@ -87,7 +87,9 @@ namespace OSBLE.Controllers
                 set;
             }
         } // bunch of getters and setters
-
+        public class wtUser
+        {
+        }
         //
         // GET: /Roster/
         [CanModifyCourse]
@@ -102,6 +104,9 @@ namespace OSBLE.Controllers
 
             List<UsersBySection> usersBySections = new List<UsersBySection>();
 
+
+            //yc this portion is used to populate a white table relative to the current course 
+            //this information should only be visible to instructors/admins (currently all students see this information
             //Forrests code start
             var WTusers = (from d in db.WhiteTableUsers
                            where d.CourseID == ActiveCourseUser.AbstractCourseID

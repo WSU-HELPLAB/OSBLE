@@ -26,6 +26,9 @@ namespace OSBLE.Models.Courses
         [StringLength(50)]
         public string Name { get; set; }
 
+        [Display(Name = "Time Zone")]
+        public int TimeZoneOffset { get; set; }
+
         [DataType(DataType.Time)]
         public DateTime StartTime { get; set; }
 

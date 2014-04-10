@@ -676,6 +676,7 @@
     <Content Include="Areas\AssessmentWizard\Views\Home\SelectComponent.cshtml" />
     <Content Include="Areas\AssessmentWizard\Views\Home\Summary.cshtml" />
     <Content Include="Content\gradebook.zip" />
+    <Content Include="ClassDiagram1.cd" />
     <None Include="Properties\PublishProfiles\filesystem.pubxml" />
     <None Include="Scripts\jquery-2.0.1.intellisense.js" />
     <Content Include="Scripts\jquery-2.0.1.js" />
@@ -728,7 +729,9 @@
     <Content Include="Views\Shared\LogOnUserControl.ascx" />
     <Content Include="Views\Shared\Xrds.aspx" />
     <Content Include="Views\User\Identity.aspx" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>

@@ -26,7 +26,7 @@
     {
         //Check to see if the utc adjusted times are different if they are
         //then the event is truly on a new day in the user's time zone
-        DateTime tmpDateNew = e.StartDate.AddMinutes(-utcOffset);
+        DateTime tmpDateNew = e.StartDate;// .AddMinutes(-utcOffset);
              
         if (tmpLastDate.Date != tmpDateNew.Date)
         {
