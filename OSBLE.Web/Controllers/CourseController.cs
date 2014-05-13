@@ -72,7 +72,7 @@ namespace OSBLE.Controllers
 
                     cm.StartTime = cm.StartTime.AddMinutes(utcOffset);
                     cm.EndTime = cm.EndTime.AddMinutes(utcOffset);
-                    course.TimeZoneOffset = cm.TimeZoneOffset = Convert.ToInt32(Request.Params["meeting_timezone"]);
+
                     //Check to see if the utc offset will change the day if so adjust the Meeting's date
                     if (beforeUtcStartTime.DayOfYear != cm.StartTime.DayOfYear)
                     {
@@ -253,6 +253,7 @@ namespace OSBLE.Controllers
                 {
                 }
 
+                course.TimeZoneOffset = Convert.ToInt32(Request.Params["course_timezone"]);
                 createMeetingTimes(course, utcOffset);
                 createBreaks(course);
 
