@@ -50,7 +50,7 @@ namespace OSBLE.Controllers
                 get;
                 set;
             }
-        } // getters setters
+        } 
 
         public class UsersBySection
         {
@@ -65,7 +65,7 @@ namespace OSBLE.Controllers
                 get;
                 set;
             }
-        } // getters setter
+        } 
 
         public class UsersByRole
         {
@@ -86,11 +86,7 @@ namespace OSBLE.Controllers
                 get;
                 set;
             }
-        } // bunch of getters and setters
-        public class wtUser
-        {
         }
-        //
         // GET: /Roster/
         [CanModifyCourse]
         public ActionResult Index()
@@ -107,23 +103,28 @@ namespace OSBLE.Controllers
 
             //yc this portion is used to populate a white table relative to the current course 
             //this information should only be visible to instructors/admins (currently all students see this information
-            //Forrests code start
+            //FW
+            // I do not know how to LINQ the users from the WT databas, what makes the users being imported from the roster with CourseID of 0 any different that the users who will be withdrawn they both have CourseID == 0?
+            // Why is the WT database being populated with users who should not have been added to the WT because the roster hasnt been imported yet?
+            // it appears right now that all of the users who are to be withdraw are added to the WT and THEN after are withdrawn from the course, do we want that?
             var WTusers = (from d in db.WhiteTableUsers
-                           where d.CourseID == ActiveCourseUser.AbstractCourseID
+                           //where d.CourseID == ActiveCourseUser.AbstractCourseID
                            select d);
  
-            var WTusersGroupedByCourseID = WTusers.GroupBy(WhiteTableUsers => WhiteTableUsers.CourseID).OrderBy(WhiteTableUsers => WhiteTableUsers.Key).ToList();
+            //var WTusersGroupedByCourseID = WTusers.GroupBy(WhiteTableUsers => WhiteTableUsers.CourseID).OrderBy(WhiteTableUsers => WhiteTableUsers.Key).ToList();
 
-            List<WhiteTableUser> WTusersByCourseID = new List<WhiteTableUser>();
+            List<WhiteTableUser> WTup = new List<WhiteTableUser>();
 
-            foreach (var CourseID in WTusersGroupedByCourseID)
+            foreach (var WTu in WTusers)
             {
-                WTusersGroupedByCourseID.Add(CourseID);
+                WTup.Add(WTu);
             }
+            
+            //Remove duplicates that may slip in 
+            WTup = WTup.Distinct().ToList();
+            ViewBag.WhiteTableUsers = WTup;
 
-            ViewBag.WTUCourseID = WTusersGroupedByCourseID;
-
-           //Forrest code end
+           //\FW
 
             foreach (var section in usersGroupedBySection)
             {
@@ -420,7 +421,7 @@ namespace OSBLE.Controllers
                             //NO EMAIL PROVIDED... so this is error checking
                         }
                         //newRoster.Add(courseUser);
-                        newTable.Add(user);
+                        newTable.Add(user);// this isnt being used...delete? FW
                         //createCourseUser(courseUser);
                         createWhiteTableUser(user);
                         //orphans.Remove(courseUser.UserProfile);
