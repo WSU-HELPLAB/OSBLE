@@ -48,6 +48,7 @@ namespace OSBLE.Models
             public static string CourseYear = "(Required) the year in which this class is held, e.g., 2011";
             public static string CourseStartDate = "(Required) the date of the first day of class";
             public static string CourseEndDate = "(Required) the date of the last day of class (or the final exam)";
+            public static string CourseTimeZone = "(Required) specifiy the time zone for the class";
             public static string CourseMeetingTimes = "Click on the \"+\" to specify regular meeting times for lectures, labs, etc. These can be optionally included on the course calendar.";
             public static string CourseBreaks = "Click on the \"+\" button to specify course breaks and holidays. These can optionally be included on the course calendar.";
 

@@ -67,6 +67,7 @@ namespace OSBLE.Controllers
             //Account for utcOffset
             System.Web.HttpCookie cookieOffset = new System.Web.HttpCookie("utcOffset");
             cookieOffset = Request.Cookies["utcOffset"];
+
             int utcOffset;
             if (cookieOffset != null)
             {
@@ -87,12 +88,28 @@ namespace OSBLE.Controllers
             {
                 start = Request.Params["start"];
                 e.StartDate = DateTime.Parse(start);
-              
+                e.EndDate = e.StartDate;
+                e.StartTime = (ActiveCourseUser.AbstractCourse as Course).CourseMeetings.FirstOrDefault().StartTime;
+                e.EndTime = (ActiveCourseUser.AbstractCourse as Course).CourseMeetings.FirstOrDefault().EndTime;
+                
+            }
+            else
+            {
+                List<Event> nextday = GetActiveCourseEvents((ActiveCourseUser.AbstractCourse as Course).StartDate, (ActiveCourseUser.AbstractCourse as Course).EndDate);
+                foreach (Event nd in nextday)
+                {
+                    if (nd.StartDate > DateTime.Now)
+                    {
+                        e.StartDate = nd.StartDate;
+                        break;
+                    }
+                }
+                e.EndDate = e.StartDate;
+                //e.StartDate = (ActiveCourseUser.AbstractCourse as Course).CourseMeetings.FirstOrDefault().m
                 e.StartTime = (ActiveCourseUser.AbstractCourse as Course).CourseMeetings.FirstOrDefault().StartTime;
                 e.EndTime = (ActiveCourseUser.AbstractCourse as Course).CourseMeetings.FirstOrDefault().EndTime;
             }
-            e.StartTime = (ActiveCourseUser.AbstractCourse as Course).CourseMeetings.FirstOrDefault().StartTime; 
-            e.EndDate = e.StartDate;
+
             //e.EndTime = e.StartTime.Add(new TimeSpan(0, 1, 0, 0, 0));
 
             //e.StartTime = e.StartTime.AddMinutes(-utcOffset);
@@ -150,8 +167,8 @@ namespace OSBLE.Controllers
             if (ModelState.IsValid)
             {
                 //Account for utc time before saved
-                e.EndDate = e.EndDate.Value.AddMinutes(utcOffset);
-                e.StartDate = e.StartDate.AddMinutes(utcOffset);
+                //e.EndDate = e.EndDate.Value.AddMinutes(utcOffset);
+                //e.StartDate = e.StartDate.AddMinutes(utcOffset);
 
                 db.Events.Add(e);
                 db.SaveChanges();
