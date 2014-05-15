@@ -59,7 +59,6 @@ namespace OSBLE.Controllers
                     cm.Location = Request.Params["meeting_location_" + i.ToString()];
                     cm.StartTime = DateTime.Parse(Request.Params["meeting_start_" + i.ToString()]);
                     cm.EndTime = DateTime.Parse(Request.Params["meeting_end_" + i.ToString()]);
-
                     cm.Sunday = Convert.ToBoolean(Request.Params["meeting_sunday_" + i.ToString()]);
                     cm.Monday = Convert.ToBoolean(Request.Params["meeting_monday_" + i.ToString()]);
                     cm.Tuesday = Convert.ToBoolean(Request.Params["meeting_tuesday_" + i.ToString()]);
@@ -67,18 +66,17 @@ namespace OSBLE.Controllers
                     cm.Thursday = Convert.ToBoolean(Request.Params["meeting_thursday_" + i.ToString()]);
                     cm.Friday = Convert.ToBoolean(Request.Params["meeting_friday_" + i.ToString()]);
                     cm.Saturday = Convert.ToBoolean(Request.Params["meeting_saturday_" + i.ToString()]);
+                    //DateTime beforeUtcStartTime = cm.StartTime;
 
-                    DateTime beforeUtcStartTime = cm.StartTime;
-
-                    cm.StartTime = cm.StartTime.AddMinutes(utcOffset);
-                    cm.EndTime = cm.EndTime.AddMinutes(utcOffset);
+                    //cm.StartTime = cm.StartTime.AddMinutes(utcOffset);
+                    //cm.EndTime = cm.EndTime.AddMinutes(utcOffset);
 
                     //Check to see if the utc offset will change the day if so adjust the Meeting's date
-                    if (beforeUtcStartTime.DayOfYear != cm.StartTime.DayOfYear)
-                    {
-                        int difference = (beforeUtcStartTime.DayOfYear - cm.StartTime.DayOfYear);
-                        correctDay(cm, difference);
-                    }
+                    //if (beforeUtcStartTime.DayOfYear != cm.StartTime.DayOfYear)
+                    //{
+                    //    int difference = (beforeUtcStartTime.DayOfYear - cm.StartTime.DayOfYear);
+                    //    correctDay(cm, difference);
+                    //}
                     course.CourseMeetings.Add(cm);
                 }
             }
@@ -86,6 +84,7 @@ namespace OSBLE.Controllers
             db.SaveChanges();
         }
 
+        //yc: not sure if this situation occurs anymore for below, currently not ever called
         //Correct the listed day because of utc offset
         private void correctDay(CourseMeeting cm, int difference)
         {
