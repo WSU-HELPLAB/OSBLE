@@ -136,15 +136,22 @@
                 </td>
                 }
             }
+            <td>
+                <!--Prints the users in the whitetable for the current class-->
+                <h3>
+                    WhiteTable(@ViewBag.WhiteTableUsers.Count)
+                </h3>
+                @foreach (var WTuser in ViewBag.WhiteTableUsers)
+                {
+                    @WTuser.Name1<br />
+                    @WTuser.Name2<br />
+                    @WTuser.Email<br />
+                    <br />
+                       
+                }
+            </td>
         </tr>
-        @foreach (var WTuser in ViewBag.WhiteTableUsers)
-        {
-            <tr>
-                <td>@WTuser.Name1</td>
-                <td>@WTuser.Name2</td>
-                <td>@WTuser.Email</td>
-            </tr>
-        } 
+
     </table>
 }
 
