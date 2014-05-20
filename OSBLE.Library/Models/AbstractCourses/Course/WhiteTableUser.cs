@@ -35,7 +35,7 @@ namespace OSBLE.Models.AbstractCourses.Course
         }
         public virtual School School { get; set; }
         [Required]
-        public int Identification // student identification number
+        public string Identification // student identification number NEEDS TO BE A STRING 
         {
             set;
             get;
@@ -58,7 +58,7 @@ namespace OSBLE.Models.AbstractCourses.Course
             set;
         }
 
-        //normal constructor
+        
         public WhiteTableUser()
             : base ()
         {
@@ -66,7 +66,7 @@ namespace OSBLE.Models.AbstractCourses.Course
             Name1 = "";
             Name2 = "";
         }
-        //cpy constructor
+        
         public WhiteTableUser(WhiteTableUser cpyuser)
             : this ()
         {
