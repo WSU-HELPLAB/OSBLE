@@ -862,9 +862,9 @@ namespace OSBLE.Controllers
                         where c.Identification == whitetable.WhiteTableUser.Identification //changed this from ID to identification, should fix the dublication error
                         && c.SchoolID == ActiveCourseUser.UserProfile.SchoolID
                         select c).FirstOrDefault();
-            if (user == null)
+            if (user == null || user.CourseID != ActiveCourseUser.AbstractCourseID)
             {
-                //user doesn't exist so we got to make a new one
+                //user doesn't exist so we got to make a new one or the user exists, but not in this course, create a new user
                 //Create userProfile with the new ID
                 WhiteTableUser up = new WhiteTableUser();
                 up.SchoolID = CurrentUser.SchoolID;
@@ -899,16 +899,22 @@ namespace OSBLE.Controllers
                 whitetable.AbstractCourseID = ActiveCourseUser.AbstractCourseID;
                 whitetable.WhiteTableUser.CourseID = ActiveCourseUser.AbstractCourseID;
             }
+                
+            
             else //If the CourseUser already has a UserProfile..
             {
                 if (whitetable.WhiteTableUser.Name1 != null)
                 {
                     user.Name1 = whitetable.WhiteTableUser.Name1;
                     user.Name2 = whitetable.WhiteTableUser.Name2;
+
+                    db.Entry(user).State = EntityState.Modified;
                     db.SaveChanges();
                 }
                 whitetable.WhiteTableUser = user;
                 whitetable.WhiteTableUserID = user.ID;
+
+                db.Entry(whitetable).State = EntityState.Modified;
                 db.SaveChanges();
             }
         }
