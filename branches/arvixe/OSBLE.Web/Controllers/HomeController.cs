@@ -155,6 +155,9 @@ namespace OSBLE.Controllers
             }
             ViewBag.CourseLinks = listing;
             ViewBag.Uploader = fileUploader;
+
+            //yc: setup max file size
+            
         }
 
         private void setupNotifications()

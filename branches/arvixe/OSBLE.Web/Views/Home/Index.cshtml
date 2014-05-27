@@ -1,5 +1,6 @@
 ﻿@using OSBLE.Models.HomePage
 @using OSBLE.Models
+@using System.Web.Configuration
 
 @{
     ViewBag.Title = "Dashboard";
@@ -53,10 +54,11 @@
 <div id="divFileManager">
     (Please wait, loading files...)
 </div>
-
-
+    <!--yc: file upload size change!-->
+        
     <!-- Scripts for file manager -->
-
+    @Helpers.CreateToolTip(ToolTips.FileUploader) <!--yc: currently cant find a way to put this line of code into the script so its placed here for now-->
+    
     <script src="../../Scripts/CourseFilesUploader.js" type="text/javascript"></script>
     <script src="../../Scripts/CourseFileManager.js" type="text/javascript"></script>
     <script type="text/javascript">
@@ -70,6 +72,7 @@
             document.write("File upload not supported. Please upgrade your web browser.");
         }
     </script>
+
 
 @if (false)
 {

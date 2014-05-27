@@ -191,7 +191,7 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
                 result += "<div id=\"stateSelectID_" + stateObjIndex.toString() + "\" class=\"itemSelection\" state-obj-select=\"" + stateObjIndex.toString() + "\" file-or-folder=\"folder\" folder-name=\"" + folderName + "\">";
             }
         }
-
+        debugger;
         result += "<table width=100%; id=\"folder_text_" + ss + "\" style=\"" + " table-layout: fixed; " + "\">";
         result += "<tr>";
         result += "<td style=\"" + " width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; " + "\">";
@@ -307,7 +307,6 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
             courseID.toString() + "&filePath=" + fileStateObj.fullPath;
 
         var copyLink = linkURL.toString();
-
         //If the user has control over the Files and Links
         //then add in the controls by making the file div a member of the context-menu class, same as above
         if (fileStateObj.allowsDeletion) {

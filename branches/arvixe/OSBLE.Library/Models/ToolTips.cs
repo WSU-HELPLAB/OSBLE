@@ -65,7 +65,8 @@ namespace OSBLE.Models
 
         #region HomeToolTips
 
-            // There are currently no tooltips in the Home section
+            // There are currently one tooltips in the Home section
+            public static string FileUploader = "Right clicking \"Files and Links\" will bring up a dialog for the current course file manager";
 
         #endregion
 
