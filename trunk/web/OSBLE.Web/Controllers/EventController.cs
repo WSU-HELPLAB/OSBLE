@@ -24,14 +24,16 @@ namespace OSBLE.Controllers
             // Set range for all events
             DateTime StartDate = new DateTime();
             DateTime EndDate = new DateTime();
+            //yc set time
+
 
             if (ActiveCourseUser.AbstractCourse is Course)
             {
                 StartDate = (ActiveCourseUser.AbstractCourse as Course).StartDate;
-
                 //AC: ticket #435 asks that events that go beyond the end of the class be displayed.
                 //This is important for displaying final exam notices.
                 EndDate = (ActiveCourseUser.AbstractCourse as Course).EndDate.Add(new TimeSpan(30, 0, 0, 0, 0));
+ 
             }
             else if (ActiveCourseUser.AbstractCourse is Community)
             {
@@ -60,10 +62,12 @@ namespace OSBLE.Controllers
         [CanPostEvent]
         public ActionResult Create()
         {
-
+            DateTime StartTime = new DateTime();
+            DateTime Endtime = new DateTime();
             //Account for utcOffset
             System.Web.HttpCookie cookieOffset = new System.Web.HttpCookie("utcOffset");
             cookieOffset = Request.Cookies["utcOffset"];
+
             int utcOffset;
             if (cookieOffset != null)
             {
@@ -84,14 +88,32 @@ namespace OSBLE.Controllers
             {
                 start = Request.Params["start"];
                 e.StartDate = DateTime.Parse(start);
-                e.StartTime = e.StartDate;
+                e.EndDate = e.StartDate;
+                e.StartTime = (ActiveCourseUser.AbstractCourse as Course).CourseMeetings.FirstOrDefault().StartTime;
+                e.EndTime = (ActiveCourseUser.AbstractCourse as Course).CourseMeetings.FirstOrDefault().EndTime;
+                
             }
-             
-            e.EndDate = e.StartDate;
-            e.EndTime = e.StartTime.Add(new TimeSpan(0, 1, 0, 0, 0));
+            else
+            {
+                List<Event> nextday = GetActiveCourseEvents((ActiveCourseUser.AbstractCourse as Course).StartDate, (ActiveCourseUser.AbstractCourse as Course).EndDate);
+                foreach (Event nd in nextday)
+                {
+                    if (nd.StartDate > DateTime.Now)
+                    {
+                        e.StartDate = nd.StartDate;
+                        break;
+                    }
+                }
+                e.EndDate = e.StartDate;
+                //e.StartDate = (ActiveCourseUser.AbstractCourse as Course).CourseMeetings.FirstOrDefault().m
+                e.StartTime = (ActiveCourseUser.AbstractCourse as Course).CourseMeetings.FirstOrDefault().StartTime;
+                e.EndTime = (ActiveCourseUser.AbstractCourse as Course).CourseMeetings.FirstOrDefault().EndTime;
+            }
 
-            e.StartTime = e.StartTime.AddMinutes(-utcOffset);
-            e.EndTime = e.EndTime.Value.AddMinutes(-utcOffset);
+            //e.EndTime = e.StartTime.Add(new TimeSpan(0, 1, 0, 0, 0));
+
+            //e.StartTime = e.StartTime.AddMinutes(-utcOffset);
+            //e.EndTime = e.EndTime.Value.AddMinutes(-utcOffset);
 
             return View(e);
         }
@@ -145,8 +167,8 @@ namespace OSBLE.Controllers
             if (ModelState.IsValid)
             {
                 //Account for utc time before saved
-                e.EndDate = e.EndDate.Value.AddMinutes(utcOffset);
-                e.StartDate = e.StartDate.AddMinutes(utcOffset);
+                //e.EndDate = e.EndDate.Value.AddMinutes(utcOffset);
+                //e.StartDate = e.StartDate.AddMinutes(utcOffset);
 
                 db.Events.Add(e);
                 db.SaveChanges();

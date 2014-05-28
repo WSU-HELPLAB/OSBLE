@@ -57,8 +57,18 @@
     <Reference Include="System.ServiceModel.DomainServices.Server, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Web.Helpers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
-    <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.4.0.20710.0\lib\net40\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.WebPages.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -84,12 +94,14 @@
     <Compile Include="Models\AbstractCourses\Course\CourseMeeting.cs" />
     <Compile Include="Models\AbstractCourses\Course\CourseRole.cs" />
     <Compile Include="Models\AbstractCourses\Course\CourseUser.cs" />
+    <Compile Include="Models\AbstractCourses\Course\CourseWhiteTable.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\CellDescription.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\CriterionEvaluation.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\Criterion.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\Level.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\Rubric.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\RubricEvaluation.cs" />
+    <Compile Include="Models\AbstractCourses\Course\WhiteTableUser.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\ActivityLog.cs" />
     <Compile Include="Models\Annotate\AnnotateApi.cs" />
@@ -161,6 +173,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

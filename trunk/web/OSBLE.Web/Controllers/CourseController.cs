@@ -37,6 +37,7 @@ namespace OSBLE.Controllers
             return View(new Course());
         }
 
+        //yc: utcOffset is the zone offset information (eg PST == -8)
         private void createMeetingTimes(Course course, int utcOffset)
         {
             int count = Convert.ToInt32(Request.Params["meetings_max"]);
@@ -59,7 +60,6 @@ namespace OSBLE.Controllers
                     cm.Location = Request.Params["meeting_location_" + i.ToString()];
                     cm.StartTime = DateTime.Parse(Request.Params["meeting_start_" + i.ToString()]);
                     cm.EndTime = DateTime.Parse(Request.Params["meeting_end_" + i.ToString()]);
-
                     cm.Sunday = Convert.ToBoolean(Request.Params["meeting_sunday_" + i.ToString()]);
                     cm.Monday = Convert.ToBoolean(Request.Params["meeting_monday_" + i.ToString()]);
                     cm.Tuesday = Convert.ToBoolean(Request.Params["meeting_tuesday_" + i.ToString()]);
@@ -68,18 +68,62 @@ namespace OSBLE.Controllers
                     cm.Friday = Convert.ToBoolean(Request.Params["meeting_friday_" + i.ToString()]);
                     cm.Saturday = Convert.ToBoolean(Request.Params["meeting_saturday_" + i.ToString()]);
 
-                    DateTime beforeUtcStartTime = cm.StartTime;
+                    //yc
+                    //timezone checking
+                    //case 1: user is creating a course in a different timezone and it is not currently daylight savings time
+                    //case 2: user is creating a course in a different timezone and IT IS currently  daylight savings time
+                    //case 3: user is creating a course in the same timezone and it is not currently daylight savings time
+                    //case 4: user is creating a course in the same timezone and IT IS currently daylight savings time
+                    TimeZone curTimezone = TimeZone.CurrentTimeZone;
+                    TimeSpan currentOffset = curTimezone.GetUtcOffset(DateTime.Now);
+                    TimeSpan classTimeZone;
+                    if (DateTime.Now.IsDaylightSavingTime()) //case 1 3
+                    {
+                        classTimeZone = new TimeSpan(utcOffset + 1, 0, 0);
 
-                    cm.StartTime = cm.StartTime.AddMinutes(utcOffset);
-                    cm.EndTime = cm.EndTime.AddMinutes(utcOffset);
+                        if (classTimeZone != currentOffset) //case 1
+                        {
+                            //calculate the offset 
+                            TimeSpan difference = classTimeZone - currentOffset;
+                            cm.StartTime = cm.StartTime.Subtract(difference);
+                            cm.EndTime = cm.StartTime.Subtract(difference);
+
+                        }
+                        else //case 3
+                        {
+                            //do nothing time is correct
+                        }
+                    }
+                    else//case 2 and 4
+                    {
+                        classTimeZone = new TimeSpan(utcOffset, 0, 0);
+                        if (classTimeZone != currentOffset) //case 2
+                        {
+                            TimeSpan difference = classTimeZone - currentOffset;
+                            cm.StartTime = cm.StartTime.Subtract(difference);
+                            cm.EndTime = cm.StartTime.Subtract(difference);
+
+
+
+                        }
+                        else //case 4
+                        {
+                            //do nothing time is correct
+                        }
+                    }
+                    //yc i commented out the below since this is no longer needed, and how and dates are really pulled fromt he course rather than
+                    //meeting times.
+                    //DateTime beforeUtcStartTime = cm.StartTime;
+
+                    //cm.StartTime = cm.StartTime.AddMinutes(utcOffset);
+                    //cm.EndTime = cm.EndTime.AddMinutes(utcOffset);
 
                     //Check to see if the utc offset will change the day if so adjust the Meeting's date
-                    if (beforeUtcStartTime.DayOfYear != cm.StartTime.DayOfYear)
-                    {
-                        int difference = (beforeUtcStartTime.DayOfYear - cm.StartTime.DayOfYear);
-                        correctDay(cm, difference);
-                    }
-                  
+                    //if (beforeUtcStartTime.DayOfYear != cm.StartTime.DayOfYear)
+                    //{
+                    //    int difference = (beforeUtcStartTime.DayOfYear - cm.StartTime.DayOfYear);
+                    //    correctDay(cm, difference);
+                    //}
                     course.CourseMeetings.Add(cm);
                 }
             }
@@ -87,6 +131,7 @@ namespace OSBLE.Controllers
             db.SaveChanges();
         }
 
+        //yc: not sure if this situation occurs anymore for below, currently not ever called
         //Correct the listed day because of utc offset
         private void correctDay(CourseMeeting cm, int difference)
         {
@@ -254,7 +299,8 @@ namespace OSBLE.Controllers
                 {
                 }
 
-                createMeetingTimes(course, utcOffset);
+                course.TimeZoneOffset = Convert.ToInt32(Request.Params["course_timezone"]);
+                createMeetingTimes(course, course.TimeZoneOffset);
                 createBreaks(course);
 
                 // Make current user an instructor on new course.
@@ -388,7 +434,7 @@ namespace OSBLE.Controllers
             updateCourse.HoursLateUntilZero = course.HoursLateUntilZero;
             updateCourse.PercentPenalty = course.PercentPenalty;
 
-            createMeetingTimes(updateCourse, utcOffset);
+            createMeetingTimes(updateCourse, updateCourse.TimeZoneOffset);
 
             createBreaks(updateCourse);
 
@@ -421,7 +467,7 @@ namespace OSBLE.Controllers
                 db.SaveChanges();
             }
 
-            return RedirectToAction("Index", "Home"); 
+            return RedirectToAction("Index", "Home");
         }
 
         protected override void Dispose(bool disposing)

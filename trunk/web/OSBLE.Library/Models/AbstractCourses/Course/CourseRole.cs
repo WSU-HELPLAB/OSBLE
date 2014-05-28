@@ -67,7 +67,7 @@ namespace OSBLE.Models.Courses
             Student,
             Moderator,
             Observer,
-            Withdrawn 
+            Withdrawn
         }
     }
 }

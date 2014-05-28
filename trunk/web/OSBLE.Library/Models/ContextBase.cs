@@ -10,6 +10,7 @@ using OSBLE.Models.HomePage;
 using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.Users;
 using OSBLE.Models.AbstractCourses;
+using OSBLE.Models.AbstractCourses.Course;
 using System.Data.Common;
 using System.Data.Entity.Infrastructure;
 using System.Data.Objects;
@@ -131,7 +132,9 @@ namespace OSBLE.Models
             // Withdrawn: The student has withdrawn from the course
             this.CourseRoles.Add(new CourseRole(CourseRole.CourseRoles.Withdrawn.ToString(), false, false, false, false, false, false));
 
+            
             // Community Roles
+            
 
             // Leader: Can Modify Community
             this.CommunityRoles.Add(new CommunityRole(CommunityRole.OSBLERoles.Leader.ToString(), true, true, true, true));
@@ -222,6 +225,10 @@ namespace OSBLE.Models
 
         public DbSet<CourseUser> CourseUsers { get; set; }
 
+        public DbSet<WhiteTable> WhiteTable { get; set; }
+
+        public DbSet<WhiteTableUser> WhiteTableUsers { get; set; }
+
         // HomePage
 
         public DbSet<AbstractDashboard> AbstractDashboards { get; set; }
@@ -263,6 +270,7 @@ namespace OSBLE.Models
 
         //misc
         public DbSet<ActivityLog> ActivityLogs { get; set; }
+
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

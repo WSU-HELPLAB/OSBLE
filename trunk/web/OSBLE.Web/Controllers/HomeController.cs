@@ -16,7 +16,7 @@ using OSBLE.Utility;
 namespace OSBLE.Controllers
 {
 #if !DEBUG
-    [RequireHttps]
+    //[RequireHttps]
 #endif
     [OsbleAuthorize]
     public class HomeController : OSBLEController
@@ -158,6 +158,9 @@ namespace OSBLE.Controllers
             }
             ViewBag.CourseLinks = listing;
             ViewBag.Uploader = fileUploader;
+
+            //yc: setup max file size
+            
         }
 
         private void setupNotifications()

@@ -26,11 +26,11 @@
     {
         //Check to see if the utc adjusted times are different if they are
         //then the event is truly on a new day in the user's time zone
-        DateTime tmpDateNew = e.StartDate.AddMinutes(-utcOffset);
+        DateTime tmpDateNew = e.StartDate;// .AddMinutes(-utcOffset);
              
         if (tmpLastDate.Date != tmpDateNew.Date)
         {
-            lastDate = e.StartDate;
+            lastDate = e.StartDate.ToUniversalTime();
             tmpLastDate = tmpDateNew;           
         <li class="event_date">
             <time class="utc-time"
@@ -69,16 +69,16 @@
                 <div class="event_time">
                     <time class="utc-time"
                 style="font-size:small;"
-                datetime="@Helpers.DateAsUnixTime(e.StartDate)" 
-                data-original-date="@Helpers.RawDate(e.StartDate)" 
+                datetime="@Helpers.DateAsUnixTime(e.StartDate.ToUniversalTime())" 
+                data-original-date="@Helpers.RawDate(e.StartDate.ToUniversalTime())" 
                 data-date-format="hh:mm A">
-                        @ShowEventTime(e.StartDate, e) (UTC)
+                        @ShowEventTime(e.StartDate.ToUniversalTime(), e) (UTC)
                     </time>
              
                     @if ((e.EndDate != null))
                     {
 
-                        DateTime endDate = (DateTime)e.EndDate;
+                        DateTime endDate = (DateTime)(e.EndDate.Value.ToUniversalTime());
                         string dateFormatString = "hh:mm A";
                         if (endDate.Date.CompareTo(e.StartDate.Date) != 0)
                         {

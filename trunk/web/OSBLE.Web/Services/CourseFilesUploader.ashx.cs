@@ -23,201 +23,225 @@ namespace OSBLE.Services
     {
         public void ProcessRequest(HttpContext context)
         {
-            HttpFileCollection coll = context.Request.Files;
+            HttpFileCollection coll;
+            //yc: set the max upload size
 
-            // This web service returns XML
-            context.Response.ContentType = "text/xml";
-
-            if (0 == coll.Count)
+            try
             {
-                WriteErrorResponse(context,
-                    "Course file upload service requires one or more files in the request. " + 
-                    "It's possible that your browser did not correctly send the file data " + 
-                    "and you may need to update your browser if the problem persists.");
-                return;
-            }
+                coll = context.Request.Files;
+                context.Response.ContentType = "text/xml";
 
-            // We're expecting the course ID to be in a parameter (required)
-            string courseIDParam = context.Request.Params["courseID"];
-            if (string.IsNullOrEmpty(courseIDParam))
-            {
-                WriteErrorResponse(context,
-                    "Course file upload service requires a \"courseID\" parameter.");
-                return;
-            }
-
-            // Make sure the course ID is an integer and a valid course ID at that
-            int courseID;
-            if (!int.TryParse(courseIDParam, out courseID))
-            {
-                WriteErrorResponse(context,
-                    "The course ID must be a valid integer value.");
-                return;
-            }
-
-            // There might be an optional "target_folder" parameter
-            string targetFolderParam = context.Request.Params["target_folder"];
-
-            // Try to get the current OSBLE user
-            Models.Users.UserProfile up = OSBLE.Utility.OsbleAuthentication.CurrentUser;
-            if (null == up)
-            {
-                // In the future what I'd like to do here is look for a user name and 
-                // password in the request headers. This would allow this web service to 
-                // be used by other sources, but for now it requires a logged in OSBLE user.
-                WriteErrorResponse(context,
-                    "Could not get active OSBLE user for request. Please login.");
-                return;
-            }
-
-            // Make sure this user has permission to upload to this course
-            OSBLEContext _db = new OSBLEContext();
-            CourseUser courseUser = (
-                                      from cu in _db.CourseUsers
-                                      where cu.UserProfileID == up.ID
-                                      &&
-                                      cu.AbstractCourse is AbstractCourse
-                                      &&
-                                      cu.AbstractCourseID == courseID
-                                      select cu
-                                      ).FirstOrDefault();
-            if (null == courseUser || !courseUser.AbstractRole.CanUploadFiles)
-            {
-                // User cannot upload files for this course
-                context.Response.Write(
-                    "<CourseFilesUploaderResponse success=\"false\">" +
-                    "  <Message>The specified user does not have access to course with ID=" + 
-                        courseID.ToString() + ". User must be " +
-                        "a course owner to access this service.</Message>" +
-                    "</CourseFilesUploaderResponse>");
-                return;
-            }
-
-            // We will look for an optional "fileusage" parameter that tells us where 
-            // the file(s) will go. By default we use "generic" if the parameter is 
-            // absent.
-            string fileUsage = context.Request.Params["fileusage"];
-            if (string.IsNullOrEmpty(fileUsage))
-            {
-                // Default to "generic", which puts files in the CourseDocs folder.
-                fileUsage = "generic";
-            }
-            else
-            {
-                fileUsage = fileUsage.ToLower();
-            }
-
-            // Save based on the usage
-            if ("generic" == fileUsage)
-            {
-                OSBLEDirectory location = Models.FileSystem.Directories.GetCourseDocs(courseID);
-                
-                // For now the target folder parameter is only allowed for generic files
-                if (!string.IsNullOrEmpty(targetFolderParam) &&
-                    "\\" != targetFolderParam &&
-                    "/" != targetFolderParam)
+                if (0 == coll.Count)
                 {
-                    // We can't let it start with / or \
-                    while (targetFolderParam.StartsWith("\\"))
+                    WriteErrorResponse(context,
+                        "Course file upload service requires one or more files in the request. " +
+                        "It's possible that your browser did not correctly send the file data " +
+                        "and you may need to update your browser if the problem persists.");
+                    return;
+                }
+
+                // We're expecting the course ID to be in a parameter (required)
+                string courseIDParam = context.Request.Params["courseID"];
+                if (string.IsNullOrEmpty(courseIDParam))
+                {
+                    WriteErrorResponse(context,
+                        "Course file upload service requires a \"courseID\" parameter.");
+                    return;
+                }
+
+                // Make sure the course ID is an integer and a valid course ID at that
+                int courseID;
+                if (!int.TryParse(courseIDParam, out courseID))
+                {
+                    WriteErrorResponse(context,
+                        "The course ID must be a valid integer value.");
+                    return;
+                }
+
+                // There might be an optional "target_folder" parameter
+                string targetFolderParam = context.Request.Params["target_folder"];
+
+                // Try to get the current OSBLE user
+                Models.Users.UserProfile up = OSBLE.Utility.OsbleAuthentication.CurrentUser;
+                if (null == up)
+                {
+                    // In the future what I'd like to do here is look for a user name and 
+                    // password in the request headers. This would allow this web service to 
+                    // be used by other sources, but for now it requires a logged in OSBLE user.
+                    WriteErrorResponse(context,
+                        "Could not get active OSBLE user for request. Please login.");
+                    return;
+                }
+
+                // Make sure this user has permission to upload to this course
+                OSBLEContext _db = new OSBLEContext();
+                CourseUser courseUser = (
+                                          from cu in _db.CourseUsers
+                                          where cu.UserProfileID == up.ID
+                                          &&
+                                          cu.AbstractCourse is AbstractCourse
+                                          &&
+                                          cu.AbstractCourseID == courseID
+                                          select cu
+                                          ).FirstOrDefault();
+                if (null == courseUser || !courseUser.AbstractRole.CanUploadFiles)
+                {
+                    // User cannot upload files for this course
+                    context.Response.Write(
+                        "<CourseFilesUploaderResponse success=\"false\">" +
+                        "  <Message>The specified user does not have access to course with ID=" +
+                            courseID.ToString() + ". User must be " +
+                            "a course owner to access this service.</Message>" +
+                        "</CourseFilesUploaderResponse>");
+                    return;
+                }
+
+                // We will look for an optional "fileusage" parameter that tells us where 
+                // the file(s) will go. By default we use "generic" if the parameter is 
+                // absent.
+                string fileUsage = context.Request.Params["fileusage"];
+                if (string.IsNullOrEmpty(fileUsage))
+                {
+                    // Default to "generic", which puts files in the CourseDocs folder.
+                    fileUsage = "generic";
+                }
+                else
+                {
+                    fileUsage = fileUsage.ToLower();
+                }
+
+                // Save based on the usage
+                if ("generic" == fileUsage)
+                {
+                    OSBLEDirectory location = Models.FileSystem.Directories.GetCourseDocs(courseID);
+
+                    // For now the target folder parameter is only allowed for generic files
+                    if (!string.IsNullOrEmpty(targetFolderParam) &&
+                        "\\" != targetFolderParam &&
+                        "/" != targetFolderParam)
                     {
-                        targetFolderParam = targetFolderParam.Substring(1);
+                        // We can't let it start with / or \
+                        while (targetFolderParam.StartsWith("\\"))
+                        {
+                            targetFolderParam = targetFolderParam.Substring(1);
+                        }
+                        while (targetFolderParam.StartsWith("/"))
+                        {
+                            targetFolderParam = targetFolderParam.Substring(1);
+                        }
+
+                        location = location.GetDir(targetFolderParam);
+                        if (null == location)
+                        {
+                            WriteErrorResponse(context,
+                                "Could not upload to target folder: " + targetFolderParam);
+                            return;
+                        }
                     }
-                    while (targetFolderParam.StartsWith("/"))
+
+                    // Save each file to the target directory
+                    for (int i = 0; i < coll.Count; i++)
                     {
-                        targetFolderParam = targetFolderParam.Substring(1);
+                        HttpPostedFile postedFile = coll[i];
+                        //yc: check the file size in MB
+                        int size = postedFile.ContentLength / 1024 / 1024; //contentLenght(BYTES)/ 1024 (gets KB) / 1024 (GETS MB)
+                        if (size < 30)
+                        {
+
+                        }
+                        else
+                        {
+                            //too large
+                        }
+                        string fileName = Path.GetFileName(postedFile.FileName);
+                        location.AddFile(fileName, postedFile.InputStream);
                     }
-                    
-                    location = location.GetDir(targetFolderParam);
-                    if (null == location)
+
+                    context.Response.Write(string.Format(
+                        "<CourseFilesUploaderResponse success=\"true\">" +
+                        "  <Message>Successfully uploaded {0} files</Message>" +
+                        "</CourseFilesUploaderResponse>", coll.Count));
+                    return;
+                }
+                else if ("assignment_description" == fileUsage ||
+                    "assignment_solution" == fileUsage)
+                {
+                    // In this case we also need an assignment ID parameter
+                    string aIDString = context.Request.Params["assignmentID"];
+                    if (string.IsNullOrEmpty(aIDString))
                     {
                         WriteErrorResponse(context,
-                            "Could not upload to target folder: " + targetFolderParam);
+                            "An \"assignmentID\" parameter is required when uploading a " +
+                            "file for an assignment " +
+                            (("assignment_description" == fileUsage) ? "description." : "solution."));
                         return;
                     }
-                }
-                
-                // Save each file to the target directory
-                for (int i = 0; i < coll.Count; i++)
-                {
-                    HttpPostedFile postedFile = coll[i];
-                    string fileName = Path.GetFileName(postedFile.FileName);
-                    location.AddFile(fileName, postedFile.InputStream);
+
+                    int aID;
+                    if (!int.TryParse(aIDString, out aID))
+                    {
+                        WriteErrorResponse(context,
+                            "The \"assignmentID\" parameter must be an integer value.");
+                        return;
+                    }
+
+                    // Assignment must exist
+                    Models.FileSystem.AssignmentFilePath afs =
+                        Models.FileSystem.Directories.GetAssignment(courseID, aID);
+                    if (null == afs)
+                    {
+                        WriteErrorResponse(context,
+                            "Could not get assignment file path for assignment: " + aIDString);
+                        return;
+                    }
+
+                    // Get the attributable files storage for this assignment
+                    OSBLE.Models.FileSystem.OSBLEDirectory attrFiles = afs.AttributableFiles;
+                    if (null == attrFiles)
+                    {
+                        WriteErrorResponse(context,
+                            "Internal error: could not get attributable files manager for assignment");
+                        return;
+                    }
+
+                    // Set up the system attributes for this file
+                    Dictionary<string, string> sys = new Dictionary<string, string>();
+                    sys.Add("created", DateTime.Now.ToString());
+                    sys.Add(fileUsage, aIDString);
+                    sys.Add("uploadedby", up.UserName);
+                    if ("assignment_solution" != fileUsage)
+                    {
+                        sys.Add("any_course_user_can_download", null);
+                    }
+
+                    // Save each file to the target directory
+                    for (int i = 0; i < coll.Count; i++)
+                    {
+                        HttpPostedFile postedFile = coll[i];
+                        string fileName = Path.GetFileName(postedFile.FileName);
+                        attrFiles.AddFile(fileName, postedFile.InputStream, sys, null);
+                    }
+
+                    context.Response.Write(string.Format(
+                        "<CourseFilesUploaderResponse success=\"true\">" +
+                        "  <Message>Successfully uploaded {0} files</Message>" +
+                        "</CourseFilesUploaderResponse>", coll.Count));
+                    return;
                 }
 
-                context.Response.Write(string.Format(
-                    "<CourseFilesUploaderResponse success=\"true\">" +
-                    "  <Message>Successfully uploaded {0} files</Message>" +
-                    "</CourseFilesUploaderResponse>", coll.Count));
-                return;
+                // Coming here implies we didn't recognize the file usage
+                WriteErrorResponse(context, "Unsupported file usage: " + fileUsage);
             }
-            else if ("assignment_description" == fileUsage ||
-                "assignment_solution" == fileUsage)
+            catch(HttpException ex)
             {
-                // In this case we also need an assignment ID parameter
-                string aIDString = context.Request.Params["assignmentID"];
-                if (string.IsNullOrEmpty(aIDString))
+                if (ex.WebEventCode == 3004)
                 {
-                    WriteErrorResponse(context,
-                        "An \"assignmentID\" parameter is required when uploading a " +
-                        "file for an assignment " +
-                        (("assignment_description" == fileUsage) ? "description." : "solution."));
+                    WriteErrorResponse(context, "File exceeds 30MB upload limit");
                     return;
                 }
-
-                int aID;
-                if (!int.TryParse(aIDString, out aID))
-                {
-                    WriteErrorResponse(context,
-                        "The \"assignmentID\" parameter must be an integer value.");
-                    return;
-                }
-
-                // Assignment must exist
-                Models.FileSystem.AssignmentFilePath afs =
-                    Models.FileSystem.Directories.GetAssignment(courseID, aID);
-                if (null == afs)
-                {
-                    WriteErrorResponse(context,
-                        "Could not get assignment file path for assignment: " + aIDString);
-                    return;
-                }
-
-                // Get the attributable files storage for this assignment
-                OSBLE.Models.FileSystem.OSBLEDirectory attrFiles = afs.AttributableFiles;
-                if (null == attrFiles)
-                {
-                    WriteErrorResponse(context,
-                        "Internal error: could not get attributable files manager for assignment");
-                    return;
-                }
-
-                // Set up the system attributes for this file
-                Dictionary<string, string> sys = new Dictionary<string, string>();
-                sys.Add("created", DateTime.Now.ToString());
-                sys.Add(fileUsage, aIDString);
-                sys.Add("uploadedby", up.UserName);
-                if ("assignment_solution" != fileUsage)
-                {
-                    sys.Add("any_course_user_can_download", null);
-                }
-
-                // Save each file to the target directory
-                for (int i = 0; i < coll.Count; i++)
-                {
-                    HttpPostedFile postedFile = coll[i];
-                    string fileName = Path.GetFileName(postedFile.FileName);
-                    attrFiles.AddFile(fileName, postedFile.InputStream, sys, null);
-                }
-
-                context.Response.Write(string.Format(
-                    "<CourseFilesUploaderResponse success=\"true\">" +
-                    "  <Message>Successfully uploaded {0} files</Message>" +
-                    "</CourseFilesUploaderResponse>", coll.Count));
-                return;
             }
-
-            // Coming here implies we didn't recognize the file usage
-            WriteErrorResponse(context, "Unsupported file usage: " + fileUsage);
+            // This web service returns XML
+           
         }
 
         private static void WriteErrorResponse(HttpContext context, string errorMessage)

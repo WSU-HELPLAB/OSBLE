@@ -16,10 +16,10 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort />
-    <IISExpressAnonymousAuthentication />
-    <IISExpressWindowsAuthentication />
-    <IISExpressUseClassicPipelineMode />
+    <IISExpressSSLPort>3615</IISExpressSSLPort>
+    <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
+    <IISExpressWindowsAuthentication>disabled</IISExpressWindowsAuthentication>
+    <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
@@ -625,7 +625,6 @@
     <Content Include="Areas\AssignmentWizard\Views\TeamEvaluation\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Team\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\_ViewStart.cshtml" />
-    <Content Include="Content\images\fileextimages\.DS_Store" />
     <Content Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\CriticalReviewStudentDownloadDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\CriticalReviewSubmissionDecorator.cshtml" />
@@ -677,6 +676,7 @@
     <Content Include="Areas\AssessmentWizard\Views\Home\SelectComponent.cshtml" />
     <Content Include="Areas\AssessmentWizard\Views\Home\Summary.cshtml" />
     <Content Include="Content\gradebook.zip" />
+    <Content Include="ClassDiagram1.cd" />
     <None Include="Properties\PublishProfiles\filesystem.pubxml" />
     <None Include="Scripts\jquery-2.0.1.intellisense.js" />
     <Content Include="Scripts\jquery-2.0.1.js" />
@@ -729,7 +729,9 @@
     <Content Include="Views\Shared\LogOnUserControl.ascx" />
     <Content Include="Views\Shared\Xrds.aspx" />
     <Content Include="Views\User\Identity.aspx" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -896,12 +898,11 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>False</UseIIS>
+          <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>3615</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>
-          </IISUrl>
+          <IISUrl>http://localhost:3615/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
