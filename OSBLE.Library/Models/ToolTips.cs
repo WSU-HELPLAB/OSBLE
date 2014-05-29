@@ -48,7 +48,7 @@ namespace OSBLE.Models
             public static string CourseYear = "(Required) the year in which this class is held, e.g., 2011";
             public static string CourseStartDate = "(Required) the date of the first day of class";
             public static string CourseEndDate = "(Required) the date of the last day of class (or the final exam)";
-            public static string CourseTimeZone = "(Required) specifiy the time zone for the class";
+            public static string CourseTimeZone = "Specify the local timezone for this course. All posts, emails, and assignment submissions will be time stamped based on this timezone";
             public static string CourseMeetingTimes = "Click on the \"+\" to specify regular meeting times for lectures, labs, etc. These can be optionally included on the course calendar.";
             public static string CourseBreaks = "Click on the \"+\" button to specify course breaks and holidays. These can optionally be included on the course calendar.";
 
@@ -129,11 +129,13 @@ namespace OSBLE.Models
                 {"Leader",      "Community leader...?"},
                 {"Participant", "Community participant...?"} };
 
+            public static string RosterWhitetableRoleRole = "Whitelisted users do not have an OSBLE account. Provided a valid email address, these students will be invited to register and enroll into this course. Students highlighed in red do not have a valid email address.";
             public static string RosterUserName = "This is the name this user will be publicly identified by in mail, posts, assignments, and other content.";
             public static string RosterEmail = "This must be the email address this user registered with for OSBLE.";
             public static string RosterSchoolID = "Input the school/ organization identification number for this user to indicate who is being added to this course.";
             public static string RosterRole = "Select what role this person has for this course. (Instructor, TA, Student, Moderator, and Observer explanations go here.)";
             public static string RosterSection = "Enter 0 to add this user to all sections.";
+
 
         #endregion
         
