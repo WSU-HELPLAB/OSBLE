@@ -353,11 +353,19 @@ namespace OSBLE.Controllers
 
                         UserProfile userWithAccount = getEntryUserProfile(entry);
 
+
                         if(userWithAccount != null)
                         {
                             //this user should not be added to the WT, they should instead be enrolled in the class and sent an email verification
                             //only issue I(FW) see with this is, what if thats an outdated email and they never reply?
                             //should we instead WT this user and wait for a response before taking them off?
+                            //now how do I create a courseUser for said userProfile
+
+                            CourseUser existingUser = new CourseUser();
+                            existingUser.UserProfile = userWithAccount;
+                            createCourseUser(existingUser);
+
+
                         }
                         //else the entry does not have a user profile, so WT them 
                         else
@@ -426,7 +434,7 @@ namespace OSBLE.Controllers
                             }
                             else
                             {
-                                //NO EMAIL PROVIDED... so this is error checking
+                                whitetable.WhiteTableUser.Email = String.Empty;
                             }
 
                             createWhiteTableUser(whitetable);
