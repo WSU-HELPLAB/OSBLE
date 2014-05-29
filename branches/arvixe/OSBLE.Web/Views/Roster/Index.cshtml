@@ -83,6 +83,30 @@
             {
                 if (userByRole.Count > 0)
                 {
+                if (userByRole.RoleName == "Withdrawn")
+                { 
+                <td>
+                <!--Prints the users in the whitetable for the current class-->
+                <h3>
+                    WhiteTable(@ViewBag.WhiteTableUsers.Count)
+                </h3>
+                <ul class="WhiteTable_list">
+                    @foreach (var WTuser in ViewBag.WhiteTableUsers)
+                    {
+                        
+                            <div class="WhiteTable_controls">
+                                @if (WTuser.Email != null)
+                                {
+                                    <a title="Mail This User" href="@Url.Action("CreateWhiteTableUserProfileId", "Mail", new { id = WTuser.ID })">@Helpers.MailButton()</a>
+                                }
+                            </div>
+                            @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", new { userProfile = WTuser.ID }))
+                            <span>@WTuser.Name1 @WTuser.Name2</span>
+                        
+                    }
+                </ul>
+                </td>
+                }    
                 <td>
                     <h3>
                         @userByRole.RoleName (<span id="roleheader_@(usersBySection.SectionNumber)_@(userByRole.RoleName)">@userByRole.Count.ToString()</span>)
@@ -136,27 +160,7 @@
                 </td>
                 }
             }
-            <td>
-                <!--Prints the users in the whitetable for the current class-->
-                <h3>
-                    WhiteTable(@ViewBag.WhiteTableUsers.Count)
-                </h3>
-                <ul class="WhiteTable_list">
-                    @foreach (var WTuser in ViewBag.WhiteTableUsers)
-                    {
-                        
-                            <div class="WhiteTable_controls">
-                                @if (WTuser.Email != null)
-                                {
-                                    <a title="Mail This User" href="@Url.Action("CreateWhiteTableUserProfileId", "Mail", new { id = WTuser.ID })">@Helpers.MailButton()</a>
-                                }
-                            </div>
-                            @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", new { userProfile = WTuser.ID }))
-                            <span>@WTuser.Name1 @WTuser.Name2</span>
-                        
-                    }
-                </ul>
-            </td>
+            
         </tr>
 
     </table>
