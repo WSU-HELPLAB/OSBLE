@@ -992,8 +992,10 @@ namespace OSBLE.Controllers
             foreach (var user in oldUsers) 
             {
                 db.WhiteTableUsers.Remove(user);
-                db.SaveChanges();
+                
             }
+
+            db.SaveChanges();
         }
     }
 }
