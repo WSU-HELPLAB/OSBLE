@@ -351,74 +351,86 @@ namespace OSBLE.Controllers
                     foreach (RosterEntry entry in rosterEntries)
                     {
 
-                        //create the WhiteTable that will hold the whitetableusers
-                        WhiteTable whitetable = new WhiteTable();
-                        whitetable.WhiteTableUser = new WhiteTableUser();
+                        UserProfile userWithAccount = getEntryUserProfile(entry);
 
-                        
-                        whitetable.Section = entry.Section;
-
-                        whitetable.WhiteTableUser.Identification = entry.Identification;
-
-                        if (entry.Name != null)
+                        if(userWithAccount != null)
                         {
-                            if (entry.Name.Contains(',')) //Assume "LastName, FirstName" format.
-                            {
-                                names = entry.Name.Split(',');
-                                string[] parseFirstName = names[1].Trim().Split(' ');
-
-                                if (parseFirstName != null)
-                                {
-                                    whitetable.WhiteTableUser.Name1 = parseFirstName[0];
-                                    whitetable.WhiteTableUser.Name2 = names[0].Trim();
-                                }
-                                else
-                                {
-                                    whitetable.WhiteTableUser.Name1 = names[1].Trim();
-                                    whitetable.WhiteTableUser.Name2 = names[0].Trim();
-                                }
-                            }
-                            else //Assume "FirstName LastName" format. and No middle names.
-                            {
-                                
-                                names = entry.Name.Trim().Split(' '); //Trimming trialing and leading spaces to avoid conflicts below
-                                if(names.Count() ==  1) //Assume only last name
-                                {
-
-                                    whitetable.WhiteTableUser.Name1 = string.Empty;
-                                    whitetable.WhiteTableUser.Name2 = names[0];
-                                }
-                                else if(names.Count() == 2) //Only first and last name exist
-                                {
-
-                                    whitetable.WhiteTableUser.Name1 = names[0];
-                                    whitetable.WhiteTableUser.Name2 = names[1];
-                                }
-                                else //at least 1 Middle name exists. Use first and last entries in names
-                                {
-
-                                    whitetable.WhiteTableUser.Name1 = names[0];
-                                    whitetable.WhiteTableUser.Name2 = names[names.Count() - 1];
-                                }
-                            }
+                            //this user should not be added to the WT, they should instead be enrolled in the class and sent an email verification
+                            //only issue I(FW) see with this is, what if thats an outdated email and they never reply?
+                            //should we instead WT this user and wait for a response before taking them off?
                         }
-                        else// the are nameless so the user will need to add this upon being added to a course 
-                        {
-                            whitetable.WhiteTableUser.Name1 = "Pending";
-                            whitetable.WhiteTableUser.Name2 = string.Format("({0})", entry.Identification);
-                        }
-                        //check for emails
-
-                        if (entry.Email != null)
-                        {
-                            whitetable.WhiteTableUser.Email = entry.Email;
-                        }
+                        //else the entry does not have a user profile, so WT them 
                         else
                         {
-                            //NO EMAIL PROVIDED... so this is error checking
-                        }
+                            //create the WhiteTable that will hold the whitetableusers
+                            WhiteTable whitetable = new WhiteTable();
+                            whitetable.WhiteTableUser = new WhiteTableUser();
 
-                        createWhiteTableUser(whitetable);
+
+                            whitetable.Section = entry.Section;
+
+                            whitetable.WhiteTableUser.Identification = entry.Identification;
+
+                            if (entry.Name != null)
+                            {
+                                if (entry.Name.Contains(',')) //Assume "LastName, FirstName" format.
+                                {
+                                    names = entry.Name.Split(',');
+                                    string[] parseFirstName = names[1].Trim().Split(' ');
+
+                                    if (parseFirstName != null)
+                                    {
+                                        whitetable.WhiteTableUser.Name1 = parseFirstName[0];
+                                        whitetable.WhiteTableUser.Name2 = names[0].Trim();
+                                    }
+                                    else
+                                    {
+                                        whitetable.WhiteTableUser.Name1 = names[1].Trim();
+                                        whitetable.WhiteTableUser.Name2 = names[0].Trim();
+                                    }
+                                }
+                                else //Assume "FirstName LastName" format. and No middle names.
+                                {
+
+                                    names = entry.Name.Trim().Split(' '); //Trimming trialing and leading spaces to avoid conflicts below
+                                    if (names.Count() == 1) //Assume only last name
+                                    {
+
+                                        whitetable.WhiteTableUser.Name1 = string.Empty;
+                                        whitetable.WhiteTableUser.Name2 = names[0];
+                                    }
+                                    else if (names.Count() == 2) //Only first and last name exist
+                                    {
+
+                                        whitetable.WhiteTableUser.Name1 = names[0];
+                                        whitetable.WhiteTableUser.Name2 = names[1];
+                                    }
+                                    else //at least 1 Middle name exists. Use first and last entries in names
+                                    {
+
+                                        whitetable.WhiteTableUser.Name1 = names[0];
+                                        whitetable.WhiteTableUser.Name2 = names[names.Count() - 1];
+                                    }
+                                }
+                            }
+                            else// the are nameless so the user will need to add this upon being added to a course 
+                            {
+                                whitetable.WhiteTableUser.Name1 = "Pending";
+                                whitetable.WhiteTableUser.Name2 = string.Format("({0})", entry.Identification);
+                            }
+                            //check for emails
+
+                            if (entry.Email != null)
+                            {
+                                whitetable.WhiteTableUser.Email = entry.Email;
+                            }
+                            else
+                            {
+                                //NO EMAIL PROVIDED... so this is error checking
+                            }
+
+                            createWhiteTableUser(whitetable);
+                        }
 
                     }// end foreach loop for whitetables
                     db.SaveChanges();
@@ -902,7 +914,7 @@ namespace OSBLE.Controllers
                 whitetable.WhiteTableUserID = up.ID;
                 whitetable.AbstractCourseID = ActiveCourseUser.AbstractCourseID;
                 whitetable.WhiteTableUser.CourseID = ActiveCourseUser.AbstractCourseID;
-                emailWhiteTableUser(whitetable);
+                //emailWhiteTableUser(whitetable);
             }
                 
             
@@ -921,67 +933,67 @@ namespace OSBLE.Controllers
 
                 db.Entry(whitetable).State = EntityState.Modified;
                 db.SaveChanges();
-                emailWhiteTableUser(whitetable);
+                //emailWhiteTableUser(whitetable);
             }
         }
 
-        private void emailWhiteTableUser(WhiteTable whitetable)
-        {
-            //This will return one if they exist already or null if they don't
-            //if user == null then the user does not yet have a OSBLE Account
-            //if user != null then the user has an OSBLE account 
-            var user = (from c in db.UserProfiles
-                        where c.Identification == whitetable.WhiteTableUser.Identification
-                        && c.SchoolID == whitetable.WhiteTableUser.SchoolID
-                        select c).FirstOrDefault();
+//        private void emailWhiteTableUser(WhiteTable whitetable)
+//        {
+//            //This will return one if they exist already or null if they don't
+//            //if user == null then the user does not yet have a OSBLE Account
+//            //if user != null then the user has an OSBLE account 
+//            var user = (from c in db.UserProfiles
+//                        where c.Identification == whitetable.WhiteTableUser.Identification
+//                        && c.SchoolID == whitetable.WhiteTableUser.SchoolID
+//                        select c).FirstOrDefault();
 
-            //case 1 user is not registered with OSBLE
-            //send email to user with link to page that allows them to create an account and then auto populate the account info with the info
-            // provided in whitetable.whitetableuser.stufff
-            if(user == null)
-            {
-                string subject = "Create an OSBLE Account";
-                string link = "https://osble.org" + Url.Action("CreateAccount");
+//            //case 1 user is not registered with OSBLE
+//            //send email to user with link to page that allows them to create an account and then auto populate the account info with the info
+//            // provided in whitetable.whitetableuser.stufff
+//            if(user == null)
+//            {
+//                string subject = "Create an OSBLE Account";
+//                string link = "https://osble.org" + Url.Action("CreateAccount");
 
-                string message = "Dear " + whitetable.WhiteTableUser.Name2 + @",<br/>
-                <br/>
-                This email was sent to notify you that you have been added to a course on osble.org.
-                However it appears you have not yet created an account with OSBLE. You must create
-                account by <a href='" + link + @"'>visiting thins link</a>.
-                <br/>
-                <br/>
-                ";
+//                string message = "Dear " + whitetable.WhiteTableUser.Name2 + @",<br/>
+//                <br/>
+//                This email was sent to notify you that you have been added to a course on osble.org.
+//                However it appears you have not yet created an account with OSBLE. You must create
+//                account by <a href='" + link + @"'>visiting thins link</a>.
+//                <br/>
+//                <br/>
+//                ";
 
-                message += @"Best regards,<br/>
-                The OSBLE Team in the <a href='www.helplab.org'>HELP lab</a> at <a href='www.wsu.edu'>Washington State University</a>";
+//                message += @"Best regards,<br/>
+//                The OSBLE Team in the <a href='www.helplab.org'>HELP lab</a> at <a href='www.wsu.edu'>Washington State University</a>";
 
-                Email.Send(subject, message, new List<MailAddress>() { new MailAddress(whitetable.WhiteTableUser.Email) });
-            }
+//                Email.Send(subject, message, new List<MailAddress>() { new MailAddress(whitetable.WhiteTableUser.Email) });
+//            }
 
-            //case 2 user is registered with OSBLE
-            else
-            {
-                string subject = "Welcome to OSBLE";
-                string link = "https://osble.org" + Url.Action("ActivateAccount");
+//            //case 2 user is registered with OSBLE
+//            else
+//            {
+//                string subject = "Welcome to OSBLE";
+//                string link = "https://osble.org" + Url.Action("ActivateAccount");
 
-                string message = "Dear " + whitetable.WhiteTableUser.Name2 + @",<br/>
-                <br/>
-                This email was sent to notify you that you have been added to a course on osble.org.
-                Before you may proceed, we ask that you confirm your already exisitng account infotmation.
-                You can do that by <a href='" + link + @"'>visiting this link</a>.
-                <br/>
-                <br/>
-                ";
+//                string message = "Dear " + whitetable.WhiteTableUser.Name2 + @",<br/>
+//                <br/>
+//                This email was sent to notify you that you have been added to a course on osble.org.
+//                Before you may proceed, we ask that you confirm your already exisitng account infotmation.
+//                You can do that by <a href='" + link + @"'>visiting this link</a>.
+//                <br/>
+//                <br/>
+//                ";
 
-                message += @"Best regards,<br/>
-                The OSBLE Team in the <a href='www.helplab.org'>HELP lab</a> at <a href='www.wsu.edu'>Washington State University</a>";
+//                message += @"Best regards,<br/>
+//                The OSBLE Team in the <a href='www.helplab.org'>HELP lab</a> at <a href='www.wsu.edu'>Washington State University</a>";
 
-                Email.Send(subject, message, new List<MailAddress>() { new MailAddress(whitetable.WhiteTableUser.Email) });
-            }
+//                Email.Send(subject, message, new List<MailAddress>() { new MailAddress(whitetable.WhiteTableUser.Email) });
+//            }
 
 
 
-        }
+//        }
 
         private void clearWhiteTableOnRosterImport()
         {
@@ -996,6 +1008,14 @@ namespace OSBLE.Controllers
             }
 
             db.SaveChanges();
+        }
+
+        private UserProfile getEntryUserProfile(RosterEntry entry)
+        {
+            UserProfile possibleUser = (from d in db.UserProfiles
+                                        where d.Identification == entry.Identification && d.UserName == entry.Email
+                                        select d).FirstOrDefault();
+            return possibleUser;
         }
     }
 }
