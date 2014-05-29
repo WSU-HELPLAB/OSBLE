@@ -345,6 +345,8 @@ namespace OSBLE.Controllers
                     string[] names = new string[2];
                     // Attach to users or add new user profile stubs.
 
+                    //on new roster import clear the whitetable
+                    clearWhiteTableOnRosterImport();
                    
                     foreach (RosterEntry entry in rosterEntries)
                     {
@@ -979,6 +981,19 @@ namespace OSBLE.Controllers
 
 
 
+        }
+
+        private void clearWhiteTableOnRosterImport()
+        {
+            var oldUsers = from d in db.WhiteTableUsers
+                           where d.CourseID == ActiveCourseUser.AbstractCourseID
+                           select d;
+
+            foreach (var user in oldUsers) 
+            {
+                db.WhiteTableUsers.Remove(user);
+                db.SaveChanges();
+            }
         }
     }
 }
