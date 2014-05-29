@@ -361,9 +361,15 @@ namespace OSBLE.Controllers
                             //should we instead WT this user and wait for a response before taking them off?
                             //now how do I create a courseUser for said userProfile
 
-                            CourseUser existingUser = new CourseUser();
+                            CourseUser existingUser = new CourseUser(); 
+                            //yc: before using create course user, you must set the following
                             existingUser.UserProfile = userWithAccount;
+                            existingUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+
+                            //
+                            newRoster.Add(existingUser);
                             createCourseUser(existingUser);
+                            orphans.Remove(existingUser.UserProfile);
 
 
                         }
