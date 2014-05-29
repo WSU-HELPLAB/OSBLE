@@ -196,7 +196,7 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         result += "<td style=\"" + " width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; " + "\">";
         if (stateObj.allowsCollapsing) {
             if (folderName == "Files and Links") {
-                result += "<h3 style=\"-webkit-margin-before: .60em; -webkit-margin-after: .5em;\">Files and Links</h3>";
+                result += "<h3 style=\"-webkit-margin-before: .60em; -webkit-margin-after: .5em;\">Files and Links</h3> \@Helpers.CreateToolTip(ToolTips.FileUploader)";
             } else {
                 result += "<a style=\"cursor: pointer;\" title=\"" + folderName + "\" onclick=\"cfm_expand_collapse(" + ss + ");\">";
                 result += "<img id=\"expander_img_" + ss + "\" src=\"" + stateObj.getExpanderImgSrc() + "\" />&nbsp;" + folderName;
