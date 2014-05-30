@@ -1,0 +1,18 @@
+﻿@model OSBLE.Models.Courses.Course
+
+@{
+    ViewBag.Title = "Search";
+}
+
+<h2>Search</h2>
+
+<table>
+    <tr>
+        <td>
+            @foreach(var course in ViewBag.CourseList)
+            {
+                @course.Name;<br/>
+            }
+        </td>
+    </tr>
+</table>

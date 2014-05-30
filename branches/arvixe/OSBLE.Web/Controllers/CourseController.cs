@@ -321,7 +321,20 @@ namespace OSBLE.Controllers
             return View(course);
         }
 
-        //
+        
+        public ActionResult Search()
+        {
+            var Courses = from d in db.AbstractCourses
+                          
+                          select d;
+            List<AbstractCourse> ListOfCourses = new List<AbstractCourse>(Courses);
+
+            ViewBag.CourseList = ListOfCourses;
+
+            return View();
+        }
+
+        
         // GET: /Course/Edit/5
         [RequireActiveCourse]
         [CanModifyCourse]
@@ -469,6 +482,8 @@ namespace OSBLE.Controllers
 
             return RedirectToAction("Index", "Home");
         }
+
+        
 
         protected override void Dispose(bool disposing)
         {
