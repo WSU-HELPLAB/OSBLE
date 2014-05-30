@@ -90,10 +90,13 @@ else
     <ul id="AvailableStudent">
         @foreach (CourseUser cu in unassignedUsers)
         {
-            string studentDisplayName = cu.DisplayName((int)CourseRole.CourseRoles.Instructor);
-            <li id="cu_@(cu.ID)" class="ui-state-default Student" style="list-style-type:none">@studentDisplayName
-                <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @studentDisplayName" title="remove @studentDisplayName" onclick="removeFromTeam(this)" />
-            </li>
+            if(cu.AbstractRoleID != (int)CourseRole.CourseRoles.Withdrawn)
+            {
+                string studentDisplayName = cu.DisplayName((int)CourseRole.CourseRoles.Instructor);
+                <li id="cu_@(cu.ID)" class="ui-state-default Student" style="list-style-type:none">@studentDisplayName
+                    <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @studentDisplayName" title="remove @studentDisplayName" onclick="removeFromTeam(this)" />
+                </li>    
+            }
         }
     </ul>
     <div id="AvailableModeratorList" style="display:@(ViewBag.DisplayModeratorList)">
@@ -129,20 +132,23 @@ else
             <ul id="team_@(counter)_@(@aTeam.TeamID)" class="TeamSortable">
                 @foreach (TeamMember member in aTeam.Team.TeamMembers)
                 {
-                    
-                    if (member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA || member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
+
+                    if (member.CourseUser.AbstractRoleID != (int)CourseRole.CourseRoles.Withdrawn)
                     {
-                        displayName = member.CourseUser.DisplayNameWithRole((int)CourseRole.CourseRoles.Instructor);
-                        roleClass = "Moderator";
+                        if (member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA || member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
+                        {
+                            displayName = member.CourseUser.DisplayNameWithRole((int)CourseRole.CourseRoles.Instructor);
+                            roleClass = "Moderator";
+                        }
+                        else
+                        {
+                            displayName = member.CourseUser.DisplayName((int)CourseRole.CourseRoles.Instructor);
+                            roleClass = "Student";
+                        }
+                        <li id="cu_@(member.CourseUserID)" data-id="cu_@(member.CourseUserID)" class="ui-state-default @roleClass">@displayName
+                            <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @displayName" title="remove @displayName" onclick="removeFromTeam(this)" />
+                        </li>
                     }
-                    else
-                    {
-                        displayName = member.CourseUser.DisplayName((int)CourseRole.CourseRoles.Instructor);
-                        roleClass = "Student";
-                    }
-                    <li id="cu_@(member.CourseUserID)" data-id="cu_@(member.CourseUserID)" class="ui-state-default @roleClass">@displayName
-                        <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @displayName" title="remove @displayName" onclick="removeFromTeam(this)" />
-                    </li>
                 }
             </ul>
         </div>
