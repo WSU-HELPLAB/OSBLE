@@ -207,6 +207,13 @@ namespace OSBLE.Controllers
                     cu.Hidden = newHidden;
                     db.Entry(cu).State = EntityState.Modified;
                 }
+                //yc if the users decided to withdraw from a course
+                bool withdraw = Convert.ToBoolean(Request.Params["cu_withdraw_" + cu.AbstractCourseID]);
+                if (withdraw)
+                {
+                    //user has checked this to remove themself from this course. leets update it!
+                    WithdrawUserFromCourse(CurrentUser);
+                }
             }
 
             // Update the default course ID for log in.
