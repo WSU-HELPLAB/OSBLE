@@ -226,7 +226,18 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                                           }
                                           );
                 }
-                else
+                else if (Request.Form.AllKeys.Contains("AutoGenFromPastButton"))
+                {
+                    //we need to handle the case for Discussion team reconfigurations
+
+                    //return RedirectToRoute("Default",
+                    //                      new
+                    //                      {
+                    //                          controller = "Assignment",
+                    //                          action = "index"
+                    //                      }
+                    //                      );
+                }
                 {
                     //not having any form keys means that we're using the QuickNav as it won't send back
                     //any submit button data
