@@ -356,19 +356,20 @@ namespace OSBLE.Controllers
 
                         if(userWithAccount != null)
                         {
-                            //this user should not be added to the WT, they should instead be enrolled in the class and sent an email verification
-                            //only issue I(FW) see with this is, what if thats an outdated email and they never reply?
-                            //should we instead WT this user and wait for a response before taking them off?
-                            //now how do I create a courseUser for said userProfile
 
                             CourseUser existingUser = new CourseUser(); 
                             //yc: before using create course user, you must set the following
                             existingUser.UserProfile = userWithAccount;
                             existingUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
 
-                            //
                             newRoster.Add(existingUser);
                             createCourseUser(existingUser);
+
+                            //email the user notifying them that they have been added to this course 
+                            emailCourseUser(existingUser);
+        
+
+                         
                             orphans.Remove(existingUser.UserProfile);
 
 
@@ -444,9 +445,14 @@ namespace OSBLE.Controllers
                             }
 
                             createWhiteTableUser(whitetable);
+                            //will send email to white table user notifying them that they need to create an account to be added to the course 
+                            emailWhiteTableUser(whitetable);
                         }
 
                     }// end foreach loop for whitetables
+
+                  
+
                     db.SaveChanges();
 
                     //withdraw all orphans
@@ -951,64 +957,6 @@ namespace OSBLE.Controllers
             }
         }
 
-//        private void emailWhiteTableUser(WhiteTable whitetable)
-//        {
-//            //This will return one if they exist already or null if they don't
-//            //if user == null then the user does not yet have a OSBLE Account
-//            //if user != null then the user has an OSBLE account 
-//            var user = (from c in db.UserProfiles
-//                        where c.Identification == whitetable.WhiteTableUser.Identification
-//                        && c.SchoolID == whitetable.WhiteTableUser.SchoolID
-//                        select c).FirstOrDefault();
-
-//            //case 1 user is not registered with OSBLE
-//            //send email to user with link to page that allows them to create an account and then auto populate the account info with the info
-//            // provided in whitetable.whitetableuser.stufff
-//            if(user == null)
-//            {
-//                string subject = "Create an OSBLE Account";
-//                string link = "https://osble.org" + Url.Action("CreateAccount");
-
-//                string message = "Dear " + whitetable.WhiteTableUser.Name2 + @",<br/>
-//                <br/>
-//                This email was sent to notify you that you have been added to a course on osble.org.
-//                However it appears you have not yet created an account with OSBLE. You must create
-//                account by <a href='" + link + @"'>visiting thins link</a>.
-//                <br/>
-//                <br/>
-//                ";
-
-//                message += @"Best regards,<br/>
-//                The OSBLE Team in the <a href='www.helplab.org'>HELP lab</a> at <a href='www.wsu.edu'>Washington State University</a>";
-
-//                Email.Send(subject, message, new List<MailAddress>() { new MailAddress(whitetable.WhiteTableUser.Email) });
-//            }
-
-//            //case 2 user is registered with OSBLE
-//            else
-//            {
-//                string subject = "Welcome to OSBLE";
-//                string link = "https://osble.org" + Url.Action("ActivateAccount");
-
-//                string message = "Dear " + whitetable.WhiteTableUser.Name2 + @",<br/>
-//                <br/>
-//                This email was sent to notify you that you have been added to a course on osble.org.
-//                Before you may proceed, we ask that you confirm your already exisitng account infotmation.
-//                You can do that by <a href='" + link + @"'>visiting this link</a>.
-//                <br/>
-//                <br/>
-//                ";
-
-//                message += @"Best regards,<br/>
-//                The OSBLE Team in the <a href='www.helplab.org'>HELP lab</a> at <a href='www.wsu.edu'>Washington State University</a>";
-
-//                Email.Send(subject, message, new List<MailAddress>() { new MailAddress(whitetable.WhiteTableUser.Email) });
-//            }
-
-
-
-//        }
-
         private void clearWhiteTableOnRosterImport()
         {
             var oldUsers = from d in db.WhiteTableUsers
@@ -1030,6 +978,49 @@ namespace OSBLE.Controllers
                                         where d.Identification == entry.Identification && d.UserName == entry.Email
                                         select d).FirstOrDefault();
             return possibleUser;
+        }
+
+        private void emailCourseUser(CourseUser user)
+        {
+            string subject = "Welcome to " + ActiveCourseUser.AbstractCourse.Name;
+            string link = "https://osble.org";
+
+            string message = "Dear " + user.UserProfile.FirstName + " " + user.UserProfile.LastName + @", <br/>
+            <br/>
+            This email was sent to notify you that you have been added to " + ActiveCourseUser.AbstractCourse.Name +
+            "You may go to the course by <a href='" + link + @"'>following this link</a>. 
+            <br/>
+            <br/>
+            ";
+
+            message += @"Best regards,<br/>
+            The OSBLE Team in the <a href='www.helplab.org'>HELP lab</a> at <a href='www.wsu.edu'>Washington State University</a>";
+
+            Email.Send(subject, message, new List<MailAddress>() { new MailAddress(user.UserProfile.UserName) });
+        }
+
+        private void emailWhiteTableUser(WhiteTable whitetable)
+        {
+            var WTU = whitetable.WhiteTableUser;
+
+            string subject = "Welcome to OSBLE.org";
+            string link = "https://osble.org/Account/AcademiaRegister?email=" 
+                + WTU.Email + "&firstname=" + WTU.Name2 + "&lastname=" + WTU.Name1 + "&identification=" + WTU.Identification; 
+
+            string message = "Dear " + WTU.Name2 + " " + WTU.Name1 + @", <br/>
+                <br/>
+                This email was sent to notify you that you have been added to " + ActiveCourseUser.AbstractCourse.Name +
+            " To access this course you need to create an account with OSBLE first. You may create an account " +
+            "by <a href='" + link + @"'>following this link</a>. 
+                <br/>
+                <br/>
+                ";
+
+            message += @"Best regards,<br/>
+                The OSBLE Team in the <a href='www.helplab.org'>HELP lab</a> at <a href='www.wsu.edu'>Washington State University</a>";
+
+            Email.Send(subject, message, new List<MailAddress>() { new MailAddress(WTU.Email) });
+            
         }
     }
 }

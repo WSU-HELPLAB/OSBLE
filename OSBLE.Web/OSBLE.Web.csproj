@@ -868,6 +868,7 @@
     <Content Include="Views\Account\FindUsernameSuccess.cshtml" />
     <Content Include="Views\Account\FindUsernameFailure.cshtml" />
     <Content Include="Views\Committee\Create.cshtml" />
+    <Content Include="Views\Course\Search.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

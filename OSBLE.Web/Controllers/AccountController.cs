@@ -385,7 +385,25 @@ namespace OSBLE.Controllers
             ViewBag.SchoolID = new SelectList(from c in db.Schools
                                               where c.Name != Constants.ProfessionalSchool
                                               select c, "ID", "Name");
-            return View();
+
+            var WTmodel = new RegisterModel
+            {
+                Email = Request.QueryString["email"]
+                ,
+                FirstName = Request.QueryString["firstname"]
+                ,
+                LastName = Request.QueryString["lastname"]
+                ,
+                Identification = Request.QueryString["identification"]
+            };
+
+            if(WTmodel != null)
+                return View(WTmodel);
+            else
+                return View();
+
+
+           
         }
 
         //
