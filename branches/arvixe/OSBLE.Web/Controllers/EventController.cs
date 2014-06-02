@@ -106,8 +106,18 @@ namespace OSBLE.Controllers
                 }
                 e.EndDate = e.StartDate;
                 //e.StartDate = (ActiveCourseUser.AbstractCourse as Course).CourseMeetings.FirstOrDefault().m
-                e.StartTime = (ActiveCourseUser.AbstractCourse as Course).CourseMeetings.FirstOrDefault().StartTime;
-                e.EndTime = (ActiveCourseUser.AbstractCourse as Course).CourseMeetings.FirstOrDefault().EndTime;
+                //yc fixing for no course meetings crash
+                if ((ActiveCourseUser.AbstractCourse as Course).CourseMeetings.Count > 0)
+                {
+                    e.StartTime = (ActiveCourseUser.AbstractCourse as Course).CourseMeetings.FirstOrDefault().StartTime;
+                    e.EndTime = (ActiveCourseUser.AbstractCourse as Course).CourseMeetings.FirstOrDefault().EndTime;
+                }
+                else
+                {
+                    //default to noon for one hour
+                    e.StartTime = e.StartDate.AddHours(12.0) ;
+                    e.EndTime = e.StartTime.AddHours(1.0);
+                }
             }
 
             //e.EndTime = e.StartTime.Add(new TimeSpan(0, 1, 0, 0, 0));

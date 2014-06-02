@@ -89,7 +89,7 @@ else
     <a href="#" onclick="create_and_open_course_create_dialog()" title="Create Course or Community" id="course_create_button" class="course_modify_buttons">@Helpers.AddButton()</a>
     if (ViewBag.ActiveCourse != null && ViewBag.ActiveCourse.AbstractRole.CanModify)
     {
-        <a href="/Course/Delete" title="Delete current course / community" class="course_modify_buttons">@Helpers.DeleteButton()</a>
+    <a href="/Course/Delete" title="Delete current course / community" class="course_modify_buttons">@Helpers.DeleteButton()</a>
     }
     <script type="text/javascript">
 
@@ -134,52 +134,61 @@ else
             $('#course_create_dialog').remove();
         }
     </script>
-
-}
-@if(ViewBag.CurrentUser != null && !(ViewBag.CurrentUser.CanCreateCourses))
-{
-    <a href="#" onclick="search_and_open_course_search_dialog()" title="Search for Course" id="course_create_button" class="course_modify_buttons">@Helpers.AddButton()</a>
     
+    }
+else if (ViewBag.CurrentUser != null)    //yc adding a withdraw button this user cannot create courses so they can probably removethemselves from a course
+{
+    <a href="#" onclick="withdraw_course_dialog()" title="Withdraw From Course" id="course_withdraw_button" class="course_modify_buttons">@Helpers.DeleteButton()</a>
     <script type="text/javascript">
 
-        function search_and_open_course_search_dialog() {
+        function withdraw_course_dialog() {
 
             //create the div that we will then make into a dialog
 
             $('body').append(
-           '<div id="course_search_dialog" title="Search For A Course"> \
-        <p>Select a course to request enrollment</p><ul> \
-        <li>@Html.ActionLink("Search Courses", "Search", "Course", new { area = "" }, null) </li> \
-        <li>@Html.ActionLink("Search Communities", "Search", "Course", new { area = "" }, null) </li> \
-    </ul></div>');
+           '<div id="withdraw_course_dialog" title="Withdraw"> \
+            <p>Are you sure you want to withdraw from the current course? This action is irreversible and you \
+            must contact the course instructor to be reenrolled</p>\
+            <button onclick="withdraw_user()">Withdraw</button>\
+            <button onclick="remove_withdraw_course_dialog()">Cancel</button>\
+            </div>');
 
             //make the div we just created into a dialog box
 
-            $('#course_search_dialog').dialog({
+            $('#withdraw_course_dialog').dialog({
                 modal: true,
                 autoOpen: true,
                 resizable: false,
                 width: 350,
                 height: 220,
                 closeOnEscape: true,
-                close: remove_course_search_dialog
+                close: remove_withdraw_course_dialog
             });
 
 
 
-            $('#course_search_dialog').dialog('open');
+            $('#course_create_dialog').dialog('open');
 
             return false;
 
         }
 
-        function remove_course_search_dialog() {
+        function remove_withdraw_course_dialog() {
 
             //change the dialog back into a normal div (that is what destroy does although it does not destroy the div)
-            $('#course_search_dialog').dialog("destroy");
+            $('#withdraw_course_dialog').dialog("destroy");
 
             //then remove the div
-            $('#course_search_dialog').remove();
+            $('#withdraw_course_dialog').remove();
+        }
+
+       function withdraw_user() {
+            
+            remove_withdraw_course_dialog();
+            var url = "/Account/WithdrawFromCourse";
+            $.get(url, function (data) {
+                return false;
+            });
         }
     </script>
 }
