@@ -47,8 +47,6 @@ namespace OSBLE.Models.AbstractCourses.Course
             get;
             set;
         }
-
-        [Required]
         public string Email
         {
             get;
