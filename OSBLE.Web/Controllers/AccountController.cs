@@ -869,5 +869,18 @@ namespace OSBLE.Controllers
 
             Email.Send(subject, message, new List<MailAddress>() { new MailAddress(to) });
         }
+
+        //yc: Need to make a view and controller removing oneself from the course.
+        //initalie link click
+        [OsbleAuthorize]
+        public ActionResult WithdrawFromCourse()
+        {
+
+            WithdrawUserFromCourse(CurrentUser);
+            return RedirectToAction("Index", "Home");
+        }
+
+
+
     }
 }
