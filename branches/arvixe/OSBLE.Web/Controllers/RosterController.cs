@@ -435,7 +435,7 @@ namespace OSBLE.Controllers
                             }
                             //check for emails
 
-                            if (entry.Email != null)
+                            if (entry.Email != "")
                             {
                                 whitetable.WhiteTableUser.Email = entry.Email;
                             }
@@ -446,7 +446,9 @@ namespace OSBLE.Controllers
 
                             createWhiteTableUser(whitetable);
                             //will send email to white table user notifying them that they need to create an account to be added to the course 
-                            emailWhiteTableUser(whitetable);
+                            //yc another check for emails
+                            if (entry.Email != "")
+                                emailWhiteTableUser(whitetable);
                         }
 
                     }// end foreach loop for whitetables
@@ -920,11 +922,12 @@ namespace OSBLE.Controllers
                     up.Name1 = "Pending";
                     up.Name2 = string.Format("({0})", up.Identification);
                 }
-                if (whitetable.WhiteTableUser.Email != null)
+                if (whitetable.WhiteTableUser.Email != "")
                     up.Email = whitetable.WhiteTableUser.Email;
                 else
                 {
                     //error check here
+                    up.Email = "";
                 }
                 db.WhiteTableUsers.Add(up);
                 db.SaveChanges();
