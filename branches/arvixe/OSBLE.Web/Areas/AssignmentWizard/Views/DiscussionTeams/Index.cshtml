@@ -99,20 +99,25 @@ else
             }
         }
     </ul>
-    <div id="AvailableModeratorList" style="display:@(ViewBag.DisplayModeratorList)">
-        <h3>
-            @ViewBag.ModeratorListTitle</h3>
-        <ul id="AvailableModerators" class="ModeratorsDraggable">
-            @foreach (CourseUser cu in moderators)
-            {
-                string modDisplayName = cu.DisplayNameWithRole((int)CourseRole.CourseRoles.Instructor);
+
+    @if(moderators != null)
+    { 
+
+        <div id="AvailableModeratorList" style="display:@(ViewBag.DisplayModeratorList)">
+            <h3>
+                @ViewBag.ModeratorListTitle</h3>
+            <ul id="AvailableModerators" class="ModeratorsDraggable">
+                @foreach (CourseUser cu in moderators)
+                {
+                    string modDisplayName = cu.DisplayNameWithRole((int)CourseRole.CourseRoles.Instructor);
             
-                <li data-id="cu_@(cu.ID)" id="cu_@(cu.ID)" class="ui-state-default Moderator">@modDisplayName
-                    <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @modDisplayName" title="remove @modDisplayName" onclick="removeFromTeam(this)" />
-                </li>
-            }
-        </ul>
-    </div>
+                    <li data-id="cu_@(cu.ID)" id="cu_@(cu.ID)" class="ui-state-default Moderator">@modDisplayName
+                        <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @modDisplayName" title="remove @modDisplayName" onclick="removeFromTeam(this)" />
+                    </li>
+                }
+            </ul>
+        </div>
+    }
 </div>
 
 
@@ -164,9 +169,12 @@ else
 {
     <input type="hidden" id="student_@(cu.ID)" name="student_@(cu.ID)" value="@(cu.UserProfile.FirstName) @(cu.UserProfile.LastName)" />
 }
-@foreach (CourseUser cu in moderators)
+@if(moderators != null)
+    {
+foreach (CourseUser cu in moderators)
 {
     <input type="hidden" id="moderator_@(cu.ID)" name="moderator_@(cu.ID)" value="" />
+}
 }
 @foreach (IAssignmentTeam team in teams)
 {

@@ -62,20 +62,20 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             if (Assignment.DiscussionSettings != null && Assignment.DiscussionSettings.TAsCanPostToAllDiscussions)
             {
                 Moderators = (from cu in db.CourseUsers
-                                      where cu.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator
-                                      && cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID
-                                      orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
-                                      select cu).ToList();
+                              where cu.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator
+                              && cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID
+                              orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
+                              select cu).ToList();
                 ViewBag.ModeratorListTitle = "Moderators";
             }
             else
             {
                 Moderators = (from cu in db.CourseUsers
-                                      where (cu.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator
-                                      || cu.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
-                                      && cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID
-                                      orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
-                                      select cu).ToList();
+                              where (cu.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator
+                              || cu.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
+                              && cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID
+                              orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
+                              select cu).ToList();
                 ViewBag.ModeratorListTitle = "Moderators/TAs";
             }
             ViewBag.Moderators = Moderators;
@@ -109,94 +109,122 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
             db.SaveChanges();
 
-            string[] studentKeys = Request.Form.AllKeys.Where(k => k.Contains("student_")).ToArray();
-            List<string> TeamNames = new List<string>(); ; //This will be a list of the TeamNames from the form. These can be pre-existing teams or new teams.
-
-            foreach (string studentKey in studentKeys)
+            if (Request.Form.AllKeys.Contains("AutoGenFromPastButton"))
             {
-                TeamNames.Add(Request.Form[studentKey]);
-            }
-
-            string[] PreExistingTeamKeys = Request.Form.AllKeys.Where(k => k.Contains("team_")).ToArray(); //These are keys for teams that  already existed
-            foreach (string preExistingTeamKey in PreExistingTeamKeys) //Determining if each preexisting team should be kept or deleted
-            {
-                string TeamName = Request.Form[preExistingTeamKey];
-                int TeamID;
-                Int32.TryParse(preExistingTeamKey.Split('_')[1], out TeamID);
-
-                Team team = Assignment.DiscussionTeams.Where(dt => dt.TeamID == TeamID).Select(dt => dt.Team).FirstOrDefault();
-
-                if (TeamNames.Contains(TeamName)) //The TeamName corrisponds to a team that a student is on.
+                //we don't want to continue so force success to be false
+                WasUpdateSuccessful = false;
+                int assignmentId = Assignment.ID;
+                Int32.TryParse(Request.Form["AutoGenFromPastSelect"].ToString(), out assignmentId);
+                Assignment otherAssignment = db.Assignments.Find(assignmentId);
+                List<IAssignmentTeam> otherTeams = null;
+                switch (otherAssignment.Type)
                 {
-                    //Save new name if team exists, in case of rename
-                    if (team != null)
+                    case AssignmentTypes.DiscussionAssignment:
+                    case AssignmentTypes.CriticalReviewDiscussion:
+                        otherTeams = RemoveWithdrawnMembers(otherAssignment.DiscussionTeams.Cast<IAssignmentTeam>().ToList(), "Discussion");
+                        break;
+
+                    default:
+                        otherTeams = RemoveWithdrawnMembers(otherAssignment.AssignmentTeams.Cast<IAssignmentTeam>().ToList(), "Assignment");
+                        break;
+                }
+                SetUpViewBag(otherTeams);
+            }
+            //else
+            //{
+
+
+
+                string[] studentKeys = Request.Form.AllKeys.Where(k => k.Contains("student_")).ToArray();
+                List<string> TeamNames = new List<string>(); ; //This will be a list of the TeamNames from the form. These can be pre-existing teams or new teams.
+
+                foreach (string studentKey in studentKeys)
+                {
+                    TeamNames.Add(Request.Form[studentKey]);
+                }
+
+                string[] PreExistingTeamKeys = Request.Form.AllKeys.Where(k => k.Contains("team_")).ToArray(); //These are keys for teams that  already existed
+                foreach (string preExistingTeamKey in PreExistingTeamKeys) //Determining if each preexisting team should be kept or deleted
+                {
+                    string TeamName = Request.Form[preExistingTeamKey];
+                    int TeamID;
+                    Int32.TryParse(preExistingTeamKey.Split('_')[1], out TeamID);
+
+                    Team team = Assignment.DiscussionTeams.Where(dt => dt.TeamID == TeamID).Select(dt => dt.Team).FirstOrDefault();
+
+                    if (TeamNames.Contains(TeamName)) //The TeamName corrisponds to a team that a student is on.
                     {
-                        team.Name = TeamName;
-                        db.SaveChanges();
-                    }
-                    //If the team has the same ID, then its safe to keep. If it does not, we must delete it, as it
-                    //has been deleted by the user and recreated with the same name. Meaning a complete different team.
-                    
-                    bool TeamHasSameID = Assignment.DiscussionTeams.Where(dt => dt.TeamID == TeamID).Count() > 0;
-                    if (TeamHasSameID == false)
-                    {
-                        //Team has a new ID, but a pre-existing name. Team must have been delete/recreated. So we must 
-                        //do the same
+                        //Save new name if team exists, in case of rename
                         if (team != null)
                         {
+                            team.Name = TeamName;
+                            db.SaveChanges();
+                        }
+                        //If the team has the same ID, then its safe to keep. If it does not, we must delete it, as it
+                        //has been deleted by the user and recreated with the same name. Meaning a complete different team.
+
+                        bool TeamHasSameID = Assignment.DiscussionTeams.Where(dt => dt.TeamID == TeamID).Count() > 0;
+                        if (TeamHasSameID == false)
+                        {
+                            //Team has a new ID, but a pre-existing name. Team must have been delete/recreated. So we must 
+                            //do the same
+                            if (team != null)
+                            {
+                                db.Teams.Remove(team);
+                                db.SaveChanges();
+                            }
+                        }
+                    }
+                    else //The TeamName does not corrispond with any Team a student is associated with. So delete it
+                    {
+                        if (team != null)
+                        {
+                            DiscussionTeam temp = (from dt in db.DiscussionTeams
+                                                   where dt.TeamID == team.ID
+                                                   select dt).FirstOrDefault();
+                            db.DiscussionTeams.Remove(temp);
+                            db.SaveChanges();
+
+
                             db.Teams.Remove(team);
                             db.SaveChanges();
                         }
                     }
                 }
-                else //The TeamName does not corrispond with any Team a student is associated with. So delete it
-                {
-                    if (team != null)
-                    {
-                        DiscussionTeam temp = (from dt in db.DiscussionTeams
-                                               where dt.TeamID == team.ID
-                                               select dt).FirstOrDefault();
-                        db.DiscussionTeams.Remove(temp);
-                        db.SaveChanges();
-                                            
 
-                        db.Teams.Remove(team);
+
+
+                //At this point, all old teams have been purged. So any team from the studentKeys values are either
+                //new teams, or preexisting teams.
+                foreach (string studentKey in studentKeys)
+                {
+                    Team team = Assignment.DiscussionTeams.Where(dt => dt.TeamName == Request.Form[studentKey]).Select(dt => dt.Team).FirstOrDefault();
+
+                    if (team == null) //a new team. Create the team and discussion team before continuing.
+                    {
+                        team = new Team();
+                        team.Name = Request.Form[studentKey];
+                        db.Teams.Add(team);
+                        db.SaveChanges();
+
+                        DiscussionTeam dt = new DiscussionTeam();
+                        dt.TeamID = team.ID;
+                        dt.AssignmentID = Assignment.ID;
+                        db.DiscussionTeams.Add(dt);
                         db.SaveChanges();
                     }
-                }
-            }
 
+                    int courseUserId = 0;
+                    Int32.TryParse(studentKey.Split('_')[1], out courseUserId);
 
-
-            //At this point, all old teams have been purged. So any team from the studentKeys values are either
-            //new teams, or preexisting teams.
-            foreach (string studentKey in studentKeys)
-            {
-                Team team = Assignment.DiscussionTeams.Where(dt => dt.TeamName == Request.Form[studentKey]).Select(dt => dt.Team).FirstOrDefault();
-
-                if(team == null) //a new team. Create the team and discussion team before continuing.
-                {
-                    team = new Team();
-                    team.Name = Request.Form[studentKey];
-                    db.Teams.Add(team);
-                    db.SaveChanges();
-
-                    DiscussionTeam dt = new DiscussionTeam();
-                    dt.TeamID = team.ID;
-                    dt.AssignmentID = Assignment.ID;
-                    db.DiscussionTeams.Add(dt);
+                    TeamMember tm = new TeamMember();
+                    tm.TeamID = team.ID;
+                    tm.CourseUserID = courseUserId;
+                    db.TeamMembers.Add(tm);
                     db.SaveChanges();
                 }
 
-                int courseUserId = 0;
-                Int32.TryParse(studentKey.Split('_')[1], out courseUserId);
-
-                TeamMember tm = new TeamMember();
-                tm.TeamID = team.ID;
-                tm.CourseUserID = courseUserId;
-                db.TeamMembers.Add(tm);
-                db.SaveChanges();
-            }
+            //}
 
             //get all moderator form keys
             string[] modKeys = Request.Form.AllKeys.Where(k => k.Contains("moderator_")).ToArray();
@@ -234,14 +262,15 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
             //Checking for empty teams one last time to be sure
             List<DiscussionTeam> dtsToRemove = Assignment.DiscussionTeams.Where(dt => dt.Team.TeamMembers.Count == 0).ToList();
-            for(int i = dtsToRemove.Count - 1; i >= 0; i--)
+            for (int i = dtsToRemove.Count - 1; i >= 0; i--)
             {
                 db.DiscussionTeams.Remove(dtsToRemove[i]);
             }
             db.SaveChanges();
+
         }
 
-       
+
 
         [HttpPost]
         public override ActionResult Index(Assignment model)
