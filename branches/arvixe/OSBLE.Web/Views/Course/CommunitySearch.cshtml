@@ -1,0 +1,23 @@
+﻿@model OSBLE.Models.Courses.Course
+
+@using OSBLE.Models;
+@using OSBLE.Controllers;
+
+@{
+    ViewBag.Title = "Community Search";
+}
+
+<h2>ComminitySearch</h2>
+
+<table>
+    <tr>
+        <td>
+            <h3>Communities(@ViewBag.CommunitiesList.Count) @Helpers.CreateToolTip(ToolTips.CommunitiesSearch)</h3>
+            @foreach (var com in ViewBag.CommunitiesList)
+            {
+                @com.Name;<br />
+            }
+        </td>
+    </tr>
+</table>
+
