@@ -1,0 +1,47 @@
+﻿@model OSBLE.Models.Courses.Course
+
+@using OSBLE.Models;
+@using OSBLE.Controllers;
+
+@{
+    ViewBag.Title = "Course Search";
+}
+
+<h2>CourseSearch @Helpers.CreateToolTip(ToolTips.CourseSearch)</h2>
+
+@using (Html.BeginForm())
+{
+    <fieldset>
+        <legend>Search Menu</legend>
+        @Html.Label("Course")
+        @Html.DropDownList("Course", ViewBag.CourseName as SelectList, "Select a Course", new { id = "Course"})
+        @Html.ValidationMessage("Course", "*")
+
+        @Html.Label("Number")
+        <select id="Number" name="Number"></select>
+        @Html.ValidationMessage("Number", "*")
+
+        <p>
+            <input type="submit" value="Search" id="SubmitId" />
+        </p>
+    </fieldset>
+
+    @Scripts.Render("~/bundles/jquery")
+    <script type="text/jscript">
+        $(function () {
+            $('#Course').change(function () {
+                $.getJSON('/Course/CourseNumberList/' + $('#Course').val(), function (data) {
+                    var items = '<option>Select a Course Number</option>';
+                    $.each(data, function (i, Number) {
+                        items += "<option value='" + Number.Value + "'>" + Number.Text + "</option>";
+                    });
+                    $('#Number').html(items);
+                });
+            });
+        });
+    </script>
+}
+
+
+
+
