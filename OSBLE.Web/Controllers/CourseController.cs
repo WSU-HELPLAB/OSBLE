@@ -321,31 +321,36 @@ namespace OSBLE.Controllers
             return View(course);
         }
 
-
+        [HttpGet]
         public ActionResult CourseSearch()
         {
+            //get all the courses
             var CourseList = from d in db.Courses
                              where d.EndDate > DateTime.Now
                              select d;
 
+            //add them to a list as a selectlistitem
             List<SelectListItem> course = new List<SelectListItem>();
             foreach(var c in CourseList)
             {
-                course.Add(new SelectListItem { Text = c.Name, Value = c.Name });
+                course.Add(new SelectListItem { Text = c.Prefix, Value = c.Prefix });
             }
-            ViewBag.CourseName = new SelectList(course, "Value", "Text");
+            //remove any duplicate course names
+            var finalList = course.GroupBy(x => x.Text).Select(x => x.OrderByDescending(y => y.Text).First()).ToList();
+
+            //throw it in the view bag
+            ViewBag.CourseName = new SelectList(finalList, "Value", "Text");
 
             return View();
         }
 
-        public JsonResult CourseNumberList(string id)
+        public JsonResult CourseNumber(string id)
         {
-            var number = from s in db.Courses
-                         where s.Name == id
-                         select s;
+            var CourseNumber = from s in db.Courses
+                               where s.Prefix == id
+                               select s;
 
-
-            return Json(new SelectList(number.ToArray(), "CourseName", "CourseNumber"), JsonRequestBehavior.AllowGet);
+            return Json(new SelectList(CourseNumber.ToArray(), "Number", "Number"), JsonRequestBehavior.AllowGet);
         }
 
 
