@@ -130,11 +130,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 }
                 SetUpViewBag(otherTeams);
             }
-            //else
-            //{
-
-
-
+            else
+            {
                 string[] studentKeys = Request.Form.AllKeys.Where(k => k.Contains("student_")).ToArray();
                 List<string> TeamNames = new List<string>(); ; //This will be a list of the TeamNames from the form. These can be pre-existing teams or new teams.
 
@@ -224,7 +221,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     db.SaveChanges();
                 }
 
-            //}
+            }
 
             //get all moderator form keys
             string[] modKeys = Request.Form.AllKeys.Where(k => k.Contains("moderator_")).ToArray();
