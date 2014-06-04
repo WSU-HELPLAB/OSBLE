@@ -327,16 +327,16 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             switch (assignmentType)
             {
                 case "Discussion":
-                    foreach (DiscussionTeam team in unverifiedTeams.ToList())
-                    {
-                        foreach (TeamMember member in team.Team.TeamMembers.ToList())
-                        {
-                            if (member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Withdrawn)
-                            {
-                                registeredTeams.Where(rt => rt.TeamID == team.TeamID).FirstOrDefault().Team.TeamMembers.Remove(member);
-                            }
-                        }
-                    }
+                    //foreach (DiscussionTeam team in unverifiedTeams.ToList())
+                    //{
+                    //    foreach (TeamMember member in team.Team.TeamMembers.ToList())
+                    //    {
+                    //        if (member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Withdrawn)
+                    //        {
+                    //            registeredTeams.Where(rt => rt.TeamID == team.TeamID).FirstOrDefault().Team.TeamMembers.Remove(member);
+                    //        }
+                    //    }
+                    //}
                     break;
                 default:
                     foreach (AssignmentTeam team in unverifiedTeams.ToList())
