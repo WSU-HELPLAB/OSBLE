@@ -25,7 +25,7 @@ using System.Net;
 namespace OSBLE.Controllers
 {
 #if !DEBUG
-    //[RequireHttps]
+    [RequireHttps]
 #endif
     public class AccountController : OSBLEController
     {

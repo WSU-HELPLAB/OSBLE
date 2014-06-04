@@ -19,7 +19,7 @@ using System.Net.Mail;
 namespace OSBLE.Controllers
 {
 #if !DEBUG
-    //[RequireHttps]
+    [RequireHttps]
 #endif
     [OsbleAuthorize]
     [RequireActiveCourse]

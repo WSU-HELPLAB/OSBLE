@@ -19,7 +19,7 @@ using System.Threading;
 namespace OSBLE.Controllers
 {
 #if !DEBUG
-    //[RequireHttps]
+    [RequireHttps]
 #endif
     public class GradebookController : OSBLEController
     {

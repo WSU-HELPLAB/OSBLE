@@ -18,7 +18,7 @@ namespace OSBLE.Controllers
     [RequireActiveCourse]
     [NotForCommunity]
 #if !DEBUG
-    //[RequireHttps]
+    [RequireHttps]
 #endif
     public class AssignmentController : OSBLEController
     {
