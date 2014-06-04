@@ -226,6 +226,15 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                                           }
                                           );
                 }
+                else if (Request.Form.AllKeys.Contains("AutoGenFromPastButton"))
+                {
+                    return RedirectToRoute(AssignmentWizardAreaRegistration.AssignmentWizardRoute,
+                                          new
+                                          {
+                                              controller = manager.ActiveComponent.ControllerName
+                                          }
+                                          );
+                }
                 else
                 {
                     //not having any form keys means that we're using the QuickNav as it won't send back

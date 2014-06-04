@@ -23,9 +23,6 @@ namespace OSBLE.Models.AbstractCourses.Course
             set;
             get;
         }
-        //is section needed with course id?
-        // It wouldn't make sense to say a WT user has a course ID becasue they are on the WT because thay have yet to have been addad to a course 
-        // could we give WT users a course ID of like -1, it would make selecting them from the db easier 
 
         [Required]
         public int SchoolID
@@ -50,8 +47,6 @@ namespace OSBLE.Models.AbstractCourses.Course
             get;
             set;
         }
-
-        [Required]
         public string Email
         {
             get;

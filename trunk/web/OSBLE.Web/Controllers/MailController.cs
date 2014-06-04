@@ -8,6 +8,9 @@ using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Assignments;
+using OSBLE.Models.AbstractCourses.Course;
+
+
 
 namespace OSBLE.Controllers
 {
@@ -276,6 +279,53 @@ namespace OSBLE.Controllers
 
         }
 
+        public void setUpWhiteTableMailViewBags(List<OSBLE.Models.AbstractCourses.Course.WhiteTableUser> InitialRecipients = null )
+        {
+            List<CourseUser> TaAndInstructorList = db.CourseUsers
+                    .Where(cu => (cu.AbstractRoleID == (int)CourseRole.CourseRoles.TA || cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor) && cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID)
+                    .ToList();
+
+            string[] TaNameList = TaAndInstructorList
+                    .Where(cu => cu.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
+                    .Select(cu => cu.UserProfile.FirstName + " " + cu.UserProfile.LastName)
+                    .ToArray();
+
+            int[] TaIdList = TaAndInstructorList
+                    .Where(cu => cu.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
+                    .Select(cu => cu.UserProfileID)
+                    .ToArray();
+
+            string[] InstructorNameList = TaAndInstructorList
+                    .Where(cu => cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor)
+                    .Select(cu => cu.UserProfile.FirstName + " " + cu.UserProfile.LastName)
+                    .ToArray();
+
+            int[] InstructorIdList = TaAndInstructorList
+                    .Where(cu => cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor)
+                    .Select(cu => cu.UserProfileID)
+                    .ToArray();
+
+            if (InitialRecipients != null)
+            {
+                string[] RecipientNameList = InitialRecipients
+                        .Select(up => up.Name2 + " " + up.Name1)
+                        .ToArray();
+
+                int[] RecipientIdList = InitialRecipients
+                        .Select(up => up.ID)
+                        .ToArray();
+
+                ViewBag.RecipientNameList = string.Join(",", RecipientNameList);
+                ViewBag.RecipientIdList = string.Join(",", RecipientIdList);
+            }
+
+            ViewBag.MailHeader = "New Message";
+            ViewBag.TaNameList = string.Join(",", TaNameList);
+            ViewBag.TaIdList = string.Join(",", TaIdList);
+            ViewBag.InstructorNameList = string.Join(",", InstructorNameList);
+            ViewBag.InstructorIdList = string.Join(",", InstructorIdList);
+        }
+
         public ActionResult NoCourses()
         {
             return View();
@@ -366,6 +416,23 @@ namespace OSBLE.Controllers
             }
             setUpMailViewBags(recipientList);
             return View("Create", new Mail());
+        }
+
+        public ActionResult CreateWhiteTableUserProfileId(int id)
+        {
+            var profile = db.WhiteTableUsers.Find(id);
+            List<OSBLE.Models.AbstractCourses.Course.WhiteTableUser> recipientList 
+                = new List<Models.AbstractCourses.Course.WhiteTableUser>();
+
+            if(profile != null)
+            {
+                recipientList.Add(profile);
+            }
+            setUpWhiteTableMailViewBags(recipientList);
+            return View("Create", new Mail());
+
+
+
         }
 
         public ActionResult CreateUser(int id)

@@ -13,6 +13,8 @@ using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Models.AbstractCourses;
 using OSBLE.Models.AbstractCourses.Course;
+using OSBLE.Utility;
+using System.Net.Mail;
 
 namespace OSBLE.Controllers
 {
@@ -52,7 +54,7 @@ namespace OSBLE.Controllers
             {
                 get;
                 set;
-        }
+            }
         } 
 
         public class UsersBySection
@@ -68,7 +70,7 @@ namespace OSBLE.Controllers
                 get;
                 set;
             }
-        }
+        } 
 
         public class UsersByRole
         {
@@ -200,7 +202,7 @@ namespace OSBLE.Controllers
             }
 
             return View();
-        }
+        } 
 
         [HttpPost]
         [CanModifyCourse]
@@ -267,7 +269,7 @@ namespace OSBLE.Controllers
                         if (Regex.IsMatch(header, "email", RegexOptions.IgnoreCase) || Regex.IsMatch(header, "e-mail", RegexOptions.IgnoreCase))
                         {
                             guessedEmail = header;
-                }
+                        }
                     }
                 }
 
@@ -346,10 +348,38 @@ namespace OSBLE.Controllers
                     string[] names = new string[2];
                     // Attach to users or add new user profile stubs.
 
+                    //on new roster import clear the whitetable
+                    clearWhiteTableOnRosterImport();
                    
                     foreach (RosterEntry entry in rosterEntries)
                     {
 
+                        UserProfile userWithAccount = getEntryUserProfile(entry);
+
+
+                        if(userWithAccount != null)
+                        {
+
+                            CourseUser existingUser = new CourseUser(); 
+                            //yc: before using create course user, you must set the following
+                            existingUser.UserProfile = userWithAccount;
+                            existingUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+
+                            newRoster.Add(existingUser);
+                            createCourseUser(existingUser);
+
+                            //email the user notifying them that they have been added to this course 
+                            emailCourseUser(existingUser);
+        
+
+                         
+                            orphans.Remove(existingUser.UserProfile);
+
+
+                        }
+                        //else the entry does not have a user profile, so WT them 
+                        else
+                        {
                         //create the WhiteTable that will hold the whitetableusers
                         WhiteTable whitetable = new WhiteTable();
                         whitetable.WhiteTableUser = new WhiteTableUser();
@@ -370,7 +400,7 @@ namespace OSBLE.Controllers
                                 {
                                     whitetable.WhiteTableUser.Name1 = parseFirstName[0];
                                     whitetable.WhiteTableUser.Name2 = names[0].Trim();
-                            }
+                                }
                                 else
                                 {
                                     whitetable.WhiteTableUser.Name1 = names[1].Trim();
@@ -381,13 +411,13 @@ namespace OSBLE.Controllers
                             {
                                 
                                 names = entry.Name.Trim().Split(' '); //Trimming trialing and leading spaces to avoid conflicts below
-                                if(names.Count() ==  1) //Assume only last name
+                                    if (names.Count() == 1) //Assume only last name
                                 {
 
                                     whitetable.WhiteTableUser.Name1 = string.Empty;
                                     whitetable.WhiteTableUser.Name2 = names[0];
                                 }
-                                else if(names.Count() == 2) //Only first and last name exist
+                                    else if (names.Count() == 2) //Only first and last name exist
                                 {
 
                                     whitetable.WhiteTableUser.Name1 = names[0];
@@ -400,26 +430,34 @@ namespace OSBLE.Controllers
                                     whitetable.WhiteTableUser.Name2 = names[names.Count() - 1];
                                 }
                             }
-                                }
+                        }
                         else// the are nameless so the user will need to add this upon being added to a course 
                         {
                             whitetable.WhiteTableUser.Name1 = "Pending";
                             whitetable.WhiteTableUser.Name2 = string.Format("({0})", entry.Identification);
-                            }
+                        }
                         //check for emails
 
-                        if (entry.Email != null)
+                            if (entry.Email != "")
                         {
                             whitetable.WhiteTableUser.Email = entry.Email;
                         }
                         else
                         {
-                            //NO EMAIL PROVIDED... so this is error checking
-                    }
+                                whitetable.WhiteTableUser.Email = String.Empty;
+                        }
 
                         createWhiteTableUser(whitetable);
+                            //will send email to white table user notifying them that they need to create an account to be added to the course 
+                            //yc another check for emails
+                            if (entry.Email != "")
+                                emailWhiteTableUser(whitetable);
+                        }
 
                     }// end foreach loop for whitetables
+
+                  
+
                     db.SaveChanges();
 
                     //withdraw all orphans
@@ -615,7 +653,7 @@ namespace OSBLE.Controllers
                                select c);
 
             if (courseUser.UserProfileID != CurrentUser.ID || diffTeacher.Count() > 0)
-            {
+            {   
                 return true;
             }
             else
@@ -757,7 +795,7 @@ namespace OSBLE.Controllers
                 addNewStudentToTeams(courseuser);
             }
         }
-
+       
         /// <summary>
         /// This method will add the new courseUser to all the various types of teams they need to be on for each assignment type.
         /// </summary>
@@ -862,7 +900,7 @@ namespace OSBLE.Controllers
             //do the same thing as createCourseUser but make the function work with our whitetable
             //This will return one if they exist already or null if they don't
             var user = (from c in db.WhiteTableUsers
-                        where c.Identification == whitetable.WhiteTableUser.Identification //changed this from ID to identification, should fix the dublication error
+                        where c.Identification == whitetable.WhiteTableUser.Identification 
                         && c.SchoolID == ActiveCourseUser.UserProfile.SchoolID
                         select c).FirstOrDefault();
             if (user == null || user.CourseID != ActiveCourseUser.AbstractCourseID)
@@ -887,11 +925,12 @@ namespace OSBLE.Controllers
                     up.Name1 = "Pending";
                     up.Name2 = string.Format("({0})", up.Identification);
                 }
-                if (whitetable.WhiteTableUser.Email != null)
+                if (whitetable.WhiteTableUser.Email != "")
                     up.Email = whitetable.WhiteTableUser.Email;
                 else
                 {
                     //error check here
+                    up.Email = "";
                 }
                 db.WhiteTableUsers.Add(up);
                 db.SaveChanges();
@@ -901,6 +940,7 @@ namespace OSBLE.Controllers
                 whitetable.WhiteTableUserID = up.ID;
                 whitetable.AbstractCourseID = ActiveCourseUser.AbstractCourseID;
                 whitetable.WhiteTableUser.CourseID = ActiveCourseUser.AbstractCourseID;
+                //emailWhiteTableUser(whitetable);
             }
                 
             
@@ -919,7 +959,74 @@ namespace OSBLE.Controllers
 
                 db.Entry(whitetable).State = EntityState.Modified;
                 db.SaveChanges();
+                //emailWhiteTableUser(whitetable);
             }
+            }
+
+        private void clearWhiteTableOnRosterImport()
+        {
+            var oldUsers = from d in db.WhiteTableUsers
+                           where d.CourseID == ActiveCourseUser.AbstractCourseID
+                           select d;
+
+            foreach (var user in oldUsers) 
+            {
+                db.WhiteTableUsers.Remove(user);
+                
+            }
+
+            db.SaveChanges();
+        }
+
+        private UserProfile getEntryUserProfile(RosterEntry entry)
+        {
+            UserProfile possibleUser = (from d in db.UserProfiles
+                                        where d.Identification == entry.Identification && d.UserName == entry.Email
+                                        select d).FirstOrDefault();
+            return possibleUser;
+        }
+
+        private void emailCourseUser(CourseUser user)
+        {
+            string subject = "Welcome to " + ActiveCourseUser.AbstractCourse.Name;
+            string link = "https://osble.org";
+
+            string message = "Dear " + user.UserProfile.FirstName + " " + user.UserProfile.LastName + @", <br/>
+            <br/>
+            This email was sent to notify you that you have been added to " + ActiveCourseUser.AbstractCourse.Name +
+            "You may go to the course by <a href='" + link + @"'>following this link</a>. 
+            <br/>
+            <br/>
+            ";
+
+            message += @"Best regards,<br/>
+            The OSBLE Team in the <a href='www.helplab.org'>HELP lab</a> at <a href='www.wsu.edu'>Washington State University</a>";
+
+            Email.Send(subject, message, new List<MailAddress>() { new MailAddress(user.UserProfile.UserName) });
+        }
+
+        private void emailWhiteTableUser(WhiteTable whitetable)
+        {
+            var WTU = whitetable.WhiteTableUser;
+
+            string subject = "Welcome to OSBLE.org";
+            string link = "https://osble.org/Account/AcademiaRegister?email=" 
+                + WTU.Email + "&firstname=" + WTU.Name2 + "&lastname=" + WTU.Name1 + "&identification=" + WTU.Identification; 
+
+            string message = "Dear " + WTU.Name2 + " " + WTU.Name1 + @", <br/>
+                <br/>
+                This email was sent to notify you that you have been added to " + ActiveCourseUser.AbstractCourse.Name +
+            " To access this course you need to create an account with OSBLE first. You may create an account " +
+            "by <a href='" + link + @"'>following this link</a>. 
+                <br/>
+                <br/>
+                ";
+
+            message += @"Best regards,<br/>
+                The OSBLE Team in the <a href='www.helplab.org'>HELP lab</a> at <a href='www.wsu.edu'>Washington State University</a>";
+
+            Email.Send(subject, message, new List<MailAddress>() { new MailAddress(WTU.Email) });
+            
         }
     }
 }

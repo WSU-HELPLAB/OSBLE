@@ -210,6 +210,13 @@ namespace OSBLE.Controllers
                     cu.Hidden = newHidden;
                     db.Entry(cu).State = EntityState.Modified;
                 }
+                //yc if the users decided to withdraw from a course
+                bool withdraw = Convert.ToBoolean(Request.Params["cu_withdraw_" + cu.AbstractCourseID]);
+                if (withdraw)
+                {
+                    //user has checked this to remove themself from this course. leets update it!
+                    WithdrawUserFromCourse(CurrentUser);
+                }
             }
 
             // Update the default course ID for log in.
@@ -381,7 +388,25 @@ namespace OSBLE.Controllers
             ViewBag.SchoolID = new SelectList(from c in db.Schools
                                               where c.Name != Constants.ProfessionalSchool
                                               select c, "ID", "Name");
-            return View();
+
+            var WTmodel = new RegisterModel
+            {
+                Email = Request.QueryString["email"]
+                ,
+                FirstName = Request.QueryString["firstname"]
+                ,
+                LastName = Request.QueryString["lastname"]
+                ,
+                Identification = Request.QueryString["identification"]
+            };
+
+            if(WTmodel != null)
+                return View(WTmodel);
+            else
+                return View();
+
+
+           
         }
 
         //
@@ -847,5 +872,18 @@ namespace OSBLE.Controllers
 
             Email.Send(subject, message, new List<MailAddress>() { new MailAddress(to) });
         }
+
+        //yc: Need to make a view and controller removing oneself from the course.
+        //initalie link click
+        [OsbleAuthorize]
+        public ActionResult WithdrawFromCourse()
+        {
+
+            WithdrawUserFromCourse(CurrentUser);
+            return RedirectToAction("Index", "Home");
+        }
+
+
+
     }
 }

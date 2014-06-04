@@ -256,6 +256,17 @@ ul.user_list
 	float: right;
 	padding-right: 3px;
 }
+.user_list li div.wt_no_email_controls
+{
+    display: none;
+    background-color: #ff1313;
+    float: right;
+    padding-right: 3px;
+}
+.user_list li:hover div.wt_no_email_controls
+{
+	display: block;
+}
 
 #users_table td
 {

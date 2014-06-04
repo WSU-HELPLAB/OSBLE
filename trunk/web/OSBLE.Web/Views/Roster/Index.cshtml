@@ -81,8 +81,37 @@
         <tr>
             @foreach (RosterController.UsersByRole userByRole in usersBySection.UsersByRole)
             {
+                //yc: going to need to add a check for users with editing privlidges on this portion too
+                if (userByRole.RoleName == "Withdrawn" )
+                { 
+                <td>
+                    <!--Prints the users in the whitetable for the current class-->
+                <h3>WhiteTable(@ViewBag.WhiteTableUsers.Count) @Helpers.CreateToolTip(ToolTips.RosterWhitetableRoleRole)</h3>
+                      
+                <ul class="user_list">
+                    @foreach (var WTuser in ViewBag.WhiteTableUsers)
+                    {
+                        <li>
+                                @if (WTuser.Email != String.Empty)
+                                {
+                                    <div class="user_controls">
+                                        <a title="Mail This User" href="@Url.Action("CreateWhiteTableUserProfileId", "Mail", new { id = WTuser.ID })">@Helpers.MailButton()</a>
+                                    </div>
+                                }
+                                else if (WTuser.Email == String.Empty)
+                                {
+                                    <div class="wt_no_email_controls">
+                                        <a title="Mail This User" href="@Url.Action("CreateWhiteTableUserProfileId", "Mail", new { id = WTuser.ID })">@Helpers.MailButton()</a>
+                                    </div>
+                                }
+                        @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", new { userProfile = WTuser.ID }))
+                        <span>@WTuser.Name1 @WTuser.Name2</span></li>
+                    }
+                </ul>
+                </td>
+                }
                 if (userByRole.Count > 0)
-                {
+                {  
                 <td>
                     <h3>
                         @userByRole.RoleName (<span id="roleheader_@(usersBySection.SectionNumber)_@(userByRole.RoleName)">@userByRole.Count.ToString()</span>)
@@ -136,20 +165,7 @@
                 </td>
                 }
             }
-            <td>
-                <!--Prints the users in the whitetable for the current class-->
-                <h3>
-                    WhiteTable(@ViewBag.WhiteTableUsers.Count)
-                </h3>
-                @foreach (var WTuser in ViewBag.WhiteTableUsers)
-                {
-                    @WTuser.Name1<br />
-                    @WTuser.Name2<br />
-                    @WTuser.Email<br />
-                    <br />
-                       
-                }
-            </td>
+            
         </tr>
 
     </table>

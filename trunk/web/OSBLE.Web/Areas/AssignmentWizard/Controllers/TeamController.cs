@@ -32,7 +32,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
         public override IWizardBaseController Prerequisite
         {
-            get 
+            get
             {
                 return new BasicsController();
             }
@@ -70,11 +70,22 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             //Guaranteed to pull all people enrolled in the course that can submit files
             //(probably students).
             List<CourseUser> users = (from cu in db.CourseUsers
-                                       where cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID
-                                       && cu.AbstractRole.CanSubmit
-                                       orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
-                                       select cu).ToList();
-            List<CourseUser> allUsers = users.ToList();
+                                      where cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID
+                                      && cu.AbstractRole.CanSubmit
+                                      && cu.AbstractRoleID != (int)CourseRole.CourseRoles.Withdrawn
+                                      orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
+                                      select cu).ToList();
+
+
+
+            List<CourseUser> allUsers = new List<CourseUser>();
+
+            foreach (CourseUser cUser in users)
+            {
+                if (cUser.UserProfile != null)
+                    allUsers.Add(cUser);
+            }
+
             List<IAssignmentTeam> teamsToDisplay = new List<IAssignmentTeam>();
 
             //remove students currently on the team list from our complete user list
@@ -103,7 +114,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     member.CourseUser = user;
                 }
                 teamsToDisplay.Add(team);
-                
+
             }
 
             //pull previous team configurations
@@ -132,7 +143,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         /// Sets up the view for the Assignment Team view. Note: Teams are initially set up in BasicController.
         /// </summary>
         /// <returns></returns>
-        public override ActionResult Index() 
+        public override ActionResult Index()
         {
             base.Index();
             SetUpViewBag();
@@ -162,11 +173,11 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 {
                     case AssignmentTypes.DiscussionAssignment:
                     case AssignmentTypes.CriticalReviewDiscussion:
-                        otherTeams = otherAssignment.DiscussionTeams.Cast<IAssignmentTeam>().ToList();
+                        otherTeams = RemoveWithdrawnMembers(otherAssignment.DiscussionTeams.Cast<IAssignmentTeam>().ToList(), "Discussion");
                         break;
 
                     default:
-                        otherTeams = otherAssignment.AssignmentTeams.Cast<IAssignmentTeam>().ToList();
+                        otherTeams = RemoveWithdrawnMembers(otherAssignment.AssignmentTeams.Cast<IAssignmentTeam>().ToList(), "Assignment");
                         break;
                 }
                 SetUpViewBag(otherTeams);
@@ -257,7 +268,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 string TeamName = Request.Form[key];
                 int courseUserId = 0;
-                if(!Int32.TryParse(key.Split('_')[1], out courseUserId))
+                if (!Int32.TryParse(key.Split('_')[1], out courseUserId))
                 {
                     continue;
                 }
@@ -272,8 +283,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     teams.Add(newTeam);
                 }
                 Team team = teams.Find(t => t.Name.CompareTo(TeamName) == 0);
-                TeamMember tm = new TeamMember() 
-                { 
+                TeamMember tm = new TeamMember()
+                {
                     CourseUserID = courseUserId,
                     Team = team
                 };
@@ -300,13 +311,47 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             foreach (Team team in teams)
             {
                 previousTeams.Add(new AssignmentTeam()
-                { 
-                        Assignment = Assignment, 
-                        AssignmentID = Assignment.ID, 
-                        Team = team,
-                        TeamID = team.ID
+                {
+                    Assignment = Assignment,
+                    AssignmentID = Assignment.ID,
+                    Team = team,
+                    TeamID = team.ID
                 });
             }
+        }
+
+        protected List<IAssignmentTeam> RemoveWithdrawnMembers(List<IAssignmentTeam> unverifiedTeams, string assignmentType)
+        {
+            List<IAssignmentTeam> registeredTeams = unverifiedTeams;
+
+            switch (assignmentType)
+            {
+                case "Discussion":
+                    //foreach (DiscussionTeam team in unverifiedTeams.ToList())
+                    //{
+                    //    foreach (TeamMember member in team.Team.TeamMembers.ToList())
+                    //    {
+                    //        if (member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Withdrawn)
+                    //        {
+                    //            registeredTeams.Where(rt => rt.TeamID == team.TeamID).FirstOrDefault().Team.TeamMembers.Remove(member);
+                    //        }
+                    //    }
+                    //}
+                    break;
+                default:
+                    foreach (AssignmentTeam team in unverifiedTeams.ToList())
+                    {
+                        foreach (TeamMember member in team.Team.TeamMembers.ToList())
+                        {
+                            if (member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Withdrawn)
+                            {
+                                registeredTeams.Where(rt => rt.TeamID == team.TeamID).FirstOrDefault().Team.TeamMembers.Remove(member);
+                            }
+                        }
+                    }
+                    break;
+            }
+            return registeredTeams;
         }
     }
 }

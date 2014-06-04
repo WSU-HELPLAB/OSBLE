@@ -321,7 +321,45 @@ namespace OSBLE.Controllers
             return View(course);
         }
 
-        //
+
+        public ActionResult CourseSearch()
+        {
+            var CourseList = from d in db.Courses
+                             where d.EndDate > DateTime.Now
+                             select d;
+
+            List<SelectListItem> course = new List<SelectListItem>();
+            foreach(var c in CourseList)
+            {
+                course.Add(new SelectListItem { Text = c.Name, Value = c.Name });
+            }
+            ViewBag.CourseName = new SelectList(course, "Value", "Text");
+
+            return View();
+        }
+
+        public JsonResult CourseNumberList(string id)
+        {
+            var number = from s in db.Courses
+                         where s.Name == id
+                         select s;
+
+
+            return Json(new SelectList(number.ToArray(), "CourseName", "CourseNumber"), JsonRequestBehavior.AllowGet);
+        }
+
+
+        public ActionResult CommunitySearch()
+        {
+            //Get list of communities from db
+            var ListOfCommunities = db.Communities;
+
+            ViewBag.CommunitiesList = ListOfCommunities.OrderBy(c => c.Name).ToList();
+
+            return View();
+        }
+
+        
         // GET: /Course/Edit/5
         [RequireActiveCourse]
         [CanModifyCourse]
@@ -469,6 +507,8 @@ namespace OSBLE.Controllers
 
             return RedirectToAction("Index", "Home");
         }
+
+        
 
         protected override void Dispose(bool disposing)
         {
