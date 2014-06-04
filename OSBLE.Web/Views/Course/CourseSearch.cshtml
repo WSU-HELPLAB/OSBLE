@@ -7,31 +7,32 @@
     ViewBag.Title = "Course Search";
 }
 
-<h2>CourseSearch @Helpers.CreateToolTip(ToolTips.CourseSearch)</h2>
+<h2>Course Search @Helpers.CreateToolTip(ToolTips.CourseSearch)</h2>
 
 @using (Html.BeginForm())
 {
     <fieldset>
         <legend>Search Menu</legend>
-        @Html.Label("Course")
-        @Html.DropDownList("Course", ViewBag.CourseName as SelectList, "Select a Course", new { id = "Course" })
-        @Html.ValidationMessage("Course", "*")
+        @Html.Label("Course Prefix")
+        @Html.DropDownList("Course", ViewBag.CourseName as SelectList, "Select a Course Prefix", new { id = "Course" })
+        
 
-        @Html.Label("Number")
+        @Html.Label("Course Prefix Number")
         <select id="Number" name="Number"> </select>
-        @Html.ValidationMessage("Number", "*")
+       
 
         <p>
-            <input type="submit" value="Search" id="SubmitId" onclick="location.href='@Url.Action("CourseSearch", "Course")'"/>
+            <input type="button" value="Search" id="SubmitId" onclick="location.href='@Url.Action("CourseSearch", "Course")'"/>
         </p>
     </fieldset>
 }
 @Scripts.Render("~/bundles/jquery")
 <script type="text/jscript">
     $(function () {
+       
         $('#Course').change(function () {
             $.getJSON('/Course/CourseNumber/' + $('#Course').val(), function (data) {
-                var items = '<option>Select a Course Number</option>';
+                var items = '<option>Search All</option>';
                 $.each(data, function (i, Number) {
                     items += "<option value='" + Number.Value + "'>" + Number.Text + "</option>";
                 });
