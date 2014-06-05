@@ -337,7 +337,7 @@ ul.user_list
 
 li.wt_no_email
 {
-    background-color: #ff1313;
+    background-color: #ffb0b0;
     list-style: none;
 	width: 230px;
 	min-height: 43px;
@@ -347,13 +347,6 @@ li.wt_no_email
 	float: right;
 	padding-right: 3px;
 
-}
-.wt_no_email :hover
-{
-    display:block;
-    background-color: #ffdddd;
-    min-height: 43px;
-    padding-top: 4px;
 }
 /* LogOn/Register Screens */
 
