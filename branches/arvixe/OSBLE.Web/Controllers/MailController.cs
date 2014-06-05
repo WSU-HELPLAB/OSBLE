@@ -349,14 +349,22 @@ namespace OSBLE.Controllers
         {
             if (ModelState.IsValid)
             {
+                
                 string recipient_string = Request.Params["recipientlist"];
                 string[] recipients;
                 string currentCourse = Request.Form["CurrentlySelectedCourse"];    //gets selected FROM courseid
-                
+                string mailReply = Request.Form["mailReply"];
+                if(mailReply == "" || mailReply == null)
+                {
+                    mail.ContextID = Convert.ToInt16(currentCourse); 
+                }
+                else
+                {
+                    //we want the default context if it's a reply
+                    mail.ContextID = ActiveCourseUser.AbstractCourseID;                    
+                }
                 //mail.ContextID = ActiveCourseUser.AbstractCourseID;
 
-                mail.ContextID = Convert.ToInt16(currentCourse); 
-                
                 mail.Context = db.Courses.Where(b => b.ID == mail.ContextID).FirstOrDefault();
 
                 if (recipient_string != null)
@@ -707,8 +715,10 @@ namespace OSBLE.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetUserCourseList(int id)
+        public JsonResult GetUserCourseList()
         {
+            int id = this.CurrentUser.ID;
+
             List<CourseUser> courseUsers = new List<CourseUser>();
             courseUsers = db.CourseUsers.Where(u => u.UserProfileID == id).ToList();
 

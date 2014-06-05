@@ -4,6 +4,16 @@
 
 @{
     ViewBag.Title = "Create";
+    bool showFromDropdown = false;
+    string currentURL = HttpContext.Current.Request.Path.ToString();
+    string[] temp = currentURL.Split('/');
+    foreach(string str in temp)
+    {
+        if (str == "CreateUserProfileId" || str == "CreateWhiteTableUserProfileId")
+        {
+            showFromDropdown = true;
+        }
+    }
 }
 
 <h2>@ViewBag.MailHeader</h2>
@@ -17,10 +27,14 @@
 
     @Html.HiddenFor(model => model.ContextID)
 
-    <a>Send From:</a>
-    <select id="SendFromSelectList">
-        
-    </select>
+    if(showFromDropdown)
+    {
+        <a>Send From Course:</a>
+        <select id="SendFromSelectList">        
+        </select>    
+    }
+    
+    
     
     <ul id="MailList">        
         <li><a>To:</a></li>
@@ -70,6 +84,11 @@
     <input type="hidden" id="RecipientIdList"value="@ViewBag.RecipientIdList" />
     <input type="hidden" id="FinalList" name="recipientlist" />
     <input type="hidden" id="CurrentlySelectedCourse" name="CurrentlySelectedCourse" value="" />
+    if (!showFromDropdown)
+    {
+        <input type="hidden" id="mailReply" name="mailReply" value="reply" />
+    }
+
 }
 
 <div>
@@ -105,7 +124,7 @@
                 dataType: "json",
                 type: "GET",
                 url: '@Url.Action("GetUserCourseList", "Mail")',
-                data: { id: currentUserID },
+                data: {  },
                 success: function (data) {
                     for(i = 0; i < data.length; i++)
                     {
