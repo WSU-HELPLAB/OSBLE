@@ -351,10 +351,12 @@ namespace OSBLE.Controllers
             {
                 string recipient_string = Request.Params["recipientlist"];
                 string[] recipients;
+                string currentCourse = Request.Form["CurrentlySelectedCourse"];
 
                 // gets the current courseid
-                mail.ContextID = ActiveCourseUser.AbstractCourseID;
-
+                //mail.ContextID = ActiveCourseUser.AbstractCourseID;
+                //gets selected courseid
+                mail.ContextID = Convert.ToInt16(currentCourse);
                 // gets the current course
                 mail.Context = db.Courses.Where(b => b.ID == mail.ContextID).FirstOrDefault();
 
@@ -703,6 +705,49 @@ namespace OSBLE.Controllers
                 db.Mails.Remove(mail);
             }
             db.SaveChanges();
+        }
+
+        [HttpGet]
+        public JsonResult GetUserCourseList(int id)
+        {
+            List<CourseUser> courseUsers = new List<CourseUser>();
+            courseUsers = db.CourseUsers.Where(u => u.UserProfileID == id).ToList();
+
+            List<string> userCourseList = new List<string>();
+
+            foreach (CourseUser cu in courseUsers)
+            {
+                string tag = GetCourseTags(db.AbstractCourses.Where(a => a.ID == cu.AbstractCourseID).FirstOrDefault());
+                if (tag != "")
+                    userCourseList.Add(cu.AbstractCourseID + "," + tag);
+            }
+            
+            return Json(userCourseList, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Returns tags for either a course or a community, if one exists for the notification. Otherwise, empty string.
+        ///
+        /// </summary>
+        /// <param name="c">The abstract course</param>
+        /// <returns>Tag with leading space (" CptS 314") if course or community exists, "" if not.</returns>
+        private string GetCourseTags(AbstractCourse c)
+        {
+            string tag = "";
+
+            if (c != null)
+            {
+                if (c is Course)
+                {
+                    tag = (c as Course).Prefix + " " + (c as Course).Number;
+                }
+                else if (c is Community)
+                {
+                    tag = (c as Community).Nickname;
+                }
+            }
+
+            return tag;
         }
     }
 }

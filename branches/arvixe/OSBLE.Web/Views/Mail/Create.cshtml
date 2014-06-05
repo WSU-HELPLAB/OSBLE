@@ -17,8 +17,12 @@
 
     @Html.HiddenFor(model => model.ContextID)
 
+    <a>Send From:</a>
+    <select id="SendFromSelectList">
+        
+    </select>
     
-    <ul id="MailList">
+    <ul id="MailList">        
         <li><a>To:</a></li>
         <li>
             <input id="people_finder" /></li>
@@ -65,7 +69,8 @@
     <input type="hidden" id="RecipientNameList"value="@ViewBag.RecipientNameList" />
     <input type="hidden" id="RecipientIdList"value="@ViewBag.RecipientIdList" />
     <input type="hidden" id="FinalList" name="recipientlist" />
-   }
+    <input type="hidden" id="CurrentlySelectedCourse" name="CurrentlySelectedCourse" value="" />
+}
 
 <div>
     @Html.ActionLink("Back to Inbox", "Index")
@@ -75,7 +80,8 @@
     <script type="text/javascript">
         var recipientList = new Array(); //array that will hold only the Ids of those to be mailed
 
-        $(document).ready(function(){
+        $(document).ready(function () {
+            
             var ids = $("#RecipientIdList").val();
             var idArray = ids.split(',');
             var names = $("#RecipientNameList").val();
@@ -88,6 +94,41 @@
                 }
             }
             HandleNoRecipientElement();
+
+        
+            //setup the send from dropdown
+            var currentUserID = $("input[name=redirect]").val();
+            currentUserID = currentUserID.split("/");
+            currentUserID = currentUserID[3];
+            
+            $.ajax({
+                dataType: "json",
+                type: "GET",
+                url: '@Url.Action("GetUserCourseList", "Mail")',
+                data: { id: currentUserID },
+                success: function (data) {
+                    for(i = 0; i < data.length; i++)
+                    {
+                        var abstractIDTag = data[i].split(",");
+                        
+                        $('#SendFromSelectList').append($('<option>', {
+                            value: abstractIDTag[0],
+                            text: abstractIDTag[1]
+                        }));
+                    }                    
+                    $('#SendFromSelectList').val($("#course_select :selected").val());
+                },
+                error: function (data) {
+                    //TODO: handle error...
+                }
+            });
+
+            //get the currently selected course
+            var currentlySelectedCourse = $("#course_select :selected").text().split("-");
+            var coursePrefixAndNumber = currentlySelectedCourse[0].trim();
+            $("#CurrentlySelectedCourse").val($("#course_select :selected").val());
+
+
         });
 
         //add recipient to mailing list and display them
@@ -230,6 +271,8 @@
                 }
             }
         });
+
+        
 
     </script>
 
