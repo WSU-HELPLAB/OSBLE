@@ -986,7 +986,7 @@ namespace OSBLE.Controllers
         private void emailCourseUser(CourseUser user)
         {
             string subject = "Welcome to " + ActiveCourseUser.AbstractCourse.Name;
-            string link = "https://osble.azurewebsites.net";
+            string link = "https://osble.org";
 
             string message = "Dear " + user.UserProfile.FirstName + " " + user.UserProfile.LastName + @", <br/>
             <br/>
@@ -1007,7 +1007,7 @@ namespace OSBLE.Controllers
             var WTU = whitetable.WhiteTableUser;
 
             string subject = "Welcome to OSBLE.org";
-            string link = "https://osble.azurewebsites.net/Account/AcademiaRegister?email=" 
+            string link = "https://osble.org/Account/AcademiaRegister?email=" 
                 + WTU.Email + "&firstname=" + WTU.Name2 + "&lastname=" + WTU.Name1 + "&identification=" + WTU.Identification; 
 
             string message = "Dear " + WTU.Name2 + " " + WTU.Name1 + @", <br/>
