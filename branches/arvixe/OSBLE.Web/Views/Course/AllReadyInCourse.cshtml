@@ -1,0 +1,13 @@
+﻿@model OSBLE.Models.Courses.Course
+
+@{
+    ViewBag.Title = "AllReadyInCourse";
+}
+
+<h2>You are Currently Enrolled in This Course</h2>
+
+<p>
+    Your request to join has been rejected because you are already enrolled in this course.
+</p>
+
+@Html.ActionLink("Back to Course Search", "CourseSearch")

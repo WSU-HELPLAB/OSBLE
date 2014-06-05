@@ -56,6 +56,10 @@ namespace OSBLE.Controllers
                         int.TryParse(n.Data.Split(';')[0], out precteamId);
                         int.TryParse(n.Data.Split(';')[1], out teamEvalAssignmnetID);
                         return RedirectToAction("TeacherTeamEvaluation", "Assignment", new { precedingTeamId = precteamId, TeamEvaluationAssignmentId = teamEvalAssignmnetID });
+                    case Notification.Types.JoinCourseApproval:
+                        return RedirectToAction("Approval", "Course", new { ID = n.ItemID });
+                    
+
                 }
             }
 
@@ -187,6 +191,29 @@ namespace OSBLE.Controllers
                 n.ItemID = e.ID;
                 n.RecipientID = instructor.ID;
                 n.SenderID = e.Poster.ID;
+
+                addNotification(n);
+            }
+        }
+
+        [NonAction]
+        public void SendCourseApprovalNotification(Course c)
+        {
+            // Get all instructors in the course.
+            List<CourseUser> instructors = (from i in db.CourseUsers
+                                           where
+                                             i.AbstractCourseID == c.ID &&
+                                             i.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor
+                                           select i).ToList();
+
+            foreach (CourseUser instructor in instructors)
+            {
+                Notification n = new Notification();
+                n.ItemType = Notification.Types.JoinCourseApproval;
+                n.ItemID = c.ID;
+                n.RecipientID = instructor.ID;
+                n.SenderID = ActiveCourseUser.ID; //This only wokrs if the sender is enrolled in at least one course else its null and will break 
+                
 
                 addNotification(n);
             }
