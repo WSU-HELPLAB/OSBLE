@@ -131,6 +131,10 @@
 
         });
 
+        $('#SendFromSelectList').change(function () {            
+            $("#CurrentlySelectedCourse").val($("#SendFromSelectList :selected").val());            
+        });
+
         //add recipient to mailing list and display them
         function addRecipient(upId, name)
         {  
