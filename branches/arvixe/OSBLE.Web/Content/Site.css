@@ -256,18 +256,6 @@ ul.user_list
 	float: right;
 	padding-right: 3px;
 }
-.user_list li div.wt_no_email_controls
-{
-    display: none;
-    background-color: #ff1313;
-    float: right;
-    padding-right: 3px;
-}
-.user_list li:hover div.wt_no_email_controls
-{
-	display: block;
-}
-
 #users_table td
 {
 	width: 250px;
@@ -347,6 +335,26 @@ ul.user_list
 	width: 6em;
 }
 
+li.wt_no_email
+{
+    background-color: #ff1313;
+    list-style: none;
+	width: 230px;
+	min-height: 43px;
+	padding-top: 4px;
+	margin-bottom: 7px;
+	font-size: 10pt;
+	float: right;
+	padding-right: 3px;
+
+}
+.wt_no_email :hover
+{
+    display:block;
+    background-color: #ffdddd;
+    min-height: 43px;
+    padding-top: 4px;
+}
 /* LogOn/Register Screens */
 
 body#layoutLogOn
