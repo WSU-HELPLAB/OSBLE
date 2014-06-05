@@ -118,7 +118,12 @@ namespace OSBLE.Controllers
             n.ItemType = Notification.Types.Mail;
             n.ItemID = mail.ID;            
             n.RecipientID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.ToUserProfileID).FirstOrDefault().ID;
-            n.SenderID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.FromUserProfileID).FirstOrDefault().ID;
+            n.SenderID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.FromUserProfileID).FirstOrDefault().ID;           
+            
+            //add context id so we can put the proper subject context in the email
+            n.Sender = new CourseUser();          
+            n.Sender.AbstractCourseID = mail.ContextID;
+
             addNotification(n);
         }
 
@@ -304,8 +309,16 @@ namespace OSBLE.Controllers
         /// <param name="n">Notification to be added</param>
         private void addNotification(Notification n)
         {
+            //temporarily store the sending course ID, we dont' want/need to save the courseuser to the db
+            int id = n.Sender.AbstractCourseID;
+            n.Sender = null;
+
             db.Notifications.Add(n);
             db.SaveChanges();
+
+            //put back the ID we'll need to add the proper context to the email subject.
+            n.Sender = new CourseUser();
+            n.Sender.AbstractCourseID = id;
 
             // Find recipient profile and check notification settings
             CourseUser recipient = (from a in db.CourseUsers
@@ -327,11 +340,11 @@ namespace OSBLE.Controllers
 #if !DEBUG
             SmtpClient mailClient = new SmtpClient();
             mailClient.UseDefaultCredentials = true;
-
+            
             UserProfile sender = db.UserProfiles.Find(n.Sender.UserProfileID);
             UserProfile recipient = db.UserProfiles.Find(n.Recipient.UserProfileID);
 
-            // this comes back as null, for some reason.
+            // this comes back as null, for some reason. //dmo:6/5/2014 does it really? it seems to work??
             AbstractCourse course = db.AbstractCourses.Where(b => b.ID == n.Sender.AbstractCourseID).FirstOrDefault();
 
             string subject = "";

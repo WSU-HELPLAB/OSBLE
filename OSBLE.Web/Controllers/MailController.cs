@@ -351,13 +351,12 @@ namespace OSBLE.Controllers
             {
                 string recipient_string = Request.Params["recipientlist"];
                 string[] recipients;
-                string currentCourse = Request.Form["CurrentlySelectedCourse"];
-
-                // gets the current courseid
+                string currentCourse = Request.Form["CurrentlySelectedCourse"];    //gets selected FROM courseid
+                
                 //mail.ContextID = ActiveCourseUser.AbstractCourseID;
-                //gets selected courseid
-                mail.ContextID = Convert.ToInt16(currentCourse);
-                // gets the current course
+
+                mail.ContextID = Convert.ToInt16(currentCourse); 
+                
                 mail.Context = db.Courses.Where(b => b.ID == mail.ContextID).FirstOrDefault();
 
                 if (recipient_string != null)
@@ -396,7 +395,7 @@ namespace OSBLE.Controllers
                             }
 
                             using (NotificationController nc = new NotificationController())
-                            {
+                            {                                
                                 nc.SendMailNotification(newMail);
                             }
                             ++count;
