@@ -16,6 +16,7 @@ using System.Web.Security;
 using OSBLE.Models;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
+using OSBLE.Models.AbstractCourses.Course;
 using OSBLE.Models.Users;
 using OSBLE.Utility;
 using OSBLE.Attributes;
@@ -468,6 +469,27 @@ namespace OSBLE.Controllers
                         else // Profile does not exist.
                         {
                             db.UserProfiles.Add(profile);
+                        }
+
+                        //yc: profile made. Check white table for account information
+                        List<WhiteTableUser> whitetableusers = db.WhiteTableUsers.Where(w => w.Identification == profile.Identification && w.SchoolID == profile.SchoolID).ToList();
+
+                        if (whitetableusers.Count > 0)
+                        {
+                            foreach (WhiteTableUser wtu in whitetableusers)
+                            {
+                                //you have gathered all the users  time to add them to courses
+                                //bug found, we need to have section location for now
+                                //seetting them to 0 for now
+                                //we have 
+                                CourseUser newUser = new CourseUser();
+                                newUser.UserProfile = profile;
+                                newUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+                                newUser.AbstractCourseID = wtu.CourseID;
+                                newUser.UserProfileID = profile.ID;
+                                db.CourseUsers.Add(newUser);
+                                db.WhiteTableUsers.Remove(wtu);
+                            }
                         }
 
                         db.SaveChanges();

@@ -132,7 +132,7 @@ namespace OSBLE.Models
                 {"Leader",      "Community leader...?"},
                 {"Participant", "Community participant...?"} };
 
-            public static string RosterWhitetableRoleRole = "Whitelisted users do not have an OSBLE account. Provided a valid email address, these students will be invited to register and enroll into this course. Students highlighed in red do not have a valid email address.";
+            public static string RosterWhitetableRoleRole = "Whitelisted users are approved to  enroll in the course, but they do not have an OSBLE account. Provided a valid email address, these students will be invited to register and enroll into this course. If an email address on the roster that was uploaded, these students will be notified. Students highlighed in red do not have a valid email address.";
             public static string RosterUserName = "This is the name this user will be publicly identified by in mail, posts, assignments, and other content.";
             public static string RosterEmail = "This must be the email address this user registered with for OSBLE.";
             public static string RosterSchoolID = "Input the school/ organization identification number for this user to indicate who is being added to this course.";

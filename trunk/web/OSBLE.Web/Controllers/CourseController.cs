@@ -298,7 +298,7 @@ namespace OSBLE.Controllers
                 catch (Exception)
                 {
                 }
-
+              
                 course.TimeZoneOffset = Convert.ToInt32(Request.Params["course_timezone"]);
                 createMeetingTimes(course, course.TimeZoneOffset);
                 createBreaks(course);
@@ -317,7 +317,6 @@ namespace OSBLE.Controllers
 
                 return RedirectToAction("Index", "Home");
             }
-
             return View(course);
         }
 
@@ -340,6 +339,8 @@ namespace OSBLE.Controllers
 
             //throw it in the view bag
             ViewBag.CourseName = new SelectList(finalList, "Value", "Text");
+            ViewBag.SearchResults = TempData["SearchResults"];
+
 
             return View();
         }
@@ -353,6 +354,65 @@ namespace OSBLE.Controllers
             return Json(new SelectList(CourseNumber.ToArray(), "Number", "Number"), JsonRequestBehavior.AllowGet);
         }
 
+        [HttpPost]
+        public ActionResult SearchResults(string course, string number)
+        {
+            if(number == "Search All")
+            {
+                var Results = from d in db.Courses
+                              where d.Prefix == course 
+                              select d;
+
+                Results.GroupBy(x => x.Prefix)
+                        .OrderBy(x => x.Count())
+                        .Select(x => x.First());
+
+                TempData["SearchResults"] = Results.ToList();
+
+                return RedirectToAction("CourseSearch", "Course");
+            }
+            else
+            {
+                var Results = from d in db.Courses
+                              where d.Prefix == course && d.Number == number
+                              select d;
+
+                Results.GroupBy(x => x.Number)
+                        .OrderBy(x => x.Count())
+                        .Select(x => x.First());
+
+                TempData["SearchResults"] = Results.ToList();
+
+                return RedirectToAction("CourseSearch", "Course");
+            }
+
+
+        }
+
+        public ActionResult ReqestCourseJoin(string id)
+        {
+            //get course from ID
+            int intID = Convert.ToInt32(id);
+            var request = (from c in db.Courses
+                           where c.ID == intID
+                           select c).FirstOrDefault();
+
+            if(ActiveCourseUser != null)
+            {
+                if(ActiveCourseUser.AbstractCourseID == request.ID)
+                {
+                    return View("AllReadyInCourse");
+                }
+                //send notification to instructors
+                using (NotificationController nc = new NotificationController())
+                {
+                    nc.SendCourseApprovalNotification(request);
+                }
+            }
+
+
+            return View("NeedsApproval");
+        }
 
         public ActionResult CommunitySearch()
         {
@@ -363,7 +423,6 @@ namespace OSBLE.Controllers
 
             return View();
         }
-
         
         // GET: /Course/Edit/5
         [RequireActiveCourse]
@@ -512,8 +571,6 @@ namespace OSBLE.Controllers
 
             return RedirectToAction("Index", "Home");
         }
-
-        
 
         protected override void Dispose(bool disposing)
         {
