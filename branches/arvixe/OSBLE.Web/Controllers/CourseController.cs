@@ -431,6 +431,18 @@ namespace OSBLE.Controllers
                 //send notification to instructors
                 using (NotificationController nc = new NotificationController())
                 {
+                    //temporaly put them in the course as hidden
+                    CourseUser tempUser = new CourseUser();
+                    UserProfile profile = db.UserProfiles.Where(up => up.ID == this.CurrentUser.ID).FirstOrDefault();
+                    tempUser.UserProfile = profile;
+                    tempUser.UserProfileID = profile.ID;
+                    tempUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+                    tempUser.AbstractCourseID = request.ID;
+                    tempUser.Hidden = true;
+
+                    db.CourseUsers.Add(tempUser);
+                    db.SaveChanges();
+
                     nc.SendCourseApprovalNotification(request, ActiveCourseUser);
                 }
                 return View("NeedsApproval");
@@ -454,7 +466,10 @@ namespace OSBLE.Controllers
             ViewBag.Instructor = Instructor;
             ViewBag.Student = Student;
             ViewBag.notification = notification;
+            ViewBag.CourseName = ActiveCourseUser.AbstractCourse.Name;
+            ViewBag.CourseID = ActiveCourseUser.AbstractCourse.ID;
 
+            
 
             return View("Approval");
         }
@@ -468,8 +483,11 @@ namespace OSBLE.Controllers
             int userId = Convert.ToInt16(Request.Form["userId"]);            
             int courseId = Convert.ToInt16(Request.Form["courseId"]);
 
+
+
             if (approval == "Approve Request")
-            {                
+            {   
+                //this check will only return a courseUser for previously unenrolled students 
                 CourseUser courseUser = db.CourseUsers.Where(cu => cu.UserProfileID == userId)
                                                       .Where(cu=>cu.AbstractCourseID == courseId).FirstOrDefault();
                 //make the course visible to the student
@@ -481,6 +499,7 @@ namespace OSBLE.Controllers
             }
             else if (approval == "Deny Request")
             {
+                //this check will only return a courseUser for previously unenrolled students 
                 CourseUser courseUser = db.CourseUsers.Where(cu => cu.UserProfileID == userId)
                                                       .Where(cu => cu.AbstractCourseID == courseId).FirstOrDefault();
                 //remove the user from the course                
