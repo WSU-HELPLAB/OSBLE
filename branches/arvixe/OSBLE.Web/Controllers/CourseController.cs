@@ -400,6 +400,20 @@ namespace OSBLE.Controllers
             //if the user is not enrolled in any courses 
             if(ActiveCourseUser == null)
             {
+                //we need to create a course user in order to send a proper notification to the instructor(s)
+                CourseUser newUser = new CourseUser();
+                UserProfile profile = this.CurrentUser;
+                newUser.UserProfile = profile;                
+                newUser.UserProfileID = profile.ID;
+                newUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+                newUser.AbstractCourseID = request.ID;
+                newUser.Hidden = true;
+
+                db.CourseUsers.Add(newUser);
+                db.SaveChanges();
+
+                ActiveCourseUser = newUser;
+
                 using (NotificationController nc = new NotificationController())
                 {
                     nc.SendCourseApprovalNotification(request, ActiveCourseUser);

@@ -211,8 +211,6 @@ namespace OSBLE.Controllers
                                              i.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor
                                            select i).ToList();
 
-
-
             foreach (CourseUser instructor in instructors)
             {
                 Notification n = new Notification();
