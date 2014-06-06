@@ -82,21 +82,27 @@
             @foreach (RosterController.UsersByRole userByRole in usersBySection.UsersByRole)
             {
                 //yc: going to need to add a check for users with editing privlidges on this portion too
+                //the only person who should see this is a 
                 if (userByRole.RoleName == "Withdrawn" && ViewBag.WhiteTableUsers.Count != 0)
                 { 
                 <td>
                     <!--Prints the users in the whitetable for the current class-->
-                <h3>White Listed(@ViewBag.WhiteTableUsers.Count) @Helpers.CreateToolTip(ToolTips.RosterWhitetableRoleRole)</h3>
+                <h3>Whitelisted(@ViewBag.WhiteTableUsers.Count) @Helpers.CreateToolTip(ToolTips.RosterWhitetableRoleRole)</h3>
                       
                 <ul class="user_list">
                     @foreach (var WTuser in ViewBag.WhiteTableUsers)
                     {
                         if (WTuser.Email != String.Empty)
                         {
-                            <li>
+                            <li id="wtuser_item_@WTuser.ID">
                                 <div class="user_controls">
                                     <a title="Mail This User" href="@Url.Action("CreateWhiteTableUserProfileId", "Mail", new { id = WTuser.ID })">@Helpers.MailButton()</a>
+                                    @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                                    {
+                                        <a title="Modify This User" href="@Url.Action("EditWTUser", "Roster", new { wtuID = WTuser.ID })">@Helpers.EditButton()</a>
+                                    }
                                 </div>
+                                
                                 @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", new { userProfile = WTuser.ID }))
                                 <span>@WTuser.Name1 @WTuser.Name2</span>
                             </li>

@@ -873,6 +873,7 @@
     <Content Include="Views\Course\NeedsApproval.cshtml" />
     <Content Include="Views\Course\AllReadyInCourse.cshtml" />
     <Content Include="Views\Course\Approval.cshtml" />
+    <Content Include="Views\Roster\EditWTUser.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
