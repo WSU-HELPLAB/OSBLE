@@ -338,10 +338,19 @@ namespace OSBLE.Controllers
 
             // this comes back as null, for some reason. //dmo:6/5/2014 does it really? it seems to work??
             AbstractCourse course = db.AbstractCourses.Where(b => b.ID == n.Sender.AbstractCourseID).FirstOrDefault();
-
+            string[] temp;
             //checking to see if there is no data besides abstractCourseID
-            string[] temp = n.Data.Split(';');
+            if(n.Data != null)
+            {
+                temp = n.Data.Split(';');
+            }
+            else
+            {
+                temp = new string[0];
+            }
+            
             int id;
+            
             if (temp.Length == 1) //data not being used by other mail method, send from selected course
             {
                 id = Convert.ToInt16(temp[0]);
