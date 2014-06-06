@@ -148,6 +148,7 @@ namespace OSBLE.Controllers
                     foreach (CourseRole.CourseRoles r in rolesOrder)
                     {
                         roles.Add(db.CourseRoles.Find((int)r));
+                        
                     }
                 }
                 else

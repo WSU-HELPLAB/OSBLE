@@ -138,6 +138,9 @@ namespace OSBLE.Models.Courses
                 case (int)CourseRole.CourseRoles.TA:
                     roleAbbreviation = "TA";
                     break;
+                case (int)CourseRole.CourseRoles.Pending:
+                    roleAbbreviation = "P";
+                    break;
             }
             return string.Format("({0}) {1}", roleAbbreviation, UserProfile.DisplayName(AbstractRoleId, FirstThenLast, false));
         }

@@ -405,7 +405,7 @@ namespace OSBLE.Controllers
                 UserProfile profile = db.UserProfiles.Where(up => up.ID == this.CurrentUser.ID).FirstOrDefault();
                 newUser.UserProfile = profile;                
                 newUser.UserProfileID = profile.ID;
-                newUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+                newUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending; //FIX THIS NOW FORREST
                 newUser.AbstractCourseID = request.ID;
                 newUser.Hidden = true;
 
@@ -436,7 +436,7 @@ namespace OSBLE.Controllers
                     UserProfile profile = db.UserProfiles.Where(up => up.ID == this.CurrentUser.ID).FirstOrDefault();
                     tempUser.UserProfile = profile;
                     tempUser.UserProfileID = profile.ID;
-                    tempUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+                    tempUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending; //FIX THIS NOW FORREST
                     tempUser.AbstractCourseID = request.ID;
                     tempUser.Hidden = true;
 
@@ -492,6 +492,7 @@ namespace OSBLE.Controllers
                                                       .Where(cu=>cu.AbstractCourseID == courseId).FirstOrDefault();
                 //make the course visible to the student
                 courseUser.Hidden = false;
+                courseUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
                 db.Entry(courseUser).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index", "Roster", new { notice = courseUser.UserProfile.FirstName + " " + courseUser.UserProfile.LastName + " has been enrolled into the course." });

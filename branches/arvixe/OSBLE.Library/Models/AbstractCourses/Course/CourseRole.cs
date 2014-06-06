@@ -67,7 +67,9 @@ namespace OSBLE.Models.Courses
             Student,
             Moderator,
             Observer,
-            Withdrawn
+            Withdrawn,
+            Pending
+            //FIX THIS NOW FORREST
         }
     }
 }
