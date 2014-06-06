@@ -12,7 +12,7 @@
 @using (Html.BeginForm("SearchResults", "Course", FormMethod.Post, new { @class = "form-class" }))
 {
     <fieldset>
-        <legend>Search Menu</legend>
+        <legend><b>Search Menu</b></legend>
         @Html.Label("Course Prefix")
         @Html.DropDownList("Course", ViewBag.CourseName as SelectList, "Select a Course Prefix", new { id = "Course" })
         
@@ -23,26 +23,44 @@
        
         <p> <input type="submit" value="Search"/> </p>
 
+
         @if (ViewBag.SearchResults != null)
         {
             var results = ViewBag.SearchResults;
             <fieldset>
                 <legend>Search Results</legend>
-                <table>
-                    <tr>
                         @foreach (var result in results)
                         {
-                            <td>
-                                <ol>
-                                    <div class="search_results">
-                                        <a title="Request to join Course" href="@Url.Action("ReqestCourseJoin", "Course", new { id = result.ID })"> @Helpers.AddButton() </a>
-                                    </div>
-                                    <p>@result.Prefix  @result.Number <br /> @result.Name <br /> @result.Semester @result.Year</p>
-                                </ol>
-                            </td>
+                            <fieldset>
+                                <legend><a title="Request to join Course" href="@Url.Action("ReqestCourseJoin", "Course", new { id = result.ID })">@Helpers.AddButton()</a><b>@result.Name</b></legend>
+                                <table>
+                                    <tr>
+                                        <th align="left">Course Prefix:</th>
+                                        <td>@result.Prefix</td>
+                                    </tr>
+                                    <tr>
+                                        <th align="left">Prefix Number:</th>
+                                        <td>@result.Number</td>
+                                    </tr>
+                                    <tr>
+                                        <th align="left">Semester:</th>
+                                        <td>@result.Semester</td>
+                                    </tr>
+                                    <tr>
+                                        <th align="left">Year:</th>
+                                        <td>@result.Year</td>
+                                    </tr>
+                                    <tr>
+                                        <th align="left">Start Date:</th>
+                                        <td>@result.StartDate</td>
+                                    </tr>
+                                    <tr>
+                                        <th align="left">End Date:</th>
+                                        <td>@result.EndDate</td>
+                                    </tr>
+                                </table>
+                            </fieldset>
                         }
-                    </tr>
-                </table>
             </fieldset>
         }
 
