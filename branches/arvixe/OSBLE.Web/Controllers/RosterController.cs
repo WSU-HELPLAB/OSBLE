@@ -552,6 +552,32 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index");
         }
 
+        //yc: get the white table user, wrote getWhiteTableUser to narrow results in function, so do need to organize here
+        //get
+        [CanModifyCourse]
+        public ActionResult EditWTUser(int wtuID)
+        {
+            WhiteTableUser wtUser = getWhiteTableUser(wtuID);
+            //wtu has been loaded up
+            //setup views
+            
+            return View(wtUser);
+        }
+
+        [HttpPost]
+        [CanModifyCourse]
+        public ActionResult EditWTUser(WhiteTableUser wtUser)
+        {
+            //wtu has been loaded up
+            if (ModelState.IsValid)
+            {
+                db.Entry(wtUser).State = EntityState.Modified;
+                db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+
+            return RedirectToAction("Index");
+        }
         //Students
         //
 
@@ -625,6 +651,12 @@ namespace OSBLE.Controllers
             base.Dispose(disposing);
         }
 
+        private WhiteTableUser getWhiteTableUser(int wtuID)
+        {
+            return (from w in db.WhiteTableUsers
+                    where w.ID == wtuID && w.CourseID == ActiveCourseUser.AbstractCourseID
+                    select w).FirstOrDefault();
+        }
         private CourseUser getCourseUser(int userProfileId)
         {
             return (from c in db.CourseUsers
