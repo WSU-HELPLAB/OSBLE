@@ -459,6 +459,46 @@ namespace OSBLE.Controllers
             return View("Approval");
         }
 
+        [HttpPost]
+        public ActionResult HandleCourseApproval()
+        {
+            //approval will be either "Deny Request" or "Deny Request"Approve Request"
+            string approval = Request.Form["submitButton"];
+            //get the supplied user and course IDs
+            int userId = Convert.ToInt16(Request.Form["userId"]);            
+            int courseId = Convert.ToInt16(Request.Form["courseId"]);
+
+            if (approval == "Approve Request")
+            {                
+                CourseUser courseUser = db.CourseUsers.Where(cu => cu.UserProfileID == userId)
+                                                      .Where(cu=>cu.AbstractCourseID == courseId).FirstOrDefault();
+                //make the course visible to the student
+                courseUser.Hidden = false;
+                db.Entry(courseUser).State = EntityState.Modified;
+                db.SaveChanges();
+
+                return View("RequestApproved");
+            }
+            else if (approval == "Deny Request")
+            {
+                CourseUser courseUser = db.CourseUsers.Where(cu => cu.UserProfileID == userId)
+                                                      .Where(cu => cu.AbstractCourseID == courseId).FirstOrDefault();
+                //remove the user from the course                
+                db.CourseUsers.Remove(courseUser);
+                db.SaveChanges();
+
+                return View("RequestDenied");
+            }
+            else
+            {
+                //something went wrong... there should only be two submit buttons to take us here!
+                //TODO: handle this case
+                return View("Index");
+            }
+            
+            
+        }
+
         public ActionResult CommunitySearch()
         {
             //Get list of communities from db
