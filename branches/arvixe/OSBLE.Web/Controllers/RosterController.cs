@@ -290,6 +290,7 @@ namespace OSBLE.Controllers
         {
             byte[] rosterContent = (byte[])Cache["RosterFile"];
             int rosterCount = 0;
+            int wtCount = 0;
 
             if ((rosterContent != null) && (idColumn != null) && (nameColumn != null))
             {
@@ -301,9 +302,6 @@ namespace OSBLE.Controllers
 
                 if (rosterEntries.Count > 0)
                 {
-                    rosterCount = rosterEntries.Count;
-
-                    
                    
                     // First check to make sure there are no duplicates in the ID table.
                     List<string> usedIdentifications = new List<string>();
@@ -364,7 +362,7 @@ namespace OSBLE.Controllers
 
                             newRoster.Add(existingUser);
                             createCourseUser(existingUser);
-
+                            rosterCount++;
                             //email the user notifying them that they have been added to this course 
                             emailCourseUser(existingUser);
         
@@ -445,6 +443,7 @@ namespace OSBLE.Controllers
                             }
 
                             createWhiteTableUser(whitetable);
+                            wtCount++;
                             //will send email to white table user notifying them that they need to create an account to be added to the course 
                             //yc another check for emails
                             if (entry.Email != "")
@@ -475,7 +474,7 @@ namespace OSBLE.Controllers
                 return View("RosterError");
             }
 
-            return RedirectToAction("Index", new { notice = "Roster imported with " + rosterCount.ToString() + " students." });
+            return RedirectToAction("Index", new { notice = "Roster imported with " + rosterCount.ToString() + " students and " + wtCount.ToString() +" whitelisted students" });
         }
 
         //
