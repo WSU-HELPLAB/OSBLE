@@ -202,7 +202,7 @@ namespace OSBLE.Controllers
         }
 
         [NonAction]
-        public void SendCourseApprovalNotification(Course c)
+        public void SendCourseApprovalNotification(Course c, CourseUser sender)
         {
             // Get all instructors in the course.
             List<CourseUser> instructors = (from i in db.CourseUsers
@@ -211,13 +211,15 @@ namespace OSBLE.Controllers
                                              i.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor
                                            select i).ToList();
 
+
+
             foreach (CourseUser instructor in instructors)
             {
                 Notification n = new Notification();
                 n.ItemType = Notification.Types.JoinCourseApproval;
                 n.ItemID = c.ID;
                 n.RecipientID = instructor.ID;
-                n.SenderID = ActiveCourseUser.ID; //This only wokrs if the sender is enrolled in at least one course else its null and will break 
+                n.SenderID = sender.ID;
                 
 
                 addNotification(n);

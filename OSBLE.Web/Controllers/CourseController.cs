@@ -340,7 +340,7 @@ namespace OSBLE.Controllers
             //throw it in the view bag
             ViewBag.CourseName = new SelectList(finalList, "Value", "Text");
             ViewBag.SearchResults = TempData["SearchResults"];
-
+           
 
             return View();
         }
@@ -397,21 +397,52 @@ namespace OSBLE.Controllers
                            where c.ID == intID
                            select c).FirstOrDefault();
 
-            if(ActiveCourseUser != null)
+            //if the user is not enrolled in any courses 
+            if(ActiveCourseUser == null)
             {
-                if(ActiveCourseUser.AbstractCourseID == request.ID)
+                using (NotificationController nc = new NotificationController())
                 {
-                    return View("AllReadyInCourse");
+                    nc.SendCourseApprovalNotification(request, ActiveCourseUser);
                 }
+
+                return View("NeedsApproval");
+            }
+                //user is already enrolled in the course...dummy
+            else if (ActiveCourseUser.AbstractCourseID == request.ID)
+            {
+                return View("AllReadyInCourse");
+            }
+            else
+            {
                 //send notification to instructors
                 using (NotificationController nc = new NotificationController())
                 {
-                    nc.SendCourseApprovalNotification(request);
+                    nc.SendCourseApprovalNotification(request, ActiveCourseUser);
                 }
+                return View("NeedsApproval");
             }
+        }
+
+        public ActionResult Approval(int ID)
+        {
+            var notification = (from d in db.Notifications
+                                where d.ItemID == ID
+                                select d).FirstOrDefault();
+            
+            var Instructor = (from d in db.CourseUsers
+                              where d.ID == notification.RecipientID
+                              select d).FirstOrDefault();
+
+            var Student = (from d in db.CourseUsers
+                           where d.ID == notification.SenderID
+                           select d).FirstOrDefault();
+
+            ViewBag.Instructor = Instructor;
+            ViewBag.Student = Student;
+            ViewBag.notification = notification;
 
 
-            return View("NeedsApproval");
+            return View("Approval");
         }
 
         public ActionResult CommunitySearch()
