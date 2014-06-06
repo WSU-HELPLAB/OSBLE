@@ -684,8 +684,8 @@
     <Content Include="Scripts\jquery-2.0.1.min.map" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery-tooltip.js" />
-    <Content Include="Scripts\jquery-ui-1.10.3.js" />
-    <Content Include="Scripts\jquery-ui-1.10.3.min.js" />
+    <Content Include="Scripts\jquery-ui-1.10.4.js" />
+    <Content Include="Scripts\jquery-ui-1.10.4.min.js" />
     <Content Include="Scripts\jquery.collapse.js" />
     <Content Include="Scripts\jquery.contextMenu.js" />
     <Content Include="Scripts\jquery.cookie.js" />
@@ -870,6 +870,9 @@
     <Content Include="Views\Committee\Create.cshtml" />
     <Content Include="Views\Course\CommunitySearch.cshtml" />
     <Content Include="Views\Course\CourseSearch.cshtml" />
+    <Content Include="Views\Course\NeedsApproval.cshtml" />
+    <Content Include="Views\Course\AllReadyInCourse.cshtml" />
+    <Content Include="Views\Course\Approval.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
