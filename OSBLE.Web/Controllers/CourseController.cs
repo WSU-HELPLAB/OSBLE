@@ -494,8 +494,8 @@ namespace OSBLE.Controllers
                 courseUser.Hidden = false;
                 db.Entry(courseUser).State = EntityState.Modified;
                 db.SaveChanges();
-
-                return View("RequestApproved");
+                return RedirectToAction("Index", "Roster", new { notice = courseUser.UserProfile.FirstName + " " + courseUser.UserProfile.LastName + " has been enrolled into the course." });
+                //return View("RequestApproved");
             }
             else if (approval == "Deny Request")
             {
@@ -505,8 +505,8 @@ namespace OSBLE.Controllers
                 //remove the user from the course                
                 db.CourseUsers.Remove(courseUser);
                 db.SaveChanges();
-
-                return View("RequestDenied");
+                return RedirectToAction("Index", "Roster", new { notice = courseUser.UserProfile.FirstName + " " + courseUser.UserProfile.LastName + " has been denied enrollment into this course." });
+                //return View("RequestDenied");
             }
             else
             {
