@@ -402,7 +402,7 @@ namespace OSBLE.Controllers
             {
                 //we need to create a course user in order to send a proper notification to the instructor(s)
                 CourseUser newUser = new CourseUser();
-                UserProfile profile = this.CurrentUser;
+                UserProfile profile = db.UserProfiles.Where(up => up.ID == this.CurrentUser.ID).FirstOrDefault();
                 newUser.UserProfile = profile;                
                 newUser.UserProfileID = profile.ID;
                 newUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
