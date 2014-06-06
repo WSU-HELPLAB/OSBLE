@@ -17,13 +17,11 @@
 {
     @Html.ValidationSummary(true)
 
-    @Html.HiddenFor(model => model.Email)
     @Html.HiddenFor(model => model.Name1)
     @Html.HiddenFor(model => model.Name2)
     @Html.HiddenFor(model => model.CourseID)
     @Html.HiddenFor(model => model.SchoolID)
-    @Html.HiddenFor(model => model.Identification)
-    @Html.HiddenFor(model => model.ID)
+    @Html.HiddenFor(model => Model.ID)
     
 
     <div class="editor-label">

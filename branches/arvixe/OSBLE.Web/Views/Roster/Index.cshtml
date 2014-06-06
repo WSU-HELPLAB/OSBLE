@@ -82,12 +82,12 @@
             @foreach (RosterController.UsersByRole userByRole in usersBySection.UsersByRole)
             {
                 //yc: going to need to add a check for users with editing privlidges on this portion too
-                //the only person who should see this is a 
+                //the only person who should see the white list is instructors and ta's. TA's cannot modify
                 if (userByRole.RoleName == "Withdrawn" && ViewBag.WhiteTableUsers.Count != 0)
                 { 
                 <td>
                     <!--Prints the users in the whitetable for the current class-->
-                <h3>Whitelisted(@ViewBag.WhiteTableUsers.Count) @Helpers.CreateToolTip(ToolTips.RosterWhitetableRoleRole)</h3>
+                <h3>Whitelisted(<span id="roleheader_@(usersBySection.SectionNumber)_whitetable">@ViewBag.WhiteTableUsers.Count.ToString()</span>) @Helpers.CreateToolTip(ToolTips.RosterWhitetableRoleRole)</h3>
                       
                 <ul class="user_list">
                     @foreach (var WTuser in ViewBag.WhiteTableUsers)
@@ -100,6 +100,8 @@
                                     @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                                     {
                                         <a title="Modify This User" href="@Url.Action("EditWTUser", "Roster", new { wtuID = WTuser.ID })">@Helpers.EditButton()</a>
+
+
                                     }
                                 </div>
                                 

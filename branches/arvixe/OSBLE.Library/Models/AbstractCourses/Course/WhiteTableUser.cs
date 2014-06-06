@@ -8,7 +8,7 @@ using OSBLE.Models.Users;
 
 namespace OSBLE.Models.AbstractCourses.Course
 {
-    public class WhiteTableUser
+    public class WhiteTableUser : IModelBuilderExtender
     {
         [Key]
         [Required]

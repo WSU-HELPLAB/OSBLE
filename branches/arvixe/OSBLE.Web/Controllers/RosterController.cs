@@ -626,7 +626,24 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index");
         }
 
+
+        //yc: post: /roster/delete/
         //
+        [HttpPost]
+        [CanModifyCourse]
+        public ActionResult DeleteWTUser(int wtuID)
+        {
+            WhiteTableUser wtUser = getWhiteTableUser(wtuID);
+            if (wtUser != null)
+            {
+                db.WhiteTableUsers.Remove(wtUser);
+                db.SaveChanges();
+            }
+            else
+                Response.StatusCode = 403;
+
+            return View("_AjaxEmpty");
+        }
         // POST: /Roster/Delete/5
 
         [HttpPost]
