@@ -193,7 +193,7 @@ else if (ViewBag.CurrentUser != null)    //yc adding a withdraw button this user
     </script>
     if(ViewBag.CurrentUser != null && !(ViewBag.CurrentUser.CanCreateCourses)) //fw: crease a button so users may search communities and courses
     {
-        <a href="#" onclick="search_and_open_course_search_dialog()" title="Search for Course" id="course_create_button" class="course_modify_buttons">@Helpers.AddButton()</a>
+        <a href="#" onclick="search_and_open_course_search_dialog()" title="Search for Course" id="course_create_button" class="course_modify_buttons">@Helpers.SearchButton()</a>
 
         <script type="text/javascript">
 
