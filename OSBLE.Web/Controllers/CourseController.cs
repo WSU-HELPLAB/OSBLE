@@ -495,6 +495,9 @@ namespace OSBLE.Controllers
                 courseUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
                 db.Entry(courseUser).State = EntityState.Modified;
                 db.SaveChanges();
+
+                //yc: fixing redirect and setting up sending email
+
                 return RedirectToAction("Index", "Roster", new { notice = courseUser.UserProfile.FirstName + " " + courseUser.UserProfile.LastName + " has been enrolled into the course." });
                 //return View("RequestApproved");
             }
@@ -506,6 +509,8 @@ namespace OSBLE.Controllers
                 //remove the user from the course                
                 db.CourseUsers.Remove(courseUser);
                 db.SaveChanges();
+
+
                 return RedirectToAction("Index", "Roster", new { notice = courseUser.UserProfile.FirstName + " " + courseUser.UserProfile.LastName + " has been denied enrollment into this course." });
                 //return View("RequestDenied");
             }
