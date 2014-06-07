@@ -21,7 +21,7 @@
         <select id="Number" name="Number"> </select>
 
        
-        <p> <input type="submit" value="Search"/> </p>
+        <p> <input type="submit" id="submitSearch" value="Search"/> </p>
 
 
         @if (ViewBag.SearchResults != null)
@@ -70,8 +70,10 @@
 <script type="text/jscript">
     $(function () {
         $('#Number').prop('disabled', true);
+        $('#submitSearch').prop('disabled', true);
         $('#Course').change(function () {
             $('#Number').prop('disabled', false);
+            $('#submitSearch').prop('disabled', false);
             $.getJSON('/Course/CourseNumber/' + $('#Course').val(), function (data) {
                 var items = '<option>Search All</option>';
                 $.each(data, function (i, Number) {
