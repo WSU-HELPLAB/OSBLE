@@ -429,7 +429,7 @@ namespace OSBLE.Controllers
                     action = "view team evaluation discrepancy.";
 
                     break;
-                case Notifcation.Types.JoinCourseApproval:
+                case Notification.Types.JoinCourseApproval:
                     subject += sender.FirstName + " " + sender.LastName + "has submitted a request to join" + course.Name;
 
                     body = sender.FirstName + " " + sender.LastName + " has submitted a request to join" + course.Name; 
