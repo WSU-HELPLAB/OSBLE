@@ -13,11 +13,11 @@
 {
     <fieldset>
         <legend><b>Search Menu</b></legend>
-        @Html.Label("Course Prefix")
+        @Html.Label("Search for courses to join:")
         @Html.DropDownList("Course", ViewBag.CourseName as SelectList, "Select a Course Prefix", new { id = "Course" })
         
 
-        @Html.Label("Course Prefix Number")
+        @Html.Label("Course Number")
         <select id="Number" name="Number"> </select>
 
        
@@ -29,38 +29,51 @@
             var results = ViewBag.SearchResults;
             <fieldset>
                 <legend>Search Results</legend>
-                        @foreach (var result in results)
-                        {
-                            <fieldset>
-                                <legend><a title="Request to join Course" href="@Url.Action("ReqestCourseJoin", "Course", new { id = result.ID })">@Helpers.AddButton()</a><b>@result.Name</b></legend>
-                                <table>
-                                    <tr>
-                                        <th align="left">Course Prefix:</th>
-                                        <td>@result.Prefix</td>
-                                    </tr>
-                                    <tr>
-                                        <th align="left">Prefix Number:</th>
-                                        <td>@result.Number</td>
-                                    </tr>
-                                    <tr>
-                                        <th align="left">Semester:</th>
-                                        <td>@result.Semester</td>
-                                    </tr>
-                                    <tr>
-                                        <th align="left">Year:</th>
-                                        <td>@result.Year</td>
-                                    </tr>
-                                    <tr>
-                                        <th align="left">Start Date:</th>
-                                        <td>@result.StartDate</td>
-                                    </tr>
-                                    <tr>
-                                        <th align="left">End Date:</th>
-                                        <td>@result.EndDate</td>
-                                    </tr>
-                                </table>
-                            </fieldset>
-                        }
+                <table id="searchTable">
+
+                    <tr>
+                        <th >Join</th>
+                        <th >Course Name</th>                        
+                        <th >Course Number</th>                      
+                        <th >Semester</th>                                                
+                        <th>Instructors</th>
+                    </tr>
+                    @foreach (var result in results)
+                    {
+                        <tr>
+                            <td>
+                                <a style="margin-right:5px; margin-left:5px;" title="Request to join Course" href="@Url.Action("ReqestCourseJoin", "Course", new { id = result.ID })">@Helpers.AddButton()</a>
+                            </td>
+                            <td>@result.Name</td>
+                            <td>@result.Prefix @result.Number</td>
+                            <td>@result.Semester @result.Year</td>
+                            <td>
+                                @if (ViewBag.SearchResultsInstructors != null)
+                                {
+                                    <table id="searchInstructorTable">
+                                        @{
+                                            var instructors = ViewBag.SearchResultsInstructors;                                
+                                            }
+                                        <tr>
+                                            @foreach (var instructor in instructors)
+                                            {
+                                                if (instructor.AbstractCourseID == result.ID)
+                                                {
+                                                    <td>
+                                                        @instructor.UserProfile.LastName, @instructor.UserProfile.FirstName;
+                                                    </td>
+                                                }
+                                            }
+                                        </tr>
+
+                                    </table>
+                                }
+                            </td>
+                            
+                        </tr>
+                    }
+                </table>
+
             </fieldset>
         }
 
