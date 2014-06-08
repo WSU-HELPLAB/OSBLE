@@ -563,24 +563,25 @@ namespace OSBLE.Controllers
                 utcOffset = 0;
             }
 
+            //yc: this edit no longer needs to check this anymore. may have to remove all of this if statement
             //If it exists, which it should update all of the meetings to reflect the correct utc adjusted time.
             if (utcOffset != 0)
             {
                 ICollection<CourseMeeting> Meetings = course.CourseMeetings;
-                foreach (CourseMeeting meeting in Meetings)
-                {
-                    DateTime beforeUtcStartTime = meeting.StartTime;
+                //foreach (CourseMeeting meeting in Meetings)
+                //{
+                //    DateTime beforeUtcStartTime = meeting.StartTime;
 
-                    meeting.StartTime = meeting.StartTime.AddMinutes(-utcOffset);
-                    meeting.EndTime = meeting.EndTime.AddMinutes(-utcOffset);
+                //    meeting.StartTime = meeting.StartTime.AddMinutes(-utcOffset);
+                //    meeting.EndTime = meeting.EndTime.AddMinutes(-utcOffset);
 
-                    //Check to see if the utc offset will change the day if so adjust the Meeting's date
-                    if (beforeUtcStartTime.DayOfYear != meeting.StartTime.DayOfYear)
-                    {
-                        int difference = (beforeUtcStartTime.DayOfYear - meeting.StartTime.DayOfYear);
-                        correctDay(meeting, difference);
-                    }
-                }
+                //    //Check to see if the utc offset will change the day if so adjust the Meeting's date
+                //    if (beforeUtcStartTime.DayOfYear != meeting.StartTime.DayOfYear)
+                //    {
+                //        int difference = (beforeUtcStartTime.DayOfYear - meeting.StartTime.DayOfYear);
+                //        correctDay(meeting, difference);
+                //    }
+                //}
             }
             else //Rare case where a cookie doesn't exist set the time to null essentially
             {
