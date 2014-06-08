@@ -93,10 +93,10 @@
             <td>
                 <time 
                 class="utc-time"
-                datetime="@Helpers.DateAsUnixTime(assignments[i].DueDate)" 
-                data-original-date="@Helpers.RawDate(assignments[i].DueDate)" 
+                datetime="@Helpers.DateAsUnixTime(assignments[i].DueDate.ToUniversalTime())" 
+                data-original-date="@Helpers.RawDate(assignments[i].DueDate.ToUniversalTime())" 
                 data-date-format="MM/DD/YYYY hh:mm A">
-                    @assignments[i].DueDate.ToShortDateString() @assignments[i].DueDate.ToShortTimeString() (UTC)
+                    @assignments[i].DueDate.ToShortDateString() @assignments[i].DueDate.ToUniversalTime().ToShortTimeString() (UTC)
                 </time>
             </td>
 
