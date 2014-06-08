@@ -14,6 +14,9 @@ using OSBLE.Models.ViewModels;
 
 namespace OSBLE.Controllers
 {
+#if !DEBUG
+    [RequireHttps]
+#endif
     [OsbleAuthorize]
     [RequireActiveCourse]
     [NotForCommunity]

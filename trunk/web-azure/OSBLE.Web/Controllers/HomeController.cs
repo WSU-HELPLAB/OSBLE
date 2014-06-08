@@ -15,6 +15,9 @@ using OSBLE.Utility;
 
 namespace OSBLE.Controllers
 {
+#if !DEBUG
+    [RequireHttps]
+#endif
     [OsbleAuthorize]
     public class HomeController : OSBLEController
     {

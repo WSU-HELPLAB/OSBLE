@@ -18,6 +18,9 @@ using System.Net.Mail;
 
 namespace OSBLE.Controllers
 {
+#if !DEBUG
+    [RequireHttps]
+#endif
     [OsbleAuthorize]
     [RequireActiveCourse]
     public class RosterController : OSBLEController

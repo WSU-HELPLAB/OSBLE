@@ -25,6 +25,9 @@ using System.Net;
 
 namespace OSBLE.Controllers
 {
+#if !DEBUG
+    [RequireHttps]
+#endif
     public class AccountController : OSBLEController
     {
         public ActionResult ErrorPage()

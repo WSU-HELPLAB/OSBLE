@@ -10,6 +10,9 @@ using OSBLE.Utility;
 
 namespace OSBLE.Controllers
 {
+#if !DEBUG
+    [RequireHttps]
+#endif
     [OsbleAuthorize]
     [IsAdmin]
     public class AdminController : OSBLEController
