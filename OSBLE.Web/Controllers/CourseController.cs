@@ -93,6 +93,7 @@ namespace OSBLE.Controllers
                         {
                             //do nothing time is correct ON LOCAL VERSIO
                             //LIVE VERSION REQUIRES THE BELOW
+                            classTimeZone = new TimeSpan(utcOffset, 0, 0);
                             cm.StartTime = cm.StartTime.Add(classTimeZone);
                             cm.EndTime = cm.EndTime.Add(classTimeZone);
                         }
@@ -571,20 +572,20 @@ namespace OSBLE.Controllers
             if (utcOffset != 0)
             {
                 ICollection<CourseMeeting> Meetings = course.CourseMeetings;
-                //foreach (CourseMeeting meeting in Meetings)
-                //{
-                //    DateTime beforeUtcStartTime = meeting.StartTime;
+                foreach (CourseMeeting meeting in Meetings)
+                {
+                    DateTime beforeUtcStartTime = meeting.StartTime;
 
-                //    meeting.StartTime = meeting.StartTime.AddMinutes(-utcOffset);
-                //    meeting.EndTime = meeting.EndTime.AddMinutes(-utcOffset);
+                    meeting.StartTime = meeting.StartTime.Subtract(new TimeSpan(course.TimeZoneOffset, 0 ,0));
+                    meeting.EndTime = meeting.EndTime.Subtract(new TimeSpan(course.TimeZoneOffset, 0 ,0));
 
-                //    //Check to see if the utc offset will change the day if so adjust the Meeting's date
-                //    if (beforeUtcStartTime.DayOfYear != meeting.StartTime.DayOfYear)
-                //    {
-                //        int difference = (beforeUtcStartTime.DayOfYear - meeting.StartTime.DayOfYear);
-                //        correctDay(meeting, difference);
-                //    }
-                //}
+                    //Check to see if the utc offset will change the day if so adjust the Meeting's date
+                    //if (beforeUtcStartTime.DayOfYear != meeting.StartTime.DayOfYear)
+                    //{
+                    //    int difference = (beforeUtcStartTime.DayOfYear - meeting.StartTime.DayOfYear);
+                    //    correctDay(meeting, difference);
+                    //}
+                }
             }
             else //Rare case where a cookie doesn't exist set the time to null essentially
             {
