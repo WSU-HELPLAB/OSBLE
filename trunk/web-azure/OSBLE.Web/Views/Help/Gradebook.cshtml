@@ -1,0 +1,64 @@
+﻿@{
+    ViewBag.Title = "Gradebook";
+}
+<h1>Gradebook</h1>
+<p>
+    OSBIDE supports the uploading of CSV-based files as course gradebooks.  
+    This page discusses both how to upload a gradebook to OSBLE and the expected format of the CSV files.
+</p>
+<h2 id="uploading">Uploading a Gradebook to OSBLE</h2>
+<p>
+    Gradebook files can either be submitted as a single CSV file or in bulk as a ZIP file.  
+    To begin, open your gradebook as normal.  In this example, we are using Microsoft Excel.
+</p>
+<img src="@Url.Content("~/Content/images/help/gradebook_1.png")" alt="an excel gradebook" />
+<p>
+    Our example gradebook contains two worksheets: Main and Participation. 
+     Each worksheet will need to be converted to CSV file.  To convert to CSV, make sure that the appropriate
+     worksheet is selected and select save as &quot;Other Formats.&quot;
+</p>
+<img src="@Url.Content("~/Content/images/help/gradebook_3.png")" alt="save as -> other formas" />
+<p>
+    Select &quot;CSV (Comma delimited) (*.csv)&quot; from the &quot;Save as type&quot; dropdown list.  
+    Give the CSV file the same name as the corresponding worksheet.  
+</p>
+<img src="@Url.Content("~/Content/images/help/gradebook_4.png")" alt="save as CSV" />
+<p>
+    After exporting all worksheets to CSV, you will need to compile them into a ZIP file.  
+    On Windows systems, this can be accomplished by highlighting all worksheets, right clicking, 
+    selecting Send to -> Compressed (zipped) folder.  This will create a new ZIP file in the same 
+    folder as your CSV files.  Note that creating a ZIP file is only required if your gradebook has 
+    multiple worksheets.  
+</p>
+<img src="@Url.Content("~/Content/images/help/gradebook_5.png")" alt="creating zip files" />
+<p>
+    Having created the ZIP file, it is now time to upload the file to OSBLE.  
+    To begin, click the &quot;Grades&quot; tab near the top of the page.
+</p>
+<img src="@Url.Content("~/Content/images/help/gradebook_6.png")" alt="click the grades tab" />
+<p>
+    On the far right of the page, you will see a button titled &quot;Choose File.&quot;  
+    Clicking this button will bring up an &quot;Open File&quot; dialog.  Select the ZIP file created 
+    in the previous step or a single CSV file, click the okay button, and then click the 
+    &quot;Upload&quot; button.  After a moment, the page will refresh with your gradebook data.  
+    Note that each workbook receives its own tab.
+</p>
+<img src="@Url.Content("~/Content/images/help/gradebook_7.png")" alt="a sample gradebook" />
+<h2 id="format">Expected Gradebook File Format
+</h2>
+<p>
+    OSBLE expects the first column of any CSV file to contain student ID numbers and the second column 
+    to contain student names.  By default, students will only see the row on which their student ID occurs.  
+    This behavior can be altered by using two special character modifiers.  
+</p>
+<p>
+    Including a pound (#) sign on the first cell of a row will allow students to see that row even 
+    when the row does not contain their ID number.  Using the pound sign is often useful for 
+    displaying summary data or the names of assignments as a sort of header row.  
+</p>
+<p>
+    Including an exclamation point (!) in any cell will mark the column in which the exclamation exists 
+    not visible to students regardless of whether or not their ID number occurs on the row.  
+    This is often useful for hiding information such as aggregate data (e.g. grade distributions, etc.) 
+    that you do not want to expose to students.
+</p>

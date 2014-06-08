@@ -1,0 +1,102 @@
+﻿@using OSBLE.Models.Assignments
+@using OSBLE.Areas.AssignmentDetails.ViewModels
+@using OSBLE.Models.Courses;
+@using OSBLE.Resources
+@model AssignmentDetailsViewModel
+@{
+    ViewBag.Title = "Assignment Details";
+    DynamicDictionary headerData = Model.HeaderBuilder.BuildHeader(Model.CurrentAssignment);
+    
+}
+@section AssignmentDetails
+{
+    <tr>
+        <th>
+            Due:
+        </th>
+        <td>
+            <time 
+                class="utc-time"
+                datetime="@Helpers.DateAsUnixTime(Model.CurrentAssignment.DueDate)" 
+                data-original-date="@Helpers.RawDate(Model.CurrentAssignment.DueDate)" 
+                data-date-format="MM/DD/YYYY hh:mm A">
+                @Model.CurrentAssignment.DueDate.ToShortDateString() @Model.CurrentAssignment.DueDate.ToShortTimeString() (UTC)
+            </time>
+        </td>
+    </tr>
+    @foreach (string view in Model.HeaderViews)
+    {
+        string viewLocation = string.Format("HeaderBuilder/{0}", view);
+        @Html.Partial(viewLocation, headerData);
+    }
+}
+@section TableData
+{
+    @if (Model.Client.AbstractRole.CanGrade)
+    {
+
+        //If preceding assignment team was a discussion, we want to use discussion teams for the team evaluation
+        List<IAssignmentTeam> teams = null;
+        if(Model.CurrentAssignment.PreceedingAssignment.Type == AssignmentTypes.DiscussionAssignment)
+        {
+             teams =    (from t in Model.CurrentAssignment.PreceedingAssignment.DiscussionTeams
+                        orderby t.TeamName ascending
+                        select (IAssignmentTeam)t).ToList();
+        }
+        else
+        {
+            teams = (from t in Model.CurrentAssignment.PreceedingAssignment.AssignmentTeams
+                    orderby t.Team.Name ascending
+                    select (IAssignmentTeam)t).ToList();
+        }
+        
+        
+        //Going over each Team. Creating a header row for the team. And under the header row, creating a 
+        //a row for each user.
+        foreach (IAssignmentTeam assignmentTeam in teams)
+        {
+            if (assignmentTeam.Team.TeamMembers.Count() > 1)
+            {
+                <tr>
+                    <th class="TeamHeader" colspan="6">
+                        @{string actionLink = Url.Action("CreateTeam", "Mail", new { area = "", teamID = assignmentTeam.Team.ID });
+                        }
+                        <a href="@actionLink" title="Email this team" >@Helpers.MailButton()</a>
+                        @assignmentTeam.Team.Name - 
+                        @Html.ActionLink("View Evaluations", "TeacherTeamEvaluation", "Assignment", new { precedingTeamId = assignmentTeam.TeamID, TeamEvaluationAssignmentId = Model.CurrentAssignment.ID, area = "" }, new { })
+                    </th>
+                </tr>
+            }
+
+            //Creating a fake assignment team for each team member. This fake assignment team only has the user we're interested in in the TeamMembers list
+            //but has the correct TeamID for the TeamID slot.
+            foreach (TeamMember member in assignmentTeam.Team.TeamMembers.OrderBy(t => t.CourseUser.DisplayName(Model.Client.AbstractRoleID, false)).ToList())
+            {
+                if(member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student)
+                {
+                AssignmentTeam singleUserAssignmentTeam = new AssignmentTeam();
+                singleUserAssignmentTeam.Team = new Team();
+                singleUserAssignmentTeam.Team.TeamMembers.Add(member);
+                singleUserAssignmentTeam.Team.Name = member.CourseUser.DisplayName(Model.Client.AbstractRole);
+                singleUserAssignmentTeam.TeamID = member.TeamID;
+                singleUserAssignmentTeam.Assignment = assignmentTeam.Assignment;
+                singleUserAssignmentTeam.AssignmentID = assignmentTeam.AssignmentID;             
+                    <tr>
+                        <td>
+                            @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", id = member.CourseUser.ID });}
+                            <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
+                            @member.CourseUser.DisplayName(Model.Client.AbstractRoleID, false)
+                        </td>
+                        @foreach (string view in Model.TableColumnHeaders.Keys)
+                        {
+                            DynamicDictionary tableData = Model.TeamTableBuilders[assignmentTeam].BuildTableForTeam(singleUserAssignmentTeam);
+                            string viewLocation = string.Format("TableBuilder/{0}", view);
+                            @Html.Partial(viewLocation, tableData);
+                        }
+                    </tr>
+                }
+            }
+            
+        }
+    }
+}

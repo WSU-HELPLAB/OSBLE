@@ -1,0 +1,235 @@
+﻿@model OSBLE.Models.Users.Mail
+@using OSBLE.Models
+@using OSBLE.Models.Users
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>@ViewBag.MailHeader</h2>
+
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+
+@using (Html.BeginForm("Create", "Mail", FormMethod.Post))
+{
+    @Html.ValidationSummary(true)
+
+    @Html.HiddenFor(model => model.ContextID)
+
+    
+    <ul id="MailList">
+        <li><a>To:</a></li>
+        <li>
+            <input id="people_finder" /></li>
+        <li>
+            <div>
+                <input type="checkbox" id="InstructorCB" value="Instructors" />
+                Add Instructors
+                <br />
+                <input type="checkbox" id="TACB" value="TAs" />
+                Add TAs
+            </div>
+        </li>
+    </ul>
+    
+    <br />
+    <div id="recipients_data">
+        <div id="NoRecipient" class="recipient" style="display:none">
+            <a> << No Recipients >> </a>
+        </div>
+    </div>
+    
+    
+    <div class="editor-field" style="clear: both;">
+        @Html.LabelFor(model => model.Subject): @Html.EditorFor(model => model.Subject)<br />
+        @Html.ValidationMessageFor(model => model.Subject)
+    </div>
+
+    <div class="editor-label">
+        @Html.LabelFor(model => model.Message)
+    </div>
+    <div class="editor-field">
+        @Html.TextAreaFor(model => model.Message, new { @id = "send_mail_textarea" })<br />
+        @Html.ValidationMessageFor(model => model.Message)
+    </div>
+
+    <p>
+        <input id="send_btn" type="submit" value="Send Message" disabled="disabled"/>
+    </p>
+
+    <input type="hidden" id="TaNameList"value="@ViewBag.TaNameList" />        
+    <input type="hidden" id="TaIdList" value="@ViewBag.TaIdlist" />
+    <input type="hidden" id="InstructorNameList"value="@ViewBag.InstructorNameList" />
+    <input type="hidden" id="InstructorIdList"value="@ViewBag.InstructorIdList" />
+    <input type="hidden" id="RecipientNameList"value="@ViewBag.RecipientNameList" />
+    <input type="hidden" id="RecipientIdList"value="@ViewBag.RecipientIdList" />
+    <input type="hidden" id="FinalList" name="recipientlist" />
+   }
+
+<div>
+    @Html.ActionLink("Back to Inbox", "Index")
+</div>
+
+     
+    <script type="text/javascript">
+        var recipientList = new Array(); //array that will hold only the Ids of those to be mailed
+
+        $(document).ready(function(){
+            var ids = $("#RecipientIdList").val();
+            var idArray = ids.split(',');
+            var names = $("#RecipientNameList").val();
+            var nameArray = names.split(',');
+            if(ids.length > 0) //must check ids length because idArray will always have a length of 1, even if ids = "" (as idArray[0] = "")
+            {
+                for(var n = 0; n<idArray.length;n++)
+                {
+                    addRecipient(idArray[n], nameArray[n]);
+                }
+            }
+            HandleNoRecipientElement();
+        });
+
+        //add recipient to mailing list and display them
+        function addRecipient(upId, name)
+        {  
+            if(upId != "" && name != "")
+            {
+                if(getIndexInRecipientList(upId) == -1) //if the element is not in list...
+                {
+                    //adding them to mail list
+                    recipientList.push(upId);
+
+                    //removing NoRecipient element
+                    HandleNoRecipientElement();
+
+                    //adding an element for that user
+                    $('#recipients_data').append('<div id="' + upId + '" class="recipient" />');
+                    var newRecipient = $('#' + upId);
+
+                    // delete button  
+                    newRecipient.append('<div class="recipient_tools"><a href="#" title="Delete this recipient" onclick="removeRecipient(' + upId + ')" class="deleteIconDiv"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');                                                                                                                                                                                                  
+                    
+                    // main layout
+                    newRecipient.append('<a><img src="@Url.Action("ProfilePicture")/' + upId + '" class="small_profile_picture" alt="Profile Picture" />' + name + "</a>");
+                }
+            }
+        }
+
+        //remove a recipient from the mailing list and its html elements from the page
+        function removeRecipient(upId)
+        {
+            var indexToRemove = getIndexInRecipientList(upId);
+
+            if(indexToRemove >= 0)
+            {
+                //remove the element at indexToRemove
+                recipientList.splice(indexToRemove, 1);
+                $('#'+upId.toString()).remove();
+
+            }
+            HandleNoRecipientElement();
+        }
+
+        //returns the Index of the Id sent in, or -1 if it is not in the list.
+        function getIndexInRecipientList(upId)
+        {
+            var indexOfUpId = -1;
+            for(var n = 0; n<recipientList.length; n++)
+            {
+                if(recipientList[n] == upId)
+                {
+                    indexOfUpId = n;
+                    break;
+                }
+            }
+            return indexOfUpId;
+        }
+
+        //Adds a <<No recipients>> element
+        function HandleNoRecipientElement()
+        {
+            $("#FinalList").val(recipientList); //keep final list up to date
+            if(recipientList.length == 0)
+            {
+                $("#NoRecipient").show();
+                $("#send_btn").attr("disabled", "disabled");
+            }
+            else
+            {
+                $("#NoRecipient").hide();
+                $("#send_btn").removeAttr("disabled");  
+            }
+        }
+
+
+        $("#people_finder").autocomplete({
+            source: "@(Url.Action("Search"))",
+            select: function(event, ui) {
+                $(this).val("");
+                if(getIndexInRecipientList(ui.item.value) == -1) //if element is not in list...
+                {
+                    addRecipient(ui.item.value, ui.item.label);
+                }
+                return false;
+            },
+            focus: function(event, ui) {return false;}
+        }).data("autocomplete")._renderItem = function( ul, item ) {
+            return $( "<li></li>" )
+            .data( "item.autocomplete", item )
+            .append( "<a>" + '<img src="@Url.Action("ProfilePicture")/' + item.value + '" class="small_profile_picture" alt="Profile Picture" /> ' + item.label + '</a>')
+            .appendTo( ul );
+        }
+
+         $('#InstructorCB').click(function(){
+            var id_list = $('#InstructorIdList').val();
+            var idArray = id_list.split(',');
+
+            if ($(this).is (':checked')) //add instructors
+            {
+                var name_list = $('#InstructorNameList').val();
+                var nameArray = name_list.split(',');
+                for(var j = 0; j<idArray.length;j++)
+                {
+                    if(getIndexInRecipientList(idArray[j]) == -1) //if element is not in list..
+                    {
+                        addRecipient(idArray[j], nameArray[j]);
+                    }
+                }
+            }
+            else //remove instructors
+            {
+                for(j = 0; j<idArray.length;j++)
+                {
+                    removeRecipient(idArray[j]);
+                }
+            }
+        });
+
+        $('#TACB').click(function(){
+            var id_list = $('#TaIdList').val();
+            var idArray = id_list.split(',');
+
+            if ($(this).is (':checked')) //add TAs
+            {
+                var name_list = $('#TaNameList').val();
+                var nameArray = name_list.split(',');
+                for(j = 0; j<idArray.length;j++)
+                {
+                    if(getIndexInRecipientList(idArray[j]) == -1) //if element is not in list...
+                    {
+                        addRecipient(idArray[j], nameArray[j]);
+                    }
+                }
+            }
+            else //remove TAs
+            {
+                for(j = 0; j<idArray.length;j++)
+                {
+                    removeRecipient(idArray[j]);
+                }
+            }
+        });
+
+    </script>
+

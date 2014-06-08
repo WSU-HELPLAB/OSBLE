@@ -1,0 +1,33 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Courses
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;               
+}
+<tr>
+    <!--Team members row-->
+    <th>
+        Your Team
+    </th>
+    <td>
+    <strong>@dataModel.Team.Name</strong>
+    <a title="Mail this Team" href="@Url.Action("CreateTeam", "Mail", new { teamID = dataModel.Team.ID, area = "" })">@Helpers.MailButton()</a>
+    
+    <div class="UserList">
+        @foreach (TeamMember member in dataModel.Team.TeamMembers)
+        {
+          <li>    
+            <div class="UserControls">
+                @if (member.CourseUser.UserProfile.UserName != null)
+                {
+                    <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { id = member.CourseUserID, area = "" })">@Helpers.MailButton()</a>
+                }
+            </div>
+            @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", "Roster", new { userProfile = member.CourseUser.UserProfile.ID, area = "" }))
+            <span class="roster_name">@Helpers.DisplayFullNameOrPending(member.CourseUser.UserProfile)</span>
+                </li>  
+        }
+    </div>
+    </td>
+</tr>

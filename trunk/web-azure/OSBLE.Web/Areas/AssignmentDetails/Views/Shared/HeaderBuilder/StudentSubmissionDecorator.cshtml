@@ -1,0 +1,62 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+
+    AjaxOptions options = new AjaxOptions()
+    {
+        LoadingElementId = "Loading",
+        HttpMethod = "Get",
+        UpdateTargetId = "submitFiles",
+        OnComplete = "SubmissionLoaded"
+    };               
+}
+
+
+<tr>
+    <th>
+        Submission:
+    </th>
+    <td>
+        @if (dataModel.Submission.hasSubmitted == false)
+        {
+            @Ajax.ActionLink("Submit", "Create", "Submission", new { id = dataModel.Submission.assignmentID, area = "" }, options, new object())
+        }
+        else
+        {
+            String submissionTime = dataModel.Submission.SubmissionTime;
+            <ul id="SubmissionItems">
+            <li>
+                @(Html.ActionLink(submissionTime, "getCurrentUsersZip", "FileHandler", new { assignmentID = dataModel.Submission.assignmentID, area = "" }, new { onclick = "create_and_open_downloading_submission_dialog()" }))  
+            </li>
+            <li>
+                @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = dataModel.Submission.assignmentID, area = "" }, options, new object())  
+            </li>
+
+            @if (dataModel.Submission.SubmissionReceived)
+            {
+                <li id="SubmissionReceivedText">Submission received</li>   
+            }
+            </ul>
+        }
+</tr>
+
+<!--Elements for submission modal box and loading message-->
+<text id="Loading" style="display:none"> <br />Please Wait...</text>
+<div id="submit_files_dialog" style="display:none">
+    <div id= "submitFiles"></div>
+    <script type="text/javascript">
+        $(function () {
+            $('#submit_files_dialog').dialog(
+            {
+                modal: true,
+                autoOpen: false,
+                height: 600,
+                width: 500
+            });
+        });
+    </script>
+    </div>
+</div>
+

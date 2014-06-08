@@ -1,0 +1,17 @@
+﻿@model OSBLE.Models.ViewModels.RubricViewModel
+@using OSBLE.Models.Courses.Rubrics;
+@using OSBLE.Models.Assignments;
+
+@{
+    ViewBag.Title = "Rubric Evaluation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Rubric Evaluation of @ViewBag.AssignmentName </h2>
+
+@if (ViewBag.DisplayGrade)
+{
+    <h3>Grade: @ViewBag.Grade</h3>
+}
+          
+@Html.Partial("_Display", Model)

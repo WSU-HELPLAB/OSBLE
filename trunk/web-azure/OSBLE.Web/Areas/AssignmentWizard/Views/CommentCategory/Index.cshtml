@@ -1,0 +1,77 @@
+﻿@using OSBLE.Models.Assignments;
+@using OSBLE.Models;
+@model OSBLE.Models.Assignments.Assignment
+@{
+    List<Assignment> previousAssignments = ViewBag.PreviousAssignments;
+    string previousButtonText = ViewBag.PreviousAssignmentButton;
+    string previousSelectName = ViewBag.PreviousSelectName;
+}
+@section Header
+{
+    <script src="@Url.Content("~/areas/AssignmentWizard/Content/js/commentCategories.js")" type="text/javascript"></script>
+}
+@Html.HiddenFor(m => m.ID)
+<div id="manual_config_options" class="indented_options">
+<ul style="list-style:none;">
+    <li style="margin-bottom:8px;">Load an existing configuration from: 
+        <select name="@previousSelectName">
+        @foreach (Assignment pastAssignment in previousAssignments)
+        {
+            <option value="@pastAssignment.ID">@pastAssignment.AssignmentName</option>
+        }
+        </select>
+        <input type="submit" value="Load" name="@previousButtonText" />
+    </li>
+    <li>
+    Create a new set of comment categories called
+        <input type="text" id="category_config_name" name="category_config_name" value="@Model.CommentCategory.Name" />
+        <br />
+    </li>
+</ul>
+        <br style="clear: both;" />
+    <div id="category_data">
+    </div>
+    <div id="add_new_category_div">
+        <br style="clear: left;" />
+        <p>
+            <a href="#" id="add_new_category" title="Add new category" style="text-decoration: none;">
+                <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add new category" />
+                Add a category </a>
+        </p>
+    </div>
+    <br style="clear: both;" />
+</div>
+<script type="text/javascript">
+    $(document).ready(documentReady);
+
+    //Called when the document has finished loading and is safe to make DOM calls
+    function documentReady() {
+        
+        //setup prior comment categories
+        @{
+            if (Model.CommentCategory.Categories.Count > 0)
+            {
+                int counter = 0;
+                foreach (CommentCategory cat in Model.CommentCategory.Categories)
+                {
+                    string js = string.Format("\n\taddNamedCategory(\"{0}\", \"{1}\");\n", cat.Name, cat.Options[0].Name);
+                    @Html.Raw(js)
+                    int insideCounter = -1;
+                    foreach (CommentCategoryOption option in cat.Options)
+                    {
+                        //skip the first item as we added it with the previous JS call
+                        insideCounter++;
+                        if (insideCounter == 0)
+                        {
+                            continue;
+                        }
+                        js = string.Format("\taddNamedCategoryOption(\"{0}\", \"{1}\");\n", counter, option.Name);
+                        @Html.Raw(js)
+                    }
+                    counter++;
+                }
+            }
+        }
+
+    }
+</script>

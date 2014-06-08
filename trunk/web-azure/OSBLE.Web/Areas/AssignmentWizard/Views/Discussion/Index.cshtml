@@ -1,0 +1,71 @@
+﻿@using OSBLE.Models.Assignments;
+@using OSBLE.Models;
+@model DiscussionSetting
+@section Header
+{
+    <script src="@Url.Content("~/areas/AssignmentWizard/Content/js/discussion.js")" type="text/javascript"></script>
+}
+@Html.ValidationSummary() 
+@Html.HiddenFor(m => m.AssignmentID)
+
+<input id="utc-offset" name="utc-offset"  value="" type="hidden"/>
+<table class="wizard_entry_table">
+    <tr>
+        <th>@Html.LabelFor(m => m.MinimumFirstPostLength)</th>
+        <td>@Html.EditorFor(m => m.MinimumFirstPostLength)</td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.MaximumFirstPostLength)</th>
+        <td>@Html.EditorFor(m => m.MaximumFirstPostLength)</td>
+    </tr>
+    
+    <tr>
+        <th>@Html.LabelFor(m => m.RequiresPostBeforeView)</th>
+        <td>@Html.CheckBoxFor(m => m.RequiresPostBeforeView)</td>
+        <td></td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.TAsCanPostToAllDiscussions)</th>
+        <td>@Html.CheckBoxFor(m => m.TAsCanPostToAllDiscussions)</td>
+        <td></td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.InitialPostDueDate):</th>
+        <td>@Html.EditorFor(m => m.InitialPostDueDate) at @Html.EditorFor(m => m.InitialPostDueDueTime)</td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.WillEmailInstructorsOnModeratorPost):</th>
+        <td>@Html.CheckBoxFor(m => m.WillEmailInstructorsOnModeratorPost)</td>
+    </tr>
+    <tr><td style="height:15px"></td></tr>
+    <tr>
+        <th>Anonymization Settings:</th>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.HasAnonymousInstructorsToStudents)</th>
+        <td>@Html.CheckBoxFor(m => m.HasAnonymousInstructorsToStudents)</td>
+        <td></td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.HasAnonymousModeratorsToStudents)</th>
+        <td>@Html.CheckBoxFor(m => m.HasAnonymousModeratorsToStudents)</td>
+        <td></td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.HasAnonymousStudentsToStudents)</th>
+        <td>@Html.CheckBoxFor(m => m.HasAnonymousStudentsToStudents)</td>
+        <td></td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.HasAnonymousStudentsToModerators)</th>
+        <td>@Html.CheckBoxFor(m => m.HasAnonymousStudentsToModerators)</td>
+        <td></td>
+    </tr>
+
+    <tr>
+        <th>@Html.LabelFor(m => m.HasHiddenRoles)</th>
+        <td>@Html.CheckBoxFor(m => m.HasHiddenRoles)</td>
+        <td></td>
+    </tr>
+
+</table>

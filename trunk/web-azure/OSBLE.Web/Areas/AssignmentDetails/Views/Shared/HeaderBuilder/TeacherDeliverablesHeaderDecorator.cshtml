@@ -1,0 +1,25 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;               
+}
+<tr>
+    <th>Deliverables:</th>
+    <td>
+    <ol style="margin:0;">
+    @foreach (object deliverableObj in dataModel.Deliverables.AllDeliverables)
+    {
+        Deliverable deliverable = deliverableObj as Deliverable;
+        string[] extensions = deliverable.FileExtensions;
+        string extensionsStr = string.Join(",", extensions);
+        <li>@deliverable.Name (@extensionsStr)</li>
+    }
+    </ol>
+    </td>
+</tr>
+<tr>
+    <th>Submissions:</th>
+    <td>@dataModel.Deliverables.SubmissionCount of @dataModel.Deliverables.NumberOfTeams have been submitted
+    @Html.ActionLink("[Download All]", "GetAllSubmissionsForAssignment", "FileHandler", new { assignmentID = dataModel.Assignment.ID, area = "" }, new { onclick = "create_and_open_downloading_submission_dialog()", style = "text-decoration:none" }) </td>
+</tr>
