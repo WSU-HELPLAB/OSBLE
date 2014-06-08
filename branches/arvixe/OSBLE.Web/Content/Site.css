@@ -2023,3 +2023,23 @@ tbody #awesome
 {
     background-color: White;
 }
+
+a:link.searchResultsText{  
+   
+   vertical-align:middle;
+   background: #383838;
+}
+
+#searchTable td, th{    
+    text-align: left;
+    padding: 6px;
+    border-bottom:dashed 1px #074974;
+}
+
+#searchInstructorTable td, th {
+    border-bottom:none;
+}
+
+#searchTable th{        
+    border-bottom:solid 1px #074974;
+}

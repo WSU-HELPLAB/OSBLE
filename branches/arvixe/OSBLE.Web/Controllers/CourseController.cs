@@ -323,6 +323,9 @@ namespace OSBLE.Controllers
         [HttpGet]
         public ActionResult CourseSearch()
         {
+            //get all instructors
+            List<CourseUser> Instructors = db.CourseUsers.Where(cu => cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor).ToList();
+            
             //get all the courses
             var CourseList = from d in db.Courses
                              where d.EndDate > DateTime.Now
@@ -331,7 +334,7 @@ namespace OSBLE.Controllers
             //add them to a list as a selectlistitem
             List<SelectListItem> course = new List<SelectListItem>();
             foreach(var c in CourseList)
-            {
+            {                
                 course.Add(new SelectListItem { Text = c.Prefix, Value = c.Prefix });
             }
             //remove any duplicate course names
@@ -340,8 +343,8 @@ namespace OSBLE.Controllers
             //throw it in the view bag
             ViewBag.CourseName = new SelectList(finalList, "Value", "Text");
             ViewBag.SearchResults = TempData["SearchResults"];
-           
-
+            ViewBag.SearchResultsInstructors = Instructors;
+            
             return View();
         }
 
