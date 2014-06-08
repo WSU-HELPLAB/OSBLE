@@ -341,8 +341,9 @@ namespace OSBLE.Controllers
             //add them to a list as a selectlistitem
             List<SelectListItem> course = new List<SelectListItem>();
             foreach(var c in CourseList)
-            {                
-                course.Add(new SelectListItem { Text = c.Prefix, Value = c.Prefix });
+            {   
+                if(c.EndDate > DateTime.Now)
+                    course.Add(new SelectListItem { Text = c.Prefix, Value = c.Prefix });
             }
             //remove any duplicate course names
             var finalList = course.GroupBy(x => x.Text).Select(x => x.OrderByDescending(y => y.Text).First()).ToList();
