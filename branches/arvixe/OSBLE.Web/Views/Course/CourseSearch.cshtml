@@ -40,6 +40,8 @@
                     </tr>
                     @foreach (var result in results)
                     {
+                        if(result.EndDate > DateTime.Now)
+                        {
                         <tr>
                             <td>
                                 <a style="margin-right:5px; margin-left:5px;" title="Request to join Course" href="@Url.Action("ReqestCourseJoin", "Course", new { id = result.ID })">@Helpers.AddButton()</a>
@@ -71,6 +73,7 @@
                             </td>
                             
                         </tr>
+                        }
                     }
                 </table>
 
