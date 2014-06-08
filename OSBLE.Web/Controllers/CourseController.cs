@@ -581,8 +581,8 @@ namespace OSBLE.Controllers
                 {
                     DateTime beforeUtcStartTime = meeting.StartTime;
 
-                    meeting.StartTime = meeting.StartTime.Subtract(new TimeSpan(course.TimeZoneOffset, 0 ,0));
-                    meeting.EndTime = meeting.EndTime.Subtract(new TimeSpan(course.TimeZoneOffset, 0 ,0));
+                    meeting.StartTime = meeting.StartTime.Add(new TimeSpan(course.TimeZoneOffset, 0 ,0));
+                    meeting.EndTime = meeting.EndTime.Add(new TimeSpan(course.TimeZoneOffset, 0 ,0));
 
                     //Check to see if the utc offset will change the day if so adjust the Meeting's date
                     //if (beforeUtcStartTime.DayOfYear != meeting.StartTime.DayOfYear)
