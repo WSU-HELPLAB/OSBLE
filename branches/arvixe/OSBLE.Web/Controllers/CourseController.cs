@@ -76,11 +76,12 @@ namespace OSBLE.Controllers
                     //case 4: user is creating a course in the same timezone and IT IS currently daylight savings time
                     TimeZone curTimezone = TimeZone.CurrentTimeZone;
                     TimeSpan currentOffset = curTimezone.GetUtcOffset(DateTime.Now);
-                    TimeSpan classTimeZone;
+                    cm.TimeZoneOffset = currentOffset.Hours;
+
                     if (DateTime.Now.IsDaylightSavingTime()) //case 1 3
                     {
+                                            /*
                         classTimeZone = new TimeSpan(utcOffset + 1, 0, 0);
-
                         if (classTimeZone != currentOffset) //case 1
                         {
                             //calculate the offset 
@@ -96,10 +97,11 @@ namespace OSBLE.Controllers
                             classTimeZone = new TimeSpan(utcOffset, 0, 0);
                             cm.StartTime = cm.StartTime.Add(classTimeZone);
                             cm.EndTime = cm.EndTime.Add(classTimeZone);
-                        }
+                        }*/
                     }
                     else//case 2 and 4
                     {
+                        /*
                         classTimeZone = new TimeSpan(utcOffset, 0, 0);
                         if (classTimeZone != currentOffset) //case 2
                         {
@@ -113,7 +115,8 @@ namespace OSBLE.Controllers
                             //LIVE VERSION REQUIRES THE BELOW
                             cm.StartTime = cm.StartTime.Add(classTimeZone);
                             cm.EndTime = cm.EndTime.Add(classTimeZone);
-                        }
+                        }*/
+
                     }
                     //yc i commented out the below since this is no longer needed, and how and dates are really pulled fromt he course rather than
                     //meeting times.
