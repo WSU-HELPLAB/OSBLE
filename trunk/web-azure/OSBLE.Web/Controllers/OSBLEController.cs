@@ -21,6 +21,7 @@ namespace OSBLE.Controllers
     [SessionState(SessionStateBehavior.Default)]
     public abstract class OSBLEController : Controller
     {
+        
         protected OSBLEContext db = new OSBLEContext();
 
         public FileCache Cache { get; private set; }

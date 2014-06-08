@@ -12,7 +12,6 @@ using OSBLE.Attributes;
 
 namespace OSBLE.Controllers
 {
-    [ForceHttp]
     public class PdfCriticalReviewController : OSBLEController
     {
         //
@@ -30,7 +29,7 @@ namespace OSBLE.Controllers
         /// <param name="authorTeamID"></param>
         /// <returns></returns>
         [CanGradeCourse]
-        public ActionResult Grade(int assignmentID, int authorTeamID, bool forceUpdate = false)
+        public ActionResult Grade(int assignmentID, int authorTeamID)
         {
             WebClient client = new WebClient();
             Assignment assignment = db.Assignments.Find(assignmentID);
@@ -50,7 +49,7 @@ namespace OSBLE.Controllers
             {
                 AnnotateApi api = new AnnotateApi(ConfigurationManager.AppSettings["AnnotateUserName"], ConfigurationManager.AppSettings["AnnotateApiKey"]);
 
-                AnnotateResult uploadResult = api.UploadDocument((int)assignment.ID, authorTeamID, forceUpdate);
+                AnnotateResult uploadResult = api.UploadDocument((int)assignment.ID, authorTeamID);
                 if (uploadResult.Result == ResultCode.OK)
                 {
                     AnnotateResult createResult = api.CreateAccount(CurrentUser);

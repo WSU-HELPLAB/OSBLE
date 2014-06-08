@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using Microsoft.Office.Tools.Ribbon;
 using Microsoft.Office.Interop.Excel;
-using System.Windows.Forms;
 
 namespace OSBLEExcelPlugin
 {
@@ -100,7 +99,7 @@ namespace OSBLEExcelPlugin
 
             RibbonDropDownItem rddi = ddCourses.SelectedItem;
             OSBLEServices.Course c = rddi.Tag as OSBLEServices.Course;
-            OSBLEWorkbookSaver.SaveResult sr = OSBLEWorkbookSaver.UploadToOsble(
+            OSBLEWorkbookSaver.SaveResult sr = OSBLEWorkbookSaver.Save(
                 m_state.UserName, m_state.Password, c.ID,
                 Globals.ThisAddIn.Application.ActiveWorkbook);
 
@@ -144,31 +143,5 @@ namespace OSBLEExcelPlugin
             grpSelectedCourse.Visible = true;
             */
         }
-
-        /// <summary>
-        /// Opens a save as dialog that can be used to store the ZIP CSV file locally
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btnSaveAsZip_Click(object sender, RibbonControlEventArgs e)
-        {
-            SaveFileDialog saveAs = new SaveFileDialog();
-            saveAs.Filter = "CSV ZIP (*.zip)|*.zip";
-            saveAs.RestoreDirectory = true;
-            if (saveAs.ShowDialog() == DialogResult.OK)
-            {
-                using (Stream fs = saveAs.OpenFile())
-                {
-                    if (fs != null)
-                    {
-                        int sheetCount = 0;
-                        byte[] data = OSBLEWorkbookSaver.PackageAsZip(Globals.ThisAddIn.Application.ActiveWorkbook, out sheetCount);
-                        fs.Write(data, 0, data.Length);
-                        fs.Close();
-                    }
-                }
-            }
-        }
-
     }
 }

@@ -16,10 +16,10 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort>3615</IISExpressSSLPort>
-    <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
-    <IISExpressWindowsAuthentication>disabled</IISExpressWindowsAuthentication>
-    <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
@@ -251,7 +251,6 @@
     <Compile Include="Attributes\CanSubmitAssignments.cs" />
     <Compile Include="Attributes\EmailAttribute.cs" />
     <Compile Include="Attributes\FileCacheAttribute.cs" />
-    <Compile Include="Attributes\ForceHttp.cs" />
     <Compile Include="Attributes\IsAdmin.cs" />
     <Compile Include="Attributes\IsCommunity.cs" />
     <Compile Include="Attributes\IsNotAnonymized.cs" />
@@ -625,6 +624,7 @@
     <Content Include="Areas\AssignmentWizard\Views\TeamEvaluation\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Team\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\_ViewStart.cshtml" />
+    <Content Include="Content\images\fileextimages\.DS_Store" />
     <Content Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\CriticalReviewStudentDownloadDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\CriticalReviewSubmissionDecorator.cshtml" />
@@ -684,8 +684,8 @@
     <Content Include="Scripts\jquery-2.0.1.min.map" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery-tooltip.js" />
-    <Content Include="Scripts\jquery-ui-1.10.3.js" />
-    <Content Include="Scripts\jquery-ui-1.10.3.min.js" />
+    <Content Include="Scripts\jquery-ui-1.10.4.js" />
+    <Content Include="Scripts\jquery-ui-1.10.4.min.js" />
     <Content Include="Scripts\jquery.collapse.js" />
     <Content Include="Scripts\jquery.contextMenu.js" />
     <Content Include="Scripts\jquery.cookie.js" />
@@ -868,6 +868,12 @@
     <Content Include="Views\Account\FindUsernameSuccess.cshtml" />
     <Content Include="Views\Account\FindUsernameFailure.cshtml" />
     <Content Include="Views\Committee\Create.cshtml" />
+    <Content Include="Views\Course\CommunitySearch.cshtml" />
+    <Content Include="Views\Course\CourseSearch.cshtml" />
+    <Content Include="Views\Course\NeedsApproval.cshtml" />
+    <Content Include="Views\Course\AllReadyInCourse.cshtml" />
+    <Content Include="Views\Course\Approval.cshtml" />
+    <Content Include="Views\Roster\EditWTUser.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -898,11 +904,12 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>3615</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:3615/</IISUrl>
+          <IISUrl>
+          </IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

@@ -8,6 +8,9 @@ using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Assignments;
+using OSBLE.Models.AbstractCourses.Course;
+
+
 
 namespace OSBLE.Controllers
 {
@@ -276,6 +279,53 @@ namespace OSBLE.Controllers
 
         }
 
+        public void setUpWhiteTableMailViewBags(List<OSBLE.Models.AbstractCourses.Course.WhiteTableUser> InitialRecipients = null )
+        {
+            List<CourseUser> TaAndInstructorList = db.CourseUsers
+                    .Where(cu => (cu.AbstractRoleID == (int)CourseRole.CourseRoles.TA || cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor) && cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID)
+                    .ToList();
+
+            string[] TaNameList = TaAndInstructorList
+                    .Where(cu => cu.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
+                    .Select(cu => cu.UserProfile.FirstName + " " + cu.UserProfile.LastName)
+                    .ToArray();
+
+            int[] TaIdList = TaAndInstructorList
+                    .Where(cu => cu.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
+                    .Select(cu => cu.UserProfileID)
+                    .ToArray();
+
+            string[] InstructorNameList = TaAndInstructorList
+                    .Where(cu => cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor)
+                    .Select(cu => cu.UserProfile.FirstName + " " + cu.UserProfile.LastName)
+                    .ToArray();
+
+            int[] InstructorIdList = TaAndInstructorList
+                    .Where(cu => cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor)
+                    .Select(cu => cu.UserProfileID)
+                    .ToArray();
+
+            if (InitialRecipients != null)
+            {
+                string[] RecipientNameList = InitialRecipients
+                        .Select(up => up.Name2 + " " + up.Name1)
+                        .ToArray();
+
+                int[] RecipientIdList = InitialRecipients
+                        .Select(up => up.ID)
+                        .ToArray();
+
+                ViewBag.RecipientNameList = string.Join(",", RecipientNameList);
+                ViewBag.RecipientIdList = string.Join(",", RecipientIdList);
+            }
+
+            ViewBag.MailHeader = "New Message";
+            ViewBag.TaNameList = string.Join(",", TaNameList);
+            ViewBag.TaIdList = string.Join(",", TaIdList);
+            ViewBag.InstructorNameList = string.Join(",", InstructorNameList);
+            ViewBag.InstructorIdList = string.Join(",", InstructorIdList);
+        }
+
         public ActionResult NoCourses()
         {
             return View();
@@ -299,13 +349,22 @@ namespace OSBLE.Controllers
         {
             if (ModelState.IsValid)
             {
+                
                 string recipient_string = Request.Params["recipientlist"];
                 string[] recipients;
+                string currentCourse = Request.Form["CurrentlySelectedCourse"];    //gets selected FROM courseid
+                string mailReply = Request.Form["mailReply"];
+                if(mailReply == "" || mailReply == null)
+                {
+                    mail.ContextID = Convert.ToInt16(currentCourse); 
+                }
+                else
+                {
+                    //we want the default context if it's a reply
+                    mail.ContextID = ActiveCourseUser.AbstractCourseID;                    
+                }
+                //mail.ContextID = ActiveCourseUser.AbstractCourseID;
 
-                // gets the current courseid
-                mail.ContextID = ActiveCourseUser.AbstractCourseID;
-
-                // gets the current course
                 mail.Context = db.Courses.Where(b => b.ID == mail.ContextID).FirstOrDefault();
 
                 if (recipient_string != null)
@@ -344,7 +403,7 @@ namespace OSBLE.Controllers
                             }
 
                             using (NotificationController nc = new NotificationController())
-                            {
+                            {                                
                                 nc.SendMailNotification(newMail);
                             }
                             ++count;
@@ -366,6 +425,23 @@ namespace OSBLE.Controllers
             }
             setUpMailViewBags(recipientList);
             return View("Create", new Mail());
+        }
+
+        public ActionResult CreateWhiteTableUserProfileId(int id)
+        {
+            var profile = db.WhiteTableUsers.Find(id);
+            List<OSBLE.Models.AbstractCourses.Course.WhiteTableUser> recipientList 
+                = new List<Models.AbstractCourses.Course.WhiteTableUser>();
+
+            if(profile != null)
+            {
+                recipientList.Add(profile);
+            }
+            setUpWhiteTableMailViewBags(recipientList);
+            return View("Create", new Mail());
+
+
+
         }
 
         public ActionResult CreateUser(int id)
@@ -636,6 +712,51 @@ namespace OSBLE.Controllers
                 db.Mails.Remove(mail);
             }
             db.SaveChanges();
+        }
+
+        [HttpGet]
+        public JsonResult GetUserCourseList()
+        {
+            int id = this.CurrentUser.ID;
+
+            List<CourseUser> courseUsers = new List<CourseUser>();
+            courseUsers = db.CourseUsers.Where(u => u.UserProfileID == id).ToList();
+
+            List<string> userCourseList = new List<string>();
+
+            foreach (CourseUser cu in courseUsers)
+            {
+                string tag = GetCourseTags(db.AbstractCourses.Where(a => a.ID == cu.AbstractCourseID).FirstOrDefault());
+                if (tag != "")
+                    userCourseList.Add(cu.AbstractCourseID + "," + tag);
+            }
+            
+            return Json(userCourseList, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Returns tags for either a course or a community, if one exists for the notification. Otherwise, empty string.
+        ///
+        /// </summary>
+        /// <param name="c">The abstract course</param>
+        /// <returns>Tag with leading space (" CptS 314") if course or community exists, "" if not.</returns>
+        private string GetCourseTags(AbstractCourse c)
+        {
+            string tag = "";
+
+            if (c != null)
+            {
+                if (c is Course)
+                {
+                    tag = (c as Course).Prefix + " " + (c as Course).Number;
+                }
+                else if (c is Community)
+                {
+                    tag = (c as Community).Nickname;
+                }
+            }
+
+            return tag;
         }
     }
 }

@@ -17,9 +17,6 @@ namespace OSBLE.Controllers
     [OsbleAuthorize]
     [RequireActiveCourse]
     [NotForCommunity]
-#if !DEBUG
-    //[RequireHttps]
-#endif
     public class AssignmentController : OSBLEController
     {
         public AssignmentController()
@@ -118,7 +115,7 @@ namespace OSBLE.Controllers
                                 string UtcOffsetString = cookieOffset.Value;
                                 utcOffset = Convert.ToInt32(UtcOffsetString);
 
-                                subTime = subTime.Value.AddMinutes(-utcOffset);
+                                //subTime = subTime.Value.AddMinutes(-utcOffset);
                             }
                             else
                             {

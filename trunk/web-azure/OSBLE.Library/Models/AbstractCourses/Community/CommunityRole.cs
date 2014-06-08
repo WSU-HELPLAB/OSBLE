@@ -23,7 +23,8 @@
         {
             //Leader being the first one is used in RosterController so any new roles add at the end.
             //Also note that this 7 is one past the end of CourseRole.
-            Leader = 7,
+            //FIX THIS FORREST
+            Leader = 8,//8
             Participant,
             TrustedCommunityMember
         }

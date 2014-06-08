@@ -256,7 +256,6 @@ ul.user_list
 	float: right;
 	padding-right: 3px;
 }
-
 #users_table td
 {
 	width: 250px;
@@ -336,6 +335,19 @@ ul.user_list
 	width: 6em;
 }
 
+li.wt_no_email
+{
+    background-color: #ffb0b0;
+    list-style: none;
+	width: 230px;
+	min-height: 43px;
+	padding-top: 4px;
+	margin-bottom: 7px;
+	font-size: 10pt;
+	float: right;
+	padding-right: 3px;
+
+}
 /* LogOn/Register Screens */
 
 body#layoutLogOn
@@ -2010,4 +2022,24 @@ tbody #awesome
 .HeaderRow
 {
     background-color: White;
+}
+
+a:link.searchResultsText{  
+   
+   vertical-align:middle;
+   background: #383838;
+}
+
+#searchTable td, th{    
+    text-align: left;
+    padding: 6px;
+    border-bottom:dashed 1px #074974;
+}
+
+#searchInstructorTable td, th {
+    border-bottom:none;
+}
+
+#searchTable th{        
+    border-bottom:solid 1px #074974;
 }

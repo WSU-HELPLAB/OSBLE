@@ -45,12 +45,14 @@ namespace OSBLEExcelPlugin
             }
         }
 
-        public static byte[] PackageAsZip(Workbook wb, out int sheetCount)
+        public static SaveResult Save(string userName, string password, int courseID,
+            Workbook wb)
         {
             // What needs to be done here:
             // 1. "Export" each sheet in the workbook to a CSV
             // 2. Package all CSVs in a zip
-            sheetCount = 0;
+            // 3. Upload this zip to OSBLE through the web service
+
             string tempSaveDir = Environment.GetFolderPath(
                 Environment.SpecialFolder.LocalApplicationData);
             if (!tempSaveDir.EndsWith("\\") &&
@@ -61,33 +63,28 @@ namespace OSBLEExcelPlugin
 
             // For each non-empty worksheet in the workbook we need to make a CSV
             ZipFile zf = new ZipFile();
+            int sheetCount = 0;
             foreach (Worksheet ws in wb.Worksheets)
             {
-                // We only want gradebook worksheets.
-                // Check for a "#" in cell A1 before making a CSV
-                var currentWorkSheet = Convert.ToString(ws.Range["A1"].Value);
-
-                if (currentWorkSheet == null) // Cell is empty
+                // Make an in-memory CSV for the worksheet
+                string csvTemp = WorksheetToCSVString(ws);
+                if (string.IsNullOrEmpty(csvTemp))
                 {
+                    continue;
                 }
-                else if (currentWorkSheet.Contains("#")) //Cell contains #, continue...
-                {
-                    // Make an in-memory CSV for the worksheet
-                    string csvTemp = WorksheetToCSVString(ws);
-                    if (string.IsNullOrEmpty(csvTemp))
-                    {
-                        continue;
-                    }
 
-                    sheetCount++;
-                    zf.AddEntry(ws.Name + ".csv", Encoding.UTF8.GetBytes(csvTemp));
-                }
+                sheetCount++;
+                zf.AddEntry(ws.Name + ".csv", Encoding.UTF8.GetBytes(csvTemp));
             }
 
             // If we didn't get any data then we can't upload to OSBLE
             if (0 == sheetCount)
             {
-                return new byte[0];
+                return new SaveResult(false,
+                    string.Format(
+                        "Save attempt at {0} failed because no data could be obtained " +
+                        "from the workbook.\r\nPlease make sure you have at least 2x2 " + 
+                        "cells worth of grade data in one or more worksheets.", DateTime.Now));
             }
 
             // Save the zip to a memory stream
@@ -98,29 +95,6 @@ namespace OSBLEExcelPlugin
 
             // Get the byte array from the memory stream
             byte[] data = ms.ToArray();
-            return data;
-        }
-
-        public static SaveResult UploadToOsble(string userName, string password, int courseID,
-            Workbook wb)
-        {
-
-            // What needs to be done here:
-            // 1. "Export" each sheet in the workbook to a CSV
-            // 2. Package all CSVs in a zip
-            // 3. Upload this zip to OSBLE through the web service
-            int sheetCount = 0;
-            byte[] data = PackageAsZip(wb, out sheetCount);
-
-            //nothing to save?
-            if (data.Length == 0)
-            {
-                return new SaveResult(false,
-                    string.Format(
-                        "Save attempt at {0} failed because no data could be obtained " +
-                        "from the workbook.\r\nPlease make sure you have at least 2x2 " +
-                        "cells worth of grade data in one or more worksheets.", DateTime.Now));
-            }
 
             AuthenticationServiceClient auth = new AuthenticationServiceClient();
             string authToken;
@@ -190,11 +164,11 @@ namespace OSBLEExcelPlugin
                 {
                     if (y == colCount)
                     {
-                        sb.AppendLine(string.Format("\"{0}\"", used.Cells[x, y].Text));
+                        sb.AppendLine(used.Cells[x, y].Text);
                     }
                     else
                     {
-                        sb.Append(string.Format("\"{0}\"", used.Cells[x, y].Text) + ",");
+                        sb.Append(used.Cells[x, y].Text + ",");
                     }
                 }
             }

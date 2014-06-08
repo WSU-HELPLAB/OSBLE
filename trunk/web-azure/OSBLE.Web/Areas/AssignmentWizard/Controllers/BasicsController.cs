@@ -113,8 +113,9 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 catch (Exception)
                 {
                 }
-                Assignment.ReleaseDate = Assignment.ReleaseDate.AddMinutes(utcOffset);
-                Assignment.DueDate = Assignment.DueDate.AddMinutes(utcOffset);
+                //yc taking out old assignment offset
+                Assignment.ReleaseDate = Assignment.ReleaseDate;//.AddMinutes(utcOffset);
+                Assignment.DueDate = Assignment.DueDate;//.AddMinutes(utcOffset);
 
                 //update our DB
                 if (Assignment.ID == 0)

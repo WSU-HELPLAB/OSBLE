@@ -1,0 +1,15 @@
+﻿@model OSBLE.Models.Courses.Course
+
+@{
+    ViewBag.Title = "NeedsApproval";
+}
+
+<h2>Request To Join Course Needs Approval</h2>
+
+
+<p>
+    Your request to join has been received, but must first receive approval from an instructor before you are added to the course.
+    A notification has been sent to the instructor to approve your request.
+</p>
+
+@Html.ActionLink("Back to Course Search", "CourseSearch")

@@ -12,9 +12,6 @@ namespace OSBLE.Controllers
 {
     [OsbleAuthorize]
     [IsAdmin]
-#if !DEBUG
-    //[RequireHttps]
-#endif
     public class AdminController : OSBLEController
     {
         public AdminController()

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="/Imports">
+      <xsd:import schemaLocation="http://osble.org/Services/OsbleService.svc?xsd=xsd0" />
+      <xsd:import schemaLocation="http://osble.org/Services/OsbleService.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://osble.org/Services/OsbleService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" />
+      <xsd:import schemaLocation="http://osble.org/Services/OsbleService.svc?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments" />
+      <xsd:import schemaLocation="http://osble.org/Services/OsbleService.svc?xsd=xsd4" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Users" />
+      <xsd:import schemaLocation="http://osble.org/Services/OsbleService.svc?xsd=xsd5" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models" />
+      <xsd:import schemaLocation="http://osble.org/Services/OsbleService.svc?xsd=xsd6" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.HomePage" />
+      <xsd:import schemaLocation="http://osble.org/Services/OsbleService.svc?xsd=xsd7" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+      <xsd:import schemaLocation="http://osble.org/Services/OsbleService.svc?xsd=xsd8" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="OsbleService_GetCourses_InputMessage">
+    <wsdl:part name="parameters" element="GetCourses" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_GetCourses_OutputMessage">
+    <wsdl:part name="parameters" element="GetCoursesResponse" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_GetCoursesTaught_InputMessage">
+    <wsdl:part name="parameters" element="GetCoursesTaught" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_GetCoursesTaught_OutputMessage">
+    <wsdl:part name="parameters" element="GetCoursesTaughtResponse" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_UploadCourseGradebook_InputMessage">
+    <wsdl:part name="parameters" element="UploadCourseGradebook" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_UploadCourseGradebook_OutputMessage">
+    <wsdl:part name="parameters" element="UploadCourseGradebookResponse" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_GetCourseAssignments_InputMessage">
+    <wsdl:part name="parameters" element="GetCourseAssignments" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_GetCourseAssignments_OutputMessage">
+    <wsdl:part name="parameters" element="GetCourseAssignmentsResponse" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_GetMergedReviewDocument_InputMessage">
+    <wsdl:part name="parameters" element="GetMergedReviewDocument" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_GetMergedReviewDocument_OutputMessage">
+    <wsdl:part name="parameters" element="GetMergedReviewDocumentResponse" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_GetReviewItems_InputMessage">
+    <wsdl:part name="parameters" element="GetReviewItems" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_GetReviewItems_OutputMessage">
+    <wsdl:part name="parameters" element="GetReviewItemsResponse" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_SubmitReview_InputMessage">
+    <wsdl:part name="parameters" element="SubmitReview" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_SubmitReview_OutputMessage">
+    <wsdl:part name="parameters" element="SubmitReviewResponse" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_GetAssignmentSubmission_InputMessage">
+    <wsdl:part name="parameters" element="GetAssignmentSubmission" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_GetAssignmentSubmission_OutputMessage">
+    <wsdl:part name="parameters" element="GetAssignmentSubmissionResponse" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_GetCourseRole_InputMessage">
+    <wsdl:part name="parameters" element="GetCourseRole" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_GetCourseRole_OutputMessage">
+    <wsdl:part name="parameters" element="GetCourseRoleResponse" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_SubmitAssignment_InputMessage">
+    <wsdl:part name="parameters" element="SubmitAssignment" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_SubmitAssignment_OutputMessage">
+    <wsdl:part name="parameters" element="SubmitAssignmentResponse" />
+  </wsdl:message>
+  <wsdl:portType name="OsbleService">
+    <wsdl:operation name="GetCourses">
+      <wsdl:input wsaw:Action="urn:OsbleService/GetCourses" message="OsbleService_GetCourses_InputMessage" />
+      <wsdl:output wsaw:Action="urn:OsbleService/GetCoursesResponse" message="OsbleService_GetCourses_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCoursesTaught">
+      <wsdl:input wsaw:Action="urn:OsbleService/GetCoursesTaught" message="OsbleService_GetCoursesTaught_InputMessage" />
+      <wsdl:output wsaw:Action="urn:OsbleService/GetCoursesTaughtResponse" message="OsbleService_GetCoursesTaught_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UploadCourseGradebook">
+      <wsdl:input wsaw:Action="urn:OsbleService/UploadCourseGradebook" message="OsbleService_UploadCourseGradebook_InputMessage" />
+      <wsdl:output wsaw:Action="urn:OsbleService/UploadCourseGradebookResponse" message="OsbleService_UploadCourseGradebook_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCourseAssignments">
+      <wsdl:input wsaw:Action="urn:OsbleService/GetCourseAssignments" message="OsbleService_GetCourseAssignments_InputMessage" />
+      <wsdl:output wsaw:Action="urn:OsbleService/GetCourseAssignmentsResponse" message="OsbleService_GetCourseAssignments_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetMergedReviewDocument">
+      <wsdl:input wsaw:Action="urn:OsbleService/GetMergedReviewDocument" message="OsbleService_GetMergedReviewDocument_InputMessage" />
+      <wsdl:output wsaw:Action="urn:OsbleService/GetMergedReviewDocumentResponse" message="OsbleService_GetMergedReviewDocument_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetReviewItems">
+      <wsdl:input wsaw:Action="urn:OsbleService/GetReviewItems" message="OsbleService_GetReviewItems_InputMessage" />
+      <wsdl:output wsaw:Action="urn:OsbleService/GetReviewItemsResponse" message="OsbleService_GetReviewItems_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SubmitReview">
+      <wsdl:input wsaw:Action="urn:OsbleService/SubmitReview" message="OsbleService_SubmitReview_InputMessage" />
+      <wsdl:output wsaw:Action="urn:OsbleService/SubmitReviewResponse" message="OsbleService_SubmitReview_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAssignmentSubmission">
+      <wsdl:input wsaw:Action="urn:OsbleService/GetAssignmentSubmission" message="OsbleService_GetAssignmentSubmission_InputMessage" />
+      <wsdl:output wsaw:Action="urn:OsbleService/GetAssignmentSubmissionResponse" message="OsbleService_GetAssignmentSubmission_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCourseRole">
+      <wsdl:input wsaw:Action="urn:OsbleService/GetCourseRole" message="OsbleService_GetCourseRole_InputMessage" />
+      <wsdl:output wsaw:Action="urn:OsbleService/GetCourseRoleResponse" message="OsbleService_GetCourseRole_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SubmitAssignment">
+      <wsdl:input wsaw:Action="urn:OsbleService/SubmitAssignment" message="OsbleService_SubmitAssignment_InputMessage" />
+      <wsdl:output wsaw:Action="urn:OsbleService/SubmitAssignmentResponse" message="OsbleService_SubmitAssignment_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

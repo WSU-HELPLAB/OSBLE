@@ -1,0 +1,63 @@
+﻿@model OSBLE.Models.Courses.Course
+
+@{
+    ViewBag.Title = "Approval";
+    
+    var currentUser = ViewBag.Currentuser;
+    var student = ViewBag.Student;
+
+
+    string studentName = student.UserProfile.FirstName + " " +student.UserProfile.LastName;
+
+    //TODO: dmo: this is not bringing up the correct correct as of 6/5/2014 10PM.
+    //need to look into getting the correct course from the notification request for this to work.    
+    string courseName = ViewBag.CourseName;
+    string coursePrefix = student.AbstractCourse.Prefix;
+    string courseSemester = student.AbstractCourse.Semester;
+    string courseYear = student.AbstractCourse.Year;
+    string courseID = ViewBag.CourseID.ToString(); ;
+    string userId = student.UserProfile.ID.ToString();
+    var notification = ViewBag.notification;    
+    
+
+}
+
+@using (Html.BeginForm("HandleCourseApproval", "Course", FormMethod.Post))
+{
+    <h2>Approve Student for Course</h2>
+    
+    <table class="course_approval">
+        <tr>
+            <th>Requester</th>
+            <td>@studentName</td>
+        </tr>
+        <tr>
+            <th>Course Prefix</th>
+            <td>@coursePrefix</td>
+        </tr>
+        <tr>
+            <th>Course Name</th>
+            <td>@courseName</td>
+        </tr>
+        <tr>
+            <th>Semester</th>
+            <td>@courseSemester</td>
+        </tr>
+        <tr>
+            <th>Year</th>
+            <td>@courseYear</td>
+        </tr>
+    </table>
+    <br />
+
+    <input type="submit" value="Deny Request" name="submitButton" onclick="return confirm('Are you sure you want to deny this request?')" />
+    <input type="submit" value="Approve Request" name="submitButton" onclick="return confirm('Are you sure you want to approve this request?')" />
+
+    <input type="hidden" name="userId" value="@userId" />
+    <input type="hidden" name="courseId" value="@courseID" />
+
+}
+
+
+
+

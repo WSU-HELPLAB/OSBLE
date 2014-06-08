@@ -16,6 +16,7 @@ using System.Web.Security;
 using OSBLE.Models;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
+using OSBLE.Models.AbstractCourses.Course;
 using OSBLE.Models.Users;
 using OSBLE.Utility;
 using OSBLE.Attributes;
@@ -24,9 +25,6 @@ using System.Net;
 
 namespace OSBLE.Controllers
 {
-#if !DEBUG
-    //[RequireHttps]
-#endif
     public class AccountController : OSBLEController
     {
         public ActionResult ErrorPage()
@@ -210,6 +208,13 @@ namespace OSBLE.Controllers
                     cu.Hidden = newHidden;
                     db.Entry(cu).State = EntityState.Modified;
                 }
+                //yc if the users decided to withdraw from a course
+                bool withdraw = Convert.ToBoolean(Request.Params["cu_withdraw_" + cu.AbstractCourseID]);
+                if (withdraw)
+                {
+                    //user has checked this to remove themself from this course. leets update it!
+                    WithdrawUserFromCourse(CurrentUser);
+                }
             }
 
             // Update the default course ID for log in.
@@ -381,7 +386,25 @@ namespace OSBLE.Controllers
             ViewBag.SchoolID = new SelectList(from c in db.Schools
                                               where c.Name != Constants.ProfessionalSchool
                                               select c, "ID", "Name");
-            return View();
+
+            var WTmodel = new RegisterModel
+            {
+                Email = Request.QueryString["email"]
+                ,
+                FirstName = Request.QueryString["firstname"]
+                ,
+                LastName = Request.QueryString["lastname"]
+                ,
+                Identification = Request.QueryString["identification"]
+            };
+
+            if(WTmodel != null)
+                return View(WTmodel);
+            else
+                return View();
+
+
+           
         }
 
         //
@@ -443,6 +466,27 @@ namespace OSBLE.Controllers
                         else // Profile does not exist.
                         {
                             db.UserProfiles.Add(profile);
+                        }
+
+                        //yc: profile made. Check white table for account information
+                        List<WhiteTableUser> whitetableusers = db.WhiteTableUsers.Where(w => w.Identification == profile.Identification && w.SchoolID == profile.SchoolID).ToList();
+
+                        if (whitetableusers.Count > 0)
+                        {
+                            foreach (WhiteTableUser wtu in whitetableusers)
+                            {
+                                //you have gathered all the users  time to add them to courses
+                                //bug found, we need to have section location for now
+                                //seetting them to 0 for now
+                                //we have 
+                                CourseUser newUser = new CourseUser();
+                                newUser.UserProfile = profile;
+                                newUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+                                newUser.AbstractCourseID = wtu.CourseID;
+                                newUser.UserProfileID = profile.ID;
+                                db.CourseUsers.Add(newUser);
+                                db.WhiteTableUsers.Remove(wtu);
+                            }
                         }
 
                         db.SaveChanges();
@@ -847,5 +891,18 @@ namespace OSBLE.Controllers
 
             Email.Send(subject, message, new List<MailAddress>() { new MailAddress(to) });
         }
+
+        //yc: Need to make a view and controller removing oneself from the course.
+        //initalie link click
+        [OsbleAuthorize]
+        public ActionResult WithdrawFromCourse()
+        {
+
+            WithdrawUserFromCourse(CurrentUser);
+            return RedirectToAction("Index", "Home");
+        }
+
+
+
     }
 }

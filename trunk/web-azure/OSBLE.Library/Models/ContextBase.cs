@@ -132,6 +132,10 @@ namespace OSBLE.Models
             // Withdrawn: The student has withdrawn from the course
             this.CourseRoles.Add(new CourseRole(CourseRole.CourseRoles.Withdrawn.ToString(), false, false, false, false, false, false));
 
+            //FIX THIS NOW FORREST
+            // Pending: The student is pending being added to the course, as of 6/6/2014 only course controller uses this for handling enrollment requests from users
+            this.CourseRoles.Add(new CourseRole(CourseRole.CourseRoles.Pending.ToString(), false, false, false, false, false, false));
+
             
             // Community Roles
             

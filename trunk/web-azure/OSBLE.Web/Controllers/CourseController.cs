@@ -298,7 +298,7 @@ namespace OSBLE.Controllers
                 catch (Exception)
                 {
                 }
-
+              
                 course.TimeZoneOffset = Convert.ToInt32(Request.Params["course_timezone"]);
                 createMeetingTimes(course, course.TimeZoneOffset);
                 createBreaks(course);
@@ -317,11 +317,229 @@ namespace OSBLE.Controllers
 
                 return RedirectToAction("Index", "Home");
             }
-
             return View(course);
         }
 
-        //
+        [HttpGet]
+        public ActionResult CourseSearch()
+        {
+            //get all instructors
+            List<CourseUser> Instructors = db.CourseUsers.Where(cu => cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor).ToList();
+            
+            //get all the courses
+            var CourseList = from d in db.Courses
+                             where d.EndDate > DateTime.Now
+                             select d;
+
+            //add them to a list as a selectlistitem
+            List<SelectListItem> course = new List<SelectListItem>();
+            foreach(var c in CourseList)
+            {                
+                course.Add(new SelectListItem { Text = c.Prefix, Value = c.Prefix });
+            }
+            //remove any duplicate course names
+            var finalList = course.GroupBy(x => x.Text).Select(x => x.OrderByDescending(y => y.Text).First()).ToList();
+
+            //throw it in the view bag
+            ViewBag.CourseName = new SelectList(finalList, "Value", "Text");
+            ViewBag.SearchResults = TempData["SearchResults"];
+            ViewBag.SearchResultsInstructors = Instructors;
+            
+            return View();
+        }
+
+        public JsonResult CourseNumber(string id)
+        {
+            var CourseNumber = from s in db.Courses
+                               where s.Prefix == id
+                               select s;
+
+            return Json(new SelectList(CourseNumber.ToArray(), "Number", "Number"), JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult SearchResults(string course, string number)
+        {
+            if(number == "Search All")
+            {
+                var Results = from d in db.Courses
+                              where d.Prefix == course 
+                              select d;
+
+                Results.GroupBy(x => x.Prefix)
+                        .OrderBy(x => x.Count())
+                        .Select(x => x.First());
+
+                TempData["SearchResults"] = Results.ToList();
+
+                return RedirectToAction("CourseSearch", "Course");
+            }
+            else
+            {
+                var Results = from d in db.Courses
+                              where d.Prefix == course && d.Number == number
+                              select d;
+
+                Results.GroupBy(x => x.Number)
+                        .OrderBy(x => x.Count())
+                        .Select(x => x.First());
+
+                TempData["SearchResults"] = Results.ToList();
+
+                return RedirectToAction("CourseSearch", "Course");
+            }
+
+
+        }
+
+        public ActionResult ReqestCourseJoin(string id)
+        {
+            //get course from ID
+            int intID = Convert.ToInt32(id);
+            var request = (from c in db.Courses
+                           where c.ID == intID
+                           select c).FirstOrDefault();
+
+            //if the user is not enrolled in any courses 
+            if(ActiveCourseUser == null)
+            {
+                //we need to create a course user in order to send a proper notification to the instructor(s)
+                CourseUser newUser = new CourseUser();
+                UserProfile profile = db.UserProfiles.Where(up => up.ID == this.CurrentUser.ID).FirstOrDefault();
+                newUser.UserProfile = profile;                
+                newUser.UserProfileID = profile.ID;
+                newUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending; //FIX THIS NOW FORREST
+                newUser.AbstractCourseID = request.ID;
+                newUser.Hidden = true;
+
+                db.CourseUsers.Add(newUser);
+                db.SaveChanges();
+
+                ActiveCourseUser = newUser;
+
+                using (NotificationController nc = new NotificationController())
+                {
+                    nc.SendCourseApprovalNotification(request, ActiveCourseUser);
+                }
+
+                return View("NeedsApproval");
+            }
+                //user is already enrolled in the course...dummy
+            else if (ActiveCourseUser.AbstractCourseID == request.ID)
+            {
+                return View("AllReadyInCourse");
+            }
+            else
+            {
+                //send notification to instructors
+                using (NotificationController nc = new NotificationController())
+                {
+                    //temporaly put them in the course as hidden
+                    CourseUser tempUser = new CourseUser();
+                    UserProfile profile = db.UserProfiles.Where(up => up.ID == this.CurrentUser.ID).FirstOrDefault();
+                    tempUser.UserProfile = profile;
+                    tempUser.UserProfileID = profile.ID;
+                    tempUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending; //FIX THIS NOW FORREST
+                    tempUser.AbstractCourseID = request.ID;
+                    tempUser.Hidden = true;
+
+                    db.CourseUsers.Add(tempUser);
+                    db.SaveChanges();
+
+                    nc.SendCourseApprovalNotification(request, ActiveCourseUser);
+                }
+                return View("NeedsApproval");
+            }
+        }
+
+        public ActionResult Approval(int ID)
+        {
+            var notification = (from d in db.Notifications
+                                where d.ItemID == ID
+                                select d).FirstOrDefault();
+            
+            var Instructor = (from d in db.CourseUsers
+                              where d.ID == notification.RecipientID
+                              select d).FirstOrDefault();
+
+            var Student = (from d in db.CourseUsers
+                           where d.ID == notification.SenderID
+                           select d).FirstOrDefault();
+
+            ViewBag.Instructor = Instructor;
+            ViewBag.Student = Student;
+            ViewBag.notification = notification;
+            ViewBag.CourseName = ActiveCourseUser.AbstractCourse.Name;
+            ViewBag.CourseID = ActiveCourseUser.AbstractCourse.ID;
+
+            
+
+            return View("Approval");
+        }
+
+        [HttpPost]
+        public ActionResult HandleCourseApproval()
+        {
+            //approval will be either "Deny Request" or "Deny Request"Approve Request"
+            string approval = Request.Form["submitButton"];
+            //get the supplied user and course IDs
+            int userId = Convert.ToInt16(Request.Form["userId"]);            
+            int courseId = Convert.ToInt16(Request.Form["courseId"]);
+
+
+
+            if (approval == "Approve Request")
+            {   
+                //this check will only return a courseUser for previously unenrolled students 
+                CourseUser courseUser = db.CourseUsers.Where(cu => cu.UserProfileID == userId)
+                                                      .Where(cu=>cu.AbstractCourseID == courseId).FirstOrDefault();
+                //make the course visible to the student
+                courseUser.Hidden = false;
+                courseUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+                db.Entry(courseUser).State = EntityState.Modified;
+                db.SaveChanges();
+
+                //yc: fixing redirect and setting up sending email
+
+                return RedirectToAction("Index", "Roster", new { notice = courseUser.UserProfile.FirstName + " " + courseUser.UserProfile.LastName + " has been enrolled into the course." });
+                //return View("RequestApproved");
+            }
+            else if (approval == "Deny Request")
+            {
+                //this check will only return a courseUser for previously unenrolled students 
+                CourseUser courseUser = db.CourseUsers.Where(cu => cu.UserProfileID == userId)
+                                                      .Where(cu => cu.AbstractCourseID == courseId).FirstOrDefault();
+
+                string firstName = courseUser.UserProfile.FirstName;
+                string lastName = courseUser.UserProfile.LastName;
+                //remove the user from the course                
+                db.CourseUsers.Remove(courseUser);
+                db.SaveChanges();
+
+
+                return RedirectToAction("Index", "Roster", new { notice = firstName + " " + lastName + " has been denied enrollment into this course." });
+                //return View("RequestDenied");
+            }
+            else
+            {
+                //something went wrong... there should only be two submit buttons to take us here!
+                //TODO: handle this case
+                return View("Index");
+            }
+            
+            
+        }
+
+        public ActionResult CommunitySearch()
+        {
+            //Get list of communities from db
+            var ListOfCommunities = db.Communities;
+
+            ViewBag.CommunitiesList = ListOfCommunities.OrderBy(c => c.Name).ToList();
+
+            return View();
+        }
+        
         // GET: /Course/Edit/5
         [RequireActiveCourse]
         [CanModifyCourse]
@@ -345,24 +563,25 @@ namespace OSBLE.Controllers
                 utcOffset = 0;
             }
 
+            //yc: this edit no longer needs to check this anymore. may have to remove all of this if statement
             //If it exists, which it should update all of the meetings to reflect the correct utc adjusted time.
             if (utcOffset != 0)
             {
                 ICollection<CourseMeeting> Meetings = course.CourseMeetings;
-                foreach (CourseMeeting meeting in Meetings)
-                {
-                    DateTime beforeUtcStartTime = meeting.StartTime;
+                //foreach (CourseMeeting meeting in Meetings)
+                //{
+                //    DateTime beforeUtcStartTime = meeting.StartTime;
 
-                    meeting.StartTime = meeting.StartTime.AddMinutes(-utcOffset);
-                    meeting.EndTime = meeting.EndTime.AddMinutes(-utcOffset);
+                //    meeting.StartTime = meeting.StartTime.AddMinutes(-utcOffset);
+                //    meeting.EndTime = meeting.EndTime.AddMinutes(-utcOffset);
 
-                    //Check to see if the utc offset will change the day if so adjust the Meeting's date
-                    if (beforeUtcStartTime.DayOfYear != meeting.StartTime.DayOfYear)
-                    {
-                        int difference = (beforeUtcStartTime.DayOfYear - meeting.StartTime.DayOfYear);
-                        correctDay(meeting, difference);
-                    }
-                }
+                //    //Check to see if the utc offset will change the day if so adjust the Meeting's date
+                //    if (beforeUtcStartTime.DayOfYear != meeting.StartTime.DayOfYear)
+                //    {
+                //        int difference = (beforeUtcStartTime.DayOfYear - meeting.StartTime.DayOfYear);
+                //        correctDay(meeting, difference);
+                //    }
+                //}
             }
             else //Rare case where a cookie doesn't exist set the time to null essentially
             {

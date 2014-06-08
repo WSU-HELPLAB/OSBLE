@@ -48,7 +48,7 @@ namespace OSBLE.Models
             public static string CourseYear = "(Required) the year in which this class is held, e.g., 2011";
             public static string CourseStartDate = "(Required) the date of the first day of class";
             public static string CourseEndDate = "(Required) the date of the last day of class (or the final exam)";
-            public static string CourseTimeZone = "(Required) specifiy the time zone for the class";
+            public static string CourseTimeZone = "Specify the local timezone for this course. All posts, emails, and assignment submissions will be time stamped based on this timezone";
             public static string CourseMeetingTimes = "Click on the \"+\" to specify regular meeting times for lectures, labs, etc. These can be optionally included on the course calendar.";
             public static string CourseBreaks = "Click on the \"+\" button to specify course breaks and holidays. These can optionally be included on the course calendar.";
 
@@ -60,6 +60,9 @@ namespace OSBLE.Models
             public static string CourseCalendarEvents = "Specify the number of weeks of events to show in the course calendar by default. Events outside this window of time can still be accessed by clicking on the \"Show All Events\" link.";
             public static string CourseGradingScheme = "Using this section, you may define the grading scheme for the course. For each letter grade, you must specify the minimum percentage required to receive that grade.";
             public static string CourseLatePolicy = "Using this section, you specify the penalties that OSBLE will automatically apply to late assignments.";
+
+            public static string CourseSearch = "A list of classes you may request enrollment for. Upon enrollment you will be notified via an email from the course instructor.";
+            public static string CommunitiesSearch = "A list of communities you may request to join. Upon joining you will be notified via an email from the communitie leader.";
         #endregion
 
 
@@ -129,11 +132,14 @@ namespace OSBLE.Models
                 {"Leader",      "Community leader...?"},
                 {"Participant", "Community participant...?"} };
 
+            public static string RosterWhitetableRoleRole = "Whitelisted users are approved to  enroll in the course, but they do not have an OSBLE account. Provided a valid email address, these students will be invited to register and enroll into this course. If an email address on the roster that was uploaded, these students will be notified. Students highlighed in red do not have a valid email address.";
             public static string RosterUserName = "This is the name this user will be publicly identified by in mail, posts, assignments, and other content.";
             public static string RosterEmail = "This must be the email address this user registered with for OSBLE.";
             public static string RosterSchoolID = "Input the school/ organization identification number for this user to indicate who is being added to this course.";
             public static string RosterRole = "Select what role this person has for this course. (Instructor, TA, Student, Moderator, and Observer explanations go here.)";
             public static string RosterSection = "Enter 0 to add this user to all sections.";
+            public static string RosterIdentificationNumber = "This is users identification number given by the school";
+
 
         #endregion
         

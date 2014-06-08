@@ -9,6 +9,7 @@ using System.Net.Mail;
 using System.Configuration;
 using OSBLE.Attributes;
 using OSBLE.Utility;
+using System;
 
 namespace OSBLE.Controllers
 {
@@ -56,6 +57,10 @@ namespace OSBLE.Controllers
                         int.TryParse(n.Data.Split(';')[0], out precteamId);
                         int.TryParse(n.Data.Split(';')[1], out teamEvalAssignmnetID);
                         return RedirectToAction("TeacherTeamEvaluation", "Assignment", new { precedingTeamId = precteamId, TeamEvaluationAssignmentId = teamEvalAssignmnetID });
+                    case Notification.Types.JoinCourseApproval:
+                        return RedirectToAction("Approval", "Course", new { ID = n.ItemID });
+                    
+
                 }
             }
 
@@ -114,7 +119,11 @@ namespace OSBLE.Controllers
             n.ItemType = Notification.Types.Mail;
             n.ItemID = mail.ID;            
             n.RecipientID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.ToUserProfileID).FirstOrDefault().ID;
-            n.SenderID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.FromUserProfileID).FirstOrDefault().ID;
+            n.SenderID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.FromUserProfileID).FirstOrDefault().ID;           
+            
+            //using the data variable to store context id for email context later.
+            n.Data = mail.ContextID.ToString();
+
             addNotification(n);
         }
 
@@ -187,6 +196,29 @@ namespace OSBLE.Controllers
                 n.ItemID = e.ID;
                 n.RecipientID = instructor.ID;
                 n.SenderID = e.Poster.ID;
+
+                addNotification(n);
+            }
+        }
+
+        [NonAction]
+        public void SendCourseApprovalNotification(Course c, CourseUser sender)
+        {
+            // Get all instructors in the course.
+            List<CourseUser> instructors = (from i in db.CourseUsers
+                                           where
+                                             i.AbstractCourseID == c.ID &&
+                                             i.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor
+                                           select i).ToList();
+
+            foreach (CourseUser instructor in instructors)
+            {
+                Notification n = new Notification();
+                n.ItemType = Notification.Types.JoinCourseApproval;
+                n.ItemID = c.ID;
+                n.RecipientID = instructor.ID;
+                n.SenderID = sender.ID;
+                
 
                 addNotification(n);
             }
@@ -279,7 +311,7 @@ namespace OSBLE.Controllers
         {
             db.Notifications.Add(n);
             db.SaveChanges();
-
+         
             // Find recipient profile and check notification settings
             CourseUser recipient = (from a in db.CourseUsers
                                     where a.ID == n.RecipientID
@@ -300,12 +332,30 @@ namespace OSBLE.Controllers
 #if !DEBUG
             SmtpClient mailClient = new SmtpClient();
             mailClient.UseDefaultCredentials = true;
-
+            
             UserProfile sender = db.UserProfiles.Find(n.Sender.UserProfileID);
             UserProfile recipient = db.UserProfiles.Find(n.Recipient.UserProfileID);
 
-            // this comes back as null, for some reason.
+            // this comes back as null, for some reason. //dmo:6/5/2014 does it really? it seems to work??
             AbstractCourse course = db.AbstractCourses.Where(b => b.ID == n.Sender.AbstractCourseID).FirstOrDefault();
+            string[] temp;
+            //checking to see if there is no data besides abstractCourseID
+            if(n.Data != null)
+            {
+                temp = n.Data.Split(';');
+            }
+            else
+            {
+                temp = new string[0];
+            }
+            
+            int id;
+            
+            if (temp.Length == 1) //data not being used by other mail method, send from selected course
+            {
+                id = Convert.ToInt16(temp[0]);
+                course = db.AbstractCourses.Where(b => b.ID == id).FirstOrDefault();
+            }
 
             string subject = "";
             if(getCourseTag(course) != "")
@@ -377,6 +427,14 @@ namespace OSBLE.Controllers
                     body = sender.FirstName + " " + sender.LastName + " has submitted a Team Evaluation that has raised a discrepancy flag."; //Can we get name of assignment?
 
                     action = "view team evaluation discrepancy.";
+
+                    break;
+                case Notification.Types.JoinCourseApproval:
+                    subject += sender.FirstName + " " + sender.LastName + "has submitted a request to join" + course.Name;
+
+                    body = sender.FirstName + " " + sender.LastName + " has submitted a request to join" + course.Name; 
+
+                    action = "view the request to join.";
 
                     break;
                 default:
