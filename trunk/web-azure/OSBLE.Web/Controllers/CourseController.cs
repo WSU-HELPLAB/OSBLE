@@ -86,7 +86,7 @@ namespace OSBLE.Controllers
                             //calculate the offset 
                             TimeSpan difference = classTimeZone - currentOffset;
                             cm.StartTime = cm.StartTime.Subtract(difference);
-                            cm.EndTime = cm.StartTime.Subtract(difference);
+                            cm.EndTime = cm.EndTime.Subtract(difference);
 
                         }
                         else //case 3
@@ -101,7 +101,7 @@ namespace OSBLE.Controllers
                         {
                             TimeSpan difference = classTimeZone - currentOffset;
                             cm.StartTime = cm.StartTime.Subtract(difference);
-                            cm.EndTime = cm.StartTime.Subtract(difference);
+                            cm.EndTime = cm.EndTime.Subtract(difference);
 
 
 
