@@ -506,12 +506,15 @@ namespace OSBLE.Controllers
                 //this check will only return a courseUser for previously unenrolled students 
                 CourseUser courseUser = db.CourseUsers.Where(cu => cu.UserProfileID == userId)
                                                       .Where(cu => cu.AbstractCourseID == courseId).FirstOrDefault();
+
+                string firstName = courseUser.UserProfile.FirstName;
+                string lastName = courseUser.UserProfile.LastName;
                 //remove the user from the course                
                 db.CourseUsers.Remove(courseUser);
                 db.SaveChanges();
 
 
-                return RedirectToAction("Index", "Roster", new { notice = courseUser.UserProfile.FirstName + " " + courseUser.UserProfile.LastName + " has been denied enrollment into this course." });
+                return RedirectToAction("Index", "Roster", new { notice = firstName + " " + lastName + " has been denied enrollment into this course." });
                 //return View("RequestDenied");
             }
             else
