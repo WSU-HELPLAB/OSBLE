@@ -12,7 +12,7 @@
 @using (Html.BeginForm("SearchResults", "Course", FormMethod.Post, new { @class = "form-class" }))
 {
     <fieldset>
-        <legend><b>Search Menu</b></legend>
+        <legend><b>Search For Courses</b></legend>
         @Html.Label("Search for courses to join:")
         @Html.DropDownList("Course", ViewBag.CourseName as SelectList, "Select a Course Prefix", new { id = "Course" })
         

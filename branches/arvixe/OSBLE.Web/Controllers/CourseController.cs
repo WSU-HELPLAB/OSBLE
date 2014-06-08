@@ -400,6 +400,12 @@ namespace OSBLE.Controllers
 
         }
 
+        [HttpPost]
+        public ActionResult CommunitySearchResults(string name)
+        {
+            return RedirectToAction("CommunitySearch", "Course");
+        }
+
         public ActionResult ReqestCourseJoin(string id)
         {
             //get course from ID
@@ -407,6 +413,7 @@ namespace OSBLE.Controllers
             var request = (from c in db.Courses
                            where c.ID == intID
                            select c).FirstOrDefault();
+
 
             //if the user is not enrolled in any courses 
             if(ActiveCourseUser == null)
@@ -433,7 +440,7 @@ namespace OSBLE.Controllers
                 return View("NeedsApproval");
             }
                 //user is already enrolled in the course...dummy
-            else if (ActiveCourseUser.AbstractCourseID == request.ID)
+            else if (currentCourses.Select(x => x.AbstractCourse).Contains(request))
             {
                 return View("AllReadyInCourse");
             }

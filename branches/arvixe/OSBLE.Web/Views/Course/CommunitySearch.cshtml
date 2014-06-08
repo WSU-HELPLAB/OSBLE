@@ -7,17 +7,19 @@
     ViewBag.Title = "Community Search";
 }
 
-<h2>ComminitySearch</h2>
+<h2>Comminity Search @Helpers.CreateToolTip(ToolTips.CommunitiesSearch)</h2>
 
-<table>
-    <tr>
-        <td>
-            <h3>Communities(@ViewBag.CommunitiesList.Count) @Helpers.CreateToolTip(ToolTips.CommunitiesSearch)</h3>
-            @foreach (var com in ViewBag.CommunitiesList)
-            {
-                @com.Name;<br />
-            }
-        </td>
-    </tr>
-</table>
+@using (Html.BeginForm("CommunitySearchResults", "Course", FormMethod.Post, new { @class = "form-class" }))
+{
+    <fieldset>
+        <legend><b>Sear For Communities</b></legend>
+        <form id="searchbox" action="CommunitySearchResults">
+            <input id="communitysearch" type="search" placeholder="Community Name here" autocomplete="on" autofocus />
+            <input id="submitcommunitysearch" type="submit" value="Search" />
+        </form>
+
+    </fieldset>
+
+}
+
 
