@@ -93,8 +93,8 @@ namespace OSBLE.Controllers
                         {
                             //do nothing time is correct ON LOCAL VERSIO
                             //LIVE VERSION REQUIRES THE BELOW
-                            cm.StartTime = cm.StartTime.Subtract(classTimeZone);
-                            cm.EndTime = cm.EndTime.Subtract(classTimeZone);
+                            cm.StartTime = cm.StartTime.Add(classTimeZone);
+                            cm.EndTime = cm.EndTime.Add(classTimeZone);
                         }
                     }
                     else//case 2 and 4
@@ -110,8 +110,8 @@ namespace OSBLE.Controllers
                         {
                             //do nothing time is correct ON LOCAL VERSIO
                             //LIVE VERSION REQUIRES THE BELOW
-                            cm.StartTime = cm.StartTime.Subtract(classTimeZone);
-                            cm.EndTime = cm.EndTime.Subtract(classTimeZone);
+                            cm.StartTime = cm.StartTime.Add(classTimeZone);
+                            cm.EndTime = cm.EndTime.Add(classTimeZone);
                         }
                     }
                     //yc i commented out the below since this is no longer needed, and how and dates are really pulled fromt he course rather than
