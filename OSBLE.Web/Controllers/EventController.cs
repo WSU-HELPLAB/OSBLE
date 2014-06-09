@@ -521,7 +521,7 @@ namespace OSBLE.Controllers
                                 regular.EndDate = regular.EndDate;//.Value.AddHours(-1.0);
                             else
                                 regular.EndDate = regular.StartDate.AddHours(1.0);
-                        }
+                        }/*
                         if (regular.StartTime != null) 
                         {
                             regular.StartTime = regular.StartTime;//.AddHours(-1.0);
@@ -529,7 +529,7 @@ namespace OSBLE.Controllers
                                 regular.EndTime = regular.EndTime;//.Value.AddHours(-1.0);
                             else
                                 regular.EndTime = regular.StartTime.AddHours(1.0);
-                        }
+                        }*/
 
 
                     }
