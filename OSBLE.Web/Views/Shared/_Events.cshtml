@@ -88,10 +88,10 @@
 
                         <time class="utc-time"
                 style="font-size:small;"
-                datetime="@Helpers.DateAsUnixTime(endDate)" 
-                data-original-date="@Helpers.RawDate(endDate)" 
+                datetime="@Helpers.DateAsUnixTime(endDate.AddHours(-@ViewBag.ctzOffset))" 
+                data-original-date="@Helpers.RawDate(endDate.AddHours(-@ViewBag.ctzOffset))" 
                 data-date-format="@dateFormatString">
-                            @ShowEventTime(endDate, e) (UTC)
+                            @ShowEventTime(endDate.AddHours(-@ViewBag.ctzOffset), e) (UTC)
                        </time>
                     }
 
