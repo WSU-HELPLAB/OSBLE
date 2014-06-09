@@ -569,8 +569,8 @@ namespace OSBLE.Controllers
                             if (pst.IsDaylightSavingTime())
                             {
                                 //-8 becomes -7
-                                e.StartDate.AddHours(1.0);
-                                e.EndDate.Value.AddHours(1.0);
+                                e.StartDate = e.StartDate.AddHours(-1.0);
+                                e.EndDate = e.EndDate.Value.AddHours(-1.0);
                             }
                             //else its normal
 
