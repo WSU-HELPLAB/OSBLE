@@ -30,7 +30,7 @@
              
         if (tmpLastDate.Date != tmpDateNew.Date)
         {
-            lastDate = e.StartDate.AddHours(-@ViewBag.ctzOffset);
+            lastDate = e.StartDate;
             tmpLastDate = tmpDateNew;           
         <li class="event_date">
             <time class="utc-time"
@@ -69,10 +69,10 @@
                 <div class="event_time">
                     <time class="utc-time"
                 style="font-size:small;"
-                datetime="@Helpers.DateAsUnixTime(e.StartDate.AddHours(-@ViewBag.ctzOffset))" 
-                data-original-date="@Helpers.RawDate(e.StartDate.AddHours(-@ViewBag.ctzOffset))" 
+                datetime="@Helpers.DateAsUnixTime(e.StartDate)" 
+                data-original-date="@Helpers.RawDate(e.StartDate)" 
                 data-date-format="hh:mm A">
-                        @ShowEventTime(e.StartDate.AddHours(-@ViewBag.ctzOffset), e) (UTC)
+                        @ShowEventTime(e.StartDate, e) (UTC)
                     </time>
              
                     @if ((e.EndDate != null))
@@ -88,10 +88,10 @@
 
                         <time class="utc-time"
                 style="font-size:small;"
-                datetime="@Helpers.DateAsUnixTime(endDate.AddHours(-@ViewBag.ctzOffset))" 
-                data-original-date="@Helpers.RawDate(endDate.AddHours(-@ViewBag.ctzOffset))" 
+                datetime="@Helpers.DateAsUnixTime(endDate)" 
+                data-original-date="@Helpers.RawDate(endDate)" 
                 data-date-format="@dateFormatString">
-                            @ShowEventTime(endDate.AddHours(-@ViewBag.ctzOffset), e) (UTC)
+                            @ShowEventTime(endDate, e) (UTC)
                        </time>
                     }
 

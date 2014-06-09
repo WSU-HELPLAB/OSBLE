@@ -560,6 +560,19 @@ namespace OSBLE.Controllers
                             e.StartDate = current.AddHours((double)cm.StartTime.Hour).AddMinutes((double)cm.StartTime.Minute);
                             e.EndDate = current.AddHours((double)cm.EndTime.Hour).AddMinutes((double)cm.EndTime.Minute);
                             e.HideDelete = true;
+                            //yc: compute offset
+                            //
+                            int courseOffset = ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset;
+                            ViewBag.ctzoffset = courseOffset;
+                            TimeZoneInfo zone = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
+                            DateTime pst = TimeZoneInfo.ConvertTime(DateTime.Now, zone);
+                            if (pst.IsDaylightSavingTime())
+                            {
+                                //-8 becomes -7
+                                e.StartDate.AddHours(1.0);
+                                e.EndDate.Value.AddHours(1.0);
+                            }
+                            //else its normal
 
                             // Do not show Course meetings outside of course start/end date and breaks.
                             if ((e.StartDate.Date >= course.StartDate.Date) && (e.StartDate.Date <= course.EndDate.Date) && (course.CourseBreaks.Where(b => (current >= b.StartDate) && (current <= b.EndDate)).Count() < 1))
