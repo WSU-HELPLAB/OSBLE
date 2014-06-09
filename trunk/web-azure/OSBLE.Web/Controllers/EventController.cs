@@ -179,6 +179,9 @@ namespace OSBLE.Controllers
                 //Account for utc time before saved
                 //e.EndDate = e.EndDate.Value.AddMinutes(utcOffset);
                 //e.StartDate = e.StartDate.AddMinutes(utcOffset);
+                int courseOffset = ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset;
+                e.EndDate = e.EndDate.Value.Subtract(new TimeSpan(courseOffset,0,0));
+                e.StartDate = e.StartTime.Subtract(new TimeSpan(courseOffset, 0, 0));
 
                 db.Events.Add(e);
                 db.SaveChanges();
@@ -382,9 +385,9 @@ namespace OSBLE.Controllers
                 //Adjust the time if there is
                 string UtcOffsetString = cookieOffset.Value;
                 utcOffset = Convert.ToInt32(UtcOffsetString);
-
-                e.StartDate = e.StartDate.AddMinutes(-utcOffset);
-                e.EndDate = e.EndDate.Value.AddMinutes(-utcOffset);
+                int courseOffset = ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset;
+                e.StartDate = e.StartDate.AddHours(courseOffset);
+                e.EndDate = e.EndDate.Value.AddHours(courseOffset);
             }
             else
             {
@@ -415,8 +418,10 @@ namespace OSBLE.Controllers
             originalEvent.Title = e.Title;
             originalEvent.Description = e.Description;
 
-            originalEvent.StartDate = e.StartDate.AddMinutes(utcOffset);
-            originalEvent.StartTime = e.StartTime.AddMinutes(utcOffset);
+            int courseOffset = ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset;
+
+            originalEvent.StartDate = e.StartDate.Subtract(new TimeSpan(courseOffset, 0, 0));// AddMinutes(utcOffset);
+            originalEvent.StartTime = e.StartTime.Subtract(new TimeSpan(courseOffset, 0, 0));//.AddMinutes(utcOffset);
 
             if (!Request.Form.AllKeys.Contains("IncludeEndDate"))
             {
@@ -424,8 +429,8 @@ namespace OSBLE.Controllers
             }
             else
             {
-                originalEvent.EndDate = e.EndDate.Value.AddMinutes(utcOffset);
-                originalEvent.EndDate = e.EndTime.Value.AddMinutes(utcOffset) ;
+                originalEvent.EndDate = e.EndDate.Value.Subtract(new TimeSpan(courseOffset, 0, 0));//.AddMinutes(utcOffset);
+                originalEvent.EndDate = e.EndTime.Value.Subtract(new TimeSpan(courseOffset, 0, 0));//.AddMinutes(utcOffset) ;
                 //make sure that the end date happens after the start
                 if ((DateTime)originalEvent.EndDate < originalEvent.StartDate)
                 {
@@ -491,6 +496,46 @@ namespace OSBLE.Controllers
                                    && e.StartDate <= EndDate
                                    && e.Approved
                                    select e).ToList();
+            //yc: daylight savings thigns
+            int courseOffset = ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset;
+            ViewBag.ctzoffset = courseOffset;
+            TimeZoneInfo zone = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
+            DateTime pst = TimeZoneInfo.ConvertTime(DateTime.Now, zone);
+
+            //cycle already known events for times and perform daylight savings check on them
+            foreach (Event regular in events)
+            {
+                if (regular != null)
+                {
+                    if (pst.IsDaylightSavingTime())
+                    {
+                        //nothing but i have a feeling this is wrong
+                    }
+                    else
+                    {
+                        //-8 becomes -7
+                        /*
+                        if (regular.StartDate != null)
+                        {
+                            regular.StartDate = regular.StartDate;//.AddHours(-1.0);
+                            if (regular.EndDate != null)
+                                regular.EndDate = regular.EndDate;//.Value.AddHours(-1.0);
+                            else
+                                regular.EndDate = regular.StartDate.AddHours(1.0);
+                        }*/
+                        if (regular.StartTime != null) 
+                        {
+                            regular.StartTime = regular.StartTime.AddHours(-1.0);
+                            if (regular.EndTime != null)
+                                regular.EndTime = regular.EndTime.Value.AddHours(-1.0);
+                            else
+                                regular.EndTime = regular.StartTime.AddHours(1.0);
+                        }
+
+
+                    }
+                }
+            }
 
             // Add course meeting times and breaks.
             if (ActiveCourseUser.AbstractCourse is Course && ((ActiveCourseUser.AbstractCourse as Course).ShowMeetings == true))
@@ -560,6 +605,21 @@ namespace OSBLE.Controllers
                             e.StartDate = current.AddHours((double)cm.StartTime.Hour).AddMinutes((double)cm.StartTime.Minute);
                             e.EndDate = current.AddHours((double)cm.EndTime.Hour).AddMinutes((double)cm.EndTime.Minute);
                             e.HideDelete = true;
+                            //yc: compute offset
+                            //
+
+                            if (pst.IsDaylightSavingTime())
+                            {
+
+                            }
+                            else
+                            {
+                                //-8 becomes -7
+                                e.StartDate = e.StartDate.AddHours(-1.0);
+                                e.EndDate = e.EndDate.Value.AddHours(-1.0);
+                            }
+
+                            //else its normal
 
                             // Do not show Course meetings outside of course start/end date and breaks.
                             if ((e.StartDate.Date >= course.StartDate.Date) && (e.StartDate.Date <= course.EndDate.Date) && (course.CourseBreaks.Where(b => (current >= b.StartDate) && (current <= b.EndDate)).Count() < 1))

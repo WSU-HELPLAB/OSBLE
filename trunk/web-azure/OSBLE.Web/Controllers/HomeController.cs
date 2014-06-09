@@ -175,8 +175,8 @@ namespace OSBLE.Controllers
             int eventDays = 7 * ActiveCourseUser.AbstractCourse.CalendarWindowOfTime;
 
             DateTime today = DateTime.Now.Date;
+            
             DateTime upto = today.AddDays(eventDays);
-
             using (EventController ec = new EventController())
             {
                 ViewBag.Events = ec.GetActiveCourseEvents(today, upto);

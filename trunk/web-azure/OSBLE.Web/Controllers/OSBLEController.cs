@@ -704,6 +704,10 @@ namespace OSBLE.Controllers
                              select c).FirstOrDefault();
             if (cu != null)
             {
+                if(cu.AbstractRole.GetType() == typeof(CommunityRole))
+                {
+                    RemoveUserFromCourse(user);
+                }
                 cu.AbstractRoleID = (int)CourseRole.CourseRoles.Withdrawn;
                 db.Entry(cu).State = System.Data.EntityState.Modified;
             }

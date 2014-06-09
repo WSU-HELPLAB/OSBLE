@@ -68,7 +68,8 @@ namespace OSBLE.Controllers
                     cm.Friday = Convert.ToBoolean(Request.Params["meeting_friday_" + i.ToString()]);
                     cm.Saturday = Convert.ToBoolean(Request.Params["meeting_saturday_" + i.ToString()]);
 
-                    //yc
+                    //yc ALL TIMES ARE DONE AT UTC, experinces no 
+
                     //timezone checking
                     //case 1: user is creating a course in a different timezone and it is not currently daylight savings time
                     //case 2: user is creating a course in a different timezone and IT IS currently  daylight savings time
@@ -91,15 +92,14 @@ namespace OSBLE.Controllers
                         }
                         else //case 3
                         {
-                            //do nothing time is correct ON LOCAL VERSIO
-                            //LIVE VERSION REQUIRES THE BELOW
-                            classTimeZone = new TimeSpan(utcOffset, 0, 0);
-                            cm.StartTime = cm.StartTime.Add(classTimeZone);
-                            cm.EndTime = cm.EndTime.Add(classTimeZone);
+                            //do nothing time is correct 
                         }
                     }
                     else//case 2 and 4
                     {
+                        //based on server
+                        //utc should never be in daylights savings you should always come here
+                        //will have to do a check
                         classTimeZone = new TimeSpan(utcOffset, 0, 0);
                         if (classTimeZone != currentOffset) //case 2
                         {
@@ -109,10 +109,7 @@ namespace OSBLE.Controllers
                         }
                         else //case 4
                         {
-                            //do nothing time is correct ON LOCAL VERSIO
-                            //LIVE VERSION REQUIRES THE BELOW
-                            cm.StartTime = cm.StartTime.Add(classTimeZone);
-                            cm.EndTime = cm.EndTime.Add(classTimeZone);
+                            //do nothing
                         }
                     }
                     //yc i commented out the below since this is no longer needed, and how and dates are really pulled fromt he course rather than
@@ -338,8 +335,9 @@ namespace OSBLE.Controllers
             //add them to a list as a selectlistitem
             List<SelectListItem> course = new List<SelectListItem>();
             foreach(var c in CourseList)
-            {                
-                course.Add(new SelectListItem { Text = c.Prefix, Value = c.Prefix });
+            {   
+                if(c.EndDate > DateTime.Now)
+                    course.Add(new SelectListItem { Text = c.Prefix, Value = c.Prefix });
             }
             //remove any duplicate course names
             var finalList = course.GroupBy(x => x.Text).Select(x => x.OrderByDescending(y => y.Text).First()).ToList();
@@ -396,6 +394,56 @@ namespace OSBLE.Controllers
 
         }
 
+        [HttpPost]
+        public ActionResult CommunitySearchResults(string name)
+        {
+           
+
+            var Results = from d in db.Communities
+                          where d.Name.Contains(name)
+                          select d;
+            Results.GroupBy(x => x.Name)
+                    .OrderBy(x => x.Count())
+                    .Select(x => x.First());
+
+            TempData["CommunitySearchResults"] = Results.ToList();
+
+            return RedirectToAction("CommunitySearch", "Course");
+        }
+
+        public ActionResult CommunitySearch()
+        {
+            List<CourseUser> Leaders = db.CourseUsers.Where(cu => cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor).ToList();
+            ViewBag.CommunitySearchResults = TempData["CommunitySearchResults"];
+            ViewBag.SearchResultsLeaders = Leaders;
+            return View();
+        }
+
+        public ActionResult ReqestCommunityJoin(string id)
+        {
+            int intID = Convert.ToInt32(id);
+            var request = (from c in db.Communities
+                           where c.ID == intID
+                           select c).FirstOrDefault();
+
+            if (currentCourses.Select(x => x.AbstractCourse).Contains(request))
+            {
+                return View("AllReadyInCommunity");
+            }
+
+            CourseUser newUser = new CourseUser();
+            UserProfile profile = db.UserProfiles.Where(up => up.ID == this.CurrentUser.ID).FirstOrDefault();
+            newUser.UserProfile = profile;
+            newUser.UserProfileID = profile.ID;
+            newUser.AbstractCourseID = request.ID;
+            newUser.AbstractRoleID = (int)CommunityRole.OSBLERoles.Participant;
+            newUser.Hidden = false;
+            db.CourseUsers.Add(newUser);
+            db.SaveChanges();
+
+            return View("AddedToCommunity");
+        }
+
         public ActionResult ReqestCourseJoin(string id)
         {
             //get course from ID
@@ -403,6 +451,7 @@ namespace OSBLE.Controllers
             var request = (from c in db.Courses
                            where c.ID == intID
                            select c).FirstOrDefault();
+
 
             //if the user is not enrolled in any courses 
             if(ActiveCourseUser == null)
@@ -429,7 +478,7 @@ namespace OSBLE.Controllers
                 return View("NeedsApproval");
             }
                 //user is already enrolled in the course...dummy
-            else if (ActiveCourseUser.AbstractCourseID == request.ID)
+            else if (currentCourses.Select(x => x.AbstractCourse).Contains(request))
             {
                 return View("AllReadyInCourse");
             }
@@ -534,15 +583,6 @@ namespace OSBLE.Controllers
             
         }
 
-        public ActionResult CommunitySearch()
-        {
-            //Get list of communities from db
-            var ListOfCommunities = db.Communities;
-
-            ViewBag.CommunitiesList = ListOfCommunities.OrderBy(c => c.Name).ToList();
-
-            return View();
-        }
         
         // GET: /Course/Edit/5
         [RequireActiveCourse]
@@ -576,8 +616,8 @@ namespace OSBLE.Controllers
                 {
                     DateTime beforeUtcStartTime = meeting.StartTime;
 
-                    meeting.StartTime = meeting.StartTime.Subtract(new TimeSpan(course.TimeZoneOffset, 0 ,0));
-                    meeting.EndTime = meeting.EndTime.Subtract(new TimeSpan(course.TimeZoneOffset, 0 ,0));
+                    meeting.StartTime = meeting.StartTime.Add(new TimeSpan(course.TimeZoneOffset, 0 ,0));
+                    meeting.EndTime = meeting.EndTime.Add(new TimeSpan(course.TimeZoneOffset, 0 ,0));
 
                     //Check to see if the utc offset will change the day if so adjust the Meeting's date
                     //if (beforeUtcStartTime.DayOfYear != meeting.StartTime.DayOfYear)
