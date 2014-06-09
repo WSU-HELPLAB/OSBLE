@@ -172,8 +172,16 @@ namespace OSBLE.Controllers
             int eventDays = 7 * ActiveCourseUser.AbstractCourse.CalendarWindowOfTime;
 
             DateTime today = DateTime.Now.Date;
-            DateTime upto = today.AddDays(eventDays);
+            int courseOffset = ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset;
+            ViewBag.ctzoffset = courseOffset;
+            TimeZoneInfo zone = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
+            DateTime pst = TimeZoneInfo.ConvertTime(DateTime.Now, zone);
+            if (pst.IsDaylightSavingTime())
+                ViewBag.ctzoffset = 1;
+            else
+                ViewBag.ctzoffset = 0;
 
+            DateTime upto = today.AddDays(eventDays);
             using (EventController ec = new EventController())
             {
                 ViewBag.Events = ec.GetActiveCourseEvents(today, upto);
