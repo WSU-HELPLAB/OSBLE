@@ -574,9 +574,17 @@ namespace OSBLE.Controllers
                             if (pst.IsDaylightSavingTime())
                             {
                                 //-8 becomes -7
-                                e.StartDate = e.StartDate.AddHours(-1.0);
-                                e.EndDate = e.EndDate.Value.AddHours(-1.0);
+                                e.StartDate = e.StartDate.AddHours(-1.0).AddMinutes(2.0);
+                                e.StartTime = e.StartDate;
+                                e.EndDate = e.EndDate.Value.AddHours(-1.0).AddMinutes(2.0);
+                                e.EndTime = e.EndDate;
                             }
+                            else
+                            {
+                                e.StartDate = e.StartDate.AddHours(-1.0).AddMinutes(5.0);
+                                e.EndDate = e.EndDate.Value.AddHours(-1.0).AddMinutes(5.0);
+                            }
+
                             //else its normal
 
                             // Do not show Course meetings outside of course start/end date and breaks.
