@@ -516,17 +516,17 @@ namespace OSBLE.Controllers
                         //-8 becomes -7
                         if (regular.StartDate != null)
                         {
-                            regular.StartDate = regular.StartDate.AddHours(-1.0);
+                            regular.StartDate = regular.StartDate;//.AddHours(-1.0);
                             if (regular.EndDate != null)
-                                regular.EndDate = regular.EndDate.Value.AddHours(-1.0);
+                                regular.EndDate = regular.EndDate;//.Value.AddHours(-1.0);
                             else
                                 regular.EndDate = regular.StartDate.AddHours(1.0);
                         }
                         if (regular.StartTime != null) 
                         {
-                            regular.StartTime = regular.StartTime.AddHours(-1.0);
+                            regular.StartTime = regular.StartTime;//.AddHours(-1.0);
                             if (regular.EndTime != null)
-                                regular.EndTime = regular.EndTime.Value.AddHours(-1.0);
+                                regular.EndTime = regular.EndTime;//.Value.AddHours(-1.0);
                             else
                                 regular.EndTime = regular.StartTime.AddHours(1.0);
                         }
