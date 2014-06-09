@@ -42,7 +42,7 @@
 
                     @foreach (var result in results)
                     {
-                        if(result.EndDate > DateTime.Now)
+                        if(result.EndDate > DateTime.Now && !result.IsDeleted)
                         {
                             atLeastOneResult = true;
                         <tr>
