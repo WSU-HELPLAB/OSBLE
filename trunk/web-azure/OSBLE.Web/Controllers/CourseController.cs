@@ -336,7 +336,7 @@ namespace OSBLE.Controllers
             List<SelectListItem> course = new List<SelectListItem>();
             foreach(var c in CourseList)
             {   
-                if(c.EndDate > DateTime.Now)
+                if(c.EndDate > DateTime.Now && !c.IsDeleted)
                     course.Add(new SelectListItem { Text = c.Prefix, Value = c.Prefix });
             }
             //remove any duplicate course names
@@ -355,6 +355,8 @@ namespace OSBLE.Controllers
             var CourseNumber = from s in db.Courses
                                where s.Prefix == id
                                select s;
+
+
 
             return Json(new SelectList(CourseNumber.ToArray(), "Number", "Number"), JsonRequestBehavior.AllowGet);
         }

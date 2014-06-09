@@ -113,9 +113,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 catch (Exception)
                 {
                 }
-                //yc taking out old assignment offset
-                Assignment.ReleaseDate = Assignment.ReleaseDate;//.AddMinutes(utcOffset);
-                Assignment.DueDate = Assignment.DueDate;//.AddMinutes(utcOffset);
+                Assignment.ReleaseDate = Assignment.ReleaseDate.AddMinutes(utcOffset);
+                Assignment.DueDate = Assignment.DueDate.AddMinutes(utcOffset);
 
                 //update our DB
                 if (Assignment.ID == 0)
@@ -194,8 +193,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
 
             bool assignmentTeamsExist = (from at in db.AssignmentTeams
-                                                     where at.AssignmentID == Assignment.ID
-                                                     select at).Count() > 0;
+                                         where at.AssignmentID == Assignment.ID
+                                         select at).Count() > 0;
             //Only set up default teams if teams don't already exist
             if (Assignment.ID == 0 || !assignmentTeamsExist)
             {
