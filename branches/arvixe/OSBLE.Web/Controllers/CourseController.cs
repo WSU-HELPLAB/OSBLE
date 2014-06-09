@@ -397,7 +397,51 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult CommunitySearchResults(string name)
         {
+           
+
+            var Results = from d in db.Communities
+                          where d.Name.Contains(name)
+                          select d;
+            Results.GroupBy(x => x.Name)
+                    .OrderBy(x => x.Count())
+                    .Select(x => x.First());
+
+            TempData["CommunitySearchResults"] = Results.ToList();
+
             return RedirectToAction("CommunitySearch", "Course");
+        }
+
+        public ActionResult CommunitySearch()
+        {
+            List<CourseUser> Leaders = db.CourseUsers.Where(cu => cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor).ToList();
+            ViewBag.CommunitySearchResults = TempData["CommunitySearchResults"];
+            ViewBag.SearchResultsLeaders = Leaders;
+            return View();
+        }
+
+        public ActionResult ReqestCommunityJoin(string id)
+        {
+            int intID = Convert.ToInt32(id);
+            var request = (from c in db.Communities
+                           where c.ID == intID
+                           select c).FirstOrDefault();
+
+            if (currentCourses.Select(x => x.AbstractCourse).Contains(request))
+            {
+                return View("AllReadyInCommunity");
+            }
+
+            CourseUser newUser = new CourseUser();
+            UserProfile profile = db.UserProfiles.Where(up => up.ID == this.CurrentUser.ID).FirstOrDefault();
+            newUser.UserProfile = profile;
+            newUser.UserProfileID = profile.ID;
+            newUser.AbstractCourseID = request.ID;
+            newUser.AbstractRoleID = (int)CommunityRole.OSBLERoles.Participant;
+            newUser.Hidden = false;
+            db.CourseUsers.Add(newUser);
+            db.SaveChanges();
+
+            return View("AddedToCommunity");
         }
 
         public ActionResult ReqestCourseJoin(string id)
@@ -539,15 +583,6 @@ namespace OSBLE.Controllers
             
         }
 
-        public ActionResult CommunitySearch()
-        {
-            //Get list of communities from db
-            var ListOfCommunities = db.Communities;
-
-            ViewBag.CommunitiesList = ListOfCommunities.OrderBy(c => c.Name).ToList();
-
-            return View();
-        }
         
         // GET: /Course/Edit/5
         [RequireActiveCourse]

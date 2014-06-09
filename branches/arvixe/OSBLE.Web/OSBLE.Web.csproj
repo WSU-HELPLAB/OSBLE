@@ -874,6 +874,8 @@
     <Content Include="Views\Course\AllReadyInCourse.cshtml" />
     <Content Include="Views\Course\Approval.cshtml" />
     <Content Include="Views\Roster\EditWTUser.cshtml" />
+    <Content Include="Views\Course\AddedToCommunity.cshtml" />
+    <Content Include="Views\Course\AllReadyInCommunity.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
