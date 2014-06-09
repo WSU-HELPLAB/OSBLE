@@ -505,16 +505,28 @@ namespace OSBLE.Controllers
             //cycle already known events for times and perform daylight savings check on them
             foreach (Event regular in events)
             {
-                if (pst.IsDaylightSavingTime())
+                if (regular != null)
                 {
-                    //nothing but i have a feeling this is wrong
-                }
-                else
-                {
-                    //-8 becomes -7
-                    regular.StartDate = regular.StartDate.AddHours(-1.0);
-                    regular.EndDate = regular.EndDate.Value.AddHours(-1.0);
+                    if (pst.IsDaylightSavingTime())
+                    {
+                        //nothing but i have a feeling this is wrong
+                    }
+                    else
+                    {
+                        //-8 becomes -7
+                        if (regular.StartDate != null)
+                        {
+                            regular.StartDate = regular.StartDate.AddHours(-1.0);
+                            regular.EndDate = regular.EndDate.Value.AddHours(-1.0);
+                        }
+                        if (regular.StartTime != null) 
+                        {
+                            regular.StartTime = regular.StartTime.AddHours(-1.0);
+                            regular.EndTime = regular.EndTime.Value.AddHours(-1.0);
+                        }
 
+
+                    }
                 }
             }
 
