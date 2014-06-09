@@ -496,6 +496,27 @@ namespace OSBLE.Controllers
                                    && e.StartDate <= EndDate
                                    && e.Approved
                                    select e).ToList();
+            //yc: daylight savings thigns
+            int courseOffset = ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset;
+            ViewBag.ctzoffset = courseOffset;
+            TimeZoneInfo zone = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
+            DateTime pst = TimeZoneInfo.ConvertTime(DateTime.Now, zone);
+
+            //cycle already known events for times and perform daylight savings check on them
+            foreach (Event regular in events)
+            {
+                if (pst.IsDaylightSavingTime())
+                {
+                    //nothing but i have a feeling this is wrong
+                }
+                else
+                {
+                    //-8 becomes -7
+                    regular.StartDate = regular.StartDate.AddHours(-1.0);
+                    regular.EndDate = regular.EndDate.Value.AddHours(-1.0);
+
+                }
+            }
 
             // Add course meeting times and breaks.
             if (ActiveCourseUser.AbstractCourse is Course && ((ActiveCourseUser.AbstractCourse as Course).ShowMeetings == true))
@@ -567,22 +588,16 @@ namespace OSBLE.Controllers
                             e.HideDelete = true;
                             //yc: compute offset
                             //
-                            int courseOffset = ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset;
-                            ViewBag.ctzoffset = courseOffset;
-                            TimeZoneInfo zone = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
-                            DateTime pst = TimeZoneInfo.ConvertTime(DateTime.Now, zone);
+
                             if (pst.IsDaylightSavingTime())
                             {
-                                //-8 becomes -7
-                                e.StartDate = e.StartDate.AddHours(-1.0).AddMinutes(2.0);
-                                e.StartTime = e.StartDate;
-                                e.EndDate = e.EndDate.Value.AddHours(-1.0).AddMinutes(2.0);
-                                e.EndTime = e.EndDate;
+
                             }
                             else
                             {
-                                e.StartDate = e.StartDate.AddHours(-1.0).AddMinutes(5.0);
-                                e.EndDate = e.EndDate.Value.AddHours(-1.0).AddMinutes(5.0);
+                                //-8 becomes -7
+                                e.StartDate = e.StartDate.AddHours(-1.0);
+                                e.EndDate = e.EndDate.Value.AddHours(-1.0);
                             }
 
                             //else its normal
