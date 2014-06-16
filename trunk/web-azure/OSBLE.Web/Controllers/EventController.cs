@@ -497,7 +497,8 @@ namespace OSBLE.Controllers
                                    && e.Approved
                                    select e).ToList();
             //yc: daylight savings thigns
-            int courseOffset = ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset;
+            //int courseOffset = ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset;
+            int courseOffset = (ActiveCourseUser.AbstractCourse).GetType() == typeof(Course) ? ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset : 0;
             ViewBag.ctzoffset = courseOffset;
             TimeZoneInfo zone = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             DateTime pst = TimeZoneInfo.ConvertTime(DateTime.Now, zone);
