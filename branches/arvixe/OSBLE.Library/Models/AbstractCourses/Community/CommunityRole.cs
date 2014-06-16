@@ -22,11 +22,12 @@
         public enum OSBLERoles : int
         {
             //Leader being the first one is used in RosterController so any new roles add at the end.
-            //Also note that this 7 is one past the end of CourseRole.
+            //Also note that this 8 is one past the end of CourseRole.
             //FIX THIS FORREST
-            Leader = 8,//8
-            Participant,
-            TrustedCommunityMember
+            Leader = 8,             //8
+            Participant,            //9
+            TrustedCommunityMember, //10
+            Pending                 //11
         }
     }
 }

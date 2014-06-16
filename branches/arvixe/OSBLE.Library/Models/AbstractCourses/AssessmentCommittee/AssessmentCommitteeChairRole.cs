@@ -19,7 +19,7 @@ namespace OSBLE.Models.Courses
             Name = "Assessment Committee Chair";
         }
 
-        // Roles defined elsewhere go up to 9, so we start at 10 here
-        public const int RoleID = 10;
+        // Roles defined elsewhere go up to 11, so we start at 12 here
+        public const int RoleID = 12;
     }
 }

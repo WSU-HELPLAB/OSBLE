@@ -320,7 +320,8 @@ namespace OSBLE.Controllers
             }
             return View(course);
         }
-
+        
+        //Course Search
         [HttpGet]
         public ActionResult CourseSearch()
         {
@@ -396,56 +397,6 @@ namespace OSBLE.Controllers
 
         }
 
-        [HttpPost]
-        public ActionResult CommunitySearchResults(string name)
-        {
-           
-
-            var Results = from d in db.Communities
-                          where d.Name.Contains(name)
-                          select d;
-            Results.GroupBy(x => x.Name)
-                    .OrderBy(x => x.Count())
-                    .Select(x => x.First());
-
-            TempData["CommunitySearchResults"] = Results.ToList();
-
-            return RedirectToAction("CommunitySearch", "Course");
-        }
-
-        public ActionResult CommunitySearch()
-        {
-            List<CourseUser> Leaders = db.CourseUsers.Where(cu => cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor).ToList();
-            ViewBag.CommunitySearchResults = TempData["CommunitySearchResults"];
-            ViewBag.SearchResultsLeaders = Leaders;
-            return View();
-        }
-
-        public ActionResult ReqestCommunityJoin(string id)
-        {
-            int intID = Convert.ToInt32(id);
-            var request = (from c in db.Communities
-                           where c.ID == intID
-                           select c).FirstOrDefault();
-
-            if (currentCourses.Select(x => x.AbstractCourse).Contains(request))
-            {
-                return View("AllReadyInCommunity");
-            }
-
-            CourseUser newUser = new CourseUser();
-            UserProfile profile = db.UserProfiles.Where(up => up.ID == this.CurrentUser.ID).FirstOrDefault();
-            newUser.UserProfile = profile;
-            newUser.UserProfileID = profile.ID;
-            newUser.AbstractCourseID = request.ID;
-            newUser.AbstractRoleID = (int)CommunityRole.OSBLERoles.Participant;
-            newUser.Hidden = false;
-            db.CourseUsers.Add(newUser);
-            db.SaveChanges();
-
-            return View("AddedToCommunity");
-        }
-
         public ActionResult ReqestCourseJoin(string id)
         {
             //get course from ID
@@ -454,14 +405,15 @@ namespace OSBLE.Controllers
                            where c.ID == intID
                            select c).FirstOrDefault();
 
+            ViewBag.CourseName = request.Prefix.ToString() + " " + request.Number.ToString() + " - " + request.Name.ToString();
 
             //if the user is not enrolled in any courses 
-            if(ActiveCourseUser == null)
+            if (ActiveCourseUser == null)
             {
                 //we need to create a course user in order to send a proper notification to the instructor(s)
                 CourseUser newUser = new CourseUser();
                 UserProfile profile = db.UserProfiles.Where(up => up.ID == this.CurrentUser.ID).FirstOrDefault();
-                newUser.UserProfile = profile;                
+                newUser.UserProfile = profile;
                 newUser.UserProfileID = profile.ID;
                 newUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending; //FIX THIS NOW FORREST
                 newUser.AbstractCourseID = request.ID;
@@ -474,15 +426,15 @@ namespace OSBLE.Controllers
 
                 using (NotificationController nc = new NotificationController())
                 {
-                    nc.SendCourseApprovalNotification(request, ActiveCourseUser);
+                    nc.SendCourseApprovalNotification(request, newUser);
                 }
 
-                return View("NeedsApproval");
+                return View("CourseAwaitingApproval");
             }
-                //user is already enrolled in the course...dummy
+            //user is already enrolled in the course...dummy
             else if (currentCourses.Select(x => x.AbstractCourse).Contains(request))
             {
-                return View("AllReadyInCourse");
+                return View("CourseCurrentlyEnrolled");
             }
             else
             {
@@ -501,89 +453,104 @@ namespace OSBLE.Controllers
                     db.CourseUsers.Add(tempUser);
                     db.SaveChanges();
 
-                    nc.SendCourseApprovalNotification(request, ActiveCourseUser);
+                    nc.SendCourseApprovalNotification(request, tempUser);
                 }
-                return View("NeedsApproval");
+                return View("CourseAwaitingApproval");
             }
         }
 
-        public ActionResult Approval(int ID)
+        //Community Search 
+        [HttpGet]
+        public ActionResult CommunitySearch()
         {
-            var notification = (from d in db.Notifications
-                                where d.ItemID == ID
-                                select d).FirstOrDefault();
-            
-            var Instructor = (from d in db.CourseUsers
-                              where d.ID == notification.RecipientID
-                              select d).FirstOrDefault();
-
-            var Student = (from d in db.CourseUsers
-                           where d.ID == notification.SenderID
-                           select d).FirstOrDefault();
-
-            ViewBag.Instructor = Instructor;
-            ViewBag.Student = Student;
-            ViewBag.notification = notification;
-            ViewBag.CourseName = ActiveCourseUser.AbstractCourse.Name;
-            ViewBag.CourseID = ActiveCourseUser.AbstractCourse.ID;
-
-            
-
-            return View("Approval");
+            List<CourseUser> Leaders = db.CourseUsers.Where(cu => cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor).ToList();
+            ViewBag.CommunitySearchResults = TempData["CommunitySearchResults"];
+            ViewBag.SearchResultsLeaders = Leaders;
+            return View();
         }
 
         [HttpPost]
-        public ActionResult HandleCourseApproval()
+        public ActionResult CommunitySearchResults(string name)
         {
-            //approval will be either "Deny Request" or "Deny Request"Approve Request"
-            string approval = Request.Form["submitButton"];
-            //get the supplied user and course IDs
-            int userId = Convert.ToInt16(Request.Form["userId"]);            
-            int courseId = Convert.ToInt16(Request.Form["courseId"]);
 
+            var Results = from d in db.Communities
+                          where d.Name.Contains(name)
+                          || d.Description.Contains(name)
+                          || d.Name.Contains(name)
+                          || d.Nickname.Contains(name)
+                          select d;
+            Results.GroupBy(x => x.Name)
+                    .OrderBy(x => x.Count())
+                    .Select(x => x.First());
 
+            TempData["CommunitySearchResults"] = Results.ToList();
 
-            if (approval == "Approve Request")
-            {   
-                //this check will only return a courseUser for previously unenrolled students 
-                CourseUser courseUser = db.CourseUsers.Where(cu => cu.UserProfileID == userId)
-                                                      .Where(cu=>cu.AbstractCourseID == courseId).FirstOrDefault();
-                //make the course visible to the student
-                courseUser.Hidden = false;
-                courseUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
-                db.Entry(courseUser).State = EntityState.Modified;
-                db.SaveChanges();
+            return RedirectToAction("CommunitySearch", "Course");
+        }
 
-                //yc: fixing redirect and setting up sending email
+        public ActionResult ReqestCommunityJoin(string id)
+        {
+            int intID = Convert.ToInt32(id);
+            var request = (from c in db.Communities
+                           where c.ID == intID
+                           select c).FirstOrDefault();
 
-                return RedirectToAction("Index", "Roster", new { notice = courseUser.UserProfile.FirstName + " " + courseUser.UserProfile.LastName + " has been enrolled into the course." });
-                //return View("RequestApproved");
-            }
-            else if (approval == "Deny Request")
+            ViewBag.CommunityName = request.Name.ToString();
+
+            if (currentCourses.Select(x => x.AbstractCourse).Contains(request))
             {
-                //this check will only return a courseUser for previously unenrolled students 
-                CourseUser courseUser = db.CourseUsers.Where(cu => cu.UserProfileID == userId)
-                                                      .Where(cu => cu.AbstractCourseID == courseId).FirstOrDefault();
+                return View("CommunityCurrentlyEnrolled");
+            }
 
-                string firstName = courseUser.UserProfile.FirstName;
-                string lastName = courseUser.UserProfile.LastName;
-                //remove the user from the course                
-                db.CourseUsers.Remove(courseUser);
+            else if (ActiveCourseUser == null)
+            {
+                //we need to create a course user in order to send a proper notification to the instructor(s)
+                CourseUser newUser = new CourseUser();
+                UserProfile profile = db.UserProfiles.Where(up => up.ID == this.CurrentUser.ID).FirstOrDefault();
+                newUser.UserProfile = profile;
+                newUser.UserProfileID = profile.ID;
+                newUser.AbstractRoleID = (int)CommunityRole.OSBLERoles.Pending; //FIX THIS NOW FORREST
+                newUser.AbstractCourseID = request.ID;
+                newUser.Hidden = true;
+
+                db.CourseUsers.Add(newUser);
                 db.SaveChanges();
 
+                ActiveCourseUser = newUser;
 
-                return RedirectToAction("Index", "Roster", new { notice = firstName + " " + lastName + " has been denied enrollment into this course." });
-                //return View("RequestDenied");
+                using (NotificationController nc = new NotificationController())
+                {
+                   //nc.SendCourseApprovalNotification(request, ActiveCourseUser);
+                    nc.SendCommunityApprovalNotification(request, newUser);
+                }
+
+                return View("CommunityAwaitingApproval");
             }
+
             else
             {
-                //something went wrong... there should only be two submit buttons to take us here!
-                //TODO: handle this case
-                return View("Index");
+                using (NotificationController nc = new NotificationController())
+                {
+                    //temporaly put them in the course as hidden
+                    CourseUser tempUser = new CourseUser();
+                    UserProfile profile = db.UserProfiles.Where(up => up.ID == this.CurrentUser.ID).FirstOrDefault();
+                    tempUser.UserProfile = profile;
+                    tempUser.UserProfileID = profile.ID;
+                    tempUser.AbstractRoleID = (int)CommunityRole.OSBLERoles.Pending; //FIX THIS NOW FORREST
+                    tempUser.AbstractCourseID = request.ID;
+                    tempUser.Hidden = true;
+
+                    db.CourseUsers.Add(tempUser);
+                    db.SaveChanges();
+
+                    nc.SendCommunityApprovalNotification(request, tempUser);
+                }
+                return View("CommunityAwaitingApproval");
             }
-            
-            
         }
+
+
+       
 
         
         // GET: /Course/Edit/5

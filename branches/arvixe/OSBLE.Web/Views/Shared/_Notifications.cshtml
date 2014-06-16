@@ -55,6 +55,11 @@
                             <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> sent you a @NotificationLink(n.ID, "request to join course")</text>
                             break;
                         }
+                     case Notification.Types.JoinCommunityApproval:
+                        {
+                            <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> sent you a @NotificationLink(n.ID, "request to join community")</text>
+                            break;
+                        }
                     case Notification.Types.Dashboard:
                         {
                             <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> posted in a @NotificationLink(n.ID, "dashboard thread")

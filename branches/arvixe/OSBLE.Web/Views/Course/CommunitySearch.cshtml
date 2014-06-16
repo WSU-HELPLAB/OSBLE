@@ -14,8 +14,9 @@
     <fieldset>
         <legend><b>Search For Communities</b></legend>
         <form id="searchbox" action="CommunitySearchResults">
-            @Html.TextBox("name")
+            @Html.TextBox("name", "", new { placeholder = "Search All" } )
             <input id="submitcommunitysearch" type="submit" value="Search" />
+
 
         </form>
 
@@ -36,7 +37,7 @@
                     {
                         <tr>
                             <td>
-                                <a style="margin-right:5px; margin-left:5px;" title="Join Community" href="@Url.Action("ReqestCommunityJoin", "Course", new { id = result.ID })">@Helpers.AddButton()</a>
+                                <a style="margin-right:5px; margin-left:5px;" title="Request to Join Community" href="@Url.Action("ReqestCommunityJoin", "Course", new { id = result.ID })">@Helpers.AddButton()</a>
                             </td>
                             <td>@result.Name</td>
                             <td>@result.Nickname</td>
