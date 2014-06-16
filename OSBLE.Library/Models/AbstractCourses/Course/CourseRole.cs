@@ -63,12 +63,12 @@ namespace OSBLE.Models.Courses
             //Also Note that community members magically start 6 which is one past the end of this and they will
             //need to update if you add a new role here.  (Also update any old data)
             Instructor = 1,
-            TA,
-            Student,
-            Moderator,
-            Observer,
-            Withdrawn,
-            Pending
+            TA,         //2
+            Student,    //3
+            Moderator,  //4
+            Observer,   //5
+            Withdrawn,  //6
+            Pending     //7
             //FIX THIS NOW FORREST
         }
     }

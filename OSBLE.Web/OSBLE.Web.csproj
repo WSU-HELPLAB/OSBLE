@@ -870,12 +870,11 @@
     <Content Include="Views\Committee\Create.cshtml" />
     <Content Include="Views\Course\CommunitySearch.cshtml" />
     <Content Include="Views\Course\CourseSearch.cshtml" />
-    <Content Include="Views\Course\NeedsApproval.cshtml" />
-    <Content Include="Views\Course\AllReadyInCourse.cshtml" />
-    <Content Include="Views\Course\Approval.cshtml" />
+    <Content Include="Views\Course\CourseCurrentlyEnrolled.cshtml" />
     <Content Include="Views\Roster\EditWTUser.cshtml" />
-    <Content Include="Views\Course\AddedToCommunity.cshtml" />
-    <Content Include="Views\Course\AllReadyInCommunity.cshtml" />
+    <Content Include="Views\Course\CommunityCurrentlyEnrolled.cshtml" />
+    <Content Include="Views\Course\CourseAwaitingApproval.cshtml" />
+    <Content Include="Views\Course\CommunityAwaitingApproval.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

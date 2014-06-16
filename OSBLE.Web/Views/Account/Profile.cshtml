@@ -140,13 +140,27 @@
 
                             @Helpers.CourseTag(cu.AbstractCourse) &mdash; @cu.AbstractCourse.Name (@cu.AbstractRole.Name)
                         </td>
-                        <td class="coursemenu_option">
-                            <input type="checkbox" value="True" name="cu_hidden_@(cu.AbstractCourseID)" @if (cu.Hidden) { <text> checked="checked" </text> } />
-                        </td>
-                        <!--yc adding withdraw-->
-                        <td class="coursemenu_option">
-                            <input type="checkbox" value="True" name="cu_withdraw_@(cu.AbstractCourseID)" />
-                        </td>
+                        <!--Dont show hidden button if the user is Pending-->
+                        @if(cu.AbstractRole.Name == "Pending")
+                        {
+                            <td class="coursemenu_option">
+                                <input type="hidden" value="True" name="cu_hidden_@(cu.AbstractCourseID)" @if (cu.Hidden) { <text> checked="checked" </text> } />
+                            </td>
+                            <!--yc adding withdraw-->
+                            <td class="coursemenu_option">
+                                <input type="checkbox" value="True" name="cu_withdraw_@(cu.AbstractCourseID)" />
+                            </td>
+                        }
+                        else
+                        {
+                            <td class="coursemenu_option">
+                                <input type="checkbox" value="True" name="cu_hidden_@(cu.AbstractCourseID)" @if (cu.Hidden) { <text> checked="checked" </text> } />
+                            </td>
+                            <!--yc adding withdraw-->
+                            <td class="coursemenu_option">
+                                <input type="checkbox" value="True" name="cu_withdraw_@(cu.AbstractCourseID)" />
+                            </td>
+                        }
                     </tr>
                     firstCourse = false;
                 }

@@ -149,6 +149,8 @@ namespace OSBLE.Models
             //trusted communityt member: same as participant, but can upload files to the server
             this.CommunityRoles.Add(new CommunityRole(CommunityRole.OSBLERoles.TrustedCommunityMember.ToString(), false, true, true, true));
 
+            this.CommunityRoles.Add(new CommunityRole(CommunityRole.OSBLERoles.Pending.ToString(), false, false, false, false));
+
             // Assessment committee roles (don't change statement order here)
             this.CommitteeRoles.Add(new AssessmentCommitteeChairRole());
             this.CommitteeRoles.Add(new AssessmentCommitteeMemberRole());

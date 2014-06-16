@@ -58,7 +58,9 @@ namespace OSBLE.Controllers
                         int.TryParse(n.Data.Split(';')[1], out teamEvalAssignmnetID);
                         return RedirectToAction("TeacherTeamEvaluation", "Assignment", new { precedingTeamId = precteamId, TeamEvaluationAssignmentId = teamEvalAssignmnetID });
                     case Notification.Types.JoinCourseApproval:
-                        return RedirectToAction("Approval", "Course", new { ID = n.ItemID });
+                        return RedirectToAction("Index", "Roster", new { ID = n.ItemID });
+                    case Notification.Types.JoinCommunityApproval:
+                        return RedirectToAction("Index", "Roster", new { ID = n.ItemID });
                     
 
                 }
@@ -219,6 +221,26 @@ namespace OSBLE.Controllers
                 n.RecipientID = instructor.ID;
                 n.SenderID = sender.ID;
                 
+                addNotification(n);
+            }
+        }
+
+        [NonAction]
+        public void SendCommunityApprovalNotification(Community c, CourseUser sender)
+        {
+            List<CourseUser> leaders = (from i in db.CourseUsers
+                                        where
+                                          i.AbstractCourseID == c.ID &&
+                                          i.AbstractRoleID == (int)CommunityRole.OSBLERoles.Leader
+                                        select i).ToList();
+
+            foreach (CourseUser leader in leaders)
+            {
+                Notification n = new Notification();
+                n.ItemType = Notification.Types.JoinCommunityApproval;
+                n.ItemID = c.ID;
+                n.RecipientID = leader.ID;
+                n.SenderID = sender.ID;
 
                 addNotification(n);
             }
