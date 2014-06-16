@@ -407,34 +407,60 @@ namespace OSBLE.Controllers
 
             ViewBag.CourseName = request.Prefix.ToString() + " " + request.Number.ToString() + " - " + request.Name.ToString();
 
-            //if the user is not enrolled in any courses 
-            if (ActiveCourseUser == null)
-            {
-                //we need to create a course user in order to send a proper notification to the instructor(s)
-                CourseUser newUser = new CourseUser();
-                UserProfile profile = db.UserProfiles.Where(up => up.ID == this.CurrentUser.ID).FirstOrDefault();
-                newUser.UserProfile = profile;
-                newUser.UserProfileID = profile.ID;
-                newUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending; //FIX THIS NOW FORREST
-                newUser.AbstractCourseID = request.ID;
-                newUser.Hidden = true;
-
-                db.CourseUsers.Add(newUser);
-                db.SaveChanges();
-
-                ActiveCourseUser = newUser;
-
-                using (NotificationController nc = new NotificationController())
-                {
-                    nc.SendCourseApprovalNotification(request, newUser);
-                }
-
-                return View("CourseAwaitingApproval");
-            }
             //user is already enrolled in the course...dummy
-            else if (currentCourses.Select(x => x.AbstractCourse).Contains(request))
+            if (currentCourses.Select(x => x.AbstractCourse).Contains(request))
             {
                 return View("CourseCurrentlyEnrolled");
+            }
+            
+            //if the user is not enrolled in any courses but may be withdrawn in a course
+            else if (ActiveCourseUser == null)
+            {
+                //this is for checking if they are withdrawn, poo will be null if they are not in course, else it will return a CourseUser
+                var previousUser = (from d in db.CourseUsers
+                           where d.UserProfileID == this.CurrentUser.ID
+                           select d).FirstOrDefault();
+
+                if (previousUser != null)
+                {
+                    previousUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending;
+                    previousUser.AbstractCourseID = request.ID;
+                    previousUser.Hidden = true;
+
+                    db.Entry(previousUser).State = EntityState.Modified;
+                    db.SaveChanges();
+                    ActiveCourseUser = previousUser;
+
+                    using (NotificationController nc = new NotificationController())
+                    {
+                        nc.SendCourseApprovalNotification(request, previousUser);
+                    }
+                }
+                else
+                {
+
+                    //we need to create a course user in order to send a proper notification to the instructor(s)
+                    CourseUser newUser = new CourseUser();
+                    UserProfile profile = db.UserProfiles.Where(up => up.ID == this.CurrentUser.ID).FirstOrDefault();
+                    newUser.UserProfile = profile;
+                    newUser.UserProfileID = profile.ID;
+                    newUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending; //FIX THIS NOW FORREST
+                    newUser.AbstractCourseID = request.ID;
+                    newUser.Hidden = true;
+
+                    db.CourseUsers.Add(newUser);
+                    db.SaveChanges();
+
+                    ActiveCourseUser = newUser;
+
+                    using (NotificationController nc = new NotificationController())
+                    {
+                        nc.SendCourseApprovalNotification(request, newUser);
+                    }
+                }
+
+
+                return View("CourseAwaitingApproval");
             }
             else
             {
