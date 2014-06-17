@@ -2,12 +2,16 @@
 
 @{
     ViewBag.Title = "CourseCurrentlyEnrolled";
+    string CourseName = ViewBag.CourseName;
 }
 
-<h2>You are Currently Enrolled in This Course</h2>
+<h2>Request to Join Course [@CourseName]</h2>
 
 <p>
-    Your request to join has been rejected because you are already enrolled in this course.
+    Your request to join <strong>[@CourseName]</strong> was not successful. 
+    <br /><br />
+    You are either currently enrolled or have pending enrollment status for this course.
 </p>
 
+<br />
 @Html.ActionLink("Back to Course Search", "CourseSearch")

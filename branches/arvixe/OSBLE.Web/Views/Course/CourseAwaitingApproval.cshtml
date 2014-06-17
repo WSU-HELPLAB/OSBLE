@@ -5,12 +5,14 @@
     string CourseName = ViewBag.CourseName;
 }
 
-<h2>Request To Join @CourseName is Awaiting Instructor Approval</h2>
+<h2>Request To Join [@CourseName] is Awaiting Instructor Approval</h2>
 
 
 <p>
-    Your request to join @CourseName has been received. Before you are enrolled, you must first recieve approval from the course instructor.
+    Your request to join <strong>[@CourseName]</strong> has been received. Before you are enrolled, you must first recieve approval from the course instructor.
+    <br /><br />
     The instructor has been notified of your request.
 </p>
 
-@Html.ActionLink("Back to OSBLE Home", "Index", "Home")
+<br />
+@Html.ActionLink("Back to Course Search", "CourseSearch")
