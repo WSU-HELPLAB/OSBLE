@@ -64,6 +64,7 @@ namespace OSBLE.Models.HomePage
             public const string FileSubmitted = "FileSubmitted";
             public const string TeamEvaluationDiscrepancy = "TeamEvaluationDiscrepancy";
             public const string JoinCourseApproval = "JoinCourseApproval";
+            public const string JoinCommunityApproval = "JoinCommunityApproval";
         }
 
         public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
