@@ -351,7 +351,7 @@ namespace OSBLE.Controllers
         /// <param name="n">Notification to be emailed</param>
         private void emailNotification(Notification n)
         {
-#if !DEBUG
+
             SmtpClient mailClient = new SmtpClient();
             mailClient.UseDefaultCredentials = true;
             
@@ -359,6 +359,7 @@ namespace OSBLE.Controllers
             UserProfile recipient = db.UserProfiles.Find(n.Recipient.UserProfileID);
 
             // this comes back as null, for some reason. //dmo:6/5/2014 does it really? it seems to work??
+            //Abstract course can represent a course or a community 
             AbstractCourse course = db.AbstractCourses.Where(b => b.ID == n.Sender.AbstractCourseID).FirstOrDefault();
             string[] temp;
             //checking to see if there is no data besides abstractCourseID
@@ -452,6 +453,14 @@ namespace OSBLE.Controllers
 
                     break;
                 case Notification.Types.JoinCourseApproval:
+                    subject += sender.FirstName + " " + sender.LastName + "has submitted a request to join" + course.Name;
+
+                    body = sender.FirstName + " " + sender.LastName + " has submitted a request to join" + course.Name; 
+
+                    action = "view the request to join.";
+
+                    break;
+                case Notification.Types.JoinCommunityApproval:
                     subject += sender.FirstName + " " + sender.LastName + "has submitted a request to join" + course.Name;
 
                     body = sender.FirstName + " " + sender.LastName + " has submitted a request to join" + course.Name; 
