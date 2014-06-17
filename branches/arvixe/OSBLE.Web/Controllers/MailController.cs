@@ -448,7 +448,9 @@ namespace OSBLE.Controllers
         {
             List<UserProfile> recipientList = new List<UserProfile>();
 
-            CourseUser studentRec = db.CourseUsers.Find(id);
+            CourseUser studentRec = (from d in db.CourseUsers
+                                     where d.UserProfileID == id
+                                     select d).FirstOrDefault();
             if (studentRec != null)
             {
                 recipientList.Add(studentRec.UserProfile);
