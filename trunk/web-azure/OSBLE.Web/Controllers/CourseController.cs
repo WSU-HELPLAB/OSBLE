@@ -356,6 +356,7 @@ namespace OSBLE.Controllers
             var CourseNumber = from s in db.Courses
                                where s.Prefix == id
                                && s.IsDeleted == false
+                               && s.EndDate > DateTime.Now
                                select s;            
 
             return Json(new SelectList(CourseNumber.ToArray(), "Number", "Number"), JsonRequestBehavior.AllowGet);
