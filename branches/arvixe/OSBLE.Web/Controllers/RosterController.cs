@@ -13,6 +13,7 @@ using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Models.AbstractCourses;
 using OSBLE.Models.AbstractCourses.Course;
+using OSBLE.Models.HomePage; //yc: added for notifcations
 using OSBLE.Utility;
 using System.Net.Mail;
 
@@ -571,6 +572,9 @@ namespace OSBLE.Controllers
             //wtu has been loaded up
             if (ModelState.IsValid)
             {
+                if (wtUser.Email == null)
+                    wtUser.Email = String.Empty;
+
                 db.Entry(wtUser).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
@@ -578,6 +582,127 @@ namespace OSBLE.Controllers
 
             return RedirectToAction("Index");
         }
+
+        //
+        /// <summary>
+        /// yc: get- approve pending user for current course enrollment, clean up notifcation to instructor, change student status
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns>back to index with notice the current pending user has been enrolled</returns>
+        [CanModifyCourse]
+        public ActionResult ApprovePending(int userId)
+        {
+            CourseUser pendingUser = getCourseUser(userId);
+
+            //notifcation cleanup
+            //find all notifcations sent from this userid and notifcation type is joincourseapproval
+            //weve decided that notifications are no longer crucial to clean up
+            //List<Notification> approvalNotifications = (from n in db.Notifications
+            //                                            where n.SenderID == pendingUser.ID &&
+            //                                            n.ItemType == Notification.Types.JoinCourseApproval &&
+            //                                            n.ItemID == ActiveCourseUser.AbstractCourseID
+            //                                            select n).ToList();
+            //foreach (Notification aN in approvalNotifications)
+            //{
+            //    //delete this notification
+            //    db.Notifications.Remove(aN);
+            //    db.SaveChanges();
+            //}
+            //save teh changes
+
+
+            //set user to active student
+            if (pendingUser.AbstractRoleID == (int)CourseRole.CourseRoles.Pending)
+            {
+                pendingUser.Hidden = false;
+                pendingUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+                db.Entry(pendingUser).State = EntityState.Modified;
+                db.SaveChanges();
+
+                return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " has been enrolled into this course" });
+            }
+            else
+            {
+                return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " IS NOT A PENDING USER" });
+            }
+            
+        }
+        /// <summary>
+        /// yc: get- deny pending user for current course enrollmenet, clean up notifications to instructor
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        [CanModifyCourse]
+        public ActionResult DenyPending(int userId)
+        {
+            CourseUser pendingUser = getCourseUser(userId);
+
+            //db entry will no longer exists, save names for notice
+            string firstName = pendingUser.UserProfile.FirstName;
+            string lastName = pendingUser.UserProfile.LastName;
+
+            //notifcation clean up
+
+            //remove the kid from the db
+            db.CourseUsers.Remove(pendingUser);
+            db.SaveChanges();
+
+            return RedirectToAction("Index", "Roster", new { notice = firstName + " " + lastName + " has been denied enrollment into this course" });
+        }
+        
+        /// <summary>
+        /// yc: creating a batch approval on pending users based on the current course
+        /// </summary>
+        /// <returns> to users page reflecting the changes</returns>
+        [CanModifyCourse]
+        public ActionResult BatchApprove()
+        {
+            int count = 0;
+
+            //find all pending users for current course
+            List<CourseUser> pendingUsers = (from c in db.CourseUsers
+                                             where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                                             c.AbstractRoleID == (int)CourseRole.CourseRoles.Pending
+                                             select c).ToList();
+
+            count = pendingUsers.Count();
+
+            foreach (CourseUser p in pendingUsers)
+            {
+                p.Hidden = false;
+                p.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+                db.Entry(p).State = EntityState.Modified;
+                db.SaveChanges();
+            }
+
+            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " of students have been enrolled into this course" });
+        }
+
+        /// <summary>
+        /// yc: creating a batch denial on pending users based on the current course.
+        /// </summary>
+        /// <returns> to users page reflect the changes</returns>
+        [CanModifyCourse]
+        public ActionResult BatchDeny()
+        {
+            int count = 0;
+            //find all pending users for current course
+            List<CourseUser> pendingUsers = (from c in db.CourseUsers
+                                             where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                                             c.AbstractRoleID == (int)CourseRole.CourseRoles.Pending
+                                             select c).ToList();
+
+            count = pendingUsers.Count();
+            foreach (CourseUser p in pendingUsers)
+            {
+                db.CourseUsers.Remove(p);
+                db.SaveChanges();
+            }
+
+            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " of students have been denied enrollment into this course" });
+        }
+
+
         //Students
         //
 
