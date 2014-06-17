@@ -128,6 +128,7 @@ namespace OSBLE.Models
                 {"Student",     "Students are the individuals who participate in the course for turning in assignments, receiving grades, and other activities."},
                 {"TA",          "Teaching assistant who helps with grading assignments."},
                 {"Withdrawn",   "Students that have withdrawn from the course.  Any OSBLE content created by these users will remain in the system."},
+                {"Pending",   "Pending users awaiting approval to join the course/community."},
                 {"Moderator",   "Moderators are...?"},
                 {"Leader",      "Community leader...?"},
                 {"Participant", "Community participant...?"} };
