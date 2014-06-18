@@ -675,7 +675,7 @@ namespace OSBLE.Controllers
                 db.SaveChanges();
             }
 
-            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " of students have been enrolled into this course" });
+            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " students have been enrolled into this course" });
         }
 
         /// <summary>
@@ -699,10 +699,76 @@ namespace OSBLE.Controllers
                 db.SaveChanges();
             }
 
-            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " of students have been denied enrollment into this course" });
+            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " students have been denied enrollment into this course" });
         }
 
 
+        /// <summary>
+        /// yc: this function finds all students currently enrolled, and will turn them all into withdrawn students.
+        /// </summary>
+        /// <returns></returns>
+        [CanModifyCourse]
+        public ActionResult BatchWithdraw()
+        {
+            int count = 0;
+
+            //find all students for current course
+            List<CourseUser> students = (from c in db.CourseUsers
+                                             where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                                             c.AbstractRoleID == (int)CourseRole.CourseRoles.Student
+                                             select c).ToList();
+            count = students.Count();
+
+            foreach (CourseUser p in students)
+            {
+                p.AbstractRoleID = (int)CourseRole.CourseRoles.Withdrawn;
+                db.Entry(p).State = EntityState.Modified;
+                db.SaveChanges();
+            }
+
+            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " students have been withdrawn from this course" });
+        }
+
+        [CanModifyCourse]
+        public ActionResult BatchClearWhiteTable()
+        {
+            int count = 0;
+
+            //find all whitelisted students
+            List<WhiteTableUser> students = (from c in db.WhiteTableUsers
+                                             where c.CourseID == ActiveCourseUser.AbstractCourseID
+                                             select c).ToList();
+            count = students.Count();
+
+            foreach (WhiteTableUser p in students)
+            {
+                db.WhiteTableUsers.Remove(p);
+                db.SaveChanges();
+            }
+
+            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " whitelisted students no longer have automatic enrollment into this course" });
+        }
+
+        [CanModifyCourse]
+        public ActionResult BatchDeleteWithdrawn()
+        {
+            int count = 0;
+
+            //find all withdrawn students for current course
+            List<CourseUser> students = (from c in db.CourseUsers
+                                         where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                                         c.AbstractRoleID == (int)CourseRole.CourseRoles.Withdrawn
+                                         select c).ToList();
+            count = students.Count();
+
+            foreach (CourseUser p in students)
+            {
+                db.CourseUsers.Remove(p);
+                db.SaveChanges();
+            }
+
+            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " withdrawn students have been banished from the course" });
+        }
         //Students
         //
 

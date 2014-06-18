@@ -87,7 +87,12 @@
                 { 
                 <td>
                     <!--Prints the users in the whitetable for the current class-->
-                <h3>Whitelisted(<span id="roleheader_@(usersBySection.SectionNumber)_whitetable">@ViewBag.WhiteTableUsers.Count.ToString()</span>) @Helpers.CreateToolTip(ToolTips.RosterWhitetableRoleRole)</h3>
+                <h3>Whitelisted(<span id="roleheader_@(usersBySection.SectionNumber)_whitetable">@ViewBag.WhiteTableUsers.Count.ToString()</span>)
+                    @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                    {
+                        <a title="Clear All Whitelisted Users" href="@Url.Action("BatchClearWhiteTable", "Roster")">@Helpers.DeleteButton()</a>
+                    }
+                    @Helpers.CreateToolTip(ToolTips.RosterWhitetableRoleRole)</h3>
                       
                 <ul class="user_list">
                     @foreach (var WTuser in ViewBag.WhiteTableUsers)
@@ -133,6 +138,14 @@
                 <td>
                     <h3>
                         @userByRole.RoleName (<span id="roleheader_@(usersBySection.SectionNumber)_@(userByRole.RoleName)">@userByRole.Count.ToString()</span>)
+                        @if (userByRole.RoleName == "Student" && ViewBag.ActiveCourse.AbstractRole.CanModify)
+                        {
+                            <a title="Withdraw All Students" href="@Url.Action("BatchWithdraw", "Roster")">@Helpers.DeleteButton()</a>
+                        }
+                        else if (userByRole.RoleName == "Withdrawn" && ViewBag.ActiveCourse.AbstractRole.CanModify)
+                        {
+                            <a title="Delete Withdrawn Students" href="@Url.Action("BatchDeleteWithdrawn", "Roster")">@Helpers.DeleteButton()</a>
+                        }
                         @try
                         {
                             @Helpers.CreateToolTip(ToolTips.RosterRolesDictionary[userByRole.RoleName]);
@@ -209,7 +222,6 @@
                                         {
                                             <a title="Approve this User" href="@Url.Action("ApprovePending", "Roster", new { userId = user.ID })">@Helpers.ThumbsUpButton()</a>
                                             <a title="Deny this User" href="@Url.Action("DenyPending", "Roster", new { userId = user.ID })">@Helpers.ThumbsDownButton()</a>
-
                                         }
                                     </div>
                                 }
