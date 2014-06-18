@@ -105,8 +105,6 @@
                                     @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                                     {
                                         <a title="Modify This User" href="@Url.Action("EditWTUser", "Roster", new { wtuID = WTuser.ID })">@Helpers.EditButton()</a>
-
-
                                     }
                                 </div>
                                 
@@ -121,7 +119,6 @@
                                     @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                                     {
                                         <a title="Modify This User" href="@Url.Action("EditWTUser", "Roster", new { wtuID = WTuser.ID })">@Helpers.EditButton()</a>
-
                                     }
                                 </div>
                                 @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", new { userProfile = WTuser.ID }))
@@ -140,7 +137,7 @@
                         @userByRole.RoleName (<span id="roleheader_@(usersBySection.SectionNumber)_@(userByRole.RoleName)">@userByRole.Count.ToString()</span>)
                         @if (userByRole.RoleName == "Student" && ViewBag.ActiveCourse.AbstractRole.CanModify)
                         {
-                            <a title="Withdraw All Students" href="@Url.Action("BatchWithdraw", "Roster")">@Helpers.DeleteButton()</a>
+                            <a title="Withdraw All Students" href="@Url.Action("BatchWithdraw", "Roster")">@Helpers.WithdrawButton()</a>
                         }
                         else if (userByRole.RoleName == "Withdrawn" && ViewBag.ActiveCourse.AbstractRole.CanModify)
                         {
