@@ -107,8 +107,8 @@
                                         <a title="Modify This User" href="@Url.Action("EditWTUser", "Roster", new { wtuID = WTuser.ID })">@Helpers.EditButton()</a>
                                     }
                                 </div>
-                                
-                                @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", new { userProfile = WTuser.ID }))
+                                @* Whitelisted users do not have an osble account and therefore cannot have a profile picture yet! *@
+                                @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", new { userProfile = -1 }))
                                 <span>@WTuser.Name1 @WTuser.Name2</span>
                             </li>
                         }
@@ -121,7 +121,8 @@
                                         <a title="Modify This User" href="@Url.Action("EditWTUser", "Roster", new { wtuID = WTuser.ID })">@Helpers.EditButton()</a>
                                     }
                                 </div>
-                                @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", new { userProfile = WTuser.ID }))
+                                @* Whitelisted users do not have an osble account and therefore cannot have a profile picture yet! *@
+                                @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", new { userProfile = -1 }))
                                 <span>@WTuser.Name1 @WTuser.Name2</span>
                             </li>
                         }
