@@ -66,7 +66,11 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         public FileStreamResult Picture(int id, int size = 128)
         {
-            UserProfile user = db.UserProfiles.Where(u => u.ID == id).FirstOrDefault();
+            UserProfile user = null;
+            // id == -1 means whitelisted user, whitelist users do not have profiles/profileimages so don't check the db.
+            if(id != -1)
+                user = db.UserProfiles.Where(u => u.ID == id).FirstOrDefault();
+
             System.Drawing.Bitmap userBitmap;
             if (user != null)
             {
