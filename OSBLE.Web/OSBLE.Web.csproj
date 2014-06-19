@@ -495,6 +495,8 @@
     <Content Include="Content\images\page_white_delete.png" />
     <Content Include="Content\images\page_white_edit.png" />
     <Content Include="Content\images\publish.png" />
+    <Content Include="Content\images\thumbs_up.png" />
+    <Content Include="Content\images\thumb_down.png" />
     <Content Include="Content\images\tooltip\109_AllAnnotations_Help_16x16_72.png" />
     <Content Include="Content\images\tooltip\bubble-1.png" />
     <Content Include="Content\images\tooltip\bubble-2.png" />

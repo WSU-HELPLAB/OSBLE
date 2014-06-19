@@ -115,7 +115,7 @@ namespace OSBLE.Controllers
                                 string UtcOffsetString = cookieOffset.Value;
                                 utcOffset = Convert.ToInt32(UtcOffsetString);
 
-                                //subTime = subTime.Value.AddMinutes(-utcOffset);
+                                subTime = subTime.Value.AddMinutes(-utcOffset);
                             }
                             else
                             {
