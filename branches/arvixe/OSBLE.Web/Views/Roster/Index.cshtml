@@ -101,10 +101,11 @@
                         {
                             <li id="wtuser_item_@WTuser.ID">
                                 <div class="user_controls">
-                                    <a title="Mail This User" href="@Url.Action("CreateWhiteTableUserProfileId", "Mail", new { id = WTuser.ID })">@Helpers.MailButton()</a>
+                                    <a title="Send Course Invitation Email" href="@Url.Action("resendWhiteTableEmail", "Roster", new { wtUserId = WTuser.ID })">@Helpers.MailButton()</a>
                                     @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                                     {
                                         <a title="Modify This User" href="@Url.Action("EditWTUser", "Roster", new { wtuID = WTuser.ID })">@Helpers.EditButton()</a>
+                                        <a title="Delete This User" href="@Url.Action("DeleteWTUser", "Roster", new { wtuID = WTuser.ID })">@Helpers.DeleteButton()</a>
                                     }
                                 </div>
                                 @* Whitelisted users do not have an osble account and therefore cannot have a profile picture yet! *@
@@ -126,7 +127,6 @@
                                 <span>@WTuser.Name1 @WTuser.Name2</span>
                             </li>
                         }
-                        
                     }
                 </ul>
                 </td>
@@ -142,7 +142,19 @@
                         }
                         else if (userByRole.RoleName == "Withdrawn" && ViewBag.ActiveCourse.AbstractRole.CanModify)
                         {
-                            <a title="Delete Withdrawn Students" href="@Url.Action("BatchDeleteWithdrawn", "Roster")">@Helpers.DeleteButton()</a>
+                            <a href="#" onclick="confirmBatchDelete()" title="Delete All Withdrawn Users">@Helpers.DeleteButton()</a>
+                            <script type="text/javascript">
+                                function confirmBatchDelete() {
+                                    r = confirm("Are you sure? This action is irreversible and all withdrawn student work will be lost");
+                                    if (r) {
+                                        var url = "/Roster/BatchDeleteWithdrawn";
+                                        $.get(url, function (data) {
+                                            return true;
+                                        });
+                                    }
+                                    return false;
+                                }
+                            </script>
                         }
                         @try
                         {
@@ -167,7 +179,6 @@
                                         @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                                         {
                                             <a title="Modify This User" href="@Url.Action("Edit", "Roster", new { userProfileID = user.ID })">@Helpers.EditButton()</a>
-
                                             <form action="@Url.Action("Delete")"
                                 style="display: inline;"
                                 data-ajax="true"
