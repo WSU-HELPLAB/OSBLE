@@ -1,5 +1,11 @@
 ﻿@using OSBLE.Models.HomePage
 
+@{
+    bool courseFlag = true;
+    bool communityFlag = true;
+}
+
+
 <ul id="notifications_list">
 
 
@@ -14,6 +20,7 @@
         {
             classToAppend = "read";
         }
+        //this javascript roght here is what is causeing all of the notifications with just the dates to be printed. I havn't figured out a way around it yet 
         <li class="notification @classToAppend" id="notification_@(n.ID)" >
             <time class="utc-time"
                 style="font-size:small;"
@@ -52,16 +59,67 @@
                         }
                     case Notification.Types.JoinCourseApproval:
                         {
-                            <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> sent you a @NotificationLink(n.ID, "request to join course")</text>
-                            break;
+                         //this flag is toggled when we recieve a JoinCourseApproval Notification, we will do all of the notification printing upon recieving 
+                         //the first joincourseapproval notification and then toggle this flag to false   
+                            
+                        //TODO: see the commented java script above around line 22ish. We need to stop that from printing for each notification. because we end up with one consolidated courseappproval 
+                        //notification and then a few more below it with the just the time and the date since the forloop ran through them all, and will hit the JS everytime    
+                            if (courseFlag)
+                            {
+                                courseFlag = false;                                             //toggle flag
+                                List<Notification> courseNotification = ViewBag.Notifications;  //make a list 
+                                int CourseNotificationCount = courseNotification.Select(x => x.ItemType == Notification.Types.JoinCourseApproval).Count(); //get the count of joincourseapproval notifications
+                            
+                                if(courseNotification != null)  //make sure there are even notifications to display 
+                                {
+                                    
+                                    if (CourseNotificationCount > 1) //if there is more than one notification for joincourse approval we need to consolidate it 
+                                    {
+                                        <text>You have <b>@CourseNotificationCount.ToString()</b> request to join this course @NotificationLink(n.ID, "see requests here")</text>
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> sent you a @NotificationLink(n.ID, "request to join course")</text>
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                            break;  
                         }
                      case Notification.Types.JoinCommunityApproval:
                         {
-                            <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> sent you a @NotificationLink(n.ID, "request to join community")</text>
-                            break;
+                            if (communityFlag)
+                            {
+                                communityFlag = false;  //flag is for consolidation of notifications, it prevents all the notifications from printing and allows 
+                                                        //us to make them into one notification as seen in the if (CommunityNotificationCount > 1) block
+                                    
+                                List<Notification> communityNotification = ViewBag.Notifications;
+                                int CommunityNotificationCount = communityNotification.Select(x => x.ItemType == Notification.Types.JoinCourseApproval).Count();
+
+                                if (communityNotification != null)
+                                {
+
+                                    if (CommunityNotificationCount > 1)
+                                    {
+                                        <text>You have <b>@CommunityNotificationCount.ToString()</b> request to join this course @NotificationLink(n.ID, "see requests here")</text>
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> sent you a @NotificationLink(n.ID, "request to join community")</text>
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                            break;  
+                           
                         }
                     case Notification.Types.Dashboard:
                         {
+                            
                             <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> posted in a @NotificationLink(n.ID, "dashboard thread")
                             that you participated in</text>
                             break;
