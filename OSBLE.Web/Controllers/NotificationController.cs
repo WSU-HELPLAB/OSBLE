@@ -35,7 +35,7 @@ namespace OSBLE.Controllers
                 n.Read = true;
                 db.SaveChanges();
 
-                // Determine which item type and dispatch to the appropriate action/controller.
+                // Determine which item type and dispatch to the appropriate action/controller
                 switch (n.ItemType)
                 {
                     case Notification.Types.Mail:
