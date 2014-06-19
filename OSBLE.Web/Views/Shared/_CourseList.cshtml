@@ -9,15 +9,33 @@
         bool courseOptGroup = false;
         bool communityOptGroup = false;
         bool committeeOptGroup = false;
+        var currentCourses = ViewBag.CurrentCourses;
+        
         foreach (OSBLE.Models.Courses.CourseUser cu in ViewBag.CurrentCourses)
         {
+            //get the semester/year info for the course
+            string semester = "";
+            string year = "";
+
+            if (cu.AbstractCourse is Course)
+            {
+                foreach (var course in currentCourses)
+                {
+                    if (course.AbstractCourse.ID == cu.AbstractCourse.ID)
+                    {
+                        semester = ": " + course.AbstractCourse.Semester + ", ";
+                        year = course.AbstractCourse.Year;
+                    }
+                }
+            }
+            
             // Skip hidden courses
             if (cu.Hidden)
             {
                 continue;
             }
 
-            string courseDisplay = Helpers.CourseTag(cu.AbstractCourse) + " - " + cu.AbstractCourse.Name + " (" + cu.AbstractRole.Name + ")";
+            string courseDisplay = Helpers.CourseTag(cu.AbstractCourse) + " - " + cu.AbstractCourse.Name + semester + year + " (" + cu.AbstractRole.Name + ")";
 
             // Different display for committees
             if (cu.AbstractCourse is AssessmentCommittee)
