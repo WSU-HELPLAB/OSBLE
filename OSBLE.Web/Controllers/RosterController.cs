@@ -68,6 +68,7 @@ namespace OSBLE.Controllers
                 get;
                 set;
             }
+
         } 
 
         public class UsersByRole
@@ -324,7 +325,8 @@ namespace OSBLE.Controllers
                     List<CourseUser> otherMembers = db.CourseUsers.Where(c => c.AbstractCourseID == ActiveCourseUser.AbstractCourseID && c.AbstractRoleID != (int)CourseRole.CourseRoles.Student).ToList();
                     foreach (CourseUser member in otherMembers)
                     {
-                        if (usedIdentifications.Contains(member.UserProfile.Identification))
+                        
+                        if (usedIdentifications.Contains(member.UserProfile.Identification) && member.AbstractRoleID != (int)CourseRole.CourseRoles.Pending)
                         {
                             ViewBag.Error = "There is a non-student (" + member.UserProfile.FirstName + " " + member.UserProfile.LastName + ") in the course with the same School ID as a student on the roster. Please check your roster and try again.";
                             return View("RosterError");
@@ -352,11 +354,18 @@ namespace OSBLE.Controllers
                     {
 
                         UserProfile userWithAccount = getEntryUserProfile(entry);
-
+                        
 
                         if(userWithAccount != null)
                         {
-
+                            CourseUser userIsPending = getPendingUserOnRoster(entry);
+                            if(userIsPending != null)
+                            {
+                                userIsPending.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+                                orphans.Remove(userIsPending.UserProfile);
+                                db.Entry(userIsPending).State = EntityState.Modified;
+                                continue;                            
+                            }
                             CourseUser existingUser = new CourseUser(); 
                             //yc: before using create course user, you must set the following
                             existingUser.UserProfile = userWithAccount;
@@ -1222,6 +1231,18 @@ namespace OSBLE.Controllers
             return possibleUser;
         }
 
+        private CourseUser getPendingUserOnRoster(RosterEntry entry)
+        {
+            CourseUser pendingUser = (from d in db.CourseUsers
+                                      where d.AbstractCourseID == ActiveCourseUser.AbstractCourseID
+                                      && d.UserProfile.Identification == entry.Identification
+                                      && d.UserProfile.UserName == entry.Email
+                                      && d.AbstractRoleID == (int)CourseRole.CourseRoles.Pending
+                                      select d).FirstOrDefault();
+
+            return pendingUser;
+        }
+
         private void emailCourseUser(CourseUser user)
         {
             string subject = "Welcome to " + ActiveCourseUser.AbstractCourse.Name;
@@ -1229,8 +1250,8 @@ namespace OSBLE.Controllers
 
             string message = "Dear " + user.UserProfile.FirstName + " " + user.UserProfile.LastName + @", <br/>
             <br/>
-            This email was sent to notify you that you have been added to " + ActiveCourseUser.AbstractCourse.Name +
-            "You may go to the course by <a href='" + link + @"'>following this link</a>. 
+            Congratulations! You have been enrolled in the following course at osble.org: " + ActiveCourseUser.AbstractCourse.Name +
+            "You may access this course by <a href='" + link + @"'>clicking on this link</a>. 
             <br/>
             <br/>
             ";
@@ -1251,9 +1272,9 @@ namespace OSBLE.Controllers
 
             string message = "Dear " + WTU.Name2 + " " + WTU.Name1 + @", <br/>
                 <br/>
-                This email was sent to notify you that you have been added to " + ActiveCourseUser.AbstractCourse.Name +
-            " To access this course you need to create an account with OSBLE first. You may create an account " +
-            "by <a href='" + link + @"'>following this link</a>. 
+                Congratulations! You have been enrolled in the following course at osble.org: " + ActiveCourseUser.AbstractCourse.Name +
+            " In order to access this course, please create an OSBLE account with OSBLE first by " +
+            "<a href='" + link + @"'>clicking on this link</a>. 
                 <br/>
                 <br/>
                 ";
