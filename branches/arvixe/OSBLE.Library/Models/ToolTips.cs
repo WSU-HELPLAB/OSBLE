@@ -129,9 +129,13 @@ namespace OSBLE.Models
                 {"TA",          "Teaching assistant who helps with grading assignments."},
                 {"Withdrawn",   "Students that have withdrawn from the course.  Any OSBLE content created by these users will remain in the system."},
                 {"Pending",   "Pending users awaiting approval to join the course/community."},
-                {"Moderator",   "Moderators are...?"},
-                {"Leader",      "Community leader...?"},
-                {"Participant", "Community participant...?"} };
+                {"TrustedCommunityMember","Trusted community members can participate in communities and manage shared community files."},
+                {"Moderator",   "Moderators can be injected into discussion assignments. They are responsible for prompting participants and keeping discussions on track."},
+                {"Leader",      "Community leaders administrate the community by adding and removing users along with managing files."},
+                {"Participant", "Community participants participate in communinty dicussions and download shared community files; however they do not have any file management privledges."},
+                {"Assessment Committee Chair",""},
+                {"Assessment Committee Member",""},
+                {"ABET Evaluator",""}};
 
             public static string RosterWhitetableRoleRole = "Whitelisted users are approved to  enroll in the course, but they do not have an OSBLE account. Provided a valid email address, these students will be invited to register and enroll into this course. If an email address on the roster that was uploaded, these students will be notified. Students highlighed in red do not have a valid email address.";
             public static string RosterUserName = "This is the name this user will be publicly identified by in mail, posts, assignments, and other content.";

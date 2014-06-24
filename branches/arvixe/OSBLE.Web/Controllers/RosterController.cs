@@ -684,7 +684,7 @@ namespace OSBLE.Controllers
                 db.SaveChanges();
             }
 
-            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " students have been enrolled into this course" });
+            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " student(s) have been enrolled into this course" });
         }
 
         /// <summary>
@@ -708,7 +708,7 @@ namespace OSBLE.Controllers
                 db.SaveChanges();
             }
 
-            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " students have been denied enrollment into this course" });
+            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " student(s) have been denied enrollment into this course" });
         }
 
 
@@ -735,7 +735,7 @@ namespace OSBLE.Controllers
                 db.SaveChanges();
             }
 
-            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " students have been withdrawn from this course" });
+            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " student(s) have been withdrawn from this course" });
         }
 
         [CanModifyCourse]
@@ -755,7 +755,7 @@ namespace OSBLE.Controllers
                 db.SaveChanges();
             }
 
-            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " whitelisted students have been removed from this course" });
+            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " whitelisted student(s) have been removed from this course" });
         }
 
         [CanModifyCourse]
