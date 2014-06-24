@@ -550,7 +550,64 @@ namespace OSBLE.Controllers
             {
                 try
                 {
-                    attachCourseUserByEmail(courseuser);
+                    //yc this check for multiple emails added in. 
+                    string temp = courseuser.UserProfile.UserName;
+                    char[] delim = new char[] { ' ', ',' };
+                    string[] emails = temp.Split(delim, StringSplitOptions.RemoveEmptyEntries);
+                    string[] invalidEmails = new string[emails.Count()];
+                    int invalidCount = 0;
+
+                    if (emails.Count() > 1)
+                    {
+                        // more than one 
+
+
+                        foreach (String username in emails)
+                        {
+                            //find teh user profile
+                            UserProfile user = (from u in db.UserProfiles
+                                                where u.UserName == username
+                                                select u).FirstOrDefault();
+                            if (user != null)
+                            {
+                                CourseUser newUser = courseuser;
+                                newUser.UserProfile = user;
+                                newUser.UserProfileID = user.ID;
+
+                                attachCourseUserByEmail(newUser);
+                            }
+                            else
+                            {
+                                //userprofile doenst exist.
+                                invalidEmails[invalidCount] = username;
+                                invalidCount++;
+                            }
+                            //create a copy of the course user
+                        }
+                        if (invalidCount > 0)//caught at least one invalid
+                        {
+                            //create a notice
+                            string message = "The following email(s) could not be added because these users do not exist: ";
+                            foreach (string invalid in invalidEmails)
+                            {
+                                if (invalid != "")
+                                    message += invalid + ", ";
+                            }
+                            string noticeMessage = message.Substring(0, message.Length - 2);
+                            noticeMessage += ".";
+
+                            return RedirectToAction("Index", new { notice = noticeMessage });
+                        }
+                        else
+                        {
+                            return RedirectToAction("Index", new { notice = emails.Count().ToString() + " users have been added to the course" });
+                        }
+                    }
+                    else
+                    {
+                        //only one. do what you are originally intended for
+                        attachCourseUserByEmail(courseuser);
+                    }
                 }
                 catch (Exception e)
                 {
