@@ -23,7 +23,7 @@
                 {
                     if (course.AbstractCourse.ID == cu.AbstractCourse.ID)
                     {
-                        semester = ": " + course.AbstractCourse.Semester + ", ";
+                        semester = ", " + course.AbstractCourse.Semester.Substring(0,2).ToUpper() + ", ";
                         year = course.AbstractCourse.Year;
                     }
                 }

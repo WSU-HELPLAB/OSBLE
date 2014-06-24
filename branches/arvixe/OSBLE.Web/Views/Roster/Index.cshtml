@@ -180,12 +180,20 @@
                                 @if ((user != ViewBag.CurrentUser) || ViewBag.CanEditSelf == true)
                                 {
                                     <div class="user_controls">
+
+                                       @if (userByRole.RoleName == "Withdrawn" && ViewBag.ActiveCourse.AbstractRole.CanModify)
+                                       {
+                                           <a title="Re-enroll as student" href="@Url.Action("ChangeWithdrawnToStudentRole", "Roster", new { userProfileID = user.ID })">@Helpers.LeftArrowButton()</a>
+                                       }
+
                                         @if (user.UserName != null)
                                         {
                                             <a title="Mail This User" href="@Url.Action("CreateUserProfileId", "Mail", new { id = user.ID })">@Helpers.MailButton()</a>
+                                            
                                         }
                                         @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                                         {
+                                            
                                             <a title="Modify This User" href="@Url.Action("Edit", "Roster", new { userProfileID = user.ID })">@Helpers.EditButton()</a>
                                             <form action="@Url.Action("Delete")"
                                 style="display: inline;"
@@ -203,11 +211,17 @@
                                             <input type="hidden" name="userProfileID" value="@user.ID" />
                                             @Helpers.DeleteSubmit("Remove This User")
                                             </form>
+                                            
+                                            if (userByRole.RoleName == "Student")
+                                           {
+                                               <a title="Withdraw student" href="@Url.Action("ChangeStudentToWithdrawnRole", "Roster", new { userProfileID = user.ID })">@Helpers.RightArrowButton()</a>
+                                           }
                                         }
                                     </div>
                                 }
                                 @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", new { userProfile = user.ID }))
                                 <span class="roster_name">@Helpers.DisplayFullNameOrPending(user)</span> </li>
+                            
                         }
                     </ul>
                 </td>

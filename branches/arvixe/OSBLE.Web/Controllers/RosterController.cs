@@ -775,6 +775,51 @@ namespace OSBLE.Controllers
             db.SaveChanges();
             return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " withdrawn students have been removed from the course" });
         }
+
+        [CanModifyCourse]
+        public ActionResult ChangeWithdrawnToStudentRole(int userProfileID)
+        {
+            CourseUser CourseUser = getCourseUser(userProfileID);
+            
+            if (CanModifyOwnLink(CourseUser))
+            {
+                if (ModelState.IsValid)
+                {
+                    CourseUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+                    db.Entry(CourseUser).State = EntityState.Modified;
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", CourseUser.UserProfileID);
+                ViewBag.AbstractCourse = new SelectList(db.Courses, "ID", "Prefix", CourseUser.AbstractCourseID);
+                ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name", CourseUser.AbstractRoleID);
+                return View(CourseUser);
+            }
+            return RedirectToAction("Index");
+        }
+
+        [CanModifyCourse]
+        public ActionResult ChangeStudentToWithdrawnRole(int userProfileID)
+        {
+            CourseUser CourseUser = getCourseUser(userProfileID);
+
+            if (CanModifyOwnLink(CourseUser))
+            {
+                if (ModelState.IsValid)
+                {
+                    CourseUser.AbstractRoleID = (int)CourseRole.CourseRoles.Withdrawn;
+                    db.Entry(CourseUser).State = EntityState.Modified;
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", CourseUser.UserProfileID);
+                ViewBag.AbstractCourse = new SelectList(db.Courses, "ID", "Prefix", CourseUser.AbstractCourseID);
+                ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name", CourseUser.AbstractRoleID);
+                return View(CourseUser);
+            }
+            return RedirectToAction("Index");
+        }
+
         //Students
         //
 
