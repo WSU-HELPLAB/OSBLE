@@ -70,6 +70,12 @@
     @dt.ToLongDateString()<text> </text>@dt.ToShortTimeString()
 }
 @* Buttons for editing/submitting *@
+@helper WithdrawButton()
+    {<img src="/Content/images/withdraw.png" />}
+@helper ThumbsUpButton()
+    {<img src="/Content/images/thumbs_up.png" />}
+@helper ThumbsDownButton()
+    {<img src="/Content/images/thumb_down.png" />}
 @helper MailButton()
     {<img src="/Content/images/mail_up.png" />}
 @helper AddButton()
@@ -80,6 +86,10 @@
     {<img src="/Content/images/edit_up.png" alt="Edit Button" />}
 @helper DeleteButton()
     {<img src="/Content/images/delete_up.png" alt="Delete Button" />}
+@helper LeftArrowButton()
+{<img src="/Content/images/move_left.png" alt="Left Arrow Button" />}
+@helper RightArrowButton()
+{<img src="/Content/images/move_right.png" alt="Right Arrow Button" />}
 @helper PublishButton()
     {<img src="/Content/images/publish.png" alt="Publish Button" />}
 @helper UnPublishButton()
@@ -224,8 +234,8 @@ Also runs content through nl2br to convert newlines to <br /> tags. *@
         HtmlString output = new HtmlString(tooltip);
 
     <div class='popup-bubbleInfo'>
-        <img class='popup-trigger' src='../../Content/images/tooltip/109_AllAnnotations_Help_16x16_72.png'
-            alt='(?)' height='16px' width='16px' />
+        <img class='popup-trigger' src='../../Content/images/tooltip/109_AllAnnotations_Help_19x19_72.png'
+            alt='(?)' height='19px' width='19px' />
         <div class='popup'>
             <table cellpadding='0px' cellspacing='0px'>
                 <tbody>

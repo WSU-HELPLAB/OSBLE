@@ -14,7 +14,7 @@
     @Html.ValidationSummary(true)
 
         <div class="editor-label">
-            @Html.LabelFor(model => model.UserProfileID, "Email Address")
+            @Html.LabelFor(model => model.UserProfileID, "Email Address (may be comma seperated)")
             @Helpers.CreateToolTip(ToolTips.RosterEmail) 
         </div>
         <div class="editor-field">

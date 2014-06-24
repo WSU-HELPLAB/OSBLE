@@ -6,7 +6,7 @@
     string publishText = "Publish Assignment";
     if(Model.IsDraft == false)
     {
-        publishText = "Unpublish Assignment";
+        publishText = "Unpublish the Assignment";
     }
 }
 
@@ -16,6 +16,6 @@ A new assignment entitled "@Model.AssignmentName" has been created. At this poin
 </p>
 <ul>
     <li><a href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = Model.ID})">Edit the assignment</a></li>
-    <li><a href="@Url.Action("ToggleDraft", "Assignment", new { area = "", assignmentId = Model.ID})">Publish the assignment right now</a></li>
+    <li><a href="@Url.Action("ToggleDraft", "Assignment", new { area = "", assignmentId = Model.ID})">@publishText right now</a></li>
     <li><a href="@Url.Action("Index", "Assignment", new { area = "" })">Return to main Assignments page</a></li>
 </ul>

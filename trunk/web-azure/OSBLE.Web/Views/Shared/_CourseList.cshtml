@@ -9,15 +9,33 @@
         bool courseOptGroup = false;
         bool communityOptGroup = false;
         bool committeeOptGroup = false;
+        var currentCourses = ViewBag.CurrentCourses;
+        
         foreach (OSBLE.Models.Courses.CourseUser cu in ViewBag.CurrentCourses)
         {
+            //get the semester/year info for the course
+            string semester = "";
+            string year = "";
+
+            if (cu.AbstractCourse is Course)
+            {
+                foreach (var course in currentCourses)
+                {
+                    if (course.AbstractCourse.ID == cu.AbstractCourse.ID)
+                    {
+                        semester = ", " + course.AbstractCourse.Semester.Substring(0,2).ToUpper() + ", ";
+                        year = course.AbstractCourse.Year;
+                    }
+                }
+            }
+            
             // Skip hidden courses
             if (cu.Hidden)
             {
                 continue;
             }
 
-            string courseDisplay = Helpers.CourseTag(cu.AbstractCourse) + " - " + cu.AbstractCourse.Name + " (" + cu.AbstractRole.Name + ")";
+            string courseDisplay = Helpers.CourseTag(cu.AbstractCourse) + " - " + cu.AbstractCourse.Name + semester + year + " (" + cu.AbstractRole.Name + ")";
 
             // Different display for committees
             if (cu.AbstractCourse is AssessmentCommittee)
@@ -235,6 +253,7 @@ else if (ViewBag.CurrentUser != null)    //yc adding a withdraw button this user
             remove_withdraw_course_dialog();
             var url = "/Account/WithdrawFromCourse";
             $.get(url, function (data) {
+                location.reload();
                 return false;
             });
        }

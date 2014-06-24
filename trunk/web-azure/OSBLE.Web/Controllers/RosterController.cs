@@ -13,6 +13,7 @@ using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Models.AbstractCourses;
 using OSBLE.Models.AbstractCourses.Course;
+using OSBLE.Models.HomePage; //yc: added for notifcations
 using OSBLE.Utility;
 using System.Net.Mail;
 
@@ -70,6 +71,7 @@ namespace OSBLE.Controllers
                 get;
                 set;
             }
+
         } 
 
         public class UsersByRole
@@ -326,7 +328,8 @@ namespace OSBLE.Controllers
                     List<CourseUser> otherMembers = db.CourseUsers.Where(c => c.AbstractCourseID == ActiveCourseUser.AbstractCourseID && c.AbstractRoleID != (int)CourseRole.CourseRoles.Student).ToList();
                     foreach (CourseUser member in otherMembers)
                     {
-                        if (usedIdentifications.Contains(member.UserProfile.Identification))
+                        
+                        if (usedIdentifications.Contains(member.UserProfile.Identification) && member.AbstractRoleID != (int)CourseRole.CourseRoles.Pending)
                         {
                             ViewBag.Error = "There is a non-student (" + member.UserProfile.FirstName + " " + member.UserProfile.LastName + ") in the course with the same School ID as a student on the roster. Please check your roster and try again.";
                             return View("RosterError");
@@ -354,11 +357,18 @@ namespace OSBLE.Controllers
                     {
 
                         UserProfile userWithAccount = getEntryUserProfile(entry);
-
+                        
 
                         if(userWithAccount != null)
                         {
-
+                            CourseUser userIsPending = getPendingUserOnRoster(entry);
+                            if(userIsPending != null)
+                            {
+                                userIsPending.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+                                orphans.Remove(userIsPending.UserProfile);
+                                db.Entry(userIsPending).State = EntityState.Modified;
+                                continue;                            
+                            }
                             CourseUser existingUser = new CourseUser(); 
                             //yc: before using create course user, you must set the following
                             existingUser.UserProfile = userWithAccount;
@@ -543,7 +553,64 @@ namespace OSBLE.Controllers
             {
                 try
                 {
-                    attachCourseUserByEmail(courseuser);
+                    //yc this check for multiple emails added in. 
+                    string temp = courseuser.UserProfile.UserName;
+                    char[] delim = new char[] { ' ', ',' };
+                    string[] emails = temp.Split(delim, StringSplitOptions.RemoveEmptyEntries);
+                    string[] invalidEmails = new string[emails.Count()];
+                    int invalidCount = 0;
+
+                    if (emails.Count() > 1)
+                    {
+                        // more than one 
+
+
+                        foreach (String username in emails)
+                        {
+                            //find teh user profile
+                            UserProfile user = (from u in db.UserProfiles
+                                                where u.UserName == username
+                                                select u).FirstOrDefault();
+                            if (user != null)
+                            {
+                                CourseUser newUser = courseuser;
+                                newUser.UserProfile = user;
+                                newUser.UserProfileID = user.ID;
+
+                                attachCourseUserByEmail(newUser);
+                            }
+                            else
+                            {
+                                //userprofile doenst exist.
+                                invalidEmails[invalidCount] = username;
+                                invalidCount++;
+                            }
+                            //create a copy of the course user
+                        }
+                        if (invalidCount > 0)//caught at least one invalid
+                        {
+                            //create a notice
+                            string message = "The following email(s) could not be added because these users do not exist: ";
+                            foreach (string invalid in invalidEmails)
+                            {
+                                if (invalid != "")
+                                    message += invalid + ", ";
+                            }
+                            string noticeMessage = message.Substring(0, message.Length - 2);
+                            noticeMessage += ".";
+
+                            return RedirectToAction("Index", new { notice = noticeMessage });
+                        }
+                        else
+                        {
+                            return RedirectToAction("Index", new { notice = emails.Count().ToString() + " users have been added to the course" });
+                        }
+                    }
+                    else
+                    {
+                        //only one. do what you are originally intended for
+                        attachCourseUserByEmail(courseuser);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -574,6 +641,9 @@ namespace OSBLE.Controllers
             //wtu has been loaded up
             if (ModelState.IsValid)
             {
+                if (wtUser.Email == null)
+                    wtUser.Email = String.Empty;
+
                 db.Entry(wtUser).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
@@ -581,6 +651,235 @@ namespace OSBLE.Controllers
 
             return RedirectToAction("Index");
         }
+
+        //
+        /// <summary>
+        /// yc: get- approve pending user for current course enrollment, clean up notifcation to instructor, change student status
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns>back to index with notice the current pending user has been enrolled</returns>
+        [CanModifyCourse]
+        public ActionResult ApprovePending(int userId)
+        {
+            CourseUser pendingUser = getCourseUser(userId);
+
+            //notifcation cleanup
+            //find all notifcations sent from this userid and notifcation type is joincourseapproval
+            //weve decided that notifications are no longer crucial to clean up
+            //List<Notification> approvalNotifications = (from n in db.Notifications
+            //                                            where n.SenderID == pendingUser.ID &&
+            //                                            n.ItemType == Notification.Types.JoinCourseApproval &&
+            //                                            n.ItemID == ActiveCourseUser.AbstractCourseID
+            //                                            select n).ToList();
+            //foreach (Notification aN in approvalNotifications)
+            //{
+            //    //delete this notification
+            //    db.Notifications.Remove(aN);
+            //    db.SaveChanges();
+            //}
+            //save teh changes
+
+
+            //set user to active student
+            if (pendingUser.AbstractRoleID == (int)CourseRole.CourseRoles.Pending)
+            {
+                pendingUser.Hidden = false;
+                pendingUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+                db.Entry(pendingUser).State = EntityState.Modified;
+                db.SaveChanges();
+
+                return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " has been enrolled into this course" });
+            }
+            else
+            {
+                return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " IS NOT A PENDING USER" });
+            }
+            
+        }
+        /// <summary>
+        /// yc: get- deny pending user for current course enrollmenet, clean up notifications to instructor
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        [CanModifyCourse]
+        public ActionResult DenyPending(int userId)
+        {
+            CourseUser pendingUser = getCourseUser(userId);
+
+            //db entry will no longer exists, save names for notice
+            string firstName = pendingUser.UserProfile.FirstName;
+            string lastName = pendingUser.UserProfile.LastName;
+
+            //notifcation clean up
+
+            //remove the kid from the db
+            db.CourseUsers.Remove(pendingUser);
+            db.SaveChanges();
+
+            return RedirectToAction("Index", "Roster", new { notice = firstName + " " + lastName + " has been denied enrollment into this course" });
+        }
+        
+        /// <summary>
+        /// yc: creating a batch approval on pending users based on the current course
+        /// </summary>
+        /// <returns> to users page reflecting the changes</returns>
+        [CanModifyCourse]
+        public ActionResult BatchApprove()
+        {
+            int count = 0;
+
+            //find all pending users for current course
+            List<CourseUser> pendingUsers = (from c in db.CourseUsers
+                                             where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                                             c.AbstractRoleID == (int)CourseRole.CourseRoles.Pending
+                                             select c).ToList();
+
+            count = pendingUsers.Count();
+
+            foreach (CourseUser p in pendingUsers)
+            {
+                p.Hidden = false;
+                p.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+                db.Entry(p).State = EntityState.Modified;
+                db.SaveChanges();
+            }
+
+            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " student(s) have been enrolled into this course" });
+        }
+
+        /// <summary>
+        /// yc: creating a batch denial on pending users based on the current course.
+        /// </summary>
+        /// <returns> to users page reflect the changes</returns>
+        [CanModifyCourse]
+        public ActionResult BatchDeny()
+        {
+            int count = 0;
+            //find all pending users for current course
+            List<CourseUser> pendingUsers = (from c in db.CourseUsers
+                                             where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                                             c.AbstractRoleID == (int)CourseRole.CourseRoles.Pending
+                                             select c).ToList();
+
+            count = pendingUsers.Count();
+            foreach (CourseUser p in pendingUsers)
+            {
+                db.CourseUsers.Remove(p);
+            }
+            db.SaveChanges();
+            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " student(s) have been denied enrollment into this course" });
+        }
+
+
+        /// <summary>
+        /// yc: this function finds all students currently enrolled, and will turn them all into withdrawn students.
+        /// </summary>
+        /// <returns></returns>
+        [CanModifyCourse]
+        public ActionResult BatchWithdraw()
+        {
+            int count = 0;
+
+            //find all students for current course
+            List<CourseUser> students = (from c in db.CourseUsers
+                                             where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                                             c.AbstractRoleID == (int)CourseRole.CourseRoles.Student
+                                             select c).ToList();
+            count = students.Count();
+
+            foreach (CourseUser p in students)
+            {
+                p.AbstractRoleID = (int)CourseRole.CourseRoles.Withdrawn;
+                db.Entry(p).State = EntityState.Modified;
+                db.SaveChanges();
+            }
+
+            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " student(s) have been withdrawn from this course" });
+        }
+
+        [CanModifyCourse]
+        public ActionResult BatchClearWhiteTable()
+        {
+            int count = 0;
+
+            //find all whitelisted students
+            List<WhiteTableUser> students = (from c in db.WhiteTableUsers
+                                             where c.CourseID == ActiveCourseUser.AbstractCourseID
+                                             select c).ToList();
+            count = students.Count();
+
+            foreach (WhiteTableUser p in students)
+            {
+                db.WhiteTableUsers.Remove(p);
+            }
+            db.SaveChanges();
+            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " whitelisted student(s) have been removed from this course" });
+        }
+
+        [CanModifyCourse]
+        public ActionResult BatchDeleteWithdrawn()
+        {
+            int count = 0;
+
+            //find all withdrawn students for current course
+            List<CourseUser> students = (from c in db.CourseUsers
+                                         where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                                         c.AbstractRoleID == (int)CourseRole.CourseRoles.Withdrawn
+                                         select c).ToList();
+            count = students.Count();
+
+            foreach (CourseUser p in students)
+            {
+                db.CourseUsers.Remove(p);
+            }
+            db.SaveChanges();
+            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " withdrawn students have been removed from the course" });
+        }
+
+        [CanModifyCourse]
+        public ActionResult ChangeWithdrawnToStudentRole(int userProfileID)
+        {
+            CourseUser CourseUser = getCourseUser(userProfileID);
+            
+            if (CanModifyOwnLink(CourseUser))
+            {
+                if (ModelState.IsValid)
+                {
+                    CourseUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+                    db.Entry(CourseUser).State = EntityState.Modified;
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", CourseUser.UserProfileID);
+                ViewBag.AbstractCourse = new SelectList(db.Courses, "ID", "Prefix", CourseUser.AbstractCourseID);
+                ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name", CourseUser.AbstractRoleID);
+                return View(CourseUser);
+            }
+            return RedirectToAction("Index");
+        }
+
+        [CanModifyCourse]
+        public ActionResult ChangeStudentToWithdrawnRole(int userProfileID)
+        {
+            CourseUser CourseUser = getCourseUser(userProfileID);
+
+            if (CanModifyOwnLink(CourseUser))
+            {
+                if (ModelState.IsValid)
+                {
+                    CourseUser.AbstractRoleID = (int)CourseRole.CourseRoles.Withdrawn;
+                    db.Entry(CourseUser).State = EntityState.Modified;
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", CourseUser.UserProfileID);
+                ViewBag.AbstractCourse = new SelectList(db.Courses, "ID", "Prefix", CourseUser.AbstractCourseID);
+                ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name", CourseUser.AbstractRoleID);
+                return View(CourseUser);
+            }
+            return RedirectToAction("Index");
+        }
+
         //Students
         //
 
@@ -630,22 +929,21 @@ namespace OSBLE.Controllers
         }
 
 
-        //yc: post: /roster/delete/
+        //yc: not an inline remove
         //
-        [HttpPost]
         [CanModifyCourse]
         public ActionResult DeleteWTUser(int wtuID)
         {
             WhiteTableUser wtUser = getWhiteTableUser(wtuID);
+            string name1 = wtUser.Name1;
+            string name2 = wtUser.Name2;
             if (wtUser != null)
             {
                 db.WhiteTableUsers.Remove(wtUser);
                 db.SaveChanges();
             }
-            else
-                Response.StatusCode = 403;
 
-            return View("_AjaxEmpty");
+            return RedirectToAction("Index", "Roster", new { notice = name1 + " " + name2 + " has been removed" });
         }
         // POST: /Roster/Delete/5
 
@@ -1035,6 +1333,18 @@ namespace OSBLE.Controllers
             return possibleUser;
         }
 
+        private CourseUser getPendingUserOnRoster(RosterEntry entry)
+        {
+            CourseUser pendingUser = (from d in db.CourseUsers
+                                      where d.AbstractCourseID == ActiveCourseUser.AbstractCourseID
+                                      && d.UserProfile.Identification == entry.Identification
+                                      && d.UserProfile.UserName == entry.Email
+                                      && d.AbstractRoleID == (int)CourseRole.CourseRoles.Pending
+                                      select d).FirstOrDefault();
+
+            return pendingUser;
+        }
+
         private void emailCourseUser(CourseUser user)
         {
             string subject = "Welcome to " + ActiveCourseUser.AbstractCourse.Name;
@@ -1042,8 +1352,8 @@ namespace OSBLE.Controllers
 
             string message = "Dear " + user.UserProfile.FirstName + " " + user.UserProfile.LastName + @", <br/>
             <br/>
-            This email was sent to notify you that you have been added to " + ActiveCourseUser.AbstractCourse.Name +
-            "You may go to the course by <a href='" + link + @"'>following this link</a>. 
+            Congratulations! You have been enrolled in the following course at osble.org: " + ActiveCourseUser.AbstractCourse.Name +
+            "You may access this course by <a href='" + link + @"'>clicking on this link</a>. 
             <br/>
             <br/>
             ";
@@ -1064,9 +1374,9 @@ namespace OSBLE.Controllers
 
             string message = "Dear " + WTU.Name2 + " " + WTU.Name1 + @", <br/>
                 <br/>
-                This email was sent to notify you that you have been added to " + ActiveCourseUser.AbstractCourse.Name +
-            " To access this course you need to create an account with OSBLE first. You may create an account " +
-            "by <a href='" + link + @"'>following this link</a>. 
+                Congratulations! You have been enrolled in the following course at osble.org: " + ActiveCourseUser.AbstractCourse.Name +
+            " In order to access this course, please create an OSBLE account with OSBLE first by " +
+            "<a href='" + link + @"'>clicking on this link</a>. 
                 <br/>
                 <br/>
                 ";
@@ -1076,6 +1386,78 @@ namespace OSBLE.Controllers
 
             Email.Send(subject, message, new List<MailAddress>() { new MailAddress(WTU.Email) });
             
+        }
+
+        /// <summary>
+        /// yc: this is for an individual email to be resent
+        /// this would occur when an instructor clicks the email button on a student
+        /// </summary>
+        /// <param name="wtUser"></param>
+        /// <returns></returns>
+        [CanModifyCourse]
+        public ActionResult resendWhiteTableEmail(int wtUserId)
+        {
+
+            //find user
+            WhiteTableUser wtUser = (from c in db.WhiteTableUsers
+                                     where c.ID == wtUserId &&
+                                     c.CourseID == ActiveCourseUser.AbstractCourseID
+                                     select c).FirstOrDefault();
+
+            string subject = "Welcome to OSBLE.org";
+            string link = "https://osble.org/Account/AcademiaRegister?email="
+                + wtUser.Email + "&firstname=" + wtUser.Name2 + "&lastname=" + wtUser.Name1 + "&identification=" + wtUser.Identification;
+
+            string message = "Dear " + wtUser.Name2 + " " + wtUser.Name1 + @", <br/>
+                <br/>
+                This email was sent to notify you that you have been added to " + ActiveCourseUser.AbstractCourse.Name +
+            " To access this course you need to create an account with OSBLE first. You may create an account " +
+            "by <a href='" + link + @"'>following this link</a>. 
+                <br/>
+                <br/>
+                ";
+            message += @"Best regards,<br/>
+                The OSBLE Team in the <a href='www.helplab.org'>HELP lab</a> at <a href='www.wsu.edu'>Washington State University</a>";
+
+            Email.Send(subject, message, new List<MailAddress>() { new MailAddress(wtUser.Email) });
+
+            return RedirectToAction("Index", "Roster", new { notice = wtUser.Name2 + " " + wtUser.Name1 + " has been sent an email to join this course" });
+        }
+
+        /// <summary>
+        /// yc: batch email sending for white listed users, no params, grabs its from active course users's course id
+        /// </summary>
+        /// <returns>back to index</returns>
+        [CanModifyCourse]
+        public ActionResult BatchEmailWhiteTable()
+        {
+            //getusers
+            List<WhiteTableUser> wtu = (from w in db.WhiteTableUsers
+                                        where w.CourseID == ActiveCourseUser.AbstractCourseID
+                                        select w).ToList();
+
+            foreach (WhiteTableUser wtUser in wtu)
+            {
+                string subject = "Welcome to OSBLE.org";
+                string link = "https://osble.org/Account/AcademiaRegister?email="
+                    + wtUser.Email + "&firstname=" + wtUser.Name2 + "&lastname=" + wtUser.Name1 + "&identification=" + wtUser.Identification;
+
+                string message = "Dear " + wtUser.Name2 + " " + wtUser.Name1 + @", <br/>
+                <br/>
+                This email was sent to notify you that you have been added to " + ActiveCourseUser.AbstractCourse.Name +
+                " To access this course you need to create an account with OSBLE first. You may create an account " +
+                "by <a href='" + link + @"'>following this link</a>. 
+                <br/>
+                <br/>
+                ";
+                message += @"Best regards,<br/>
+                The OSBLE Team in the <a href='www.helplab.org'>HELP lab</a> at <a href='www.wsu.edu'>Washington State University</a>";
+
+                Email.Send(subject, message, new List<MailAddress>() { new MailAddress(wtUser.Email) });
+            }
+
+
+            return RedirectToAction("Index", "Roster", new { notice = "Whitelisted users have been sent an invintation to join the course" });
         }
     }
 }
