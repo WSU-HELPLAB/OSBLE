@@ -213,16 +213,41 @@ namespace OSBLE.Controllers
                                              i.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor
                                            select i).ToList();
 
+
             foreach (CourseUser instructor in instructors)
             {
-                Notification n = new Notification();
-                n.ItemType = Notification.Types.JoinCourseApproval;
-                n.ItemID = c.ID;
-                n.RecipientID = instructor.ID;
-                n.SenderID = sender.ID;
+                //The instsrtuctor will only have at most 1 notification at all times, we pull that notification and update its data value
+                //the data value is then used to print the number of requests that have been made to join the course 
+                var oldCourseNotification = (from d in db.Notifications
+                                             where d.RecipientID == instructor.ID && d.ItemType == Notification.Types.JoinCourseApproval
+                                             select d).FirstOrDefault();
+                if (oldCourseNotification == null)
+                {
+                    Notification n = new Notification();
+                    n.ItemType = Notification.Types.JoinCourseApproval;
+                    n.ItemID = c.ID;
+                    n.RecipientID = instructor.ID;
+                    n.SenderID = sender.ID;
+                    n.Count = 0;
+
+                    addNotification(n);
+                }
+                else
+                {
+
+                    oldCourseNotification.Count = oldCourseNotification.Count + 1;
+                    oldCourseNotification.SenderID = sender.ID;
+                    var entry = db.Entry(oldCourseNotification);
+                    entry.Property(e => e.Count).IsModified = true;
+                    entry.Property(e => e.SenderID).IsModified = true;
+
+                    
+                }
                 
-                addNotification(n);
             }
+            db.SaveChanges();
+            
+            
         }
 
         [NonAction]
@@ -236,14 +261,33 @@ namespace OSBLE.Controllers
 
             foreach (CourseUser leader in leaders)
             {
-                Notification n = new Notification();
-                n.ItemType = Notification.Types.JoinCommunityApproval;
-                n.ItemID = c.ID;
-                n.RecipientID = leader.ID;
-                n.SenderID = sender.ID;
+                var oldCommunityNotification = (from d in db.Notifications
+                                                where d.RecipientID == leader.ID && d.ItemType == Notification.Types.JoinCommunityApproval
+                                                select d).FirstOrDefault();
+                if (oldCommunityNotification == null)
+                {
+                    Notification n = new Notification();
+                    n.ItemType = Notification.Types.JoinCommunityApproval;
+                    n.ItemID = c.ID;
+                    n.RecipientID = leader.ID;
+                    n.SenderID = sender.ID;
+                    n.Count = 0;
 
-                addNotification(n);
+                    addNotification(n);
+                }
+                else
+                {
+
+                    oldCommunityNotification.Count = oldCommunityNotification.Count + 1;
+                    oldCommunityNotification.SenderID = sender.ID;
+                    var entry = db.Entry(oldCommunityNotification);
+                    entry.Property(e => e.Count).IsModified = true;
+                    entry.Property(e => e.SenderID).IsModified = true;
+
+
+                }
             }
+            db.SaveChanges();
         }
 
         [NonAction]
