@@ -253,6 +253,7 @@ else if (ViewBag.CurrentUser != null)    //yc adding a withdraw button this user
             remove_withdraw_course_dialog();
             var url = "/Account/WithdrawFromCourse";
             $.get(url, function (data) {
+                location.reload();
                 return false;
             });
        }
