@@ -1430,7 +1430,8 @@ namespace OSBLE.Controllers
         {
             //getusers
             List<WhiteTableUser> wtu = (from w in db.WhiteTableUsers
-                                        where w.CourseID == ActiveCourseUser.AbstractCourseID
+                                        where w.CourseID == ActiveCourseUser.AbstractCourseID &&
+                                        w.Email != ""
                                         select w).ToList();
 
             foreach (WhiteTableUser wtUser in wtu)
@@ -1449,7 +1450,6 @@ namespace OSBLE.Controllers
                 ";
                 message += @"Best regards,<br/>
                 The OSBLE Team in the <a href='www.helplab.org'>HELP lab</a> at <a href='www.wsu.edu'>Washington State University</a>";
-
                 Email.Send(subject, message, new List<MailAddress>() { new MailAddress(wtUser.Email) });
             }
 
