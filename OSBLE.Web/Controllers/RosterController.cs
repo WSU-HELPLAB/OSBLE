@@ -705,9 +705,8 @@ namespace OSBLE.Controllers
             foreach (CourseUser p in pendingUsers)
             {
                 db.CourseUsers.Remove(p);
-                db.SaveChanges();
             }
-
+            db.SaveChanges();
             return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " student(s) have been denied enrollment into this course" });
         }
 
@@ -752,9 +751,8 @@ namespace OSBLE.Controllers
             foreach (WhiteTableUser p in students)
             {
                 db.WhiteTableUsers.Remove(p);
-                db.SaveChanges();
             }
-
+            db.SaveChanges();
             return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " whitelisted student(s) have been removed from this course" });
         }
 
@@ -773,9 +771,8 @@ namespace OSBLE.Controllers
             foreach (CourseUser p in students)
             {
                 db.CourseUsers.Remove(p);
-                db.SaveChanges();
             }
-
+            db.SaveChanges();
             return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " withdrawn students have been removed from the course" });
         }
         //Students
@@ -827,7 +824,7 @@ namespace OSBLE.Controllers
         }
 
 
-        //yc: post: /roster/delete/
+        //yc: not an inline remove
         //
         [CanModifyCourse]
         public ActionResult DeleteWTUser(int wtuID)
@@ -1320,6 +1317,42 @@ namespace OSBLE.Controllers
             Email.Send(subject, message, new List<MailAddress>() { new MailAddress(wtUser.Email) });
 
             return RedirectToAction("Index", "Roster", new { notice = wtUser.Name2 + " " + wtUser.Name1 + " has been sent an email to join this course" });
+        }
+
+        /// <summary>
+        /// yc: batch email sending for white listed users, no params, grabs its from active course users's course id
+        /// </summary>
+        /// <returns>back to index</returns>
+        [CanModifyCourse]
+        public ActionResult BatchEmailWhiteTable()
+        {
+            //getusers
+            List<WhiteTableUser> wtu = (from w in db.WhiteTableUsers
+                                        where w.CourseID == ActiveCourseUser.AbstractCourseID
+                                        select w).ToList();
+
+            foreach (WhiteTableUser wtUser in wtu)
+            {
+                string subject = "Welcome to OSBLE.org";
+                string link = "https://osble.org/Account/AcademiaRegister?email="
+                    + wtUser.Email + "&firstname=" + wtUser.Name2 + "&lastname=" + wtUser.Name1 + "&identification=" + wtUser.Identification;
+
+                string message = "Dear " + wtUser.Name2 + " " + wtUser.Name1 + @", <br/>
+                <br/>
+                This email was sent to notify you that you have been added to " + ActiveCourseUser.AbstractCourse.Name +
+                " To access this course you need to create an account with OSBLE first. You may create an account " +
+                "by <a href='" + link + @"'>following this link</a>. 
+                <br/>
+                <br/>
+                ";
+                message += @"Best regards,<br/>
+                The OSBLE Team in the <a href='www.helplab.org'>HELP lab</a> at <a href='www.wsu.edu'>Washington State University</a>";
+
+                Email.Send(subject, message, new List<MailAddress>() { new MailAddress(wtUser.Email) });
+            }
+
+
+            return RedirectToAction("Index", "Roster", new { notice = "Whitelisted users have been sent an invintation to join the course" });
         }
     }
 }

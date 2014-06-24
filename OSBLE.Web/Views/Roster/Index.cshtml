@@ -106,6 +106,7 @@
                     @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                     {
                         <a title="Clear All Whitelisted Users" href="@Url.Action("BatchClearWhiteTable", "Roster")">@Helpers.DeleteButton()</a>
+                        <a title="Resend Invitation Email" href="@Url.Action("BatchEmailWhiteTable", "Roster")">@Helpers.MailButton()</a>
                     }
                     @Helpers.CreateToolTip(ToolTips.RosterWhitetableRoleRole)</h3>
                       
