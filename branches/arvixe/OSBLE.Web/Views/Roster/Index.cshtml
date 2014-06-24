@@ -5,6 +5,22 @@
 @{
     ViewBag.Title = "Index";
 }
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#deleteAllWithdrawnStudents").click(function () {
+            r = confirm("Are you sure? This action is irreversible and all withdrawn student work will be lost");
+            if (r) {
+                var url = "/Roster/BatchDeleteWithdrawn";
+                $.get(url, function (data) {
+                    return true;
+                });
+            }
+            return false;
+        });
+    });
+</script>
+
 <h2>
     Roster</h2>
 <h4>@ViewBag.Notice</h4>
@@ -138,23 +154,15 @@
                         @userByRole.RoleName (<span id="roleheader_@(usersBySection.SectionNumber)_@(userByRole.RoleName)">@userByRole.Count.ToString()</span>)
                         @if (userByRole.RoleName == "Student" && ViewBag.ActiveCourse.AbstractRole.CanModify)
                         {
-                            <a title="Withdraw All Students" href="@Url.Action("BatchWithdraw", "Roster")">@Helpers.WithdrawButton()</a>
+                            <span id="withdrawAllStudents"><a title="Withdraw All Students" href="@Url.Action("BatchWithdraw", "Roster")">@Helpers.WithdrawButton()</a></span>
+                            
                         }
                         else if (userByRole.RoleName == "Withdrawn" && ViewBag.ActiveCourse.AbstractRole.CanModify)
                         {
-                            <a href="#" onclick="confirmBatchDelete()" title="Delete All Withdrawn Users">@Helpers.DeleteButton()</a>
-                            <script type="text/javascript">
-                                function confirmBatchDelete() {
-                                    r = confirm("Are you sure? This action is irreversible and all withdrawn student work will be lost");
-                                    if (r) {
-                                        var url = "/Roster/BatchDeleteWithdrawn";
-                                        $.get(url, function (data) {
-                                            return true;
-                                        });
-                                    }
-                                    return false;
-                                }
-                            </script>
+                            <span id="deleteAllWithdrawnStudents">
+                            <a href="#" title="Delete All Withdrawn Users">@Helpers.DeleteButton()</a>
+                            </span>
+                            
                         }
                         @try
                         {
