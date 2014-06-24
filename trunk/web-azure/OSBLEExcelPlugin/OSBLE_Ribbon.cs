@@ -45,11 +45,11 @@ namespace OSBLEExcelPlugin
             ddCourses.Items.Clear();
             foreach (OSBLEServices.Course c in m_state.Courses)
             {                
-                RibbonDropDownItem item 
-                      = Globals.Factory.GetRibbonFactory().CreateRibbonDropDownItem();
-                item.Label = c.Name;
+                RibbonDropDownItem item
+                        = Globals.Factory.GetRibbonFactory().CreateRibbonDropDownItem();
+                item.Label = c.Name + ", " + c.Semester.Substring(0, 2).ToUpper() + ", " + c.Year;
                 item.Tag = c;
-                ddCourses.Items.Add(item);
+                ddCourses.Items.Add(item);                
             }
 
             if (ddCourses.Items.Count > 0)
