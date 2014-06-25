@@ -183,7 +183,7 @@
 
                                        @if (userByRole.RoleName == "Withdrawn" && ViewBag.ActiveCourse.AbstractRole.CanModify)
                                        {
-                                           <a title="Re-enroll as student" href="@Url.Action("ChangeWithdrawnToStudentRole", "Roster", new { userProfileID = user.ID })">@Helpers.LeftArrowButton()</a>
+                                           <a title="Re-enroll as student" href="@Url.Action("ChangeWithdrawnToStudentRole", "Roster", new { userProfileID = user.ID })">@Helpers.EnrollButton()</a>
                                        }
 
                                         @if (user.UserName != null)
@@ -214,7 +214,7 @@
                                             
                                             if (userByRole.RoleName == "Student")
                                            {
-                                               <a title="Withdraw student" href="@Url.Action("ChangeStudentToWithdrawnRole", "Roster", new { userProfileID = user.ID })">@Helpers.RightArrowButton()</a>
+                                               <a title="Withdraw student" href="@Url.Action("ChangeStudentToWithdrawnRole", "Roster", new { userProfileID = user.ID })">@Helpers.WithdrawButton()</a>
                                            }
                                         }
                                     </div>
