@@ -693,7 +693,6 @@ namespace OSBLE.Controllers
         public ActionResult DenyPending(int userId)
         {
             CourseUser pendingUser = getCourseUser(userId);
-
             //db entry will no longer exists, save names for notice
             string firstName = pendingUser.UserProfile.FirstName;
             string lastName = pendingUser.UserProfile.LastName;
@@ -703,7 +702,7 @@ namespace OSBLE.Controllers
             db.CourseUsers.Remove(pendingUser);
             db.SaveChanges();
 
-            if (ActiveCourseUser.AbstractCourse.GetType() == typeof(Course))
+            if (pendingUser.AbstractRoleID == (int)CourseRole.CourseRoles.Pending)
                 return RedirectToAction("Index", "Roster", new { notice = firstName + " " + lastName + " has been denied enrollment into this course." });
             else
                 return RedirectToAction("Index", "Roster", new { notice = firstName + " " + lastName + " has been denied the ability to participate in this community." });
@@ -719,7 +718,7 @@ namespace OSBLE.Controllers
             int count = 0;
             List<CourseUser> pendingUsers;
             //find all pending users for current course
-            if (ActiveCourseUser.AbstractCourse.GetType() == typeof(CourseRole)) //of type course
+            if (ActiveCourseUser.AbstractCourse.GetType() != typeof(Community)) //of type course
             {
                 pendingUsers = (from c in db.CourseUsers
                                 where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
@@ -772,7 +771,7 @@ namespace OSBLE.Controllers
             //find all pending users for current course
             List<CourseUser> pendingUsers;
             //find all pending users for current course
-            if (ActiveCourseUser.AbstractCourse.GetType() == typeof(CourseRole))
+            if (ActiveCourseUser.AbstractCourse.GetType() != typeof(Community))
             {
 
                 pendingUsers = (from c in db.CourseUsers
@@ -795,7 +794,7 @@ namespace OSBLE.Controllers
             }
             db.SaveChanges();
 
-            if (ActiveCourseUser.AbstractCourse.GetType() == typeof(CourseRole))
+            if (ActiveCourseUser.AbstractCourse.GetType() != typeof(Community))
                 return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " student(s) have been denied enrollment into this course." });
             else
                 return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " participants(s) have been denied the ability to join the community." });
