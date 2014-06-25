@@ -497,7 +497,7 @@ namespace OSBLE.Controllers
 
                     break;
                 case Notification.Types.JoinCourseApproval:
-                    subject += sender.FirstName + " " + sender.LastName + "has submitted a request to join" + course.Name;
+                    subject += sender.FirstName + " " + sender.LastName + " has submitted a request to join " + course.Name;
 
                     body = sender.FirstName + " " + sender.LastName + " has submitted a request to join" + course.Name; 
 
@@ -505,9 +505,9 @@ namespace OSBLE.Controllers
 
                     break;
                 case Notification.Types.JoinCommunityApproval:
-                    subject += sender.FirstName + " " + sender.LastName + "has submitted a request to join" + course.Name;
+                    subject += sender.FirstName + " " + sender.LastName + " has submitted a request to join" + course.Name;
 
-                    body = sender.FirstName + " " + sender.LastName + " has submitted a request to join" + course.Name; 
+                    body = sender.FirstName + " " + sender.LastName + " has submitted a request to join " + course.Name; 
 
                     action = "view the request to join.";
 
