@@ -38,6 +38,7 @@ namespace OSBLE.Services
             UserProfile profile = _authService.GetActiveUser(authToken);
             List<Course> efCourses = (from cu in _db.CourseUsers
                                       where cu.UserProfileID == profile.ID
+                                      && !cu.AbstractCourse.IsDeleted
                                       &&
                                       cu.AbstractCourse is Course
                                       select cu.AbstractCourse as Course).ToList();
