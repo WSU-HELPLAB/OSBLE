@@ -20,7 +20,7 @@ namespace OSBLE.Models.HomePage
 
         public virtual CourseUser Sender { get; set; }
 
-        //used to consolidate notifications, keeps track of how many notifications there are per type.
+        //used to reduce number of notifications, keeps track of how many notifications there are per type.
         public int? Count { get; set; }
 
         public bool Read { get; set; }
