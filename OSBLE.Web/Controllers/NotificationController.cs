@@ -457,7 +457,7 @@ namespace OSBLE.Controllers
 
                     break;
                 case Notification.Types.Dashboard:
-                    subject += "Activity Feed Reply from " + sender.FirstName + " " + sender.LastName;
+                    subject += "[" + course.Name + "]" + "Activity Feed Reply from " + sender.FirstName + " " + sender.LastName;
 
                     body = sender.FirstName + " " + sender.LastName + " has posted to an activity feed thread in which you have participated.";
 

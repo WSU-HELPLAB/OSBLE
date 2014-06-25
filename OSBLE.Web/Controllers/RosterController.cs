@@ -328,7 +328,7 @@ namespace OSBLE.Controllers
                         
                         if (usedIdentifications.Contains(member.UserProfile.Identification) && member.AbstractRoleID != (int)CourseRole.CourseRoles.Pending)
                         {
-                            ViewBag.Error = "There is a non-student (" + member.UserProfile.FirstName + " " + member.UserProfile.LastName + ") in the course with the same School ID as a student on the roster. Please check your roster and try again.";
+                            ViewBag.Error = "There is a " + "[" + member.AbstractRole.Name + "]" + " non-student (" + member.UserProfile.FirstName + " " + member.UserProfile.LastName + ") in the course with the same School ID as a student on the roster. Please check your roster and try again.";
                             return View("RosterError");
                         }
                     }
@@ -1344,7 +1344,7 @@ namespace OSBLE.Controllers
 
         private void emailCourseUser(CourseUser user)
         {
-            string subject = "Welcome to " + ActiveCourseUser.AbstractCourse.Name;
+            string subject = "Welcome to " + user.AbstractCourse.Name;
             string link = "https://osble.org";
 
             string message = "Dear " + user.UserProfile.FirstName + " " + user.UserProfile.LastName + @", <br/>
