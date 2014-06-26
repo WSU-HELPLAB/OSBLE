@@ -228,17 +228,17 @@ namespace OSBLE.Controllers
                     n.ItemID = c.ID;
                     n.RecipientID = instructor.ID;
                     n.SenderID = sender.ID;
-                    n.Count = 0;
+                    n.Data = "0";
 
                     addNotification(n);
                 }
                 else
                 {
 
-                    oldCourseNotification.Count = oldCourseNotification.Count + 1;
+                    oldCourseNotification.Data = (Convert.ToInt32(oldCourseNotification.Data) + 1).ToString();
                     oldCourseNotification.SenderID = sender.ID;
                     var entry = db.Entry(oldCourseNotification);
-                    entry.Property(e => e.Count).IsModified = true;
+                    entry.Property(e => e.Data).IsModified = true;
                     entry.Property(e => e.SenderID).IsModified = true;
 
                     
@@ -271,17 +271,17 @@ namespace OSBLE.Controllers
                     n.ItemID = c.ID;
                     n.RecipientID = leader.ID;
                     n.SenderID = sender.ID;
-                    n.Count = 0;
+                    n.Data = "0";
 
                     addNotification(n);
                 }
                 else
                 {
 
-                    oldCommunityNotification.Count = oldCommunityNotification.Count + 1;
+                    oldCommunityNotification.Data = (Convert.ToInt32(oldCommunityNotification.Data) + 1).ToString();
                     oldCommunityNotification.SenderID = sender.ID;
                     var entry = db.Entry(oldCommunityNotification);
-                    entry.Property(e => e.Count).IsModified = true;
+                    entry.Property(e => e.Data).IsModified = true;
                     entry.Property(e => e.SenderID).IsModified = true;
 
 
@@ -425,11 +425,12 @@ namespace OSBLE.Controllers
             }
 
             string subject = "";
-            if(getCourseTag(course) != "")
+            if(getCourseNotificationTag(course, n) != "")
             {
-                subject = "[" + getCourseTag(course) + "] "; // Email subject prefix
+                subject = getCourseNotificationTag(course, n); // Email subject prefix
+                
             }
-
+            
             string body = "";
 
             string action = "";
@@ -439,7 +440,7 @@ namespace OSBLE.Controllers
                 case Notification.Types.Mail:
                     Mail m = db.Mails.Find(n.ItemID);
 
-                    subject += "New private message from " + sender.FirstName + " " + sender.LastName;
+                    subject += " - " + sender.FirstName + " " + sender.LastName;
 
                     action = "reply to this message";
 
@@ -449,7 +450,7 @@ namespace OSBLE.Controllers
 
                     break;
                 case Notification.Types.EventApproval:
-                    subject += "Event approval request from " + sender.FirstName + " " + sender.LastName;
+                    subject += " - " + sender.FirstName + " " + sender.LastName;
 
                     body = sender.FirstName + " " + sender.LastName + " has requested your approval of an event posting.";
 
@@ -457,7 +458,7 @@ namespace OSBLE.Controllers
 
                     break;
                 case Notification.Types.Dashboard:
-                    subject += "[" + course.Name + "]" + "Activity Feed Reply from " + sender.FirstName + " " + sender.LastName;
+                    subject += " - " + sender.FirstName + " " + sender.LastName;
 
                     body = sender.FirstName + " " + sender.LastName + " has posted to an activity feed thread in which you have participated.";
 
@@ -465,7 +466,7 @@ namespace OSBLE.Controllers
 
                     break;
                 case Notification.Types.FileSubmitted:
-                    subject += "New Assignment Submmission from " + sender.FirstName + " " + sender.LastName;
+                    subject += " - " + sender.FirstName + " " + sender.LastName;
 
                     body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
 
@@ -473,7 +474,7 @@ namespace OSBLE.Controllers
 
                     break;
                 case Notification.Types.RubricEvaluationCompleted:
-                    subject += sender.FirstName + " " + sender.LastName + "has published a rubric  Assignment Submmission from ";
+                    subject += " - " + sender.FirstName + " " + sender.LastName;
 
                     body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
 
@@ -481,7 +482,7 @@ namespace OSBLE.Controllers
 
                     break;
                 case Notification.Types.InlineReviewCompleted:
-                    subject += sender.FirstName + " " + sender.LastName + "has published a rubric  Assignment Submmission from ";
+                    subject += " - " + sender.FirstName + " " + sender.LastName;
 
                     body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
 
@@ -489,7 +490,7 @@ namespace OSBLE.Controllers
 
                     break;
                 case Notification.Types.TeamEvaluationDiscrepancy:
-                    subject += sender.FirstName + " " + sender.LastName + "has submitted a Team Evaluation that has raised a discrepancy flag";
+                    subject += " - " + sender.FirstName + " " + sender.LastName;
 
                     body = sender.FirstName + " " + sender.LastName + " has submitted a Team Evaluation that has raised a discrepancy flag."; //Can we get name of assignment?
 
@@ -497,7 +498,7 @@ namespace OSBLE.Controllers
 
                     break;
                 case Notification.Types.JoinCourseApproval:
-                    subject += sender.FirstName + " " + sender.LastName + " has submitted a request to join " + course.Name;
+                    subject += " - " + sender.FirstName + " " + sender.LastName;
 
                     body = sender.FirstName + " " + sender.LastName + " has submitted a request to join" + course.Name; 
 
@@ -505,7 +506,7 @@ namespace OSBLE.Controllers
 
                     break;
                 case Notification.Types.JoinCommunityApproval:
-                    subject += sender.FirstName + " " + sender.LastName + " has submitted a request to join" + course.Name;
+                    subject += " - " + sender.FirstName + " " + sender.LastName;
 
                     body = sender.FirstName + " " + sender.LastName + " has submitted a request to join " + course.Name; 
 
@@ -528,24 +529,24 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-        /// Returns tags for either a course or a community, if one exists for the notification. Otherwise, empty string.
+        /// Returns tags for either a course or a community as well as a tag for a notification, if one exists for the notification. Otherwise, empty string.
         ///
         /// </summary>
-        /// <param name="c">The abstract course</param>
+        /// <param name="c" , "n">The abstract course Notification param</param>
         /// <returns>Tag with leading space (" CptS 314") if course or community exists, "" if not.</returns>
-        private string getCourseTag(AbstractCourse c)
+        private string getCourseNotificationTag(AbstractCourse c, Notification n)
         {
             string tag = "";
 
-            if (c != null)
+            if (c != null || n != null)
             {
                 if (c is Course)
                 {
-                    tag = (c as Course).Prefix + " " + (c as Course).Number;
+                    tag = "[" + (c as Course).Prefix + " " + (c as Course).Number + "]" + "[" + n.ItemType + "]";
                 }
                 else if (c is Community)
                 {
-                    tag = (c as Community).Nickname;
+                    tag = "[" + (c as Community).Nickname + "]" + "[" + n.ItemType + "]";
                 }
             }
 

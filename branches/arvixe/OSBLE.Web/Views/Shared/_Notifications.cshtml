@@ -53,28 +53,28 @@
                     case Notification.Types.JoinCourseApproval:
                         {
                             //this means there is only one person, or [name] and 0 others 
-                            if(n.Count == 0)
+                            if(n.Data == "0")
                             { 
                                 <text><em>@n.Sender.DisplayNameFirstLast(ViewBag.ActiveCourse.AbstractRole)</em> sent you a @NotificationLink(n.ID, "request to join course")</text>
                                 break;
                             }
                             else
                             {
-                                <text><em>@n.Sender.DisplayNameFirstLast(ViewBag.ActiveCourse.AbstractRole)</em> and <b>@n.Count.ToString()</b> other(s) sent you a @NotificationLink(n.ID, "request to join course")</text>
+                                <text><em>@n.Sender.DisplayNameFirstLast(ViewBag.ActiveCourse.AbstractRole)</em> and <b>@n.Data</b> other(s) sent you a @NotificationLink(n.ID, "request to join course")</text>
                                 break;
                             }
                         }
                      case Notification.Types.JoinCommunityApproval:
                         {
                            //this means there is only one person, or [name] and 0 others 
-                            if(n.Count == 0)
+                            if(n.Data == "0")
                             { 
                                 <text><em>@n.Sender.DisplayNameFirstLast(ViewBag.ActiveCourse.AbstractRole)</em> sent you a @NotificationLink(n.ID, "request to join community")</text>
                                 break;
                             }
                             else
                             {
-                                <text><em>@n.Sender.DisplayNameFirstLast(ViewBag.ActiveCourse.AbstractRole)</em> and <b>@n.Count.ToString()</b> other(s) sent you a @NotificationLink(n.ID, "request to join community")</text>
+                                <text><em>@n.Sender.DisplayNameFirstLast(ViewBag.ActiveCourse.AbstractRole)</em> and <b>@n.Data</b> other(s) sent you a @NotificationLink(n.ID, "request to join community")</text>
                                 break;
                             }
                         }

@@ -419,7 +419,7 @@ namespace OSBLE.Controllers
                             {
                             }
                         }
-                        string subject = "[OSBLE] New Moderator Post";
+                        string subject = "[OSBLE][Moderator] - New Post";
                         string linkUrl = string.Format("http://osble.org{0}", Url.Action("TeacherIndex", "DiscussionAssignment", new { assignmentID = assignment.ID, discussionTeamID = newPost.DiscussionTeamID }));
                         string body = @"
 Greetings,
@@ -569,7 +569,7 @@ The OSBLE Team
                 anonSettings = true;
             }
 
-            string subject = "[OSBLE] New Discussion Post";
+            string subject = "[OSBLE][Discussion] - New Post";
             string linkUrl = string.Format("http://osble.org{0}", Url.Action("TeacherIndex", "DiscussionAssignment", new { assignmentID = assignment.ID, discussionTeamID = newPost.DiscussionTeamID }));
             string body = @"
 Greetings,
