@@ -429,8 +429,6 @@ Greetings,
 
 You may view the discussion on OSBLE by visiting the following link: <a href=""{3}"">{4}</a>.
 
-Thanks,
-The OSBLE Team
 ";
                         body = string.Format(body,
                             ActiveCourseUser.UserProfile.DisplayName((int)CourseRole.CourseRoles.Instructor, true),
@@ -579,8 +577,7 @@ Greetings,
 
 You may view the discussion on OSBLE by visiting the following link: <a href=""{3}"">{4}</a>.
 
-Thanks,
-The OSBLE Team
+
 ";
 
             body = string.Format(body,
