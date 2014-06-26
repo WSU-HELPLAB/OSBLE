@@ -721,17 +721,17 @@ namespace OSBLE.Controllers
             if (ActiveCourseUser.AbstractCourse.GetType() != typeof(Community)) //of type course
             {
                 pendingUsers = (from c in db.CourseUsers
-                                where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
-                                c.AbstractRoleID == (int)CourseRole.CourseRoles.Pending
-                                select c).ToList();
+                                             where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                                             c.AbstractRoleID == (int)CourseRole.CourseRoles.Pending
+                                             select c).ToList();
 
-                count = pendingUsers.Count();
+            count = pendingUsers.Count();
 
-                foreach (CourseUser p in pendingUsers)
-                {
-                    p.Hidden = false;
-                    p.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
-                    db.Entry(p).State = EntityState.Modified;
+            foreach (CourseUser p in pendingUsers)
+            {
+                p.Hidden = false;
+                p.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+                db.Entry(p).State = EntityState.Modified;
                 }
                 db.SaveChanges();
 
@@ -775,9 +775,9 @@ namespace OSBLE.Controllers
             {
 
                 pendingUsers = (from c in db.CourseUsers
-                                where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
-                                c.AbstractRoleID == (int)CourseRole.CourseRoles.Pending
-                                select c).ToList();
+                                             where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                                             c.AbstractRoleID == (int)CourseRole.CourseRoles.Pending
+                                             select c).ToList();
             }
             else
             {
@@ -1398,7 +1398,7 @@ namespace OSBLE.Controllers
         {
             var WTU = whitetable.WhiteTableUser;
 
-            string subject = "Welcome to OSBLE.org";
+            string subject = "Welcome to OSBLE";
             string link = "https://osble.org/Account/AcademiaRegister?email=" 
                 + WTU.Email + "&firstname=" + WTU.Name2 + "&lastname=" + WTU.Name1 + "&identification=" + WTU.Identification; 
 
@@ -1433,8 +1433,8 @@ namespace OSBLE.Controllers
                                      where c.ID == wtUserId &&
                                      c.CourseID == ActiveCourseUser.AbstractCourseID
                                      select c).FirstOrDefault();
-            
-            string subject = "Welcome to OSBLE.org -- Re-request";
+
+            string subject = "Welcome to OSBLE";
             string link = "https://osble.org/Account/AcademiaRegister?email="
                 + wtUser.Email + "&firstname=" + wtUser.Name2 + "&lastname=" + wtUser.Name1 + "&identification=" + wtUser.Identification;
 
