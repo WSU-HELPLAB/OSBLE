@@ -423,11 +423,18 @@ namespace OSBLE.Controllers
 
                 if (previousUser != null)
                 {
-                    previousUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending;
-                    previousUser.AbstractCourseID = request.ID;
-                    previousUser.Hidden = true;
+                    CourseUser addedUser = new CourseUser();
+                    UserProfile prf = previousUser.UserProfile;
+                    
+                    addedUser = previousUser;
+                    addedUser.UserProfile = prf;
+                    
+                    addedUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending;
+                    addedUser.AbstractCourseID = request.ID;
+                    addedUser.Hidden = true;
 
-                    db.Entry(previousUser).State = EntityState.Modified;
+                    db.CourseUsers.Add(addedUser);
+                   // db.Entry(previousUser).State = EntityState.Modified;
                     db.SaveChanges();
                     ActiveCourseUser = previousUser;
 
