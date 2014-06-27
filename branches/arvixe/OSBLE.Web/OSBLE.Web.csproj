@@ -878,6 +878,7 @@
     <Content Include="Views\Course\CommunityCurrentlyEnrolled.cshtml" />
     <Content Include="Views\Course\CourseAwaitingApproval.cshtml" />
     <Content Include="Views\Course\CommunityAwaitingApproval.cshtml" />
+    <Content Include="Views\Shared\_ConsolidatedNotifications.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

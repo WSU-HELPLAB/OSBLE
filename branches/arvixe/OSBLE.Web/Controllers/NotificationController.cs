@@ -58,8 +58,25 @@ namespace OSBLE.Controllers
                         int.TryParse(n.Data.Split(';')[1], out teamEvalAssignmnetID);
                         return RedirectToAction("TeacherTeamEvaluation", "Assignment", new { precedingTeamId = precteamId, TeamEvaluationAssignmentId = teamEvalAssignmnetID });
                     case Notification.Types.JoinCourseApproval:
+                        //this is done to mark all notifications that were consolidated as read
+                        var CourseMarkRead = (from d in db.Notifications
+                                              where d.RecipientID == ActiveCourseUser.ID && d.ItemType == Notification.Types.JoinCourseApproval && d.ItemID == ActiveCourseUser.AbstractCourseID
+                                              select d).ToList();
+                        foreach (var foo in CourseMarkRead)
+	                    {
+		                    foo.Read = true;
+	                    }
+                        db.SaveChanges();
                         return RedirectToAction("Index", "Roster", new { ID = n.ItemID });
                     case Notification.Types.JoinCommunityApproval:
+                        var CommunityMarkRead = (from d in db.Notifications
+                                                 where d.RecipientID == ActiveCourseUser.ID && d.ItemType == Notification.Types.JoinCourseApproval && d.ItemID == ActiveCourseUser.AbstractCourseID
+                                                 select d).ToList();
+                        foreach (var foo in CommunityMarkRead)
+	                    {
+		                    foo.Read = true;
+	                    }
+                        db.SaveChanges();
                         return RedirectToAction("Index", "Roster", new { ID = n.ItemID });
                     
 
@@ -199,6 +216,7 @@ namespace OSBLE.Controllers
                 n.RecipientID = instructor.ID;
                 n.SenderID = e.Poster.ID;
 
+
                 addNotification(n);
             }
         }
@@ -216,34 +234,17 @@ namespace OSBLE.Controllers
 
             foreach (CourseUser instructor in instructors)
             {
-                //The instsrtuctor will only have at most 1 notification at all times, we pull that notification and update its data value
-                //the data value is then used to print the number of requests that have been made to join the course 
-                var oldCourseNotification = (from d in db.Notifications
-                                             where d.RecipientID == instructor.ID && d.ItemType == Notification.Types.JoinCourseApproval
-                                             select d).FirstOrDefault();
-                if (oldCourseNotification == null)
-                {
-                    Notification n = new Notification();
-                    n.ItemType = Notification.Types.JoinCourseApproval;
-                    n.ItemID = c.ID;
-                    n.RecipientID = instructor.ID;
-                    n.SenderID = sender.ID;
-                    n.Data = "0";
 
-                    addNotification(n);
-                }
-                else
-                {
 
-                    oldCourseNotification.Data = (Convert.ToInt32(oldCourseNotification.Data) + 1).ToString();
-                    oldCourseNotification.SenderID = sender.ID;
-                    var entry = db.Entry(oldCourseNotification);
-                    entry.Property(e => e.Data).IsModified = true;
-                    entry.Property(e => e.SenderID).IsModified = true;
-
-                    
-                }
+                Notification n = new Notification();
+                n.ItemType = Notification.Types.JoinCourseApproval;
+                n.ItemID = c.ID;
+                n.RecipientID = instructor.ID;
+                n.SenderID = sender.ID;
                 
+
+                addNotification(n);
+                               
             }
             db.SaveChanges();
             
@@ -259,33 +260,18 @@ namespace OSBLE.Controllers
                                           i.AbstractRoleID == (int)CommunityRole.OSBLERoles.Leader
                                         select i).ToList();
 
+
             foreach (CourseUser leader in leaders)
             {
-                var oldCommunityNotification = (from d in db.Notifications
-                                                where d.RecipientID == leader.ID && d.ItemType == Notification.Types.JoinCommunityApproval
-                                                select d).FirstOrDefault();
-                if (oldCommunityNotification == null)
-                {
-                    Notification n = new Notification();
-                    n.ItemType = Notification.Types.JoinCommunityApproval;
-                    n.ItemID = c.ID;
-                    n.RecipientID = leader.ID;
-                    n.SenderID = sender.ID;
-                    n.Data = "0";
+                Notification n = new Notification();
+                n.ItemType = Notification.Types.JoinCommunityApproval;
+                n.ItemID = c.ID;
+                n.RecipientID = leader.ID;
+                n.SenderID = sender.ID;
+                
 
-                    addNotification(n);
-                }
-                else
-                {
+                addNotification(n);
 
-                    oldCommunityNotification.Data = (Convert.ToInt32(oldCommunityNotification.Data) + 1).ToString();
-                    oldCommunityNotification.SenderID = sender.ID;
-                    var entry = db.Entry(oldCommunityNotification);
-                    entry.Property(e => e.Data).IsModified = true;
-                    entry.Property(e => e.SenderID).IsModified = true;
-
-
-                }
             }
             db.SaveChanges();
         }
