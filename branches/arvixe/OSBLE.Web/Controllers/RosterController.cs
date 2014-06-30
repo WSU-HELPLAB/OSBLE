@@ -552,7 +552,7 @@ namespace OSBLE.Controllers
                 {
                     //yc this check for multiple emails added in. 
                     string temp = courseuser.UserProfile.UserName;
-                    char[] delim = new char[] { ' ', ',' };
+                    char[] delim = new char[] { ' ', ',' , ';' };
                     string[] emails = temp.Split(delim, StringSplitOptions.RemoveEmptyEntries);
                     string[] invalidEmails = new string[emails.Count()];
                     int invalidCount = 0;
