@@ -43,6 +43,14 @@ namespace OSBLE.Controllers
                     case Notification.Types.EventApproval:
                         return RedirectToAction("Approval", "Event", new { ID = n.ItemID });
                     case Notification.Types.Dashboard:
+                        var DashBoardRead = (from d in db.Notifications
+                                             where d.RecipientID == ActiveCourseUser.ID && d.ItemType == Notification.Types.Dashboard && d.ItemID == n.ItemID
+                                             select d).ToList();
+                        foreach (var foo in DashBoardRead)
+                        {
+                            foo.Read = true;
+                        }
+                        db.SaveChanges();
                         return RedirectToAction("ViewThread", "Home", new { ID = n.ItemID });
                     case Notification.Types.FileSubmitted:
                         return RedirectToAction("getCurrentUsersZip", "FileHandler", new { assignmentID = n.ItemID });
@@ -69,6 +77,7 @@ namespace OSBLE.Controllers
                         db.SaveChanges();
                         return RedirectToAction("Index", "Roster", new { ID = n.ItemID });
                     case Notification.Types.JoinCommunityApproval:
+                        //this is done to mark all notifications that were consolidated as read
                         var CommunityMarkRead = (from d in db.Notifications
                                                  where d.RecipientID == ActiveCourseUser.ID && d.ItemType == Notification.Types.JoinCourseApproval && d.ItemID == ActiveCourseUser.AbstractCourseID
                                                  select d).ToList();
