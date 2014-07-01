@@ -3,7 +3,7 @@
 <ul id="notifications_list">
 @{
     List<Notification> notifications = ViewBag.Notifications;
-    var ConsolidatedNotifications = notifications.Where(n => (n.ItemType != Notification.Types.JoinCourseApproval && n.ItemType != Notification.Types.JoinCommunityApproval)).ToList();
+    var ConsolidatedNotifications = notifications.Where(n => (n.ItemType != Notification.Types.JoinCourseApproval && n.ItemType != Notification.Types.JoinCommunityApproval && n.ItemType != Notification.Types.Dashboard)).ToList();
     var CourseApprovalNotifications = notifications.Where(n => (n.ItemType == Notification.Types.JoinCourseApproval)).OrderBy(x => x.Posted).ToList();
     var CommunityApprovalNotifications = notifications.Where(n => (n.ItemType == Notification.Types.JoinCommunityApproval)).OrderBy(x => x.Posted).ToList();
     
@@ -16,8 +16,24 @@
     {
         ConsolidatedNotifications.Add(CommunityApprovalNotifications.First());
     }
+
+    var DashBoardNotifications = notifications.Where(n => n.ItemType == Notification.Types.Dashboard).ToList();
+
+    var foo = from item in DashBoardNotifications
+              group item by new { ItemID = item.ItemID } into g
+              select new { ItemID = g.Key.ItemID, Count = g.Count() };
+              
+    if(foo.Count() > 0)
+    {
+        foreach (var item in foo)
+        {
+            var bar = DashBoardNotifications.Where(n => n.ItemID == item.ItemID).OrderByDescending(m => m.Posted).First();
+            ConsolidatedNotifications.Add(bar);
+        }
+    }
     
 }
+
                                 
     @foreach (Notification n in ConsolidatedNotifications)
     {
@@ -100,9 +116,29 @@
                         }
                     case Notification.Types.Dashboard:
                         {
-                            <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> posted in a @NotificationLink(n.ID, "dashboard thread")
-                            that you participated in</text>
-                            break;
+                            int myCount = 0;
+                            foreach (var item in foo)
+                            {
+                                if (item.ItemID == n.ItemID)
+                                {
+                                    myCount = item.Count;
+                                }
+                                    
+                            }
+                            
+                            if (myCount > 1)
+                            {
+                                <text>You have <b>@myCount</b> <em>unread</em> replies in a @NotificationLink(n.ID, "dashboard thread")
+                                that you participated in</text>
+                                break;
+                            }
+                            else
+                            {
+                                <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> posted in a @NotificationLink(n.ID, "dashboard thread")
+                                that you participated in</text>
+                                break;
+                            }
+                            
                         }
                     case Notification.Types.InlineReviewCompleted:
                         {
