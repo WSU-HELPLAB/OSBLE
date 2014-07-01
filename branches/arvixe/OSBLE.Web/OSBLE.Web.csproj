@@ -282,6 +282,7 @@
     <Compile Include="Controllers\SchoolController.cs" />
     <Compile Include="Controllers\StudioAssignmentController.cs" />
     <Compile Include="Controllers\SubmissionController.cs" />
+    <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\Odata\CoursesController.cs" />
     <Compile Include="Global.asax.cs">
@@ -879,6 +880,7 @@
     <Content Include="Views\Course\CourseAwaitingApproval.cshtml" />
     <Content Include="Views\Course\CommunityAwaitingApproval.cshtml" />
     <Content Include="Views\Shared\_ConsolidatedNotifications.cshtml" />
+    <Content Include="Views\Test\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
