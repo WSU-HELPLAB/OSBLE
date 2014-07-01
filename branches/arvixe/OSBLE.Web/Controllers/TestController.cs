@@ -34,6 +34,8 @@ namespace OSBLE.Controllers
             ViewBag.serverTimezone = TimeZone.CurrentTimeZone.StandardName.ToString();
             ViewBag.IsDaylightSavings = TimeZone.CurrentTimeZone.IsDaylightSavingTime(d).ToString();
 
+
+
             TimeZone curTimezone = TimeZone.CurrentTimeZone;
             TimeSpan currentOffset = curTimezone.GetUtcOffset(DateTime.Now);
             TimeSpan classTimeZone;
@@ -51,6 +53,16 @@ namespace OSBLE.Controllers
 
             EndTime = EndTime.Subtract(difference);
             ViewBag.StartTimeAfterOffset = EndTime.ToString();
+
+
+            TimeZoneInfo mst = TimeZoneInfo.FindSystemTimeZoneById("Mountain Standard Time");
+            DateTime mstoUtc = TimeZoneInfo.ConvertTimeToUtc(StartTime, mst);
+            ViewBag.mstoutcisDaylight = mstoUtc.IsDaylightSavingTime().ToString();
+
+            ViewBag.msttoutc = mstoUtc.ToString();
+            DateTime utctoMst = TimeZoneInfo.ConvertTimeFromUtc(mstoUtc, mst);
+            ViewBag.utctomst = utctoMst.ToString();
+            ViewBag.utctomstisDaylight = utctoMst.IsDaylightSavingTime().ToString();
 
             return View();
         }
