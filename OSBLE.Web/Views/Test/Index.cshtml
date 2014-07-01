@@ -7,6 +7,9 @@
 the datetime now is  = @ViewBag.datetime <br />
 the datetime utcnow is = @ViewBag.utcdatetime <br />
 the server's time zone is == @ViewBag.serverTimezone and it isDaylightsavings ==  @ViewBag.IsDaylightSavings <br />
+
+
+
 <br /><br />
 assuming the course is -8 offset<br />
 the CurrentOffset == @ViewBag.CalculatedCurrentOffset<br />
@@ -74,3 +77,8 @@ the utc time displayed on osble for the local time passed by exact value:<br />
       data-date-format="hh:mm A">
     @toUtc.ToString("h:mm tt");
 </time><br />
+<br />
+the expirement to see if 1:00:00pm from todays date in mst 
+the experiment from mst -> to utc using timezoneinfo == @ViewBag.msttoutc .IsDaylightSavignsTime() == @ViewBag.mstoutcisDaylight<br />
+the experiment from utc -> to mst using timezoneinfo == @ViewBag.utctomst .IsDaylightSavignsTime() == @ViewBag.utctomstisDaylight<br />
+
