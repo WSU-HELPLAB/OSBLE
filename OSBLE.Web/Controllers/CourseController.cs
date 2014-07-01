@@ -78,6 +78,7 @@ namespace OSBLE.Controllers
                     TimeZone curTimezone = TimeZone.CurrentTimeZone;
                     TimeSpan currentOffset = curTimezone.GetUtcOffset(DateTime.Now);
                     TimeSpan classTimeZone;
+
                     if (DateTime.Now.IsDaylightSavingTime()) //case 1 3
                     {
                         classTimeZone = new TimeSpan(utcOffset + 1, 0, 0);
