@@ -18,7 +18,7 @@
             @Helpers.CreateToolTip(ToolTips.RosterEmail) 
         </div>
         <div class="editor-field">
-            @Html.EditorFor(model => model.UserProfile.UserName)
+            @Html.TextAreaFor(model => model.UserProfile.UserName)
             @Html.ValidationMessageFor(model => model.UserProfile.UserName)
         </div>
 

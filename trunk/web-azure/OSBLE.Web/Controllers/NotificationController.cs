@@ -43,6 +43,14 @@ namespace OSBLE.Controllers
                     case Notification.Types.EventApproval:
                         return RedirectToAction("Approval", "Event", new { ID = n.ItemID });
                     case Notification.Types.Dashboard:
+                        var DashBoardRead = (from d in db.Notifications
+                                             where d.RecipientID == ActiveCourseUser.ID && d.ItemType == Notification.Types.Dashboard && d.ItemID == n.ItemID
+                                             select d).ToList();
+                        foreach (var foo in DashBoardRead)
+                        {
+                            foo.Read = true;
+                        }
+                        db.SaveChanges();
                         return RedirectToAction("ViewThread", "Home", new { ID = n.ItemID });
                     case Notification.Types.FileSubmitted:
                         return RedirectToAction("getCurrentUsersZip", "FileHandler", new { assignmentID = n.ItemID });
@@ -58,8 +66,26 @@ namespace OSBLE.Controllers
                         int.TryParse(n.Data.Split(';')[1], out teamEvalAssignmnetID);
                         return RedirectToAction("TeacherTeamEvaluation", "Assignment", new { precedingTeamId = precteamId, TeamEvaluationAssignmentId = teamEvalAssignmnetID });
                     case Notification.Types.JoinCourseApproval:
+                        //this is done to mark all notifications that were consolidated as read
+                        var CourseMarkRead = (from d in db.Notifications
+                                              where d.RecipientID == ActiveCourseUser.ID && d.ItemType == Notification.Types.JoinCourseApproval && d.ItemID == ActiveCourseUser.AbstractCourseID
+                                              select d).ToList();
+                        foreach (var foo in CourseMarkRead)
+	                    {
+		                    foo.Read = true;
+	                    }
+                        db.SaveChanges();
                         return RedirectToAction("Index", "Roster", new { ID = n.ItemID });
                     case Notification.Types.JoinCommunityApproval:
+                        //this is done to mark all notifications that were consolidated as read
+                        var CommunityMarkRead = (from d in db.Notifications
+                                                 where d.RecipientID == ActiveCourseUser.ID && d.ItemType == Notification.Types.JoinCourseApproval && d.ItemID == ActiveCourseUser.AbstractCourseID
+                                                 select d).ToList();
+                        foreach (var foo in CommunityMarkRead)
+	                    {
+		                    foo.Read = true;
+	                    }
+                        db.SaveChanges();
                         return RedirectToAction("Index", "Roster", new { ID = n.ItemID });
                     
 
@@ -199,6 +225,7 @@ namespace OSBLE.Controllers
                 n.RecipientID = instructor.ID;
                 n.SenderID = e.Poster.ID;
 
+
                 addNotification(n);
             }
         }
@@ -213,16 +240,24 @@ namespace OSBLE.Controllers
                                              i.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor
                                            select i).ToList();
 
+
             foreach (CourseUser instructor in instructors)
             {
+
+
                 Notification n = new Notification();
                 n.ItemType = Notification.Types.JoinCourseApproval;
                 n.ItemID = c.ID;
                 n.RecipientID = instructor.ID;
                 n.SenderID = sender.ID;
                 
+
                 addNotification(n);
+                               
             }
+            db.SaveChanges();
+            
+            
         }
 
         [NonAction]
@@ -234,6 +269,7 @@ namespace OSBLE.Controllers
                                           i.AbstractRoleID == (int)CommunityRole.OSBLERoles.Leader
                                         select i).ToList();
 
+
             foreach (CourseUser leader in leaders)
             {
                 Notification n = new Notification();
@@ -241,9 +277,12 @@ namespace OSBLE.Controllers
                 n.ItemID = c.ID;
                 n.RecipientID = leader.ID;
                 n.SenderID = sender.ID;
+                
 
                 addNotification(n);
+
             }
+            db.SaveChanges();
         }
 
         [NonAction]
@@ -381,11 +420,12 @@ namespace OSBLE.Controllers
             }
 
             string subject = "";
-            if(getCourseTag(course) != "")
+            if(getCourseNotificationTag(course, n) != "")
             {
-                subject = "[" + getCourseTag(course) + "] "; // Email subject prefix
+                subject = getCourseNotificationTag(course, n); // Email subject prefix
+                
             }
-
+            
             string body = "";
 
             string action = "";
@@ -395,7 +435,7 @@ namespace OSBLE.Controllers
                 case Notification.Types.Mail:
                     Mail m = db.Mails.Find(n.ItemID);
 
-                    subject += "New private message from " + sender.FirstName + " " + sender.LastName;
+                    subject += " - " + sender.FirstName + " " + sender.LastName;
 
                     action = "reply to this message";
 
@@ -405,7 +445,7 @@ namespace OSBLE.Controllers
 
                     break;
                 case Notification.Types.EventApproval:
-                    subject += "Event approval request from " + sender.FirstName + " " + sender.LastName;
+                    subject += " - " + sender.FirstName + " " + sender.LastName;
 
                     body = sender.FirstName + " " + sender.LastName + " has requested your approval of an event posting.";
 
@@ -413,7 +453,7 @@ namespace OSBLE.Controllers
 
                     break;
                 case Notification.Types.Dashboard:
-                    subject += "Activity Feed Reply from " + sender.FirstName + " " + sender.LastName;
+                    subject += " - " + sender.FirstName + " " + sender.LastName;
 
                     body = sender.FirstName + " " + sender.LastName + " has posted to an activity feed thread in which you have participated.";
 
@@ -421,7 +461,7 @@ namespace OSBLE.Controllers
 
                     break;
                 case Notification.Types.FileSubmitted:
-                    subject += "New Assignment Submmission from " + sender.FirstName + " " + sender.LastName;
+                    subject += " - " + sender.FirstName + " " + sender.LastName;
 
                     body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
 
@@ -429,7 +469,7 @@ namespace OSBLE.Controllers
 
                     break;
                 case Notification.Types.RubricEvaluationCompleted:
-                    subject += sender.FirstName + " " + sender.LastName + "has published a rubric  Assignment Submmission from ";
+                    subject += " - " + sender.FirstName + " " + sender.LastName;
 
                     body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
 
@@ -437,7 +477,7 @@ namespace OSBLE.Controllers
 
                     break;
                 case Notification.Types.InlineReviewCompleted:
-                    subject += sender.FirstName + " " + sender.LastName + "has published a rubric  Assignment Submmission from ";
+                    subject += " - " + sender.FirstName + " " + sender.LastName;
 
                     body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
 
@@ -445,7 +485,7 @@ namespace OSBLE.Controllers
 
                     break;
                 case Notification.Types.TeamEvaluationDiscrepancy:
-                    subject += sender.FirstName + " " + sender.LastName + "has submitted a Team Evaluation that has raised a discrepancy flag";
+                    subject += " - " + sender.FirstName + " " + sender.LastName;
 
                     body = sender.FirstName + " " + sender.LastName + " has submitted a Team Evaluation that has raised a discrepancy flag."; //Can we get name of assignment?
 
@@ -453,7 +493,7 @@ namespace OSBLE.Controllers
 
                     break;
                 case Notification.Types.JoinCourseApproval:
-                    subject += sender.FirstName + " " + sender.LastName + "has submitted a request to join" + course.Name;
+                    subject += " - " + sender.FirstName + " " + sender.LastName;
 
                     body = sender.FirstName + " " + sender.LastName + " has submitted a request to join" + course.Name; 
 
@@ -461,9 +501,9 @@ namespace OSBLE.Controllers
 
                     break;
                 case Notification.Types.JoinCommunityApproval:
-                    subject += sender.FirstName + " " + sender.LastName + "has submitted a request to join" + course.Name;
+                    subject += " - " + sender.FirstName + " " + sender.LastName;
 
-                    body = sender.FirstName + " " + sender.LastName + " has submitted a request to join" + course.Name; 
+                    body = sender.FirstName + " " + sender.LastName + " has submitted a request to join " + course.Name; 
 
                     action = "view the request to join.";
 
@@ -484,24 +524,24 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-        /// Returns tags for either a course or a community, if one exists for the notification. Otherwise, empty string.
+        /// Returns tags for either a course or a community as well as a tag for a notification, if one exists for the notification. Otherwise, empty string.
         ///
         /// </summary>
-        /// <param name="c">The abstract course</param>
+        /// <param name="c" , "n">The abstract course Notification param</param>
         /// <returns>Tag with leading space (" CptS 314") if course or community exists, "" if not.</returns>
-        private string getCourseTag(AbstractCourse c)
+        private string getCourseNotificationTag(AbstractCourse c, Notification n)
         {
             string tag = "";
 
-            if (c != null)
+            if (c != null || n != null)
             {
                 if (c is Course)
                 {
-                    tag = (c as Course).Prefix + " " + (c as Course).Number;
+                    tag = "[" + (c as Course).Prefix + " " + (c as Course).Number + "]" + "[" + n.ItemType + "]";
                 }
                 else if (c is Community)
                 {
-                    tag = (c as Community).Nickname;
+                    tag = "[" + (c as Community).Nickname + "]" + "[" + n.ItemType + "]";
                 }
             }
 

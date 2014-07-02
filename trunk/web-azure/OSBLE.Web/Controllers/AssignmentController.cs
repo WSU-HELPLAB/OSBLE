@@ -578,6 +578,6 @@ namespace OSBLE.Controllers
             assignment.CriticalReviewPublishDate = DateTime.UtcNow;
             db.SaveChanges();
             return RedirectToAction("Index", "Home", new { area = "AssignmentDetails", assignmentId = assignmentID });
-        }
+        }       
     }
 }

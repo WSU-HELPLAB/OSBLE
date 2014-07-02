@@ -24,8 +24,15 @@
         @{
             int counter = 0;
             string altText = "";
+            
+            List<AssignmentTypes> assignmentTypes = Model.ToList();
+            //TODO:DMO: filter types           
+            
           }
-        @foreach (AssignmentTypes type in Model)
+
+         
+
+        @foreach (AssignmentTypes type in assignmentTypes)
         {
             if (counter % 2 == 0)
             {
@@ -46,3 +53,23 @@
     </table>
     <input type="submit" value="Begin" name="@ViewBag.BeginWizardButton" id="@ViewBag.BeginWizardButton" />
 }
+
+<script>
+    
+    @*
+        //TODO:DMO: implement
+        $(document).ready(function () {        
+        var url ="@Url.Action("GetCourseType", "Home")";        
+        debugger;
+        $.get(url, function (data) {
+            //alert("SUCCESS!");
+            return;
+        })
+            .fail(function (data) {
+                //debugger;
+                //alert("FAIL!");
+            });
+    });*@
+    
+
+</script>

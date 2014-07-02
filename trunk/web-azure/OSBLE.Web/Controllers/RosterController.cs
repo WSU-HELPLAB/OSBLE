@@ -331,7 +331,7 @@ namespace OSBLE.Controllers
                         
                         if (usedIdentifications.Contains(member.UserProfile.Identification) && member.AbstractRoleID != (int)CourseRole.CourseRoles.Pending)
                         {
-                            ViewBag.Error = "There is a non-student (" + member.UserProfile.FirstName + " " + member.UserProfile.LastName + ") in the course with the same School ID as a student on the roster. Please check your roster and try again.";
+                            ViewBag.Error = "There is a " + "[" + member.AbstractRole.Name + "]" + " non-student (" + member.UserProfile.FirstName + " " + member.UserProfile.LastName + ") in the course with the same School ID as a student on the roster. Please check your roster and try again.";
                             return View("RosterError");
                         }
                     }
@@ -555,7 +555,7 @@ namespace OSBLE.Controllers
                 {
                     //yc this check for multiple emails added in. 
                     string temp = courseuser.UserProfile.UserName;
-                    char[] delim = new char[] { ' ', ',' };
+                    char[] delim = new char[] { ' ', ',' , ';' };
                     string[] emails = temp.Split(delim, StringSplitOptions.RemoveEmptyEntries);
                     string[] invalidEmails = new string[emails.Count()];
                     int invalidCount = 0;
@@ -663,23 +663,6 @@ namespace OSBLE.Controllers
         {
             CourseUser pendingUser = getCourseUser(userId);
 
-            //notifcation cleanup
-            //find all notifcations sent from this userid and notifcation type is joincourseapproval
-            //weve decided that notifications are no longer crucial to clean up
-            //List<Notification> approvalNotifications = (from n in db.Notifications
-            //                                            where n.SenderID == pendingUser.ID &&
-            //                                            n.ItemType == Notification.Types.JoinCourseApproval &&
-            //                                            n.ItemID == ActiveCourseUser.AbstractCourseID
-            //                                            select n).ToList();
-            //foreach (Notification aN in approvalNotifications)
-            //{
-            //    //delete this notification
-            //    db.Notifications.Remove(aN);
-            //    db.SaveChanges();
-            //}
-            //save teh changes
-
-
             //set user to active student
             if (pendingUser.AbstractRoleID == (int)CourseRole.CourseRoles.Pending)
             {
@@ -688,11 +671,19 @@ namespace OSBLE.Controllers
                 db.Entry(pendingUser).State = EntityState.Modified;
                 db.SaveChanges();
 
-                return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " has been enrolled into this course" });
+                return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " has been enrolled into this course." });
+            }
+            else if (pendingUser.AbstractRoleID == (int)CommunityRole.OSBLERoles.Pending)
+            {
+                pendingUser.Hidden = false;
+                pendingUser.AbstractRoleID = (int)CommunityRole.OSBLERoles.Participant;
+                db.Entry(pendingUser).State = EntityState.Modified;
+                db.SaveChanges();
+                return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " is now a participant of this community." });
             }
             else
             {
-                return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " IS NOT A PENDING USER" });
+                return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " IS NOT A PENDING USER." });
             }
             
         }
@@ -705,18 +696,19 @@ namespace OSBLE.Controllers
         public ActionResult DenyPending(int userId)
         {
             CourseUser pendingUser = getCourseUser(userId);
-
             //db entry will no longer exists, save names for notice
             string firstName = pendingUser.UserProfile.FirstName;
             string lastName = pendingUser.UserProfile.LastName;
 
-            //notifcation clean up
 
             //remove the kid from the db
             db.CourseUsers.Remove(pendingUser);
             db.SaveChanges();
 
-            return RedirectToAction("Index", "Roster", new { notice = firstName + " " + lastName + " has been denied enrollment into this course" });
+            if (pendingUser.AbstractRoleID == (int)CourseRole.CourseRoles.Pending)
+                return RedirectToAction("Index", "Roster", new { notice = firstName + " " + lastName + " has been denied enrollment into this course." });
+            else
+                return RedirectToAction("Index", "Roster", new { notice = firstName + " " + lastName + " has been denied the ability to participate in this community." });
         }
         
         /// <summary>
@@ -727,9 +719,11 @@ namespace OSBLE.Controllers
         public ActionResult BatchApprove()
         {
             int count = 0;
-
+            List<CourseUser> pendingUsers;
             //find all pending users for current course
-            List<CourseUser> pendingUsers = (from c in db.CourseUsers
+            if (ActiveCourseUser.AbstractCourse.GetType() != typeof(Community)) //of type course
+            {
+                pendingUsers = (from c in db.CourseUsers
                                              where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
                                              c.AbstractRoleID == (int)CourseRole.CourseRoles.Pending
                                              select c).ToList();
@@ -741,10 +735,32 @@ namespace OSBLE.Controllers
                 p.Hidden = false;
                 p.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
                 db.Entry(p).State = EntityState.Modified;
+                }
                 db.SaveChanges();
+
+                return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " student(s) have been enrolled into this course." });
+            }
+            else
+            {
+                pendingUsers = (from c in db.CourseUsers
+                                where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                                c.AbstractRoleID == (int)CommunityRole.OSBLERoles.Pending
+                                select c).ToList();
+
+                count = pendingUsers.Count();
+
+                foreach (CourseUser p in pendingUsers)
+                {
+                    p.Hidden = false;
+                    p.AbstractRoleID = (int)CommunityRole.OSBLERoles.Participant;
+                    db.Entry(p).State = EntityState.Modified;
+                }
+                db.SaveChanges();
+
+                return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " participant(s) have been added to the community." });
             }
 
-            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " student(s) have been enrolled into this course" });
+
         }
 
         /// <summary>
@@ -756,10 +772,23 @@ namespace OSBLE.Controllers
         {
             int count = 0;
             //find all pending users for current course
-            List<CourseUser> pendingUsers = (from c in db.CourseUsers
+            List<CourseUser> pendingUsers;
+            //find all pending users for current course
+            if (ActiveCourseUser.AbstractCourse.GetType() != typeof(Community))
+            {
+
+                pendingUsers = (from c in db.CourseUsers
                                              where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
                                              c.AbstractRoleID == (int)CourseRole.CourseRoles.Pending
                                              select c).ToList();
+            }
+            else
+            {
+                pendingUsers = (from c in db.CourseUsers
+                                where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                                c.AbstractRoleID == (int)CommunityRole.OSBLERoles.Pending
+                                select c).ToList();
+            }
 
             count = pendingUsers.Count();
             foreach (CourseUser p in pendingUsers)
@@ -767,7 +796,11 @@ namespace OSBLE.Controllers
                 db.CourseUsers.Remove(p);
             }
             db.SaveChanges();
-            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " student(s) have been denied enrollment into this course" });
+
+            if (ActiveCourseUser.AbstractCourse.GetType() != typeof(Community))
+                return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " student(s) have been denied enrollment into this course." });
+            else
+                return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " participants(s) have been denied the ability to join the community." });
         }
 
 
@@ -1347,7 +1380,7 @@ namespace OSBLE.Controllers
 
         private void emailCourseUser(CourseUser user)
         {
-            string subject = "Welcome to " + ActiveCourseUser.AbstractCourse.Name;
+            string subject = "Welcome to " + user.AbstractCourse.Name;
             string link = "https://osble.org";
 
             string message = "Dear " + user.UserProfile.FirstName + " " + user.UserProfile.LastName + @", <br/>
@@ -1368,7 +1401,7 @@ namespace OSBLE.Controllers
         {
             var WTU = whitetable.WhiteTableUser;
 
-            string subject = "Welcome to OSBLE.org";
+            string subject = "Welcome to OSBLE";
             string link = "https://osble.org/Account/AcademiaRegister?email=" 
                 + WTU.Email + "&firstname=" + WTU.Name2 + "&lastname=" + WTU.Name1 + "&identification=" + WTU.Identification; 
 
@@ -1404,7 +1437,7 @@ namespace OSBLE.Controllers
                                      c.CourseID == ActiveCourseUser.AbstractCourseID
                                      select c).FirstOrDefault();
 
-            string subject = "Welcome to OSBLE.org";
+            string subject = "Welcome to OSBLE";
             string link = "https://osble.org/Account/AcademiaRegister?email="
                 + wtUser.Email + "&firstname=" + wtUser.Name2 + "&lastname=" + wtUser.Name1 + "&identification=" + wtUser.Identification;
 
