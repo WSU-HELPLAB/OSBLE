@@ -25,14 +25,61 @@
             int counter = 0;
             string altText = "";
             
+            //put assignment types in a list so we can remove the ones we don't want to display
             List<AssignmentTypes> assignmentTypes = Model.ToList();
-            //TODO:DMO: filter types           
+            List<AssignmentTypes> filteredAssignmentTypes = new List<AssignmentTypes>();            
+            //get the current course role to filter assignment types
+            string activeCourseRole = ViewBag.ActiveCourse.AbstractRole.Name;
+
+            //TODO: as of 7/2/2014 community, committee, and ABET roles do not have implemented assignment types. 
+            //this filter will need to be adjusted when those are implemented.
+            switch (activeCourseRole)
+            {
+                case "Instructor": //instructors only want to see course assignment types.
+                    List<AssignmentTypes> temp = new List<AssignmentTypes>();
+                    foreach(var type in assignmentTypes)
+                    {
+                        switch (type)
+                        {
+                            case AssignmentTypes.Basic:
+                            case AssignmentTypes.CriticalReview:                                
+                            case AssignmentTypes.DiscussionAssignment:                                
+                            case AssignmentTypes.TeamEvaluation:
+                            case AssignmentTypes.CriticalReviewDiscussion:
+                                temp.Add(type);
+                                break;
+                            case AssignmentTypes.CommitteeDiscussion:
+                                break;
+                            case AssignmentTypes.ReviewOfStudentWork:
+                                break;
+                            case AssignmentTypes.CommitteeReview:
+                                break;
+                            case AssignmentTypes.AggregateAssessment:
+                                break;
+                            default:
+                                break;
+                        }                                             
+                    }
+                    //re-order assignment types                                        
+                    //Basic>>Discussion>>Critical Review>>Critical Review Discussion>>Team Evaluation
+                    filteredAssignmentTypes.Add(temp[0]);
+                    filteredAssignmentTypes.Add(temp[3]);
+                    filteredAssignmentTypes.Add(temp[1]);
+                    filteredAssignmentTypes.Add(temp[2]);
+                    filteredAssignmentTypes.Add(temp[4]);
+                    break;
+                case "Leader":
+                    break;
+                case "Assessment Committee Chair":
+                    break;
+                default:
+                    break;
+            }
             
           }
-
          
 
-        @foreach (AssignmentTypes type in assignmentTypes)
+        @foreach (AssignmentTypes type in filteredAssignmentTypes)
         {
             if (counter % 2 == 0)
             {
@@ -42,9 +89,17 @@
             {
                 altText = "";
             }
-            <tr class="@altText">
+            <tr class="@altText @type">
                 <td><input id="type@(counter)" type="radio" value="@type" name="@ViewBag.AssignmentTypeRadioName" /></td>
-                <td><label for="type@(counter)">@type.Explode()</label></td>
+                @if(type.ToString() == "Basic")
+                {
+                    <td><label for="type@(counter)">@type.Explode() Assignment</label></td>
+                }
+                else
+                {
+                    <td><label for="type@(counter)">@type.Explode()</label></td>    
+                }
+                
                 <td style="max-width: 800px">@type.Description()</td>
             </tr>    
             counter++;
@@ -53,23 +108,3 @@
     </table>
     <input type="submit" value="Begin" name="@ViewBag.BeginWizardButton" id="@ViewBag.BeginWizardButton" />
 }
-
-<script>
-    
-    @*
-        //TODO:DMO: implement
-        $(document).ready(function () {        
-        var url ="@Url.Action("GetCourseType", "Home")";        
-        debugger;
-        $.get(url, function (data) {
-            //alert("SUCCESS!");
-            return;
-        })
-            .fail(function (data) {
-                //debugger;
-                //alert("FAIL!");
-            });
-    });*@
-    
-
-</script>
