@@ -9,6 +9,8 @@
 
     function scaleAnnotateFrame() {
         $('#AnnotateFrame').width($(window).width() - 20);
-        $('#AnnotateFrame').height($(window).height() - 110);
+        $('#AnnotateFrame').height($(window).height() - 110);        
+        if (location.protocol == "https:")
+            location.protocol = "http:";
     }
 </script>
