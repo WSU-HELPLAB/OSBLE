@@ -68,64 +68,10 @@ namespace OSBLE.Controllers
                     cm.Friday = Convert.ToBoolean(Request.Params["meeting_friday_" + i.ToString()]);
                     cm.Saturday = Convert.ToBoolean(Request.Params["meeting_saturday_" + i.ToString()]);
 
-                    //yc ALL TIMES ARE DONE AT UTC, experinces no 
+                    //yc ALL times must be in utc relative to the course it was created from
+                    cm.StartTime = convertToUtc(utcOffset, cm.StartTime);
+                    cm.EndTime = convertToUtc(utcOffset, cm.EndTime);
 
-                    //timezone checking
-                    //case 1: user is creating a course in a different timezone and it is not currently daylight savings time
-                    //case 2: user is creating a course in a different timezone and IT IS currently  daylight savings time
-                    //case 3: user is creating a course in the same timezone and it is not currently daylight savings time
-                    //case 4: user is creating a course in the same timezone and IT IS currently daylight savings time
-                    TimeZone curTimezone = TimeZone.CurrentTimeZone;
-                    TimeSpan currentOffset = curTimezone.GetUtcOffset(DateTime.Now);
-                    TimeSpan classTimeZone;
-
-                    if (DateTime.Now.IsDaylightSavingTime()) //case 1 3
-                    {
-                        classTimeZone = new TimeSpan(utcOffset + 1, 0, 0);
-
-                        if (classTimeZone != currentOffset) //case 1
-                        {
-                            //calculate the offset 
-                            TimeSpan difference = classTimeZone - currentOffset;
-                            cm.StartTime = cm.StartTime.Subtract(difference);
-                            cm.EndTime = cm.EndTime.Subtract(difference);
-
-                        }
-                        else //case 3
-                        {
-                            //do nothing time is correct 
-                        }
-                    }
-                    else//case 2 and 4
-                    {
-                        //based on server
-                        //utc should never be in daylights savings you should always come here
-                        //will have to do a check
-                        classTimeZone = new TimeSpan(utcOffset, 0, 0);
-                        if (classTimeZone != currentOffset) //case 2
-                        {
-                            TimeSpan difference = classTimeZone - currentOffset;
-                            cm.StartTime = cm.StartTime.Subtract(difference);
-                            cm.EndTime = cm.EndTime.Subtract(difference);
-                        }
-                        else //case 4
-                        {
-                            //do nothing
-                        }
-                    }
-                    //yc i commented out the below since this is no longer needed, and how and dates are really pulled fromt he course rather than
-                    //meeting times.
-                    //DateTime beforeUtcStartTime = cm.StartTime;
-
-                    //cm.StartTime = cm.StartTime.AddMinutes(utcOffset);
-                    //cm.EndTime = cm.EndTime.AddMinutes(utcOffset);
-
-                    //Check to see if the utc offset will change the day if so adjust the Meeting's date
-                    //if (beforeUtcStartTime.DayOfYear != cm.StartTime.DayOfYear)
-                    //{
-                    //    int difference = (beforeUtcStartTime.DayOfYear - cm.StartTime.DayOfYear);
-                    //    correctDay(cm, difference);
-                    //}
                     course.CourseMeetings.Add(cm);
                 }
             }
@@ -133,6 +79,137 @@ namespace OSBLE.Controllers
             db.SaveChanges();
         }
 
+        public TimeZoneInfo getTimeZone(int tzoffset)
+        {
+            string zone = "";
+            switch (tzoffset)
+            {
+                case 0:
+                    zone = "Greenwich Standard Time";
+                    break;
+                case 1:
+                    zone = "W. Europe Standard Time";
+                    break;
+                case 2:
+                    zone = "E. Europe Standard Time";
+                    break;
+                case 3:
+                    zone = "Russian Standard Time";
+                    break;
+                case 4:
+                    zone = "Arabian Standard Time";
+                    break;
+                case 5:
+                    zone = "West Asia Standard Time";
+                    break;
+                case 6:
+                    zone = "Central Asia Standard Time";
+                    break;
+                case 7:
+                    zone = "North Asia Standard Time";
+                    break;
+                case 8:
+                    zone = "Taipei Standard Time";
+                    break;
+                case 9:
+                    zone = "Tokyo Standard Time";
+                    break;
+                case 10:
+                    zone = "AUS Eastern Standard Time";
+                    break;
+                case 11:
+                    zone = "Central Pacific Standard Time";
+                    break;
+                case 12:
+                    zone = "New Zealand Standard Time";
+                    break;
+                case 13:
+                    zone = "Tonga Standard Time";
+                    break;
+                case -1:
+                    zone = "Cape Verde Standard Time";
+                    break;
+                case -2:
+                    zone = "Mid-Atlantic Standard Time";
+                    break;
+                case -3:
+                    zone = "E. South America Standard Time";
+                    break;
+                case -4:
+                    zone = "Atlantic Standard Time";
+                    break;
+                case -5:
+                    zone = "Eastern Standard Time";
+                    break;
+                case -6:
+                    zone = "Central Standard Time";
+                    break;
+                case -7:
+                    zone = "Mountain Standard Time";
+                    break;
+                case -8:
+                    zone = "Pacific Standard Time";
+                    break;
+                case -9:
+                    zone = "Alaskan Standard Time";
+                    break;
+                case -10:
+                    zone = "Hawaiian Standard Time";
+                    break;
+                case -11:
+                    zone = "Samoa Standard Time";
+                    break;
+                case -12:
+                    zone = "Dateline Standard Time";
+                    break;
+                default:
+                    zone = "";
+                    break;
+            }
+            TimeZoneInfo tz;
+            if (zone != "")
+                tz = TimeZoneInfo.FindSystemTimeZoneById(zone);
+            else
+            {
+                //going to assume utc
+                tz = TimeZoneInfo.FindSystemTimeZoneById("Coordinate Universal Time");
+            }
+            return tz;
+
+        }
+        public DateTime convertToUtc(int tzoffset, DateTime originalTime)
+        {
+            DateTime convertedToUtc;
+            TimeZoneInfo tz = getTimeZone(tzoffset);
+
+            try
+            {
+                convertedToUtc = TimeZoneInfo.ConvertTimeToUtc(originalTime, tz);
+            }
+            catch(TimeZoneNotFoundException e)
+            {
+                //failed need to figure out what our error will be
+                convertedToUtc = new DateTime();
+            }
+            
+            return convertedToUtc;
+        }
+
+        public DateTime convertFromUtc(int tzOffset, DateTime originalTime)
+        {
+            DateTime convertedFromUtc;
+            TimeZoneInfo tz = getTimeZone(tzOffset);
+            try
+            {
+                convertedFromUtc = TimeZoneInfo.ConvertTimeFromUtc(originalTime, tz);
+            }
+            catch(TimeZoneNotFoundException e)
+            {
+                convertedFromUtc = new DateTime();
+            }
+
+            return convertedFromUtc;
+        }
         //yc: not sure if this situation occurs anymore for below, currently not ever called
         //Correct the listed day because of utc offset
         private void correctDay(CourseMeeting cm, int difference)
