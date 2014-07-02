@@ -7,6 +7,7 @@ using OSBLE.Controllers;
 using OSBLE.Areas.AssignmentWizard.Models;
 using OSBLE.Models.Assignments;
 using OSBLE.Attributes;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -126,6 +127,30 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 model = db.Assignments.Find((int)assignmentId);
             }
             return View(model);
+        }
+
+        [HttpGet]
+        public string GetCourseType()
+        {  
+            string courseType = "DEFAULT";            
+
+            //ActiveCourseUser.AbstractRoleID
+
+            switch (ActiveCourseUser.AbstractRoleID)
+            {
+                case (int)CourseRole.CourseRoles.Instructor:
+                    courseType = "Course";
+                    break;
+                case (int)CommunityRole.OSBLERoles.Leader:
+                    courseType = "Community";
+                    break;
+                case 12: case 13: case 14:
+                    courseType = "OTHER";
+                    break;
+                default:
+                    break;
+            }
+            return courseType;
         }
 
         #endregion
