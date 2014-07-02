@@ -689,22 +689,18 @@ namespace OSBLE.Controllers
 
             //yc: this edit no longer needs to check this anymore. may have to remove all of this if statement
             //If it exists, which it should update all of the meetings to reflect the correct utc adjusted time.
+            //locate timezone offset
+            int courseOffset = (ActiveCourseUser.AbstractCourse).GetType() != typeof(Community) ? ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset : 0;
+            TimeZoneInfo tz = getTimeZone(courseOffset);
+
             if (utcOffset != 0)
             {
                 ICollection<CourseMeeting> Meetings = course.CourseMeetings;
                 foreach (CourseMeeting meeting in Meetings)
                 {
-                    DateTime beforeUtcStartTime = meeting.StartTime;
+                    meeting.StartTime = TimeZoneInfo.ConvertTimeFromUtc(meeting.StartTime, tz);
+                    meeting.EndTime = TimeZoneInfo.ConvertTimeFromUtc(meeting.EndTime, tz);
 
-                    meeting.StartTime = meeting.StartTime.Add(new TimeSpan(course.TimeZoneOffset, 0 ,0));
-                    meeting.EndTime = meeting.EndTime.Add(new TimeSpan(course.TimeZoneOffset, 0 ,0));
-
-                    //Check to see if the utc offset will change the day if so adjust the Meeting's date
-                    //if (beforeUtcStartTime.DayOfYear != meeting.StartTime.DayOfYear)
-                    //{
-                    //    int difference = (beforeUtcStartTime.DayOfYear - meeting.StartTime.DayOfYear);
-                    //    correctDay(meeting, difference);
-                    //}
                 }
             }
             else //Rare case where a cookie doesn't exist set the time to null essentially
@@ -741,15 +737,6 @@ namespace OSBLE.Controllers
             if (course.ID != ActiveCourseUser.AbstractCourseID)
             {
                 return RedirectToAction("Home");
-            }
-
-            int utcOffset = 0;
-            try
-            {
-                Int32.TryParse(Request.Form["utc-offset"].ToString(), out utcOffset);
-            }
-            catch (Exception)
-            {
             }
 
             NameValueCollection parameters = Request.Params;
