@@ -98,6 +98,10 @@ namespace OSBLE.Controllers
                     //Value: tuple(submissionTime (as string), discussion team ID as int or null)
                 Dictionary<int, string> submissionInfo = new Dictionary<int,string>();
                 Dictionary<int, DiscussionTeam> dtInfo = new Dictionary<int, DiscussionTeam>();
+                int courseOffset = (ActiveCourseUser.AbstractCourse).GetType() != typeof(Community) ? ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset : 0;
+                CourseController cc = new CourseController();
+                TimeZoneInfo tz = cc.getTimeZone(courseOffset);
+
                 foreach (Assignment a in Assignments)
                 {
                     if (a.HasDeliverables)
@@ -108,29 +112,9 @@ namespace OSBLE.Controllers
                         if (subTime != null) //found a submission time, Reassign submissionTime
                         {
                             //Submission time comes back in UTC
-                            //Check to see if there is a time zone cookie
-                            System.Web.HttpCookie cookieOffset = new System.Web.HttpCookie("utcOffset");
-                            cookieOffset = Request.Cookies["utcOffset"];
-                            int utcOffset;
-                            if (cookieOffset != null)
-                            {
-                                //Adjust the time if there is
-                                string UtcOffsetString = cookieOffset.Value;
-                                utcOffset = Convert.ToInt32(UtcOffsetString);
-
-                                subTime = subTime.Value.AddMinutes(-utcOffset);
-                            }
-                            else
-                            {
-                                //If no cookie then the event's time is left to it's utc time
-                                utcOffset = 0;
-                            }
-
+                            subTime = TimeZoneInfo.ConvertTimeFromUtc((DateTime)subTime, tz);
                             submissionTime = subTime.Value.ToString();
                         }
-
-                       
-
                         submissionInfo.Add(a.ID, submissionTime);
                     }
                     else
