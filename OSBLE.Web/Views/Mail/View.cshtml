@@ -15,7 +15,12 @@
 </style>
 
 <h2>Subject:  @Model.Subject</h2>
-<p><b>Sent:</b> @Model.Posted.ToString()</p>
+<p><b>Sent:</b> <time class="utc-time"
+      datetime="@Helpers.DateAsUnixTime(@Model.Posted)"
+      data-original-date="@Helpers.RawDate(@Model.Posted)"
+      data-date-format="MM/DD/YYYY hh:mm A">
+    @Model.Posted.ToShortDateString() @Model.Posted.ToShortTimeString() (UTC)
+</time></p>
     <div class="mail_user">
         <b>From:</b><br />
         @Helpers.ProfilePicture(@Url.Action("ProfilePicture", new { ID = Model.FromUserProfileID }))
