@@ -438,8 +438,13 @@ namespace OSBLE.Controllers
                     subject += " - " + sender.FirstName + " " + sender.LastName;
 
                     action = "reply to this message";
+                    //yc: m.posted needs to have a converetd time
+                    //locate timezone offset
+                    int courseOffset = (ActiveCourseUser.AbstractCourse).GetType() != typeof(Community) ? ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset : 0;
+                    CourseController cc = new CourseController();
+                    TimeZoneInfo tz = cc.getTimeZone(courseOffset);
 
-                    body = sender.FirstName + " " + sender.LastName + " sent this message at " + m.Posted.ToString() + ":\n\n";
+                    body = sender.FirstName + " " + sender.LastName + " sent this message at " + TimeZoneInfo.ConvertTimeFromUtc(m.Posted, tz).ToString() + ":\n\n";
                     body += "Subject: " + m.Subject + "\n\n";
                     body += m.Message;
 
