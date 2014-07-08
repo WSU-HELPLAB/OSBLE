@@ -367,6 +367,7 @@ namespace OSBLE.Controllers
                                 continue;                            
                             }
                             CourseUser existingUser = new CourseUser(); 
+                            
                             //yc: before using create course user, you must set the following
                             existingUser.UserProfile = userWithAccount;
                             existingUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
@@ -664,10 +665,12 @@ namespace OSBLE.Controllers
             //set user to active student
             if (pendingUser.AbstractRoleID == (int)CourseRole.CourseRoles.Pending)
             {
+                
                 pendingUser.Hidden = false;
                 pendingUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
                 db.Entry(pendingUser).State = EntityState.Modified;
                 db.SaveChanges();
+                addNewStudentToTeams(pendingUser);
 
                 return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " has been enrolled into this course." });
             }
@@ -733,7 +736,8 @@ namespace OSBLE.Controllers
                 p.Hidden = false;
                 p.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
                 db.Entry(p).State = EntityState.Modified;
-                }
+                addNewStudentToTeams(p);
+            }
                 db.SaveChanges();
 
                 return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " student(s) have been enrolled into this course." });
@@ -1289,6 +1293,7 @@ namespace OSBLE.Controllers
                 up.SchoolID = CurrentUser.SchoolID;
                 up.Identification = whitetable.WhiteTableUser.Identification; //courseuser.UserProfile.Identification;
                 up.CourseID = whitetable.WhiteTableUser.CourseID;
+                
 
                 if (whitetable.WhiteTableUser.Name1 != null)
                 {
