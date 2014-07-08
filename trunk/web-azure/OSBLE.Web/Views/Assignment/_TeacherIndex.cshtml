@@ -137,7 +137,10 @@
                     @if (assignments[i].HasRubric && !(isFutureAssignment || isDraftAssignment))
                     {
                     
+                        if(assignments[i].AssignmentTeams.Count > 0)
+                        {
                             @: @assignments[i].GetPublishedCount() of @assignments[i].AssignmentTeams.Count published.&nbsp @Html.ActionLink("Grade Now", "Index", "Rubric", new { assignmentId = assignments[i].ID, cuId = assignments[i].AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID }, new { })<br />
+                        }                            
                             @: @assignments[i].GetSavedAsDraftCount() saved as draft.&nbsp @Html.ActionLink("Publish All", "PublishAllRubrics", "Assignment", new { area = "", assignmentId = assignments[i].ID }, new { })
                     
                     }

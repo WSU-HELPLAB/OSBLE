@@ -378,7 +378,8 @@ namespace OSBLE.Controllers
                             createCourseUser(existingUser);
                             rosterCount++;
                             //email the user notifying them that they have been added to this course 
-                            emailCourseUser(existingUser);
+                            if(entry.Email != String.Empty)
+                                emailCourseUser(existingUser);
         
 
                          
