@@ -18,6 +18,7 @@ using OSBLE.Models.Annotate;
 using System.Reflection;
 using OSBLE.Models.Triggers;
 using OSBLE.Models.Assessments;
+using System.IO;
 
 namespace OSBLE.Models
 {
@@ -26,6 +27,9 @@ namespace OSBLE.Models
     /// </summary>
     public abstract class ContextBase : DbContext
     {
+        //this should prevent us from trying to create triggers more than once per build
+        public static bool dbTriggersInitialized = false;
+
         public ContextBase()
             : base()
         {
@@ -70,41 +74,48 @@ namespace OSBLE.Models
 
         private void init()
         {
-            //AC: Not sure if the best method to accomplish this, but I'd like to 
-            //set up database triggers automatically.  As I couldn't find any
-            //EF-based event handler that I could hook into, my solution is to 
-            //create a trigger-based setting to track whether or not triggers
-            //have been set up.
-            Setting setting = this.Settings.Where(s => s.Key == "TriggerInit").FirstOrDefault();
-            if (setting == null)
+
+            if (!dbTriggersInitialized) //we only want to try to create triggers if we haven't already done so
             {
-                setting = new Setting();
-                setting.Value = "0";
-                setting.Key = "TriggerInit";
-            }
-            if (setting.Value == "0")
-            {
-                try
+                //AC: Not sure if the best method to accomplish this, but I'd like to 
+                //set up database triggers automatically.  As I couldn't find any
+                //EF-based event handler that I could hook into, my solution is to 
+                //create a trigger-based setting to track whether or not triggers
+                //have been set up.
+                Setting setting = this.Settings.Where(s => s.Key == "TriggerInit").FirstOrDefault();
+                if (setting == null)
                 {
-                    //load all triggers using reflection
-                    List<Type> componentObjects = (from type in Assembly.GetExecutingAssembly().GetTypes()
-                                                   where
-                                                   type.IsSubclassOf(typeof(ModelTrigger)) == true
-                                                   &&
-                                                   type.IsAbstract == false
-                                                   select type).ToList();
-                    foreach (Type component in componentObjects)
+                    setting = new Setting();
+                    setting.Value = "0";
+                    setting.Key = "TriggerInit";
+                }
+
+                if (setting.Value == "0")
+                {
+                    try
                     {
-                        ModelTrigger trigger = Activator.CreateInstance(component) as ModelTrigger;
-                        trigger.CreateTrigger(this);
+                        //load all triggers using reflection
+                        List<Type> componentObjects = (from type in Assembly.GetExecutingAssembly().GetTypes()
+                                                       where
+                                                       type.IsSubclassOf(typeof(ModelTrigger)) == true
+                                                       &&
+                                                       type.IsAbstract == false
+                                                       select type).ToList();
+                        foreach (Type component in componentObjects)
+                        {
+                            ModelTrigger trigger = Activator.CreateInstance(component) as ModelTrigger;
+                            trigger.CreateTrigger(this);
+                        }
+                        setting.Value = "1";
+
                     }
-                    setting.Value = "1";
+                    catch (Exception)
+                    {
+                    }
+                    dbTriggersInitialized = true; //set to true so we don't try to create the triggers again.
                 }
-                catch (Exception)
-                {
-                }
+                this.SaveChanges();
             }
-            this.SaveChanges();
         }
 
         /// <summary>
@@ -136,9 +147,9 @@ namespace OSBLE.Models
             // Pending: The student is pending being added to the course, as of 6/6/2014 only course controller uses this for handling enrollment requests from users
             this.CourseRoles.Add(new CourseRole(CourseRole.CourseRoles.Pending.ToString(), false, false, false, false, false, false));
 
-            
+
             // Community Roles
-            
+
 
             // Leader: Can Modify Community
             this.CommunityRoles.Add(new CommunityRole(CommunityRole.OSBLERoles.Leader.ToString(), true, true, true, true));
@@ -214,7 +225,7 @@ namespace OSBLE.Models
         public DbSet<AbstractRole> AbstractRoles { get; set; }
 
         public DbSet<AssessmentCommittee> Committees { get; set; }
-        
+
         public DbSet<AssessmentCommitteeRole> CommitteeRoles { get; set; }
 
         public DbSet<Community> Communities { get; set; }
