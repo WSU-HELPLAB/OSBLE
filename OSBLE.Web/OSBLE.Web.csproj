@@ -367,6 +367,7 @@
     <Content Include="Content\images\cut_context.png" />
     <Content Include="Content\images\default.jpg" />
     <Content Include="Content\images\delete_up.png" />
+    <Content Include="Content\images\delete_up_disabled.png" />
     <Content Include="Content\images\edit_up.png" />
     <Content Include="Content\images\enroll.png" />
     <Content Include="Content\images\fileextimages\aac.png" />
