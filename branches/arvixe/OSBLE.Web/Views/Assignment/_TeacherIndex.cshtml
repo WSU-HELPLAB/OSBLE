@@ -94,7 +94,14 @@
                         <a title="Click to Unpublish"  class="pointerOnMouseOver" href="/Assignment/ToggleDraft?assignmentID=@assignments[i].ID">@Helpers.UnPublishButton()</a>
                     }
                     <a title="Click to Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = assignments[i].ID })">@Helpers.EditButton()</a>
-                    <a title="Click to Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@assignments[i].ID)">@Helpers.DeleteButton()</a>
+                    @if(assignments[i].IsDraft)
+                    {
+                        <a title="Click to Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@assignments[i].ID)">@Helpers.DeleteButton()</a>
+                    }
+                    else
+                    {
+                        <a title="Must Unpublish Before Delete" class="pointerOnMouseOver">@Helpers.DeleteButtonDisabled()</a>
+                    }
                 </td>
                 <td > <!--Cell for name-->
                     @Html.ActionLink(assignments[i].AssignmentName, "Index", "Home", new { area = "AssignmentDetails", assignmentId = assignments[i].ID }, null)
