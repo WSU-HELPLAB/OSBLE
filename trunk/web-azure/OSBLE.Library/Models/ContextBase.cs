@@ -74,7 +74,8 @@ namespace OSBLE.Models
 
         private void init()
         {
-
+            //disable trigger creation for now
+            dbTriggersInitialized = true;
             if (!dbTriggersInitialized) //we only want to try to create triggers if we haven't already done so
             {
                 //AC: Not sure if the best method to accomplish this, but I'd like to 

@@ -15,7 +15,8 @@ namespace OSBLE.Models.Assignments
         CommitteeDiscussion = 6,
         ReviewOfStudentWork = 7,
         CommitteeReview = 8,
-        AggregateAssessment = 9
+        AggregateAssessment = 9,
+        AnchoredDiscussion = 10
     };
 
 	public static class AssignmentTypeExtensions
@@ -80,6 +81,9 @@ namespace OSBLE.Models.Assignments
                     break;
                 case AssignmentTypes.AggregateAssessment:
                     description = "Merges all reviews of student work for a given year, and reports average assessment ratings by outcome and student achievement level (low, medium, high).";
+                    break;
+                case AssignmentTypes.AnchoredDiscussion:
+                    description = "A special kind of discussion assignment in which students discuss one or more PDF documents by annotating the documents with sticky notes. Sticky notes can be responded to by other students, creating a threaded discussion anchored in the documents.";
                     break;
                 default:
                     description = "This assignment does not yet have a description. You should not see this message!.";
