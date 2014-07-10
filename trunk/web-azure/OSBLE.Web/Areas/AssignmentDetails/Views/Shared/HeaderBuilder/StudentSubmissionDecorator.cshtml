@@ -26,10 +26,16 @@
         else
         {
             String submissionTime = dataModel.Submission.SubmissionTime;
+            DateTime sub = DateTime.Parse(submissionTime);
             <ul id="SubmissionItems">
             <li>
-                @(Html.ActionLink(submissionTime, "getCurrentUsersZip", "FileHandler", new { assignmentID = dataModel.Submission.assignmentID, area = "" }, new { onclick = "create_and_open_downloading_submission_dialog()" }))  
-            </li>
+                <time class="utc-time-link"
+                      datetime="@Helpers.DateAsUnixTime(sub)"
+                      data-original-date="@Helpers.RawDate(sub)"
+                      data-date-format="DD/MM/YY hh:mm:ss A">
+                    @(Html.ActionLink(submissionTime + " (UTC)", "getCurrentUsersZip", "FileHandler", new { assignmentID = dataModel.Submission.assignmentID, area = "" }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
+                </time>
+</li>
             <li>
                 @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = dataModel.Submission.assignmentID, area = "" }, options, new object())  
             </li>

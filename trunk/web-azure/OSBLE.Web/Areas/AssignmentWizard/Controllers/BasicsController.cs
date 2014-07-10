@@ -104,17 +104,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
                 Assignment.CourseID = ActiveCourseUser.AbstractCourseID;
 
-                //account for local client time, reset to UTC
-                int utcOffset = 0;
-                try
-                {
-                    Int32.TryParse(Request.Form["utc-offset"].ToString(), out utcOffset);
-                }
-                catch (Exception)
-                {
-                }
-                Assignment.ReleaseDate = Assignment.ReleaseDate.AddMinutes(utcOffset);
-                Assignment.DueDate = Assignment.DueDate.AddMinutes(utcOffset);
+                CourseController cc = new CourseController();
+                int utcOffset = (ActiveCourseUser.AbstractCourse as Course).TimeZoneOffset;
+                TimeZoneInfo tz = cc.getTimeZone(utcOffset);
+
+
+
+                Assignment.ReleaseDate = TimeZoneInfo.ConvertTimeToUtc(Assignment.ReleaseDate, tz);
+                Assignment.DueDate = TimeZoneInfo.ConvertTimeToUtc(Assignment.DueDate, tz);
 
                 //update our DB
                 if (Assignment.ID == 0)

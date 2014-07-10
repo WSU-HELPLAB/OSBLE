@@ -53,6 +53,25 @@ function parseDates() {
         $(this).removeClass("utc-time");
         $(this).addClass("local-time");
     });
+    $('time.utc-time-link').each(function (index) {
+        var milliseconds = $(this).attr('datetime');
+        var formatString = $(this).attr('data-date-format');
+        var currentDate = moment.utc(milliseconds, 'X');
+        var localDate = new Date();
+        var localOffset = localDate.getTimezoneOffset();
+        var txt = $(this).html();
+        var tmp= txt.split(">");
+        currentDate = currentDate.subtract('minutes', localOffset);
+        var replace = tmp[0];
+        replace = replace.concat(">");
+        var linedate = currentDate.format(formatString);
+        linedate = linedate.concat("</a>");
+        replace = replace.concat(linedate);
+        $(this).html(replace);
+        $(this).removeClass("utc-time-link");
+        $(this).addClass("local-time");
+    });
+
 }
 
     // Ready function for date/time pickers
