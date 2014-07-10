@@ -46,6 +46,7 @@
                             case AssignmentTypes.DiscussionAssignment:                                
                             case AssignmentTypes.TeamEvaluation:
                             case AssignmentTypes.CriticalReviewDiscussion:
+                            case AssignmentTypes.AnchoredDiscussion:
                                 temp.Add(type);
                                 break;
                             case AssignmentTypes.CommitteeDiscussion:
@@ -61,12 +62,13 @@
                         }                                             
                     }
                     //re-order assignment types                                        
-                    //Basic>>Discussion>>Critical Review>>Critical Review Discussion>>Team Evaluation
-                    filteredAssignmentTypes.Add(temp[0]);
-                    filteredAssignmentTypes.Add(temp[3]);
+                    //Basic>>Discussion>>Anchored Discussion>>Critical Review>>Critical Review Discussion>>Team Evaluation
                     filteredAssignmentTypes.Add(temp[1]);
-                    filteredAssignmentTypes.Add(temp[2]);
                     filteredAssignmentTypes.Add(temp[4]);
+                    filteredAssignmentTypes.Add(temp[0]);
+                    filteredAssignmentTypes.Add(temp[2]);
+                    filteredAssignmentTypes.Add(temp[3]);
+                    filteredAssignmentTypes.Add(temp[5]);
                     break;
                 case "Leader":
                     break;
