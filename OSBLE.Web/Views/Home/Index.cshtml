@@ -4,6 +4,7 @@
 
 @{
     ViewBag.Title = "Dashboard";
+    
 }
 
 <div id="dashboard_left">
@@ -38,7 +39,9 @@
 {
 <a href="@Url.Action("Create", "Event")" title="Add New Event or Deadline">@Helpers.AddButton()</a>
 }
+    <a href="@Url.Action("GenerateCourseCalendar", "Event", new { ID = ViewBag.ActiveCourseUser.AbstractCourseID } )" title="Download Course Calendar">@Helpers.UnPublishButton()</a>
 </h3>
+
 
 <div id="important_dates">
 <p>Next @ViewBag.ActiveCourse.AbstractCourse.CalendarWindowOfTime Weeks</p>

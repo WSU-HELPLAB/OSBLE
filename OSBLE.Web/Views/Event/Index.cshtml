@@ -19,6 +19,9 @@
         @Html.ActionLink("Create New Event", "Create")
     }
 </p>
+<p>
+    @Html.ActionLink("Download Course Calendar", "GenerateCourseCalendar", new { ID = ViewBag.ActiveCourseUser.AbstractCourseID })
+</p>
 
 @{
     DateTime today = DateTime.UtcNow.Date;
