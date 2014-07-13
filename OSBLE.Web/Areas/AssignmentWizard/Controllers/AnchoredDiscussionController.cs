@@ -63,7 +63,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public override ActionResult Index()
         {
             base.Index();
-            ModelState.Clear();            
+            ModelState.Clear();
             return View(Assignment);
         }
 
