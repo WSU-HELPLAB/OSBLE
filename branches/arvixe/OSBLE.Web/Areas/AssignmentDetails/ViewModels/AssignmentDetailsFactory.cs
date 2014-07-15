@@ -112,6 +112,13 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.HeaderBuilder = new PublishCriticalReviewDecorator(vm.HeaderBuilder);
                     vm.HeaderViews.Add("PublishCriticalReviewDecorator");
                 }
+                else if (assignment.Type == AssignmentTypes.AnchoredDiscussion)
+                {
+                    //link for critical review submission document
+                    vm.HeaderBuilder = new AnchoredDiscussionSubmitDecorator(vm.HeaderBuilder, vm.Client);
+                    vm.HeaderViews.Add("AnchoredDiscussionSubmitDecorator");                       
+                }
+
 
                 // ABET outcomes - the ABETDepartment property being non-null indicates that 
                 // this assignment was labeled for ABET outcomes and assessment.
@@ -152,6 +159,12 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     //link for student to download their reviewed assignment
                     vm.HeaderBuilder = new CriticalReviewStudentDownloadDecorator(vm.HeaderBuilder, vm.Client);
                     vm.HeaderViews.Add("CriticalReviewStudentDownloadDecorator");
+                }
+                else if (assignment.Type == AssignmentTypes.AnchoredDiscussion)
+                {
+                    //link for critical review submission document
+                    vm.HeaderBuilder = new AnchoredDiscussionSubmissionDecorator(vm.HeaderBuilder, vm.Client);
+                    vm.HeaderViews.Add("AnchoredDiscussionSubmissionDecorator");                    
                 }
                 else if (assignment.Type == AssignmentTypes.DiscussionAssignment && !assignment.HasDiscussionTeams)
                 {
