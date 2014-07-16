@@ -45,6 +45,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DDay.iCal">
+      <HintPath>..\packages\DDay.iCal.1.0.2.575\lib\DDay.iCal.dll</HintPath>
+    </Reference>
     <Reference Include="DotNetOpenAuth">
       <HintPath>..\packages\DotNetOpenAuth\DotNetOpenAuth.dll</HintPath>
     </Reference>
@@ -276,6 +279,7 @@
     <Compile Include="Controllers\GradebookController.cs" />
     <Compile Include="Controllers\HelpController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\iCalendarController.cs" />
     <Compile Include="Controllers\MailController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\OpenIdController.cs" />
@@ -368,6 +372,7 @@
     <Content Include="Content\images\arrow_down.png" />
     <Content Include="Content\images\arrow_left.png" />
     <Content Include="Content\images\arrow_right.png" />
+    <Content Include="Content\images\calendar_icon.png" />
     <Content Include="Content\images\cut_context.png" />
     <Content Include="Content\images\default.jpg" />
     <Content Include="Content\images\delete_up.png" />
@@ -891,6 +896,7 @@
     <Content Include="Views\Course\CommunityAwaitingApproval.cshtml" />
     <Content Include="Views\Shared\_ConsolidatedNotifications.cshtml" />
     <Content Include="Views\Test\Index.cshtml" />
+    <Content Include="Views\iCalendar\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
