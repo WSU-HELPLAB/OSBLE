@@ -9,18 +9,15 @@
 
 <h2>Events &amp; Deadlines</h2>
 
-<p>
-    @Html.ActionLink("Back to Dashboard", "Index", "Home")
-</p>
+<p>@Html.ActionLink("Back to Dashboard", "Index", "Home")</p>
+
+<p>@Html.ActionLink("View Course Calendar", "Index", "iCalendar")</p>
 
 <p>
     @if (ViewBag.ActiveCourse.AbstractRole.CanModify || ViewBag.ActiveCourse.AbstractCourse.AllowEventPosting)
     {
         @Html.ActionLink("Create New Event", "Create")
     }
-</p>
-<p>
-    @Html.ActionLink("Download Course Calendar", "GenerateCourseCalendar", new { ID = ViewBag.ActiveCourseUser.AbstractCourseID })
 </p>
 
 @{

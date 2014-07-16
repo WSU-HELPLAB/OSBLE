@@ -39,7 +39,7 @@
 {
 <a href="@Url.Action("Create", "Event")" title="Add New Event or Deadline">@Helpers.AddButton()</a>
 }
-    <a href="@Url.Action("GenerateCourseCalendar", "Event", new { ID = ViewBag.ActiveCourseUser.AbstractCourseID } )" title="Download Course Calendar">@Helpers.UnPublishButton()</a>
+    <a href="@Url.Action("Index", "iCalendar")" title="View Course Calendar">@Helpers.CalendarButton()</a>
 </h3>
 
 

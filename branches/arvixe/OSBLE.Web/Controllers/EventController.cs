@@ -11,6 +11,9 @@ using OSBLE.Models.Assignments;
 using OSBLE.Models;
 
 
+
+
+
 namespace OSBLE.Controllers
 {
     [OsbleAuthorize]
@@ -586,122 +589,7 @@ namespace OSBLE.Controllers
 
             return events.OrderBy(e => e.ID).OrderBy(e => e.StartDate).ToList();
         }
-
-        [HttpGet]
-        public ActionResult GenerateCourseCalendar(int id)
-        {
-            
-            CourseController cc = new CourseController();
-            int utcOffset = (ActiveCourseUser.AbstractCourse as Course).TimeZoneOffset;
-            TimeZoneInfo tz = cc.getTimeZone(utcOffset);
-
-            //get course we are generating a calendar for
-            Course course = (from d in db.Courses
-                             where d.ID == id
-                             select d).FirstOrDefault();
-
-            //get all events for that course
-            List<Event> courseEvents = GetActiveCourseEvents(course.StartDate, course.EndDate);
-
-            //create the file the user will download
-            FileInfo IcalFile = new FileInfo(course.Name.ToString() + "-Course-Calendar.ics");
-            
-            //if(!IcalFile.Exists)
-            //{
-                using (StreamWriter writer = IcalFile.CreateText())
-                {
-
-                   
-                    //opening block of Ical File
-                    writer.WriteLine("BEGIN:VCALENDAR");
-                    writer.WriteLine("VERSION:2.0");
-                    writer.WriteLine("PRODID:-//OSBLE.org//Washington State University//EN");
-                    writer.WriteLine("CALSCALE:GREGORIAN");
-                    writer.WriteLine("METHOD:PUBLISH");
-                    writer.WriteLine("X-WR-CALNAME:" + course.Name.ToString() + "-Course-Calendar");
-                    writer.WriteLine("X-WR-TIMEZONE:America/Los_Angeles");
-                    writer.WriteLine("X-WR-CALDESC:A Course Calendar for " + course.Name.ToString() + " at OSBLE.org");
-
-                    //Timezone block of Ical File
-                    writer.WriteLine("BEGIN:VTIMEZONE");
-                    writer.WriteLine("TZID:America/Los_Angeles");//tz.id
-                    writer.WriteLine("X-LIC-LOCATION:America/Los_Angeles");//tz.id
-                        //Daylight savings time
-                    writer.WriteLine("BEGIN:DAYLIGHT");
-                    writer.WriteLine("TZOFFSETFROM:" + tz.BaseUtcOffset.Hours.ToString("0000"));//tz.baseutcoffset
-                    writer.WriteLine("TZOFFSETTO:" + (tz.BaseUtcOffset.Hours + 1).ToString("0000"));//tz.baseutcoffset - 1 hour
-                    writer.WriteLine("TZNAME:" + tz.StandardName);//tz.standard name
-                    writer.WriteLine("DTSTART:19700308T020000");//This should be alright using the below RRule
-                    writer.WriteLine("RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU");
-                    writer.WriteLine("END:DAYLIGHT");
-                        //standard time block 
-                    writer.WriteLine("BEGIN:STANDARD");
-                    writer.WriteLine("TZOFFSETFROM:" + (tz.BaseUtcOffset.Hours + 1).ToString("0000"));//tz.baseutcoffset - 1 hour
-                    writer.WriteLine("TZOFFSETTO:" + tz.BaseUtcOffset.Hours.ToString("0000"));///tz.baseutcoffset
-                    writer.WriteLine("TZNAME:" + tz.StandardName);//tz.standard name
-                    writer.WriteLine("DTSTART:19701101T020000");//This should be alright using the below RRule
-                    writer.WriteLine("RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU");
-                    writer.WriteLine("END:STANDARD");
-                    writer.WriteLine("END:VTIMEZONE");
-
-                    //Start Creating Events
-                    foreach (Event e in courseEvents)
-                    {
-                        string strStart, strEnd;
-                        //check if end time is specified
-                        if(e.EndDate != null)
-                        {
-                            //DateTime dtStart = e.StartDate.AddHours(utcOffset);
-                            //DateTime dtEnd = e.EndDate.Value.AddHours(utcOffset);
-
-                            DateTime dtStart = TimeZoneInfo.ConvertTimeFromUtc(e.StartDate, tz);
-                            DateTime dtEnd = TimeZoneInfo.ConvertTimeFromUtc(e.EndDate.Value, tz);
-
-                            strStart = "TZID=America/Los_Angeles:" + dtStart.ToString("yyyyMMdd'T'HHmmss");
-                            strEnd = "TZID=America/Los_Angeles:" + dtEnd.ToString("yyyyMMdd'T'HHmmss");
-                        }
-                        else
-                        {
-                            //DateTime dtStart = e.StartDate.AddHours(utcOffset).Date;
-                            //DateTime dtEnd = dtStart.AddDays(1);
-
-                            DateTime dtStart = TimeZoneInfo.ConvertTimeFromUtc(e.StartDate.Date, tz);
-                            DateTime dtEnd = TimeZoneInfo.ConvertTimeFromUtc(e.StartDate.AddDays(1).Date, tz);
-
-                            strStart = "VALUE=DATE:" + dtStart.ToString("yyyyMMdd");
-                            strEnd = "VALUE=DATE:" + dtEnd.ToString("yyyyMMdd");
-                        }
-                        //when this event for this cal was made, ie right meow
-                        string dtStamp = DateTime.Now.ToString("yyyyMMdd'T'HHmmss"); //  + utc offset
-                        string description = e.Description;//null check here
-                        //summary is event title in google-calendars
-                        string summary = e.Title;
-
-                        //build the event
-                        writer.WriteLine("BEGIN:VEVENT");
-                        writer.WriteLine("DTSTART;" + strStart);
-                        writer.WriteLine("DTEND;" + strEnd);
-                        writer.WriteLine("DTSTAMP:" + dtStamp);
-                        writer.WriteLine("SUMMARY:" + summary);
-                        if(e.Description != null)
-                        {
-                            writer.WriteLine("DESCRIPTION:" + description);
-                        }
-                        writer.WriteLine("END:VEVENT");
-
-                    }
-
-                    writer.WriteLine("END:VCALENDAR");
-                    writer.Close();
-                }
-           // }//end if
-
-            
-
-            return File(IcalFile.OpenRead(), ".ics");
-            
-        }
-
+    
         protected override void Dispose(bool disposing)
         {
             db.Dispose();
