@@ -1,35 +1,17 @@
 ﻿@using OSBLE.Models.Assignments;
 @using OSBLE.Models;
 @{
-    List<Assignment> previousAssignments = ViewBag.PreviousAssignments as List<Assignment>;
-    var temp = Model;
-    var temp2 = ViewBag;
-    var temp3 = ViewData;
-    var temp4 = TempData;
-    var temp5 = Cache;    
-    int i = 0;
-    
+    List<Assignment> previousAssignments = ViewBag.PreviousAssignments as List<Assignment>; 
 }
 @model Assignment
 @Html.HiddenFor(m => m.ID)
 
-@if (Model.AssignmentTypeID == (int)AssignmentTypes.AnchoredDiscussion)
-{
-    <p>This assignment type depends on a previously created assignment, or an assignment to be uploaded for review.  Please select that assignment from the dropdown list.</p>
-    
-    
-   
-    //TODO: Allow uploading of document, set so the value passed points to the newly uploaded document instead of the previous assignment dropdown.
-    <h4>Upload a document for review</h4>
-    <br />    <br />
-}
-else
-{
+
     <p>
         This assignment type depends on a previously created assignment.  Please select that assignment from the dropdown list.
     </p>
     
-}
+
 
 @if(previousAssignments.Count > 0)
 { 
@@ -49,5 +31,9 @@ else
         }
     </select>
 
+}
+else
+{
+    <h3>There are no previous assignments in this course!</h3>
 }
 

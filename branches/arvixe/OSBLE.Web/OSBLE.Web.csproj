@@ -220,6 +220,7 @@
     <Compile Include="Areas\AssignmentWizard\AssignmentWizardAreaRegistration.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\ABETController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\AnchoredDiscussionController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\AnchoredDiscussionDocumentsController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\BasicsController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\CommentCategoryController.cs" />
     <Compile Include="Areas\AssessmentWizard\Controllers\AssessmentBasicsController.cs" />
@@ -689,6 +690,7 @@
     <Content Include="Areas\AssignmentDetails\Views\Home\AnchoredDiscussionIndex.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\AnchoredDiscussionSubmissionDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\AnchoredDiscussionSubmitDecorator.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\AnchoredDiscussionDocuments\Index.cshtml" />
     <None Include="Properties\PublishProfiles\filesystem.pubxml" />
     <None Include="Scripts\jquery-2.0.1.intellisense.js" />
     <Content Include="Scripts\jquery-2.0.1.js" />
