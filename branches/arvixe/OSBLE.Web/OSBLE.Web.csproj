@@ -16,10 +16,10 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort />
-    <IISExpressAnonymousAuthentication />
-    <IISExpressWindowsAuthentication />
-    <IISExpressUseClassicPipelineMode />
+    <IISExpressSSLPort>3615</IISExpressSSLPort>
+    <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
+    <IISExpressWindowsAuthentication>disabled</IISExpressWindowsAuthentication>
+    <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
@@ -177,7 +177,9 @@
     <Compile Include="Areas\AssignmentDetails\Controllers\HomeController.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\DefaultBuilder.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\ABETOutcomesDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\AnchoredDiscussionSubmitDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\CriticalReviewStudentDownloadDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\AnchoredDiscussionSubmissionDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\CriticalReviewSubmissionDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\DiscussionTeamMemberDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\DownloadDiscussionItemsDecorator.cs" />
@@ -217,6 +219,7 @@
     <Compile Include="Areas\AssignmentDetails\ViewModels\CriticalReviewsReceivedTeam.cs" />
     <Compile Include="Areas\AssignmentWizard\AssignmentWizardAreaRegistration.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\ABETController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\AnchoredDiscussionController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\BasicsController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\CommentCategoryController.cs" />
     <Compile Include="Areas\AssessmentWizard\Controllers\AssessmentBasicsController.cs" />
@@ -682,6 +685,10 @@
     <Content Include="Areas\AssessmentWizard\Views\Home\Summary.cshtml" />
     <Content Include="Content\gradebook.zip" />
     <Content Include="ClassDiagram1.cd" />
+    <Content Include="Areas\AssignmentWizard\Views\AnchoredDiscussion\Index.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Home\AnchoredDiscussionIndex.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\AnchoredDiscussionSubmissionDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\AnchoredDiscussionSubmitDecorator.cshtml" />
     <None Include="Properties\PublishProfiles\filesystem.pubxml" />
     <None Include="Scripts\jquery-2.0.1.intellisense.js" />
     <Content Include="Scripts\jquery-2.0.1.js" />
@@ -912,12 +919,11 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>False</UseIIS>
+          <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>3615</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>
-          </IISUrl>
+          <IISUrl>http://localhost:3715/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
