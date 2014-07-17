@@ -896,7 +896,8 @@
     <Content Include="Views\Course\CommunityAwaitingApproval.cshtml" />
     <Content Include="Views\Shared\_ConsolidatedNotifications.cshtml" />
     <Content Include="Views\Test\Index.cshtml" />
-    <Content Include="Views\iCalendar\Index.cshtml" />
+    <Content Include="Views\Course\CloneCourse.cshtml" />
+    <Content Include="Views\Course\CloneSetup.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
