@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using OSBLE.Areas.AssignmentWizard.Models;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
+using System.IO;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -20,7 +21,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             get
             {
-                return "Select Anchored Discussion Documents";
+                return "Select Review Documents";
             }
         }
 
@@ -61,12 +62,34 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             base.Index();
             ModelState.Clear();
+            ActiveCourseUser.AbstractRole.CanSubmit = true;
             return View(Assignment);
-        }
+        }       
 
         [HttpPost]
-        public ActionResult Index(Assignment model)
-        {
+        public ActionResult Index(Assignment model, HttpPostedFileBase file)
+        {            
+            //TODO: handle file upload with annotate
+            if (file.ContentLength > 0)
+            {
+                var fileName = Path.GetFileName(file.FileName);
+                var path = Path.Combine(Server.MapPath("~/App_Data/uploads"), fileName);
+                //file.SaveAs(path);
+            }
+            //TODO: handle multiple files uploaded
+            //change file >> files
+            //foreach (var file in files)
+            //{
+            //    if (file.ContentLength > 0)
+            //    {
+            //        var fileName = Path.GetFileName(file.FileName);
+            //        var path = Path.Combine(Server.MapPath("~/App_Data/uploads"), fileName);
+            //        file.SaveAs(path);
+            //    }
+            //}
+
+
+            
             Assignment = db.Assignments.Find(model.ID);
             WasUpdateSuccessful = true;
             return base.PostBack(model);
