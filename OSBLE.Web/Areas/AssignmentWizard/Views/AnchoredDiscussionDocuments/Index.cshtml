@@ -2,7 +2,24 @@
 @using OSBLE.Models;
 @model Assignment
 
+@{
+    int assignmentID = Model.ID;
+}
+
 @Html.HiddenFor(m => m.ID)
 
-<h3>Document upload page</h3>
+<h4>Select Documents To Upload For Review</h4>
 
+<div id="file_submission">
+    <table>
+        <tr>
+            <td>
+                @Html.Label("Upload Documents: ")
+
+            </td>
+            <td>
+                <input type="file" id="fileToUpload" name="file" />
+            </td>
+        </tr>
+    </table>
+</div>

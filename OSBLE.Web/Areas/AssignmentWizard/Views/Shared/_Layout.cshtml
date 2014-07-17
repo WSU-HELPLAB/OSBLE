@@ -13,7 +13,7 @@
 }
 <div id="WizardContent">
 <h1>@ViewBag.Title</h1>
-@using (Html.BeginForm("Index", null, FormMethod.Post, new { id = "WizardForm" }))
+@using (Html.BeginForm("Index", null, FormMethod.Post, new { id = "WizardForm", enctype = "multipart/form-data"  }))
 {
     <ul id="QuickNav">
         
@@ -60,7 +60,7 @@
         <input type="hidden" id="ComponentNameNavSelect" name="ComponentName" />
 </div>
 }
-@using (Html.BeginForm("QuickNav", null, FormMethod.Post, new { id = "QuickNavForm" }))
+@using (Html.BeginForm("QuickNav", null, FormMethod.Post, new { id = "QuickNavForm"}))
 {
     <input type="hidden" id="DummyComponentNameNavSelect" name="ComponentName" />
 }
