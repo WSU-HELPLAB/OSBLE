@@ -33,6 +33,7 @@ namespace OSBLE.Controllers
 
         public ViewResult Index()
         {
+            //FW: Yes this is a bad place for this, it'll get fixed soon 
             CreateInitialCourseCalendar(ActiveCourseUser.AbstractCourseID);
             ViewBag.CourseID = ActiveCourseUser.AbstractCourseID;
             return View();
@@ -74,7 +75,16 @@ namespace OSBLE.Controllers
                 DDay.iCal.Event evt = courseCalendar.Create<DDay.iCal.Event>();
 
                 evt.Start = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(e.StartDate, tz));
-                evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(e.EndDate.Value, tz));
+                if(e.EndDate == null)
+                {
+                    evt.End = evt.Start.AddDays(1);
+                    evt.IsAllDay = true;
+                }
+                else
+                {
+                    evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(e.EndDate.Value, tz));
+                }
+                
                 evt.Summary = e.Title;
                 if(e.Description != null)
                     evt.Description = e.Description;
