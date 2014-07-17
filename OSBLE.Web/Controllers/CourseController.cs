@@ -612,7 +612,6 @@ namespace OSBLE.Controllers
             {
                 return View("CommunityCurrentlyEnrolled");
             }
-
             else if (ActiveCourseUser == null)
             {
                 //we need to create a course user in order to send a proper notification to the instructor(s)
@@ -637,7 +636,6 @@ namespace OSBLE.Controllers
 
                 return View("CommunityAwaitingApproval");
             }
-
             else
             {
                 using (NotificationController nc = new NotificationController())
@@ -660,10 +658,6 @@ namespace OSBLE.Controllers
             }
         }
 
-
-       
-
-        
         // GET: /Course/Edit/5
         [RequireActiveCourse]
         [CanModifyCourse]
@@ -805,5 +799,183 @@ namespace OSBLE.Controllers
             db.Dispose();
             base.Dispose(disposing);
         }
+
+        /// <summary>
+        /// yc: course cloning, for any course the current user has been an instructor in
+        /// </summary>
+        /// <returns></returns>
+        [CanCreateCourses]
+        public ActionResult CloneCourse()
+        {
+            //find all courses current users is in
+            List<CourseUser> allUsersCourses = db.CourseUsers.Where(cu => cu.UserProfileID == CurrentUser.ID).ToList();
+            List<CourseUser> previousInstructedCourses = allUsersCourses.Where(cu => (cu.AbstractCourse is Course)
+                    &&
+                    (cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor)).OrderByDescending(cu => (cu.AbstractCourse as Course).StartDate).ToList();
+            ViewBag.pastCourses = previousInstructedCourses;
+            return View();
+        }
+
+        [CanCreateCourses]
+        [CanModifyCourse]
+        public ActionResult CloneSetup(int courseid)
+        {
+            Course pastCourse = (from c in db.Courses
+                                 where c.ID == courseid
+                                 select c).FirstOrDefault();
+            if (pastCourse != null)
+            {
+                Course Clone = new Course();
+                Clone.AllowDashboardPosts = pastCourse.AllowDashboardPosts;
+                Clone.AllowDashboardReplies = pastCourse.AllowDashboardReplies;
+                Clone.AllowEventPosting = pastCourse.AllowEventPosting;
+                Clone.CalendarWindowOfTime = pastCourse.CalendarWindowOfTime;
+                Clone.HoursLatePerPercentPenalty = pastCourse.HoursLatePerPercentPenalty;
+                Clone.HoursLateUntilZero = pastCourse.HoursLateUntilZero;
+                Clone.MinutesLateWithNoPenalty = pastCourse.MinutesLateWithNoPenalty;             
+                Clone.Name = pastCourse.Name;
+                Clone.Number = pastCourse.Number;
+                Clone.Prefix = pastCourse.Prefix;
+                Clone.PercentPenalty = pastCourse.PercentPenalty;
+                Clone.RequireInstructorApprovalForEventPosting = pastCourse.RequireInstructorApprovalForEventPosting;
+                Clone.TimeZoneOffset = pastCourse.TimeZoneOffset;
+                //clone upkeep stuff from original course
+                Clone.ID = pastCourse.ID;
+                return View(Clone);
+            }
+            else
+            {
+                //could not find it, send them an empty coures
+                return RedirectToAction("Create");
+            }
+        }
+
+
+        [HttpPost]
+        [CanCreateCourses]
+        [CanModifyCourse]
+        public ActionResult CloneSetup(Course clone)
+        {
+            Course oldCourse = (Course)(from c in db.AbstractCourses
+                                where c.ID == clone.ID
+                                select c).FirstOrDefault();
+            Course getNewId = new Course();
+            clone.ID = getNewId.ID;
+            
+
+            if (ModelState.IsValid)
+            {
+                db.Courses.Add(clone);
+                db.SaveChanges();
+
+                int utcOffset = 0;
+                try
+                {
+                    Int32.TryParse(Request.Form["utc-offset"].ToString(), out utcOffset);
+                }
+                catch (Exception)
+                {
+                }
+
+                clone.TimeZoneOffset = Convert.ToInt32(Request.Params["course_timezone"]);
+                createMeetingTimes(clone, clone.TimeZoneOffset);
+                createBreaks(clone);
+
+                // Make current user an instructor on new course.
+                CourseUser cu = new CourseUser();
+                cu.AbstractCourseID = clone.ID;
+                cu.UserProfileID = CurrentUser.ID;
+                cu.AbstractRoleID = (int)CourseRole.CourseRoles.Instructor;
+
+
+                db.CourseUsers.Add(cu);
+                db.SaveChanges();
+
+                CloneAllAssignmentsFromCourse(clone, oldCourse);
+                Cache["ActiveCourse"] = clone.ID;
+
+                return RedirectToAction("Index", "Home");
+            }
+            return View(clone);
+        }
+
+        /// <summary>
+        /// yc: all assignments should be cloned. 
+        /// </summary>
+        /// <param name="courseDestination"></param>
+        /// <param name="courseSource"></param>
+        /// <returns></returns>
+        public bool CloneAllAssignmentsFromCourse(Course courseDestination,Course courseSource)
+        {
+            List<Assignment> previousAssignments = (from a in db.Assignments
+                                                    where a.CourseID == courseSource.ID
+                                                    select a).ToList();
+            List<Assignment> clonedAssignments = new List<Assignment>();
+
+            //calculate # of weeks since start date
+            double difference = courseDestination.StartDate.Subtract(courseSource.StartDate).TotalDays;
+
+            foreach (Assignment p in previousAssignments)
+            {
+                //copy details
+                Assignment na = new Assignment();
+                int ms = (int)(DateTime.Now - DateTime.Today).TotalMilliseconds;
+                ms += 10000;
+                na.ID = ms;
+                na.CourseID = courseDestination.ID; //rewrite course id
+                na.IsDraft = true;
+                na.AssociatedEvent = null;
+                na.AssociatedEventID = null;
+                na.Type = p.Type;
+
+                na.AssignmentDescription = p.AssignmentDescription;
+                na.AssignmentName = p.AssignmentName;
+                na.DeductionPerUnit = p.DeductionPerUnit;
+                foreach(Deliverable d in p.Deliverables)
+                {
+                    na.Deliverables.Add(d);
+                }
+                na.DiscussionSettings = new DiscussionSetting(p.DiscussionSettings);
+                na.CriticalReviewSettings = new CriticalReviewSettings(p.CriticalReviewSettings);
+
+
+                
+
+                //recalcualte new offsets for due dates on assignment
+                double release = p.ReleaseDate.Subtract(courseSource.StartDate).TotalDays;
+                double dued = p.DueDate.Subtract(courseSource.StartDate).TotalDays;
+
+                if (p.CriticalReviewPublishDate != null)
+                {
+                    double crit = ((DateTime)(p.CriticalReviewPublishDate)).Subtract(courseSource.StartDate).TotalDays;
+                    na.CriticalReviewPublishDate = ((DateTime)(p.CriticalReviewPublishDate)).Add(new TimeSpan(Convert.ToInt32(crit + difference), 0, 0, 0));
+                }
+
+                na.DueDate = p.DueDate.Add(new TimeSpan(Convert.ToInt32(dued + difference), 0, 0, 0));
+               // na.DueTime = p.DueTime.Add(new TimeSpan(Convert.ToInt32(dued + difference), 0, 0, 0));
+                na.ReleaseDate = p.ReleaseDate.Add(new TimeSpan(Convert.ToInt32(release + difference), 0, 0, 0));
+               // na.ReleaseTime = p.ReleaseTime.Add(new TimeSpan(Convert.ToInt32(release + difference), 0, 0, 0));
+                if (p.Type == AssignmentTypes.DiscussionAssignment)
+                {
+                    double initpost = na.DiscussionSettings.InitialPostDueDate.Subtract(p.DiscussionSettings.InitialPostDueDate).TotalDays;
+                    na.DiscussionSettings.AssignmentID = na.ID;
+                    na.DiscussionSettings.InitialPostDueDate = p.DiscussionSettings.InitialPostDueDate.Add(new TimeSpan(Convert.ToInt32(difference + initpost), 0, 0, 0));
+                    na.DiscussionSettings.InitialPostDueDueTime = p.DiscussionSettings.InitialPostDueDueTime.Add(new TimeSpan(Convert.ToInt32(difference + initpost), 0, 0, 0));
+                    db.DiscussionSettings.Add(na.DiscussionSettings);
+                }
+                
+                // clonedAssignments.Add(na);
+
+                db.Assignments.Add(na);
+                //db.Entry(na).State = EntityState.Modified;
+                db.SaveChanges();
+
+            }
+
+            return true;
+            
+        }
     }
+
+
 }

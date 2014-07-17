@@ -7,6 +7,7 @@ using System.Web.Configuration;
 using OSBLE.Attributes;
 using OSBLE.Models;
 using OSBLE.Models.Assignments;
+
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
@@ -17,10 +18,9 @@ using System.Collections.Specialized;
 using System.Data;
 using OSBLE.Utility;
 
-
 namespace OSBLE.Controllers
 {
-    public class TestController : Controller
+    public class TestController : OSBLEController
     {
         //
         // GET: /Test/
@@ -28,6 +28,9 @@ namespace OSBLE.Controllers
         public ActionResult Index()
         {
 
+            Assignment a = new Assignment();
+            db.Assignments.Add(a);
+            db.SaveChanges();
             ViewBag.datetime = DateTime.Now.ToString();
             ViewBag.utcdateTime = DateTime.UtcNow.ToString();
             DateTime d = DateTime.Now;
