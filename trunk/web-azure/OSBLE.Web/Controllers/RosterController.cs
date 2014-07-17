@@ -490,7 +490,16 @@ namespace OSBLE.Controllers
                 return View("RosterError");
             }
 
-            return RedirectToAction("Index", new { notice = "Roster imported with " + rosterCount.ToString() + " students and " + wtCount.ToString() +" whitelisted students" });
+            Course thisCourse = (from d in db.Courses
+                                 where d.ID == ActiveCourseUser.AbstractCourseID
+                                 select d).FirstOrDefault();
+            //if there is at least one assignmnet in the course that has teams/is team based
+            if (thisCourse.Assignments.Count(a => a.HasTeams) > 0)
+            {
+                return RedirectToAction("Index", new { notice = "Roster imported with " + rosterCount.ToString() + " students and " + wtCount.ToString() + " whitelisted students. Please note that this course has an ongoing team-based assignment, and you will need to manually add the newly enrolled students to a team." });
+            }
+
+            return RedirectToAction("Index", new { notice = "Roster imported with " + rosterCount.ToString() + " students and " + wtCount.ToString() + " whitelisted students" });
         }
 
         //
@@ -510,6 +519,7 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult Create(CourseUser courseuser)
         {
+            
             //if modelState isValid
             if (ModelState.IsValid && courseuser.AbstractRoleID != 0)
             {
@@ -524,7 +534,18 @@ namespace OSBLE.Controllers
                     return View();
                 }
             }
-            return RedirectToAction("Index");
+
+            Course thisCourse = (from d in db.Courses
+                                 where d.ID == ActiveCourseUser.AbstractCourseID
+                                 select d).FirstOrDefault();
+            //if there is at least one assignmnet in the course that has teams/is team based
+            if(thisCourse.Assignments.Count(a => a.HasTeams) > 0)
+            {
+                return RedirectToAction("Index", new { notice = "You have successfully added " + courseuser.UserProfile.LastAndFirst() + " to the course. Please note that this course has an ongoing team-based assignment, and " + courseuser.UserProfile.LastAndFirst() + " will need to be manually added to a team."});
+            }
+
+            return RedirectToAction("Index", new { notice = "You have successfully added " + courseuser.UserProfile.LastAndFirst() + " to the course." });
+
         }
 
         //
@@ -550,6 +571,9 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult CreateByEmail(CourseUser courseuser)
         {
+            Course thisCourse = (from d in db.Courses
+                                 where d.ID == ActiveCourseUser.AbstractCourseID
+                                 select d).FirstOrDefault();
             //if modelState isValid
             if (ModelState.IsValid && courseuser.AbstractRoleID != 0)
             {
@@ -605,6 +629,12 @@ namespace OSBLE.Controllers
                         }
                         else
                         {
+                           
+                            //if there is at least one assignmnet in the course that has teams/is team based
+                            if (thisCourse.Assignments.Count(a => a.HasTeams) > 0)
+                            {
+                                return RedirectToAction("Index", new { notice = emails.Count().ToString() + " users have been added to the course. Please note that this course has an ongoing team-based assignment, and you will need to manually add these users to a team." });
+                            }
                             return RedirectToAction("Index", new { notice = emails.Count().ToString() + " users have been added to the course" });
                         }
                     }
@@ -621,7 +651,13 @@ namespace OSBLE.Controllers
                     return View();
                 }
             }
-            return RedirectToAction("Index");
+          
+            //if there is at least one assignmnet in the course that has teams/is team based
+            if (thisCourse.Assignments.Count(a => a.HasTeams) > 0)
+            {
+                return RedirectToAction("Index", new { notice = "You have successfully added " + courseuser.UserProfile.LastAndFirst() + " to the course. Please note that this course has an ongoing team-based assignment, and you will need to manually add these users to a team." });
+            }
+            return RedirectToAction("Index", new { notice = "You have successfully added " + courseuser.UserProfile.LastAndFirst() + " to the course." });
         }
 
         //yc: get the white table user, wrote getWhiteTableUser to narrow results in function, so do need to organize here
@@ -664,6 +700,9 @@ namespace OSBLE.Controllers
         public ActionResult ApprovePending(int userId)
         {
             CourseUser pendingUser = getCourseUser(userId);
+            Course thisCourse = (from d in db.Courses
+                                 where d.ID == ActiveCourseUser.AbstractCourseID
+                                 select d).FirstOrDefault();
 
             //set user to active student
             if (pendingUser.AbstractRoleID == (int)CourseRole.CourseRoles.Pending)
@@ -674,6 +713,12 @@ namespace OSBLE.Controllers
                 db.Entry(pendingUser).State = EntityState.Modified;
                 db.SaveChanges();
                 addNewStudentToTeams(pendingUser);
+
+                //if there is at least one assignmnet in the course that has teams/is team based
+                if (thisCourse.Assignments.Count(a => a.HasTeams) > 0)
+                {
+                    return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " has been enrolled into this course. Please note that this course has an ongoing team-based assignment, and you will need to manually add " +pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " to a team." });
+                }
 
                 return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " has been enrolled into this course." });
             }
@@ -722,6 +767,9 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult BatchApprove()
         {
+            Course thisCourse = (from d in db.Courses
+                                 where d.ID == ActiveCourseUser.AbstractCourseID
+                                 select d).FirstOrDefault();
             int count = 0;
             List<CourseUser> pendingUsers;
             //find all pending users for current course
@@ -742,7 +790,10 @@ namespace OSBLE.Controllers
                 addNewStudentToTeams(p);
             }
                 db.SaveChanges();
-
+                if (thisCourse.Assignments.Count(a => a.HasTeams) > 0)
+                {
+                    return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " student(s) have been enrolled into this course. Please note that this course has an ongoing team-based assignment, and you will need to manually add the newly enrolled users to a team." });
+                }
                 return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " student(s) have been enrolled into this course." });
             }
             else

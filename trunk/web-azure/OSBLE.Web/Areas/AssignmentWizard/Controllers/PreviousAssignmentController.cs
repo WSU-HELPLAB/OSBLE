@@ -41,7 +41,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             get 
             {
-                return (new AssignmentTypes[] { AssignmentTypes.CriticalReview, AssignmentTypes.TeamEvaluation, AssignmentTypes.CriticalReviewDiscussion }).ToList();
+                return (new AssignmentTypes[] { AssignmentTypes.CriticalReview, AssignmentTypes.TeamEvaluation, AssignmentTypes.CriticalReviewDiscussion}).ToList();
             }
         }
 
@@ -71,7 +71,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 ViewBag.PrecedingAssignmentID = Assignment.PrecededingAssignmentID;
             }
-
+           
             ViewBag.PreviousAssignments = assignments;
             return View(Assignment);
         }
@@ -88,6 +88,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 Assignment.PrecededingAssignmentID = previousAssignmentId;
                 db.SaveChanges();
             }
+            
             return base.PostBack(model);
         }
     }
