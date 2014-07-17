@@ -5,13 +5,31 @@
 
 @{
     ViewBag.Title = "Events";
+
+    bool courseCalendarFlag = false;
+    string activeCourseRole = ViewBag.ActiveCourse.AbstractRole.Name;
+    switch (activeCourseRole)
+    {
+        case "Instructor":
+            courseCalendarFlag = true;
+            break;
+        case "Leader":
+            break;
+        case "Assessment Committee Chair":
+            break;
+        default:
+            break;
+    }
 }
 
 <h2>Events &amp; Deadlines</h2>
 
 <p>@Html.ActionLink("Back to Dashboard", "Index", "Home")</p>
+@if(courseCalendarFlag)
+{
+    <p>@Html.ActionLink("View Course Calendar", "Index", "iCalendar")</p>
+}
 
-<p>@Html.ActionLink("View Course Calendar", "Index", "iCalendar")</p>
 
 <p>
     @if (ViewBag.ActiveCourse.AbstractRole.CanModify || ViewBag.ActiveCourse.AbstractCourse.AllowEventPosting)
