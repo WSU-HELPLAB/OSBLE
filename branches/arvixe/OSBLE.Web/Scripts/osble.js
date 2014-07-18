@@ -45,10 +45,10 @@ function parseDates() {
     $('time.utc-time').each(function (index) {
         var milliseconds = $(this).attr('datetime');
         var formatString = $(this).attr('data-date-format');
-        var currentDate = moment.utc(milliseconds, 'X');
+        var currentDate = moment(milliseconds, 'X');
         var localDate = new Date();
-        var localOffset = localDate.getTimezoneOffset();
-        currentDate = currentDate.subtract('minutes', localOffset);
+        var originalOffset = currentDate.getTimezoneOffset();
+        currentDate = currentDate.subtract('minutes', originalOffset);
         $(this).html(currentDate.format(formatString));
         $(this).removeClass("utc-time");
         $(this).addClass("local-time");
