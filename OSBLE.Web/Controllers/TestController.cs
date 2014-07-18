@@ -69,7 +69,7 @@ namespace OSBLE.Controllers
             DateTime startOfclass = DateTime.Parse("1/15/2014 12:00 PM");
             TimeZoneInfo pst = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
             DateTime stocutc = cc.convertToUtc(-8, startOfclass);
-            ViewBag.utcstoc = stocutc.ToString();
+            ViewBag.utcstoc = stocutc;
             DateTime from = cc.convertFromUtc(-8, stocutc);
             ViewBag.yo = from;
             return View();
