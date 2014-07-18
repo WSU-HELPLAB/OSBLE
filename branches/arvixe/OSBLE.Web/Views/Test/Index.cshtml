@@ -82,12 +82,60 @@ the expirement to see if 1:00:00pm from todays date in mst
 the experiment from mst -> to utc using timezoneinfo == @ViewBag.msttoutc .IsDaylightSavignsTime() == @ViewBag.mstoutcisDaylight<br />
 the experiment from utc -> to mst using timezoneinfo == @ViewBag.utctomst .IsDaylightSavignsTime() == @ViewBag.mstoutcisDaylight<br />
 <br />
-parsing 1:00 for 1/15/2014 in pst is in raw format @ViewBag.utcstoc <br />
-putting it in the time we get <time class="notutc-time"
+<br />
+<br />
+parsing 1:00 for 1/15/2014 in pst is in raw from server format @ViewBag.utcstoc.ToString("h:mm tt zzz") <br />
+<br />
+the utc time displayed on osble for the original way 1:00:00 PM on 1/15/2014<br />
+<time class="utc-time"
+      style="font-size:small;"
+      datetime="@Helpers.DateAsUnixTime(ViewBag.utcstoc)"
+      data-original-date="@Helpers.RawDate(ViewBag.utcstoc)"
+      data-date-format="hh:mm A">
+    @ViewBag.utcstoc.ToString("h:mm tt") (UTC)
+</time>
+<br />
+the utc time displayed on osble for the newer way with a (utc) after way 1:00:00 PM on 1/15/2014<br />
+<time class="utc-time"
+      style="font-size:small;"
+      datetime="@Helpers.DateAsUnixTime(ViewBag.utcstoc)"
+      data-original-date="@Helpers.RawDate(ViewBag.utcstoc)"
+      data-date-format="hh:mm A Z">
+    @ViewBag.utcstoc.ToString("h:mm tt zzz") (UTC)
+</time>
+the utc time displayed on osble for the newer way for 1:00:00 PM on 1/15/2014<br />
+<time class="utc-time"
+      style="font-size:small;"
+      datetime="@Helpers.DateAsUnixTime(ViewBag.utcstoc)"
+      data-original-date="@Helpers.RawDate(ViewBag.utcstoc)"
+      data-date-format="hh:mm A Z">
+    @ViewBag.utcstoc.ToString("h:mm tt zzz")
+</time>
+<br />
+<br />
+the converted local<br />
+<br />
+<time class="utc-time"
+      style="font-size:small;"
+      datetime="@Helpers.DateAsUnixTime(ViewBag.yo)"
+      data-original-date="@Helpers.RawDate(ViewBag.yo)"
+      data-date-format="hh:mm A">
+    @ViewBag.yo.ToString("h:mm tt") (UTC)
+</time>
+<br />
+the utc time displayed on osble for the newer way with a (utc) after way for a fromutc 1:00:00 PM on 1/15/2014<br />
+<time class="utc-time"
       style="font-size:small;"
       datetime="@Helpers.DateAsUnixTime(ViewBag.yo)"
       data-original-date="@Helpers.RawDate(ViewBag.yo)"
       data-date-format="hh:mm A Z">
-    @ViewBag.yo.ToString("h:mm tt zzz");
-</time><br />
-
+    @ViewBag.yo.ToString("h:mm tt zzz") (UTC)
+</time>
+the utc time displayed on osble for the newer way for a fromutc 1:00:00 PM on 1/15/2014<br />
+<time class="utc-time"
+      style="font-size:small;"
+      datetime="@Helpers.DateAsUnixTime(ViewBag.yo)"
+      data-original-date="@Helpers.RawDate(ViewBag.yo)"
+      data-date-format="hh:mm A Z">
+    @ViewBag.yo.ToString("h:mm tt zzz")
+</time>
