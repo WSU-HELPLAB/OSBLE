@@ -65,8 +65,8 @@ the utc time displayed on osble for local using local.toUniversalTime :<br />
       style="font-size:small;"
       datetime="@Helpers.DateAsUnixTime(local.ToUniversalTime())"
       data-original-date="@Helpers.RawDate(local.ToUniversalTime())"
-      data-date-format="hh:mm A">
-    @local.ToUniversalTime().ToString("h:mm tt") (UTC)
+      data-date-format="hh:mm A Z">
+    @local.ToUniversalTime().ToString("h:mm tt zzz") 
 </time><br />
 <br />
 the utc time displayed on osble for the local time passed by exact value:<br />
@@ -81,4 +81,13 @@ the utc time displayed on osble for the local time passed by exact value:<br />
 the expirement to see if 1:00:00pm from todays date in mst 
 the experiment from mst -> to utc using timezoneinfo == @ViewBag.msttoutc .IsDaylightSavignsTime() == @ViewBag.mstoutcisDaylight<br />
 the experiment from utc -> to mst using timezoneinfo == @ViewBag.utctomst .IsDaylightSavignsTime() == @ViewBag.mstoutcisDaylight<br />
+<br />
+parsing 1:00 for 1/15/2014 in pst is in raw format @ViewBag.utcstoc <br />
+putting it in the time we get <time class="notutc-time"
+      style="font-size:small;"
+      datetime="@Helpers.DateAsUnixTime(ViewBag.yo)"
+      data-original-date="@Helpers.RawDate(ViewBag.yo)"
+      data-date-format="hh:mm A Z">
+    @ViewBag.yo.ToString("h:mm tt zzz");
+</time><br />
 

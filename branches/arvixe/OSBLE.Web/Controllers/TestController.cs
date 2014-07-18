@@ -28,9 +28,6 @@ namespace OSBLE.Controllers
         public ActionResult Index()
         {
 
-            Assignment a = new Assignment();
-            db.Assignments.Add(a);
-            db.SaveChanges();
             ViewBag.datetime = DateTime.Now.ToString();
             ViewBag.utcdateTime = DateTime.UtcNow.ToString();
             DateTime d = DateTime.Now;
@@ -67,6 +64,14 @@ namespace OSBLE.Controllers
             ViewBag.utctomst = utctoMst.ToString();
             ViewBag.utctomstisDaylight = utctoMst.IsDaylightSavingTime().ToString();
 
+            CourseController cc = new CourseController();
+            //past events
+            DateTime startOfclass = DateTime.Parse("1/15/2014 12:00 PM");
+            TimeZoneInfo pst = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
+            DateTime stocutc = cc.convertToUtc(-8, startOfclass);
+            ViewBag.utcstoc = stocutc.ToString();
+            DateTime from = cc.convertFromUtc(-8, stocutc);
+            ViewBag.yo = from;
             return View();
         }
 
