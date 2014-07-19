@@ -67,7 +67,7 @@
             @if (!e.NoDateTime)
             {
                 <div class="event_time">
-                    <time class="utc-time"
+                    <time class="utc-time-events"
                 style="font-size:small;"
                 datetime="@Helpers.DateAsUnixTime(e.StartDate)" 
                 data-original-date="@Helpers.RawDate(e.StartDate)" 
@@ -86,7 +86,7 @@
                         }
                         @:&mdash;
 
-                        <time class="utc-time"
+                        <time class="utc-time-events"
                 style="font-size:small;"
                 datetime="@Helpers.DateAsUnixTime(endDate)" 
                 data-original-date="@Helpers.RawDate(endDate)" 

@@ -196,7 +196,8 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-        /// This function will create an event that will start at the DueDate of the assignment, at Midnight. The event ends at the DueTime of the assignment.
+        /// This function will create an event that will start at the 
+        /// Date of the assignment, at Midnight. The event ends at the DueTime of the assignment.
         /// This event will be titled "AssignmentName Due"
         /// 
         /// In addition, if the assignment a discussion assignment, it will generate an additional event for "AssignmentName Initial Post Due". 
@@ -571,7 +572,9 @@ namespace OSBLE.Controllers
                             Event e = new Event();
 
                             //printing in utc time for browser to convert for you
+                            CourseController cc = new CourseController();
                             e.Title = cm.Name + " - " + cm.Location;
+                            //to combat timezone shifts 
                             e.StartDate = current.AddHours((double)cm.StartTime.Hour).AddMinutes((double)cm.StartTime.Minute);
                             e.EndDate = current.AddHours((double)cm.EndTime.Hour).AddMinutes((double)cm.EndTime.Minute);
                             e.HideDelete = true;

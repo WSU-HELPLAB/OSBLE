@@ -7,7 +7,7 @@ using System.Web.Configuration;
 using OSBLE.Attributes;
 using OSBLE.Models;
 using OSBLE.Models.Assignments;
-
+using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
@@ -181,7 +181,6 @@ namespace OSBLE.Controllers
         {
             DateTime convertedToUtc;
             TimeZoneInfo tz = getTimeZone(tzoffset);
-
             try
             {
                 convertedToUtc = TimeZoneInfo.ConvertTimeToUtc(originalTime, tz);
@@ -751,7 +750,7 @@ namespace OSBLE.Controllers
             updateCourse.StartDate = course.StartDate;
             updateCourse.Year = course.Year;
             updateCourse.ShowMeetings = course.ShowMeetings;
-
+            updateCourse.TimeZoneOffset = Convert.ToInt32(Request.Params["course_timezone"]);
             // Default Late Policy
             updateCourse.MinutesLateWithNoPenalty = course.MinutesLateWithNoPenalty;
             updateCourse.HoursLatePerPercentPenalty = course.HoursLatePerPercentPenalty;
@@ -900,7 +899,8 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-        /// yc: all assignments should be cloned. 
+        /// yc: all assignments should be cloned EXACTLY like the course source. find all the old assignments
+        /// and create a new entry into the database with corresponding components also added
         /// </summary>
         /// <param name="courseDestination"></param>
         /// <param name="courseSource"></param>
@@ -910,65 +910,130 @@ namespace OSBLE.Controllers
             List<Assignment> previousAssignments = (from a in db.Assignments
                                                     where a.CourseID == courseSource.ID
                                                     select a).ToList();
-            List<Assignment> clonedAssignments = new List<Assignment>();
 
             //calculate # of weeks since start date
             double difference = courseDestination.StartDate.Subtract(courseSource.StartDate).TotalDays;
-
             foreach (Assignment p in previousAssignments)
             {
                 //copy details
                 Assignment na = new Assignment();
-                int ms = (int)(DateTime.Now - DateTime.Today).TotalMilliseconds;
-                ms += 10000;
-                na.ID = ms;
+                //tmp holders
+                int prid = -1;
+                if (p.RubricID != null)
+                    prid = (int)p.RubricID;
+                na = p;
                 na.CourseID = courseDestination.ID; //rewrite course id
                 na.IsDraft = true;
                 na.AssociatedEvent = null;
                 na.AssociatedEventID = null;
-                na.Type = p.Type;
-
-                na.AssignmentDescription = p.AssignmentDescription;
-                na.AssignmentName = p.AssignmentName;
-                na.DeductionPerUnit = p.DeductionPerUnit;
-                foreach(Deliverable d in p.Deliverables)
-                {
-                    na.Deliverables.Add(d);
-                }
-                na.DiscussionSettings = new DiscussionSetting(p.DiscussionSettings);
-                na.CriticalReviewSettings = new CriticalReviewSettings(p.CriticalReviewSettings);
-
 
                 
 
                 //recalcualte new offsets for due dates on assignment
-                double release = p.ReleaseDate.Subtract(courseSource.StartDate).TotalDays;
-                double dued = p.DueDate.Subtract(courseSource.StartDate).TotalDays;
 
                 if (p.CriticalReviewPublishDate != null)
                 {
-                    double crit = ((DateTime)(p.CriticalReviewPublishDate)).Subtract(courseSource.StartDate).TotalDays;
-                    na.CriticalReviewPublishDate = ((DateTime)(p.CriticalReviewPublishDate)).Add(new TimeSpan(Convert.ToInt32(crit + difference), 0, 0, 0));
+                    na.CriticalReviewPublishDate = ((DateTime)(p.CriticalReviewPublishDate)).Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
+                }
+                //else
+                //    na.CriticalReviewPublishDate = null;
+                DateTime dd = convertFromUtc(courseSource.TimeZoneOffset, na.DueDate);
+                DateTime dt = convertFromUtc(courseSource.TimeZoneOffset, na.DueTime);
+                DateTime rd = convertFromUtc(courseSource.TimeZoneOffset, na.ReleaseDate);
+                DateTime rt = convertFromUtc(courseSource.TimeZoneOffset, na.ReleaseTime);
+
+                dd = dd.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
+                dt = dt.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
+                rd = rd.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
+                rt = rt.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
+
+                na.DueDate = convertToUtc(courseDestination.TimeZoneOffset, dd);
+                na.DueTime = convertToUtc(courseDestination.TimeZoneOffset, dt);
+                na.ReleaseDate = convertToUtc(courseDestination.TimeZoneOffset, rd);
+                na.ReleaseTime = convertToUtc(courseDestination.TimeZoneOffset, rt);
+
+                
+                db.Assignments.Add(na);
+                db.SaveChanges();
+
+                //copy create new components
+                //rubrics
+                if (p.RubricID != null)
+                {
+                    //create a new reburic thats an exact copy with the same critera
+                    Rubric nr = new Rubric();
+                    nr.HasGlobalComments = p.Rubric.HasGlobalComments;
+                    nr.HasCriteriaComments = p.Rubric.HasCriteriaComments;
+                    nr.Description = p.Rubric.Description;
+
+                    db.Rubrics.Add(nr);
+                    db.SaveChanges();
+                    
+                    na.RubricID = nr.ID;
+                    db.Entry(na).State = EntityState.Modified;
+                    db.SaveChanges();
+
+                    //now get all the stuff for it
+                    Dictionary<int, int> levelHolder = new Dictionary<int, int>();
+                    Dictionary<int, int> criterionHolder = new Dictionary<int, int>();
+
+                    List<Level> pls = (from rl in db.Levels
+                                       where rl.RubricID == prid
+                                       select rl).ToList();
+                    foreach (Level pl in pls)
+                    {
+                        Level nl = new Level();
+                        nl.LevelTitle = pl.LevelTitle;
+                        nl.PointSpread = pl.PointSpread;
+                        nl.RubricID = nr.ID;
+                        db.Levels.Add(nl);
+                        db.SaveChanges();
+                        levelHolder.Add(pl.ID, nl.ID);
+                    }
+
+                    List<Criterion> prcs = (from rc in db.Criteria
+                                            where rc.RubricID == prid
+                                            select rc).ToList();
+
+                    foreach (Criterion prc in prcs) //create a new criteron
+                    {
+                        Criterion nrc = new Criterion();
+                        nrc.CriterionTitle = prc.CriterionTitle;
+                        nrc.Weight = prc.Weight;
+                        nrc.RubricID = nr.ID;
+                        db.Criteria.Add(nrc);
+                        db.SaveChanges();
+                        criterionHolder.Add(prc.ID, nrc.ID);
+                    }
+
+                    //now descriptions
+                    //for some reason, cell descriptions do not come with this assignment so lets do a search fo rit
+                    List<CellDescription> pcds = (from cd in db.CellDescriptions
+                                                  where cd.RubricID == prid
+                                                  select cd).ToList();
+                    if (pcds.Count > 0)
+                    {
+                        foreach (CellDescription pcd in pcds)
+                        {
+                            CellDescription ncd = new CellDescription();
+                            ncd.CriterionID = criterionHolder[pcd.CriterionID];
+                            ncd.LevelID = levelHolder[pcd.LevelID];
+                            ncd.RubricID = nr.ID;
+                            ncd.Description = pcd.Description;
+                            db.CellDescriptions.Add(ncd);
+                            db.SaveChanges();
+                        }
+                    }
+
                 }
 
-                na.DueDate = p.DueDate.Add(new TimeSpan(Convert.ToInt32(dued + difference), 0, 0, 0));
-               // na.DueTime = p.DueTime.Add(new TimeSpan(Convert.ToInt32(dued + difference), 0, 0, 0));
-                na.ReleaseDate = p.ReleaseDate.Add(new TimeSpan(Convert.ToInt32(release + difference), 0, 0, 0));
-               // na.ReleaseTime = p.ReleaseTime.Add(new TimeSpan(Convert.ToInt32(release + difference), 0, 0, 0));
                 if (p.Type == AssignmentTypes.DiscussionAssignment)
                 {
-                    double initpost = na.DiscussionSettings.InitialPostDueDate.Subtract(p.DiscussionSettings.InitialPostDueDate).TotalDays;
                     na.DiscussionSettings.AssignmentID = na.ID;
-                    na.DiscussionSettings.InitialPostDueDate = p.DiscussionSettings.InitialPostDueDate.Add(new TimeSpan(Convert.ToInt32(difference + initpost), 0, 0, 0));
-                    na.DiscussionSettings.InitialPostDueDueTime = p.DiscussionSettings.InitialPostDueDueTime.Add(new TimeSpan(Convert.ToInt32(difference + initpost), 0, 0, 0));
+                    na.DiscussionSettings.InitialPostDueDate = na.DiscussionSettings.InitialPostDueDate.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
+                    na.DiscussionSettings.InitialPostDueDueTime = na.DiscussionSettings.InitialPostDueDueTime.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
                     db.DiscussionSettings.Add(na.DiscussionSettings);
                 }
-                
-                // clonedAssignments.Add(na);
-
-                db.Assignments.Add(na);
-                //db.Entry(na).State = EntityState.Modified;
-                db.SaveChanges();
 
             }
 
