@@ -918,7 +918,7 @@ namespace OSBLE.Controllers
                 //copy details
                 Assignment na = new Assignment();
                 //tmp holders
-                int prid = -1;
+                int prid = -1, paid = p.ID;
                 if (p.RubricID != null)
                     prid = (int)p.RubricID;
                 na = p;
@@ -1027,6 +1027,27 @@ namespace OSBLE.Controllers
 
                 }
 
+                ///deliverables
+                List<Deliverable> pads = (from d in db.Deliverables
+                                          where d.AssignmentID == paid
+                                          select d).ToList();
+                
+                if (pads.Count > 0)
+                {
+                    foreach(Deliverable pad in pads)
+                    {
+                        Deliverable nad = new Deliverable();
+                        nad.AssignmentID = na.ID;
+                        nad.DeliverableType = pad.DeliverableType;
+                        nad.Assignment = na;
+                        nad.Name = pad.Name;
+                        db.Deliverables.Add(nad);
+                        db.SaveChanges();
+                    }
+                }
+
+
+                //discussion
                 if (p.Type == AssignmentTypes.DiscussionAssignment)
                 {
                     na.DiscussionSettings.AssignmentID = na.ID;

@@ -206,6 +206,8 @@ namespace OSBLE.Models
 
         public DbSet<AbetAssignmentOutcome> AbetSubmissionOutcomes { get; set; }
 
+        public DbSet<Deliverable> Deliverables { get; set; }
+
         // Assessments
         public DbSet<Assessment> Assessments { get; set; }
 
