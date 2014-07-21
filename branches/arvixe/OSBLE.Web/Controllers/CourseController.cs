@@ -185,12 +185,12 @@ namespace OSBLE.Controllers
             {
                 convertedToUtc = TimeZoneInfo.ConvertTimeToUtc(originalTime, tz);
             }
-            catch(TimeZoneNotFoundException e)
+            catch (TimeZoneNotFoundException e)
             {
                 //failed need to figure out what our error will be
                 convertedToUtc = new DateTime();
             }
-            
+
             return convertedToUtc;
         }
 
@@ -202,7 +202,7 @@ namespace OSBLE.Controllers
             {
                 convertedFromUtc = TimeZoneInfo.ConvertTimeFromUtc(originalTime, tz);
             }
-            catch(TimeZoneNotFoundException e)
+            catch (TimeZoneNotFoundException e)
             {
                 convertedFromUtc = new DateTime();
             }
@@ -376,7 +376,7 @@ namespace OSBLE.Controllers
                 catch (Exception)
                 {
                 }
-              
+
                 course.TimeZoneOffset = Convert.ToInt32(Request.Params["course_timezone"]);
                 createMeetingTimes(course, course.TimeZoneOffset);
                 createBreaks(course);
@@ -394,7 +394,7 @@ namespace OSBLE.Controllers
                 Cache["ActiveCourse"] = course.ID;
 
                 //will create a calendar for this course
-                using(iCalendarController icalControl = new iCalendarController())
+                using (iCalendarController icalControl = new iCalendarController())
                 {
                     icalControl.CreateCourseCalendar(course.ID);
                 }
@@ -403,14 +403,14 @@ namespace OSBLE.Controllers
             }
             return View(course);
         }
-        
+
         //Course Search
         [HttpGet]
         public ActionResult CourseSearch()
         {
             //get all instructors
             List<CourseUser> Instructors = db.CourseUsers.Where(cu => cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor).ToList();
-            
+
             //get all the courses
             var CourseList = from d in db.Courses
                              where d.EndDate > DateTime.Now
@@ -418,9 +418,9 @@ namespace OSBLE.Controllers
 
             //add them to a list as a selectlistitem
             List<SelectListItem> course = new List<SelectListItem>();
-            foreach(var c in CourseList)
-            {   
-                if(c.EndDate > DateTime.Now && !c.IsDeleted)
+            foreach (var c in CourseList)
+            {
+                if (c.EndDate > DateTime.Now && !c.IsDeleted)
                     course.Add(new SelectListItem { Text = c.Prefix, Value = c.Prefix });
             }
             //remove any duplicate course names
@@ -430,7 +430,7 @@ namespace OSBLE.Controllers
             ViewBag.CourseName = new SelectList(finalList, "Value", "Text");
             ViewBag.SearchResults = TempData["SearchResults"];
             ViewBag.SearchResultsInstructors = Instructors;
-            
+
             return View();
         }
 
@@ -440,7 +440,7 @@ namespace OSBLE.Controllers
                                where s.Prefix == id
                                && s.IsDeleted == false
                                && s.EndDate > DateTime.Now
-                               select s;            
+                               select s;
 
             return Json(new SelectList(CourseNumber.ToArray(), "Number", "Number"), JsonRequestBehavior.AllowGet);
         }
@@ -448,10 +448,10 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult SearchResults(string course, string number)
         {
-            if(number == "Search All")
+            if (number == "Search All")
             {
                 var Results = from d in db.Courses
-                              where d.Prefix == course 
+                              where d.Prefix == course
                               select d;
 
                 Results.GroupBy(x => x.Prefix)
@@ -495,29 +495,29 @@ namespace OSBLE.Controllers
             {
                 return View("CourseCurrentlyEnrolled");
             }
-            
+
             //if the user is not enrolled in any courses but may be withdrawn in a course
             else if (ActiveCourseUser == null)
             {
                 //this is for checking if they are withdrawn, poo will be null if they are not in course, else it will return a CourseUser
                 var previousUser = (from d in db.CourseUsers
-                           where d.UserProfileID == this.CurrentUser.ID
-                           select d).FirstOrDefault();
+                                    where d.UserProfileID == this.CurrentUser.ID
+                                    select d).FirstOrDefault();
 
                 if (previousUser != null)
                 {
                     CourseUser addedUser = new CourseUser();
                     UserProfile prf = previousUser.UserProfile;
-                    
+
                     addedUser = previousUser;
                     addedUser.UserProfile = prf;
-                    
+
                     addedUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending;
                     addedUser.AbstractCourseID = request.ID;
                     addedUser.Hidden = true;
 
                     db.CourseUsers.Add(addedUser);
-                   // db.Entry(previousUser).State = EntityState.Modified;
+                    // db.Entry(previousUser).State = EntityState.Modified;
                     db.SaveChanges();
                     ActiveCourseUser = previousUser;
 
@@ -635,7 +635,7 @@ namespace OSBLE.Controllers
 
                 using (NotificationController nc = new NotificationController())
                 {
-                   //nc.SendCourseApprovalNotification(request, ActiveCourseUser);
+                    //nc.SendCourseApprovalNotification(request, ActiveCourseUser);
                     nc.SendCommunityApprovalNotification(request, newUser);
                 }
 
@@ -844,7 +844,7 @@ namespace OSBLE.Controllers
                 Clone.CalendarWindowOfTime = pastCourse.CalendarWindowOfTime;
                 Clone.HoursLatePerPercentPenalty = pastCourse.HoursLatePerPercentPenalty;
                 Clone.HoursLateUntilZero = pastCourse.HoursLateUntilZero;
-                Clone.MinutesLateWithNoPenalty = pastCourse.MinutesLateWithNoPenalty;             
+                Clone.MinutesLateWithNoPenalty = pastCourse.MinutesLateWithNoPenalty;
                 Clone.Name = pastCourse.Name;
                 Clone.Number = pastCourse.Number;
                 Clone.Prefix = pastCourse.Prefix;
@@ -869,11 +869,11 @@ namespace OSBLE.Controllers
         public ActionResult CloneSetup(Course clone)
         {
             Course oldCourse = (Course)(from c in db.AbstractCourses
-                                where c.ID == clone.ID
-                                select c).FirstOrDefault();
+                                        where c.ID == clone.ID
+                                        select c).FirstOrDefault();
             Course getNewId = new Course();
             clone.ID = getNewId.ID;
-            
+
 
             if (ModelState.IsValid)
             {
@@ -918,7 +918,7 @@ namespace OSBLE.Controllers
         /// <param name="courseDestination"></param>
         /// <param name="courseSource"></param>
         /// <returns></returns>
-        public bool CloneAllAssignmentsFromCourse(Course courseDestination,Course courseSource)
+        public bool CloneAllAssignmentsFromCourse(Course courseDestination, Course courseSource)
         {
             List<Assignment> previousAssignments = (from a in db.Assignments
                                                     where a.CourseID == courseSource.ID
@@ -959,7 +959,7 @@ namespace OSBLE.Controllers
                 na.AssignmentTeams = new List<AssignmentTeam>();
                 if (p.HasDeliverables)
                     na.Deliverables = new List<Deliverable>();
-                if (p.HasDiscussionTeams) 
+                if (p.HasDiscussionTeams)
                     na.DiscussionTeams = new List<DiscussionTeam>();
 
                 //recalcualte new offsets for due dates on assignment
@@ -985,7 +985,7 @@ namespace OSBLE.Controllers
                 na.ReleaseDate = convertToUtc(courseDestination.TimeZoneOffset, rd);
                 na.ReleaseTime = convertToUtc(courseDestination.TimeZoneOffset, rt);
 
-                
+
 
                 db.Assignments.Add(na);
                 db.SaveChanges();
@@ -1033,5 +1033,104 @@ namespace OSBLE.Controllers
                         db.Entry(na).State = EntityState.Modified;
                         db.SaveChanges();
                     }
+                }
+
+                //components
+                //rubrics
+                if (p.RubricID != null)
+                {
+                    //create a new reburic thats an exact copy with the same critera
+                    Rubric nr = new Rubric();
+                    nr.HasGlobalComments = p.Rubric.HasGlobalComments;
+                    nr.HasCriteriaComments = p.Rubric.HasCriteriaComments;
+                    nr.Description = p.Rubric.Description;
+
+                    db.Rubrics.Add(nr);
+                    db.SaveChanges();
+
+                    na.RubricID = nr.ID;
+                    db.Entry(na).State = EntityState.Modified;
+                    db.SaveChanges();
+
+                    //now get all the stuff for it
+                    Dictionary<int, int> levelHolder = new Dictionary<int, int>();
+                    Dictionary<int, int> criterionHolder = new Dictionary<int, int>();
+
+                    List<Level> pls = (from rl in db.Levels
+                                       where rl.RubricID == prid
+                                       select rl).ToList();
+                    foreach (Level pl in pls)
+                    {
+                        Level nl = new Level();
+                        nl.LevelTitle = pl.LevelTitle;
+                        nl.PointSpread = pl.PointSpread;
+                        nl.RubricID = nr.ID;
+                        db.Levels.Add(nl);
+                        db.SaveChanges();
+                        levelHolder.Add(pl.ID, nl.ID);
+                    }
+
+                    List<Criterion> prcs = (from rc in db.Criteria
+                                            where rc.RubricID == prid
+                                            select rc).ToList();
+
+                    foreach (Criterion prc in prcs) //create a new criteron
+                    {
+                        Criterion nrc = new Criterion();
+                        nrc.CriterionTitle = prc.CriterionTitle;
+                        nrc.Weight = prc.Weight;
+                        nrc.RubricID = nr.ID;
+                        db.Criteria.Add(nrc);
+                        db.SaveChanges();
+                        criterionHolder.Add(prc.ID, nrc.ID);
+                    }
+
+                    //now descriptions
+                    //for some reason, cell descriptions do not come with this assignment so lets do a search fo rit
+                    List<CellDescription> pcds = (from cd in db.CellDescriptions
+                                                  where cd.RubricID == prid
+                                                  select cd).ToList();
+
+                    foreach (CellDescription pcd in pcds)
+                    {
+                        CellDescription ncd = new CellDescription();
+                        ncd.CriterionID = criterionHolder[pcd.CriterionID];
+                        ncd.LevelID = levelHolder[pcd.LevelID];
+                        ncd.RubricID = nr.ID;
+                        ncd.Description = pcd.Description;
+                        db.CellDescriptions.Add(ncd);
+                        db.SaveChanges();
+                    }
+
+
+                }
+
+                ///deliverables
+                List<Deliverable> pads = (from d in db.Deliverables
+                                          where d.AssignmentID == paid
+                                          select d).ToList();
+                foreach (Deliverable pad in pads)
+                {
+                    Deliverable nad = new Deliverable();
+                    nad.AssignmentID = na.ID;
+                    nad.DeliverableType = pad.DeliverableType;
+                    nad.Assignment = na;
+                    nad.Name = pad.Name;
+                    db.Deliverables.Add(nad);
+                    db.SaveChanges();
+                    na.Deliverables.Add(nad);
+                    db.Entry(na).State = EntityState.Modified;
+                    db.SaveChanges();
+                }
+
+
+
+
+
+            }
+
+            return true;
+
+        }
     }
 }
