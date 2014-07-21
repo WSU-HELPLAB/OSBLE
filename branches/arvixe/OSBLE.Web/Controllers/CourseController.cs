@@ -912,13 +912,30 @@ namespace OSBLE.Controllers
                                                     select a).ToList();
 
             //calculate # of weeks since start date
+
             double difference = courseDestination.StartDate.Subtract(courseSource.StartDate).TotalDays;
+            //for linking purposes, key == previous id, value == the clone course that is teh same
+            Dictionary<int, int> linkHolder = new Dictionary<int, int>();
             foreach (Assignment p in previousAssignments)
             {
+                int prid = -1, paid = p.ID;
+                //for insert sake of cloned assigntment
+                //we must temprarly hold the list of assignments whos id links to this assignment for temporary holding
+                List<Assignment> previouslyLinked = (from pl in db.Assignments
+                                                     where pl.PrecededingAssignmentID == paid
+                                                     select pl).ToList();
+                foreach (Assignment link in previouslyLinked)
+                {
+                    link.PrecededingAssignmentID = null;
+                    db.Entry(link).State = EntityState.Modified;
+                    db.SaveChanges();
+                }
+
+
                 //copy details
                 Assignment na = new Assignment();
                 //tmp holders
-                int prid = -1, paid = p.ID;
+
                 if (p.RubricID != null)
                     prid = (int)p.RubricID;
                 na = p;
@@ -926,8 +943,11 @@ namespace OSBLE.Controllers
                 na.IsDraft = true;
                 na.AssociatedEvent = null;
                 na.AssociatedEventID = null;
-
-                
+                na.AssignmentTeams = new List<AssignmentTeam>();
+                if (p.HasDeliverables)
+                    na.Deliverables = new List<Deliverable>();
+                if (p.HasDiscussionTeams) 
+                    na.DiscussionTeams = new List<DiscussionTeam>();
 
                 //recalcualte new offsets for due dates on assignment
 
@@ -953,10 +973,56 @@ namespace OSBLE.Controllers
                 na.ReleaseTime = convertToUtc(courseDestination.TimeZoneOffset, rt);
 
                 
+
                 db.Assignments.Add(na);
                 db.SaveChanges();
 
-                //copy create new components
+                linkHolder.Add(paid, na.ID);
+
+                //fix the link now
+                foreach (Assignment link in previouslyLinked)
+                {
+                    link.PrecededingAssignmentID = paid;
+                    db.Entry(link).State = EntityState.Modified;
+                    db.SaveChanges();
+                }
+
+                if (p.Type == AssignmentTypes.DiscussionAssignment)
+                {
+                    DiscussionSetting pds = (from ds in db.DiscussionSettings
+                                             where ds.AssignmentID == paid
+                                             select ds).FirstOrDefault();
+
+                    DiscussionSetting nds = new DiscussionSetting();
+                    nds.InitialPostDueDate = pds.InitialPostDueDate.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
+                    nds.InitialPostDueDueTime = pds.InitialPostDueDueTime.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
+                    nds.AssociatedEventID = null;
+                    nds.MaximumFirstPostLength = pds.MaximumFirstPostLength;
+                    nds.MinimumFirstPostLength = pds.MinimumFirstPostLength;
+                    nds.AnonymitySettings = pds.AnonymitySettings;
+                    na.DiscussionSettings = nds;
+                    db.Entry(na).State = EntityState.Modified;
+                    db.SaveChanges();
+                }
+                //critical review
+                if (p.Type == AssignmentTypes.CriticalReview)
+                {
+                    CriticalReviewSettings pcs = (from ds in db.CriticalReviewSettings
+                                                  where ds.AssignmentID == paid
+                                                  select ds).FirstOrDefault();
+
+                    if (pcs != null)
+                    {
+                        CriticalReviewSettings ncs = new CriticalReviewSettings();
+                        ncs.ReviewSettings = pcs.ReviewSettings;
+                        na.CriticalReviewSettings = ncs;
+                        na.PrecededingAssignmentID = linkHolder[(int)p.PrecededingAssignmentID];
+                        db.Entry(na).State = EntityState.Modified;
+                        db.SaveChanges();
+                    }
+                }
+
+                //components
                 //rubrics
                 if (p.RubricID != null)
                 {
@@ -1011,19 +1077,18 @@ namespace OSBLE.Controllers
                     List<CellDescription> pcds = (from cd in db.CellDescriptions
                                                   where cd.RubricID == prid
                                                   select cd).ToList();
-                    if (pcds.Count > 0)
+
+                    foreach (CellDescription pcd in pcds)
                     {
-                        foreach (CellDescription pcd in pcds)
-                        {
-                            CellDescription ncd = new CellDescription();
-                            ncd.CriterionID = criterionHolder[pcd.CriterionID];
-                            ncd.LevelID = levelHolder[pcd.LevelID];
-                            ncd.RubricID = nr.ID;
-                            ncd.Description = pcd.Description;
-                            db.CellDescriptions.Add(ncd);
-                            db.SaveChanges();
-                        }
+                        CellDescription ncd = new CellDescription();
+                        ncd.CriterionID = criterionHolder[pcd.CriterionID];
+                        ncd.LevelID = levelHolder[pcd.LevelID];
+                        ncd.RubricID = nr.ID;
+                        ncd.Description = pcd.Description;
+                        db.CellDescriptions.Add(ncd);
+                        db.SaveChanges();
                     }
+                    
 
                 }
 
@@ -1031,30 +1096,23 @@ namespace OSBLE.Controllers
                 List<Deliverable> pads = (from d in db.Deliverables
                                           where d.AssignmentID == paid
                                           select d).ToList();
+                foreach(Deliverable pad in pads)
+                {
+                    Deliverable nad = new Deliverable();
+                    nad.AssignmentID = na.ID;
+                    nad.DeliverableType = pad.DeliverableType;
+                    nad.Assignment = na;
+                    nad.Name = pad.Name;
+                    db.Deliverables.Add(nad);
+                    db.SaveChanges();
+                    na.Deliverables.Add(nad);
+                    db.Entry(na).State = EntityState.Modified;
+                    db.SaveChanges();
+                }
                 
-                if (pads.Count > 0)
-                {
-                    foreach(Deliverable pad in pads)
-                    {
-                        Deliverable nad = new Deliverable();
-                        nad.AssignmentID = na.ID;
-                        nad.DeliverableType = pad.DeliverableType;
-                        nad.Assignment = na;
-                        nad.Name = pad.Name;
-                        db.Deliverables.Add(nad);
-                        db.SaveChanges();
-                    }
-                }
 
 
-                //discussion
-                if (p.Type == AssignmentTypes.DiscussionAssignment)
-                {
-                    na.DiscussionSettings.AssignmentID = na.ID;
-                    na.DiscussionSettings.InitialPostDueDate = na.DiscussionSettings.InitialPostDueDate.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
-                    na.DiscussionSettings.InitialPostDueDueTime = na.DiscussionSettings.InitialPostDueDueTime.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
-                    db.DiscussionSettings.Add(na.DiscussionSettings);
-                }
+                
 
             }
 
