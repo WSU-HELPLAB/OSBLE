@@ -898,6 +898,7 @@
     <Content Include="Views\Test\Index.cshtml" />
     <Content Include="Views\Course\CloneCourse.cshtml" />
     <Content Include="Views\Course\CloneSetup.cshtml" />
+    <Content Include="Views\Course\SelectAssignmentsToClone.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
