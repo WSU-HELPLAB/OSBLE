@@ -393,6 +393,12 @@ namespace OSBLE.Controllers
 
                 Cache["ActiveCourse"] = course.ID;
 
+                //will create a calendar for this course
+                using(iCalendarController icalControl = new iCalendarController())
+                {
+                    icalControl.CreateCourseCalendar(course.ID);
+                }
+
                 return RedirectToAction("Index", "Home");
             }
             return View(course);
@@ -765,6 +771,13 @@ namespace OSBLE.Controllers
             {
                 db.Entry(updateCourse).State = EntityState.Modified;
                 db.SaveChanges();
+
+                //will update a calendar for this course
+                using (iCalendarController icalControl = new iCalendarController())
+                {
+                    icalControl.CreateCourseCalendar(course.ID);
+                }
+
                 return RedirectToAction("Index", "Home");
             }
             return View(course);
@@ -789,7 +802,7 @@ namespace OSBLE.Controllers
                 ActiveCourseUser.AbstractCourse.IsDeleted = true;
                 db.SaveChanges();
             }
-
+            //TODO: Delete course calendar 
             return RedirectToAction("Index", "Home");
         }
 
@@ -1020,106 +1033,5 @@ namespace OSBLE.Controllers
                         db.Entry(na).State = EntityState.Modified;
                         db.SaveChanges();
                     }
-                }
-
-                //components
-                //rubrics
-                if (p.RubricID != null)
-                {
-                    //create a new reburic thats an exact copy with the same critera
-                    Rubric nr = new Rubric();
-                    nr.HasGlobalComments = p.Rubric.HasGlobalComments;
-                    nr.HasCriteriaComments = p.Rubric.HasCriteriaComments;
-                    nr.Description = p.Rubric.Description;
-
-                    db.Rubrics.Add(nr);
-                    db.SaveChanges();
-                    
-                    na.RubricID = nr.ID;
-                    db.Entry(na).State = EntityState.Modified;
-                    db.SaveChanges();
-
-                    //now get all the stuff for it
-                    Dictionary<int, int> levelHolder = new Dictionary<int, int>();
-                    Dictionary<int, int> criterionHolder = new Dictionary<int, int>();
-
-                    List<Level> pls = (from rl in db.Levels
-                                       where rl.RubricID == prid
-                                       select rl).ToList();
-                    foreach (Level pl in pls)
-                    {
-                        Level nl = new Level();
-                        nl.LevelTitle = pl.LevelTitle;
-                        nl.PointSpread = pl.PointSpread;
-                        nl.RubricID = nr.ID;
-                        db.Levels.Add(nl);
-                        db.SaveChanges();
-                        levelHolder.Add(pl.ID, nl.ID);
-                    }
-
-                    List<Criterion> prcs = (from rc in db.Criteria
-                                            where rc.RubricID == prid
-                                            select rc).ToList();
-
-                    foreach (Criterion prc in prcs) //create a new criteron
-                    {
-                        Criterion nrc = new Criterion();
-                        nrc.CriterionTitle = prc.CriterionTitle;
-                        nrc.Weight = prc.Weight;
-                        nrc.RubricID = nr.ID;
-                        db.Criteria.Add(nrc);
-                        db.SaveChanges();
-                        criterionHolder.Add(prc.ID, nrc.ID);
-                    }
-
-                    //now descriptions
-                    //for some reason, cell descriptions do not come with this assignment so lets do a search fo rit
-                    List<CellDescription> pcds = (from cd in db.CellDescriptions
-                                                  where cd.RubricID == prid
-                                                  select cd).ToList();
-
-                    foreach (CellDescription pcd in pcds)
-                    {
-                        CellDescription ncd = new CellDescription();
-                        ncd.CriterionID = criterionHolder[pcd.CriterionID];
-                        ncd.LevelID = levelHolder[pcd.LevelID];
-                        ncd.RubricID = nr.ID;
-                        ncd.Description = pcd.Description;
-                        db.CellDescriptions.Add(ncd);
-                        db.SaveChanges();
-                    }
-                    
-
-                }
-
-                ///deliverables
-                List<Deliverable> pads = (from d in db.Deliverables
-                                          where d.AssignmentID == paid
-                                          select d).ToList();
-                foreach(Deliverable pad in pads)
-                {
-                    Deliverable nad = new Deliverable();
-                    nad.AssignmentID = na.ID;
-                    nad.DeliverableType = pad.DeliverableType;
-                    nad.Assignment = na;
-                    nad.Name = pad.Name;
-                    db.Deliverables.Add(nad);
-                    db.SaveChanges();
-                    na.Deliverables.Add(nad);
-                    db.Entry(na).State = EntityState.Modified;
-                    db.SaveChanges();
-                }
-                
-
-
-                
-
-            }
-
-            return true;
-            
-        }
     }
-
-
 }
