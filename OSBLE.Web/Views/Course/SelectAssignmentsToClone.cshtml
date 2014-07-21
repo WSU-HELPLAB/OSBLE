@@ -1,0 +1,19 @@
+﻿@using OSBLE.Models
+@using OSBLE.Models.Courses
+@using OSBLE.Models.Assignments
+
+@{
+    ViewBag.Title = "SelectAssignmentsToClone";
+}
+
+<h2>SelectAssignmentsToClone</h2>
+
+<table>
+    @foreach (Assignment a in ViewBag.PreviousAssignments)
+    {
+        <tr>
+            <td>x</td>
+            <td>@a.AssignmentName</td>
+        </tr>
+    }
+</table>
