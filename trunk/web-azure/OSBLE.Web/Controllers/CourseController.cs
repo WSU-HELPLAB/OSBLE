@@ -7,7 +7,7 @@ using System.Web.Configuration;
 using OSBLE.Attributes;
 using OSBLE.Models;
 using OSBLE.Models.Assignments;
-
+using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
@@ -17,6 +17,7 @@ using System.Diagnostics;
 using System.Collections.Specialized;
 using System.Data;
 using OSBLE.Utility;
+
 
 namespace OSBLE.Controllers
 {
@@ -181,12 +182,11 @@ namespace OSBLE.Controllers
         {
             DateTime convertedToUtc;
             TimeZoneInfo tz = getTimeZone(tzoffset);
-
             try
             {
                 convertedToUtc = TimeZoneInfo.ConvertTimeToUtc(originalTime, tz);
             }
-            catch(TimeZoneNotFoundException e)
+            catch (TimeZoneNotFoundException e)
             {
                 //failed need to figure out what our error will be
                 convertedToUtc = new DateTime();
@@ -203,7 +203,7 @@ namespace OSBLE.Controllers
             {
                 convertedFromUtc = TimeZoneInfo.ConvertTimeFromUtc(originalTime, tz);
             }
-            catch(TimeZoneNotFoundException e)
+            catch (TimeZoneNotFoundException e)
             {
                 convertedFromUtc = new DateTime();
             }
@@ -394,6 +394,12 @@ namespace OSBLE.Controllers
 
                 Cache["ActiveCourse"] = course.ID;
 
+                //will create a calendar for this course
+                using (iCalendarController icalControl = new iCalendarController())
+                {
+                    icalControl.CreateCourseCalendar(course.ID);
+                }
+
                 return RedirectToAction("Index", "Home");
             }
             return View(course);
@@ -413,9 +419,9 @@ namespace OSBLE.Controllers
 
             //add them to a list as a selectlistitem
             List<SelectListItem> course = new List<SelectListItem>();
-            foreach(var c in CourseList)
+            foreach (var c in CourseList)
             {   
-                if(c.EndDate > DateTime.Now && !c.IsDeleted)
+                if (c.EndDate > DateTime.Now && !c.IsDeleted)
                     course.Add(new SelectListItem { Text = c.Prefix, Value = c.Prefix });
             }
             //remove any duplicate course names
@@ -443,7 +449,7 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult SearchResults(string course, string number)
         {
-            if(number == "Search All")
+            if (number == "Search All")
             {
                 var Results = from d in db.Courses
                               where d.Prefix == course 
@@ -612,7 +618,6 @@ namespace OSBLE.Controllers
             {
                 return View("CommunityCurrentlyEnrolled");
             }
-
             else if (ActiveCourseUser == null)
             {
                 //we need to create a course user in order to send a proper notification to the instructor(s)
@@ -637,7 +642,6 @@ namespace OSBLE.Controllers
 
                 return View("CommunityAwaitingApproval");
             }
-
             else
             {
                 using (NotificationController nc = new NotificationController())
@@ -660,10 +664,6 @@ namespace OSBLE.Controllers
             }
         }
 
-
-       
-
-        
         // GET: /Course/Edit/5
         [RequireActiveCourse]
         [CanModifyCourse]
@@ -757,7 +757,7 @@ namespace OSBLE.Controllers
             updateCourse.StartDate = course.StartDate;
             updateCourse.Year = course.Year;
             updateCourse.ShowMeetings = course.ShowMeetings;
-
+            updateCourse.TimeZoneOffset = Convert.ToInt32(Request.Params["course_timezone"]);
             // Default Late Policy
             updateCourse.MinutesLateWithNoPenalty = course.MinutesLateWithNoPenalty;
             updateCourse.HoursLatePerPercentPenalty = course.HoursLatePerPercentPenalty;
@@ -772,6 +772,13 @@ namespace OSBLE.Controllers
             {
                 db.Entry(updateCourse).State = EntityState.Modified;
                 db.SaveChanges();
+
+                //will update a calendar for this course
+                using (iCalendarController icalControl = new iCalendarController())
+                {
+                    icalControl.CreateCourseCalendar(course.ID);
+                }
+
                 return RedirectToAction("Index", "Home");
             }
             return View(course);
@@ -796,7 +803,7 @@ namespace OSBLE.Controllers
                 ActiveCourseUser.AbstractCourse.IsDeleted = true;
                 db.SaveChanges();
             }
-
+            //TODO: Delete course calendar 
             return RedirectToAction("Index", "Home");
         }
 
@@ -804,6 +811,513 @@ namespace OSBLE.Controllers
         {
             db.Dispose();
             base.Dispose(disposing);
+        }
+
+        /// <summary>
+        /// yc: course cloning, for any course the current user has been an instructor in
+        /// </summary>
+        /// <returns></returns>
+        [CanCreateCourses]
+        public ActionResult CloneCourse()
+        {
+            //find all courses current users is in
+            List<CourseUser> allUsersCourses = db.CourseUsers.Where(cu => cu.UserProfileID == CurrentUser.ID).ToList();
+            List<CourseUser> previousInstructedCourses = allUsersCourses.Where(cu => (cu.AbstractCourse is Course)
+                    &&
+                    (cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor)).OrderByDescending(cu => (cu.AbstractCourse as Course).StartDate).ToList();
+            ViewBag.pastCourses = previousInstructedCourses;
+            return View();
+        }
+
+        [CanCreateCourses]
+        [CanModifyCourse]
+        public ActionResult CloneSetup(int courseid)
+        {
+            Course pastCourse = (from c in db.Courses
+                                 where c.ID == courseid
+                                 select c).FirstOrDefault();
+            if (pastCourse != null)
+            {
+                Course Clone = new Course();
+                Clone.AllowDashboardPosts = pastCourse.AllowDashboardPosts;
+                Clone.AllowDashboardReplies = pastCourse.AllowDashboardReplies;
+                Clone.AllowEventPosting = pastCourse.AllowEventPosting;
+                Clone.CalendarWindowOfTime = pastCourse.CalendarWindowOfTime;
+                Clone.HoursLatePerPercentPenalty = pastCourse.HoursLatePerPercentPenalty;
+                Clone.HoursLateUntilZero = pastCourse.HoursLateUntilZero;
+                Clone.MinutesLateWithNoPenalty = pastCourse.MinutesLateWithNoPenalty;             
+                Clone.Name = pastCourse.Name;
+                Clone.Number = pastCourse.Number;
+                Clone.Prefix = pastCourse.Prefix;
+                Clone.PercentPenalty = pastCourse.PercentPenalty;
+                Clone.RequireInstructorApprovalForEventPosting = pastCourse.RequireInstructorApprovalForEventPosting;
+                Clone.TimeZoneOffset = pastCourse.TimeZoneOffset;
+                //clone upkeep stuff from original course
+                Clone.ID = pastCourse.ID;
+                return View(Clone);
+            }
+            else
+            {
+                //could not find it, send them an empty coures
+                return RedirectToAction("Create");
+            }
+        }
+
+
+        [HttpPost]
+        [CanCreateCourses]
+        [CanModifyCourse]
+        public ActionResult CloneSetup(Course clone)
+        {
+            Course oldCourse = (Course)(from c in db.AbstractCourses
+                                where c.ID == clone.ID
+                                select c).FirstOrDefault();
+            Course getNewId = new Course();
+            clone.ID = getNewId.ID;
+            
+
+            if (ModelState.IsValid)
+            {
+                db.Courses.Add(clone);
+                db.SaveChanges();
+
+                int utcOffset = 0;
+                try
+                {
+                    Int32.TryParse(Request.Form["utc-offset"].ToString(), out utcOffset);
+                }
+                catch (Exception)
+                {
+                }
+
+                clone.TimeZoneOffset = Convert.ToInt32(Request.Params["course_timezone"]);
+                createMeetingTimes(clone, clone.TimeZoneOffset);
+                createBreaks(clone);
+
+                // Make current user an instructor on new course.
+                CourseUser cu = new CourseUser();
+                cu.AbstractCourseID = clone.ID;
+                cu.UserProfileID = CurrentUser.ID;
+                cu.AbstractRoleID = (int)CourseRole.CourseRoles.Instructor;
+
+
+                db.CourseUsers.Add(cu);
+                db.SaveChanges();
+                CloneAllAssignmentsFromCourse(clone, oldCourse);
+                Cache["ActiveCourse"] = clone.ID;
+
+                return RedirectToAction("Index", "Home");
+            }
+            return View(clone);
+        }
+
+        /// <summary>
+        /// yc: all assignments should be cloned EXACTLY like the course source. find all the old assignments
+        /// and create a new entry into the database with corresponding components also added
+        /// </summary>
+        /// <param name="courseDestination"></param>
+        /// <param name="courseSource"></param>
+        /// <returns></returns>
+        public bool CloneAllAssignmentsFromCourse(Course courseDestination, Course courseSource)
+        {
+            List<Assignment> previousAssignments = (from a in db.Assignments
+                                                    where a.CourseID == courseSource.ID
+                                                    select a).ToList();
+
+            //calculate # of weeks since start date
+
+            double difference = courseDestination.StartDate.Subtract(courseSource.StartDate).TotalDays;
+            //for linking purposes, key == previous id, value == the clone course that is teh same
+            Dictionary<int, int> linkHolder = new Dictionary<int, int>();
+            foreach (Assignment p in previousAssignments)
+            {
+                //disabling assignments that are not finished being handled yet
+                if (p.Type == AssignmentTypes.AnchoredDiscussion || p.Type == AssignmentTypes.CommitteeDiscussion
+                    || p.Type == AssignmentTypes.TeamEvaluation || p.Type == AssignmentTypes.ReviewOfStudentWork)
+                    continue;
+
+                int prid = -1, paid = p.ID;
+                //for insert sake of cloned assigntment
+                //we must temprarly hold the list of assignments whos id links to this assignment for temporary holding
+                List<Assignment> previouslyLinked = (from pl in db.Assignments
+                                                     where pl.PrecededingAssignmentID == paid
+                                                     select pl).ToList();
+                foreach (Assignment link in previouslyLinked)
+                {
+                    link.PrecededingAssignmentID = null;
+                    db.Entry(link).State = EntityState.Modified;
+                    db.SaveChanges();
+                }
+
+                //copy details
+                Assignment na = new Assignment();
+                //tmp holders
+
+                if (p.RubricID != null)
+                    prid = (int)p.RubricID;
+                na = p;
+                na.CourseID = courseDestination.ID; //rewrite course id
+                na.IsDraft = true;
+                na.AssociatedEvent = null;
+                na.AssociatedEventID = null;
+                na.AssignmentTeams = new List<AssignmentTeam>();
+                if (p.HasDeliverables)
+                    na.Deliverables = new List<Deliverable>();
+                if (p.HasDiscussionTeams) 
+                    na.DiscussionTeams = new List<DiscussionTeam>();
+
+                //recalcualte new offsets for due dates on assignment
+
+                if (p.CriticalReviewPublishDate != null)
+                {
+                    na.CriticalReviewPublishDate = ((DateTime)(p.CriticalReviewPublishDate)).Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
+                }
+                //else
+                //    na.CriticalReviewPublishDate = null;
+                DateTime dd = convertFromUtc(courseSource.TimeZoneOffset, na.DueDate);
+                DateTime dt = convertFromUtc(courseSource.TimeZoneOffset, na.DueTime);
+                DateTime rd = convertFromUtc(courseSource.TimeZoneOffset, na.ReleaseDate);
+                DateTime rt = convertFromUtc(courseSource.TimeZoneOffset, na.ReleaseTime);
+
+                dd = dd.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
+                dt = dt.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
+                rd = rd.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
+                rt = rt.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
+
+                na.DueDate = convertToUtc(courseDestination.TimeZoneOffset, dd);
+                na.DueTime = convertToUtc(courseDestination.TimeZoneOffset, dt);
+                na.ReleaseDate = convertToUtc(courseDestination.TimeZoneOffset, rd);
+                na.ReleaseTime = convertToUtc(courseDestination.TimeZoneOffset, rt);
+
+                
+
+                db.Assignments.Add(na);
+                db.SaveChanges();
+
+                linkHolder.Add(paid, na.ID);
+
+                //fix the link now
+                foreach (Assignment link in previouslyLinked)
+                {
+                    link.PrecededingAssignmentID = paid;
+                    db.Entry(link).State = EntityState.Modified;
+                    db.SaveChanges();
+                }
+
+                if (p.Type == AssignmentTypes.DiscussionAssignment || p.Type == AssignmentTypes.CriticalReviewDiscussion)
+                {
+                    DiscussionSetting pds = (from ds in db.DiscussionSettings
+                                             where ds.AssignmentID == paid
+                                             select ds).FirstOrDefault();
+
+                    DiscussionSetting nds = new DiscussionSetting();
+                    nds.InitialPostDueDate = pds.InitialPostDueDate.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
+                    nds.InitialPostDueDueTime = pds.InitialPostDueDueTime.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
+                    nds.AssociatedEventID = null;
+                    nds.MaximumFirstPostLength = pds.MaximumFirstPostLength;
+                    nds.MinimumFirstPostLength = pds.MinimumFirstPostLength;
+                    nds.AnonymitySettings = pds.AnonymitySettings;
+                    na.DiscussionSettings = nds;
+                    db.Entry(na).State = EntityState.Modified;
+                    db.SaveChanges();
+                }
+                //critical review
+                if (p.Type == AssignmentTypes.CriticalReview)
+                {
+                    CriticalReviewSettings pcs = (from ds in db.CriticalReviewSettings
+                                                  where ds.AssignmentID == paid
+                                                  select ds).FirstOrDefault();
+
+                    if (pcs != null)
+                    {
+                        CriticalReviewSettings ncs = new CriticalReviewSettings();
+                        ncs.ReviewSettings = pcs.ReviewSettings;
+                        na.CriticalReviewSettings = ncs;
+                        na.PrecededingAssignmentID = linkHolder[(int)p.PrecededingAssignmentID];
+                        db.Entry(na).State = EntityState.Modified;
+                        db.SaveChanges();
+                    }
+                }
+
+                //components
+                //rubrics
+                if (p.RubricID != null)
+                    CopyRubric(p, na);
+                //if (p.RubricID != null)
+                //{
+                //    //create a new reburic thats an exact copy with the same critera
+                //    Rubric nr = new Rubric();
+                //    nr.HasGlobalComments = p.Rubric.HasGlobalComments;
+                //    nr.HasCriteriaComments = p.Rubric.HasCriteriaComments;
+                //    nr.Description = p.Rubric.Description;
+
+                //    db.Rubrics.Add(nr);
+                //    db.SaveChanges();
+                    
+                //    na.RubricID = nr.ID;
+                //    db.Entry(na).State = EntityState.Modified;
+                //    db.SaveChanges();
+
+                //    //now get all the stuff for it
+                //    Dictionary<int, int> levelHolder = new Dictionary<int, int>();
+                //    Dictionary<int, int> criterionHolder = new Dictionary<int, int>();
+
+                //    List<Level> pls = (from rl in db.Levels
+                //                       where rl.RubricID == prid
+                //                       select rl).ToList();
+                //    foreach (Level pl in pls)
+                //    {
+                //        Level nl = new Level();
+                //        nl.LevelTitle = pl.LevelTitle;
+                //        nl.PointSpread = pl.PointSpread;
+                //        nl.RubricID = nr.ID;
+                //        db.Levels.Add(nl);
+                //        db.SaveChanges();
+                //        levelHolder.Add(pl.ID, nl.ID);
+                //    }
+
+                //    List<Criterion> prcs = (from rc in db.Criteria
+                //                            where rc.RubricID == prid
+                //                            select rc).ToList();
+
+                //    foreach (Criterion prc in prcs) //create a new criteron
+                //    {
+                //        Criterion nrc = new Criterion();
+                //        nrc.CriterionTitle = prc.CriterionTitle;
+                //        nrc.Weight = prc.Weight;
+                //        nrc.RubricID = nr.ID;
+                //        db.Criteria.Add(nrc);
+                //        db.SaveChanges();
+                //        criterionHolder.Add(prc.ID, nrc.ID);
+                //    }
+
+                //    //now descriptions
+                //    //for some reason, cell descriptions do not come with this assignment so lets do a search fo rit
+                //    List<CellDescription> pcds = (from cd in db.CellDescriptions
+                //                                  where cd.RubricID == prid
+                //                                  select cd).ToList();
+
+                //    foreach (CellDescription pcd in pcds)
+                //    {
+                //        CellDescription ncd = new CellDescription();
+                //        ncd.CriterionID = criterionHolder[pcd.CriterionID];
+                //        ncd.LevelID = levelHolder[pcd.LevelID];
+                //        ncd.RubricID = nr.ID;
+                //        ncd.Description = pcd.Description;
+                //        db.CellDescriptions.Add(ncd);
+                //        db.SaveChanges();
+                //    }
+                    
+
+                //}
+
+                ///deliverables
+                List<Deliverable> pads = (from d in db.Deliverables
+                                          where d.AssignmentID == paid
+                                          select d).ToList();
+                foreach(Deliverable pad in pads)
+                {
+                    Deliverable nad = new Deliverable();
+                    nad.AssignmentID = na.ID;
+                    nad.DeliverableType = pad.DeliverableType;
+                    nad.Assignment = na;
+                    nad.Name = pad.Name;
+                    db.Deliverables.Add(nad);
+                    db.SaveChanges();
+                    na.Deliverables.Add(nad);
+                    db.Entry(na).State = EntityState.Modified;
+                    db.SaveChanges();
+                }
+                
+            }
+
+            return true;
+            
+        }
+
+        public bool CopyRubric(Assignment Source, Assignment Destination)
+        {
+            int sid = -1;
+
+            if (Source.RubricID != null)
+            {
+                sid = (int)Source.RubricID;
+                    //create a new reburic thats an exact copy with the same critera
+                    Rubric nr = new Rubric();
+                nr.HasGlobalComments = Source.Rubric.HasGlobalComments;
+                nr.HasCriteriaComments = Source.Rubric.HasCriteriaComments;
+                nr.Description = Source.Rubric.Description;
+
+                    db.Rubrics.Add(nr);
+                    db.SaveChanges();
+                    
+                Destination.RubricID = nr.ID;
+                db.Entry(Destination).State = EntityState.Modified;
+                    db.SaveChanges();
+
+                    //now get all the stuff for it
+                Dictionary<int, int> clevelHolder = new Dictionary<int, int>();
+                Dictionary<int, int> ccriterionHolder = new Dictionary<int, int>();
+
+                    List<Level> pls = (from rl in db.Levels
+                                   where rl.RubricID == sid
+                                       select rl).ToList();
+                    foreach (Level pl in pls)
+                    {
+                        Level nl = new Level();
+                        nl.LevelTitle = pl.LevelTitle;
+                        nl.PointSpread = pl.PointSpread;
+                        nl.RubricID = nr.ID;
+                        db.Levels.Add(nl);
+                        db.SaveChanges();
+                    clevelHolder.Add(pl.ID, nl.ID);
+                    }
+
+                    List<Criterion> prcs = (from rc in db.Criteria
+                                        where rc.RubricID == sid
+                                            select rc).ToList();
+
+                    foreach (Criterion prc in prcs) //create a new criteron
+                    {
+                        Criterion nrc = new Criterion();
+                        nrc.CriterionTitle = prc.CriterionTitle;
+                        nrc.Weight = prc.Weight;
+                        nrc.RubricID = nr.ID;
+                        db.Criteria.Add(nrc);
+                        db.SaveChanges();
+                    ccriterionHolder.Add(prc.ID, nrc.ID);
+                    }
+
+                    //now descriptions
+                    //for some reason, cell descriptions do not come with this assignment so lets do a search fo rit
+                    List<CellDescription> pcds = (from cd in db.CellDescriptions
+                                              where cd.RubricID == sid
+                                                  select cd).ToList();
+
+                    foreach (CellDescription pcd in pcds)
+                    {
+                        CellDescription ncd = new CellDescription();
+                    ncd.CriterionID = ccriterionHolder[pcd.CriterionID];
+                    ncd.LevelID = clevelHolder[pcd.LevelID];
+                        ncd.RubricID = nr.ID;
+                        ncd.Description = pcd.Description;
+                        db.CellDescriptions.Add(ncd);
+                        db.SaveChanges();
+                    }
+            }
+            if (Source.StudentRubricID != null)
+            {
+                sid = (int)Source.StudentRubricID;
+                //create a new reburic thats an exact copy with the same critera
+                Rubric nr = new Rubric();
+                nr.HasGlobalComments = Source.Rubric.HasGlobalComments;
+                nr.HasCriteriaComments = Source.Rubric.HasCriteriaComments;
+                nr.Description = Source.Rubric.Description;
+
+                db.Rubrics.Add(nr);
+                db.SaveChanges();
+                    
+                Destination.StudentRubricID = nr.ID;
+                db.Entry(Destination).State = EntityState.Modified;
+                db.SaveChanges();
+
+                //now get all the stuff for it
+                Dictionary<int, int> slevelHolder = new Dictionary<int, int>();
+                Dictionary<int, int> scriterionHolder = new Dictionary<int, int>();
+
+                List<Level> pls = (from rl in db.Levels
+                                   where rl.RubricID == sid
+                                   select rl).ToList();
+                foreach (Level pl in pls)
+                {
+                    Level nl = new Level();
+                    nl.LevelTitle = pl.LevelTitle;
+                    nl.PointSpread = pl.PointSpread;
+                    nl.RubricID = nr.ID;
+                    db.Levels.Add(nl);
+                    db.SaveChanges();
+                    slevelHolder.Add(pl.ID, nl.ID);
+                }
+                
+                List<Criterion> prcs = (from rc in db.Criteria
+                                        where rc.RubricID == sid
+                                        select rc).ToList();
+
+                foreach (Criterion prc in prcs) //create a new criteron
+                {
+                    Criterion nrc = new Criterion();
+                    nrc.CriterionTitle = prc.CriterionTitle;
+                    nrc.Weight = prc.Weight;
+                    nrc.RubricID = nr.ID;
+                    db.Criteria.Add(nrc);
+                    db.SaveChanges();
+                    scriterionHolder.Add(prc.ID, nrc.ID);
+                }
+                
+                //now descriptions
+                //for some reason, cell descriptions do not come with this assignment so lets do a search fo rit
+                List<CellDescription> pcds = (from cd in db.CellDescriptions
+                                              where cd.RubricID == sid
+                                              select cd).ToList();
+
+                foreach (CellDescription pcd in pcds)
+                {
+                    CellDescription ncd = new CellDescription();
+                    ncd.CriterionID = scriterionHolder[pcd.CriterionID];
+                    ncd.LevelID = slevelHolder[pcd.LevelID];
+                    ncd.RubricID = nr.ID;
+                    ncd.Description = pcd.Description;
+                    db.CellDescriptions.Add(ncd);
+                    db.SaveChanges();
+                }
+            }
+
+            return true;
+        }
+        public ActionResult SelectAssignmentsToClone(Course course)
+        {
+            ViewBag.PreviousAssignments = course.Assignments;
+            return View();
+        }
+
+        public FileStreamResult DownloadDashboardPosts()
+        {
+            //get all the dashboard posts for this course 
+            List<int> viewedCourses = new List<int>();
+            viewedCourses.Add(ActiveCourseUser.AbstractCourseID);
+            List<DashboardPost> dashboardPosts = db.DashboardPosts.Where(d => viewedCourses.Contains(d.CourseUser.AbstractCourseID))
+                                                                        .OrderByDescending(d => d.Posted).ToList();
+            
+
+            FileInfo info = new FileInfo("ActivityFeed.csv");
+            StreamWriter writer = info.CreateText();
+            writer.WriteLine("PostNumber,Author,AuthorRole,Date,Content");
+            int postCount = 1;
+            
+
+            foreach (var post in dashboardPosts)
+            {
+                int replyCount = 1;
+                writer.WriteLine(
+                    postCount.ToString() + "," 
+                    + (post.CourseUser.UserProfile.FirstName).Substring(0, 1) + (post.CourseUser.UserProfile.LastName).Substring(0, 1) + "," 
+                    + post.CourseUser.AbstractRole.Name + "," 
+                    + (post.Posted.ToLocalTime()).ToString("MM/dd/yy H:mm:ss") + "," 
+                    + post.Content);
+                foreach (var reply in post.Replies)
+                {
+                    writer.WriteLine(
+                        postCount.ToString() + "." + replyCount.ToString() + ","
+                        + (reply.CourseUser.UserProfile.FirstName).Substring(0, 1) + (reply.CourseUser.UserProfile.LastName).Substring(0, 1) + "," 
+                        + reply.CourseUser.AbstractRole.Name + ","
+                        + (reply.Posted.ToLocalTime()).ToString("MM/dd/yy H:mm:ss") + "," 
+                        + reply.Content);
+                    replyCount++;
+                }
+                postCount++;
+            }
+            writer.Close();
+            return File(info.OpenRead(), "text/csv", ActiveCourseUser.AbstractCourse.Name + "-ActivityFeed.csv");
         }
     }
 }

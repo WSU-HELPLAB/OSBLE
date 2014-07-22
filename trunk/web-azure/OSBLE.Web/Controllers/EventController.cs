@@ -189,14 +189,21 @@ namespace OSBLE.Controllers
 
                     return RedirectToAction("NeedsApproval");
                 }
+                //will update a calendar for this course
+                using (iCalendarController icalControl = new iCalendarController())
+                {
+                    icalControl.CreateCourseCalendar(ActiveCourseUser.AbstractCourseID);
+                }
                 return RedirectToAction("Index");
+
             }
 
             return View(e);
         }
 
         /// <summary>
-        /// This function will create an event that will start at the DueDate of the assignment, at Midnight. The event ends at the DueTime of the assignment.
+        /// This function will create an event that will start at the 
+        /// Date of the assignment, at Midnight. The event ends at the DueTime of the assignment.
         /// This event will be titled "AssignmentName Due"
         /// 
         /// In addition, if the assignment a discussion assignment, it will generate an additional event for "AssignmentName Initial Post Due". 
@@ -240,11 +247,21 @@ namespace OSBLE.Controllers
                 assignment.AssociatedEventID = aEvent.ID;
                 db.Entry(assignment).State = System.Data.EntityState.Modified;
                 db.SaveChanges();
+                //will update a calendar for this course
+                using (iCalendarController icalControl = new iCalendarController())
+                {
+                    icalControl.CreateCourseCalendar(assignment.CourseID.Value);
+                }
             }
             else
             {
                 db.Entry(aEvent).State = System.Data.EntityState.Modified;
                 db.SaveChanges();
+                //will update a calendar for this course
+                using (iCalendarController icalControl = new iCalendarController())
+                {
+                    icalControl.CreateCourseCalendar(assignment.CourseID.Value);
+                }
             }
         }
 
@@ -316,6 +333,11 @@ namespace OSBLE.Controllers
             e.Approved = true;
             db.Entry(e).State = EntityState.Modified;
             db.SaveChanges();
+            //will update a calendar for this course
+            using (iCalendarController icalControl = new iCalendarController())
+            {
+                icalControl.CreateCourseCalendar(ActiveCourseUser.AbstractCourseID);
+            }
 
             return RedirectToAction("Index", "Event");
         }
@@ -451,6 +473,13 @@ namespace OSBLE.Controllers
             {
                 db.Entry(originalEvent).State = EntityState.Modified;
                 db.SaveChanges();
+
+                //will update a calendar for this course
+                using (iCalendarController icalControl = new iCalendarController())
+                {
+                    icalControl.CreateCourseCalendar(ActiveCourseUser.AbstractCourseID);
+                }
+
                 return RedirectToAction("Index");
             }
             return View(e);
@@ -571,7 +600,9 @@ namespace OSBLE.Controllers
                             Event e = new Event();
 
                             //printing in utc time for browser to convert for you
+                            CourseController cc = new CourseController();
                             e.Title = cm.Name + " - " + cm.Location;
+                            //to combat timezone shifts 
                             e.StartDate = current.AddHours((double)cm.StartTime.Hour).AddMinutes((double)cm.StartTime.Minute);
                             e.EndDate = current.AddHours((double)cm.EndTime.Hour).AddMinutes((double)cm.EndTime.Minute);
                             e.HideDelete = true;

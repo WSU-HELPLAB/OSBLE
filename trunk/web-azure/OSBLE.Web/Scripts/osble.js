@@ -45,13 +45,45 @@ function parseDates() {
     $('time.utc-time').each(function (index) {
         var milliseconds = $(this).attr('datetime');
         var formatString = $(this).attr('data-date-format');
+        var original = $(this).attr('data-original-date');
+        var originaldate = moment(original);
         var currentDate = moment.utc(milliseconds, 'X');
-        var localDate = new Date();
-        var localOffset = localDate.getTimezoneOffset();
-        currentDate = currentDate.subtract('minutes', localOffset);
+        var originalOffset = originaldate.zone();
+        currentDate = currentDate.subtract('minutes', originalOffset);
         $(this).html(currentDate.format(formatString));
         $(this).removeClass("utc-time");
-        $(this).addClass("local-time");
+        $(this).addClass("course-local-time");
+    });
+    $('time.utc-time-events').each(function (index) {
+        var milliseconds = $(this).attr('datetime');
+        var formatString = $(this).attr('data-date-format');
+        var original = $(this).attr('data-original-date');
+        var originaldate = moment(original);
+        var currentDate = moment.utc(milliseconds, 'X');
+        var originalOffset = originaldate.zone();
+
+        var localDate = new Date();
+        var localOffset = localDate.getTimezoneOffset();
+        var od = moment(original).isDST();
+        var ld = moment(localDate).isDST();
+
+        if (!od && ld)
+        {
+            originalOffset -= (originalOffset - localOffset);
+            currentDate = currentDate.subtract('minutes', originalOffset);
+        }
+        else if (od && !ld)
+        {
+            originalOffset += (originalOffset - localOffset);
+            currentDate = currentDate.subtract('minutes', originalOffset);
+        }
+        else
+        {
+            currentDate = currentDate.subtract('minutes', originalOffset);
+        }
+        $(this).html(currentDate.format(formatString));
+        $(this).removeClass("utc-time");
+        $(this).addClass("course-local-event-time");
     });
     $('time.utc-time-link').each(function (index) {
         var milliseconds = $(this).attr('datetime');

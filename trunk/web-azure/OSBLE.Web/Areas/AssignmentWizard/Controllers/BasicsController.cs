@@ -66,7 +66,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             base.Index();
             ModelState.Clear();
             Assignment.Type = manager.ActiveAssignmentType;
-
+            
             // The temporary ID that we use before the assignment actually gets created 
             // is the number of milliseconds that has elapsed since the beginning of 
             // the day + 10,000 to avoid conflicts with assignment IDs (HACK). When 
@@ -91,6 +91,12 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 Assignment.DeductionPerUnit = (ActiveCourseUser.AbstractCourse as Course).PercentPenalty;
                 Assignment.HoursLateWindow = (ActiveCourseUser.AbstractCourse as Course).HoursLateUntilZero;
             }
+
+            //yc:daylightsavings shift!
+            CourseController cc = new CourseController();
+            int utcOffset = (ActiveCourseUser.AbstractCourse as Course).TimeZoneOffset;
+            TimeZoneInfo tz = cc.getTimeZone(utcOffset);
+
             return View(Assignment);
         }
 

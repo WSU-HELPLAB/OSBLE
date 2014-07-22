@@ -33,14 +33,11 @@ namespace OSBLE.Controllers
 
         public ViewResult Index()
         {
-            //FW: Yes this is a bad place for this, it'll get fixed soon 
-            CreateInitialCourseCalendar(ActiveCourseUser.AbstractCourseID);
             ViewBag.CourseID = ActiveCourseUser.AbstractCourseID;
             return View();
-           
         }
    
-        public void CreateInitialCourseCalendar(int id)
+        public void CreateCourseCalendar(int id)
         {
             //Get the Course
             Course course = (from d in db.Courses
@@ -75,7 +72,7 @@ namespace OSBLE.Controllers
                 DDay.iCal.Event evt = courseCalendar.Create<DDay.iCal.Event>();
 
                 evt.Start = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(e.StartDate, tz));
-                if(e.EndDate == null)
+                if (e.EndDate == null)
                 {
                     evt.End = evt.Start.AddDays(1);
                     evt.IsAllDay = true;
@@ -86,7 +83,7 @@ namespace OSBLE.Controllers
                 }
                 
                 evt.Summary = e.Title;
-                if(e.Description != null)
+                if (e.Description != null)
                     evt.Description = e.Description;
             }
 
@@ -97,51 +94,110 @@ namespace OSBLE.Controllers
             // Get a serializer for our object
             IStringSerializer serializer = factory.Build(courseCalendar.GetType(), ctx) as IStringSerializer;
 
-            //create a path in app_data for the calendar to be stored as a .ics file
-            string path = HttpContext.Server.MapPath("~/App_Data/FileSystem/Courses/" + id.ToString() + "/CourseCalendar/");
+            string output = serializer.SerializeToString(courseCalendar);
+            var bytes = Encoding.UTF8.GetBytes(output);
+            SaveCourseCalendar(bytes, course.ID);
 
-            //check if it exists
-            if(!Directory.Exists(path))
+        }
+        public ActionResult DownloadCourseCalendar(int id)
             {
-                Directory.CreateDirectory(path);
+            Course course = (from d in db.Courses
+                             where d.ID == id
+                             select d).FirstOrDefault();
+
+            //get all the course events 
+            List<OSBLE.Models.HomePage.Event> courseEvents = new List<Models.HomePage.Event>();
+
+            using (var result = new EventController())
+            {
+                courseEvents = result.GetActiveCourseEvents(course.StartDate, course.EndDate);
             }
 
-            //create the file
-            Stream file = new FileStream(path + courseCalendar.Name + ".ics", FileMode.Create);
+            //get the timezone of the course 
+            CourseController cc = new CourseController();
+            int utcOffset = (ActiveCourseUser.AbstractCourse as Course).TimeZoneOffset;
+            TimeZoneInfo tz = cc.getTimeZone(utcOffset);
 
-            //ical uses utf8 encoding 
-            serializer.Serialize(courseCalendar, file, Encoding.UTF8);
+            //Create and initalize the Calendar object 
+            iCalendar courseCalendar = new iCalendar();
+            courseCalendar.AddTimeZone(tz);
+            courseCalendar.Method = "PUBLISH";
+            courseCalendar.Name = "VCALENDAR";
+            courseCalendar.Version = "2.0";
+            courseCalendar.ProductID = "-//Washington State University//OSBLE.org//EN";
+            courseCalendar.Scale = "GREGORIAN";
 
-            //close the file TADA
-            file.Close();
+            //add all the events to the calendar 
+            foreach (OSBLE.Models.HomePage.Event e in courseEvents)
+            {
+                DDay.iCal.Event evt = courseCalendar.Create<DDay.iCal.Event>();
             
+                evt.Start = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(e.StartDate, tz));
+                if (e.EndDate == null)
+                {
+                    evt.End = evt.Start.AddDays(1);
+                    evt.IsAllDay = true;
+        }
+                else
+        {
+                    evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(e.EndDate.Value, tz));
+            }
+
+                evt.Summary = e.Title;
+                if (e.Description != null)
+                    evt.Description = e.Description;
         }
 
-        public ActionResult DownloadCourseCalendar(int id)
-        {
-            string path = Server.MapPath("~/App_Data/FileSystem/Courses/" + id.ToString() + "/CourseCalendar/VCALENDAR.ics");
-            if (System.IO.File.Exists(path))
-            {
-                return File(Server.MapPath("~/App_Data/FileSystem/Courses/" + id.ToString() + "/CourseCalendar/VCALENDAR.ics"), "text/calendar", "CourseCalendar.ics");
-            }
-            return HttpNotFound();
+            // Create a serialization context and serializer factory.
+            // These will be used to build the serializer for our object.
+            ISerializationContext ctx = new SerializationContext();
+            ISerializerFactory factory = new DDay.iCal.Serialization.iCalendar.SerializerFactory();
+            // Get a serializer for our object
+            IStringSerializer serializer = factory.Build(courseCalendar.GetType(), ctx) as IStringSerializer;
+
+            string output = serializer.SerializeToString(courseCalendar);
+            var contentType = "text/calendar";
+            var bytes = Encoding.UTF8.GetBytes(output);
+
+            return File(bytes, contentType, course.Prefix + course.Number + ".ics");
 
         }
         public ActionResult SubscribeToCalendar(int id)
         {
-            string path = Server.MapPath("~/App_Data/FileSystem/Courses/" + id.ToString() + "/CourseCalendar/VCALENDAR.ics");
-            string uri = new Uri(Request.Url, path).AbsoluteUri;
+            //Get the Course
+            Course course = (from d in db.Courses
+                             where d.ID == id
+                             select d).FirstOrDefault();
    
+            string path = "http://osble.org/Content/iCal/" + course.ID + "/" + course.Prefix + course.Number + ".ics?nocache";
 
-            if(System.IO.File.Exists(path))
+            if (System.IO.File.Exists(path))
             {
-                return Redirect("http://www.google.com/calendar/render?cid=" + uri);
+                return Redirect("http://www.google.com/calendar/render?cid=" + path);
             }
 
             return HttpNotFound();
         }
+        public void SaveCourseCalendar(Byte[] courseCalendar, int id)
+        {
+            //Get the Course
+            Course course = (from d in db.Courses
+                             where d.ID == id
+                             select d).FirstOrDefault();
+            string path = "http://osble.org/Content/iCal/" + course.ID + "/";
 
+#if DEBUG
+            path = Server.MapPath("~/Content/iCal/" + course.ID + "/");
+#endif
 
+            //check if it exists
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            System.IO.File.WriteAllBytes(path + course.Prefix + course.Number + ".ics", courseCalendar);
       
     }
+}
 }

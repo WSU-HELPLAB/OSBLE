@@ -7,6 +7,7 @@ using System.Web.Configuration;
 using OSBLE.Attributes;
 using OSBLE.Models;
 using OSBLE.Models.Assignments;
+
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
@@ -17,10 +18,9 @@ using System.Collections.Specialized;
 using System.Data;
 using OSBLE.Utility;
 
-
 namespace OSBLE.Controllers
 {
-    public class TestController : Controller
+    public class TestController : OSBLEController
     {
         //
         // GET: /Test/
@@ -64,6 +64,14 @@ namespace OSBLE.Controllers
             ViewBag.utctomst = utctoMst.ToString();
             ViewBag.utctomstisDaylight = utctoMst.IsDaylightSavingTime().ToString();
 
+            CourseController cc = new CourseController();
+            //past events
+            DateTime startOfclass = DateTime.Parse("1/15/2014 12:00 PM");
+            TimeZoneInfo pst = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
+            DateTime stocutc = cc.convertToUtc(-8, startOfclass);
+            ViewBag.utcstoc = stocutc;
+            DateTime from = cc.convertFromUtc(-8, stocutc);
+            ViewBag.yo = from;
             return View();
         }
 

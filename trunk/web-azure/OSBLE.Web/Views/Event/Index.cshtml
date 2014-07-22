@@ -8,6 +8,7 @@
 
     bool courseCalendarFlag = false;
     string activeCourseRole = ViewBag.ActiveCourse.AbstractRole.Name;
+    int courseID = ViewBag.ActiveCourse.AbstractCourse.ID;
     switch (activeCourseRole)
     {
         case "Instructor":
@@ -22,14 +23,15 @@
     }
 }
 
-<h2>Events &amp; Deadlines</h2>
+<h2>Events &amp; Deadlines
+    @if (courseCalendarFlag)
+{
+    <a href="@Url.Action("DownloadCourseCalendar", "iCalendar", new { id = courseID })" title="Download Course Calendar">@Helpers.UnPublishButton()</a>
+    <a href="@Url.Action("SubscribeToCalendar", "iCalendar", new { id = courseID })" title="Subscribe to Course Calendar ()">@Helpers.CalendarButton()</a>
+}</h2>
+
 
 <p>@Html.ActionLink("Back to Dashboard", "Index", "Home")</p>
-@if(courseCalendarFlag)
-{
-    <p>@Html.ActionLink("View Course Calendar", "Index", "iCalendar")</p>
-}
-
 
 <p>
     @if (ViewBag.ActiveCourse.AbstractRole.CanModify || ViewBag.ActiveCourse.AbstractCourse.AllowEventPosting)
