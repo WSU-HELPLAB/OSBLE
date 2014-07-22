@@ -18,7 +18,9 @@
 
             </td>
             <td>
-                <input type="file" id="fileToUpload" name="file" />
+                @*<input type="file" id="fileToUpload" name="file" />*@
+                <input type="file" data-val="true" data-val-required="At least one review document is required to continue." name="files" multiple />
+                @Html.ValidationMessage("files")
             </td>
         </tr>
     </table>

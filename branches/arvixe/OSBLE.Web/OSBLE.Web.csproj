@@ -899,6 +899,7 @@
     <Content Include="Views\Course\CloneCourse.cshtml" />
     <Content Include="Views\Course\CloneSetup.cshtml" />
     <Content Include="Views\Course\SelectAssignmentsToClone.cshtml" />
+    <Content Include="Views\iCalendar\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

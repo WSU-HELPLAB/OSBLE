@@ -76,12 +76,30 @@ namespace OSBLE.Controllers
             {
                 Assignment assignment = db.Assignments.Find(id);
 
-                if (assignment != null && (assignment.HasDeliverables == true || assignment.Type == AssignmentTypes.CriticalReview))
+                if (assignment != null && (assignment.HasDeliverables == true ||
+                                            assignment.Type == AssignmentTypes.CriticalReview ||
+                                            assignment.Type == AssignmentTypes.AnchoredDiscussion))
                 {
                     List<Deliverable> deliverables;
-                    if(assignment.Type == AssignmentTypes.CriticalReview)
+                    if (assignment.Type == AssignmentTypes.CriticalReview)
                     {
                         deliverables = new List<Deliverable>((assignment.PreceedingAssignment).Deliverables);
+                    }
+                    else if (assignment.Type == AssignmentTypes.AnchoredDiscussion)
+                    {
+                        deliverables = new List<Deliverable>((assignment).Deliverables);
+                        foreach (var file in files)
+                        {
+                            //TODO: complete this bit of code!
+                            deliverables.Add(new Deliverable
+                            {
+                                Assignment = assignment,
+                                AssignmentID = assignment.ID,
+                                DeliverableType = DeliverableType.PDF,
+                                Name = Path.GetFileNameWithoutExtension(file.FileName),
+
+                            });
+                        }
                     }
                     else
                     {
@@ -89,10 +107,10 @@ namespace OSBLE.Controllers
                     }
 
 
-                    if (assignment.CourseID == ActiveCourseUser.AbstractCourseID && ActiveCourseUser.AbstractRole.CanSubmit == true)
+                    if (assignment.CourseID == ActiveCourseUser.AbstractCourseID && (ActiveCourseUser.AbstractRole.CanSubmit == true || ActiveCourseUser.AbstractRole.CanUploadFiles == true))
                     {
                         AssignmentTeam assignmentTeam = GetAssignmentTeam(assignment, ActiveCourseUser);
-                        
+
                         int i = 0;
 
                         //the files variable is null when submitting an in-browser text submission
@@ -118,38 +136,78 @@ namespace OSBLE.Controllers
 
                                     if (allowFileExtensions.Contains(extension))
                                     {
-                                        if (assignment.Type == AssignmentTypes.CriticalReview)
+                                        if (assignment.Type == AssignmentTypes.CriticalReview || assignment.Type == AssignmentTypes.AnchoredDiscussion)
                                         {
-                                            AssignmentTeam authorTeam = (from at in db.AssignmentTeams
-                                                                         where at.TeamID == authorTeamID &&
-                                                                         at.AssignmentID == assignment.PrecededingAssignmentID
+                                            AssignmentTeam authorTeam = new AssignmentTeam();
+                                            ReviewTeam reviewTeam = new ReviewTeam();
+
+                                            if (assignment.Type == AssignmentTypes.AnchoredDiscussion)
+                                            {
+                                                authorTeam = new AssignmentTeam
+                                                {
+                                                    Assignment = assignment,
+                                                    AssignmentID = assignment.ID,
+                                                    //Team = ,
+                                                    TeamID = ActiveCourseUser.ID,
+                                                };
+
+                                                reviewTeam = new ReviewTeam
+                                                {
+                                                    Assignment = assignment,
+                                                    AssignmentID = assignment.ID,
+                                                    //AuthorTeam = ,
+                                                    AuthorTeamID = ActiveCourseUser.ID,
+                                                    //ReviewingTeam = ,
+                                                    ReviewTeamID = ActiveCourseUser.ID,
+
+                                                };
+                                            }
+                                            else
+                                            {
+
+                                                authorTeam = (from at in db.AssignmentTeams
+                                                                             where at.TeamID == authorTeamID &&
+                                                                             at.AssignmentID == assignment.PrecededingAssignmentID
                                                                              select at).FirstOrDefault();
 
-                                            ReviewTeam reviewTeam = (from tm in db.TeamMembers
-                                                                     join t in db.Teams on tm.TeamID equals t.ID
-                                                                     join rt in db.ReviewTeams on t.ID equals rt.ReviewTeamID
-                                                                     where tm.CourseUserID == ActiveCourseUser.ID
-                                                                     && rt.AssignmentID == assignment.ID
-                                                                     select rt).FirstOrDefault();
+                                                reviewTeam = (from tm in db.TeamMembers
+                                                                         join t in db.Teams on tm.TeamID equals t.ID
+                                                                         join rt in db.ReviewTeams on t.ID equals rt.ReviewTeamID
+                                                                         where tm.CourseUserID == ActiveCourseUser.ID
+                                                                         && rt.AssignmentID == assignment.ID
+                                                                         select rt).FirstOrDefault();
+                                            }
 
                                             //MG&MK: file system for critical review assignments is laid out a bit differently, so 
                                             //critical review assignments must use different file system functions
 
                                             //remove all prior files
-                                            OSBLE.Models.FileSystem.AssignmentFilePath fs = 
+                                            OSBLE.Models.FileSystem.AssignmentFilePath fs =
                                                 Models.FileSystem.Directories.GetAssignment(
-                                                    ActiveCourseUser.AbstractCourseID, assignment.ID); 
+                                                    ActiveCourseUser.AbstractCourseID, assignment.ID);
                                             fs.Review(authorTeam.TeamID, reviewTeam.ReviewTeamID)
                                                 .File(deliverableName)
                                                 .Delete();
 
+                                            if(assignment.Type != AssignmentTypes.AnchoredDiscussion) // handle non
+                                            { 
                                             //We need to remove the zipfile corresponding to the authorTeamId being sent in as well as the regularly cached zip. 
                                             AssignmentTeam precedingAuthorAssignmentTeam = (from at in assignment.PreceedingAssignment.AssignmentTeams
                                                                                             where at.TeamID == authorTeamID
                                                                                             select at).FirstOrDefault();
-                                            FileSystem.RemoveZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, precedingAuthorAssignmentTeam );
+                                            FileSystem.RemoveZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, precedingAuthorAssignmentTeam);
                                             FileSystem.RemoveZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, assignmentTeam);
 
+                                            }
+                                            else //anchored discussion type
+                                            {
+                                                //We need to remove the zipfile corresponding to the authorTeamId being sent in as well as the regularly cached zip. 
+                                                AssignmentTeam precedingAuthorAssignmentTeam = (from at in assignment.AssignmentTeams
+                                                                                                where at.TeamID == authorTeamID
+                                                                                                select at).FirstOrDefault();
+                                                FileSystem.RemoveZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, precedingAuthorAssignmentTeam);
+                                                FileSystem.RemoveZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, assignmentTeam);
+                                            }
                                             //add in the new file
                                             fs.Review(authorTeam.TeamID, reviewTeam.ReviewTeamID)
                                                 .AddFile(deliverableName, file.InputStream);
@@ -209,7 +267,7 @@ namespace OSBLE.Controllers
                                                 }
                                             }
                                         }
-                                        
+
                                         DateTime? dueDate = assignment.DueDate;
                                         if (dueDate != null)
                                         {
@@ -233,10 +291,18 @@ namespace OSBLE.Controllers
                         string delName;
                         do
                         {
-                            delName = Request.Params["desiredName[" + j + "]"];
+                            if (Request != null)
+                                delName = Request.Params["desiredName[" + j + "]"];
+                            else //TODO: change this to releveant string
+                                delName = "desiredName";
+
                             if (delName != null)
                             {
-                                string inbrowser = Request.Params["inBrowserText[" + j + "]"];
+                                string inbrowser;
+                                if (Request != null)
+                                    inbrowser = Request.Params["inBrowserText[" + j + "]"];
+                                else //TODO: change this to releveant string
+                                    inbrowser = (ViewBag.Uploadpath != null) ? ViewBag.UploadPath : "/";
                                 if (inbrowser.Length > 0)
                                 {
                                     var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, ActiveCourseUser.AbstractCourse as Course, (int)id, assignmentTeam), CurrentUser.LastName + "_" + CurrentUser.FirstName + "_" + delName + ".txt");

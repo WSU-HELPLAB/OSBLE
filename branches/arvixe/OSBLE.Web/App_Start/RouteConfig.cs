@@ -21,7 +21,14 @@ namespace OSBLE
             routes.IgnoreRoute("Scripts/{*pathInfo}");
             routes.IgnoreRoute("ClientBin/{*pathInfo}");
             routes.IgnoreRoute("Services/{*pathInfo}");
-            routes.IgnoreRoute("clientaccesspolicy.xml");
+            routes.IgnoreRoute("clientaccesspolicy.xml");            
+
+            //custom path to iCalendar subscription methods
+            routes.MapRoute(
+                "iCalendar Subscribe",
+                "iCal/{courseId}",
+                new { Controller = "iCalendar", action = "Test" }, //TODO: change to proper method
+                new { courseId = @"\d+" });
 
             routes.MapRoute(
                 "User identities",
