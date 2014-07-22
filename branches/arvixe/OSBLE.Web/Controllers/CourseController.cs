@@ -18,6 +18,7 @@ using System.Collections.Specialized;
 using System.Data;
 using OSBLE.Utility;
 
+
 namespace OSBLE.Controllers
 {
     [OsbleAuthorize]
@@ -1277,6 +1278,46 @@ namespace OSBLE.Controllers
         {
             ViewBag.PreviousAssignments = course.Assignments;
             return View();
+        }
+
+        public FileStreamResult DownloadDashboardPosts()
+        {
+            //get all the dashboard posts for this course 
+            List<int> viewedCourses = new List<int>();
+            viewedCourses.Add(ActiveCourseUser.AbstractCourseID);
+            List<DashboardPost> dashboardPosts = db.DashboardPosts.Where(d => viewedCourses.Contains(d.CourseUser.AbstractCourseID))
+                                                                        .OrderByDescending(d => d.Posted).ToList();
+            
+
+            FileInfo info = new FileInfo("ActivityFeed.csv");
+            StreamWriter writer = info.CreateText();
+            writer.WriteLine("PostNumber,Author,AuthorRole,Date,Content");
+            int postCount = 1;
+            
+
+            foreach (var post in dashboardPosts)
+            {
+                int replyCount = 1;
+                writer.WriteLine(
+                    postCount.ToString() + "," 
+                    + (post.CourseUser.UserProfile.FirstName).Substring(0, 1) + (post.CourseUser.UserProfile.LastName).Substring(0, 1) + "," 
+                    + post.CourseUser.AbstractRole.Name + "," 
+                    + (post.Posted.ToLocalTime()).ToString("MM/dd/yy H:mm:ss") + "," 
+                    + post.Content);
+                foreach (var reply in post.Replies)
+                {
+                    writer.WriteLine(
+                        postCount.ToString() + "." + replyCount.ToString() + ","
+                        + (reply.CourseUser.UserProfile.FirstName).Substring(0, 1) + (reply.CourseUser.UserProfile.LastName).Substring(0, 1) + "," 
+                        + reply.CourseUser.AbstractRole.Name + ","
+                        + (reply.Posted.ToLocalTime()).ToString("MM/dd/yy H:mm:ss") + "," 
+                        + reply.Content);
+                    replyCount++;
+                }
+                postCount++;
+            }
+            writer.Close();
+            return File(info.OpenRead(), "text/csv", ActiveCourseUser.AbstractCourse.Name + "-ActivityFeed.csv");
         }
     }
 }
