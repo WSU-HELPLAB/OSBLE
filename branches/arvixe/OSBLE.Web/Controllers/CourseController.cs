@@ -393,7 +393,7 @@ namespace OSBLE.Controllers
                 db.SaveChanges();
 
                 Cache["ActiveCourse"] = course.ID;
-
+                
                 //will create a calendar for this course
                 using (iCalendarController icalControl = new iCalendarController())
                 {
