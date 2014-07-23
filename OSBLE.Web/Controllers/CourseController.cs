@@ -1318,7 +1318,7 @@ namespace OSBLE.Controllers
                 int replyCount = 1;
                 writer.WriteLine(
                     postCount.ToString() + "," 
-                    + (post.CourseUser.UserProfile.FirstName).Substring(0, 1) + (post.CourseUser.UserProfile.LastName).Substring(0, 1) + "," 
+                    + post.CourseUser.UserProfile.Identification + "," 
                     + post.CourseUser.AbstractRole.Name + "," 
                     + (post.Posted.ToLocalTime()).ToString("MM/dd/yy H:mm:ss") + "," 
                     + "\"" + postContent + "\"");
@@ -1327,7 +1327,7 @@ namespace OSBLE.Controllers
                     string replyContent = (reply.Content.Replace("\"", "\"\"")).Replace("\r\n", " ");
                     writer.WriteLine(
                         postCount.ToString() + "." + replyCount.ToString() + ","
-                        + (reply.CourseUser.UserProfile.FirstName).Substring(0, 1) + (reply.CourseUser.UserProfile.LastName).Substring(0, 1) + "," 
+                        + reply.CourseUser.UserProfile.Identification + "," 
                         + reply.CourseUser.AbstractRole.Name + ","
                         + (reply.Posted.ToLocalTime()).ToString("MM/dd/yy H:mm:ss") + "," 
                         + "\"" + replyContent + "\"");
