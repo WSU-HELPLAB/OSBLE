@@ -1280,20 +1280,30 @@ namespace OSBLE.Controllers
             return View();
         }
 
-        public FileStreamResult DownloadDashboardPosts()
+        public ActionResult DownloadDashboardPosts(int? id)
         {
             //get all the dashboard posts for this course 
             List<int> viewedCourses = new List<int>();
-            viewedCourses.Add(ActiveCourseUser.AbstractCourseID);
-            List<DashboardPost> dashboardPosts = db.DashboardPosts.Where(d => viewedCourses.Contains(d.CourseUser.AbstractCourseID))
-                                                                        .OrderByDescending(d => d.Posted).ToList();
-            
+            List<DashboardPost> dashboardPosts = new List<DashboardPost>();
+            DashboardPost dp = new DashboardPost();
 
             FileInfo info = new FileInfo("ActivityFeed.csv");
             StreamWriter writer = info.CreateText();
             writer.WriteLine("PostNumber,Author,AuthorRole,Date,Content");
             int postCount = 1;
             
+
+            if(id == null)
+            {
+                viewedCourses.Add(ActiveCourseUser.AbstractCourseID);
+                dashboardPosts = db.DashboardPosts.Where(d => viewedCourses.Contains(d.CourseUser.AbstractCourseID))
+                                                                        .OrderByDescending(d => d.Posted).ToList();
+            }
+            else
+            {
+                dp = db.DashboardPosts.Find(id);
+                dashboardPosts.Add(dp);
+            }
 
             foreach (var post in dashboardPosts)
             {
