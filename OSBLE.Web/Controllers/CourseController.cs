@@ -191,7 +191,7 @@ namespace OSBLE.Controllers
                 //failed need to figure out what our error will be
                 convertedToUtc = new DateTime();
             }
-
+            
             return convertedToUtc;
         }
 
@@ -377,7 +377,7 @@ namespace OSBLE.Controllers
                 catch (Exception)
                 {
                 }
-
+              
                 course.TimeZoneOffset = Convert.ToInt32(Request.Params["course_timezone"]);
                 createMeetingTimes(course, course.TimeZoneOffset);
                 createBreaks(course);
@@ -393,7 +393,7 @@ namespace OSBLE.Controllers
                 db.SaveChanges();
 
                 Cache["ActiveCourse"] = course.ID;
-
+                
                 //will create a calendar for this course
                 using (iCalendarController icalControl = new iCalendarController())
                 {
@@ -404,14 +404,14 @@ namespace OSBLE.Controllers
             }
             return View(course);
         }
-
+        
         //Course Search
         [HttpGet]
         public ActionResult CourseSearch()
         {
             //get all instructors
             List<CourseUser> Instructors = db.CourseUsers.Where(cu => cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor).ToList();
-
+            
             //get all the courses
             var CourseList = from d in db.Courses
                              where d.EndDate > DateTime.Now
@@ -420,7 +420,7 @@ namespace OSBLE.Controllers
             //add them to a list as a selectlistitem
             List<SelectListItem> course = new List<SelectListItem>();
             foreach (var c in CourseList)
-            {
+            {   
                 if (c.EndDate > DateTime.Now && !c.IsDeleted)
                     course.Add(new SelectListItem { Text = c.Prefix, Value = c.Prefix });
             }
@@ -431,7 +431,7 @@ namespace OSBLE.Controllers
             ViewBag.CourseName = new SelectList(finalList, "Value", "Text");
             ViewBag.SearchResults = TempData["SearchResults"];
             ViewBag.SearchResultsInstructors = Instructors;
-
+            
             return View();
         }
 
@@ -441,7 +441,7 @@ namespace OSBLE.Controllers
                                where s.Prefix == id
                                && s.IsDeleted == false
                                && s.EndDate > DateTime.Now
-                               select s;
+                               select s;            
 
             return Json(new SelectList(CourseNumber.ToArray(), "Number", "Number"), JsonRequestBehavior.AllowGet);
         }
@@ -452,7 +452,7 @@ namespace OSBLE.Controllers
             if (number == "Search All")
             {
                 var Results = from d in db.Courses
-                              where d.Prefix == course
+                              where d.Prefix == course 
                               select d;
 
                 Results.GroupBy(x => x.Prefix)
@@ -496,29 +496,29 @@ namespace OSBLE.Controllers
             {
                 return View("CourseCurrentlyEnrolled");
             }
-
+            
             //if the user is not enrolled in any courses but may be withdrawn in a course
             else if (ActiveCourseUser == null)
             {
                 //this is for checking if they are withdrawn, poo will be null if they are not in course, else it will return a CourseUser
                 var previousUser = (from d in db.CourseUsers
-                                    where d.UserProfileID == this.CurrentUser.ID
-                                    select d).FirstOrDefault();
+                           where d.UserProfileID == this.CurrentUser.ID
+                           select d).FirstOrDefault();
 
                 if (previousUser != null)
                 {
                     CourseUser addedUser = new CourseUser();
                     UserProfile prf = previousUser.UserProfile;
-
+                    
                     addedUser = previousUser;
                     addedUser.UserProfile = prf;
-
+                    
                     addedUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending;
                     addedUser.AbstractCourseID = request.ID;
                     addedUser.Hidden = true;
 
                     db.CourseUsers.Add(addedUser);
-                    // db.Entry(previousUser).State = EntityState.Modified;
+                   // db.Entry(previousUser).State = EntityState.Modified;
                     db.SaveChanges();
                     ActiveCourseUser = previousUser;
 
@@ -636,7 +636,7 @@ namespace OSBLE.Controllers
 
                 using (NotificationController nc = new NotificationController())
                 {
-                    //nc.SendCourseApprovalNotification(request, ActiveCourseUser);
+                   //nc.SendCourseApprovalNotification(request, ActiveCourseUser);
                     nc.SendCommunityApprovalNotification(request, newUser);
                 }
 
@@ -845,7 +845,7 @@ namespace OSBLE.Controllers
                 Clone.CalendarWindowOfTime = pastCourse.CalendarWindowOfTime;
                 Clone.HoursLatePerPercentPenalty = pastCourse.HoursLatePerPercentPenalty;
                 Clone.HoursLateUntilZero = pastCourse.HoursLateUntilZero;
-                Clone.MinutesLateWithNoPenalty = pastCourse.MinutesLateWithNoPenalty;
+                Clone.MinutesLateWithNoPenalty = pastCourse.MinutesLateWithNoPenalty;             
                 Clone.Name = pastCourse.Name;
                 Clone.Number = pastCourse.Number;
                 Clone.Prefix = pastCourse.Prefix;
@@ -870,11 +870,11 @@ namespace OSBLE.Controllers
         public ActionResult CloneSetup(Course clone)
         {
             Course oldCourse = (Course)(from c in db.AbstractCourses
-                                        where c.ID == clone.ID
-                                        select c).FirstOrDefault();
+                                where c.ID == clone.ID
+                                select c).FirstOrDefault();
             Course getNewId = new Course();
             clone.ID = getNewId.ID;
-
+            
 
             if (ModelState.IsValid)
             {
@@ -963,7 +963,7 @@ namespace OSBLE.Controllers
                 na.AssignmentTeams = new List<AssignmentTeam>();
                 if (p.HasDeliverables)
                     na.Deliverables = new List<Deliverable>();
-                if (p.HasDiscussionTeams)
+                if (p.HasDiscussionTeams) 
                     na.DiscussionTeams = new List<DiscussionTeam>();
 
                 //recalcualte new offsets for due dates on assignment
@@ -989,7 +989,7 @@ namespace OSBLE.Controllers
                 na.ReleaseDate = convertToUtc(courseDestination.TimeZoneOffset, rd);
                 na.ReleaseTime = convertToUtc(courseDestination.TimeZoneOffset, rt);
 
-
+                
 
                 db.Assignments.Add(na);
                 db.SaveChanges();
@@ -1053,7 +1053,7 @@ namespace OSBLE.Controllers
 
                 //    db.Rubrics.Add(nr);
                 //    db.SaveChanges();
-
+                    
                 //    na.RubricID = nr.ID;
                 //    db.Entry(na).State = EntityState.Modified;
                 //    db.SaveChanges();
@@ -1107,7 +1107,7 @@ namespace OSBLE.Controllers
                 //        db.CellDescriptions.Add(ncd);
                 //        db.SaveChanges();
                 //    }
-
+                    
 
                 //}
 
@@ -1128,11 +1128,11 @@ namespace OSBLE.Controllers
                     db.Entry(na).State = EntityState.Modified;
                     db.SaveChanges();
                 }
-
+                
             }
 
             return true;
-
+            
         }
 
         public bool CopyRubric(Assignment Source, Assignment Destination)
@@ -1142,68 +1142,68 @@ namespace OSBLE.Controllers
             if (Source.RubricID != null)
             {
                 sid = (int)Source.RubricID;
-                //create a new reburic thats an exact copy with the same critera
-                Rubric nr = new Rubric();
+                    //create a new reburic thats an exact copy with the same critera
+                    Rubric nr = new Rubric();
                 nr.HasGlobalComments = Source.Rubric.HasGlobalComments;
                 nr.HasCriteriaComments = Source.Rubric.HasCriteriaComments;
                 nr.Description = Source.Rubric.Description;
 
-                db.Rubrics.Add(nr);
-                db.SaveChanges();
-
+                    db.Rubrics.Add(nr);
+                    db.SaveChanges();
+                    
                 Destination.RubricID = nr.ID;
                 db.Entry(Destination).State = EntityState.Modified;
-                db.SaveChanges();
+                    db.SaveChanges();
 
-                //now get all the stuff for it
+                    //now get all the stuff for it
                 Dictionary<int, int> clevelHolder = new Dictionary<int, int>();
                 Dictionary<int, int> ccriterionHolder = new Dictionary<int, int>();
 
-                List<Level> pls = (from rl in db.Levels
+                    List<Level> pls = (from rl in db.Levels
                                    where rl.RubricID == sid
-                                   select rl).ToList();
-                foreach (Level pl in pls)
-                {
-                    Level nl = new Level();
-                    nl.LevelTitle = pl.LevelTitle;
-                    nl.PointSpread = pl.PointSpread;
-                    nl.RubricID = nr.ID;
-                    db.Levels.Add(nl);
-                    db.SaveChanges();
+                                       select rl).ToList();
+                    foreach (Level pl in pls)
+                    {
+                        Level nl = new Level();
+                        nl.LevelTitle = pl.LevelTitle;
+                        nl.PointSpread = pl.PointSpread;
+                        nl.RubricID = nr.ID;
+                        db.Levels.Add(nl);
+                        db.SaveChanges();
                     clevelHolder.Add(pl.ID, nl.ID);
-                }
+                    }
 
-                List<Criterion> prcs = (from rc in db.Criteria
+                    List<Criterion> prcs = (from rc in db.Criteria
                                         where rc.RubricID == sid
-                                        select rc).ToList();
+                                            select rc).ToList();
 
-                foreach (Criterion prc in prcs) //create a new criteron
-                {
-                    Criterion nrc = new Criterion();
-                    nrc.CriterionTitle = prc.CriterionTitle;
-                    nrc.Weight = prc.Weight;
-                    nrc.RubricID = nr.ID;
-                    db.Criteria.Add(nrc);
-                    db.SaveChanges();
+                    foreach (Criterion prc in prcs) //create a new criteron
+                    {
+                        Criterion nrc = new Criterion();
+                        nrc.CriterionTitle = prc.CriterionTitle;
+                        nrc.Weight = prc.Weight;
+                        nrc.RubricID = nr.ID;
+                        db.Criteria.Add(nrc);
+                        db.SaveChanges();
                     ccriterionHolder.Add(prc.ID, nrc.ID);
-                }
+                    }
 
-                //now descriptions
-                //for some reason, cell descriptions do not come with this assignment so lets do a search fo rit
-                List<CellDescription> pcds = (from cd in db.CellDescriptions
+                    //now descriptions
+                    //for some reason, cell descriptions do not come with this assignment so lets do a search fo rit
+                    List<CellDescription> pcds = (from cd in db.CellDescriptions
                                               where cd.RubricID == sid
-                                              select cd).ToList();
+                                                  select cd).ToList();
 
-                foreach (CellDescription pcd in pcds)
-                {
-                    CellDescription ncd = new CellDescription();
+                    foreach (CellDescription pcd in pcds)
+                    {
+                        CellDescription ncd = new CellDescription();
                     ncd.CriterionID = ccriterionHolder[pcd.CriterionID];
                     ncd.LevelID = clevelHolder[pcd.LevelID];
-                    ncd.RubricID = nr.ID;
-                    ncd.Description = pcd.Description;
-                    db.CellDescriptions.Add(ncd);
-                    db.SaveChanges();
-                }
+                        ncd.RubricID = nr.ID;
+                        ncd.Description = pcd.Description;
+                        db.CellDescriptions.Add(ncd);
+                        db.SaveChanges();
+                    }
             }
             if (Source.StudentRubricID != null)
             {
@@ -1216,7 +1216,7 @@ namespace OSBLE.Controllers
 
                 db.Rubrics.Add(nr);
                 db.SaveChanges();
-
+                    
                 Destination.StudentRubricID = nr.ID;
                 db.Entry(Destination).State = EntityState.Modified;
                 db.SaveChanges();
@@ -1238,7 +1238,7 @@ namespace OSBLE.Controllers
                     db.SaveChanges();
                     slevelHolder.Add(pl.ID, nl.ID);
                 }
-
+                
                 List<Criterion> prcs = (from rc in db.Criteria
                                         where rc.RubricID == sid
                                         select rc).ToList();
@@ -1253,7 +1253,7 @@ namespace OSBLE.Controllers
                     db.SaveChanges();
                     scriterionHolder.Add(prc.ID, nrc.ID);
                 }
-
+                
                 //now descriptions
                 //for some reason, cell descriptions do not come with this assignment so lets do a search fo rit
                 List<CellDescription> pcds = (from cd in db.CellDescriptions
@@ -1314,21 +1314,23 @@ namespace OSBLE.Controllers
 
             foreach (var post in dashboardPosts)
             {
+                string postContent = (post.Content.Replace("\"", "\"\"")).Replace("\r\n", " ");
                 int replyCount = 1;
                 writer.WriteLine(
-                    postCount.ToString() + ","
-                    + (post.CourseUser.UserProfile.FirstName).Substring(0, 1) + (post.CourseUser.UserProfile.LastName).Substring(0, 1) + ","
-                    + post.CourseUser.AbstractRole.Name + ","
-                    + (post.Posted.ToLocalTime()).ToString("MM/dd/yy H:mm:ss") + ","
-                    + post.Content);
+                    postCount.ToString() + "," 
+                    + (post.CourseUser.UserProfile.FirstName).Substring(0, 1) + (post.CourseUser.UserProfile.LastName).Substring(0, 1) + "," 
+                    + post.CourseUser.AbstractRole.Name + "," 
+                    + (post.Posted.ToLocalTime()).ToString("MM/dd/yy H:mm:ss") + "," 
+                    + "\"" + postContent + "\"");
                 foreach (var reply in post.Replies)
                 {
+                    string replyContent = (reply.Content.Replace("\"", "\"\"")).Replace("\r\n", " ");
                     writer.WriteLine(
                         postCount.ToString() + "." + replyCount.ToString() + ","
-                        + (reply.CourseUser.UserProfile.FirstName).Substring(0, 1) + (reply.CourseUser.UserProfile.LastName).Substring(0, 1) + ","
+                        + (reply.CourseUser.UserProfile.FirstName).Substring(0, 1) + (reply.CourseUser.UserProfile.LastName).Substring(0, 1) + "," 
                         + reply.CourseUser.AbstractRole.Name + ","
-                        + (reply.Posted.ToLocalTime()).ToString("MM/dd/yy H:mm:ss") + ","
-                        + reply.Content);
+                        + (reply.Posted.ToLocalTime()).ToString("MM/dd/yy H:mm:ss") + "," 
+                        + "\"" + replyContent + "\"");
                     replyCount++;
                 }
                 postCount++;
