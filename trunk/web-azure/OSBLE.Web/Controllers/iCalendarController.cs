@@ -195,6 +195,7 @@ namespace OSBLE.Controllers
 
             if (System.IO.File.Exists(path))
             {
+                path = "http://osble.org/Content/iCal/" + course.ID.ToString() + "/" + prefix + number + "-" + course.Semester + "-" + course.Year + ".ics";
                 return Redirect("http://www.google.com/calendar/render?cid=" + path + "?nocache");
             }
 

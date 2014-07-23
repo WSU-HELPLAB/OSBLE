@@ -24,11 +24,18 @@ namespace OSBLE
             routes.IgnoreRoute("clientaccesspolicy.xml");            
 
             //custom path to iCalendar subscription methods
+            //routes.MapRoute(
+            //    "iCalendar Subscribe",
+            //    "iCal/{id}/{calendarLink}",
+            //    new { Controller = "iCalendar", action = "SubscribeToCalendar" },
+            //    new { id = @"\d+" },
+            //    new {calendarLink = @"[a-zA-z]{1,}\d{1,}[-]{1}[a-zA-z]{1,}[-]{1}\d{4}"});
+
             routes.MapRoute(
-                "iCalendar Subscribe",
-                "iCal/{id}",
-                new { Controller = "iCalendar", action = "SubscribeToCalendar" },
-                new { id = @"\d+" });
+                name: "iCalendar Subscribe",
+                url: "iCal/{id}/{calendarLink}",
+                defaults:
+                new { Controller = "iCalendar", action = "SubscribeToCalendar", id = @"\d+", calendarLink = @"[a-zA-z]{1,}\d{1,}[-]{1}[a-zA-z]{1,}[-]{1}\d{4}" });
 
             routes.MapRoute(
                 "User identities",
