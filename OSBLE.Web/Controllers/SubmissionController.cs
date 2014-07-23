@@ -147,20 +147,21 @@ namespace OSBLE.Controllers
                                                 {
                                                     Assignment = assignment,
                                                     AssignmentID = assignment.ID,
-                                                    //Team = ,
-                                                    TeamID = ActiveCourseUser.ID,
+                                                    Team = null,
+                                                    TeamID = ActiveCourseUser.AbstractCourse.ID,
                                                 };
 
                                                 reviewTeam = new ReviewTeam
                                                 {
                                                     Assignment = assignment,
                                                     AssignmentID = assignment.ID,
-                                                    //AuthorTeam = ,
-                                                    AuthorTeamID = ActiveCourseUser.ID,
-                                                    //ReviewingTeam = ,
-                                                    ReviewTeamID = ActiveCourseUser.ID,
+                                                    AuthorTeam = null,
+                                                    AuthorTeamID = ActiveCourseUser.AbstractCourse.ID,
+                                                    ReviewingTeam = null,
+                                                    ReviewTeamID = ActiveCourseUser.AbstractCourse.ID,
 
                                                 };
+                                                db.SaveChanges();
                                             }
                                             else
                                             {
