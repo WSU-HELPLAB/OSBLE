@@ -28,7 +28,7 @@ namespace OSBLE.Controllers
 
                 if (assignment != null)
                 {
-                    if (assignment.CourseID == ActiveCourseUser.AbstractCourseID && ActiveCourseUser.AbstractRole.CanSubmit == true)
+                    if (assignment.CourseID == ActiveCourseUser.AbstractCourseID && (ActiveCourseUser.AbstractRole.CanSubmit == true || ActiveCourseUser.AbstractRole.CanUploadFiles))
                     {
 
                         if (assignment.Type == AssignmentTypes.CriticalReview)
@@ -294,19 +294,20 @@ namespace OSBLE.Controllers
                             if (Request != null)
                                 delName = Request.Params["desiredName[" + j + "]"];
                             else //TODO: change this to releveant string
-                                delName = "desiredName";
+                                delName = null;
 
                             if (delName != null)
                             {
                                 string inbrowser;
                                 if (Request != null)
-                                    inbrowser = Request.Params["inBrowserText[" + j + "]"];
-                                else //TODO: change this to releveant string
-                                    inbrowser = (ViewBag.Uploadpath != null) ? ViewBag.UploadPath : "/";
-                                if (inbrowser.Length > 0)
                                 {
-                                    var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, ActiveCourseUser.AbstractCourse as Course, (int)id, assignmentTeam), CurrentUser.LastName + "_" + CurrentUser.FirstName + "_" + delName + ".txt");
-                                    System.IO.File.WriteAllText(path, inbrowser);
+                                    inbrowser = Request.Params["inBrowserText[" + j + "]"];
+
+                                    if (inbrowser.Length > 0)
+                                    {
+                                        var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, ActiveCourseUser.AbstractCourse as Course, (int)id, assignmentTeam), CurrentUser.LastName + "_" + CurrentUser.FirstName + "_" + delName + ".txt");
+                                        System.IO.File.WriteAllText(path, inbrowser);
+                                    }
                                 }
                             }
                             j++;
@@ -317,7 +318,10 @@ namespace OSBLE.Controllers
                         {
                             Cache["SubmissionForAuthorTeamID"] = authorTeamID;
                         }
-                        return Redirect(Request.UrlReferrer.ToString());
+                        if (assignment.Type == AssignmentTypes.AnchoredDiscussion)
+                            return RedirectToAction("Index", "AnchoredDiscussionController");
+                        else
+                            return Redirect(Request.UrlReferrer.ToString());
                     }
                 }
             }

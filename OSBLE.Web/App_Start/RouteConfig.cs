@@ -26,9 +26,9 @@ namespace OSBLE
             //custom path to iCalendar subscription methods
             routes.MapRoute(
                 "iCalendar Subscribe",
-                "iCal/{courseId}",
-                new { Controller = "iCalendar", action = "Test" }, //TODO: change to proper method
-                new { courseId = @"\d+" });
+                "iCal/{id}",
+                new { Controller = "iCalendar", action = "SubscribeToCalendar" },
+                new { id = @"\d+" });
 
             routes.MapRoute(
                 "User identities",

@@ -30,13 +30,13 @@ namespace OSBLE.Controllers
     {
         //
         // GET: /iCalendar/
-        
+
         public ViewResult Index()
         {
             ViewBag.CourseID = ActiveCourseUser.AbstractCourseID;
             return View();
         }
-
+   
         /// <summary>
         /// Function is called to create the course ics file
         /// Function is called everytime the course calendar needs to be updated
@@ -68,7 +68,7 @@ namespace OSBLE.Controllers
             courseCalendar.Method = "PUBLISH";
             courseCalendar.Name = "VCALENDAR";
             courseCalendar.Version = "2.0";
-            courseCalendar.ProductID = "-//Washington State University//OSBLE.org//EN";
+            courseCalendar.ProductID = "-//Washington State University//OSBLE.org//EN";    
             courseCalendar.Scale = "GREGORIAN";
 
             //add all the events to the calendar 
@@ -86,7 +86,7 @@ namespace OSBLE.Controllers
                 {
                     evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(e.EndDate.Value, tz));
                 }
-
+                
                 evt.Summary = e.Title;
                 if (e.Description != null)
                     evt.Description = e.Description;
@@ -112,7 +112,7 @@ namespace OSBLE.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         public ActionResult DownloadCourseCalendar(int id)
-        {
+            {
             Course course = (from d in db.Courses
                              where d.ID == id
                              select d).FirstOrDefault();
@@ -143,22 +143,22 @@ namespace OSBLE.Controllers
             foreach (OSBLE.Models.HomePage.Event e in courseEvents)
             {
                 DDay.iCal.Event evt = courseCalendar.Create<DDay.iCal.Event>();
-
+            
                 evt.Start = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(e.StartDate, tz));
                 if (e.EndDate == null)
                 {
                     evt.End = evt.Start.AddDays(1);
                     evt.IsAllDay = true;
-                }
+        }
                 else
-                {
+        {
                     evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(e.EndDate.Value, tz));
-                }
+            }
 
                 evt.Summary = e.Title;
                 if (e.Description != null)
                     evt.Description = e.Description;
-            }
+        }
 
             // Create a serialization context and serializer factory.
             // These will be used to build the serializer for our object.
@@ -187,15 +187,15 @@ namespace OSBLE.Controllers
             Course course = (from d in db.Courses
                              where d.ID == id
                              select d).FirstOrDefault();
-
+   
             string prefix = course.Prefix.Replace(@"/", "-");
             string number = course.Number.Replace(@"/", "-");
 
-            string path = AppDomain.CurrentDomain.BaseDirectory + "Content/iCal/" + course.ID.ToString() + "/" + prefix + number + "-" + course.Semester + "-" + course.Year + ".ics?nocache";
+            string path = AppDomain.CurrentDomain.BaseDirectory + "Content/iCal/" + course.ID.ToString() + "/" + prefix + number + "-" + course.Semester + "-" + course.Year + ".ics";
 
             if (System.IO.File.Exists(path))
             {
-                return Redirect("http://www.google.com/calendar/render?cid=" + path);
+                return Redirect("http://www.google.com/calendar/render?cid=" + path + "?nocache");
             }
 
             return HttpNotFound();
@@ -226,7 +226,7 @@ namespace OSBLE.Controllers
             string number = course.Number.Replace(@"/", "-");
 
             System.IO.File.WriteAllBytes(path + prefix + number + "-" + course.Semester + "-" + course.Year + ".ics", courseCalendar);
-
-        }
+      
     }
+}
 }
