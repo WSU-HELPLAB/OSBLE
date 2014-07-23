@@ -37,6 +37,11 @@ namespace OSBLE.Controllers
             return View();
         }
    
+        /// <summary>
+        /// Function is called to create the course ics file
+        /// Function is called everytime the course calendar needs to be updated
+        /// </summary>
+        /// <param name="id"></param>
         public void CreateCourseCalendar(int id)
         {
             //Get the Course
@@ -99,6 +104,13 @@ namespace OSBLE.Controllers
             SaveCourseCalendar(bytes, course.ID);
 
         }
+
+        /// <summary>
+        /// Function is called when the user request a course calendar ics file
+        /// the file is generate upon request, therefore it will alwyas be up to date 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public ActionResult DownloadCourseCalendar(int id)
             {
             Course course = (from d in db.Courses
@@ -162,6 +174,13 @@ namespace OSBLE.Controllers
             return File(bytes, contentType, course.Prefix + course.Number + ".ics");
 
         }
+
+        /// <summary>
+        /// Function is called when a users request to subscribe to a course calendar
+        /// google is passed a publicly accessable link that points at the course ics file
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public ActionResult SubscribeToCalendar(int id)
         {
             //Get the Course
@@ -169,26 +188,33 @@ namespace OSBLE.Controllers
                              where d.ID == id
                              select d).FirstOrDefault();
    
-            string path = "http://osble.org/Content/iCal/" + course.ID + "/" + course.Prefix + course.Number + ".ics?nocache";
+            string prefix = course.Prefix.Replace(@"/", "-");
+            string number = course.Number.Replace(@"/", "-");
+
+            string path = AppDomain.CurrentDomain.BaseDirectory + "Content/iCal/" + course.ID.ToString() + "/" + prefix + number + "-" + course.Semester + "-" + course.Year + ".ics";
 
             if (System.IO.File.Exists(path))
             {
-                return Redirect("http://www.google.com/calendar/render?cid=" + path);
+                return Redirect("http://www.google.com/calendar/render?cid=" + path + "?nocache");
             }
 
             return HttpNotFound();
         }
+
+        /// <summary>
+        /// Function saves the course calendar to /Content/iCal/{CourseID}
+        /// Called everytime the couse calendar must update
+        /// </summary>
+        /// <param name="courseCalendar"></param>
+        /// <param name="id"></param>
         public void SaveCourseCalendar(Byte[] courseCalendar, int id)
         {
             //Get the Course
             Course course = (from d in db.Courses
                              where d.ID == id
                              select d).FirstOrDefault();
-            string path = "http://osble.org/Content/iCal/" + course.ID + "/";
 
-#if DEBUG
-            path = Server.MapPath("~/Content/iCal/" + course.ID + "/");
-#endif
+            string path = AppDomain.CurrentDomain.BaseDirectory + "Content/iCal/" + course.ID.ToString() + "/";
 
             //check if it exists
             if (!Directory.Exists(path))
@@ -196,7 +222,10 @@ namespace OSBLE.Controllers
                 Directory.CreateDirectory(path);
             }
 
-            System.IO.File.WriteAllBytes(path + course.Prefix + course.Number + ".ics", courseCalendar);
+            string prefix = course.Prefix.Replace(@"/", "-");
+            string number = course.Number.Replace(@"/", "-");
+
+            System.IO.File.WriteAllBytes(path + prefix + number + "-" + course.Semester + "-" + course.Year + ".ics", courseCalendar);
       
     }
 }

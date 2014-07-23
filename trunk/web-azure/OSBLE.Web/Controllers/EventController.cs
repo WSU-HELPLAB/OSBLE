@@ -189,12 +189,15 @@ namespace OSBLE.Controllers
 
                     return RedirectToAction("NeedsApproval");
                 }
-                //will update a calendar for this course
-                using (iCalendarController icalControl = new iCalendarController())
+                //rebuilds course calendar file upon creating of a new event ICAL
+                using (iCalendarController ical = new iCalendarController())
                 {
-                    icalControl.CreateCourseCalendar(ActiveCourseUser.AbstractCourseID);
+                    ical.CreateCourseCalendar(ActiveCourseUser.AbstractCourseID);
                 }
+
                 return RedirectToAction("Index");
+
+                
 
             }
 
@@ -247,22 +250,22 @@ namespace OSBLE.Controllers
                 assignment.AssociatedEventID = aEvent.ID;
                 db.Entry(assignment).State = System.Data.EntityState.Modified;
                 db.SaveChanges();
-                //will update a calendar for this course
-                using (iCalendarController icalControl = new iCalendarController())
-                {
-                    icalControl.CreateCourseCalendar(assignment.CourseID.Value);
-                }
             }
             else
             {
                 db.Entry(aEvent).State = System.Data.EntityState.Modified;
                 db.SaveChanges();
-                //will update a calendar for this course
-                using (iCalendarController icalControl = new iCalendarController())
+            }
+            if(assignment.CourseID.HasValue)
+            {
+                //rebuilds course calendar file upon assignment updates/creations
+                using (iCalendarController ical = new iCalendarController())
                 {
-                    icalControl.CreateCourseCalendar(assignment.CourseID.Value);
+                    ical.CreateCourseCalendar(assignment.CourseID.Value);
                 }
             }
+            
+
         }
 
         /// <summary>
@@ -292,7 +295,6 @@ namespace OSBLE.Controllers
             db.Entry(ds).State = System.Data.EntityState.Modified;
             db.Entry(dEvent).State = System.Data.EntityState.Modified;
             db.SaveChanges();
-
         }
 
         public ViewResult NeedsApproval()
@@ -333,10 +335,11 @@ namespace OSBLE.Controllers
             e.Approved = true;
             db.Entry(e).State = EntityState.Modified;
             db.SaveChanges();
-            //will update a calendar for this course
-            using (iCalendarController icalControl = new iCalendarController())
+
+            //rebuilds course calendar file upon event approval
+            using (iCalendarController ical = new iCalendarController())
             {
-                icalControl.CreateCourseCalendar(ActiveCourseUser.AbstractCourseID);
+                ical.CreateCourseCalendar(ActiveCourseUser.AbstractCourseID);
             }
 
             return RedirectToAction("Index", "Event");
@@ -474,10 +477,10 @@ namespace OSBLE.Controllers
                 db.Entry(originalEvent).State = EntityState.Modified;
                 db.SaveChanges();
 
-                //will update a calendar for this course
-                using (iCalendarController icalControl = new iCalendarController())
+                //rebuilds course calendar file upon editing an event
+                using (iCalendarController ical = new iCalendarController())
                 {
-                    icalControl.CreateCourseCalendar(ActiveCourseUser.AbstractCourseID);
+                    ical.CreateCourseCalendar(ActiveCourseUser.AbstractCourseID);
                 }
 
                 return RedirectToAction("Index");

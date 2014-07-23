@@ -27,7 +27,7 @@
     @if (courseCalendarFlag)
 {
     <a href="@Url.Action("DownloadCourseCalendar", "iCalendar", new { id = courseID })" title="Download Course Calendar">@Helpers.UnPublishButton()</a>
-    <a href="@Url.Action("SubscribeToCalendar", "iCalendar", new { id = courseID })" title="Subscribe to Course Calendar ()">@Helpers.CalendarButton()</a>
+    <a href="@Url.Action("SubscribeToCalendar", "iCalendar", new { id = courseID })" target="_blank" title="Subscribe to Course Calendar ()">@Helpers.CalendarButton()</a>
 }</h2>
 
 
