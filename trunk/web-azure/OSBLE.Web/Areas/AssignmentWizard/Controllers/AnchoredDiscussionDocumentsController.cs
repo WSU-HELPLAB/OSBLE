@@ -73,44 +73,44 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             Assignment = db.Assignments.Find(model.ID);
             
             //remove old teams
-            Assignment.AssignmentTeams.Clear();
-            Assignment.ReviewTeams.Clear();    
-            db.SaveChanges();
+            //Assignment.AssignmentTeams.Clear();
+            //Assignment.ReviewTeams.Clear();    
+            //db.SaveChanges();
 
             //TODO: handle file upload with annotate   
             //foreach file create an a team!
-            foreach (var file in files)
-            {
-                if (file.ContentLength > 0)
-                {
-                    var fileName = Path.GetFileName(file.FileName);
-                    ViewBag.UploadPath = Path.Combine(Server.MapPath("~/App_Data/uploads"), fileName);
+            //foreach (var file in files)
+            //{
+            //    if (file.ContentLength > 0)
+            //    {
+            //        var fileName = Path.GetFileName(file.FileName);
+            //        ViewBag.UploadPath = Path.Combine(Server.MapPath("~/App_Data/uploads"), fileName);
 
-                    Assignment.AssignmentTeams.Add(new AssignmentTeam
-                    {
-                        Assignment = Assignment,
-                        AssignmentID = Assignment.ID,
-                        //Team = ,
-                        TeamID = ActiveCourseUser.ID,
-                    });
+            //        Assignment.AssignmentTeams.Add(new AssignmentTeam
+            //        {
+            //            Assignment = Assignment,
+            //            AssignmentID = Assignment.ID,
+            //            //Team = ,
+            //            TeamID = ActiveCourseUser.ID,
+            //        });
 
-                    Assignment.ReviewTeams.Add(new ReviewTeam
-                    {
-                        Assignment = Assignment,
-                        AssignmentID = Assignment.ID,
-                        //AuthorTeam = ,
-                        AuthorTeamID = ActiveCourseUser.ID,
-                        //ReviewingTeam = ,
-                        ReviewTeamID = ActiveCourseUser.ID,
+            //        Assignment.ReviewTeams.Add(new ReviewTeam
+            //        {
+            //            Assignment = Assignment,
+            //            AssignmentID = Assignment.ID,
+            //            //AuthorTeam = ,
+            //            AuthorTeamID = ActiveCourseUser.ID,
+            //            //ReviewingTeam = ,
+            //            ReviewTeamID = ActiveCourseUser.ID,
                         
-                    });
-                    db.SaveChanges();
-                }
-            }
+            //        });
+            //        db.SaveChanges();
+            //    }
+            //}
 
             //submit file to the system
             SubmissionController submission = new SubmissionController();            
-            submission.Create(model.ID, files, ActiveCourseUser.ID);
+            submission.Create(model.ID, files, ActiveCourseUser.AbstractCourse.ID);
 
             
 
