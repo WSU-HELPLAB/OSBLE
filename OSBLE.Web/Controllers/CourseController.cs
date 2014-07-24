@@ -1291,7 +1291,7 @@ namespace OSBLE.Controllers
             {
                 viewedCourses.Add(ActiveCourseUser.AbstractCourseID);
                 dashboardPosts = db.DashboardPosts.Where(d => viewedCourses.Contains(d.CourseUser.AbstractCourseID))
-                                                                        .OrderByDescending(d => d.Posted).ToList();
+                                                                        .OrderBy(d => d.Posted).ToList();
             }
             else
             {
