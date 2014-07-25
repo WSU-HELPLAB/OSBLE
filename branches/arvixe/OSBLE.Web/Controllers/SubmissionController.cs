@@ -87,10 +87,15 @@ namespace OSBLE.Controllers
                     }
                     else if (assignment.Type == AssignmentTypes.AnchoredDiscussion)
                     {
+                        //TODO: need to keep deliverables if no changes have been made.
+                        //need to remove old deliverables
+                        assignment.Deliverables.Clear();
+                        db.SaveChanges();
                         deliverables = new List<Deliverable>((assignment).Deliverables);
+                        List<string> deliverableNames = new List<string>();
+
                         foreach (var file in files)
                         {
-                            //TODO: complete this bit of code!
                             deliverables.Add(new Deliverable
                             {
                                 Assignment = assignment,
@@ -100,6 +105,14 @@ namespace OSBLE.Controllers
 
                             });
                         }
+
+                        foreach (Deliverable d in deliverables)
+                        {
+                            assignment.Deliverables.Add(d);
+                        }
+                        db.Entry(assignment).State = System.Data.EntityState.Modified;
+                        db.SaveChanges();
+
                     }
                     else
                     {
@@ -167,16 +180,16 @@ namespace OSBLE.Controllers
                                             {
 
                                                 authorTeam = (from at in db.AssignmentTeams
-                                                                             where at.TeamID == authorTeamID &&
-                                                                             at.AssignmentID == assignment.PrecededingAssignmentID
-                                                                             select at).FirstOrDefault();
+                                                              where at.TeamID == authorTeamID &&
+                                                              at.AssignmentID == assignment.PrecededingAssignmentID
+                                                              select at).FirstOrDefault();
 
                                                 reviewTeam = (from tm in db.TeamMembers
-                                                                         join t in db.Teams on tm.TeamID equals t.ID
-                                                                         join rt in db.ReviewTeams on t.ID equals rt.ReviewTeamID
-                                                                         where tm.CourseUserID == ActiveCourseUser.ID
-                                                                         && rt.AssignmentID == assignment.ID
-                                                                         select rt).FirstOrDefault();
+                                                              join t in db.Teams on tm.TeamID equals t.ID
+                                                              join rt in db.ReviewTeams on t.ID equals rt.ReviewTeamID
+                                                              where tm.CourseUserID == ActiveCourseUser.ID
+                                                              && rt.AssignmentID == assignment.ID
+                                                              select rt).FirstOrDefault();
                                             }
 
                                             //MG&MK: file system for critical review assignments is laid out a bit differently, so 
@@ -190,14 +203,14 @@ namespace OSBLE.Controllers
                                                 .File(deliverableName)
                                                 .Delete();
 
-                                            if(assignment.Type != AssignmentTypes.AnchoredDiscussion) // handle non
-                                            { 
-                                            //We need to remove the zipfile corresponding to the authorTeamId being sent in as well as the regularly cached zip. 
-                                            AssignmentTeam precedingAuthorAssignmentTeam = (from at in assignment.PreceedingAssignment.AssignmentTeams
-                                                                                            where at.TeamID == authorTeamID
-                                                                                            select at).FirstOrDefault();
-                                            FileSystem.RemoveZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, precedingAuthorAssignmentTeam);
-                                            FileSystem.RemoveZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, assignmentTeam);
+                                            if (assignment.Type != AssignmentTypes.AnchoredDiscussion) // handle non
+                                            {
+                                                //We need to remove the zipfile corresponding to the authorTeamId being sent in as well as the regularly cached zip. 
+                                                AssignmentTeam precedingAuthorAssignmentTeam = (from at in assignment.PreceedingAssignment.AssignmentTeams
+                                                                                                where at.TeamID == authorTeamID
+                                                                                                select at).FirstOrDefault();
+                                                FileSystem.RemoveZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, precedingAuthorAssignmentTeam);
+                                                FileSystem.RemoveZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, assignmentTeam);
 
                                             }
                                             else //anchored discussion type
