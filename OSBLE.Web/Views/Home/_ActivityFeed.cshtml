@@ -101,10 +101,21 @@
 
     if (older < newEnd)
     {
-<text>&nbsp;&nbsp;</text>
-@Html.ActionLink("Older Posts >", "Index", new { startPost = older })
+        <text>&nbsp;&nbsp;</text>
+        @Html.ActionLink("Older Posts >", "Index", new { startPost = older })
     }
-<text>&nbsp;&nbsp;</text>
-@Html.ActionLink("Oldest Posts >>", "Index", new { startPost = newEnd })
+    <text>&nbsp;&nbsp;</text>
+    @Html.ActionLink("Oldest Posts >>", "Index", new { startPost = newEnd })
 
 }
+@if (Convert.ToBoolean(ViewBag.ShowAll))
+{
+    <text>&nbsp;&nbsp;</text>
+    @Html.ActionLink("10 Posts >>", "Index", new { showAll = false })
+}
+@if (!(Convert.ToBoolean(ViewBag.ShowAll)))
+{
+    <text>&nbsp;&nbsp;</text>
+    @Html.ActionLink("All Posts >>", "Index", new { showAll = true })
+}
+
