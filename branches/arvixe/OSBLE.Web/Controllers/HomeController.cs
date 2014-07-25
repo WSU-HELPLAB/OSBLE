@@ -110,10 +110,20 @@ namespace OSBLE.Controllers
             // First get all posts to do a count and then do proper paging
             dashboardPosts = db.DashboardPosts.Where(d => viewedCourses.Contains(d.CourseUser.AbstractCourseID))
                                                                         .OrderByDescending(d => d.Posted).ToList();
-
+            ViewBag.ShowAll = false;
+            if (Request.Params["showAll"] != null)
+            {
+                bool showAll = Convert.ToBoolean(Request.Params["showAll"]);
+                ViewBag.ShowAll = showAll;
+                if (showAll)
+                {
+                    postsPerPage = dashboardPosts.Count();
+                }
+            }
+            
             pagedDashboardPosts = dashboardPosts.Skip(startPost)
-                                                .Take(postsPerPage)
-                                                .ToList();
+                                            .Take(postsPerPage)
+                                            .ToList();
 
             // Set up display settings for each post (recursively sets up replies.)
             foreach (DashboardPost dp in pagedDashboardPosts)
