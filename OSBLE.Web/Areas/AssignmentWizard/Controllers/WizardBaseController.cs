@@ -207,12 +207,28 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 if (Request.Form.AllKeys.Contains(WizardNavButtons.PreviousButton.ToString()))
                 {
                     comp = manager.GetPreviousComponent();
+
+                    if (Assignment.Type == AssignmentTypes.AnchoredDiscussion)
+                    {
+                        // we use deliverables to upload files for anchored discussion but we don't use it in the wizard
+                        if (comp.ControllerName == "Deliverables")
+                            comp = manager.GetPreviousComponent(); // skip over the deliverables page
+                    }
+
                     errorPath = "Home";
                     action = "SelectComponent";
                 }
                 else if (Request.Form.AllKeys.Contains(WizardNavButtons.NextButton.ToString()))
                 {
                     comp = manager.GetNextComponent();
+
+                    if(Assignment.Type == AssignmentTypes.AnchoredDiscussion)
+                    {
+                        // we use deliverables to upload files for anchored discussion but we don't use it in the wizard
+                        if (comp.ControllerName == "Deliverables")
+                            comp = manager.GetNextComponent(); // skip over the deliverables page
+                    }
+
                     errorPath = "Home";
                     action = "Summary";
                 }

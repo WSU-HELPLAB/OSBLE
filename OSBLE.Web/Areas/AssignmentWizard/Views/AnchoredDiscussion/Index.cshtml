@@ -76,26 +76,30 @@
             }
         </ul>
     </div>
-    <div id="TeamsDiv">
+    <div id="TeamsDiv">        
         <h3>
-            Items to be Reviewed from &quot;ATassignment.PreceedingAssignment.AssignmentName&quot;
+            Items to be Reviewed
         </h3>
         @{int counter = 0;}
-        @*@foreach (AssignmentTeam aTeam in assignment.PreceedingAssignment.AssignmentTeams.OrderBy(t => t.Team.Name))
+        @*@foreach (AssignmentTeam aTeam in assignment.AssignmentTeams.OrderBy(t => t.Team.Name))*@
+        @foreach (Deliverable d in assignment.Deliverables)
         {
             counter++;
             string hasDeliverableClass = "hasDeliverable";
             string selectorChecked = @"checked=""checked""";
-            if (aTeam.GetSubmissionTime() == null)
+            if (d.Assignment.DueDate == null)
             {
                 hasDeliverableClass = "noDeliverable";
                 selectorChecked = "";
             }
-            <div id="teamDiv_@(aTeam.TeamID)" class="TeamDiv @hasDeliverableClass">
-                <input class="selectorCheckBox" type="checkbox" id="teamDiv_checkbox_@(aTeam.TeamID)" name="teamDiv_checkbox_@(aTeam.TeamID)" @selectorChecked />
-                <label for="teamDiv_checkbox_@(aTeam.TeamID)">@aTeam.Team.Name</label>
-                <ul id="team_@(@aTeam.TeamID)" class="TeamSortable">
-                    @foreach (ReviewTeam reviewTeam in assignment.ReviewTeams.Where(rt => rt.AuthorTeamID == aTeam.TeamID))
+            <div id="teamDiv_@(d.Name)" class="TeamDiv @hasDeliverableClass">
+                <input class="selectorCheckBox" type="checkbox" id="teamDiv_checkbox_@(d.Name)" name="teamDiv_checkbox_@(d.Name)" @selectorChecked />
+                <label for="teamDiv_checkbox_@(d.Name)">@d.Name</label>
+                <ul id="team_@(d.Name)" class="TeamSortable">
+
+                   
+
+                    @foreach (ReviewTeam reviewTeam in assignment.ReviewTeams.Where(rt => rt.AuthorTeamID == assignment.CourseID))
                     {
                         <li data-id="reviewTeam_@(reviewTeam.ReviewingTeam.ID)" class="ui-state-default StudentListItem">
                             @reviewTeam.ReviewingTeam.Name
@@ -109,7 +113,7 @@
                 <div style="clear: both;">
                 </div>
             }
-        }*@
+        }
     </div>
 </div>
 
