@@ -70,6 +70,7 @@ namespace OSBLE.Controllers
             courseCalendar.Version = "2.0";
             courseCalendar.ProductID = "-//Washington State University//OSBLE.org//EN";    
             courseCalendar.Scale = "GREGORIAN";
+            courseCalendar.AddProperty("X-WR-CALNAME", course.Prefix + "-" + course.Number + "-" + course.Semester + "-" + course.Year);
 
             //add all the events to the calendar 
             foreach (OSBLE.Models.HomePage.Event e in courseEvents)
@@ -138,6 +139,7 @@ namespace OSBLE.Controllers
             courseCalendar.Version = "2.0";
             courseCalendar.ProductID = "-//Washington State University//OSBLE.org//EN";
             courseCalendar.Scale = "GREGORIAN";
+            courseCalendar.AddProperty("X-WR-CALNAME", course.Prefix + "-" + course.Number + "-" + course.Semester + "-" + course.Year);
 
             //add all the events to the calendar 
             foreach (OSBLE.Models.HomePage.Event e in courseEvents)

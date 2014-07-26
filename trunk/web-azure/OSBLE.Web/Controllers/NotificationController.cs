@@ -249,8 +249,7 @@ namespace OSBLE.Controllers
                 n.ItemType = Notification.Types.JoinCourseApproval;
                 n.ItemID = c.ID;
                 n.RecipientID = instructor.ID;
-                n.SenderID = sender.ID;
-                
+                n.SenderID = sender.ID;               
 
                 addNotification(n);
                                
@@ -390,10 +389,11 @@ namespace OSBLE.Controllers
         /// <param name="n">Notification to be emailed</param>
         private void emailNotification(Notification n)
         {
-#if !DEBUG
+
             SmtpClient mailClient = new SmtpClient();
             mailClient.UseDefaultCredentials = true;
             
+            n.Sender = db.CourseUsers.Find(ActiveCourseUser.ID);
             UserProfile sender = db.UserProfiles.Find(n.Sender.UserProfileID);
             UserProfile recipient = db.UserProfiles.Find(n.Recipient.UserProfileID);
 
@@ -524,6 +524,7 @@ namespace OSBLE.Controllers
             MailAddress to = new MailAddress(recipient.UserName, recipient.DisplayName((int)CourseRole.CourseRoles.Instructor));
             List<MailAddress> recipients = new List<MailAddress>();
             recipients.Add(to);
+#if !DEBUG
             Email.Send(subject, body, recipients);
 #endif
         }
