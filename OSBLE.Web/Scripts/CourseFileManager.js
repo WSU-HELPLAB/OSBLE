@@ -1066,14 +1066,14 @@ function cfm_CopyLinkClicked(stateObjectIndex) {
 
     // Find the appropriate DIV
     var targetDIV = document.getElementById("stateSelectID_" + stateObjectIndex.toString());
-    var copyLink = "osble.org";
+    var copyLink = "https://osble.org";
     copyLink += $(targetDIV).attr("copy-link");
 
 
     //// Add the controls into the DIV
     $('body').append(
 "<div id=\"input_dialog\" title=\"Copy File Link\"> \
-        <br /><div><input type=\"text\" value=\"" + copyLink +
+        <br /><div><input type=\"text\" onfocus=\"this.select()\" value=\"" + copyLink +
         "\" style=\"width: 100%; box-sizing: border-box;\"></div>" +
         "<br /><input type=\"button\" value=\"Ok\" style=\"width: 100%;\" " +
         "onclick=\"removePopUp()\");\" />\
