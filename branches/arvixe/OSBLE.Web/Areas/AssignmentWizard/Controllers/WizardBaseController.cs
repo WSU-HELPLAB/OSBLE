@@ -225,7 +225,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     if(Assignment.Type == AssignmentTypes.AnchoredDiscussion)
                     {
                         // we use deliverables to upload files for anchored discussion but we don't use it in the wizard
-                        if (comp.ControllerName == "Deliverables")
+                        if (comp != null && comp.ControllerName == "Deliverables")
                             comp = manager.GetNextComponent(); // skip over the deliverables page
                     }
 
