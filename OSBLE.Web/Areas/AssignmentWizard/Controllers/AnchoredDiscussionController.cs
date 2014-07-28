@@ -62,9 +62,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
         public override ActionResult Index()
         {
-            base.Index();
-            //ModelState.Clear();
-            //return View(Assignment);
+            base.Index();            
 
             SetUpViewBag();
             if (Assignment.CriticalReviewSettings == null)

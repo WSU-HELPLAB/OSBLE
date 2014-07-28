@@ -71,50 +71,24 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public ActionResult Index(Assignment model, IEnumerable<HttpPostedFileBase> files)
         {
             Assignment = db.Assignments.Find(model.ID);
-            
-            //remove old teams
-            //Assignment.AssignmentTeams.Clear();
-            //Assignment.ReviewTeams.Clear();    
-            //db.SaveChanges();
 
-            //TODO: handle file upload with annotate   
-            //foreach file create an a team!
-            //foreach (var file in files)
-            //{
-            //    if (file.ContentLength > 0)
-            //    {
-            //        var fileName = Path.GetFileName(file.FileName);
-            //        ViewBag.UploadPath = Path.Combine(Server.MapPath("~/App_Data/uploads"), fileName);
+            bool newUpload = false;
+            foreach(var file in files)
+            {
+                if (file != null && file.ContentLength > 0)
+                {
+                    newUpload = true;
+                    break;
+                }                    
+            }
 
-            //        Assignment.AssignmentTeams.Add(new AssignmentTeam
-            //        {
-            //            Assignment = Assignment,
-            //            AssignmentID = Assignment.ID,
-            //            //Team = ,
-            //            TeamID = ActiveCourseUser.ID,
-            //        });
+            if (files != null && newUpload)
+            {
+                //submit file to the system
+                SubmissionController submission = new SubmissionController();
+                submission.Create(model.ID, files, ActiveCourseUser.AbstractCourse.ID);
+            }
 
-            //        Assignment.ReviewTeams.Add(new ReviewTeam
-            //        {
-            //            Assignment = Assignment,
-            //            AssignmentID = Assignment.ID,
-            //            //AuthorTeam = ,
-            //            AuthorTeamID = ActiveCourseUser.ID,
-            //            //ReviewingTeam = ,
-            //            ReviewTeamID = ActiveCourseUser.ID,
-                        
-            //        });
-            //        db.SaveChanges();
-            //    }
-            //}
-
-            //submit file to the system
-            SubmissionController submission = new SubmissionController();            
-            submission.Create(model.ID, files, ActiveCourseUser.AbstractCourse.ID);
-
-            
-
-            
             WasUpdateSuccessful = true;
             return base.PostBack(model);
 
