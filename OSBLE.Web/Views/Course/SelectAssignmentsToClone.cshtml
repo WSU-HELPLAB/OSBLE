@@ -1,19 +1,37 @@
 ﻿@using OSBLE.Models
 @using OSBLE.Models.Courses
 @using OSBLE.Models.Assignments
+@model List<Assignment>
 
 @{
-    ViewBag.Title = "SelectAssignmentsToClone";
+    ViewBag.Title = "Select Assignments To Clone";
 }
 
 <h2>SelectAssignmentsToClone</h2>
 
-<table>
-    @foreach (Assignment a in ViewBag.PreviousAssignments)
+<h3>Note:</h3>
+<p> The following assignments will be created and saved as draft for futher editing.</p>
+
+@using (Html.BeginForm("SelectAssignmentsToClone", "Course", FormMethod.Post))
+{
+    if (Model != null)
     {
-        <tr>
-            <td>x</td>
-            <td>@a.AssignmentName</td>
-        </tr>
+        <input type="hidden" name="count" value="@Model.Count" />
+        <input type="hidden" name="cID" value="@ViewBag.cid" />
+        <table>
+            <tr>
+                <th>Select</th>
+                <th>Assignment Name</th>
+            </tr>
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                <tr>
+                    <td><input type="checkbox" id="a_@Model[i].ID" name="a_@Model[i].ID" checked/></td>
+                    <td>@Html.DisplayFor(model => Model[i].AssignmentName)</td>
+
+                </tr>
+            }
+        </table>
+        <input type="submit" name="select" value="Continue" />
     }
-</table>
+}

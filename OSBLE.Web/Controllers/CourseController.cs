@@ -881,15 +881,6 @@ namespace OSBLE.Controllers
                 db.Courses.Add(clone);
                 db.SaveChanges();
 
-                int utcOffset = 0;
-                try
-                {
-                    Int32.TryParse(Request.Form["utc-offset"].ToString(), out utcOffset);
-                }
-                catch (Exception)
-                {
-                }
-
                 clone.TimeZoneOffset = Convert.ToInt32(Request.Params["course_timezone"]);
                 createMeetingTimes(clone, clone.TimeZoneOffset);
                 createBreaks(clone);
@@ -903,10 +894,10 @@ namespace OSBLE.Controllers
 
                 db.CourseUsers.Add(cu);
                 db.SaveChanges();
-                CloneAllAssignmentsFromCourse(clone, oldCourse);
+                
                 Cache["ActiveCourse"] = clone.ID;
 
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("SelectAssignmentsToClone",new { courseID = oldCourse.ID });
             }
             return View(clone);
         }
@@ -924,243 +915,226 @@ namespace OSBLE.Controllers
                                                     where a.CourseID == courseSource.ID
                                                     select a).ToList();
 
-            //calculate # of weeks since start date
+            if (CopyAssignments(courseDestination, courseSource, previousAssignments))
+                return true;
+            else
+                return false;
 
-            double difference = courseDestination.StartDate.Subtract(courseSource.StartDate).TotalDays;
-            //for linking purposes, key == previous id, value == the clone course that is teh same
-            Dictionary<int, int> linkHolder = new Dictionary<int, int>();
-            foreach (Assignment p in previousAssignments)
+        }
+
+        /// <summary>
+        /// yc: with a given list of assignments, copy them from one course to another.
+        /// </summary>
+        /// <param name="courseDestination"></param>
+        /// <param name="courseSource"></param>
+        /// <param name="previousAssignments"></param>
+        /// <returns></returns>
+        public bool CopyAssignments(Course courseDestination, Course courseSource, List<Assignment> previousAssignments)
+        {
+            try
             {
-                //disabling assignments that are not finished being handled yet
-                if (p.Type == AssignmentTypes.AnchoredDiscussion || p.Type == AssignmentTypes.CommitteeDiscussion
-                    || p.Type == AssignmentTypes.TeamEvaluation || p.Type == AssignmentTypes.ReviewOfStudentWork)
-                    continue;
-
-                int prid = -1, paid = p.ID;
-                //for insert sake of cloned assigntment
-                //we must temprarly hold the list of assignments whos id links to this assignment for temporary holding
-                List<Assignment> previouslyLinked = (from pl in db.Assignments
-                                                     where pl.PrecededingAssignmentID == paid
-                                                     select pl).ToList();
-                foreach (Assignment link in previouslyLinked)
+                //calculate # of weeks since start date
+                double difference = courseDestination.StartDate.Subtract(courseSource.StartDate).TotalDays;
+                //for linking purposes, key == previous id, value == the clone course that is teh same
+                Dictionary<int, int> linkHolder = new Dictionary<int, int>();
+                foreach (Assignment p in previousAssignments)
                 {
-                    link.PrecededingAssignmentID = null;
-                    db.Entry(link).State = EntityState.Modified;
-                    db.SaveChanges();
-                }
+                    //disabling assignments that are not finished being handled yet
+                    if (p.Type == AssignmentTypes.AnchoredDiscussion || p.Type == AssignmentTypes.CommitteeDiscussion
+                            || p.Type == AssignmentTypes.ReviewOfStudentWork)
+                        continue;
 
-                //copy details
-                Assignment na = new Assignment();
-                //tmp holders
-
-                if (p.RubricID != null)
-                    prid = (int)p.RubricID;
-                na = p;
-                na.CourseID = courseDestination.ID; //rewrite course id
-                na.IsDraft = true;
-                na.AssociatedEvent = null;
-                na.AssociatedEventID = null;
-                na.AssignmentTeams = new List<AssignmentTeam>();
-                if (p.HasDeliverables)
-                    na.Deliverables = new List<Deliverable>();
-                if (p.HasDiscussionTeams) 
-                    na.DiscussionTeams = new List<DiscussionTeam>();
-
-                //recalcualte new offsets for due dates on assignment
-
-                if (p.CriticalReviewPublishDate != null)
-                {
-                    na.CriticalReviewPublishDate = ((DateTime)(p.CriticalReviewPublishDate)).Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
-                }
-                //else
-                //    na.CriticalReviewPublishDate = null;
-                DateTime dd = convertFromUtc(courseSource.TimeZoneOffset, na.DueDate);
-                DateTime dt = convertFromUtc(courseSource.TimeZoneOffset, na.DueTime);
-                DateTime rd = convertFromUtc(courseSource.TimeZoneOffset, na.ReleaseDate);
-                DateTime rt = convertFromUtc(courseSource.TimeZoneOffset, na.ReleaseTime);
-
-                dd = dd.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
-                dt = dt.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
-                rd = rd.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
-                rt = rt.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
-
-                na.DueDate = convertToUtc(courseDestination.TimeZoneOffset, dd);
-                na.DueTime = convertToUtc(courseDestination.TimeZoneOffset, dt);
-                na.ReleaseDate = convertToUtc(courseDestination.TimeZoneOffset, rd);
-                na.ReleaseTime = convertToUtc(courseDestination.TimeZoneOffset, rt);
-
-                
-
-                db.Assignments.Add(na);
-                db.SaveChanges();
-
-                linkHolder.Add(paid, na.ID);
-
-                //fix the link now
-                foreach (Assignment link in previouslyLinked)
-                {
-                    link.PrecededingAssignmentID = paid;
-                    db.Entry(link).State = EntityState.Modified;
-                    db.SaveChanges();
-                }
-
-                if (p.Type == AssignmentTypes.DiscussionAssignment || p.Type == AssignmentTypes.CriticalReviewDiscussion)
-                {
-                    DiscussionSetting pds = (from ds in db.DiscussionSettings
-                                             where ds.AssignmentID == paid
-                                             select ds).FirstOrDefault();
-
-                    DiscussionSetting nds = new DiscussionSetting();
-                    nds.InitialPostDueDate = pds.InitialPostDueDate.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
-                    nds.InitialPostDueDueTime = pds.InitialPostDueDueTime.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
-                    nds.AssociatedEventID = null;
-                    nds.MaximumFirstPostLength = pds.MaximumFirstPostLength;
-                    nds.MinimumFirstPostLength = pds.MinimumFirstPostLength;
-                    nds.AnonymitySettings = pds.AnonymitySettings;
-                    na.DiscussionSettings = nds;
-                    db.Entry(na).State = EntityState.Modified;
-                    db.SaveChanges();
-                }
-                //critical review
-                if (p.Type == AssignmentTypes.CriticalReview)
-                {
-                    CriticalReviewSettings pcs = (from ds in db.CriticalReviewSettings
-                                                  where ds.AssignmentID == paid
-                                                  select ds).FirstOrDefault();
-
-                    if (pcs != null)
+                    int prid = -1, paid = p.ID;
+                    //for insert sake of cloned assigntment we must temprarly hold the list of assignments 
+                    //whos id links to this assignment for temporary holding
+                    List<Assignment> previouslyLinked = (from pl in db.Assignments
+                                                         where pl.PrecededingAssignmentID == paid
+                                                         select pl).ToList();
+                    //remove the links for now
+                    foreach (Assignment link in previouslyLinked)
                     {
-                        CriticalReviewSettings ncs = new CriticalReviewSettings();
-                        ncs.ReviewSettings = pcs.ReviewSettings;
-                        na.CriticalReviewSettings = ncs;
+                        link.PrecededingAssignmentID = null;
+                        db.Entry(link).State = EntityState.Modified;
+                        db.SaveChanges();
+                    }
+
+                    //tmp holders
+                    if (p.RubricID != null)
+                        prid = (int)p.RubricID;
+                    //we are now ready for copying
+                    Assignment na = new Assignment();
+                    na = p;
+                    na.CourseID = courseDestination.ID; //rewrite course id
+                    na.IsDraft = true;
+                    na.AssociatedEvent = null;
+                    na.AssociatedEventID = null;
+                    na.PrecededingAssignmentID = null;
+                    na.AssignmentTeams = new List<AssignmentTeam>();
+                    na.DiscussionTeams = new List<DiscussionTeam>();
+                    na.ReviewTeams = new List<ReviewTeam>();
+                    na.Deliverables = new List<Deliverable>();
+    
+
+                    //recalcualte new offsets for due dates on assignment
+                    if (p.CriticalReviewPublishDate != null)
+                    {
+                        na.CriticalReviewPublishDate = ((DateTime)(p.CriticalReviewPublishDate)).Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
+                    }
+                    // to retain the time incase of in differt daylightsavings .. shifts
+                    DateTime dd = convertFromUtc(courseSource.TimeZoneOffset, na.DueDate);
+                    DateTime dt = convertFromUtc(courseSource.TimeZoneOffset, na.DueTime);
+                    DateTime rd = convertFromUtc(courseSource.TimeZoneOffset, na.ReleaseDate);
+                    DateTime rt = convertFromUtc(courseSource.TimeZoneOffset, na.ReleaseTime);
+                    dd = dd.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
+                    dt = dt.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
+                    rd = rd.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
+                    rt = rt.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
+                    //convert back to utc
+                    na.DueDate = convertToUtc(courseDestination.TimeZoneOffset, dd);
+                    na.DueTime = convertToUtc(courseDestination.TimeZoneOffset, dt);
+                    na.ReleaseDate = convertToUtc(courseDestination.TimeZoneOffset, rd);
+                    na.ReleaseTime = convertToUtc(courseDestination.TimeZoneOffset, rt);
+                    //we now have a base to save
+                    db.Assignments.Add(na); 
+                    db.SaveChanges();
+
+
+                    //fix the link now
+                    foreach (Assignment link in previouslyLinked)
+                    {
+                        link.PrecededingAssignmentID = paid;
+                        db.Entry(link).State = EntityState.Modified;
+                        db.SaveChanges();
+                    }
+                    linkHolder.Add(paid, na.ID); //for future assignment links
+
+                    if (p.PrecededingAssignmentID != null)
+                    {
                         na.PrecededingAssignmentID = linkHolder[(int)p.PrecededingAssignmentID];
+                        na.PreceedingAssignment = db.Assignments.Find(linkHolder[(int)p.PrecededingAssignmentID]);
                         db.Entry(na).State = EntityState.Modified;
                         db.SaveChanges();
                     }
+
+                    //copy assignmenttypes
+                    if (p.Type == AssignmentTypes.DiscussionAssignment || p.Type == AssignmentTypes.CriticalReviewDiscussion)
+                    {
+                        DiscussionSetting pds = (from ds in db.DiscussionSettings
+                                                 where ds.AssignmentID == paid
+                                                 select ds).FirstOrDefault();
+
+                        DiscussionSetting nds = new DiscussionSetting();
+                        nds.InitialPostDueDate = pds.InitialPostDueDate.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
+                        nds.InitialPostDueDueTime = pds.InitialPostDueDueTime.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
+                        nds.AssociatedEventID = null;
+                        nds.MaximumFirstPostLength = pds.MaximumFirstPostLength;
+                        nds.MinimumFirstPostLength = pds.MinimumFirstPostLength;
+                        nds.AnonymitySettings = pds.AnonymitySettings;
+                        na.DiscussionSettings = nds;
+                        db.Entry(na).State = EntityState.Modified;
+                        db.SaveChanges();
+                    }
+
+                    //copy critical review settings
+                    if (p.Type == AssignmentTypes.CriticalReview)
+                    {
+                        CriticalReviewSettings pcs = (from ds in db.CriticalReviewSettings
+                                                      where ds.AssignmentID == paid
+                                                      select ds).FirstOrDefault();
+
+                        if (pcs != null)
+                        {
+                            CriticalReviewSettings ncs = new CriticalReviewSettings();
+                            ncs.ReviewSettings = pcs.ReviewSettings;
+                            na.CriticalReviewSettings = ncs;
+                            db.Entry(na).State = EntityState.Modified;
+                            db.SaveChanges();
+                        }
+                    }
+
+                    //team eval
+                    if (p.Type == AssignmentTypes.TeamEvaluation)
+                    {
+                        TeamEvaluationSettings ptes = (from tes in db.TeamEvaluationSettings
+                                                       where tes.AssignmentID == paid
+                                                       select tes).FirstOrDefault();
+
+                        if (ptes != null)
+                        {
+                            TeamEvaluationSettings ntes = new TeamEvaluationSettings();
+                            ntes.DiscrepancyCheckSize = ptes.DiscrepancyCheckSize;
+                            ntes.RequiredCommentLength = ptes.RequiredCommentLength;
+                            ntes.MaximumMultiplier = ptes.MaximumMultiplier;
+                            ntes.AssignmentID = na.ID;
+                            na.TeamEvaluationSettings = ntes;
+                            db.Entry(na).State = EntityState.Modified;
+                            db.SaveChanges();
+                        }
+
+                    }
+
+                    //components
+                    //rubrics
+                    if (p.RubricID != null)
+                        CopyRubric(p, na);
+
+                    ///deliverables
+                    List<Deliverable> pads = (from d in db.Deliverables
+                                              where d.AssignmentID == paid
+                                              select d).ToList();
+                    foreach (Deliverable pad in pads)
+                    {
+                        Deliverable nad = new Deliverable();
+                        nad.AssignmentID = na.ID;
+                        nad.DeliverableType = pad.DeliverableType;
+                        nad.Assignment = na;
+                        nad.Name = pad.Name;
+                        db.Deliverables.Add(nad);
+                        db.SaveChanges();
+                        na.Deliverables.Add(nad);
+                        db.Entry(na).State = EntityState.Modified;
+                        db.SaveChanges();
+                    }
+                    //abet stuff should prolly go here
                 }
-
-                //components
-                //rubrics
-                if (p.RubricID != null)
-                    CopyRubric(p, na);
-                //if (p.RubricID != null)
-                //{
-                //    //create a new reburic thats an exact copy with the same critera
-                //    Rubric nr = new Rubric();
-                //    nr.HasGlobalComments = p.Rubric.HasGlobalComments;
-                //    nr.HasCriteriaComments = p.Rubric.HasCriteriaComments;
-                //    nr.Description = p.Rubric.Description;
-
-                //    db.Rubrics.Add(nr);
-                //    db.SaveChanges();
-                    
-                //    na.RubricID = nr.ID;
-                //    db.Entry(na).State = EntityState.Modified;
-                //    db.SaveChanges();
-
-                //    //now get all the stuff for it
-                //    Dictionary<int, int> levelHolder = new Dictionary<int, int>();
-                //    Dictionary<int, int> criterionHolder = new Dictionary<int, int>();
-
-                //    List<Level> pls = (from rl in db.Levels
-                //                       where rl.RubricID == prid
-                //                       select rl).ToList();
-                //    foreach (Level pl in pls)
-                //    {
-                //        Level nl = new Level();
-                //        nl.LevelTitle = pl.LevelTitle;
-                //        nl.PointSpread = pl.PointSpread;
-                //        nl.RubricID = nr.ID;
-                //        db.Levels.Add(nl);
-                //        db.SaveChanges();
-                //        levelHolder.Add(pl.ID, nl.ID);
-                //    }
-
-                //    List<Criterion> prcs = (from rc in db.Criteria
-                //                            where rc.RubricID == prid
-                //                            select rc).ToList();
-
-                //    foreach (Criterion prc in prcs) //create a new criteron
-                //    {
-                //        Criterion nrc = new Criterion();
-                //        nrc.CriterionTitle = prc.CriterionTitle;
-                //        nrc.Weight = prc.Weight;
-                //        nrc.RubricID = nr.ID;
-                //        db.Criteria.Add(nrc);
-                //        db.SaveChanges();
-                //        criterionHolder.Add(prc.ID, nrc.ID);
-                //    }
-
-                //    //now descriptions
-                //    //for some reason, cell descriptions do not come with this assignment so lets do a search fo rit
-                //    List<CellDescription> pcds = (from cd in db.CellDescriptions
-                //                                  where cd.RubricID == prid
-                //                                  select cd).ToList();
-
-                //    foreach (CellDescription pcd in pcds)
-                //    {
-                //        CellDescription ncd = new CellDescription();
-                //        ncd.CriterionID = criterionHolder[pcd.CriterionID];
-                //        ncd.LevelID = levelHolder[pcd.LevelID];
-                //        ncd.RubricID = nr.ID;
-                //        ncd.Description = pcd.Description;
-                //        db.CellDescriptions.Add(ncd);
-                //        db.SaveChanges();
-                //    }
-                    
-
-                //}
-
-                ///deliverables
-                List<Deliverable> pads = (from d in db.Deliverables
-                                          where d.AssignmentID == paid
-                                          select d).ToList();
-                foreach (Deliverable pad in pads)
-                {
-                    Deliverable nad = new Deliverable();
-                    nad.AssignmentID = na.ID;
-                    nad.DeliverableType = pad.DeliverableType;
-                    nad.Assignment = na;
-                    nad.Name = pad.Name;
-                    db.Deliverables.Add(nad);
-                    db.SaveChanges();
-                    na.Deliverables.Add(nad);
-                    db.Entry(na).State = EntityState.Modified;
-                    db.SaveChanges();
-                }
-                
+                return true;
             }
-
-            return true;
-            
+            catch
+            {
+                return false;
+            }
         }
 
+        /// <summary>
+        /// yc: this copy the rubric information from one assignment to another. 
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <param name="Destination"></param>
+        /// <returns>bool for if success or fail</returns>
         public bool CopyRubric(Assignment Source, Assignment Destination)
         {
-            int sid = -1;
-
-            if (Source.RubricID != null)
+            try
             {
-                sid = (int)Source.RubricID;
+                int sid = -1;
+
+                if (Source.RubricID != null)
+                {
+                    sid = (int)Source.RubricID;
                     //create a new reburic thats an exact copy with the same critera
                     Rubric nr = new Rubric();
-                nr.HasGlobalComments = Source.Rubric.HasGlobalComments;
-                nr.HasCriteriaComments = Source.Rubric.HasCriteriaComments;
-                nr.Description = Source.Rubric.Description;
-
-                    db.Rubrics.Add(nr);
-                    db.SaveChanges();
-                    
-                Destination.RubricID = nr.ID;
-                db.Entry(Destination).State = EntityState.Modified;
+                    nr.HasGlobalComments = Source.Rubric.HasGlobalComments;
+                    nr.HasCriteriaComments = Source.Rubric.HasCriteriaComments;
+                    nr.Description = Source.Rubric.Description;
+                    Destination.Rubric = nr;
+                    db.Entry(Destination).State = EntityState.Modified;
                     db.SaveChanges();
 
                     //now get all the stuff for it
-                Dictionary<int, int> clevelHolder = new Dictionary<int, int>();
-                Dictionary<int, int> ccriterionHolder = new Dictionary<int, int>();
+                    Dictionary<int, int> clevelHolder = new Dictionary<int, int>();
+                    Dictionary<int, int> ccriterionHolder = new Dictionary<int, int>();
 
                     List<Level> pls = (from rl in db.Levels
-                                   where rl.RubricID == sid
+                                       where rl.RubricID == sid
                                        select rl).ToList();
                     foreach (Level pl in pls)
                     {
@@ -1170,11 +1144,11 @@ namespace OSBLE.Controllers
                         nl.RubricID = nr.ID;
                         db.Levels.Add(nl);
                         db.SaveChanges();
-                    clevelHolder.Add(pl.ID, nl.ID);
+                        clevelHolder.Add(pl.ID, nl.ID);
                     }
 
                     List<Criterion> prcs = (from rc in db.Criteria
-                                        where rc.RubricID == sid
+                                            where rc.RubricID == sid
                                             select rc).ToList();
 
                     foreach (Criterion prc in prcs) //create a new criteron
@@ -1185,99 +1159,148 @@ namespace OSBLE.Controllers
                         nrc.RubricID = nr.ID;
                         db.Criteria.Add(nrc);
                         db.SaveChanges();
-                    ccriterionHolder.Add(prc.ID, nrc.ID);
+                        ccriterionHolder.Add(prc.ID, nrc.ID);
                     }
 
                     //now descriptions
                     //for some reason, cell descriptions do not come with this assignment so lets do a search fo rit
                     List<CellDescription> pcds = (from cd in db.CellDescriptions
-                                              where cd.RubricID == sid
+                                                  where cd.RubricID == sid
                                                   select cd).ToList();
 
                     foreach (CellDescription pcd in pcds)
                     {
                         CellDescription ncd = new CellDescription();
-                    ncd.CriterionID = ccriterionHolder[pcd.CriterionID];
-                    ncd.LevelID = clevelHolder[pcd.LevelID];
+                        ncd.CriterionID = ccriterionHolder[pcd.CriterionID];
+                        ncd.LevelID = clevelHolder[pcd.LevelID];
                         ncd.RubricID = nr.ID;
                         ncd.Description = pcd.Description;
                         db.CellDescriptions.Add(ncd);
                         db.SaveChanges();
                     }
+                }
+                if (Source.StudentRubricID != null)
+                {
+                    sid = (int)Source.StudentRubricID;
+                    //create a new reburic thats an exact copy with the same critera
+                    Rubric nr = new Rubric();
+                    nr.HasGlobalComments = Source.Rubric.HasGlobalComments;
+                    nr.HasCriteriaComments = Source.Rubric.HasCriteriaComments;
+                    nr.Description = Source.Rubric.Description;
+
+                    db.Rubrics.Add(nr);
+                    db.SaveChanges();
+
+                    Destination.StudentRubricID = nr.ID;
+                    db.Entry(Destination).State = EntityState.Modified;
+                    db.SaveChanges();
+
+                    //now get all the stuff for it
+                    Dictionary<int, int> slevelHolder = new Dictionary<int, int>();
+                    Dictionary<int, int> scriterionHolder = new Dictionary<int, int>();
+
+                    List<Level> pls = (from rl in db.Levels
+                                       where rl.RubricID == sid
+                                       select rl).ToList();
+                    foreach (Level pl in pls)
+                    {
+                        Level nl = new Level();
+                        nl.LevelTitle = pl.LevelTitle;
+                        nl.PointSpread = pl.PointSpread;
+                        nl.RubricID = nr.ID;
+                        db.Levels.Add(nl);
+                        db.SaveChanges();
+                        slevelHolder.Add(pl.ID, nl.ID);
+                    }
+
+                    List<Criterion> prcs = (from rc in db.Criteria
+                                            where rc.RubricID == sid
+                                            select rc).ToList();
+
+                    foreach (Criterion prc in prcs) //create a new criteron
+                    {
+                        Criterion nrc = new Criterion();
+                        nrc.CriterionTitle = prc.CriterionTitle;
+                        nrc.Weight = prc.Weight;
+                        nrc.RubricID = nr.ID;
+                        db.Criteria.Add(nrc);
+                        db.SaveChanges();
+                        scriterionHolder.Add(prc.ID, nrc.ID);
+                    }
+
+                    //now descriptions
+                    //for some reason, cell descriptions do not come with this assignment so lets do a search fo rit
+                    List<CellDescription> pcds = (from cd in db.CellDescriptions
+                                                  where cd.RubricID == sid
+                                                  select cd).ToList();
+
+                    foreach (CellDescription pcd in pcds)
+                    {
+                        CellDescription ncd = new CellDescription();
+                        ncd.CriterionID = scriterionHolder[pcd.CriterionID];
+                        ncd.LevelID = slevelHolder[pcd.LevelID];
+                        ncd.RubricID = nr.ID;
+                        ncd.Description = pcd.Description;
+                        db.CellDescriptions.Add(ncd);
+                        db.SaveChanges();
+                    }
+                }
+
+                return true;
             }
-            if (Source.StudentRubricID != null)
+            catch
             {
-                sid = (int)Source.StudentRubricID;
-                //create a new reburic thats an exact copy with the same critera
-                Rubric nr = new Rubric();
-                nr.HasGlobalComments = Source.Rubric.HasGlobalComments;
-                nr.HasCriteriaComments = Source.Rubric.HasCriteriaComments;
-                nr.Description = Source.Rubric.Description;
+                return false;
+            }
+        }
 
-                db.Rubrics.Add(nr);
-                db.SaveChanges();
-                    
-                Destination.StudentRubricID = nr.ID;
-                db.Entry(Destination).State = EntityState.Modified;
-                db.SaveChanges();
+        /// <summary>
+        /// yc: get for view
+        /// </summary>
+        /// <param name="course"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public ActionResult SelectAssignmentsToClone(int courseID)
+        {
+            ViewBag.cid = courseID;
+            List<Assignment> previousAssignments = (from a in db.Assignments
+                                                    where a.CourseID == courseID
+                                                    select a).ToList();
+            return View(previousAssignments);
+        }
 
-                //now get all the stuff for it
-                Dictionary<int, int> slevelHolder = new Dictionary<int, int>();
-                Dictionary<int, int> scriterionHolder = new Dictionary<int, int>();
-
-                List<Level> pls = (from rl in db.Levels
-                                   where rl.RubricID == sid
-                                   select rl).ToList();
-                foreach (Level pl in pls)
+        /// <summary>
+        /// yc: post for select assignment, passed the count beacuse we cannot have the funciton signature
+        /// </summary>
+        /// <param name="cID"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult SelectAssignmentsToClone(int cID, int count)
+        {
+            Course o = (Course)(from c in db.AbstractCourses
+                                where c.ID == cID
+                                select c).FirstOrDefault();
+            List<Assignment> previousAssignments = (from a in db.Assignments
+                                                    where a.CourseID == cID
+                                                    select a).ToList();
+            List<int> i = new List<int>(); //the home of assignments we want to copy
+            List<Assignment> n = new List<Assignment>();
+            foreach (Assignment a in previousAssignments)
+            {
+                if (Request.Params["a_" + a.ID.ToString()] != null)
                 {
-                    Level nl = new Level();
-                    nl.LevelTitle = pl.LevelTitle;
-                    nl.PointSpread = pl.PointSpread;
-                    nl.RubricID = nr.ID;
-                    db.Levels.Add(nl);
-                    db.SaveChanges();
-                    slevelHolder.Add(pl.ID, nl.ID);
-                }
-                
-                List<Criterion> prcs = (from rc in db.Criteria
-                                        where rc.RubricID == sid
-                                        select rc).ToList();
-
-                foreach (Criterion prc in prcs) //create a new criteron
-                {
-                    Criterion nrc = new Criterion();
-                    nrc.CriterionTitle = prc.CriterionTitle;
-                    nrc.Weight = prc.Weight;
-                    nrc.RubricID = nr.ID;
-                    db.Criteria.Add(nrc);
-                    db.SaveChanges();
-                    scriterionHolder.Add(prc.ID, nrc.ID);
-                }
-                
-                //now descriptions
-                //for some reason, cell descriptions do not come with this assignment so lets do a search fo rit
-                List<CellDescription> pcds = (from cd in db.CellDescriptions
-                                              where cd.RubricID == sid
-                                              select cd).ToList();
-
-                foreach (CellDescription pcd in pcds)
-                {
-                    CellDescription ncd = new CellDescription();
-                    ncd.CriterionID = scriterionHolder[pcd.CriterionID];
-                    ncd.LevelID = slevelHolder[pcd.LevelID];
-                    ncd.RubricID = nr.ID;
-                    ncd.Description = pcd.Description;
-                    db.CellDescriptions.Add(ncd);
-                    db.SaveChanges();
+                    i.Add(previousAssignments.IndexOf(a));
                 }
             }
+            foreach (int a in i)
+            {
+                n.Add(previousAssignments[a]);
+            }
+            if (n.Count > 0)
+                CopyAssignments((ActiveCourseUser.AbstractCourse as Course), o, n);
 
-            return true;
-        }
-        public ActionResult SelectAssignmentsToClone(Course course)
-        {
-            ViewBag.PreviousAssignments = course.Assignments;
-            return View();
+            return RedirectToAction("Index", "Home");
         }
 
         public ActionResult DownloadDashboardPosts(int? id)
@@ -1289,7 +1312,7 @@ namespace OSBLE.Controllers
 
             if (id == null)
             {
-                viewedCourses.Add(ActiveCourseUser.AbstractCourseID);
+            viewedCourses.Add(ActiveCourseUser.AbstractCourseID);
                 dashboardPosts = db.DashboardPosts.Where(d => viewedCourses.Contains(d.CourseUser.AbstractCourseID))
                                                                         .OrderBy(d => d.Posted).ToList();
             }
@@ -1305,13 +1328,13 @@ namespace OSBLE.Controllers
             {
                 Directory.CreateDirectory(path);
             }
-
+            
             FileInfo info = new FileInfo(Path.Combine(path, "ActivityFeed.csv"));
 
             StreamWriter writer = info.CreateText();
             writer.WriteLine("PostNumber,Author,AuthorRole,Date,Content");
             int postCount = 1;
-
+            
             foreach (var post in dashboardPosts)
             {
                 string postContent = (post.Content.Replace("\"", "\"\"")).Replace("\r\n", " ");
