@@ -345,7 +345,7 @@ namespace OSBLE.Controllers
             var contentType = "text/calendar";
             var bytes = Encoding.UTF8.GetBytes(output);
 
-            return File(bytes, contentType, course.Prefix + course.Number + ".ics");
+            return File(bytes, contentType, course.Prefix + course.Number + "-" + course.Semester + "-" + course.Year + ".ics");
 
         }
 
