@@ -62,8 +62,9 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public override ActionResult Index()
         {
             base.Index();
-            ModelState.Clear();
-            ActiveCourseUser.AbstractRole.CanSubmit = true;
+            ModelState.Clear();   
+            //Setup new group assignment team and review team.
+            Assignment = SetupTeams(Assignment);
             return View(Assignment);
         }
 
@@ -71,53 +72,66 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public ActionResult Index(Assignment model, IEnumerable<HttpPostedFileBase> files)
         {
             Assignment = db.Assignments.Find(model.ID);
-            
-            //remove old teams
-            //Assignment.AssignmentTeams.Clear();
-            //Assignment.ReviewTeams.Clear();    
-            //db.SaveChanges();
 
-            //TODO: handle file upload with annotate   
-            //foreach file create an a team!
-            //foreach (var file in files)
-            //{
-            //    if (file.ContentLength > 0)
-            //    {
-            //        var fileName = Path.GetFileName(file.FileName);
-            //        ViewBag.UploadPath = Path.Combine(Server.MapPath("~/App_Data/uploads"), fileName);
+            bool newUpload = false;
+            foreach(var file in files)
+            {
+                if (file != null && file.ContentLength > 0)
+                {
+                    newUpload = true;
+                    break;
+                }                    
+            }
 
-            //        Assignment.AssignmentTeams.Add(new AssignmentTeam
-            //        {
-            //            Assignment = Assignment,
-            //            AssignmentID = Assignment.ID,
-            //            //Team = ,
-            //            TeamID = ActiveCourseUser.ID,
-            //        });
+            if (files != null && newUpload)
+            {
+                //submit file to the system
+                SubmissionController submission = new SubmissionController();
+                submission.Create(model.ID, files, ActiveCourseUser.AbstractCourse.ID);
+            }
 
-            //        Assignment.ReviewTeams.Add(new ReviewTeam
-            //        {
-            //            Assignment = Assignment,
-            //            AssignmentID = Assignment.ID,
-            //            //AuthorTeam = ,
-            //            AuthorTeamID = ActiveCourseUser.ID,
-            //            //ReviewingTeam = ,
-            //            ReviewTeamID = ActiveCourseUser.ID,
-                        
-            //        });
-            //        db.SaveChanges();
-            //    }
-            //}
-
-            //submit file to the system
-            SubmissionController submission = new SubmissionController();            
-            submission.Create(model.ID, files, ActiveCourseUser.AbstractCourse.ID);
-
-            
-
-            
             WasUpdateSuccessful = true;
             return base.PostBack(model);
 
+        }
+
+        public Assignment SetupTeams(Assignment assignment)
+        {
+            List<CourseUser> courseUsers = db.CourseUsers.Where(cu => cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID).ToList();
+            
+            //clear old teams
+            assignment.AssignmentTeams.Clear();
+            //db.Entry(assignment).State = System.Data.EntityState.Modified;
+            //db.SaveChanges();
+
+            //make new teams for user listing          
+            foreach (CourseUser cu in courseUsers)
+            {
+                Team newTeam = new Team();
+
+                newTeam.Name = cu.UserProfile.LastAndFirst();
+                
+                newTeam.TeamMembers.Add(new TeamMember
+                {
+                    CourseUser = cu,
+                    CourseUserID = cu.ID,
+                    Team = newTeam,
+                    TeamID = newTeam.ID
+                });
+                
+                assignment.AssignmentTeams.Add(new AssignmentTeam
+                {
+                    Assignment = assignment,
+                    AssignmentID = assignment.ID,
+                    Team = newTeam,
+                    TeamID = ActiveCourseUser.AbstractCourseID
+                });
+            }
+
+            db.Entry(assignment).State = System.Data.EntityState.Modified;
+            db.SaveChanges();
+
+            return assignment;
         }
     }
 }

@@ -703,6 +703,9 @@ namespace OSBLE.Controllers
             Course thisCourse = (from d in db.Courses
                                  where d.ID == ActiveCourseUser.AbstractCourseID
                                  select d).FirstOrDefault();
+            Notification n = db.Notifications.Where(item => item.SenderID == pendingUser.ID && item.RecipientID == ActiveCourseUser.ID).FirstOrDefault();
+            n.Read = true;
+            db.SaveChanges();
 
             //set user to active student
             if (pendingUser.AbstractRoleID == (int)CourseRole.CourseRoles.Pending)
@@ -749,6 +752,9 @@ namespace OSBLE.Controllers
             string firstName = pendingUser.UserProfile.FirstName;
             string lastName = pendingUser.UserProfile.LastName;
 
+            //mark notification read
+            Notification n = db.Notifications.Where(item => item.SenderID == pendingUser.ID && item.RecipientID == ActiveCourseUser.ID).FirstOrDefault();
+            n.Read = true;
 
             //remove the kid from the db
             db.CourseUsers.Remove(pendingUser);
@@ -776,19 +782,34 @@ namespace OSBLE.Controllers
             if (ActiveCourseUser.AbstractCourse.GetType() != typeof(Community)) //of type course
             {
                 pendingUsers = (from c in db.CourseUsers
-                                             where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
-                                             c.AbstractRoleID == (int)CourseRole.CourseRoles.Pending
-                                             select c).ToList();
+                                where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                                c.AbstractRoleID == (int)CourseRole.CourseRoles.Pending
+                                select c).ToList();
 
-            count = pendingUsers.Count();
+                count = pendingUsers.Count();
 
-            foreach (CourseUser p in pendingUsers)
-            {
-                p.Hidden = false;
-                p.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
-                db.Entry(p).State = EntityState.Modified;
-                addNewStudentToTeams(p);
-            }
+                foreach (CourseUser p in pendingUsers)
+                {
+                    p.Hidden = false;
+                    p.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+                    db.Entry(p).State = EntityState.Modified;
+                    addNewStudentToTeams(p);
+                }
+
+                //get all notifications
+                List<Notification> allUnreadNotifications = (from n in db.Notifications
+                                                             where n.RecipientID == ActiveCourseUser.ID && !n.Read
+                                                             select n).ToList();
+                //get all notifications pertaining to the pendingUsers List
+                List<Notification> pendingUsersNotifications = allUnreadNotifications.Where(item => pendingUsers.Contains(item.Sender)).ToList();
+                //Mark them all as read
+                foreach (Notification n in pendingUsersNotifications)
+                {
+                    n.Read = true;
+                    db.Entry(n).State = EntityState.Modified;
+                }
+
+                
                 db.SaveChanges();
                 if (thisCourse.Assignments.Count(a => a.HasTeams) > 0)
                 {
@@ -811,6 +832,20 @@ namespace OSBLE.Controllers
                     p.AbstractRoleID = (int)CommunityRole.OSBLERoles.Participant;
                     db.Entry(p).State = EntityState.Modified;
                 }
+
+                //get all notifications
+                List<Notification> allUnreadNotifications = (from n in db.Notifications
+                                                             where n.RecipientID == ActiveCourseUser.ID && !n.Read
+                                                             select n).ToList();
+                //get all notifications pertaining to the pendingUsers List
+                List<Notification> pendingUsersNotifications = allUnreadNotifications.Where(item => pendingUsers.Contains(item.Sender)).ToList();
+                //Mark them all as read
+                foreach (Notification n in pendingUsersNotifications)
+                {
+                    n.Read = true;
+                    db.Entry(n).State = EntityState.Modified;
+                }
+
                 db.SaveChanges();
 
                 return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " participant(s) have been added to the community." });
@@ -844,6 +879,19 @@ namespace OSBLE.Controllers
                                 where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
                                 c.AbstractRoleID == (int)CommunityRole.OSBLERoles.Pending
                                 select c).ToList();
+            }
+
+            //get all notifications
+            List<Notification> allUnreadNotifications = (from n in db.Notifications
+                                                         where n.RecipientID == ActiveCourseUser.ID && !n.Read
+                                                         select n).ToList();
+            //get all notifications pertaining to the pendingUsers List
+            List<Notification> pendingUsersNotifications = allUnreadNotifications.Where(item => pendingUsers.Contains(item.Sender)).ToList();
+            //Mark them all as read
+            foreach (Notification n in pendingUsersNotifications)
+            {
+                n.Read = true;
+                db.Entry(n).State = EntityState.Modified;
             }
 
             count = pendingUsers.Count();

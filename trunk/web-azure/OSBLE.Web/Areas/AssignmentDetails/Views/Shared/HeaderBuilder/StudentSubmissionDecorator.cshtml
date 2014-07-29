@@ -39,12 +39,27 @@
             <li>
                 @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = dataModel.Submission.assignmentID, area = "" }, options, new object())  
             </li>
+               @{                   
+            
+                   
+               }
+                @if(dataModel.IsPublished)
+                {
+                    <li>
+                        @*@Html.ActionLink("View Reviewed Document", "ReviewGradedDocument", "../PdfCriticalReview", new { assignmentId = dataModel.Submission.assignmentID, authorTeamId = dataModel.Submission.authorTeamID }, new { area = "" })*@
+                        <a href="~/PdfCriticalReview/ReviewGradedDocument?assignmentId=@dataModel.Submission.assignmentID&authorTeamId=@dataModel.Submission.authorTeamID">View Reviewed Document</a>
+                    </li>
+                }
+                else //Document is not published yet, no link to view.
+                {                                
+                }
+                
 
             @if (dataModel.Submission.SubmissionReceived)
             {
-                <li id="SubmissionReceivedText">Submission received</li>   
+                <li id="SubmissionReceivedText">Submission received</li>
             }
-            </ul>
+            </ul>            
         }
 </tr>
 

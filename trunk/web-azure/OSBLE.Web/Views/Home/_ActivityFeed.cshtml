@@ -70,7 +70,7 @@
 
 
 @* TODO: Make this into a general purpose pagination helper? *@
-@if (ViewBag.StartPost > 0)
+@if (ViewBag.StartPost > 0 || ViewBag.ShowAll)
 {
     int newStart = Math.Max(ViewBag.StartPost - ViewBag.PostsPerPage, 0);
 
@@ -106,16 +106,12 @@
     }
     <text>&nbsp;&nbsp;</text>
     @Html.ActionLink("Oldest Posts >>", "Index", new { startPost = newEnd })
+    if (!(Convert.ToBoolean(ViewBag.ShowAll)))
+    {
+        <text>&nbsp;&nbsp;</text>
+        @Html.ActionLink("All Posts >>", "Index", new { showAll = true })
+    }
 
 }
-@if (Convert.ToBoolean(ViewBag.ShowAll))
-{
-    <text>&nbsp;&nbsp;</text>
-    @Html.ActionLink("10 Posts >>", "Index", new { showAll = false })
-}
-@if (!(Convert.ToBoolean(ViewBag.ShowAll)))
-{
-    <text>&nbsp;&nbsp;</text>
-    @Html.ActionLink("All Posts >>", "Index", new { showAll = true })
-}
+
 

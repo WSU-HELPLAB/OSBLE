@@ -92,10 +92,10 @@
                 hasDeliverableClass = "noDeliverable";
                 selectorChecked = "";
             }
-            <div id="teamDiv_@(d.Name)" class="TeamDiv @hasDeliverableClass">
-                <input class="selectorCheckBox" type="checkbox" id="teamDiv_checkbox_@(d.Name)" name="teamDiv_checkbox_@(d.Name)" @selectorChecked />
-                <label for="teamDiv_checkbox_@(d.Name)">@d.Name</label>
-                <ul id="team_@(d.Name)" class="TeamSortable">
+            <div id="teamDiv_@(counter)" class="TeamDiv @hasDeliverableClass">
+                <input class="selectorCheckBox" type="checkbox" id="teamDiv_checkbox_@(counter)" name="teamDiv_checkbox_@(counter)" @selectorChecked />
+                <label for="teamDiv_checkbox_@(counter)">@d.Name</label>
+                <ul id="team_@(counter)" class="TeamSortable">
 
                    
 

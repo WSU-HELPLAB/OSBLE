@@ -707,5 +707,21 @@ namespace OSBLE.Controllers
             }
             return RedirectToAction("Index", "Home");
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="assignmentId"></param>
+        /// <param name="authorTeamId"></param>
+        /// <returns></returns>
+        [CanSubmitAssignments]
+        [OsbleAuthorize]
+        [RequireActiveCourse]
+        public ActionResult GetAnnotatedDocument(int assignmentId, int authorTeamId)
+        {
+            //TODO: check that activecourse user is on an assignment team for this document
+            return RedirectToRoute(new { controller = "PdfCriticalReview", action = "ReviewGradedDocument", assignmentID = assignmentId, authorTeamID = authorTeamId });
+                
+        }
     }
 }

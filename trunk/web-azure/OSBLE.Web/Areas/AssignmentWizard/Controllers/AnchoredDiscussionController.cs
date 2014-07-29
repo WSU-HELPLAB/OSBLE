@@ -62,9 +62,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
         public override ActionResult Index()
         {
-            base.Index();
-            //ModelState.Clear();
-            //return View(Assignment);
+            base.Index();            
 
             SetUpViewBag();
             if (Assignment.CriticalReviewSettings == null)
@@ -131,37 +129,37 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
             List<CourseUser> courseUsers = db.CourseUsers.Where(cu => cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID).ToList();
 
-            //clear old teams
-            Assignment.AssignmentTeams.Clear();
-            db.Entry(Assignment).State = System.Data.EntityState.Modified;
-            db.SaveChanges();
-            int i = 0;
-            //make new teams            
-            foreach(CourseUser cu in courseUsers)
-            {
-                Team newTeam = new Team();
+            ////clear old teams
+            //Assignment.AssignmentTeams.Clear();
+            //db.Entry(Assignment).State = System.Data.EntityState.Modified;
+            //db.SaveChanges();
+            
+            ////make new teams            
+            //foreach(CourseUser cu in courseUsers)
+            //{
+            //    Team newTeam = new Team();
 
-                newTeam.Name = cu.UserProfile.LastAndFirst();
-                newTeam.TeamMembers.Add(new TeamMember { 
-                    CourseUser = cu,
-                    CourseUserID = cu.ID,
-                    Team = newTeam,
-                    TeamID = newTeam.ID                    
-                });
-                Assignment.AssignmentTeams.Add(new AssignmentTeam { 
-                    Assignment = Assignment,
-                    AssignmentID = Assignment.ID,
-                    Team = newTeam,
-                    TeamID = ActiveCourseUser.AbstractCourseID
-                });
-            }
-            db.Entry(Assignment).State = System.Data.EntityState.Modified;
-            db.SaveChanges();           
+            //    newTeam.Name = cu.UserProfile.LastAndFirst();
+            //    newTeam.TeamMembers.Add(new TeamMember { 
+            //        CourseUser = cu,
+            //        CourseUserID = cu.ID,
+            //        Team = newTeam,
+            //        TeamID = newTeam.ID                    
+            //    });
+            //    Assignment.AssignmentTeams.Add(new AssignmentTeam { 
+            //        Assignment = Assignment,
+            //        AssignmentID = Assignment.ID,
+            //        Team = newTeam,
+            //        TeamID = ActiveCourseUser.AbstractCourseID
+            //    });
+            //}
+            //db.Entry(Assignment).State = System.Data.EntityState.Modified;
+            //db.SaveChanges();           
 
             //place items into the viewbag
             ViewBag.Teams = Assignment.AssignmentTeams.Select(t => t.Team).OrderBy(t => t.Name).ToList();
-            ViewBag.PreviousTeamAssignments = previousTeamAssignments;
-            ViewBag.AllUsers = db.CourseUsers.Where(cu => cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID).ToList();
+            ViewBag.PreviousTeamAssignments = previousTeamAssignments;            
+            ViewBag.AllUsers = courseUsers;
         }
 
         private void UpdateCriticalReviewDiscussions()
