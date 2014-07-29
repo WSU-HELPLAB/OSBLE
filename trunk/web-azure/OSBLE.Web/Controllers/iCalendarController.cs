@@ -18,6 +18,7 @@ using DDay.Collections;
 using DDay.iCal;
 using DDay.iCal.Serialization;
 using DDay.iCal.Serialization.iCalendar;
+using System.Threading.Tasks;
 
 
 
@@ -36,7 +37,7 @@ namespace OSBLE.Controllers
             ViewBag.CourseID = ActiveCourseUser.AbstractCourseID;
             return View();
         }
-   
+
         /// <summary>
         /// Function is called to create the course ics file
         /// Function is called everytime the course calendar needs to be updated
@@ -46,34 +47,119 @@ namespace OSBLE.Controllers
         {
             //Get the Course
             Course course = (from d in db.Courses
-                             where d.ID == id
-                             select d).FirstOrDefault();
-
-            //get all the course events 
-            List<OSBLE.Models.HomePage.Event> courseEvents = new List<Models.HomePage.Event>();
-
-            using (var result = new EventController())
-            {
-                courseEvents = result.GetActiveCourseEvents(course.StartDate, course.EndDate);
-            }
-
+                            where d.ID == id
+                            select d).FirstOrDefault();
             //get the timezone of the course 
             CourseController cc = new CourseController();
             int utcOffset = (ActiveCourseUser.AbstractCourse as Course).TimeZoneOffset;
             TimeZoneInfo tz = cc.getTimeZone(utcOffset);
 
-            //Create and initalize the Calendar object 
+            //get course events
+            List<OSBLE.Models.HomePage.Event> events = (from e in db.Events
+                                                        where e.Poster.AbstractCourseID == ActiveCourseUser.AbstractCourseID
+                                                        && e.StartDate >= course.StartDate
+                                                        && e.StartDate <= course.EndDate
+                                                        && e.Approved
+                                                        select e).ToList();
+
+            //Create the calendar object 
             iCalendar courseCalendar = new iCalendar();
+            //initalize the Calendar object 
             courseCalendar.AddTimeZone(tz);
             courseCalendar.Method = "PUBLISH";
             courseCalendar.Name = "VCALENDAR";
             courseCalendar.Version = "2.0";
-            courseCalendar.ProductID = "-//Washington State University//OSBLE.org//EN";    
+            courseCalendar.ProductID = "-//Washington State University//OSBLE.org//EN";
             courseCalendar.Scale = "GREGORIAN";
             courseCalendar.AddProperty("X-WR-CALNAME", course.Prefix + "-" + course.Number + "-" + course.Semester + "-" + course.Year);
 
+            //get course breaks
+            if (ActiveCourseUser.AbstractCourse is Course && ((ActiveCourseUser.AbstractCourse as Course).ShowMeetings == true))
+            {
+                foreach (CourseBreak cb in course.CourseBreaks)
+                {
+                    // Start of break
+                    if ((cb.StartDate >= course.StartDate) && (cb.StartDate <= course.EndDate))
+                    {
+                        OSBLE.Models.HomePage.Event e = new OSBLE.Models.HomePage.Event();
+
+                        e.Title = cb.Name;
+
+                        if (cb.StartDate.Date != cb.EndDate.Date)
+                        {
+                            e.Title += " Starts";
+                        }
+
+                        e.StartDate = cb.StartDate.Date;
+                        e.HideTime = true;
+                        e.NoDateTime = true;
+                        e.HideDelete = true;
+
+                        events.Add(e);
+                    }
+
+                    // End of break (only if date is different than start)
+                    if ((cb.StartDate.Date != cb.EndDate.Date) && (cb.EndDate >= course.StartDate) && (cb.EndDate <= course.EndDate))
+                    {
+                        OSBLE.Models.HomePage.Event e = new OSBLE.Models.HomePage.Event();
+
+                        e.Title = cb.Name + " Ends";
+                        e.StartDate = cb.EndDate.Date;
+                        e.HideTime = true;
+                        e.HideDelete = true;
+                        events.Add(e);
+                    }
+                }//end foreach
+
+                foreach (CourseMeeting cm in course.CourseMeetings)
+                {
+                    StringBuilder rpPattern = new StringBuilder("FREQ=WEEKLY;UNTIL=");
+                    rpPattern.Append(new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(course.EndDate, tz)).ToString(@"yyyyMMdd\THHmmss\Z"));
+                    rpPattern.Append(";WKST=SU;BYDAY=");
+                    if (cm.Sunday)
+                        rpPattern.Append("SU,");
+                    if (cm.Monday)
+                        rpPattern.Append("MO,");
+                    if (cm.Tuesday)
+                        rpPattern.Append("TU,");
+                    if (cm.Wednesday)
+                        rpPattern.Append("WE,");
+                    if (cm.Thursday)
+                        rpPattern.Append("TH,");
+                    if (cm.Friday)
+                        rpPattern.Append("FR,");
+                    if (cm.Saturday)
+                        rpPattern.Append("SA");
+
+                    //trim trailing comma if it is there
+                    if (rpPattern[rpPattern.Length - 1] == ',')
+                        rpPattern.Remove(rpPattern.Length - 1, 1);
+
+                    RecurringComponent recurringComponent = new RecurringComponent();
+                    RecurrencePattern pattern = new RecurrencePattern(rpPattern.ToString());
+
+                    DDay.iCal.Event evt = courseCalendar.Create<DDay.iCal.Event>();
+                    //may cause issues
+                    DateTime evtStart = course.StartDate.Date;
+                    evtStart = evtStart.Add(cm.StartTime.TimeOfDay);
+                    DateTime evtEnd = course.StartDate.Date;
+                    evtEnd = evtEnd.Add(cm.EndTime.TimeOfDay);
+
+
+                    evt.Start = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(evtStart, tz));
+                    evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(evtEnd, tz));
+                    evt.LastModified = new iCalDateTime(DateTime.Now);
+                    evt.Summary = cm.Name;
+                    evt.Location = cm.Location;
+                    evt.RecurrenceRules.Add(pattern);
+
+                }
+
+
+            }//end if
+
             //add all the events to the calendar 
-            foreach (OSBLE.Models.HomePage.Event e in courseEvents)
+            foreach (OSBLE.Models.HomePage.Event e in events)
             {
                 DDay.iCal.Event evt = courseCalendar.Create<DDay.iCal.Event>();
 
@@ -87,7 +173,7 @@ namespace OSBLE.Controllers
                 {
                     evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(e.EndDate.Value, tz));
                 }
-                
+
                 evt.Summary = e.Title;
                 if (e.Description != null)
                     evt.Description = e.Description;
@@ -112,27 +198,27 @@ namespace OSBLE.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ActionResult DownloadCourseCalendar(int id)
-            {
-            Course course = (from d in db.Courses
-                             where d.ID == id
-                             select d).FirstOrDefault();
-
-            //get all the course events 
-            List<OSBLE.Models.HomePage.Event> courseEvents = new List<Models.HomePage.Event>();
-
-            using (var result = new EventController())
-            {
-                courseEvents = result.GetActiveCourseEvents(course.StartDate, course.EndDate);
-            }
+        public ActionResult DownloadCourseCalendar()
+        {
+            //Get the Course
+            Course course = ActiveCourseUser.AbstractCourse as Course;
 
             //get the timezone of the course 
             CourseController cc = new CourseController();
             int utcOffset = (ActiveCourseUser.AbstractCourse as Course).TimeZoneOffset;
             TimeZoneInfo tz = cc.getTimeZone(utcOffset);
 
-            //Create and initalize the Calendar object 
+            //get course events
+            List<OSBLE.Models.HomePage.Event> events = (from e in db.Events
+                                                        where e.Poster.AbstractCourseID == ActiveCourseUser.AbstractCourseID
+                                                        && e.StartDate >= course.StartDate
+                                                        && e.StartDate <= course.EndDate
+                                                        && e.Approved
+                                                        select e).ToList();
+
+            //Create the calendar object 
             iCalendar courseCalendar = new iCalendar();
+            //initalize the Calendar object 
             courseCalendar.AddTimeZone(tz);
             courseCalendar.Method = "PUBLISH";
             courseCalendar.Name = "VCALENDAR";
@@ -141,26 +227,112 @@ namespace OSBLE.Controllers
             courseCalendar.Scale = "GREGORIAN";
             courseCalendar.AddProperty("X-WR-CALNAME", course.Prefix + "-" + course.Number + "-" + course.Semester + "-" + course.Year);
 
+            //get course breaks
+            if (ActiveCourseUser.AbstractCourse is Course && ((ActiveCourseUser.AbstractCourse as Course).ShowMeetings == true))
+            {
+                foreach (CourseBreak cb in course.CourseBreaks)
+                {
+                    // Start of break
+                    if ((cb.StartDate >= course.StartDate) && (cb.StartDate <= course.EndDate))
+                    {
+                        OSBLE.Models.HomePage.Event e = new OSBLE.Models.HomePage.Event();
+
+                        e.Title = cb.Name;
+
+                        if (cb.StartDate.Date != cb.EndDate.Date)
+                        {
+                            e.Title += " Starts";
+                        }
+
+                        e.StartDate = cb.StartDate.Date;
+                        e.HideTime = true;
+                        e.NoDateTime = true;
+                        e.HideDelete = true;
+
+                        events.Add(e);
+                    }
+
+                    // End of break (only if date is different than start)
+                    if ((cb.StartDate.Date != cb.EndDate.Date) && (cb.EndDate >= course.StartDate) && (cb.EndDate <= course.EndDate))
+                    {
+                        OSBLE.Models.HomePage.Event e = new OSBLE.Models.HomePage.Event();
+
+                        e.Title = cb.Name + " Ends";
+                        e.StartDate = cb.EndDate.Date;
+                        e.HideTime = true;
+                        e.HideDelete = true;
+                        events.Add(e);
+                    }
+                }//end foreach
+
+                foreach (CourseMeeting cm in course.CourseMeetings)
+                {
+                    StringBuilder rpPattern = new StringBuilder("FREQ=WEEKLY;UNTIL=");
+                    rpPattern.Append(new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(course.EndDate, tz)).ToString(@"yyyyMMdd\THHmmss\Z"));
+                    rpPattern.Append(";WKST=SU;BYDAY=");
+                    if (cm.Sunday)
+                        rpPattern.Append("SU,");
+                    if (cm.Monday)
+                        rpPattern.Append("MO,");
+                    if (cm.Tuesday)
+                        rpPattern.Append("TU,");
+                    if (cm.Wednesday)
+                        rpPattern.Append("WE,");
+                    if (cm.Thursday)
+                        rpPattern.Append("TH,");
+                    if (cm.Friday)
+                        rpPattern.Append("FR,");
+                    if (cm.Saturday)
+                        rpPattern.Append("SA");
+
+                    //trim trailing comma if it is there
+                    if (rpPattern[rpPattern.Length - 1] == ',')
+                        rpPattern.Remove(rpPattern.Length - 1, 1);
+
+                    RecurringComponent recurringComponent = new RecurringComponent();
+                    RecurrencePattern pattern = new RecurrencePattern(rpPattern.ToString());
+
+                    DDay.iCal.Event evt = courseCalendar.Create<DDay.iCal.Event>();
+                    //may cause issues
+                    DateTime evtStart = course.StartDate.Date;
+                    evtStart = evtStart.Add(cm.StartTime.TimeOfDay);
+                    DateTime evtEnd = course.StartDate.Date;
+                    evtEnd = evtEnd.Add(cm.EndTime.TimeOfDay);
+                    
+                    
+                    evt.Start = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(evtStart, tz));
+                    evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(evtEnd, tz));
+                    evt.LastModified = new iCalDateTime(DateTime.Now);
+                    evt.Summary = cm.Name;
+                    evt.Location = cm.Location;
+                    evt.RecurrenceRules.Add(pattern);
+
+                }
+
+
+            }//end if
+
             //add all the events to the calendar 
-            foreach (OSBLE.Models.HomePage.Event e in courseEvents)
+            foreach (OSBLE.Models.HomePage.Event e in events)
             {
                 DDay.iCal.Event evt = courseCalendar.Create<DDay.iCal.Event>();
-            
+
                 evt.Start = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(e.StartDate, tz));
                 if (e.EndDate == null)
                 {
                     evt.End = evt.Start.AddDays(1);
                     evt.IsAllDay = true;
-        }
+                }
                 else
-        {
+                {
                     evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(e.EndDate.Value, tz));
-            }
+                }
 
                 evt.Summary = e.Title;
                 if (e.Description != null)
                     evt.Description = e.Description;
-        }
+            }
+
 
             // Create a serialization context and serializer factory.
             // These will be used to build the serializer for our object.
@@ -189,7 +361,7 @@ namespace OSBLE.Controllers
             Course course = (from d in db.Courses
                              where d.ID == id
                              select d).FirstOrDefault();
-   
+
             string prefix = course.Prefix.Replace(@"/", "-");
             string number = course.Number.Replace(@"/", "-");
 
@@ -229,7 +401,7 @@ namespace OSBLE.Controllers
             string number = course.Number.Replace(@"/", "-");
 
             System.IO.File.WriteAllBytes(path + prefix + number + "-" + course.Semester + "-" + course.Year + ".ics", courseCalendar);
-      
+
+        }
     }
-}
 }
