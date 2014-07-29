@@ -2043,3 +2043,19 @@ a:link.searchResultsText{
 #searchTable th{        
     border-bottom:solid 1px #074974;
 }
+
+.RubricList Input {
+    background: #eeeeff;
+}
+
+.RubricList textarea {
+    background: #eeeeff;
+}
+
+.rubric Input {
+    background: #eeeeff;
+}
+
+.rubric textarea {
+    background: #eeeeff;
+}
