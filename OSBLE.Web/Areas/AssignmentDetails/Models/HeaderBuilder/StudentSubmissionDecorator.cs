@@ -8,6 +8,9 @@ using System.Linq;
 using System.Runtime.Caching;
 using OSBLE.Utility;
 using System.IO;
+using OSBLE.Models.Courses.Rubrics;
+using OSBLE.Controllers;
+using OSBLE.Models;
 
 namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
 {
@@ -71,6 +74,41 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
                 header.Submission.SubmissionReceived = false;
                 Cache["SubmissionReceived"] = false;
             }
+
+           
+            //handle link for viewing annotated documents
+            RubricEvaluation rubricEvaluation = null;
+
+            //Getting the assignment team for Student, and if its non-null then we take that team ID and find the RubricEvaluation
+            //that they were the recipient of. 
+            AssignmentTeam ateam = OSBLEController.GetAssignmentTeam(assignment, Student);
+            int teamId = 0;
+            if (ateam != null)
+            {
+                teamId = ateam.TeamID;
+                header.Submission.authorTeamID = teamId;
+
+                using (OSBLEContext db = new OSBLEContext())
+                {
+                    //Only want to look at evaluations where Evaluator.AbstractRole.CanGrade is true, otherwise
+                    //the rubric evaluation is a  student rubric (not interested in them here)
+                    rubricEvaluation = (from re in db.RubricEvaluations
+                                        where re.AssignmentID == assignment.ID &&
+                                        re.Evaluator.AbstractRole.CanGrade &&
+                                        re.RecipientID == teamId
+                                        select re).FirstOrDefault();
+                }
+            }
+
+            //If the Rubric has been evaluated and is published, calculate the rubric grade % to display to the student
+            if (rubricEvaluation != null && rubricEvaluation.IsPublished)
+            {
+                header.IsPublished = true;                
+            }
+            else
+            {
+                header.IsPublished = false;                
+            }  
 
 
             return header;

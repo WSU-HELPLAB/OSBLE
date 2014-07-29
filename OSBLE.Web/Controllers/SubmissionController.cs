@@ -203,7 +203,7 @@ namespace OSBLE.Controllers
                                                 .File(deliverableName)
                                                 .Delete();
 
-                                            if (assignment.Type != AssignmentTypes.AnchoredDiscussion) // handle non
+                                            if (assignment.Type != AssignmentTypes.AnchoredDiscussion) // handle assignments that are not anchored discussion
                                             {
                                                 //We need to remove the zipfile corresponding to the authorTeamId being sent in as well as the regularly cached zip. 
                                                 AssignmentTeam precedingAuthorAssignmentTeam = (from at in assignment.PreceedingAssignment.AssignmentTeams
@@ -213,7 +213,7 @@ namespace OSBLE.Controllers
                                                 FileSystem.RemoveZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, assignmentTeam);
 
                                             }
-                                            else //anchored discussion type
+                                            else //anchored discussion type TODO: this does nothing right now, fix!
                                             {
                                                 //We need to remove the zipfile corresponding to the authorTeamId being sent in as well as the regularly cached zip. 
                                                 AssignmentTeam precedingAuthorAssignmentTeam = (from at in assignment.AssignmentTeams
@@ -284,7 +284,7 @@ namespace OSBLE.Controllers
 
                                         DateTime? dueDate = assignment.DueDate;
                                         if (dueDate != null)
-                                        {
+                                        {   //TODO: add case for anchored discussion assignment
                                             (new NotificationController()).SendFilesSubmittedNotification(assignment, assignmentTeam, deliverables[i].Name);
                                         }
                                     }
