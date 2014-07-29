@@ -62,8 +62,9 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public override ActionResult Index()
         {
             base.Index();
-            ModelState.Clear();
-            ActiveCourseUser.AbstractRole.CanSubmit = true;
+            ModelState.Clear();   
+            //Setup new group assignment team and review team.
+            Assignment = SetupTeams(Assignment);
             return View(Assignment);
         }
 
@@ -92,6 +93,45 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             WasUpdateSuccessful = true;
             return base.PostBack(model);
 
+        }
+
+        public Assignment SetupTeams(Assignment assignment)
+        {
+            List<CourseUser> courseUsers = db.CourseUsers.Where(cu => cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID).ToList();
+            
+            //clear old teams
+            assignment.AssignmentTeams.Clear();
+            //db.Entry(assignment).State = System.Data.EntityState.Modified;
+            //db.SaveChanges();
+
+            //make new teams for user listing          
+            foreach (CourseUser cu in courseUsers)
+            {
+                Team newTeam = new Team();
+
+                newTeam.Name = cu.UserProfile.LastAndFirst();
+                
+                newTeam.TeamMembers.Add(new TeamMember
+                {
+                    CourseUser = cu,
+                    CourseUserID = cu.ID,
+                    Team = newTeam,
+                    TeamID = newTeam.ID
+                });
+                
+                assignment.AssignmentTeams.Add(new AssignmentTeam
+                {
+                    Assignment = assignment,
+                    AssignmentID = assignment.ID,
+                    Team = newTeam,
+                    TeamID = ActiveCourseUser.AbstractCourseID
+                });
+            }
+
+            db.Entry(assignment).State = System.Data.EntityState.Modified;
+            db.SaveChanges();
+
+            return assignment;
         }
     }
 }
