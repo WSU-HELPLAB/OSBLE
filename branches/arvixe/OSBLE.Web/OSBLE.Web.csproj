@@ -620,7 +620,7 @@
     <Content Include="Areas\AssignmentDetails\Views\_ViewStart.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Basics\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\CommentCategory\Index.cshtml" />
-    <Content Include="Areas\AssignmentWizard\Views\Content\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Basics\Content\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\CriticalReviewDiscussionTeams\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\CriticalReview\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Deliverables\Index.cshtml" />
