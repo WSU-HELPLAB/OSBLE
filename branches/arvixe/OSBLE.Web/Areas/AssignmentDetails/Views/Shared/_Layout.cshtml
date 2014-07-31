@@ -172,12 +172,19 @@ else
     {
         <input type="hidden" name="hdnCourseID" value="@Model.CurrentAssignment.CourseID.Value" />
         <input type="hidden" name="hdnAssignmentID" value="@Model.CurrentAssignment.ID" />
+    
         
+    
         <table id="StudentsTable">
             <tr>
-                <th>
-                    Name
-                </th>
+                    @* If it's an anchored discussion assignment we don't have anything to put here *@
+                    @if (Model.CurrentAssignment.Type != AssignmentTypes.AnchoredDiscussion)
+                    {
+                        <th>
+                            Name
+                        </th>
+                    }
+                
                 @foreach (string key in Model.TableColumnHeaders.Keys)
                 {
                     <th>@Model.TableColumnHeaders[key]
@@ -186,7 +193,7 @@ else
             </tr>
             @RenderSection("TableData", false)
         </table>
-    
+            
         if (null != Model.CurrentAssignment.ABETDepartment)
         {
             <!-- Button to save changes to ABET stuff -->

@@ -55,6 +55,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 types.Remove(AssignmentTypes.TeamEvaluation);
                 types.Remove(AssignmentTypes.DiscussionAssignment);
                 types.Remove(AssignmentTypes.CriticalReviewDiscussion);
+                types.Remove(AssignmentTypes.AnchoredDiscussion);
                 return types;
             }
         }

@@ -85,9 +85,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
             if (files != null && newUpload)
             {
+                //clear review teams first
+                Assignment.ReviewTeams.Clear();
+                db.Entry(Assignment).State = System.Data.EntityState.Modified;
+                db.SaveChanges();
                 //submit file to the system
-                SubmissionController submission = new SubmissionController();
-                submission.Create(model.ID, files, ActiveCourseUser.AbstractCourse.ID);
+                SubmissionController submission = new SubmissionController();                
+                //removed: ActiveCourseUser.AbstractCourse.ID
+                submission.Create(model.ID, files, null);
             }
 
             WasUpdateSuccessful = true;
@@ -99,6 +104,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             List<CourseUser> courseUsers = db.CourseUsers.Where(cu => cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID).ToList();
             
+            //get old teams for checking membership
+            List<AssignmentTeam> oldAssignmentTeams = assignment.AssignmentTeams.ToList();
             //clear old teams
             assignment.AssignmentTeams.Clear();
             //db.Entry(assignment).State = System.Data.EntityState.Modified;
@@ -107,25 +114,45 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             //make new teams for user listing          
             foreach (CourseUser cu in courseUsers)
             {
-                Team newTeam = new Team();
+                //add if they are not on a review team already
+                bool inReviewTeam = false;
+                //foreach(ReviewTeam rTeam in assignment.ReviewTeams)
+                //{
+                //    foreach(AssignmentTeam aTeam in oldAssignmentTeams)
+                //    {
+                //        foreach(TeamMember tmember in aTeam.Team.TeamMembers)
+                //        {
+                //            if (tmember.TeamID == rTeam.ReviewTeamID)
+                //            {
+                //                inReviewTeam = true;                                
+                //            }                                
+                //        }
+                //    }
+                //}
 
-                newTeam.Name = cu.UserProfile.LastAndFirst();
-                
-                newTeam.TeamMembers.Add(new TeamMember
+                if(!inReviewTeam)
                 {
-                    CourseUser = cu,
-                    CourseUserID = cu.ID,
-                    Team = newTeam,
-                    TeamID = newTeam.ID
-                });
+                    Team newTeam = new Team();
+
+                    newTeam.Name = cu.UserProfile.LastAndFirst();
+
+                    newTeam.TeamMembers.Add(new TeamMember
+                    {
+                        CourseUser = cu,
+                        CourseUserID = cu.ID,
+                        Team = newTeam,
+                        TeamID = newTeam.ID
+                    });
+
+                    assignment.AssignmentTeams.Add(new AssignmentTeam
+                    {
+                        Assignment = assignment,
+                        AssignmentID = assignment.ID,
+                        Team = newTeam,
+                        TeamID = ActiveCourseUser.AbstractCourseID
+                    });
+                }
                 
-                assignment.AssignmentTeams.Add(new AssignmentTeam
-                {
-                    Assignment = assignment,
-                    AssignmentID = assignment.ID,
-                    Team = newTeam,
-                    TeamID = ActiveCourseUser.AbstractCourseID
-                });
             }
 
             db.Entry(assignment).State = System.Data.EntityState.Modified;

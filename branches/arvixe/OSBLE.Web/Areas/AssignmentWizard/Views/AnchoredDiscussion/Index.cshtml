@@ -9,14 +9,14 @@
 
 @{
     List<Team> teams = ViewBag.Teams;
-    List<CourseUser> allUsers = ViewBag.AllUsers;
-    List<Assignment> previousTeamAssignments = ViewBag.PreviousTeamAssignments;
+    List<CourseUser> allUsers = ViewBag.AllUsers;    
     Assignment assignment = Model.Assignment;
+    List<ReviewTeam> reviewTeams = ViewBag.ReviewTeams;
 }
 @section Header
 {
     <link href="@Url.Content("~/areas/AssignmentWizard/Content/css/criticalReview.css")" type="text/css" rel="Stylesheet" />
-    <script src="@Url.Content("~/areas/AssignmentWizard/Content/js/criticalReview.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/areas/AssignmentWizard/Content/js/anchoredDiscussionSetup.js")" type="text/javascript"></script>
 }
 <div id="teamDiv">
     <p>
@@ -80,11 +80,11 @@
         <h3>
             Items to be Reviewed
         </h3>
-        @{int counter = 0;}
-        @*@foreach (AssignmentTeam aTeam in assignment.AssignmentTeams.OrderBy(t => t.Team.Name))*@
+        @{int counter = 0;}        
         @foreach (Deliverable d in assignment.Deliverables)
         {
             counter++;
+            string authorTeamId = counter.ToString();
             string hasDeliverableClass = "hasDeliverable";
             string selectorChecked = @"checked=""checked""";
             if (d.Assignment.DueDate == null)
@@ -92,14 +92,13 @@
                 hasDeliverableClass = "noDeliverable";
                 selectorChecked = "";
             }
-            <div id="teamDiv_@(counter)" class="TeamDiv @hasDeliverableClass">
-                <input class="selectorCheckBox" type="checkbox" id="teamDiv_checkbox_@(counter)" name="teamDiv_checkbox_@(counter)" @selectorChecked />
-                <label for="teamDiv_checkbox_@(counter)">@d.Name</label>
-                <ul id="team_@(counter)" class="TeamSortable">
+            <div id="teamDiv_@(authorTeamId)" class="TeamDiv @hasDeliverableClass">
+                <input class="selectorCheckBox" type="checkbox" id="teamDiv_checkbox_@(authorTeamId)" name="teamDiv_checkbox_@(authorTeamId)" @selectorChecked />
 
-                   
+                <label for="teamDiv_checkbox_@(authorTeamId)">@d.Name</label>
+                <ul id="team_@(authorTeamId)" class="TeamSortable">
 
-                    @foreach (ReviewTeam reviewTeam in assignment.ReviewTeams.Where(rt => rt.AuthorTeamID == assignment.CourseID))
+                    @foreach (ReviewTeam reviewTeam in assignment.ReviewTeams.Where(rt => rt.AuthorTeamID == counter))
                     {
                         <li data-id="reviewTeam_@(reviewTeam.ReviewingTeam.ID)" class="ui-state-default StudentListItem">
                             @reviewTeam.ReviewingTeam.Name

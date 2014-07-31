@@ -25,6 +25,8 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
 
         public override DynamicDictionary BuildHeader(Assignment assignment)
         {
+            //TODO:clear out the un-needed actions here
+
             dynamic header = Builder.BuildHeader(assignment);
             header.CRSubmission = new DynamicDictionary();
             header.Assignment = assignment;
@@ -54,28 +56,11 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
                 header.CRSubmission.authorTeams = authorTeams;
                 header.CRSubmission.assignmentId = assignment.ID;
 
-                List<DateTime?> submissionTimes = new List<DateTime?>();
-               
-                // get submission times for critical review submission
-                List<DateTime?> authorSubmissionTimes = new List<DateTime?>();
-                foreach(ReviewTeam reviewTeam in authorTeams)
-                {
-                    submissionTimes.Add(FileSystem.GetSubmissionTime(assignmentTeam, reviewTeam.AuthorTeam));
-
-                    AssignmentTeam assignTeam = (from at in assignment.PreceedingAssignment.AssignmentTeams
-                                                 where at.TeamID == reviewTeam.AuthorTeamID
-                                                 select at).FirstOrDefault();
-
-                    authorSubmissionTimes.Add(assignTeam.GetSubmissionTime());
-                }
-
-                // get submission times for original assignment submission (in order to check if they have submitted)
-                // need to loop over each AssignmentTeam from the original assignment to get submission time
-                
+                List<DateTime?> submissionTimes = new List<DateTime?>();  
 
                 //pass submission times to view
                 header.CRSubmission.submissionTimes = submissionTimes;
-                header.CRSubmission.authorSubmissionTimes = authorSubmissionTimes;
+                //header.CRSubmission.authorSubmissionTimes = authorSubmissionTimes;
 
                 if (assignment.HasTeams)
                 {
@@ -105,11 +90,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
             //rubric stuff:
             header.CRSubmission.hasStudentRubric = assignment.HasStudentRubric;
             header.CRSubmission.studentRubricID = assignment.StudentRubricID;
-
-            //RubricController rc = new RubricController();   
-
-            header.testval = "BOOYA";
-
+           
             return header;
         }
     }
