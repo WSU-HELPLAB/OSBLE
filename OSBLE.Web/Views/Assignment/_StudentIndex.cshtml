@@ -127,7 +127,7 @@
                                     )
                     }
                 }
-                else if (assignments[i].HasDeliverables)
+                else if (assignments[i].HasDeliverables && assignments[i].Type != AssignmentTypes.AnchoredDiscussion)
                 {
                     //Assignment with Deliverables: Display "Resubmit"  or "Submit" depending on current submission status
                     string submissionString = "Submit";
@@ -149,6 +149,14 @@
                     {
                         @Html.ActionLink("Submit Team Evaluation", "StudentTeamEvaluation", "Assignment", new { assignmentId = assignments[i].ID }, new { })
                     }
+                }
+                else if(assignments[i].Type == AssignmentTypes.AnchoredDiscussion)
+                {
+                    //display link to review
+                    //TODO: handle multiple documents
+                    @(Html.ActionLink("Annotate Review Document", "GetAnnotatedDocument", "FileHandler",
+                    new { area = "", assignmentId = assignments[i].ID, authorTeamId = 1 },
+                    new { onclick = "create_and_open_downloading_submission_dialog()" }))  
                 }
             </td>
 

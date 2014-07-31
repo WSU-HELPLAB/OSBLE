@@ -353,6 +353,7 @@
     <Content Include="Areas\AssignmentWizard\Content\css\team.css" />
     <Content Include="Areas\AssignmentWizard\Content\icons\rubric_add.png" />
     <Content Include="Areas\AssignmentWizard\Content\icons\rubric_delete.png" />
+    <Content Include="Areas\AssignmentWizard\Content\js\anchoredDiscussionSetup.js" />
     <Content Include="Areas\AssignmentWizard\Content\js\assignmentFilesUploader.js" />
     <Content Include="Areas\AssignmentWizard\Content\js\basics.js" />
     <Content Include="Areas\AssignmentWizard\Content\js\commentCategories.js" />

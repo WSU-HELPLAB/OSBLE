@@ -132,7 +132,7 @@
                     {
                         @:@assignments[i].GetCompletedTeamEvaluationsCount() of @assignments[i].GetTotalTeamEvaluationCount() evaluations completed.
                     }
-                    else if (assignments[i].HasDeliverables)
+                    else if (assignments[i].HasDeliverables && assignments[i].Type != AssignmentTypes.AnchoredDiscussion)
                     {
                         @:@assignments[i].GetSubmissionCount() of @assignments[i].AssignmentTeams.Count submissions received.<br />
                         @:@Html.ActionLink("Download all", "GetAllSubmissionsForAssignment", "FileHandler", new { assignmentID = assignments[i].ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
