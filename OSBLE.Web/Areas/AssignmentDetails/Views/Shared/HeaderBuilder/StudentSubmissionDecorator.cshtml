@@ -43,7 +43,7 @@
             
                    
                }
-                @if(dataModel.IsPublished)
+                @if(dataModel.IsAnnotatable)
                 {
                     <li>
                         @*@Html.ActionLink("View Reviewed Document", "ReviewGradedDocument", "../PdfCriticalReview", new { assignmentId = dataModel.Submission.assignmentID, authorTeamId = dataModel.Submission.authorTeamID }, new { area = "" })*@
