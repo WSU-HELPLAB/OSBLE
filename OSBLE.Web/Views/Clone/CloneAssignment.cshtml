@@ -3,15 +3,14 @@
 
 @using OSBLE.Models
 
-
 @{
-    ViewBag.Title = "Clone An Existing Course";
+    ViewBag.Title = "Clone An Existing Assignment";
 }
 
 @if (ViewBag.pastCourses != null && ViewBag.pastCourses.Count > 0)
 {
-    @:<h2>Clone An Existing Course @Helpers.CreateToolTip(ToolTips.CloneCourse)</h2><br />
-    using (Html.BeginForm("CloneSetup", "Course", FormMethod.Get))
+    @:<h2>Select Course @Helpers.CreateToolTip(ToolTips.CloneAssignmentFromCourse) </h2><br />
+    using (Html.BeginForm("AssignmentSetup", "Clone", FormMethod.Get))
     {
         @:<select name="courseId" id="clone_select">
         bool courseOptGroup = false;
@@ -84,8 +83,8 @@
         if (courseOptGroup || communityOptGroup)
         {
             @:</optgroup>
-            }
-            @:</select>
+        }
+        @:</select>
         <input type="submit" name="Clone Course" />
     }
 }

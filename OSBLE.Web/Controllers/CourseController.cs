@@ -39,7 +39,7 @@ namespace OSBLE.Controllers
         }
 
         //yc: utcOffset is the zone offset information (eg PST == -8)
-        private void createMeetingTimes(Course course, int utcOffset)
+        public void createMeetingTimes(Course course, int utcOffset)
         {
             int count = Convert.ToInt32(Request.Params["meetings_max"]);
             if (course.CourseMeetings == null)
@@ -329,7 +329,7 @@ namespace OSBLE.Controllers
             return;
         }
 
-        private void createBreaks(Course course)
+        public void createBreaks(Course course)
         {
             int count = Convert.ToInt32(Request.Params["breaks_max"]);
             if (course.CourseBreaks == null)
