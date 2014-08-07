@@ -10,8 +10,8 @@
 
 @if (ViewBag.pastCourses != null && ViewBag.pastCourses.Count > 0)
 {
-    @:<h2>Clone An Existing Course @Helpers.CreateToolTip(ToolTips.CloneCourse)</h2><br />
-    using (Html.BeginForm("CloneSetup", "Course", FormMethod.Get))
+    @:<h2>Clone An Existing Course</h2><br />
+    using (Html.BeginForm("CourseSetup", "Clone", FormMethod.Get))
     {
         @:<select name="courseId" id="clone_select">
         bool courseOptGroup = false;

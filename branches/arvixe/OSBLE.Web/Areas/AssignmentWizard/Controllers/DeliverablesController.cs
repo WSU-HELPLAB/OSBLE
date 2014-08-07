@@ -68,6 +68,13 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
              * */
 
             ViewBag.DeliverableTypes = new SelectList(allItems, "Value", "Text");
+            foreach (var a in ViewBag.DeliverableTypes)
+            {
+                if (a.Value == "PDF (.pdf)")
+                {
+                    a.Selected = true;
+                }
+            }
             ViewBag.AllowedFileNames = from c in FileSystem.GetCourseDocumentsFileList(ActiveCourseUser.AbstractCourse, includeParentLink: false).Files select c.Name;
         }
 
