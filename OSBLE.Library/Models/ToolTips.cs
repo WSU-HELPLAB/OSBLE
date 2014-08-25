@@ -144,7 +144,7 @@ namespace OSBLE.Models
                 {"Assessment Committee Member",""},
                 {"ABET Evaluator",""}};
 
-        public static string RosterWhitetableRoleRole = "Whitelisted users are approved to  enroll in the course, but they do not have an OSBLE account. Provided a valid email address, these students will be invited to register and enroll into this course. If an email address on the roster that was uploaded, these students will be notified. Students highlighed in red do not have a valid email address.";
+        public static string RosterWhitetableRoleRole = "Whitelisted users are approved to  enroll in the course, but they do not have an OSBLE account. <em><strong>Provided a valid email address</strong></em>, these students will be invited to register and enroll into this course. If an email address on the roster that was uploaded, these students will be notified. No e-mail address is on file for students highlighted in red. You will need to ask these students to create an OSBLE account before they can be enrolled in the course.";
         public static string RosterUserName = "This is the name this user will be publicly identified by in mail, posts, assignments, and other content.";
         public static string RosterEmail = "This must be the email address this user registered with for OSBLE.";
         public static string RosterSchoolID = "Input the school/ organization identification number for this user to indicate who is being added to this course.";

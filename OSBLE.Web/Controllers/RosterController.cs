@@ -1196,7 +1196,7 @@ namespace OSBLE.Controllers
                 {
                     entry.Section = 0;
                 }
-                if(emailColumn != "")
+                if(emailColumn != "" && emailColumn != "None")
                 {
                     entry.Email = csvReader[csvReader.GetFieldIndex(emailColumn)];
                 }
@@ -1555,7 +1555,8 @@ namespace OSBLE.Controllers
             message += @"Best regards,<br/>
                 The OSBLE Team in the <a href='www.helplab.org'>HELP lab</a> at <a href='www.wsu.edu'>Washington State University</a>";
 
-            Email.Send(subject, message, new List<MailAddress>() { new MailAddress(wtUser.Email) });
+            if(null != wtUser.Email)
+                Email.Send(subject, message, new List<MailAddress>() { new MailAddress(wtUser.Email) });
 
             return RedirectToAction("Index", "Roster", new { notice = wtUser.Name2 + " " + wtUser.Name1 + " has been sent an email to join this course" });
         }

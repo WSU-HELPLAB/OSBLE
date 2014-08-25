@@ -112,12 +112,14 @@
                       
                 <ul class="user_list">
                     @foreach (var WTuser in ViewBag.WhiteTableUsers)
-                    {
-                        if (WTuser.Email != String.Empty)
+                    {                        
+                        if (WTuser.Email != String.Empty && WTuser.Email != null)
                         {
                             <li id="wtuser_item_@WTuser.ID">
-                                <div class="user_controls">
-                                    <a title="Send Course Invitation Email" href="@Url.Action("resendWhiteTableEmail", "Roster", new { wtUserId = WTuser.ID })">@Helpers.MailButton()</a>
+                                <div class="user_controls">   
+                                                                     
+                                    <a title="Send Course Invitation Email" href="@Url.Action("resendWhiteTableEmail", "Roster", new { wtUserId = WTuser.ID })">@Helpers.MailButton()</a>    
+                                                                      
                                     @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                                     {
                                         <a title="Modify This User" href="@Url.Action("EditWTUser", "Roster", new { wtuID = WTuser.ID })">@Helpers.EditButton()</a>
@@ -129,7 +131,7 @@
                                 <span>@WTuser.Name1 @WTuser.Name2</span>
                             </li>
                         }
-                        else if (WTuser.Email == String.Empty)
+                        else if (WTuser.Email == String.Empty || WTuser.Email == null)
                         {
                             <li class="wt_no_email">
                                 <div class="user_controls">
