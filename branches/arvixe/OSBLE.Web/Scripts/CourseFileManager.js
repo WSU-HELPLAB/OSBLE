@@ -196,7 +196,9 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         result += "<td style=\"" + " width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; " + "\">";
         if (stateObj.allowsCollapsing) {
             if (folderName == "Files and Links") {
-                result += "<h3 style=\"-webkit-margin-before: .60em; -webkit-margin-after: .5em;\">Files and Links</h3>";
+                result += "<h3 class=\"files_links_header\" style=\"-webkit-margin-before: .60em; -webkit-margin-after: .5em;\">Files and Links </h3>"
+                            + "<span><a  class=\"files_links\" href=\"#\" > <img width=\"19\" height=\"19\" class=\"files_links_tooltip\" alt=\"(?)\" src=\"../../Content/images/tooltip/109_AllAnnotations_Help_19x19_72.png\">"
+                            + "<span id=\"files_links_tooltip\"><p class=\"files_links_p\">Right clicking \"Files and Links\" will bring up a dialog for the current course file manager</p></span></a> </span>";
             } else {
                 result += "<a style=\"cursor: pointer;\" title=\"" + folderName + "\" onclick=\"cfm_expand_collapse(" + ss + ");\">";
                 result += "<img id=\"expander_img_" + ss + "\" src=\"" + stateObj.getExpanderImgSrc() + "\" />&nbsp;" + folderName;

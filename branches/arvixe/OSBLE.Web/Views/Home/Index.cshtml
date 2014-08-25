@@ -73,16 +73,16 @@
 
 </div>
 
-<div id="dashboard_right">
+<div id="dashboard_right">    
+    
+    @*@Helpers.CreateToolTip(ToolTips.FileUploader)*@
 
-
-
-    <!-- File manager for course files -->
+    <!-- File manager for course files -->    
     <div id="divFileManager" style="float:right;">
-        @Helpers.CreateToolTip(ToolTips.FileUploader)
+               
         (Please wait, loading files...)
     </div>
-
+    
     <!--yc: file upload size change!-->
     <!-- Scripts for file manager -->
     <!--yc: currently cant find a way to put this line of code into the script so its placed here for now-->
@@ -92,13 +92,12 @@
     <script type="text/javascript">
         // Write the HTML for the file manager control
         if (XMLHttpRequest) {
-            cfm_getListing("divFileManager");
+            cfm_getListing("divFileManager");            
         }
         else {
             document.write("File upload not supported. Please upgrade your web browser.");
-        }
+        }        
     </script>
-
 
     @if (false)
     {
@@ -122,7 +121,7 @@
         </h3>
          * */
     }
-
+    
 </div>
 
 <div id="dashboard_middle">
