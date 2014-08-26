@@ -1805,8 +1805,8 @@ a:link.searchResultsText {
 #files_links_tooltip {
     display: none;
     background: #fff;
-    margin-left: -230px;    
-    padding: 2px;
+    margin-left: -230px;  
+    padding-left: 15px;
     position: absolute;
     z-index: 1000;
     height: auto;
@@ -1814,21 +1814,24 @@ a:link.searchResultsText {
     text-wrap: normal;
     border-radius: 5px;
     width: 100%;
-    min-width: 200px; 
+    min-width: 200px;
     max-width: 300px;
     white-space: normal;
-    border-top: 1px solid #aaccff;
-    border-left: 1px solid #aaccff;
-    border-right: 1px solid #aaccff;
-    border-bottom: 1px solid #aaccff;
-    font-size:small;
-    color:black;
+    border-top: 1px solid #a0c7ff;
+    border-left: 1px solid #a0c7ff;
+    border-right: 1px solid #a0c7ff;
+    border-bottom: 1px solid #a0c7ff;
+    font-size: small;
+    color: #666;
+    -webkit-box-shadow: 0px 4px 14px 0px rgba(50, 50, 50, 0.72);
+    -moz-box-shadow: 0px 4px 14px 0px rgba(50, 50, 50, 0.72);
+    box-shadow: 0px 4px 14px 0px rgba(50, 50, 50, 0.72);
 }
 
 .files_links_header {
-    display:inline;
+    display: inline;
 }
 
 .files_links {
-    text-decoration:none;
+    text-decoration: none;
 }
