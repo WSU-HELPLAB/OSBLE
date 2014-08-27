@@ -1300,7 +1300,7 @@ namespace OSBLE.Controllers
             if (n.Count > 0)
                 CopyAssignments((ActiveCourseUser.AbstractCourse as Course), o, n);
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Assignment");
         }
 
         public ActionResult DownloadDashboardPosts(int? id)

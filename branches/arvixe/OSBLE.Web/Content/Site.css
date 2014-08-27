@@ -1805,7 +1805,7 @@ a:link.searchResultsText {
 #files_links_tooltip {
     display: none;
     background: #fff;
-    margin-left: -230px;  
+    margin-left: -230px;
     padding-left: 15px;
     position: absolute;
     z-index: 1000;
@@ -1832,6 +1832,30 @@ a:link.searchResultsText {
     display: inline;
 }
 
-.files_links {
+.files_links, .root_context_subfolder {
     text-decoration: none;
+}
+
+.assignment_check {
+    width: 100px;
+}
+
+.checkbox_td, .checkbox_th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.checkbox_table {
+    border-spacing: 5px;
+}
+
+.check_all_left {
+    border:dotted 1px #C0C0C0;
+    border-right:none;
+}
+
+.check_all_right {
+    border:dotted 1px #C0C0C0;
+    border-left:none;
+    text-align:center;
 }
