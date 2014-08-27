@@ -9,7 +9,7 @@
 
 @if (ViewBag.pastCourses != null && ViewBag.pastCourses.Count > 0)
 {
-    @:<h2>Select Course @Helpers.CreateToolTip(ToolTips.CloneAssignmentFromCourse) </h2><br />
+    @:<h2>Assignment Clone: Select Course @Helpers.CreateToolTip(ToolTips.CloneAssignmentFromCourse) </h2><br />
     using (Html.BeginForm("AssignmentSetup", "Clone", FormMethod.Get))
     {
         @:<select name="courseId" id="clone_select">
@@ -85,7 +85,7 @@
             @:</optgroup>
         }
         @:</select>
-        <input type="submit" name="Clone Course" />
+        <input type="submit" value="Select Course"  name="Clone Course" />
     }
 }
 else
