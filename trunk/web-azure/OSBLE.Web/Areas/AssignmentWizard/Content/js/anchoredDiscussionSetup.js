@@ -31,7 +31,7 @@ function documentReady() {
 
 //Adds the reviewer to the specified team
 function addReviewer(reviewerId, teamId) {
-    debugger;
+    
     var reviewer = $("#AvailableStudent").children('li').filter(function (index) {
         var dataId = $(this).attr("data-id");
         return reviewerId == dataId;
@@ -72,14 +72,14 @@ function buildTeams() {
             count: 0,
             members: Array(),
             author: $(reviewItems[i]).parent().children('.TeamSortable').first().prev().text()
-            };
+        };
     }
     for (var i = 0; i < numReviewers; i++) {
         activeReviewers[i] = {
             id: $(reviewers[i]).attr("data-id"),
             count: 0,
             name: $(reviewers[i]).text().trim()
-            };
+        };
     }
 
     //hide any visible errors
@@ -108,7 +108,7 @@ function buildTeams() {
 
     //wait for configuration to be removed before continuing
     $(".StudentListItem").promise().done(function () {
-
+        
         //assign reviewers to teams
         while (activeReviewers.length > 0) {
 
@@ -179,7 +179,7 @@ function displayError(text) {
 
 //Called whenever a draggable (student / team) is dropped onto a review entity
 function dragComplete(event, ui) {
-
+    
     //the element that just got finished being dragged
     var dragElement = $(ui.item.context);
 
@@ -232,13 +232,15 @@ function hideErrors() {
 
 //Before we can postback, we need to inject students into teams for the controller to process
 function processForm(evt) {
-
+    
     //get all review items
     var reviewItems = $.find('.TeamDiv');
     for (var i = 0; i < reviewItems.length; i++) {
 
         //find the team's DB ID
         var itemId = parseInt($(reviewItems[i]).context.id.split('_')[1]);
+        //find the assignment course
+        var courseId = parseInt($(reviewItems[i]).context.id.split('_')[2]);
 
         //find all reviewers for this item
         $(reviewItems[i]).find(".StudentListItem").each(function (index) {
@@ -249,7 +251,7 @@ function processForm(evt) {
 
             //set the form value
             var oldVal = $("#reviewTeam_" + reviewerId).val();
-            var newVal = "" + oldVal + "_" + itemId;
+            var newVal = "" + oldVal + "_" + itemId; //+ "_" + courseId;
             $("#reviewTeam_" + reviewerId).val(newVal);
         });
     }

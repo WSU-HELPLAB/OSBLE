@@ -8,6 +8,7 @@ using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Controllers;
 using OSBLE.Models;
+using OSBLE.Models.Annotate;
 
 namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
 {
@@ -32,7 +33,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
             header.CRdownload.hasRubricToView = false;
 
             //get student's team
-                        
+
             AssignmentTeam assignmentTeam = null;
             assignmentTeam = OSBLEController.GetAssignmentTeam(assignment.PreceedingAssignment, Student);
             header.CRdownload.teamID = assignmentTeam.TeamID;
@@ -40,12 +41,41 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
 
             //PDF reviews don't get sent to the file system (they get sent to annotate)
             //so we can't check the file system for review items.
+            //yc: but we can check to see if the file has been submitted into annotate
+            //dbo.annotatedocumentreferences has a field osbledocumentcode, and we have the date it was "uploaded"
+            //it follows the format:#-#-#-filename.PDF == courseID-PreviousAssignmentid-teamthatisreviewingreviewing-filename.PDF
+            //we also have dbo.reviewteams that show if some one has reviewed your assignment
             Assignment previousAssignment = assignment.PreceedingAssignment;
-            if (
-                previousAssignment.HasDeliverables
-                && previousAssignment.Deliverables[0].DeliverableType == DeliverableType.PDF
-                && previousAssignment.Deliverables.Count == 1
-                )
+            //yc: locate all reivew teams
+            ReviewTeam reviewers = null;
+            bool foundAnnotateEntry = false;
+            using (OSBLEContext db = new OSBLEContext())
+            {
+                if (assignmentTeam != null)
+                    reviewers = (from rte in db.ReviewTeams
+                                 where rte.AuthorTeamID == assignmentTeam.TeamID
+                                 select rte).FirstOrDefault();
+
+                if (reviewers != null)
+                {
+                    //if a review team exists, determin if the annoation exisits
+                    string lookup = assignment.CourseID.ToString() + "-" + previousAssignment.ID.ToString() + "-" +
+                        assignmentTeam.TeamID.ToString() + "-";
+                    AnnotateDocumentReference d = (from adr in db.AnnotateDocumentReferences
+                                                   where adr.OsbleDocumentCode.Contains(lookup)
+                                                   select adr).FirstOrDefault();
+                    if (d != null && (assignment.DueDate < DateTime.Now || assignment.IsCriticalReviewPublished))
+                    {
+                        foundAnnotateEntry = true;
+                    }
+                }
+
+            }
+            if (foundAnnotateEntry)//(
+                //previousAssignment.HasDeliverables
+                //&& previousAssignment.Deliverables[0].DeliverableType == DeliverableType.PDF
+                //&& previousAssignment.Deliverables.Count == 1
+                //)
             {
                 header.CRdownload.hasRecievedReview = true;
             }
@@ -77,12 +107,12 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
                     using (OSBLEContext db = new OSBLEContext())
                     {
                         header.CRdownload.hasRubricToView = (from e in db.RubricEvaluations
-                                                   where e.AssignmentID == assignment.ID &&
-                                                   e.RecipientID == assignmentTeam.TeamID &&
-                                                   e.Evaluator.AbstractRoleID == (int)CourseRole.CourseRoles.Student &&
-                                                   e.DatePublished != null
-                                                                 select e.ID).Count() > 0;
-                                                   
+                                                             where e.AssignmentID == assignment.ID &&
+                                                             e.RecipientID == assignmentTeam.TeamID &&
+                                                             e.Evaluator.AbstractRoleID == (int)CourseRole.CourseRoles.Student &&
+                                                             e.DatePublished != null
+                                                             select e.ID).Count() > 0;
+
                     }
                 }
             }

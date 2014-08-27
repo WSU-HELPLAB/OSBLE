@@ -118,7 +118,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
         private new void SetUpViewBag()
         {
-            //TODO: get linked assignment, not previous.
+            //TODO: get linked teams, not previous.
 
             //pull previous team configurations
             List<Assignment> previousTeamAssignments = (from assignment in db.Assignments
@@ -127,37 +127,12 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                                                         select assignment).ToList();
 
 
-            List<CourseUser> courseUsers = db.CourseUsers.Where(cu => cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID).ToList();
+            List<CourseUser> courseUsers = db.CourseUsers.Where(cu => cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID).ToList();      
 
-            ////clear old teams
-            //Assignment.AssignmentTeams.Clear();
-            //db.Entry(Assignment).State = System.Data.EntityState.Modified;
-            //db.SaveChanges();
-            
-            ////make new teams            
-            //foreach(CourseUser cu in courseUsers)
-            //{
-            //    Team newTeam = new Team();
-
-            //    newTeam.Name = cu.UserProfile.LastAndFirst();
-            //    newTeam.TeamMembers.Add(new TeamMember { 
-            //        CourseUser = cu,
-            //        CourseUserID = cu.ID,
-            //        Team = newTeam,
-            //        TeamID = newTeam.ID                    
-            //    });
-            //    Assignment.AssignmentTeams.Add(new AssignmentTeam { 
-            //        Assignment = Assignment,
-            //        AssignmentID = Assignment.ID,
-            //        Team = newTeam,
-            //        TeamID = ActiveCourseUser.AbstractCourseID
-            //    });
-            //}
-            //db.Entry(Assignment).State = System.Data.EntityState.Modified;
-            //db.SaveChanges();           
-
-            //place items into the viewbag
+            //place items into the viewbag            
             ViewBag.Teams = Assignment.AssignmentTeams.Select(t => t.Team).OrderBy(t => t.Name).ToList();
+
+            ViewBag.ReviewTeams = Assignment.ReviewTeams.ToList();            
             ViewBag.PreviousTeamAssignments = previousTeamAssignments;            
             ViewBag.AllUsers = courseUsers;
         }
@@ -272,7 +247,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     int authorId = 0;
                     Int32.TryParse(item, out authorId);
                     if (authorId > 0)
-                    {
+                    {      
                         ReviewTeam activeTeam = new ReviewTeam();
                         activeTeam.ReviewTeamID = reviewerId;
                         activeTeam.AuthorTeamID = authorId;

@@ -49,8 +49,9 @@ function parseDates() {
         var originaldate = moment(original);
         var currentDate = moment.utc(milliseconds, 'X');
         var originalOffset = originaldate.zone();
-        currentDate = currentDate.subtract('minutes', originalOffset);
-        $(this).html(currentDate.format(formatString));
+        //commented out to fix -1 error on course breaks, doesn't seem to have an effect elsewhere?
+        //currentDate = currentDate.subtract('minutes', originalOffset);
+        $(this).html(currentDate.format(formatString));        
         $(this).removeClass("utc-time");
         $(this).addClass("course-local-time");
     });
@@ -81,7 +82,7 @@ function parseDates() {
         {
             currentDate = currentDate.subtract('minutes', originalOffset);
         }
-        $(this).html(currentDate.format(formatString));
+        $(this).html(currentDate.format(formatString));        
         $(this).removeClass("utc-time");
         $(this).addClass("course-local-event-time");
     });
@@ -99,7 +100,7 @@ function parseDates() {
         var linedate = currentDate.format(formatString);
         linedate = linedate.concat("</a>");
         replace = replace.concat(linedate);
-        $(this).html(replace);
+        $(this).html(replace);        
         $(this).removeClass("utc-time-link");
         $(this).addClass("local-time");
     });

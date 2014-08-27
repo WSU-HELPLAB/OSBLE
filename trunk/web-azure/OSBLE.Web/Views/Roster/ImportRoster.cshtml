@@ -22,11 +22,11 @@
 <div class="selector">
     <br />
     <h3>
-        Section Header <em>(optional)</em>:
+        Section Header (optional):
     </h3>
     <ul id="section_selector" class="selector">
         <li class="@if (ViewBag.GuessedSection == null)
-                   {<text>selected</text>}>none_select"><em>None</em></li>
+                   {<text>selected</text>}>none_select">None</li>
         @foreach (string h in ViewBag.headers)
         {
             <li @if (h == ViewBag.GuessedSection) { <text> class="selected" </text> }>@h</li>
@@ -39,7 +39,7 @@
         </h3>
         <ul id="email_selector" class="selector">
             <li class="@if (ViewBag.GuessedEmail == null)
-                   {<text>selected</text>}>none_select"><em>None</em></li>
+                   {<text>selected</text>}>none_select">None</li>
             @foreach (string h in ViewBag.headers)
             {
                 <li @if (h == ViewBag.GuessedEmail) { <text> class="selected" </text> }>@h</li>
@@ -50,11 +50,11 @@
             <div class="selector">
                 <br />
                 <h3>
-                    Student Name Header <em>(optional)</em>:
+                    Student Name Header (optional):
                 </h3>
                 <ul id="name_selector" class="selector">
                     <li class="@if (ViewBag.GuessedSection == null)
-                           {<text>selected</text>}>none_select"><em>None</em></li>
+                           {<text>selected</text>}>none_select">None</li>
                     @foreach (string h in ViewBag.headers)
                     {
                         <li @if (h == ViewBag.GuessedName) { <text> class="selected" </text> }>@h</li>
@@ -67,11 +67,11 @@
             <div class="selector">
                 <br />
                 <h3>
-                    Student First Name Header <em>(optional)</em>:
+                    Student First Name Header (optional):
                 </h3>
                 <ul id="name_selector" class="selector">
                     <li class="@if (ViewBag.GuessedSection == null)
-                           {<text>selected</text>}>none_select"><em>None</em></li>
+                           {<text>selected</text>}>none_select">None</li>
                     @foreach (string h in ViewBag.headers)
                     {
                         <li @if (h == ViewBag.GuessedName) { <text> class="selected" </text> }>@h</li>
@@ -81,11 +81,11 @@
             <div class="selector">
                 <br />
                 <h3>
-                    Student Last Name Header <em>(optional)</em>:
+                    Student Last Name Header (optional):
                 </h3>
                 <ul id="name2_selector" class="selector">
                     <li class="@if (ViewBag.GuessedSection == null)
-                           {<text>selected</text>}>none_select"><em>None</em></li>
+                           {<text>selected</text>}>none_select">None</li>
                     @foreach (string h in ViewBag.headers)
                     {
                         <li @if (h == ViewBag.GuessedName2) { <text> class="selected" </text> }>@h</li>

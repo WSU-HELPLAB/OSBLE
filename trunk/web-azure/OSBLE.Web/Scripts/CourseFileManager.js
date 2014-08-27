@@ -196,10 +196,15 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         result += "<td style=\"" + " width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; " + "\">";
         if (stateObj.allowsCollapsing) {
             if (folderName == "Files and Links") {
-                result += "<h3 style=\"-webkit-margin-before: .60em; -webkit-margin-after: .5em;\">Files and Links</h3>";
+                result += "<h3 class=\"files_links_header\" style=\"-webkit-margin-before: .60em; -webkit-margin-after: .5em;\">Files and Links </h3>"
+                            + "<span><a  class=\"root_context_menu\" href=\"#\" > <img width=\"19\" height=\"19\" class=\"files_links_tooltip\" alt=\"(?)\" src=\"../../Content/images/folder_plus.png\"></a>"
+                            + "<span><a  class=\"files_links\" href=\"#\" > <img width=\"19\" height=\"19\" class=\"files_links_tooltip\" alt=\"(?)\" src=\"../../Content/images/tooltip/109_AllAnnotations_Help_19x19_72.png\">"
+                            + "<span id=\"files_links_tooltip\"><p class=\"files_links_p\">Right clicking \"Files and Links\" or on uploaded Files/Folders will bring up a dialog for the current course file manager</p></span></a> </span>";
             } else {
                 result += "<a style=\"cursor: pointer;\" title=\"" + folderName + "\" onclick=\"cfm_expand_collapse(" + ss + ");\">";
                 result += "<img id=\"expander_img_" + ss + "\" src=\"" + stateObj.getExpanderImgSrc() + "\" />&nbsp;" + folderName;
+                            // commented line is to put a folder+ icon to allow left click menu like the one next to files and links, not working currently due to undefined opt.$trigger when implementing this feature
+                            //+ "<span><a  class=\"root_context_subfolder\" href=\"#\" > <img width=\"19\" height=\"19\" class=\"files_links_tooltip\" alt=\"(?)\" src=\"../../Content/images/folder_plus.png\"></a>";
                 result += "</a>";
             }
         }
@@ -1131,7 +1136,6 @@ $(function () {
         {
             selector: '.context-menu-one',
             callback: function (key, options) {
-                alert("Test");
             },
             items: {
                 "Rename": {
@@ -1149,7 +1153,7 @@ $(function () {
                     callback: function (key, opt) {
                         // get the state object id of the clicked div and call the delete function
                         var m = opt.$trigger.attr('state-obj');
-                        
+
                         if (cfm_boolMultipleSelected == true) {
                             cfm_multipleFileDelete();
                         }
@@ -1255,8 +1259,13 @@ $(function () {
                 name: "Upload File(s)",
                 icon: "add",
                 callback: function (key, opt) {
-                    // get the state object id of the clicked div and call the rename function
-                    var m = opt.$trigger.attr('state-obj');
+                    // get the state object id of the clicked div and call the rename function   
+                    if (typeof opt.$trigger === "undefined") {
+                        m = 0;
+                    }
+                    else {
+                        var m = opt.$trigger.attr('state-obj');
+                    }
                     cfm_AddUploader(m);
                 }
 
@@ -1266,7 +1275,12 @@ $(function () {
                 icon: "add2",
                 callback: function (key, opt) {
                     // get the state object id of the clicked div and call the create function
-                    var m = opt.$trigger.attr('state-obj');
+                    if (typeof opt.$trigger === "undefined") {
+                        m = 0;
+                    }
+                    else {
+                        var m = opt.$trigger.attr('state-obj');
+                    }
                     cfm_CreateFolderIconClicked(m);
                 }
 
@@ -1332,7 +1346,7 @@ $(document).on('click', '.itemSelection', function (e) {
 $(document).on('click', 'html', function (e) {
 
     //Check to see if files and links was clicked and if not remove all clicked
-    if (FilesAndLinksClick == 1  || ContextMenu == true) {
+    if (FilesAndLinksClick == 1 || ContextMenu == true) {
         //Reset the files and links click
         FilesAndLinksClick = 0;
         ContextMenu = false;
@@ -1368,4 +1382,61 @@ $(document).on('mouseleave', '.itemSelection', function () {
     else {
         $(this).css("background", "white");
     }
+});
+
+
+//Check for clicking Folder+ icon after "Files and Links" 
+$(document).on('click', '.root_context_menu', function (e) {
+    
+    //we need to find the root menu UL
+    $(".context-menu-list.context-menu-root").each(function () {
+        var listText = $(this).text();        
+        
+        //when we find the root div, display it at the mouse cursor
+        if (listText == "Upload File(s)Create Folder") {
+            var currentMousePos = { x: -1, y: -1 };
+            currentMousePos.x = e.pageX;
+            currentMousePos.y = e.pageY;
+
+            $(this).css("display", "inline");            
+            $(this).css("left", currentMousePos.x);
+            $(this).css("top", currentMousePos.y);
+            $(this).css("width", "171px");
+            $(this).css("z-index", "1");
+
+        }
+    });
+
+});
+
+//hide the context menu (shown by clicking the folder+ icon) when clicking anywhere else
+$('body').click(function (event) {
+    if (!$(event.target).closest('.context-menu-list.context-menu-root').length) {
+        $('.context-menu-list.context-menu-root').hide();
+    };
+});
+
+//TODO: need to fix the opt.$trigger undefined before this will work
+//Check for clicking a subfolder Folder+ icon
+$(document).on("click", ".root_context_subfolder", function (e) {
+   
+    //RenameDeleteUpload File(s)Create Folder
+    ////we need to find the subfolder menu UL
+    $(".context-menu-list.context-menu-root").each(function () {
+        var listText = $(this).text();                
+        //when we find the subfolder menu, display it at the mouse cursor
+        if (listText == "RenameDeleteUpload File(s)Create Folder") {
+            var currentMousePos = { x: -1, y: -1 };
+            currentMousePos.x = e.pageX;
+            currentMousePos.y = e.pageY;
+
+            $(this).css("display", "inline");            
+            $(this).css("left", currentMousePos.x);
+            $(this).css("top", currentMousePos.y);
+            $(this).css("width", "171px");
+            $(this).css("z-index", "1");
+
+        }
+    });
+
 });

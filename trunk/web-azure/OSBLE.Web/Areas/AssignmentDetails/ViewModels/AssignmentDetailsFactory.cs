@@ -62,7 +62,7 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
             }
 
             //not a team evaluation assignment
-            if (assignment.Type != AssignmentTypes.TeamEvaluation)
+            if (assignment.Type != AssignmentTypes.TeamEvaluation && assignment.Type != AssignmentTypes.AnchoredDiscussion)
             {
                 //add late policy
                 vm.HeaderBuilder = new LatePolicyHeaderDecorator(vm.HeaderBuilder);
@@ -75,7 +75,7 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
             {
 
                 //add deliverable information if needed
-                if (assignment.HasDeliverables)
+                if (assignment.HasDeliverables && assignment.Type != AssignmentTypes.AnchoredDiscussion)
                 {
                     //list deliverables add download link
                     vm.HeaderBuilder = new TeacherDeliverablesHeaderDecorator(vm.HeaderBuilder);
@@ -114,9 +114,13 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                 }
                 else if (assignment.Type == AssignmentTypes.AnchoredDiscussion)
                 {
+                    //commented out: for now we don't need anything here for the instructor
+                    //in future implementations we may want to let the instructor also review documents with the group, but 
+                    //how the teams are set up currently it wont work (no team set up for instructor)
+
                     //link for critical review submission document
-                    vm.HeaderBuilder = new AnchoredDiscussionSubmitDecorator(vm.HeaderBuilder, vm.Client);
-                    vm.HeaderViews.Add("AnchoredDiscussionSubmitDecorator");                       
+                    //vm.HeaderBuilder = new AnchoredDiscussionSubmitDecorator(vm.HeaderBuilder, vm.Client);
+                    //vm.HeaderViews.Add("AnchoredDiscussionSubmitDecorator");
                 }
 
 
@@ -146,9 +150,18 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                 //needs to submit?
                 if (assignment.HasDeliverables)
                 {
-                    //add student submission link
-                    vm.HeaderBuilder = new StudentSubmissionDecorator(vm.HeaderBuilder, vm.Client);
-                    vm.HeaderViews.Add("StudentSubmissionDecorator");
+                    if (assignment.Type == AssignmentTypes.AnchoredDiscussion)
+                    {
+                        //link for critical review submission document
+                        vm.HeaderBuilder = new AnchoredDiscussionSubmissionDecorator(vm.HeaderBuilder, vm.Client);
+                        vm.HeaderViews.Add("AnchoredDiscussionSubmissionDecorator");
+                    }
+                    else
+                    {
+                        //add student submission link
+                        vm.HeaderBuilder = new StudentSubmissionDecorator(vm.HeaderBuilder, vm.Client);
+                        vm.HeaderViews.Add("StudentSubmissionDecorator");
+                    }
                 }
                 else if (assignment.Type == AssignmentTypes.CriticalReview)
                 {
@@ -164,7 +177,7 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                 {
                     //link for critical review submission document
                     vm.HeaderBuilder = new AnchoredDiscussionSubmissionDecorator(vm.HeaderBuilder, vm.Client);
-                    vm.HeaderViews.Add("AnchoredDiscussionSubmissionDecorator");                    
+                    vm.HeaderViews.Add("AnchoredDiscussionSubmissionDecorator");
                 }
                 else if (assignment.Type == AssignmentTypes.DiscussionAssignment && !assignment.HasDiscussionTeams)
                 {

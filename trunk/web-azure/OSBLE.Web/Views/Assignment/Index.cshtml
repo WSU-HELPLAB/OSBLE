@@ -13,7 +13,8 @@
 
 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
 {
-    <a href="@Url.Action("Index", "Home", new { area = "AssignmentWizard"})" class="add_link" id="assignment_create_button">@Helpers.AddButton() Create New Assignment</a><br /><br />
+    <a href="@Url.Action("Index", "Home", new { area = "AssignmentWizard"})" class="add_link" id="assignment_create_button">@Helpers.AddButton() Create New Assignment</a>
+    <a href="@Url.Action("CloneAssignment", "Clone")" class="add_link">@Helpers.AddButton() Clone A Previous Assignment</a><br /><br />
 }
 </div>
 

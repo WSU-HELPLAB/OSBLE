@@ -22,6 +22,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
             header.Assignment = assignment;
             header.Deliverables.AllDeliverables = assignment.Deliverables;
             
+            //we may have to do some fiddiling here
             
             //set header information
             header.Deliverables.SubmissionCount = assignment.GetSubmissionCount();

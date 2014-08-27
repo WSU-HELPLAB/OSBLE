@@ -129,8 +129,10 @@ namespace OSBLE.Controllers
                         //the files variable is null when submitting an in-browser text submission
                         if (files != null)
                         {
+                            int anchoredDiscussionDocumentCount = 0;
                             foreach (var file in files)
                             {
+                                anchoredDiscussionDocumentCount++;
                                 if (file != null && file.ContentLength > 0)
                                 {
                                     DeliverableType type = (DeliverableType)deliverables[i].Type;
@@ -151,6 +153,7 @@ namespace OSBLE.Controllers
                                     {
                                         if (assignment.Type == AssignmentTypes.CriticalReview || assignment.Type == AssignmentTypes.AnchoredDiscussion)
                                         {
+                                            //TODO: clean this up
                                             AssignmentTeam authorTeam = new AssignmentTeam();
                                             ReviewTeam reviewTeam = new ReviewTeam();
 
@@ -161,19 +164,21 @@ namespace OSBLE.Controllers
                                                     Assignment = assignment,
                                                     AssignmentID = assignment.ID,
                                                     Team = null,
-                                                    TeamID = ActiveCourseUser.AbstractCourse.ID,
+                                                    TeamID = anchoredDiscussionDocumentCount,
                                                 };
 
                                                 reviewTeam = new ReviewTeam
                                                 {
                                                     Assignment = assignment,
                                                     AssignmentID = assignment.ID,
-                                                    AuthorTeam = null,
-                                                    AuthorTeamID = ActiveCourseUser.AbstractCourse.ID,
-                                                    ReviewingTeam = null,
+                                                    //AuthorTeam = null,
+                                                    AuthorTeamID = anchoredDiscussionDocumentCount,
+                                                    //ReviewingTeam = null,
                                                     ReviewTeamID = ActiveCourseUser.AbstractCourse.ID,
 
                                                 };
+                                                assignment.ReviewTeams.Add(reviewTeam);
+                                                //db.Entry(assignment).State = System.Data.EntityState.Modified;
                                                 db.SaveChanges();
                                             }
                                             else
@@ -223,6 +228,7 @@ namespace OSBLE.Controllers
                                                 FileSystem.RemoveZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, assignmentTeam);
                                             }
                                             //add in the new file
+                                            //authorTeamID is the deliverable file counter, and reviewTeamID is the courseID
                                             fs.Review(authorTeam.TeamID, reviewTeam.ReviewTeamID)
                                                 .AddFile(deliverableName, file.InputStream);
 

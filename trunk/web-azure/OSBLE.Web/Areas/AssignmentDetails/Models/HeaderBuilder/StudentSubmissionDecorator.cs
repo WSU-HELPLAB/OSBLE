@@ -3,6 +3,7 @@ using System;
 using OSBLE.Resources;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
+using OSBLE.Models.Annotate;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Caching;
@@ -28,6 +29,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
         {
             dynamic header = Builder.BuildHeader(assignment);
             header.Submission = new DynamicDictionary();
+            header.IsAnnotatable = new bool();
 
             DateTime? submissionTime = null;
 
@@ -97,6 +99,27 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
                                         re.Evaluator.AbstractRole.CanGrade &&
                                         re.RecipientID == teamId
                                         select re).FirstOrDefault();
+                    //if annotatable
+                    if (assignment.IsAnnotatable)
+                    {
+                        //yc: determine if there has been an annotation for this document
+                        //there will be an issue with linking from a critical review untill further discussion on how to handle this
+                        //when an instructor grades this, the reviewerid of the annoation is the teamid 
+                        string lookup = assignment.CourseID.ToString() + "-" + assignment.ID.ToString() + "-" +
+                        teamId.ToString() + "-";
+                        AnnotateDocumentReference d = (from adr in db.AnnotateDocumentReferences
+                                                       where adr.OsbleDocumentCode.Contains(lookup)
+                                                       select adr).FirstOrDefault();
+                        if (d != null && assignment.DueDate < DateTime.UtcNow)
+                        {
+                            header.IsAnnotatable = true;
+                        }
+                        else
+                            header.IsAnnotatable = false;
+                    }
+                    else
+                        header.IsAnnotatable = false;
+
                 }
             }
 
@@ -109,6 +132,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
             {
                 header.IsPublished = false;                
             }  
+
 
 
             return header;

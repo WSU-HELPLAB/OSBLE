@@ -33,7 +33,7 @@ namespace OSBLE.Models.Annotate
             string apiKey = GenerateAnnotateKey("listNotes.php", ApiUser, epoch);
             WebClient client = new WebClient();
 
-            using(OSBLEContext db = new OSBLEContext())
+            using (OSBLEContext db = new OSBLEContext())
             {
                 criticalReview = db.Assignments.Find(criticalReviewAssignmentID);
 
@@ -128,7 +128,7 @@ namespace OSBLE.Models.Annotate
 
                 //Submit document to annotate
 #if DEBUG
-                string documentUrl = "https://osble.org/content/icershort.pdf";
+                string documentUrl = "http://osble.org/content/icershort.pdf";
 #else
                 string documentUrl = "https://osble.org/FileHandler/GetAnnotateDocument?assignmentID={0}&authorTeamID={1}&apiKey={2}";
                 documentUrl = string.Format(documentUrl, assignmentID, authorTeamID, ApiKey);
@@ -380,19 +380,46 @@ namespace OSBLE.Models.Annotate
             using (OSBLEContext db = new OSBLEContext())
             {
                 Assignment assignment = db.Assignments.Find(assignmentID);
-                AssignmentTeam assignmentTeam = (from at in db.AssignmentTeams
-                                                 where at.AssignmentID == assignment.ID
-                                                 &&
-                                                 at.TeamID == authorTeamID
-                                                 select at
+                AssignmentTeam assignmentTeam = new AssignmentTeam();
+                ReviewTeam reviewTeam = new ReviewTeam(); //needed for anchored discussion
+                string fileName;
+
+                if (assignment.Type == AssignmentTypes.AnchoredDiscussion)
+                {
+                    reviewTeam = (from rt in db.ReviewTeams
+                                  where rt.AssignmentID == assignment.ID
+                                        &&
+                                        rt.AuthorTeamID == authorTeamID
+                                        select rt
+                                                ).FirstOrDefault();
+
+                    fileName = string.Format(
+                    "{0}-{1}-{2}-{3}",
+                    assignment.CourseID,
+                    assignment.ID,
+                    reviewTeam.ReviewTeamID,
+                    assignment.Deliverables[0].ToString()
+                    );
+                }
+                else
+                {
+                    assignmentTeam = (from at in db.AssignmentTeams
+                                      where at.AssignmentID == assignment.ID
+                                      &&
+                                      at.TeamID == authorTeamID
+                                      select at
                                                  ).FirstOrDefault();
-                string fileName = string.Format(
+
+                    fileName = string.Format(
                     "{0}-{1}-{2}-{3}",
                     assignment.CourseID,
                     assignment.ID,
                     assignmentTeam.TeamID,
                     assignment.Deliverables[0].ToString()
                     );
+                }
+
+
                 return fileName;
             }
         }
@@ -433,7 +460,7 @@ namespace OSBLE.Models.Annotate
                                  "&code={5}" +              //code for document
                                  "&mapping={6}" +           //anonymous mapping
                                  "&enable={7}";             //enable or disable mapping
-                                 //"&rm={8}";                //add or remove mapping
+            //"&rm={8}";                //add or remove mapping
 
             anonString = string.Format(anonString,
                                         ApiUser,
@@ -444,7 +471,7 @@ namespace OSBLE.Models.Annotate
                                         docCode,
                                         jsonMapping,
                                         enable
-                                        //""
+                //""
                                         );
             webResult = client.DownloadString(anonString);
             result.RawMessage = webResult;
