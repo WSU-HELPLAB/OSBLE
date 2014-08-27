@@ -76,41 +76,6 @@ namespace OSBLE.Controllers
             //get course breaks
             if (ActiveCourseUser.AbstractCourse is Course && ((ActiveCourseUser.AbstractCourse as Course).ShowMeetings == true))
             {
-                foreach (CourseBreak cb in course.CourseBreaks)
-                {
-                    // Start of break
-                    if ((cb.StartDate >= course.StartDate) && (cb.StartDate <= course.EndDate))
-                    {
-                        OSBLE.Models.HomePage.Event e = new OSBLE.Models.HomePage.Event();
-
-                        e.Title = cb.Name;
-
-                        if (cb.StartDate.Date != cb.EndDate.Date)
-                        {
-                            e.Title += " Starts";
-                        }
-
-                        e.StartDate = cb.StartDate.Date;
-                        e.HideTime = true;
-                        e.NoDateTime = true;
-                        e.HideDelete = true;
-
-                        events.Add(e);
-                    }
-
-                    // End of break (only if date is different than start)
-                    if ((cb.StartDate.Date != cb.EndDate.Date) && (cb.EndDate >= course.StartDate) && (cb.EndDate <= course.EndDate))
-                    {
-                        OSBLE.Models.HomePage.Event e = new OSBLE.Models.HomePage.Event();
-
-                        e.Title = cb.Name + " Ends";
-                        e.StartDate = cb.EndDate.Date;
-                        e.HideTime = true;
-                        e.HideDelete = true;
-                        events.Add(e);
-                    }
-                }//end foreach
-
                 foreach (CourseMeeting cm in course.CourseMeetings)
                 {
                     StringBuilder rpPattern = new StringBuilder("FREQ=WEEKLY;UNTIL=");
@@ -153,6 +118,19 @@ namespace OSBLE.Controllers
                     evt.Location = cm.Location;
                     evt.RecurrenceRules.Add(pattern);
 
+                }
+
+                //create the course breaks 
+                foreach (CourseBreak cb in course.CourseBreaks)
+                {
+                    DDay.iCal.Event evt = courseCalendar.Create<DDay.iCal.Event>();
+                    DateTime evtStart = cb.StartDate.Date;
+                    DateTime evtEnd = cb.EndDate.Date.AddDays(1);
+
+                    evt.Summary = cb.Name;
+                    evt.Start = new iCalDateTime(evtStart);
+                    evt.End = new iCalDateTime(evtEnd);
+                    evt.LastModified = new iCalDateTime(DateTime.Now);
                 }
 
 
