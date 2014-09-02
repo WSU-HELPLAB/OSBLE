@@ -574,6 +574,7 @@ namespace OSBLE.Controllers
                         e.Title = cb.Name + " Ends";
                         e.StartDate = cb.EndDate.Date;
                         e.HideTime = true;
+                        e.NoDateTime = true;
                         e.HideDelete = true;
                         events.Add(e);
                     }
