@@ -432,6 +432,14 @@ namespace OSBLE.Controllers
                         return AcademiaRegister();
                     }
 
+                    takenName = db.UserProfiles.Where(u => u.Identification == model.Identification).FirstOrDefault();
+                    if (takenName != null)
+                    {
+                        //add an error message then get us out of here
+                        ModelState.AddModelError("", "The Student ID provided is already associated with an OSBLE account.");
+                        return AcademiaRegister();
+                    }
+                
                     //try creating the account
                     UserProfile profile = new UserProfile();
                     try
