@@ -249,7 +249,7 @@ namespace OSBLE.Controllers
                 n.ItemType = Notification.Types.JoinCourseApproval;
                 n.ItemID = c.ID;
                 n.RecipientID = instructor.ID;
-                n.SenderID = sender.ID;               
+                n.SenderID = sender.ID;                 
 
                 addNotification(n);
                                
@@ -376,10 +376,17 @@ namespace OSBLE.Controllers
             CourseUser recipient = (from a in db.CourseUsers
                                     where a.ID == n.RecipientID
                                     select a).FirstOrDefault();
+
+            #if DEBUG
+            emailNotification(n);
+            #endif
+#if !DEBUG
+
             if (recipient.UserProfile.EmailAllNotifications && !(recipient.UserProfile.EmailAllActivityPosts && n.ItemType == Notification.Types.Dashboard))
             {
                 emailNotification(n);
             }
+#endif
         }
 
         /// <summary>
@@ -399,7 +406,7 @@ namespace OSBLE.Controllers
 
             // this comes back as null, for some reason. //dmo:6/5/2014 does it really? it seems to work??
             //Abstract course can represent a course or a community 
-            AbstractCourse course = db.AbstractCourses.Where(b => b.ID == n.Sender.AbstractCourseID).FirstOrDefault();
+            AbstractCourse course = db.AbstractCourses.Where(b => b.ID == n.CourseID).FirstOrDefault();
             string[] temp;
             //checking to see if there is no data besides abstractCourseID
             if(n.Data != null)
@@ -500,7 +507,7 @@ namespace OSBLE.Controllers
                 case Notification.Types.JoinCourseApproval:
                     subject += " - " + sender.FirstName + " " + sender.LastName;
 
-                    body = sender.FirstName + " " + sender.LastName + " has submitted a request to join" + course.Name; 
+                    body = sender.FirstName + " " + sender.LastName + " has submitted a request to join " + course.Name; 
 
                     action = "view the request to join.";
 
