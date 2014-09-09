@@ -42,15 +42,15 @@ function updateTimezoneOffsets()
 
 //converts UTC times to local (browser) times
 function parseDates() {
-    $('time.utc-time').each(function (index) {
+    $('time.utc-time').each(function (index) {       
+       
         var milliseconds = $(this).attr('datetime');
-        var formatString = $(this).attr('data-date-format');
-        var original = $(this).attr('data-original-date');
+        var formatString = $(this).attr('data-date-format');                
+        var original = new Date(milliseconds * 1000);        
         var originaldate = moment(original);
         var currentDate = moment.utc(milliseconds, 'X');
-        var originalOffset = originaldate.zone();
-        //commented out to fix -1 error on course breaks, doesn't seem to have an effect elsewhere?
-        //currentDate = currentDate.subtract('minutes', originalOffset);
+        var originalOffset = originaldate.zone();        
+        currentDate = currentDate.subtract('minutes', originalOffset);
         $(this).html(currentDate.format(formatString));        
         $(this).removeClass("utc-time");
         $(this).addClass("course-local-time");
@@ -58,7 +58,7 @@ function parseDates() {
     $('time.utc-time-events').each(function (index) {
         var milliseconds = $(this).attr('datetime');
         var formatString = $(this).attr('data-date-format');
-        var original = $(this).attr('data-original-date');
+        var original = new Date(milliseconds * 1000);
         var originaldate = moment(original);
         var currentDate = moment.utc(milliseconds, 'X');
         var originalOffset = originaldate.zone();
