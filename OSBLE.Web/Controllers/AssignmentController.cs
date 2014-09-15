@@ -104,13 +104,15 @@ namespace OSBLE.Controllers
                     if (a.HasDeliverables)
                     {
                         AssignmentTeam at = GetAssignmentTeam(a, ActiveCourseUser);
-                        DateTime? subTime = FileSystem.GetSubmissionTime(at);
+                        DateTime? subTime = FileSystem.GetSubmissionTime(at);                        
                         string submissionTime = "No Submission";
                         if (subTime != null) //found a submission time, Reassign submissionTime
                         {
+                            DateTime convertedSubTime = new DateTime(subTime.Value.Ticks, DateTimeKind.Unspecified);
                             //Submission time comes back in UTC
-                            subTime = TimeZoneInfo.ConvertTimeFromUtc((DateTime)subTime, tz);
-                            submissionTime = subTime.Value.ToString();
+                            convertedSubTime = TimeZoneInfo.ConvertTimeFromUtc(convertedSubTime, tz);
+                            submissionTime = convertedSubTime.ToString();
+                            
                         }
                         submissionInfo.Add(a.ID, submissionTime);
                     }
