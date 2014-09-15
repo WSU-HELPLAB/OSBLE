@@ -15,7 +15,7 @@
             <time class="utc-time-link"
                   datetime="@Helpers.DateAsUnixTime((DateTime)sub)"
                   data-original-date="@Helpers.RawDate((DateTime)sub)"
-                  data-date-format="DD/MM/YY hh:mm:ss A">
+                  data-date-format="MM/DD/YY hh:mm:ss A">
                 @Html.ActionLink(sub.ToString() + " (UTC)", "GetSubmissionZip", "FileHandler", new { area = "", assignmentID = currentTeam.Assignment.ID, teamID = currentTeam.Team.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
             </time>
 
