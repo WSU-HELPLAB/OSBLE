@@ -66,15 +66,25 @@ namespace OSBLEExcelPlugin
             int sheetCount = 0;
             foreach (Worksheet ws in wb.Worksheets)
             {
-                // Make an in-memory CSV for the worksheet
-                string csvTemp = WorksheetToCSVString(ws);
-                if (string.IsNullOrEmpty(csvTemp))
-                {
-                    continue;
-                }
+                // We only want gradebook worksheets.
+                // Check for a "#" in cell A1 before making a CSV
+                var currentWorkSheet = Convert.ToString(ws.Range["A1"].Value);
 
-                sheetCount++;
-                zf.AddEntry(ws.Name + ".csv", Encoding.UTF8.GetBytes(csvTemp));
+                if (currentWorkSheet == null) // Cell is empty
+                {
+                }
+                else if (currentWorkSheet.Contains("#")) //Cell contains #, continue...
+                {
+                    // Make an in-memory CSV for the worksheet
+                    string csvTemp = WorksheetToCSVString(ws);
+                    if (string.IsNullOrEmpty(csvTemp))
+                    {
+                        continue;
+                    }
+
+                    sheetCount++;
+                    zf.AddEntry(ws.Name + ".csv", Encoding.UTF8.GetBytes(csvTemp));
+                }
             }
 
             // If we didn't get any data then we can't upload to OSBLE
