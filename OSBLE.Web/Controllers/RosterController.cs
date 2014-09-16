@@ -1466,7 +1466,8 @@ namespace OSBLE.Controllers
         private UserProfile getEntryUserProfile(RosterEntry entry)
         {
             UserProfile possibleUser = (from d in db.UserProfiles
-                                        where d.Identification == entry.Identification && d.UserName == entry.Email
+                                        where d.Identification == entry.Identification 
+                                        //&& d.UserName == entry.Email
                                         select d).FirstOrDefault();
             return possibleUser;
         }

@@ -106,8 +106,14 @@
             $('#submitSearch').prop('disabled', false);
             $.getJSON('/Course/CourseNumber/' + $('#Course').val(), function (data) {
                 var items = '<option>Search All</option>';
+                var prefix = new Array();               
                 $.each(data, function (i, Number) {
-                    items += "<option value='" + Number.Value + "'>" + Number.Text + "</option>";
+                    if ($.inArray(Number.Text, prefix) == -1) {
+                        prefix.push(Number.Text);
+                    }
+                });
+                $.each(prefix, function (i, Number) {
+                    items += "<option value='" + Number + "'>" + Number + "</option>";
                 });
                 $('#Number').html(items);
             });
