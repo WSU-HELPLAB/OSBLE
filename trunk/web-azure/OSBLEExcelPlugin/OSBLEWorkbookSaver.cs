@@ -81,7 +81,7 @@ namespace OSBLEExcelPlugin
                     {
                         continue;
                     }
-
+                    
                     sheetCount++;
                     zf.AddEntry(ws.Name + ".csv", Encoding.UTF8.GetBytes(csvTemp));
                 }
@@ -172,13 +172,18 @@ namespace OSBLEExcelPlugin
             {
                 for (int y = 1; y <= colCount; y++)
                 {
+                    string cellContents = used.Cells[x, y].Text;
+
+                    if (cellContents.Contains(","))
+                        cellContents = cellContents.Replace(",", "\",\"");
+
                     if (y == colCount)
                     {
-                        sb.AppendLine(used.Cells[x, y].Text);
+                        sb.AppendLine(cellContents);
                     }
                     else
                     {
-                        sb.Append(used.Cells[x, y].Text + ",");
+                        sb.Append(cellContents + ",");
                     }
                 }
             }
