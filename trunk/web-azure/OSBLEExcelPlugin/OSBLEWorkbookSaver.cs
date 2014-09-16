@@ -174,6 +174,11 @@ namespace OSBLEExcelPlugin
                 {
                     string cellContents = used.Cells[x, y].Text;
 
+                    //remove calculation error and replace with hide column character
+                    if (cellContents.Contains("#DIV/0!"))
+                        cellContents = cellContents.Replace("#DIV/0!", "!");
+
+                    //surround any commas in text with double quotes to avoid formatting issue with the csv parsing
                     if (cellContents.Contains(","))
                         cellContents = cellContents.Replace(",", "\",\"");
 

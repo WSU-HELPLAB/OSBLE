@@ -35,10 +35,10 @@
     <SccProvider>SAK</SccProvider>
     <IsWebBootstrapper>False</IsWebBootstrapper>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <PublishUrl>C:\Users\Evan\Desktop\</PublishUrl>
+    <PublishUrl>C:\temp\OSBLE Excel Plugin\</PublishUrl>
     <InstallUrl />
     <TargetCulture>en</TargetCulture>
-    <ApplicationVersion>1.0.0.4</ApplicationVersion>
+    <ApplicationVersion>1.0.0.10</ApplicationVersion>
     <AutoIncrementApplicationRevision>true</AutoIncrementApplicationRevision>
     <UpdateEnabled>true</UpdateEnabled>
     <UpdateInterval>7</UpdateInterval>
@@ -213,6 +213,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.config" />
+    <None Include="OSBLEExcelPlugin_2_TemporaryKey.pfx" />
     <None Include="OSBLEExcelPlugin_TemporaryKey.pfx" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -355,10 +356,10 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>OSBLEExcelPlugin_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>OSBLEExcelPlugin_2_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>2135C099FAF8A5A9B5AD6CF5C4855711FD1CA655</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>52E43E9BF719C037A82A48CA36E3E66DFB9E9349</ManifestCertificateThumbprint>
   </PropertyGroup>
   <!-- Include the build rules for a C# project. -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
