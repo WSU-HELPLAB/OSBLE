@@ -419,9 +419,11 @@ namespace OSBLE.Controllers
             //add them to a list as a selectlistitem
             List<SelectListItem> course = new List<SelectListItem>();
             foreach (var c in CourseList)
-            {   
-                if (c.EndDate > DateTime.Now && !c.IsDeleted)
-                    course.Add(new SelectListItem { Text = c.Prefix, Value = c.Prefix });
+            {
+                string cleanPrefix = c.Prefix.ToUpper();
+                var selectListItem = new SelectListItem { Text = cleanPrefix, Value = cleanPrefix };
+                if (c.EndDate > DateTime.Now && !c.IsDeleted && !course.Any(l => l.Value == selectListItem.Value))
+                    course.Add(new SelectListItem { Text = cleanPrefix, Value = cleanPrefix });
             }
             //remove any duplicate course names
             var finalList = course.GroupBy(x => x.Text).Select(x => x.OrderByDescending(y => y.Text).First()).ToList();
@@ -465,7 +467,7 @@ namespace OSBLE.Controllers
             else
             {
                 var Results = from d in db.Courses
-                              where d.Prefix == course && d.Number == number
+                              where d.Prefix.Contains(course) && d.Number == number
                               select d;
 
                 Results.GroupBy(x => x.Number)

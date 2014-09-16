@@ -365,6 +365,7 @@ namespace OSBLE.Controllers
         {
             if (ModelState.IsValid)
             {
+                course.Prefix = course.Prefix.Replace(" ", "").ToUpper();
                 db.Courses.Add(course);
                 db.SaveChanges();
 
@@ -418,14 +419,18 @@ namespace OSBLE.Controllers
 
             //add them to a list as a selectlistitem
             List<SelectListItem> course = new List<SelectListItem>();
+            List<string> allCoursePrefix = new List<string>();
+            
             foreach (var c in CourseList)
-            {
-                string cleanPrefix = c.Prefix.ToUpper();
-                var selectListItem = new SelectListItem { Text = cleanPrefix, Value = cleanPrefix };
-                if (c.EndDate > DateTime.Now && !c.IsDeleted && !course.Any(l => l.Value == selectListItem.Value))
-                    course.Add(new SelectListItem { Text = cleanPrefix, Value = cleanPrefix });
-            }
+                if(c.EndDate > DateTime.Now && !c.IsDeleted)
+                     allCoursePrefix.Add(c.Prefix.ToUpper());
+
             //remove any duplicate course names
+            allCoursePrefix = allCoursePrefix.Distinct().ToList();
+
+            foreach(string prefix in allCoursePrefix)
+                course.Add(new SelectListItem { Text = prefix, Value = prefix });
+
             var finalList = course.GroupBy(x => x.Text).Select(x => x.OrderByDescending(y => y.Text).First()).ToList();
 
             //throw it in the view bag
@@ -460,7 +465,7 @@ namespace OSBLE.Controllers
                         .OrderBy(x => x.Count())
                         .Select(x => x.First());
 
-                TempData["SearchResults"] = Results.ToList();
+                TempData["SearchResults"] = Results.Distinct().ToList();
 
                 return RedirectToAction("CourseSearch", "Course");
             }
@@ -474,7 +479,7 @@ namespace OSBLE.Controllers
                         .OrderBy(x => x.Count())
                         .Select(x => x.First());
 
-                TempData["SearchResults"] = Results.ToList();
+                TempData["SearchResults"] = Results.Distinct().ToList();
 
                 return RedirectToAction("CourseSearch", "Course");
             }
@@ -752,7 +757,7 @@ namespace OSBLE.Controllers
             updateCourse.EndDate = course.EndDate;
             updateCourse.Name = course.Name;
             updateCourse.Number = course.Number;
-            updateCourse.Prefix = course.Prefix;
+            updateCourse.Prefix = course.Prefix.Replace(" ", "").ToUpper();
             updateCourse.RequireInstructorApprovalForEventPosting = course.RequireInstructorApprovalForEventPosting;
             updateCourse.Semester = course.Semester;
             updateCourse.StartDate = course.StartDate;
@@ -849,7 +854,7 @@ namespace OSBLE.Controllers
                 Clone.MinutesLateWithNoPenalty = pastCourse.MinutesLateWithNoPenalty;             
                 Clone.Name = pastCourse.Name;
                 Clone.Number = pastCourse.Number;
-                Clone.Prefix = pastCourse.Prefix;
+                Clone.Prefix = pastCourse.Prefix.Replace(" ", "").ToUpper();
                 Clone.PercentPenalty = pastCourse.PercentPenalty;
                 Clone.RequireInstructorApprovalForEventPosting = pastCourse.RequireInstructorApprovalForEventPosting;
                 Clone.TimeZoneOffset = pastCourse.TimeZoneOffset;

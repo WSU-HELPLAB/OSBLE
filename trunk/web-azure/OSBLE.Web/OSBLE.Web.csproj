@@ -16,10 +16,10 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort />
-    <IISExpressAnonymousAuthentication />
-    <IISExpressWindowsAuthentication />
-    <IISExpressUseClassicPipelineMode />
+    <IISExpressSSLPort>3615</IISExpressSSLPort>
+    <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
+    <IISExpressWindowsAuthentication>disabled</IISExpressWindowsAuthentication>
+    <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
@@ -45,6 +45,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DDay.iCal">
+      <HintPath>..\packages\DDay.iCal.1.0.2.575\lib\DDay.iCal.dll</HintPath>
+    </Reference>
     <Reference Include="DotNetOpenAuth">
       <HintPath>..\packages\DotNetOpenAuth\DotNetOpenAuth.dll</HintPath>
     </Reference>
@@ -177,7 +180,9 @@
     <Compile Include="Areas\AssignmentDetails\Controllers\HomeController.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\DefaultBuilder.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\ABETOutcomesDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\AnchoredDiscussionSubmitDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\CriticalReviewStudentDownloadDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\AnchoredDiscussionSubmissionDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\CriticalReviewSubmissionDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\DiscussionTeamMemberDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\DownloadDiscussionItemsDecorator.cs" />
@@ -217,6 +222,8 @@
     <Compile Include="Areas\AssignmentDetails\ViewModels\CriticalReviewsReceivedTeam.cs" />
     <Compile Include="Areas\AssignmentWizard\AssignmentWizardAreaRegistration.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\ABETController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\AnchoredDiscussionController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\AnchoredDiscussionDocumentsController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\BasicsController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\CommentCategoryController.cs" />
     <Compile Include="Areas\AssessmentWizard\Controllers\AssessmentBasicsController.cs" />
@@ -261,6 +268,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\AssignmentController.cs" />
+    <Compile Include="Controllers\CloneController.cs" />
     <Compile Include="Controllers\CommitteeController.cs" />
     <Compile Include="Controllers\CommunityController.cs" />
     <Compile Include="Controllers\CookieTestController.cs" />
@@ -272,6 +280,7 @@
     <Compile Include="Controllers\GradebookController.cs" />
     <Compile Include="Controllers\HelpController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\iCalendarController.cs" />
     <Compile Include="Controllers\MailController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\OpenIdController.cs" />
@@ -282,6 +291,7 @@
     <Compile Include="Controllers\SchoolController.cs" />
     <Compile Include="Controllers\StudioAssignmentController.cs" />
     <Compile Include="Controllers\SubmissionController.cs" />
+    <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\Odata\CoursesController.cs" />
     <Compile Include="Global.asax.cs">
@@ -344,6 +354,7 @@
     <Content Include="Areas\AssignmentWizard\Content\css\team.css" />
     <Content Include="Areas\AssignmentWizard\Content\icons\rubric_add.png" />
     <Content Include="Areas\AssignmentWizard\Content\icons\rubric_delete.png" />
+    <Content Include="Areas\AssignmentWizard\Content\js\anchoredDiscussionSetup.js" />
     <Content Include="Areas\AssignmentWizard\Content\js\assignmentFilesUploader.js" />
     <Content Include="Areas\AssignmentWizard\Content\js\basics.js" />
     <Content Include="Areas\AssignmentWizard\Content\js\commentCategories.js" />
@@ -363,10 +374,13 @@
     <Content Include="Content\images\arrow_down.png" />
     <Content Include="Content\images\arrow_left.png" />
     <Content Include="Content\images\arrow_right.png" />
+    <Content Include="Content\images\calendar_icon.png" />
     <Content Include="Content\images\cut_context.png" />
     <Content Include="Content\images\default.jpg" />
     <Content Include="Content\images\delete_up.png" />
+    <Content Include="Content\images\delete_up_disabled.png" />
     <Content Include="Content\images\edit_up.png" />
+    <Content Include="Content\images\enroll.png" />
     <Content Include="Content\images\fileextimages\aac.png" />
     <Content Include="Content\images\fileextimages\ai.png" />
     <Content Include="Content\images\fileextimages\aiff.png" />
@@ -495,6 +509,8 @@
     <Content Include="Content\images\page_white_delete.png" />
     <Content Include="Content\images\page_white_edit.png" />
     <Content Include="Content\images\publish.png" />
+    <Content Include="Content\images\thumbs_up.png" />
+    <Content Include="Content\images\thumb_down.png" />
     <Content Include="Content\images\tooltip\109_AllAnnotations_Help_16x16_72.png" />
     <Content Include="Content\images\tooltip\bubble-1.png" />
     <Content Include="Content\images\tooltip\bubble-2.png" />
@@ -606,7 +622,7 @@
     <Content Include="Areas\AssignmentDetails\Views\_ViewStart.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Basics\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\CommentCategory\Index.cshtml" />
-    <Content Include="Areas\AssignmentWizard\Views\Content\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Basics\Content\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\CriticalReviewDiscussionTeams\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\CriticalReview\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Deliverables\Index.cshtml" />
@@ -677,6 +693,11 @@
     <Content Include="Areas\AssessmentWizard\Views\Home\Summary.cshtml" />
     <Content Include="Content\gradebook.zip" />
     <Content Include="ClassDiagram1.cd" />
+    <Content Include="Areas\AssignmentWizard\Views\AnchoredDiscussion\Index.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Home\AnchoredDiscussionIndex.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\AnchoredDiscussionSubmissionDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\AnchoredDiscussionSubmitDecorator.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\AnchoredDiscussionDocuments\Index.cshtml" />
     <None Include="Properties\PublishProfiles\filesystem.pubxml" />
     <None Include="Scripts\jquery-2.0.1.intellisense.js" />
     <Content Include="Scripts\jquery-2.0.1.js" />
@@ -724,6 +745,7 @@
     <Content Include="Services\AuthenticationService.svc" />
     <Content Include="Services\OsbleService.svc" />
     <Content Include="Services\UploaderWebService.svc" />
+    <Content Include="Views\Clone\readme.txt" />
     <Content Include="Views\OpenId\AskUser_old.aspx" />
     <Content Include="Views\OpenId\Provider.aspx" />
     <Content Include="Views\Shared\LogOnUserControl.ascx" />
@@ -870,10 +892,20 @@
     <Content Include="Views\Committee\Create.cshtml" />
     <Content Include="Views\Course\CommunitySearch.cshtml" />
     <Content Include="Views\Course\CourseSearch.cshtml" />
-    <Content Include="Views\Course\NeedsApproval.cshtml" />
-    <Content Include="Views\Course\AllReadyInCourse.cshtml" />
-    <Content Include="Views\Course\Approval.cshtml" />
+    <Content Include="Views\Course\CourseCurrentlyEnrolled.cshtml" />
     <Content Include="Views\Roster\EditWTUser.cshtml" />
+    <Content Include="Views\Course\CommunityCurrentlyEnrolled.cshtml" />
+    <Content Include="Views\Course\CourseAwaitingApproval.cshtml" />
+    <Content Include="Views\Course\CommunityAwaitingApproval.cshtml" />
+    <Content Include="Views\Shared\_ConsolidatedNotifications.cshtml" />
+    <Content Include="Views\Test\Index.cshtml" />
+    <Content Include="Views\Course\CloneSetup.cshtml" />
+    <Content Include="Views\Course\SelectAssignmentsToClone.cshtml" />
+    <Content Include="Views\iCalendar\Index.cshtml" />
+    <Content Include="Views\Clone\CloneCourse.cshtml" />
+    <Content Include="Views\Clone\CourseSetup.cshtml" />
+    <Content Include="Views\Clone\CloneAssignment.cshtml" />
+    <Content Include="Views\Course\CloneCourse.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -904,12 +936,11 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>False</UseIIS>
+          <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>3615</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>
-          </IISUrl>
+          <IISUrl>http://localhost:3715/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

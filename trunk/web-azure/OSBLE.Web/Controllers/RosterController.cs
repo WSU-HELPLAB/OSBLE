@@ -527,11 +527,11 @@ namespace OSBLE.Controllers
                 {
                     createCourseUser(courseuser);
                 }
-                catch
+                catch(Exception e)
                 {
-                    ModelState.AddModelError("", "This ID Number already exists in this class");
+                    ModelState.AddModelError("", e.Message);
                     ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name");
-                    return View();
+                    return View();  
                 }
             }
 
@@ -1223,38 +1223,41 @@ namespace OSBLE.Controllers
         /// <param name="courseuser">It must have section, role set, and a reference to UserProfile with Identification set</param>
         private void createCourseUser(CourseUser courseuser)
         {
-            //This will return one if they exist already or null if they don't
+            //This will return a user if they exist already or null if they don't
             var user = (from c in db.UserProfiles
                         where c.Identification == courseuser.UserProfile.Identification
                         && c.SchoolID == ActiveCourseUser.UserProfile.SchoolID
                         select c).FirstOrDefault();
             if (user == null)
             {
+
+                throw new Exception("No user exists with that Student ID!");
+
                 //user doesn't exist so we got to make a new one
                 //Create userProfile with the new ID
-                UserProfile up = new UserProfile();
-                up.CanCreateCourses = false;
-                up.IsAdmin = false;
-                up.SchoolID = CurrentUser.SchoolID;
-                up.Identification = courseuser.UserProfile.Identification;
+                //UserProfile up = new UserProfile();
+                //up.CanCreateCourses = false;
+                //up.IsAdmin = false;
+                //up.SchoolID = CurrentUser.SchoolID;
+                //up.Identification = courseuser.UserProfile.Identification;
 
-                if (courseuser.UserProfile.FirstName != null)
-                {
-                    up.FirstName = courseuser.UserProfile.FirstName;
-                    up.LastName = courseuser.UserProfile.LastName;
-                }
-                else
-                {
-                    up.FirstName = "Pending";
-                    up.LastName = string.Format("({0})", up.Identification);
-                }
-                db.UserProfiles.Add(up);
-                db.SaveChanges();
+                //if (courseuser.UserProfile.FirstName != null)
+                //{
+                //    up.FirstName = courseuser.UserProfile.FirstName;
+                //    up.LastName = courseuser.UserProfile.LastName;
+                //}
+                //else
+                //{
+                //    up.FirstName = "Pending";
+                //    up.LastName = string.Format("({0})", up.Identification);
+                //}
+                //db.UserProfiles.Add(up);
+                //db.SaveChanges();
 
-                //Set the UserProfileID to point to our new student
-                courseuser.UserProfile = up;
-                courseuser.UserProfileID = up.ID;
-                courseuser.AbstractCourseID = ActiveCourseUser.AbstractCourseID;
+                ////Set the UserProfileID to point to our new student
+                //courseuser.UserProfile = up;
+                //courseuser.UserProfileID = up.ID;
+                //courseuser.AbstractCourseID = ActiveCourseUser.AbstractCourseID;
             }
             else //If the CourseUser already has a UserProfile..
             {
@@ -1466,7 +1469,8 @@ namespace OSBLE.Controllers
         private UserProfile getEntryUserProfile(RosterEntry entry)
         {
             UserProfile possibleUser = (from d in db.UserProfiles
-                                        where d.Identification == entry.Identification && d.UserName == entry.Email
+                                        where d.Identification == entry.Identification 
+                                        //&& d.UserName == entry.Email
                                         select d).FirstOrDefault();
             return possibleUser;
         }

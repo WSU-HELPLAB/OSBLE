@@ -144,8 +144,8 @@ namespace OSBLE.Controllers
                 evt.Start = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(e.StartDate, tz));
                 if (e.EndDate == null)
                 {
-                    evt.End = evt.Start.AddDays(1);
-                    evt.IsAllDay = true;
+                    evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(e.StartDate, tz));
+                    evt.End.AddMinutes(1);
                 }
                 else
                 {
@@ -277,8 +277,9 @@ namespace OSBLE.Controllers
                 evt.Start = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(e.StartDate, tz));
                 if (e.EndDate == null)
                 {
-                    evt.End = evt.Start.AddDays(1);
-                    evt.IsAllDay = true;
+                    evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(e.StartDate, tz));
+                    evt.End.AddMinutes(1);
+                    
                 }
                 else
                 {
