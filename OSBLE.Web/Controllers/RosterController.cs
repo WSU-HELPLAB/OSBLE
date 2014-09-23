@@ -532,9 +532,7 @@ namespace OSBLE.Controllers
                 }
             }
 
-            Course thisCourse = (from d in db.Courses
-                                 where d.ID == ActiveCourseUser.AbstractCourseID
-                                 select d).FirstOrDefault();
+            Course thisCourse = ActiveCourseUser.AbstractCourse as Course;
             //if there is at least one assignmnet in the course that has teams/is team based
             if(thisCourse.Assignments.Count(a => a.HasTeams) > 0)
             {
@@ -568,9 +566,7 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult CreateByEmail(CourseUser courseuser)
         {
-            Course thisCourse = (from d in db.Courses
-                                 where d.ID == ActiveCourseUser.AbstractCourseID
-                                 select d).FirstOrDefault();
+            Course thisCourse = ActiveCourseUser.AbstractCourse as Course;
             //if modelState isValid
             if (ModelState.IsValid && courseuser.AbstractRoleID != 0)
             {
@@ -687,7 +683,7 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index");
         }
 
-        //
+    
         /// <summary>
         /// yc: get- approve pending user for current course enrollment, clean up notifcation to instructor, change student status
         /// </summary>
@@ -697,12 +693,15 @@ namespace OSBLE.Controllers
         public ActionResult ApprovePending(int userId)
         {
             CourseUser pendingUser = getCourseUser(userId);
-            Course thisCourse = (from d in db.Courses
-                                 where d.ID == ActiveCourseUser.AbstractCourseID
-                                 select d).FirstOrDefault();
+            Course thisCourse = ActiveCourseUser.AbstractCourse as Course;
             Notification n = db.Notifications.Where(item => item.SenderID == pendingUser.ID && item.RecipientID == ActiveCourseUser.ID).FirstOrDefault();
-            n.Read = true;
-            db.SaveChanges();
+            //there is not always a notification for a pending user, say a instructor manually adds them to the pending list?
+            if(n != null)
+            {
+                n.Read = true;
+                db.SaveChanges();
+            }
+           
 
             //set user to active student
             if (pendingUser.AbstractRoleID == (int)CourseRole.CourseRoles.Pending)
@@ -751,7 +750,8 @@ namespace OSBLE.Controllers
 
             //mark notification read
             Notification n = db.Notifications.Where(item => item.SenderID == pendingUser.ID && item.RecipientID == ActiveCourseUser.ID).FirstOrDefault();
-            n.Read = true;
+            if(n != null)
+                n.Read = true;
 
             //remove the kid from the db
             db.CourseUsers.Remove(pendingUser);
@@ -770,9 +770,7 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult BatchApprove()
         {
-            Course thisCourse = (from d in db.Courses
-                                 where d.ID == ActiveCourseUser.AbstractCourseID
-                                 select d).FirstOrDefault();
+            Course thisCourse = ActiveCourseUser.AbstractCourse as Course;
             int count = 0;
             List<CourseUser> pendingUsers;
             //find all pending users for current course
