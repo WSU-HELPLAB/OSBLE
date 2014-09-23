@@ -70,7 +70,10 @@
 
     <div id="important_dates">
         <p>Next @ViewBag.ActiveCourse.AbstractCourse.CalendarWindowOfTime Weeks</p>
-        @Html.Partial("_Events", (List<Event>)ViewBag.Events)
+        <div class="partialContents" data-url="/Home/Events">
+            <img src="~/Content/images/ajax-loader.gif" /> Loading...
+        </div>
+        @*@Html.Partial("_Events", (List<Event>)ViewBag.Events)*@
         <p>@Html.ActionLink("Show All Events", "Index", "Event")</p>
     </div>
 
@@ -135,7 +138,27 @@
     </h3>
 
     <div id="activity_feed">
-        @Html.Partial("_ActivityFeed")
+        <div class="partialContents" data-url="/Home/ActivityFeed">            
+            <img src="~/Content/images/ajax-loader.gif" /> Loading...
+        </div>
+       @* @Html.Partial("_ActivityFeed")*@
     </div>
 
 </div>
+
+<script type="text/javascript">
+    $(document).ready(function (e) {
+
+        $(".partialContents").each(function (index, item) {
+            var url = $(item).data("url");
+            if (url && url.length > 0) {
+                $(item).load(url);
+            }
+        });
+
+        //refresh dashboard when course listing changes
+        $("#course_select").change(function () {
+            location.reload();
+        });
+    });
+</script>
