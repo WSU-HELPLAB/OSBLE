@@ -11,6 +11,23 @@
         $('#remChars').val("(" + remaining + ") Characters left");
     }
 
+    //we need to update the activity feed timestamps when it's done loading
+    $(document).ready(function () {        
+        parseDates();
+    });
+
+    function completed() {       
+        //update to show the new posts
+        //Note: this worked without reload initially...
+        //$(".partialContents").each(function (index, item) {
+        //    var url = $(item).data("url");            
+        //    if (url && url.length > 0) {
+        //        $(item).load(url);
+        //    }
+        //});
+        location.reload();
+    }
+
 </script>
 
 <div id="activity_new_post">
@@ -24,7 +41,14 @@
         {
         <h3 class="error">@ViewBag.Error</h3>
         }
-        using (Html.BeginForm("NewPost", "Home", FormMethod.Post))
+        //using (Html.BeginForm("NewPost", "Home", FormMethod.Post))        
+        using (Ajax.BeginForm("NewPost", "Home",
+            new AjaxOptions
+            {
+                HttpMethod = "POST",                
+                OnComplete = "completed",
+                
+            }))
         {
         <input id="remChars" name="remainingChars" readonly="true" type="text" value="(@ViewBag.MaxActivityFeedLength) Characters left" /><br />
         <textarea id="ActivityFeed" name="Content" rows="5" cols="40" placeholder="Enter new feed post here..." 

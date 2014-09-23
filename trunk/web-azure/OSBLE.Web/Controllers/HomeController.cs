@@ -31,11 +31,13 @@ namespace OSBLE.Controllers
         {
             ViewBag.CurrentTab = "Dashboard";
 
-            setupActivityFeed(); // Dashboard posts/replies
+            //changed to load partial view
+            //setupActivityFeed(); // Dashboard posts/replies            
 
-            setupNotifications(); // Individual notifications (mail, grades, etc.)
+            setupNotifications(); // Individual notifications (mail, grades, etc.)        
 
-            setupEvents(); // Events & Deadlines
+            //changed to load partial view
+            //setupEvents(); // Events & Deadlines
 
             setupCourseLinks(); // Quickly accessible course files
 
@@ -63,6 +65,12 @@ namespace OSBLE.Controllers
             ViewBag.DashboardSingleCourseMode = false; // Force course/community prefixes to show when viewing thread.
 
             return View(dp);
+        }
+
+        public ActionResult ActivityFeed()
+        {
+            setupActivityFeed();
+            return PartialView("_ActivityFeed");
         }
 
         private void setupActivityFeed()
@@ -167,16 +175,25 @@ namespace OSBLE.Controllers
                 ViewBag.CanEditCourseLinks = true;
             }
             ViewBag.CourseLinks = listing;
-            ViewBag.Uploader = fileUploader;
+            ViewBag.Uploader = fileUploader;            
+        }
 
-            //yc: setup max file size
-            
+        public ActionResult Notifications()
+        {
+            setupNotifications();
+            return PartialView("_ConsolidatedNotifications");
         }
 
         private void setupNotifications()
         {
             // Load all unread notifications for the current user to display on the dashboard.
             ViewBag.Notifications = db.Notifications.Where(n => (n.RecipientID == ActiveCourseUser.ID) && (n.Read == false)).OrderByDescending(n => n.Posted).ToList();
+        }
+
+        public ActionResult Events()
+        {
+            setupEvents();
+            return PartialView("_Events", (List<Event>)ViewBag.Events);
         }
 
         private void setupEvents()
@@ -536,7 +553,7 @@ namespace OSBLE.Controllers
             }
 
             db.SaveChanges();
-            return RedirectToAction("Index");
+            return RedirectToAction("Index");            
         }
 
         [HttpPost]
