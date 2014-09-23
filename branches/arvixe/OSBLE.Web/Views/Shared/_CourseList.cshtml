@@ -3,7 +3,15 @@
 @if (ViewBag.CurrentCourses != null && ViewBag.CurrentCourses.Count > 0)
 {
     @:(@ViewBag.CourseListTitle):<br />
-    using (Html.BeginForm("SetCourse", "Home", new { area = "" }, FormMethod.Post, new { id = "set_course" }))
+    //using (Html.BeginForm("SetCourse", "Home", new { area = "" }, FormMethod.Post, new { id = "set_course" }))
+    using (Ajax.BeginForm("SetCourse", "Home",
+            new AjaxOptions
+            {
+                HttpMethod = "POST",
+                OnComplete = "completed",
+                
+
+            }, new { area = "", id = "set_course" }))
     {
     @:<select name="course" id="course_select">
         bool courseOptGroup = false;
@@ -305,6 +313,7 @@ else if (ViewBag.CurrentUser != null)    //yc adding a withdraw button this user
                 //then remove the div
                 $('#course_search_dialog').remove();
             }
+
         </script>
     }
 }
