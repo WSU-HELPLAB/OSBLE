@@ -17,6 +17,14 @@
         utcOffset = 0;
     }
 }
+
+<script type="text/javascript">
+    //we need to update the events timestamps when it's done loading
+    $(document).ready(function () {
+        parseDates();
+    });
+</script>
+
 <ul id="event_list">
     @{
         DateTime tmpLastDate = lastDate;

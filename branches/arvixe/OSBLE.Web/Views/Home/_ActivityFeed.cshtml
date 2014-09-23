@@ -11,6 +11,11 @@
         $('#remChars').val("(" + remaining + ") Characters left");
     }
 
+    //we need to update the activity feed timestamps when it's done loading
+    $(document).ready(function () {        
+        parseDates();
+    });
+
 </script>
 
 <div id="activity_new_post">
