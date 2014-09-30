@@ -17,6 +17,7 @@
 //   quotes.
 function fileuploader_getcontrolshtml(inputNameString, allowMultiple, onGetExtraServiceArgs, onCompletion)
 {
+    
     var divName = "uploadProgressDIV_" + inputNameString;
     if (null == onGetExtraServiceArgs) {
         onGetExtraServiceArgs = "null";
@@ -42,6 +43,7 @@ function fileuploader_getcontrolshtml(inputNameString, allowMultiple, onGetExtra
 
 function fileuploader_uploadfiles(fileSourceElementName, progressDIVName, onGetExtraServiceArgs, onCompletion)
 {
+    
     // If there's a function to call to get extra service arguments, then call it
     var extraServiceArgs = null;
     if (null != onGetExtraServiceArgs) {
@@ -58,7 +60,7 @@ function fileuploader_uploadfiles(fileSourceElementName, progressDIVName, onGetE
 }
 
 function fileuploader_uploadRemaining(filesArray, fileIndex, progressDIV, extraServiceArgs, onCompletion)
-{
+{    
     if (null == filesArray)
     {
         // Nothing we can do
@@ -69,6 +71,7 @@ function fileuploader_uploadRemaining(filesArray, fileIndex, progressDIV, extraS
     // If the index is beyond the last item in the array then this implies completion
     if (fileIndex >= filesArray.length)
     {
+
         progressDIV.innerHTML = "Uploaded " +
             fileIndex.toString() + ((1 == fileIndex) ? " file" : " files");
 
@@ -82,11 +85,13 @@ function fileuploader_uploadRemaining(filesArray, fileIndex, progressDIV, extraS
     // by this script must be on a page with the "course_select" selector. As far as I know 
     // this is every single page in the OSBLE site.
     var selectCourseObj = document.getElementById("course_select");
-    var courseID = selectCourseObj.value;
-
+    var courseID = selectCourseObj.value;    
     var fd = new FormData();
-    fd.append("file_src", filesArray[fileIndex]);
-
+    //clear out any special characters from file name
+    var fileName = filesArray[fileIndex].name.replace(/[^a-z0-9._-]+/gi, "");    
+    fd.append("file_src", filesArray[fileIndex], fileName);
+    
+    
     // Build the POST URL
     var url = "../Services/CourseFilesUploader.ashx?courseID=" + courseID;
     if (null != extraServiceArgs) {

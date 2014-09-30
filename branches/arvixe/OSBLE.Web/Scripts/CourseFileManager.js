@@ -414,6 +414,7 @@ function cfm_CountChildrenWithName(listNode, node_name) {
 }
 
 function cfm_CreateFolder(stateObjectIndex) {
+    
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
 
@@ -441,7 +442,8 @@ function cfm_CreateFolder(stateObjectIndex) {
         "\\" != name.substr(name.length - 1)) {
         name += "/";
     }
-    name += tb.value;
+    //clear out any special characters from file name
+    name += tb.value.replace(/[^a-z0-9]+/gi, " ");
 
     // Make an XML HTTP request to the service. The service will return an 
     // updated file listing in response to the folder creation request, 
