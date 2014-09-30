@@ -4,14 +4,14 @@
 {
     @:(@ViewBag.CourseListTitle):<br />
     //using (Html.BeginForm("SetCourse", "Home", new { area = "" }, FormMethod.Post, new { id = "set_course" }))
-    using (Ajax.BeginForm("SetCourse", "Home",
-            new AjaxOptions
+    using (Ajax.BeginForm("SetCourse", "Home", 
+        new { area = "" }, 
+        new AjaxOptions
             {
                 HttpMethod = "POST",
                 OnComplete = "completed",
-                
-
-            }, new { area = "", id = "set_course" }))
+            }, 
+            new { id = "set_course" }))
     {
     @:<select name="course" id="course_select">
         bool courseOptGroup = false;

@@ -166,47 +166,5 @@ function parseDates() {
     }
 
     function completed() {
-        //update to show the new posts
-        //Note: this worked without reload initially...
-        //$(".partialContents").each(function (index, item) {
-        //    var url = $(item).data("url");            
-        //    if (url && url.length > 0) {
-        //        $(item).load(url);
-        //    }
-        //});      
-        //var url = "http://localhost:3715/";
-        //$(location).attr('href', url);
-        //location.reload();
-        //alert("here?");
-        //$('#set_course').submit();
-    //    //location.reload();
-
-    //    Ajax.BeginForm("SetCourse", "Home",
-    //        new AjaxOptions
-    //    {
-    //            HttpMethod = "POST",
-    //            OnComplete = "completed",
-                
-
-    //}, new { area = "", id = "set_course" }))
-
-        $.ajax({
-            type: 'GET',
-            url: '../../Home/Index',
-            //data: { area: ""},
-            //async: false,
-            success: function (result) {
-                //debugger;
-                alert("success!");
-                $("#main").load(result);
-                
-            },
-            error: function (result) {
-                alert("error");
-
-            },
-            
-        });
-
         location.reload();
     }
