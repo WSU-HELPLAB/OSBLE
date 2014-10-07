@@ -72,24 +72,12 @@ namespace OSBLE.Controllers
 
         private void setupActivityFeed()
         {
-            List<int> viewedCourses;
-            List<DashboardPost> dashboardPosts;
-            List<DashboardPost> pagedDashboardPosts;
-
             // Pagination defaults
             int startPost = 0;
             int postsPerPage = 10;
 
             // Single course mode. Only display posts for the active course.
-            if (DashboardSingleCourseMode)
-            {
-                viewedCourses = new List<int>();
-                viewedCourses.Add(ActiveCourseUser.AbstractCourseID);
-            }
-            else // All course mode. Display posts for all non-hidden courses the user is attached to.
-            {
-                viewedCourses = currentCourses.Where(cu => !cu.Hidden).Select(cu => cu.AbstractCourseID).ToList();
-            }
+            List<int> viewedCourses = DashboardSingleCourseMode ? new List<int> {ActiveCourseUser.AbstractCourseID} : currentCourses.Where(cu => !cu.Hidden).Select(cu => cu.AbstractCourseID).ToList();
 
             if (ActiveCourseUser.AbstractCourse is Course && ActiveCourseUser.AbstractRole.CanModify)
             {
@@ -116,8 +104,8 @@ namespace OSBLE.Controllers
             }
 
             // First get all posts to do a count and then do proper paging
-            dashboardPosts = db.DashboardPosts.Where(d => viewedCourses.Contains(d.CourseUser.AbstractCourseID))
-                                                                        .OrderByDescending(d => d.Posted).ToList();
+            List<DashboardPost> dashboardPosts = db.DashboardPosts.Where(d => viewedCourses.Contains(d.CourseUser.AbstractCourseID))
+                .OrderByDescending(d => d.Posted).ToList();
             ViewBag.ShowAll = false;
             if (Request.Params["showAll"] != null)
             {
@@ -129,9 +117,9 @@ namespace OSBLE.Controllers
                 }
             }
             
-            pagedDashboardPosts = dashboardPosts.Skip(startPost)
-                                            .Take(postsPerPage)
-                                            .ToList();
+            List<DashboardPost> pagedDashboardPosts = dashboardPosts.Skip(startPost)
+                .Take(postsPerPage)
+                .ToList();
 
             // Set up display settings for each post (recursively sets up replies.)
             foreach (DashboardPost dp in pagedDashboardPosts)
@@ -190,6 +178,7 @@ namespace OSBLE.Controllers
         public ActionResult Events()
         {
             setupEvents();
+           
             return PartialView("_Events", (List<Event>)ViewBag.Events);
         }
 
@@ -250,7 +239,7 @@ namespace OSBLE.Controllers
                 }
 
                 // Allow deletion if current user is poster or is an instructor
-                if (currentCu.AbstractRole.CanModify || ((posterCu != null) && (posterCu.UserProfileID == currentCu.UserProfileID)))
+                if (currentCu != null && (currentCu.AbstractRole.CanModify || ((posterCu != null) && (posterCu.UserProfileID == currentCu.UserProfileID))))
                 {
                     post.CanDelete = true;
                 }
@@ -312,7 +301,7 @@ namespace OSBLE.Controllers
         /// </summary>
         /// <param name="AbstractRoleID">The Role ID of the user in question</param>
         /// <returns>Returns a title for a user in a course if they are in a leadership role in that course</returns>
-        private string getRoleTitle(int AbstractRoleID)
+        private static string getRoleTitle(int AbstractRoleID)
         {
             switch (AbstractRoleID)
             {
@@ -685,7 +674,7 @@ namespace OSBLE.Controllers
 
             if (dp != null)
             {
-                CourseUser cu = currentCourses.Where(c => c.AbstractCourseID == dp.CourseUser.AbstractCourseID).FirstOrDefault();
+                CourseUser cu = currentCourses.FirstOrDefault(c => c.AbstractCourseID == dp.CourseUser.AbstractCourseID);
                 if ((dp.CourseUserID == ActiveCourseUser.ID) || ((cu != null) && (cu.AbstractRole.CanGrade)))
                 {
                     dp.Replies.Clear();
@@ -718,7 +707,7 @@ namespace OSBLE.Controllers
 
             if (dr != null)
             {
-                CourseUser cu = currentCourses.Where(c => c.AbstractCourse == dr.Parent.CourseUser.AbstractCourse).FirstOrDefault();
+                CourseUser cu = currentCourses.FirstOrDefault(c => c.AbstractCourse == dr.Parent.CourseUser.AbstractCourse);
                 if ((dr.CourseUserID == ActiveCourseUser.ID) || ((cu != null) && (cu.AbstractRole.CanGrade)))
                 {
                     db.DashboardReplies.Remove(dr);
