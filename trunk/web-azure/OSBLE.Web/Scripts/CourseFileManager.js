@@ -358,7 +358,7 @@ function cfm_AddUploader(stateObjectIndex) {
     // Add the uploader control into the DIV
     $('body').append(
 "<div id=\"input_dialog\" title=\"Upload File(s)\"> \ " +
-    "<p style=\"font-size: small;\">NOTE: all special characters except '-' and '_' will be stripped from the folder name.</p>" +
+    "<p style=\"font-size: small;\">NOTE: all special characters except '-' and '_' will be stripped from file names.</p>" +
     "Upload files to: " + state.name +
     "<br />" + fileuploader_getcontrolshtml(
         "cfm_files_" + stateObjectIndex.toString(), true,

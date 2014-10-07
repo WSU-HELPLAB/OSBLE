@@ -229,7 +229,7 @@ namespace OSBLE.Controllers
             // Setup Display Name/Display Title/Profile Picture/Mail Button/Delete Button
 
             // If user is not anonymous, this post was written by current user, or the poster is an Instructor/TA, display name and picture.
-            if ((posterCu == null) || !currentCu.AbstractRole.Anonymized || (currentCu.UserProfileID == posterCu.UserProfileID) || posterCu.AbstractRole.CanGrade)
+            if (currentCu != null && ((posterCu == null) || !currentCu.AbstractRole.Anonymized || (currentCu.UserProfileID == posterCu.UserProfileID) || posterCu.AbstractRole.CanGrade))
             {
                 // Display Name
                 if (posterCu != null)
@@ -279,12 +279,12 @@ namespace OSBLE.Controllers
                 DashboardPost thisDp = post as DashboardPost;
 
                 // For posts, set reply box display if the course allows replies or if Instructor/TA/Observer.
-                if ((currentCu.AbstractCourse is Course &&
-                        ((currentCu.AbstractCourse as Course).AllowDashboardReplies)
-                         || (currentCu.AbstractRole.CanGrade)
-                         || (currentCu.AbstractRole.Anonymized))
+                if (currentCu != null && ((currentCu.AbstractCourse is Course &&
+                                           ((currentCu.AbstractCourse as Course).AllowDashboardReplies)
+                                           || (currentCu.AbstractRole.CanGrade)
+                                           || (currentCu.AbstractRole.Anonymized))
                     // For communities, always allow replies
-                    || (currentCu.AbstractCourse is Community)
+                                          || (currentCu.AbstractCourse is Community))
                     )
                 {
                     thisDp.CanReply = true;
@@ -574,7 +574,7 @@ namespace OSBLE.Controllers
                                        select c).FirstOrDefault();
 
                     AbstractCourse ac = null;
-                    if (cu.AbstractCourse is AbstractCourse)
+                    if (cu != null && cu.AbstractCourse is AbstractCourse)
                     {
                         ac = (AbstractCourse)cu.AbstractCourse;
                     }

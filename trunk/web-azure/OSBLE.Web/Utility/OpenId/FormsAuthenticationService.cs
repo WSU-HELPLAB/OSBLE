@@ -13,10 +13,15 @@
 		public DateTime? SignedInTimestampUtc {
 			get {
 				var cookie = HttpContext.Current.Request.Cookies[FormsAuthentication.FormsCookieName];
-				if (cookie != null) {
-					var ticket = FormsAuthentication.Decrypt(cookie.Value);
-					return ticket.IssueDate.ToUniversalTime();
-				} else {
+				if (cookie != null)
+				{
+				    var ticket = FormsAuthentication.Decrypt(cookie.Value);
+				    if (ticket != null)
+				        return ticket.IssueDate.ToUniversalTime();
+				    else
+				        return null;
+				}
+				else {
 					return null;
 				}
 			}
