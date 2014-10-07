@@ -491,7 +491,7 @@ namespace OSBLE.Controllers
                                  where d.ID == ActiveCourseUser.AbstractCourseID
                                  select d).FirstOrDefault();
             //if there is at least one assignmnet in the course that has teams/is team based
-            if (thisCourse.Assignments.Count(a => a.HasTeams) > 0)
+            if (thisCourse != null && thisCourse.Assignments.Count(a => a.HasTeams) > 0)
             {
                 return RedirectToAction("Index", new { notice = "Roster imported with " + rosterCount.ToString() + " students and " + wtCount.ToString() + " whitelisted students. Please note that this course has an ongoing team-based assignment, and you will need to manually add the newly enrolled students to a team." });
             }
@@ -534,7 +534,7 @@ namespace OSBLE.Controllers
 
             Course thisCourse = ActiveCourseUser.AbstractCourse as Course;
             //if there is at least one assignmnet in the course that has teams/is team based
-            if(thisCourse.Assignments.Count(a => a.HasTeams) > 0)
+            if(thisCourse != null && thisCourse.Assignments.Count(a => a.HasTeams) > 0)
             {
                 return RedirectToAction("Index", new { notice = "You have successfully added " + courseuser.UserProfile.LastAndFirst() + " to the course. Please note that this course has an ongoing team-based assignment, and " + courseuser.UserProfile.LastAndFirst() + " will need to be manually added to a team."});
             }
@@ -624,7 +624,7 @@ namespace OSBLE.Controllers
                         {
                            
                             //if there is at least one assignmnet in the course that has teams/is team based
-                            if (thisCourse.Assignments.Count(a => a.HasTeams) > 0)
+                            if (thisCourse != null && thisCourse.Assignments.Count(a => a.HasTeams) > 0)
                             {
                                 return RedirectToAction("Index", new { notice = emails.Count().ToString() + " users have been added to the course. Please note that this course has an ongoing team-based assignment, and you will need to manually add these users to a team." });
                             }
@@ -646,7 +646,7 @@ namespace OSBLE.Controllers
             }
           
             //if there is at least one assignmnet in the course that has teams/is team based
-            if (thisCourse.Assignments.Count(a => a.HasTeams) > 0)
+            if (thisCourse != null && thisCourse.Assignments.Count(a => a.HasTeams) > 0)
             {
                 return RedirectToAction("Index", new { notice = "You have successfully added " + courseuser.UserProfile.LastAndFirst() + " to the course. Please note that this course has an ongoing team-based assignment, and you will need to manually add these users to a team." });
             }
@@ -714,7 +714,7 @@ namespace OSBLE.Controllers
                 addNewStudentToTeams(pendingUser);
 
                 //if there is at least one assignmnet in the course that has teams/is team based
-                if (thisCourse.Assignments.Count(a => a.HasTeams) > 0)
+                if (thisCourse != null && thisCourse.Assignments.Count(a => a.HasTeams) > 0)
                 {
                     return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " has been enrolled into this course. Please note that this course has an ongoing team-based assignment, and you will need to manually add " +pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " to a team." });
                 }
@@ -806,7 +806,7 @@ namespace OSBLE.Controllers
 
                 
                 db.SaveChanges();
-                if (thisCourse.Assignments.Count(a => a.HasTeams) > 0)
+                if (thisCourse != null && thisCourse.Assignments.Count(a => a.HasTeams) > 0)
                 {
                     return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " student(s) have been enrolled into this course. Please note that this course has an ongoing team-based assignment, and you will need to manually add the newly enrolled users to a team." });
                 }
@@ -1542,25 +1542,33 @@ namespace OSBLE.Controllers
                                      c.CourseID == ActiveCourseUser.AbstractCourseID
                                      select c).FirstOrDefault();
 
-            string subject = "Welcome to OSBLE";
-            string link = "https://osble.org/Account/AcademiaRegister?email="
-                + wtUser.Email + "&firstname=" + wtUser.Name2 + "&lastname=" + wtUser.Name1 + "&identification=" + wtUser.Identification;
+            if (wtUser != null)
+            {
+                string subject = "Welcome to OSBLE";
+                string link = "https://osble.org/Account/AcademiaRegister?email="
+                    + wtUser.Email + "&firstname=" + wtUser.Name2 + "&lastname=" + wtUser.Name1 + "&identification=" + wtUser.Identification;
 
-            string message = "Dear " + wtUser.Name2 + " " + wtUser.Name1 + @", <br/>
+                string message = "Dear " + wtUser.Name2 + " " + wtUser.Name1 + @", <br/>
                 <br/>
                 This email was sent to notify you that you have been added to " + ActiveCourseUser.AbstractCourse.Name +
-            " To access this course you need to create an account with OSBLE first. You may create an account " +
-            "by <a href='" + link + @"'>following this link</a>. 
+                " To access this course you need to create an account with OSBLE first. You may create an account " +
+                "by <a href='" + link + @"'>following this link</a>. 
                 <br/>
                 <br/>
                 ";
-            message += @"Best regards,<br/>
+                message += @"Best regards,<br/>
                 The OSBLE Team in the <a href='www.helplab.org'>HELP lab</a> at <a href='www.wsu.edu'>Washington State University</a>";
 
-            if(null != wtUser.Email)
-                Email.Send(subject, message, new List<MailAddress>() { new MailAddress(wtUser.Email) });
+                if (null != wtUser.Email)
+                    Email.Send(subject, message, new List<MailAddress>() { new MailAddress(wtUser.Email) });
 
-            return RedirectToAction("Index", "Roster", new { notice = wtUser.Name2 + " " + wtUser.Name1 + " has been sent an email to join this course" });
+                return RedirectToAction("Index", "Roster", new { notice = wtUser.Name2 + " " + wtUser.Name1 + " has been sent an email to join this course" });
+            }
+            else
+            {
+                return View("Index");
+            }
+            
         }
 
         /// <summary>
