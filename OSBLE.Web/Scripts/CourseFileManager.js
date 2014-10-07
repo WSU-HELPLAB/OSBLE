@@ -358,6 +358,7 @@ function cfm_AddUploader(stateObjectIndex) {
     // Add the uploader control into the DIV
     $('body').append(
 "<div id=\"input_dialog\" title=\"Upload File(s)\"> \ " +
+    "<p style=\"font-size: small;\">NOTE: all special characters except '-' and '_' will be stripped from the folder name.</p>" +
     "Upload files to: " + state.name +
     "<br />" + fileuploader_getcontrolshtml(
         "cfm_files_" + stateObjectIndex.toString(), true,
@@ -373,7 +374,7 @@ function cfm_AddUploader(stateObjectIndex) {
         autoOpen: true,
         resizable: false,
         width: 350,
-        height: 225,
+        height: 250,
         closeOnEscape: true,
         close: removePopUp
     });
@@ -482,21 +483,23 @@ function cfm_CreateFolderIconClicked(stateObjectIndex) {
 
     //// Add the creation controls into the DIV
     $('body').append(
-"<div id=\"input_dialog\" title=\"Create Folder\"> \
-    <br />Create Folder:&nbsp;" +
+"<div id=\"input_dialog\" title=\"Create Folder\"> " +
+        "<p style=\"font-size: small;\">NOTE: all special characters except '-' and '_' will be stripped from the folder name.</p>" +
+        "<br />Create Folder:&nbsp;" +
         "<input type=\"text\" id=\"tbSubfolder_" + stateObjectIndex.toString() + "\" />" +
         "<br /><input type=\"button\" value=\"Create\" style=\"width: 100%;\" " +
         "onclick=\"cfm_CreateFolder(" + stateObjectIndex.toString() + ");\" />" +
         "<br /><input type=\"button\" value=\"Cancel\" style=\"width: 100%;\" " +
         "onclick=\"removePopUp()\");\" />" +
 "</div>");
+    
 
     $('#input_dialog').dialog({
         modal: true,
         autoOpen: true,
         resizable: false,
-        width: 225,
-        height: 225,
+        width: 300,
+        height: 250,
         closeOnEscape: true,
         close: removePopUp
     });
