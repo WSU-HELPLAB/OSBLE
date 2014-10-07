@@ -350,6 +350,8 @@ namespace OSBLE.Controllers
                     cb.Name = Request.Params["break_name_" + i.ToString()];
                     cb.StartDate = DateTime.Parse(Request.Params["break_start_" + i.ToString()]);
                     cb.EndDate = DateTime.Parse(Request.Params["break_end_" + i.ToString()]);
+                    cb.StartDate = convertToUtc(course.TimeZoneOffset, cb.StartDate);
+                    cb.EndDate = convertToUtc(course.TimeZoneOffset, cb.EndDate);
                     course.CourseBreaks.Add(cb);
                 }
             }
