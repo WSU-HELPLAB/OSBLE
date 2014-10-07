@@ -54,18 +54,7 @@ function parseDates() {
         $(this).removeClass("utc-time");
         $(this).addClass("course-local-time");
     });
-    $('time.utc-event-time').each(function (index) {       
-        var milliseconds = $(this).attr('datetime');
-        var formatString = $(this).attr('data-date-format');
-        var original = new Date(milliseconds * 1000);
-        var originaldate = moment(original);
-        var currentDate = moment.utc(milliseconds, 'X');
-        var originalOffset = originaldate.zone();
-        //currentDate = currentDate.subtract('minutes', originalOffset);
-        $(this).html(currentDate.format(formatString));
-        $(this).removeClass("utc-event-time");
-        $(this).addClass("course-local-time");
-    });
+    
     $('time.utc-time-events').each(function (index) {
         var milliseconds = $(this).attr('datetime');
         var formatString = $(this).attr('data-date-format');
@@ -174,4 +163,8 @@ function parseDates() {
         }
         //alert(errMsg);
         //omthrow new Error(errMsg);
+    }
+
+    function completed() {
+        location.reload();
     }

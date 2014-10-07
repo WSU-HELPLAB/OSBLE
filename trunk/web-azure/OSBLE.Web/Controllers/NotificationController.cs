@@ -399,8 +399,11 @@ namespace OSBLE.Controllers
 
             SmtpClient mailClient = new SmtpClient();
             mailClient.UseDefaultCredentials = true;
-            
-            n.Sender = db.CourseUsers.Find(ActiveCourseUser.ID);
+
+            //this linne causes a break if the course user is not part of any courses
+            if(n.Sender == null)
+                n.Sender = db.CourseUsers.Find(ActiveCourseUser.ID);
+
             UserProfile sender = db.UserProfiles.Find(n.Sender.UserProfileID);
             UserProfile recipient = db.UserProfiles.Find(n.Recipient.UserProfileID);
 

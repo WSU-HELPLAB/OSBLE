@@ -542,7 +542,7 @@ namespace OSBLE.Controllers
             if (ActiveCourseUser.AbstractCourse is Course && ((ActiveCourseUser.AbstractCourse as Course).ShowMeetings == true))
             {
                 Course course = (Course)ActiveCourseUser.AbstractCourse;
-
+                
                 // Add breaks within window to events
                 foreach (CourseBreak cb in course.CourseBreaks)
                 {
@@ -553,12 +553,13 @@ namespace OSBLE.Controllers
 
                         e.Title = cb.Name;
 
-                        if (cb.StartDate.Date != cb.EndDate.Date)
+                        if (cb.StartDate != cb.EndDate)
                         {
                             e.Title += " Starts";
                         }
 
-                        e.StartDate = cb.StartDate.Date;
+                        //e.StartDate = cb.StartDate.Date;
+                        e.StartDate = cb.StartDate;
                         e.HideTime = true;
                         e.NoDateTime = true;
                         e.HideDelete = true;
@@ -566,13 +567,17 @@ namespace OSBLE.Controllers
                         events.Add(e);
                     }
 
+                    var temp1 = cb.StartDate;
+                    var temp2 = cb.StartDate.Date;
+
                     // End of break (only if date is different than start)
-                    if ((cb.StartDate.Date != cb.EndDate.Date) && (cb.EndDate >= StartDate) && (cb.EndDate <= EndDate))
+                    if ((cb.StartDate != cb.EndDate) && (cb.EndDate >= StartDate) && (cb.EndDate <= EndDate))
                     {
                         Event e = new Event();
 
                         e.Title = cb.Name + " Ends";
-                        e.StartDate = cb.EndDate.Date;
+                        //e.StartDate = cb.EndDate.Date;
+                        e.StartDate = cb.EndDate;
                         e.HideTime = true;
                         e.NoDateTime = true;
                         e.HideDelete = true;
@@ -586,7 +591,8 @@ namespace OSBLE.Controllers
                 while (true)
                 {
                     DateTime current = StartDate.AddDays(day);
-                    if (current > EndDate) break;
+                    if (current > EndDate) 
+                        break;
 
                     foreach (CourseMeeting cm in course.CourseMeetings)
                     {
