@@ -4,7 +4,7 @@
 @{
     Layout = "";
     ViewBag.Title = "Submission";
-    ViewBag.MaxFileSizeMB = (((HttpRuntimeSection) WebConfigurationManager.GetSection("system.web/httpRuntime")).MaxRequestLength / 1024);
+    ViewBag.MaxFileSizeMB = ((WebConfigurationManager.GetSection("system.web/httpRuntime") as HttpRuntimeSection).MaxRequestLength / 1024);
 }
 <h2>Submission</h2>
 <script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>

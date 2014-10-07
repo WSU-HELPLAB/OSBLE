@@ -657,7 +657,7 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult Delete()
         {
-            bool fromOutbox = Request.UrlReferrer != null && Request.UrlReferrer.ToString().Contains("Outbox");
+            bool fromOutbox = Request.UrlReferrer.ToString().Contains("Outbox");
             string[] keys = Request.Params.AllKeys.Where(s => s.Contains("mailItem_")).ToArray();
             List<int> mailIdsToDelete = new List<int>();
             string value = "";

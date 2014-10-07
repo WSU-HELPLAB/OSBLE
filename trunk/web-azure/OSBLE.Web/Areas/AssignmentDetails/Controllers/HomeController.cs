@@ -166,22 +166,19 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
                 return Index(assignmentID);
             }
 
-            if (fileName != null)
+            int slashIndex = fileName.LastIndexOf('\\');
+            if (-1 == slashIndex)
             {
-                int slashIndex = fileName.LastIndexOf('\\');
-                if (-1 == slashIndex)
-                {
-                    slashIndex = fileName.LastIndexOf('/');
-                }
-                if (-1 != slashIndex)
-                {
-                    // If the file exists in some nested folders then get the 
-                    // correct directory object first.
-                    attrFiles = (OSBLEDirectory)attrFiles.GetDir(fileName.Substring(0, slashIndex));
+                slashIndex = fileName.LastIndexOf('/');
+            }
+            if (-1 != slashIndex)
+            {
+                // If the file exists in some nested folders then get the 
+                // correct directory object first.
+                attrFiles = (OSBLEDirectory)attrFiles.GetDir(fileName.Substring(0, slashIndex));
 
-                    // Also remove the path from the beginning of the file name
-                    fileName = fileName.Substring(slashIndex + 1);
-                }
+                // Also remove the path from the beginning of the file name
+                fileName = fileName.Substring(slashIndex + 1);
             }
 
             // Perform the actual deletion

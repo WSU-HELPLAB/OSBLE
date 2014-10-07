@@ -11,13 +11,9 @@
     @foreach (object deliverableObj in dataModel.Deliverables.AllDeliverables)
     {
         Deliverable deliverable = deliverableObj as Deliverable;
-        if (deliverable != null)
-        {
-            string[] extensions = deliverable.FileExtensions;
-            string extensionsStr = string.Join(",", extensions);
-            @:<li>@deliverable.Name (@extensionsStr
-        }
-        @:)</li>
+        string[] extensions = deliverable.FileExtensions;
+        string extensionsStr = string.Join(",", extensions);
+        <li>@deliverable.Name (@extensionsStr)</li>
     }
     </ol>
     </td>

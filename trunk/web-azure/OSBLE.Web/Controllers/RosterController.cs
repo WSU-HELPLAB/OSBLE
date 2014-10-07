@@ -494,7 +494,7 @@ namespace OSBLE.Controllers
                                  where d.ID == ActiveCourseUser.AbstractCourseID
                                  select d).FirstOrDefault();
             //if there is at least one assignmnet in the course that has teams/is team based
-            if (thisCourse != null && thisCourse.Assignments.Count(a => a.HasTeams) > 0)
+            if (thisCourse.Assignments.Count(a => a.HasTeams) > 0)
             {
                 return RedirectToAction("Index", new { notice = "Roster imported with " + rosterCount.ToString() + " students and " + wtCount.ToString() + " whitelisted students. Please note that this course has an ongoing team-based assignment, and you will need to manually add the newly enrolled students to a team." });
             }
@@ -537,7 +537,7 @@ namespace OSBLE.Controllers
 
             Course thisCourse = ActiveCourseUser.AbstractCourse as Course;
             //if there is at least one assignmnet in the course that has teams/is team based
-            if(thisCourse != null && thisCourse.Assignments.Count(a => a.HasTeams) > 0)
+            if(thisCourse.Assignments.Count(a => a.HasTeams) > 0)
             {
                 return RedirectToAction("Index", new { notice = "You have successfully added " + courseuser.UserProfile.LastAndFirst() + " to the course. Please note that this course has an ongoing team-based assignment, and " + courseuser.UserProfile.LastAndFirst() + " will need to be manually added to a team."});
             }
@@ -627,7 +627,7 @@ namespace OSBLE.Controllers
                         {
                            
                             //if there is at least one assignmnet in the course that has teams/is team based
-                            if (thisCourse != null && thisCourse.Assignments.Count(a => a.HasTeams) > 0)
+                            if (thisCourse.Assignments.Count(a => a.HasTeams) > 0)
                             {
                                 return RedirectToAction("Index", new { notice = emails.Count().ToString() + " users have been added to the course. Please note that this course has an ongoing team-based assignment, and you will need to manually add these users to a team." });
                             }
@@ -649,7 +649,7 @@ namespace OSBLE.Controllers
             }
           
             //if there is at least one assignmnet in the course that has teams/is team based
-            if (thisCourse != null && thisCourse.Assignments.Count(a => a.HasTeams) > 0)
+            if (thisCourse.Assignments.Count(a => a.HasTeams) > 0)
             {
                 return RedirectToAction("Index", new { notice = "You have successfully added " + courseuser.UserProfile.LastAndFirst() + " to the course. Please note that this course has an ongoing team-based assignment, and you will need to manually add these users to a team." });
             }
@@ -698,8 +698,11 @@ namespace OSBLE.Controllers
             CourseUser pendingUser = getCourseUser(userId);
             Course thisCourse = ActiveCourseUser.AbstractCourse as Course;
             Notification n = db.Notifications.Where(item => item.SenderID == pendingUser.ID && item.RecipientID == ActiveCourseUser.ID).FirstOrDefault();
-            if (n != null) n.Read = true;
-            db.SaveChanges();
+            //there is not always a notification for a pending user, say a instructor manually adds them to the pending list?
+            if(n != null)
+            {
+                n.Read = true;
+                db.SaveChanges();
             }
            
 
@@ -714,7 +717,7 @@ namespace OSBLE.Controllers
                 addNewStudentToTeams(pendingUser);
 
                 //if there is at least one assignmnet in the course that has teams/is team based
-                if (thisCourse != null && thisCourse.Assignments.Count(a => a.HasTeams) > 0)
+                if (thisCourse.Assignments.Count(a => a.HasTeams) > 0)
                 {
                     return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " has been enrolled into this course. Please note that this course has an ongoing team-based assignment, and you will need to manually add " +pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " to a team." });
                 }
@@ -806,7 +809,7 @@ namespace OSBLE.Controllers
 
                 
                 db.SaveChanges();
-                if (thisCourse != null && thisCourse.Assignments.Count(a => a.HasTeams) > 0)
+                if (thisCourse.Assignments.Count(a => a.HasTeams) > 0)
                 {
                     return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " student(s) have been enrolled into this course. Please note that this course has an ongoing team-based assignment, and you will need to manually add the newly enrolled users to a team." });
                 }
@@ -1543,8 +1546,6 @@ namespace OSBLE.Controllers
                                      select c).FirstOrDefault();
 
             string subject = "Welcome to OSBLE";
-            if (wtUser != null)
-            {
             string link = "https://osble.org/Account/AcademiaRegister?email="
                 + wtUser.Email + "&firstname=" + wtUser.Name2 + "&lastname=" + wtUser.Name1 + "&identification=" + wtUser.Identification;
 
@@ -1559,17 +1560,10 @@ namespace OSBLE.Controllers
             message += @"Best regards,<br/>
                 The OSBLE Team in the <a href='www.helplab.org'>HELP lab</a> at <a href='www.wsu.edu'>Washington State University</a>";
 
-                if (null != wtUser.Email)
+            if(null != wtUser.Email)
                 Email.Send(subject, message, new List<MailAddress>() { new MailAddress(wtUser.Email) });
 
             return RedirectToAction("Index", "Roster", new { notice = wtUser.Name2 + " " + wtUser.Name1 + " has been sent an email to join this course" });
-        }
-            else
-            {
-                //TODO: handle error with whitetable user
-                return RedirectToAction("Index");
-            }
-            
         }
 
         /// <summary>

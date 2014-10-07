@@ -145,14 +145,10 @@ namespace OSBLE.Controllers
             // Send notification to recipient about new message.
             Notification n = new Notification();
             n.ItemType = Notification.Types.Mail;
-            n.ItemID = mail.ID;
-            CourseUser recipient = db.CourseUsers.FirstOrDefault(cu => cu.UserProfileID == mail.ToUserProfileID);
-            if (recipient != null)
-                n.RecipientID = recipient.ID;
-            CourseUser sender = db.CourseUsers.FirstOrDefault(cu => cu.UserProfileID == mail.FromUserProfileID);
-            if (sender != null)
-                n.SenderID = sender.ID;
-
+            n.ItemID = mail.ID;            
+            n.RecipientID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.ToUserProfileID).FirstOrDefault().ID;
+            n.SenderID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.FromUserProfileID).FirstOrDefault().ID;           
+            
             //using the data variable to store context id for email context later.
             n.Data = mail.ContextID.ToString();
 
@@ -183,7 +179,7 @@ namespace OSBLE.Controllers
                 // are still in the course,
                 // and are not the poster of the new reply.
                 // Also checks to make sure a duplicate notification is not sent.
-                if (poster != null && (reply.CourseUser != null && !reply.CourseUser.AbstractRole.Anonymized && reply.CourseUserID != poster.ID && !sendToUsers.Contains(reply.CourseUser)))
+                if (reply.CourseUser != null && !reply.CourseUser.AbstractRole.Anonymized && reply.CourseUserID != poster.ID && !sendToUsers.Contains(reply.CourseUser))
                 {
                     sendToUsers.Add(reply.CourseUser);
                 }
@@ -201,7 +197,7 @@ namespace OSBLE.Controllers
                 n.ItemType = Notification.Types.Dashboard;
                 n.ItemID = dp.ID;
                 n.RecipientID = courseUser.ID;
-                if (poster != null) n.SenderID = poster.ID;
+                n.SenderID = poster.ID;
                 addNotification(n);
             }
         }
@@ -513,16 +509,16 @@ namespace OSBLE.Controllers
                     break;
                 case Notification.Types.JoinCourseApproval:
                     subject += " - " + sender.FirstName + " " + sender.LastName;
-                    if(course != null)
-                        body = sender.FirstName + " " + sender.LastName + " has submitted a request to join " + course.Name; 
+
+                    body = sender.FirstName + " " + sender.LastName + " has submitted a request to join " + course.Name; 
 
                     action = "view the request to join.";
 
                     break;
                 case Notification.Types.JoinCommunityApproval:
                     subject += " - " + sender.FirstName + " " + sender.LastName;
-                    if(course != null)
-                        body = sender.FirstName + " " + sender.LastName + " has submitted a request to join " + course.Name; 
+
+                    body = sender.FirstName + " " + sender.LastName + " has submitted a request to join " + course.Name; 
 
                     action = "view the request to join.";
 
