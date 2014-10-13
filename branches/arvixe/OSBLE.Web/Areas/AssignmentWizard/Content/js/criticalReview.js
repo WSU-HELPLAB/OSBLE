@@ -31,7 +31,7 @@ function documentReady() {
 
 //Adds the reviewer to the specified team
 function addReviewer(reviewerId, teamId) {
-    debugger;
+    
     var reviewer = $("#AvailableStudent").children('li').filter(function (index) {
         var dataId = $(this).attr("data-id");
         return reviewerId == dataId;
