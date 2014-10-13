@@ -58,7 +58,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
                 //published, the rubric grade should be displayed.
                 if (rubricEvaluation.IsPublished == false)
                 {
-                    data.Grade.LinkText = "Saved as Draft";
+                    data.Grade.LinkText = "Saved as Draft (" + RubricEvaluation.GetGradeAsPercent(rubricEvaluation.ID) + ")";
                 }
                 else
                 {
