@@ -519,7 +519,19 @@ namespace OSBLE.Controllers
         {
 
             string SchoolID = Request.Form["CurrentlySelectedSchool"];
-            courseuser.UserProfile.SchoolID = Convert.ToInt32(SchoolID);
+            if (string.IsNullOrEmpty(SchoolID))
+            {
+                ModelState.AddModelError("School", "The School field is required.");
+                ModelState.AddModelError("SchoolID", "");
+                ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name");
+                ViewBag.SchoolID = new SelectList(db.Schools, "ID", "Name");
+                return View(); 
+            }
+            else
+            {
+                courseuser.UserProfile.SchoolID = Convert.ToInt32(SchoolID);
+            }
+            
             //if modelState isValid
             if (ModelState.IsValid && courseuser.AbstractRoleID != 0)
             {

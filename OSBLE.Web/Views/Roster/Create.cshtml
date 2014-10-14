@@ -28,7 +28,7 @@
         </div>
         <div class="editor-field">
             @Html.DropDownList("SchoolID", String.Empty)
-            @Html.ValidationMessageFor(model => model.UserProfile.SchoolID)
+            @Html.ValidationMessage("School")
             <input type="hidden" id="CurrentlySelectedSchool" name="CurrentlySelectedSchool" value="" />
         </div>    
     
