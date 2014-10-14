@@ -513,6 +513,7 @@ namespace OSBLE.Controllers
                     }
                     mail.Subject = "RE: " + mail.Subject;
                     // Prefix each line with a '> '
+                    //TODO: check if mail.Posted is the correct time (if UTC needs to convert to local!)
                     mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
                                     mail.FromUserProfile.LastName + "\nSent at: " + mail.Posted.ToString() + "\n\n" +
                                     Regex.Replace(mail.Message, "^.*$", "> $&",
@@ -537,6 +538,7 @@ namespace OSBLE.Controllers
                     recipientList.Add(mail.FromUserProfile); //Adds the sender to the reply list
                     mail.Subject = "RE: " + mail.Subject;
                     // Prefix each line with a '> '
+                    //TODO: check if mail.Posted is the correct time (if UTC needs to convert to local!)
                     mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
                                     mail.FromUserProfile.LastName + "\nSent at: " + mail.Posted.ToString() + "\n\n" +
                                     Regex.Replace(mail.Message, "^.*$", "> $&",
@@ -559,6 +561,7 @@ namespace OSBLE.Controllers
                 {
                     mail.Subject = "FW: " + mail.Subject;
                     // Prefix each line with a '> '
+                    //TODO: check if mail.Posted is the correct time (if UTC needs to convert to local!)
                     mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
                                     mail.FromUserProfile.LastName + "\nSent at: " + mail.Posted.ToString() + "\n\n" +
                                     Regex.Replace(mail.Message, "^.*$", "> $&",

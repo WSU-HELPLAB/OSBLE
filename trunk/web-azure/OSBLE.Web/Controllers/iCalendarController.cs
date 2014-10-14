@@ -46,21 +46,38 @@ namespace OSBLE.Controllers
         public void CreateCourseCalendar(int id)
         {
             //Get the Course
-            Course course = (from d in db.Courses
-                            where d.ID == id
-                            select d).FirstOrDefault();
+            var course = (from d in db.Courses
+                          where d.ID == id
+                          select new
+                          {
+                              d.StartDate,
+                              d.EndDate,
+                              d.Prefix,
+                              d.Number,
+                              d.Semester,
+                              d.Year,
+                              d.CourseMeetings,
+                              d.CourseBreaks,
+                              d.ID
+                          }).FirstOrDefault();
             //get the timezone of the course 
             CourseController cc = new CourseController();
             int utcOffset = (ActiveCourseUser.AbstractCourse as Course).TimeZoneOffset;
             TimeZoneInfo tz = cc.getTimeZone(utcOffset);
 
             //get course events
-            List<OSBLE.Models.HomePage.Event> events = (from e in db.Events
-                                                        where e.Poster.AbstractCourseID == ActiveCourseUser.AbstractCourseID
-                                                        && e.StartDate >= course.StartDate
-                                                        && e.StartDate <= course.EndDate
-                                                        && e.Approved
-                                                        select e).ToList();
+            var events = (from e in db.Events
+                          where e.Poster.AbstractCourseID == ActiveCourseUser.AbstractCourseID
+                          && e.StartDate >= course.StartDate
+                          && e.StartDate <= course.EndDate
+                          && e.Approved
+                          select new
+                          {
+                              e.StartDate,
+                              e.EndDate,
+                              e.Title,
+                              e.Description
+                          }).ToList();
 
             //Create the calendar object 
             iCalendar courseCalendar = new iCalendar();
@@ -137,7 +154,7 @@ namespace OSBLE.Controllers
             }//end if
 
             //add all the events to the calendar 
-            foreach (OSBLE.Models.HomePage.Event e in events)
+            foreach (var e in events)
             {
                 DDay.iCal.Event evt = courseCalendar.Create<DDay.iCal.Event>();
 
@@ -187,12 +204,18 @@ namespace OSBLE.Controllers
             TimeZoneInfo tz = cc.getTimeZone(utcOffset);
 
             //get course events
-            List<OSBLE.Models.HomePage.Event> events = (from e in db.Events
-                                                        where e.Poster.AbstractCourseID == ActiveCourseUser.AbstractCourseID
-                                                        && e.StartDate >= course.StartDate
-                                                        && e.StartDate <= course.EndDate
-                                                        && e.Approved
-                                                        select e).ToList();
+            var events = (from e in db.Events
+                          where e.Poster.AbstractCourseID == ActiveCourseUser.AbstractCourseID
+                          && e.StartDate >= course.StartDate
+                          && e.StartDate <= course.EndDate
+                          && e.Approved
+                          select new
+                          {
+                              e.StartDate,
+                              e.EndDate,
+                              e.Title,
+                              e.Description
+                          }).ToList();
 
             //Create the calendar object 
             iCalendar courseCalendar = new iCalendar();
@@ -269,8 +292,9 @@ namespace OSBLE.Controllers
 
             }//end if
 
+           
             //add all the events to the calendar 
-            foreach (OSBLE.Models.HomePage.Event e in events)
+            foreach (var e in events)
             {
                 DDay.iCal.Event evt = courseCalendar.Create<DDay.iCal.Event>();
 
@@ -316,10 +340,7 @@ namespace OSBLE.Controllers
         public ActionResult SubscribeToCalendar(int id)
         {
             //Get the Course
-            Course course = (from d in db.Courses
-                             where d.ID == id
-                             select d).FirstOrDefault();
-
+            Course course = ActiveCourseUser.AbstractCourse as Course;
             string prefix = course.Prefix.Replace(@"/", "-");
             string number = course.Number.Replace(@"/", "-");
 
@@ -343,9 +364,16 @@ namespace OSBLE.Controllers
         public void SaveCourseCalendar(Byte[] courseCalendar, int id)
         {
             //Get the Course
-            Course course = (from d in db.Courses
+            var course = (from d in db.Courses
                              where d.ID == id
-                             select d).FirstOrDefault();
+                             select new
+                             {
+                                 d.ID,
+                                 d.Prefix,
+                                 d.Number,
+                                 d.Semester,
+                                 d.Year
+                             }).FirstOrDefault();
 
             string path = AppDomain.CurrentDomain.BaseDirectory + "Content/iCal/" + course.ID.ToString() + "/";
 
