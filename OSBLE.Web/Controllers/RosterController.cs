@@ -506,6 +506,7 @@ namespace OSBLE.Controllers
         public ActionResult Create()
         {
             ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name");
+            ViewBag.SchoolID = new SelectList(db.Schools, "ID", "Name");
             return View();
         }
 
@@ -516,7 +517,9 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult Create(CourseUser courseuser)
         {
-            
+
+            string SchoolID = Request.Form["CurrentlySelectedSchool"];
+            courseuser.UserProfile.SchoolID = Convert.ToInt32(SchoolID);
             //if modelState isValid
             if (ModelState.IsValid && courseuser.AbstractRoleID != 0)
             {
@@ -528,6 +531,7 @@ namespace OSBLE.Controllers
                 {
                     ModelState.AddModelError("", e.Message);
                     ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name");
+                    ViewBag.SchoolID = new SelectList(db.Schools, "ID", "Name");
                     return View();  
                 }
             }
@@ -1219,9 +1223,11 @@ namespace OSBLE.Controllers
         private void createCourseUser(CourseUser courseuser)
         {
             //This will return a user if they exist already or null if they don't
+
+
             var user = (from c in db.UserProfiles
                         where c.Identification == courseuser.UserProfile.Identification
-                        && c.SchoolID == ActiveCourseUser.UserProfile.SchoolID
+                        && c.SchoolID == courseuser.UserProfile.SchoolID
                         select c).FirstOrDefault();
             if (user == null)
             {
