@@ -21,7 +21,19 @@
             @Html.EditorFor(model => model.UserProfile.Identification)
             @Html.ValidationMessageFor(model => model.UserProfile.Identification)
         </div>
-
+        
+        <div class="editor-label">
+            @Html.LabelFor(model => model.UserProfile.SchoolID, "School")
+            @Helpers.CreateToolTip(ToolTips.RosterSchoolID) 
+        </div>
+        <div class="editor-field">
+            @Html.DropDownList("SchoolID", String.Empty)
+            @Html.ValidationMessageFor(model => model.UserProfile.SchoolID)
+            <input type="hidden" id="CurrentlySelectedSchool" name="CurrentlySelectedSchool" value="" />
+        </div>    
+    
+    
+    
         <div class="editor-label">
             @Html.LabelFor(model => model.AbstractRoleID, "Course Role")
             @Helpers.CreateToolTip(ToolTips.RosterRole) 
@@ -40,9 +52,16 @@
             @Html.ValidationMessageFor(model => model.Section)
         </div>
 
-        <p>
-            <input type="submit" value="Add User" />
-        </p>
+    <p>
+        <input type="submit" value="Add User" />
+    </p>
+    
+    <script type="text/javascript">
+    $('#SchoolID').change(function () {
+        $("#CurrentlySelectedSchool").val($("#SchoolID :selected").val());
+    });
+</script>
+    
 }
 
 <div>
