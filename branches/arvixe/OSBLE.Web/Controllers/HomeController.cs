@@ -480,24 +480,30 @@ namespace OSBLE.Controllers
                         string body = "";
                         List<MailAddress> addresses = new List<MailAddress>();
 
+                        //dp.posted needs to have a converetd time for mailing
+                        //locate timezone offset
+                        int courseOffset = (ActiveCourseUser.AbstractCourse).GetType() != typeof(Community) ? ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset : 0;
+                        CourseController cc = new CourseController();
+                        TimeZoneInfo tz = cc.getTimeZone(courseOffset);
+
                         //slightly different messages depending on course type
                         if (c is Course)
                         {
                             Course course = c as Course;
                             subject = "[" + course.Prefix + " " + course.Number + "] New Activity Post from " + CurrentUser.FirstName + " " + CurrentUser.LastName;
-                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message to the class at " + dp.Posted.ToString() + ":";
+                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message to the class at " + TimeZoneInfo.ConvertTimeFromUtc(dp.Posted, tz).ToString() + ":";
                         }
                         else if (c is Community)
                         {
                             Community community = c as Community;
                             subject = "[" + community.Nickname + "] New Activity Post from " + CurrentUser.FirstName + " " + CurrentUser.LastName;
-                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message to the community at " + dp.Posted.ToString() + ":";
+                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message to the community at " + TimeZoneInfo.ConvertTimeFromUtc(dp.Posted, tz).ToString() + ":";
                         }
                         else
                         {
                             //this should never execute, but just in case...
                             subject = "OSBLE Activity Post";
-                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message at " + dp.Posted.ToString() + ":";
+                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message at " + TimeZoneInfo.ConvertTimeFromUtc(dp.Posted, tz).ToString() + ":";
                         }
                         body += "<br /><br />";
                         body += dp.Content.Replace("\n", "<br />");
@@ -588,24 +594,30 @@ namespace OSBLE.Controllers
                         ViewBag.dp = replyToPost;
                         List<DashboardReply> replys = replyToPost.Replies.Where(r => r.ID > latestReply).ToList();
 
+                        //dr.posted needs to have a converetd time for mailing
+                        //locate timezone offset
+                        int courseOffset = (ActiveCourseUser.AbstractCourse).GetType() != typeof(Community) ? ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset : 0;
+                        CourseController cc = new CourseController();
+                        TimeZoneInfo tz = cc.getTimeZone(courseOffset);
+
                         //slightly different messages depending on course type
                         if (ac is Course && (ac as Course).AllowDashboardReplies)
                         {
                             Course course = (Course)ac;
                             subject = "[" + course.Prefix + " " + course.Number + "] Reply from " + CurrentUser.FirstName + " " + CurrentUser.LastName;
-                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following reply to the Dashboard post " + replyToPost.DisplayTitle + " at " + dr.Posted.ToString() + ":";
+                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following reply to the Dashboard post " + replyToPost.DisplayTitle + " at " + TimeZoneInfo.ConvertTimeFromUtc(dr.Posted, tz).ToString() + ":";
                         }
                         else if (ac is Community)
                         {
                             Community community = ac as Community;
                             subject = "[" + community.Nickname + "] Reply from " + CurrentUser.FirstName + " " + CurrentUser.LastName;
-                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following reply to the Dashboard post " + replyToPost.DisplayTitle + " at " + dr.Posted.ToString() + ":";
+                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following reply to the Dashboard post " + replyToPost.DisplayTitle + " at " + TimeZoneInfo.ConvertTimeFromUtc(dr.Posted, tz).ToString() + ":";
                         }
                         else
                         {
                             //this should never execute, but just in case...
                             subject = "OSBLE Activity Post";
-                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message at " + dr.Posted.ToString() + ":";
+                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message at " + TimeZoneInfo.ConvertTimeFromUtc(dr.Posted, tz).ToString() + ":";
                         }
                         body += "<br /><br />";
                         body += dr.Content.Replace("\n", "<br />");
