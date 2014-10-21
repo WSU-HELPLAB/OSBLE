@@ -367,6 +367,7 @@
     <Content Include="Areas\AssignmentWizard\Content\js\team.js" />
     <Content Include="Areas\AssignmentWizard\Controllers\README.txt" />
     <Content Include="clientaccesspolicy.xml" />
+    <Content Include="Content\images\alert.png" />
     <Content Include="Content\favicon.ico" />
     <Content Include="Content\images\account.png" />
     <Content Include="Content\images\add_up.png" />
@@ -509,6 +510,7 @@
     <Content Include="Content\images\page_white_delete.png" />
     <Content Include="Content\images\page_white_edit.png" />
     <Content Include="Content\images\publish.png" />
+    <Content Include="Content\images\refresh.png" />
     <Content Include="Content\images\thumbs_up.png" />
     <Content Include="Content\images\thumb_down.png" />
     <Content Include="Content\images\tooltip\109_AllAnnotations_Help_16x16_72.png" />
