@@ -40,7 +40,8 @@
         </div>
         <div class="editor-field">
             @Html.DropDownList("AbstractRoleID", String.Empty)
-            @Html.ValidationMessageFor(model => model.AbstractRoleID)
+            @Html.ValidationMessage("Course Role")
+            <input type="hidden" id="CurrentlySelectedAbstractRoleID" name="CurrentlySelectedAbstractRoleID" value="" />
         </div>
 
         <div class="editor-label">
@@ -59,6 +60,9 @@
     <script type="text/javascript">
     $('#SchoolID').change(function () {
         $("#CurrentlySelectedSchool").val($("#SchoolID :selected").val());
+    });
+    $('#AbstractRoleID').change(function () {
+        $("#CurrentlySelectedAbstractRoleID").val($("#AbstractRoleID :selected").val());
     });
 </script>
     
