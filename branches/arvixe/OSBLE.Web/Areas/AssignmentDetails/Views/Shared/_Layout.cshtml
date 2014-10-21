@@ -31,7 +31,60 @@
             window.location.replace("/AssignmentDetails/" + assignmentNumber);
 
         });
+
+        $("[id^='annotateId']").click(function (data) {
+            var idString = $(this).prop("class");
+            forceRefreshAnnotateDialog(idString);
+        });
     });
+
+    function forceRefreshAnnotateDialog(idString) {
+        
+        $("#dialog-confirm").html("Are you sure?<br/><br/><strong>ALL previous annotations for this document will be lost!</strong>  <br/><br/> This will refresh the document to the latest submitted file.");
+        $("#dialog-confirm").css("text-align", "center");
+
+
+        // Define the Dialog and its properties.
+        $("#dialog-confirm").dialog({
+            resizable: false,
+            modal: true,
+            title: "Force refresh document.",
+            height: 300,
+            width: 350,
+            buttons: {
+                "Yes": function () {
+                    $(this).dialog('close');
+                    callback(idString);
+                },
+                "No": function () {
+                    $(this).dialog('close');
+                    //callback(false);
+                }
+            }
+        });
+    }
+
+    function callback(idString) {
+
+        var id = idString.split('_');
+        var assignmentId = id[1];
+        var teamId = id[2];
+
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("GetSubmissionZip", "FileHandler", new { area = "" })',
+            data: {assignmentID: assignmentId, teamID: teamId, resubmission: true},
+            
+            success: function (result) {
+                alert("Document Refreshed.");
+
+            },
+            error: function (result) {
+                alert("Refresh failed...");
+            }
+        });
+        
+    }
 </script>
 
 @*If student, then remove all assignments that have not been published from the assignment list

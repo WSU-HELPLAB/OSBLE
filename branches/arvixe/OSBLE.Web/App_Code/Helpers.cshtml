@@ -98,6 +98,10 @@
 {<img src="/Content/images/move_right.png" alt="Right Arrow Button" />}
 @helper PublishButton()
     {<img src="/Content/images/publish.png" alt="Publish Button" />}
+@helper Alert()
+    {<img src="/Content/images/alert.png" alt="Alert" />}
+@helper Refresh()
+    {<img src="/Content/images/refresh.png" alt="Refresh" />}
 @helper UnPublishButton()
     {<img src="/Content/images/unpublish.png" alt="Unpublish Button" />}
 @helper DeleteSubmit(string title)
@@ -276,6 +280,44 @@ Also runs content through nl2br to convert newlines to <br /> tags. *@
     </div>
 
 }
+
+@helper CreateToolTip(string tooltip, string imgName)
+{
+    //TODO: this methid is to create a dynamic tooltip like the standard (?) tooltip.
+    // We'd like to be able to choose a custom image too! for some reason using this
+    // right now there is space between the tooltip background peieces.
+    HtmlString output = new HtmlString(tooltip);
+    string imageSource = "../../Content/images/" + imgName;
+    <div class='popup-bubbleInfo'>
+        <img class='popup-trigger' src='@imageSource'
+             alt='(?)' height='19px' width='19px' />
+        <div class='popup'>
+            <table>
+                <tbody>
+                    <tr>
+                        <td class='topleft'></td>
+                        <td class='top'></td>
+                        <td class='topright'></td>
+                    </tr>
+                    <tr>
+                        <td class='left'></td>
+                        <td class='popup-contents'>
+                            @output
+                        </td>
+                        <td class='right'></td>
+                    </tr>
+                    <tr>
+                        <td class='bottomleft'></td>
+                        <td class='bottom'></td>
+                        <td class='bottomright'></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+}
+
 @functions{
     #region C# functions
 
