@@ -396,6 +396,8 @@ namespace OSBLE.Controllers
                 LastName = Request.QueryString["lastname"]
                 ,
                 Identification = Request.QueryString["identification"]
+                ,
+                SchoolID = Convert.ToInt32(Request.QueryString["schoolid"])
             };
 
             if(WTmodel != null)
@@ -432,11 +434,15 @@ namespace OSBLE.Controllers
                         return AcademiaRegister();
                     }
 
-                    takenName = db.UserProfiles.Where(u => u.Identification == model.Identification).FirstOrDefault();
+                    takenName = (from d in db.UserProfiles
+                        where d.Identification == model.Identification &&
+                              d.SchoolID == model.SchoolID
+                        select d).FirstOrDefault();
+                    
                     if (takenName != null)
                     {
                         //add an error message then get us out of here
-                        ModelState.AddModelError("", "The Student ID provided is already associated with an OSBLE account.");
+                        ModelState.AddModelError("", "The Student ID provided is already associated with an OSBLE account for the school you provided.");
                         return AcademiaRegister();
                     }
                 
