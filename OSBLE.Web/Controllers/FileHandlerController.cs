@@ -158,18 +158,19 @@ namespace OSBLE.Controllers
             }
             return RedirectToAction("Index", "Home");
         }
-
+        
         /// <summary>
         /// For the given team id and assignment id, it returns the submission. (Including critical reviews performed)
         /// </summary>
         /// <param name="assignmentId"></param>
         /// <param name="teamId"></param>
+        /// <param name="resubmission"></param>
         /// <returns></returns>
         [OsbleAuthorize]
         [RequireActiveCourse]
         [CanGradeCourse]
         [NotForCommunity]
-        public ActionResult GetSubmissionZip(int assignmentId, int teamId)
+        public ActionResult GetSubmissionZip(int assignmentId, int teamId, bool resubmission = false)
         {
 
             //basic assignments have the option of being annotatable.  In this case,
@@ -180,7 +181,7 @@ namespace OSBLE.Controllers
             {
                 if (assignment.HasDeliverables && assignment.Deliverables[0].DeliverableType == DeliverableType.PDF)
                 {
-                    return RedirectToRoute(new { controller = "PdfCriticalReview", action = "Grade", assignmentID = assignmentId, authorTeamID = teamId });
+                    return RedirectToRoute(new { controller = "PdfCriticalReview", action = "Grade", assignmentID = assignmentId, authorTeamID = teamId, resubmission = resubmission });
                 }
             }
 
