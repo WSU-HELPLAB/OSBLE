@@ -417,7 +417,12 @@ namespace OSBLE.Controllers
             //get all the courses
             var CourseList = from d in db.Courses
                              where d.EndDate > DateTime.Now
-                             select d;
+                             select new
+                             {
+                                 d.IsDeleted,
+                                 d.EndDate,
+                                 d.Prefix
+                             };
 
             //add them to a list as a selectlistitem
             List<SelectListItem> course = new List<SelectListItem>();
@@ -1368,9 +1373,12 @@ namespace OSBLE.Controllers
             }
             writer.Close();
 
-            Course course = ActiveCourseUser.AbstractCourse as Course;
+            if ((ActiveCourseUser.AbstractCourse).GetType() != typeof (Course))
+                return File(info.OpenRead(), "text/csv",
+                    ActiveCourseUser.AbstractCourse.Name + "-Community-ActivityFeed.csv");
 
-            return File(info.OpenRead(), "text/csv", ActiveCourseUser.AbstractCourse.Name + "-" + course.Semester + "-"+ course.Year + "-ActivityFeed.csv");
+            var course = ActiveCourseUser.AbstractCourse as Course;
+            return File(info.OpenRead(), "text/csv", ActiveCourseUser.AbstractCourse.Name + "-" + course.Semester + "-" + course.Year + "-ActivityFeed.csv");
         }
     }
 }
