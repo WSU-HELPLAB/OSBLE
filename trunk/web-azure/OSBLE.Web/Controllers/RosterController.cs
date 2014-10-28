@@ -379,7 +379,7 @@ namespace OSBLE.Controllers
                             createCourseUser(existingUser);
                             rosterCount++;
                             //email the user notifying them that they have been added to this course 
-                            if(entry.Email != String.Empty)
+                            if(entry != null && String.IsNullOrEmpty(entry.Email))
                                 emailCourseUser(existingUser);
         
 
@@ -521,19 +521,27 @@ namespace OSBLE.Controllers
         public ActionResult Create(CourseUser courseuser)
         {
 
-            string SchoolID = Request.Form["CurrentlySelectedSchool"];
-            if (string.IsNullOrEmpty(SchoolID))
+            var SchoolID = Request.Form["CurrentlySelectedSchool"];
+            var AbstractRoleID = Request.Form["CurrentlySelectedAbstractRoleID"];
+            if (string.IsNullOrEmpty(SchoolID) || string.IsNullOrEmpty(AbstractRoleID))
             {
                 ModelState.AddModelError("School", "The School field is required.");
                 ModelState.AddModelError("SchoolID", "");
-                ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name");
                 ViewBag.SchoolID = new SelectList(db.Schools, "ID", "Name");
-                return View(); 
+
+                ModelState.AddModelError("Course Role", "The Course Role field is required.");
+                ModelState.AddModelError("AbstractRoleID", "");
+                ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name");
+
+                return View();
             }
             else
             {
+                courseuser.AbstractRoleID = Convert.ToInt32(AbstractRoleID);
                 courseuser.UserProfile.SchoolID = Convert.ToInt32(SchoolID);
             }
+           
+            
             
             //if modelState isValid
             if (ModelState.IsValid && courseuser.AbstractRoleID != 0)
