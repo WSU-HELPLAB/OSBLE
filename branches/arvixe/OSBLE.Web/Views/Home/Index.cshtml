@@ -150,15 +150,26 @@
     $(document).ready(function (e) {
 
         $(".partialContents").each(function (index, item) {
+            var startPost = $(location).attr('search');
             var url = $(item).data("url");
-            if (url && url.length > 0) {
-                $(item).load(url);
+            if (startPost && url != "/Home/Events") {
+                if (url && url.length > 0) {
+                    url = url + "/" + startPost;
+                    //$(item).load(url);
+                    $(item).load(url, function () {
+                        //$(location).attr("href", ($(location).attr('protocol')+ "//" + $(location).attr('host')));
+                    });
+                }
+            } else {
+                if (url && url.length > 0) {
+                    //$(item).load(url);
+                    $(item).load(url, function () {
+                        //alert($(location).attr('href'));
+                    });
+                }
             }
         });
-
-        //refresh dashboard when course listing changes
-        $("#course_select").change(function () {
-            //location.reload();   //this refreshes too soon on live         
-        });
     });
+
+    
 </script>
