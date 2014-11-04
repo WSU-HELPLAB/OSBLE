@@ -32,7 +32,12 @@ namespace OSBLE.Controllers
             ViewBag.CurrentTab = "Dashboard";
 
             //changed to load partial view
-            //setupActivityFeed(); // Dashboard posts/replies            
+            //setupActivityFeed(); // Dashboard posts/replies   
+            // Get optional start post from query for pagination
+            if (Request.Params["startPost"] != null)
+            {
+                setupActivityFeed(Convert.ToInt32(Request.Params["startPost"]));
+            }
 
             setupNotifications(); // Individual notifications (mail, grades, etc.)        
 
@@ -73,10 +78,22 @@ namespace OSBLE.Controllers
             return PartialView("_ActivityFeed");
         }
 
-        private void setupActivityFeed()
+        [HttpGet]
+        public void UpdateViewbag()
+        {
+            // Single course mode. Only display posts for the active course.
+            List<int> viewedCourses = DashboardSingleCourseMode ? new List<int> { ActiveCourseUser.AbstractCourseID } : currentCourses.Where(cu => !cu.Hidden).Select(cu => cu.AbstractCourseID).ToList();
+            // First get all posts to do a count and then do proper paging
+            List<DashboardPost> dashboardPosts = db.DashboardPosts.Where(d => viewedCourses.Contains(d.CourseUser.AbstractCourseID))
+                .OrderByDescending(d => d.Posted).ToList();
+            ViewBag.DashboardPostCount = dashboardPosts.Count();
+            return;
+        }
+
+        private void setupActivityFeed(int startPost = 0, bool showAll = false)
         {
             // Pagination defaults
-            int startPost = 0;
+            //int startPost = 0; //default set to 0
             int postsPerPage = 10;
 
             // Single course mode. Only display posts for the active course.
@@ -109,15 +126,24 @@ namespace OSBLE.Controllers
             // First get all posts to do a count and then do proper paging
             List<DashboardPost> dashboardPosts = db.DashboardPosts.Where(d => viewedCourses.Contains(d.CourseUser.AbstractCourseID))
                 .OrderByDescending(d => d.Posted).ToList();
-            ViewBag.ShowAll = false;
-            if (Request.Params["showAll"] != null)
+
+            if (showAll)
             {
-                bool showAll = Convert.ToBoolean(Request.Params["showAll"]);
+                postsPerPage = dashboardPosts.Count();
                 ViewBag.ShowAll = showAll;
-                if (showAll)
+            }
+            else
+            {
+                ViewBag.ShowAll = false;
+                if (Request.Params["showAll"] != null)
                 {
-                    postsPerPage = dashboardPosts.Count();
-                }
+                    showAll = Convert.ToBoolean(Request.Params["showAll"]);
+                    ViewBag.ShowAll = showAll;
+                    if (showAll)
+                    {
+                        postsPerPage = dashboardPosts.Count();
+                    }
+                }    
             }
             
             List<DashboardPost> pagedDashboardPosts = dashboardPosts.Skip(startPost)

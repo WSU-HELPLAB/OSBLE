@@ -12,19 +12,23 @@
     }
 
     //we need to update the activity feed timestamps when it's done loading
-    $(document).ready(function () {        
+    $(document).ready(function () {
+        @*$.ajax({
+            type: "GET",
+            url: '@Url.Action("UpdateViewbag", "Home")',
+            success: function (result) {
+                //alert("success!");
+            },
+            error: function (result) {
+                //TODO: handle error...
+                //alert("error");
+            }
+        });*@
         parseDates();
     });
 
-    function completed() {       
+    function completed() {
         //update to show the new posts
-        //Note: this worked without reload initially...
-        //$(".partialContents").each(function (index, item) {
-        //    var url = $(item).data("url");            
-        //    if (url && url.length > 0) {
-        //        $(item).load(url);
-        //    }
-        //});             
         location.reload();
     }
 
@@ -33,51 +37,51 @@
 <div id="activity_new_post">
     @if (ViewBag.ActiveCourse.AbstractRole != null)
     {
-    if ((ViewBag.ActiveCourse.AbstractRole.CanGrade == true) || (ViewBag.ActiveCourse.AbstractRole.Anonymized) || ((ViewBag.ActiveCourse.AbstractCourse is Course) && (ViewBag.ActiveCourse.AbstractCourse.AllowDashboardPosts) == true))
-    {
-        <input type="hidden" id="MaxContentChars" value="@ViewBag.MaxActivityFeedLength"/>
-        
-        if (ViewBag.Error != null)
+        if ((ViewBag.ActiveCourse.AbstractRole.CanGrade == true) || (ViewBag.ActiveCourse.AbstractRole.Anonymized) || ((ViewBag.ActiveCourse.AbstractCourse is Course) && (ViewBag.ActiveCourse.AbstractCourse.AllowDashboardPosts) == true))
         {
-        <h3 class="error">@ViewBag.Error</h3>
-        }
-        //using (Html.BeginForm("NewPost", "Home", FormMethod.Post))        
-        using (Ajax.BeginForm("NewPost", "Home",
-            new AjaxOptions
-            {
-                HttpMethod = "POST",                
-                OnComplete = "completed",
-                
-            }))
-        {
-        <input id="remChars" name="remainingChars" readonly="true" type="text" value="(@ViewBag.MaxActivityFeedLength) Characters left" /><br />
-        <textarea id="ActivityFeed" name="Content" rows="5" cols="40" placeholder="Enter new feed post here..." 
-        onkeyup="RemainingChars();" onkeydown="RemainingChars();" ></textarea><br />
-        
-        <input type="submit" name="post_active" value="Post to @Helpers.CourseTag(ViewBag.ActiveCourse.AbstractCourse)" /> 
-        
-            if (ViewBag.IsInstructor)
-            {
-                <input type="submit" name="post_all" value="Post to All Courses I Teach" onclick="return confirm('Post this message to all your taught courses?');" />
-                <input type="checkbox" value="True" name="send_email" /> <text>Email to Class</text>
-            }
+            <input type="hidden" id="MaxContentChars" value="@ViewBag.MaxActivityFeedLength"/>
 
-            if (ViewBag.IsLeader)
+            if (ViewBag.Error != null)
             {
-                <input type="checkbox" value="True" name="send_email" /> <text>Email to Community</text>
+                <h3 class="error">@ViewBag.Error</h3>
             }
+            //using (Html.BeginForm("NewPost", "Home", FormMethod.Post))
+            using (Ajax.BeginForm("NewPost", "Home",
+                new AjaxOptions
+                {
+                    HttpMethod = "POST",
+                    OnComplete = "completed",
 
+                }))
+            {
+                <input id="remChars" name="remainingChars" readonly="true" type="text" value="(@ViewBag.MaxActivityFeedLength) Characters left" /><br />
+                <textarea id="ActivityFeed" name="Content" rows="5" cols="40" placeholder="Enter new feed post here..."
+                          onkeyup="RemainingChars();" onkeydown="RemainingChars();" ></textarea><br />
+
+                <input type="submit" name="post_active" value="Post to @Helpers.CourseTag(ViewBag.ActiveCourse.AbstractCourse)" />
+
+                if (ViewBag.IsInstructor)
+                {
+                    <input type="submit" name="post_all" value="Post to All Courses I Teach" onclick="return confirm('Post this message to all your taught courses?');" />
+                    <input type="checkbox" value="True" name="send_email" /> <text>Email to Class</text>
+                }
+
+                if (ViewBag.IsLeader)
+                {
+                    <input type="checkbox" value="True" name="send_email" /> <text>Email to Community</text>
+                }
+
+            }
         }
-    }
     }
 </div>
 <div class="dashboard_mode">
     @using (Html.BeginForm("SetDashboardMode", "Home", FormMethod.Post, new { id = "set_dashboard" }))
     {
         <input type="radio" name="mode" value="false" @if (!ViewBag.DashboardSingleCourseMode) {<text>checked="checked"</text>}/>
-            <text>Show all courses/communities</text> 
+        <text>Show all courses/communities</text>
         <input type="radio" name="mode" value="true" @if (ViewBag.DashboardSingleCourseMode) {<text>checked="checked"</text>}/>
-            <text>Show only <em>@Helpers.CourseTag(ViewBag.ActiveCourse.AbstractCourse)</em></text> 
+        <text>Show only <em>@Helpers.CourseTag(ViewBag.ActiveCourse.AbstractCourse)</em></text>
     }
 </div>
 <script type="text/javascript">
