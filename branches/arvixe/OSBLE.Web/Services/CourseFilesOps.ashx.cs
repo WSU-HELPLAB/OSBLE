@@ -487,10 +487,15 @@ namespace OSBLE.Services
                 attrFiles.DeleteFile(fileName);
 
                 // Return success message with new file listing
-               /* context.Response.Write(
-                    "<CourseFilesOpsResponse success=\"true\">" +
-                    attrFiles.GetXMLListing(courseUser, true) +
-                    "</CourseFilesOpsResponse>");*/
+                /*context.Response.Write(
+                     "<CourseFilesOpsResponse success=\"true\">" +
+                     attrFiles.GetXMLListing(courseUser, true) +
+                     "</CourseFilesOpsResponse>");*/
+                //TODO: fix this... this is a hack... 
+                //without redirecting to this page, the user is directed to an XML error page, and has to hit 'back' in order to see the file deleted
+                //This also introduces a bug where the assignment timestamp is now -7 of what it previously was...
+                //the hard coded url will not be correct if this is used anywhere besides the assignment basics page...
+                context.Response.Redirect("/AssignmentWizard/Basics");
 
                 return;
             }
