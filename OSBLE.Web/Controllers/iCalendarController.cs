@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
 using System.IO;
@@ -127,13 +128,75 @@ namespace OSBLE.Controllers
                     DateTime evtEnd = DateTime.SpecifyKind(course.StartDate, DateTimeKind.Utc);
                     evtEnd = evtEnd.Add(cm.EndTime.TimeOfDay);
 
+                    //we need to test if right NOW is in DST.
+                    //case: course starts during DST, and it's now after DST, result: after DST event is now wrong.
+                    DateTime currentTime = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day,
+                                                        evtStart.Hour, evtStart.Minute, evtStart.Second, DateTimeKind.Utc);
+                    bool isDaylight = TimeZoneInfo.Local.IsDaylightSavingTime(TimeZoneInfo.ConvertTimeFromUtc(currentTime, tz));
 
-                    evt.Start = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(evtStart, tz));
-                    evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(evtEnd, tz));
-                    evt.LastModified = new iCalDateTime(DateTime.Now);
-                    evt.Summary = cm.Name;
-                    evt.Location = cm.Location;
-                    evt.RecurrenceRules.Add(pattern);
+                    if (isDaylight)
+                    {
+                        evt.Start = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(evtStart, tz));
+                        evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(evtEnd, tz));
+                        evt.LastModified = new iCalDateTime(DateTime.Now);
+                        evt.Summary = cm.Name;
+                        evt.Location = cm.Location;
+                        evt.RecurrenceRules.Add(pattern);
+                    }
+                    else //no longer DST
+                    {
+                        bool matchingStartDay = false;
+                        while (!matchingStartDay)
+                        {
+                            switch (currentTime.DayOfWeek)
+                            {
+                                case DayOfWeek.Monday:
+                                    if (cm.Monday)
+                                        matchingStartDay = true;
+                                    break;
+                                case DayOfWeek.Tuesday:
+                                    if (cm.Tuesday)
+                                        matchingStartDay = true;
+                                    break;
+                                case DayOfWeek.Wednesday:
+                                    if (cm.Wednesday)
+                                        matchingStartDay = true;
+                                    break;
+                                case DayOfWeek.Thursday:
+                                    if (cm.Thursday)
+                                        matchingStartDay = true;
+                                    break;
+                                case DayOfWeek.Friday:
+                                    if (cm.Friday)
+                                        matchingStartDay = true;
+                                    break;
+                                case DayOfWeek.Saturday:
+                                    if (cm.Saturday)
+                                        matchingStartDay = true;
+                                    break;
+                                case DayOfWeek.Sunday:
+                                    if (cm.Sunday)
+                                        matchingStartDay = true;
+                                    break;
+                                default:
+                                    matchingStartDay = false;
+                                    break;
+                            }
+
+                            if (!matchingStartDay)
+                            {
+                                currentTime = new DateTime(currentTime.Year, currentTime.Month, currentTime.AddDays(1).Day,
+                                                        evtStart.Hour, evtStart.Minute, evtStart.Second, DateTimeKind.Utc);
+                            }
+                        }
+
+                        evt.Start = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(currentTime, tz));
+                        evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(evtEnd, tz));
+                        evt.LastModified = new iCalDateTime(DateTime.Now);
+                        evt.Summary = cm.Name;
+                        evt.Location = cm.Location;
+                        evt.RecurrenceRules.Add(pattern);
+                    }
 
                 }
 
@@ -265,13 +328,76 @@ namespace OSBLE.Controllers
                     evtStart = evtStart.Add(cm.StartTime.TimeOfDay);
                     DateTime evtEnd = DateTime.SpecifyKind(course.StartDate, DateTimeKind.Utc);
                     evtEnd = evtEnd.Add(cm.EndTime.TimeOfDay);
-                    
-                    evt.Start = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(evtStart, tz));
-                    evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(evtEnd, tz));
-                    evt.LastModified = new iCalDateTime(DateTime.Now);
-                    evt.Summary = cm.Name;
-                    evt.Location = cm.Location;
-                    evt.RecurrenceRules.Add(pattern);
+
+                    //we need to test if right NOW is in DST.
+                    //case: course starts during DST, and it's now after DST, result: after DST event is now wrong.
+                    DateTime currentTime = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day,
+                                                        evtStart.Hour, evtStart.Minute, evtStart.Second, DateTimeKind.Utc);
+                    bool isDaylight = TimeZoneInfo.Local.IsDaylightSavingTime(TimeZoneInfo.ConvertTimeFromUtc(currentTime, tz));
+
+                    if (isDaylight)
+                    {
+                        evt.Start = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(evtStart, tz));
+                        evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(evtEnd, tz));
+                        evt.LastModified = new iCalDateTime(DateTime.Now);
+                        evt.Summary = cm.Name;
+                        evt.Location = cm.Location;
+                        evt.RecurrenceRules.Add(pattern);
+                    }
+                    else //no longer DST
+                    {
+                        bool matchingStartDay = false;
+                        while (!matchingStartDay)
+                        {
+                            switch (currentTime.DayOfWeek)
+                            {
+                                case DayOfWeek.Monday:
+                                    if (cm.Monday)
+                                        matchingStartDay = true;
+                                    break;
+                                case DayOfWeek.Tuesday:
+                                    if (cm.Tuesday)
+                                        matchingStartDay = true;
+                                    break;
+                                case DayOfWeek.Wednesday:
+                                    if (cm.Wednesday)
+                                        matchingStartDay = true;
+                                    break;
+                                case DayOfWeek.Thursday:
+                                    if (cm.Thursday)
+                                        matchingStartDay = true;
+                                    break;
+                                case DayOfWeek.Friday:
+                                    if (cm.Friday)
+                                        matchingStartDay = true;
+                                    break;
+                                case DayOfWeek.Saturday:
+                                    if (cm.Saturday)
+                                        matchingStartDay = true;
+                                    break;
+                                case DayOfWeek.Sunday:
+                                    if (cm.Sunday)
+                                        matchingStartDay = true;
+                                    break;
+                                default:
+                                    matchingStartDay = false;
+                                    break;
+                            }
+
+                            if (!matchingStartDay)
+                            {
+                                currentTime = new DateTime(currentTime.Year, currentTime.Month, currentTime.AddDays(1).Day,
+                                                        evtStart.Hour, evtStart.Minute, evtStart.Second, DateTimeKind.Utc);
+                            }
+                        }
+
+                        evt.Start = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(currentTime, tz));
+                        evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(evtEnd, tz));
+                        evt.LastModified = new iCalDateTime(DateTime.Now);
+                        evt.Summary = cm.Name;
+                        evt.Location = cm.Location;
+                        evt.RecurrenceRules.Add(pattern);
+                    }
 
                 }// end foreach
 
@@ -291,7 +417,7 @@ namespace OSBLE.Controllers
 
             }//end if
 
-           
+
             //add all the events to the calendar 
             foreach (var e in events)
             {
@@ -302,7 +428,7 @@ namespace OSBLE.Controllers
                 {
                     evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(e.StartDate, tz));
                     evt.End.AddMinutes(1);
-                    
+
                 }
                 else
                 {
@@ -363,15 +489,15 @@ namespace OSBLE.Controllers
         {
             //Get the Course
             var course = (from d in db.Courses
-                             where d.ID == id
-                             select new
-                             {
-                                 d.ID,
-                                 d.Prefix,
-                                 d.Number,
-                                 d.Semester,
-                                 d.Year
-                             }).FirstOrDefault();
+                          where d.ID == id
+                          select new
+                          {
+                              d.ID,
+                              d.Prefix,
+                              d.Number,
+                              d.Semester,
+                              d.Year
+                          }).FirstOrDefault();
 
             string path = AppDomain.CurrentDomain.BaseDirectory + "Content/iCal/" + course.ID.ToString() + "/";
 
