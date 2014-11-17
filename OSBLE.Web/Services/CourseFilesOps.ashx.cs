@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Microsoft.Ajax.Utilities;
 using OSBLE.Models;
 using OSBLE.Models.Courses;
 using OSBLE.Models.FileSystem;
@@ -494,9 +495,12 @@ namespace OSBLE.Services
                 //TODO: fix this... this is a hack... 
                 //without redirecting to this page, the user is directed to an XML error page, and has to hit 'back' in order to see the file deleted
                 //This also introduces a bug where the assignment timestamp is now -7 of what it previously was...
-                //the hard coded url will not be correct if this is used anywhere besides the assignment basics page...
-                context.Response.Redirect("/AssignmentWizard/Basics");
-
+                //this code should redirect back to the page that called this event.
+                //context.Response.Redirect("/AssignmentWizard/Basics");
+                string referrer = context.Request.UrlReferrer.ToString();
+                if (!String.IsNullOrEmpty(referrer))
+                    context.Response.Redirect(context.Request.UrlReferrer.ToString());    
+                
                 return;
             }
             else if ("create_folder" == cmdParam)
