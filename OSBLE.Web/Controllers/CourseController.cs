@@ -41,6 +41,8 @@ namespace OSBLE.Controllers
         //yc: utcOffset is the zone offset information (eg PST == -8)
         public void createMeetingTimes(Course course, int utcOffset)
         {
+            TimeZoneInfo tz = getTimeZone(utcOffset);
+
             int count = Convert.ToInt32(Request.Params["meetings_max"]);
             if (course.CourseMeetings == null)
             {
@@ -70,8 +72,10 @@ namespace OSBLE.Controllers
                     cm.Saturday = Convert.ToBoolean(Request.Params["meeting_saturday_" + i.ToString()]);
 
                     //yc ALL times must be in utc relative to the course it was created from
-                    cm.StartTime = convertToUtc(utcOffset, cm.StartTime);
-                    cm.EndTime = convertToUtc(utcOffset, cm.EndTime);
+                    //cm.StartTime = convertToUtc(utcOffset, cm.StartTime);
+                    cm.StartTime = TimeZoneInfo.ConvertTimeToUtc(cm.StartTime, tz);
+                    //cm.EndTime = convertToUtc(utcOffset, cm.EndTime);
+                    cm.EndTime = TimeZoneInfo.ConvertTimeToUtc(cm.EndTime, tz);
 
                     course.CourseMeetings.Add(cm);
                 }
