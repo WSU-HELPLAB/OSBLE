@@ -72,6 +72,47 @@ namespace OSBLE.Controllers
             ViewBag.utcstoc = stocutc;
             DateTime from = cc.convertFromUtc(-8, stocutc);
             ViewBag.yo = from;
+
+            //Get the Course
+            var course = (from de in db.Courses
+                          where de.ID == 1151
+                          select new
+                          {
+                              de.StartDate,
+                              de.EndDate,
+                              de.Prefix,
+                              de.Number,
+                              de.Semester,
+                              de.Year,
+                              de.CourseMeetings,
+                              de.CourseBreaks,
+                              de.ID
+                          }).FirstOrDefault();
+            CourseController cb = new CourseController();
+            int utcOffset = (ActiveCourseUser.AbstractCourse as Course).TimeZoneOffset;
+            TimeZoneInfo tz = cb.getTimeZone(utcOffset);
+
+            List<DateTime> dt = new List<DateTime>();
+            List<DateTime> dtlocal = new List<DateTime>();
+
+            foreach (CourseMeeting cm in course.CourseMeetings)
+            {
+                DateTime evtStart = DateTime.SpecifyKind(course.StartDate, DateTimeKind.Utc);
+                evtStart = evtStart.Add(cm.StartTime.TimeOfDay);
+                DateTime evtEnd = DateTime.SpecifyKind(course.StartDate, DateTimeKind.Utc);
+                evtEnd = evtEnd.Add(cm.EndTime.TimeOfDay);
+
+                dtlocal.Add(evtStart);
+
+                evtStart = TimeZoneInfo.ConvertTimeFromUtc(evtStart, tz);
+
+                dt.Add(evtStart);
+
+            }
+
+            ViewBag.dateList = dt;
+            ViewBag.dateListLocal = dt;
+
             return View();
         }
 

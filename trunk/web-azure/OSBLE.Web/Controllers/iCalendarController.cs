@@ -122,9 +122,9 @@ namespace OSBLE.Controllers
 
                     DDay.iCal.Event evt = courseCalendar.Create<DDay.iCal.Event>();
                     //may cause issues
-                    DateTime evtStart = course.StartDate.Date;
+                    DateTime evtStart = DateTime.SpecifyKind(course.StartDate, DateTimeKind.Utc);
                     evtStart = evtStart.Add(cm.StartTime.TimeOfDay);
-                    DateTime evtEnd = course.StartDate.Date;
+                    DateTime evtEnd = DateTime.SpecifyKind(course.StartDate, DateTimeKind.Utc);
                     evtEnd = evtEnd.Add(cm.EndTime.TimeOfDay);
 
 
@@ -261,11 +261,10 @@ namespace OSBLE.Controllers
 
                     DDay.iCal.Event evt = courseCalendar.Create<DDay.iCal.Event>();
                     //may cause issues
-                    DateTime evtStart = course.StartDate.Date;
+                    DateTime evtStart = DateTime.SpecifyKind(course.StartDate, DateTimeKind.Utc);
                     evtStart = evtStart.Add(cm.StartTime.TimeOfDay);
-                    DateTime evtEnd = course.StartDate.Date;
+                    DateTime evtEnd = DateTime.SpecifyKind(course.StartDate, DateTimeKind.Utc);
                     evtEnd = evtEnd.Add(cm.EndTime.TimeOfDay);
-                    
                     
                     evt.Start = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(evtStart, tz));
                     evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(evtEnd, tz));

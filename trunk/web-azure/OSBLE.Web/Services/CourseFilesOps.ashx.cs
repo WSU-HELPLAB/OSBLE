@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Microsoft.Ajax.Utilities;
 using OSBLE.Models;
 using OSBLE.Models.Courses;
 using OSBLE.Models.FileSystem;
@@ -487,11 +488,19 @@ namespace OSBLE.Services
                 attrFiles.DeleteFile(fileName);
 
                 // Return success message with new file listing
-               /* context.Response.Write(
-                    "<CourseFilesOpsResponse success=\"true\">" +
-                    attrFiles.GetXMLListing(courseUser, true) +
-                    "</CourseFilesOpsResponse>");*/
-
+                /*context.Response.Write(
+                     "<CourseFilesOpsResponse success=\"true\">" +
+                     attrFiles.GetXMLListing(courseUser, true) +
+                     "</CourseFilesOpsResponse>");*/
+                //TODO: fix this... this is a hack... 
+                //without redirecting to this page, the user is directed to an XML error page, and has to hit 'back' in order to see the file deleted
+                //This also introduces a bug where the assignment timestamp is now -7 of what it previously was...
+                //this code should redirect back to the page that called this event.
+                //context.Response.Redirect("/AssignmentWizard/Basics");
+                string referrer = context.Request.UrlReferrer.ToString();
+                if (!String.IsNullOrEmpty(referrer))
+                    context.Response.Redirect(context.Request.UrlReferrer.ToString());    
+                
                 return;
             }
             else if ("create_folder" == cmdParam)

@@ -8,6 +8,15 @@ the datetime now is  = @ViewBag.datetime <br />
 the datetime utcnow is = @ViewBag.utcdatetime <br />
 the server's time zone is == @ViewBag.serverTimezone and it isDaylightsavings ==  @ViewBag.IsDaylightSavings <br />
 
+@foreach (DateTime dtime in ViewBag.dateList)
+{
+    <p>server time @dtime.ToString()</p>
+}
+
+@foreach (DateTime dtime in ViewBag.dateListLocal)
+{
+    <p>local time @dtime.ToString()</p>
+}
 
 @*
     <br /><br />
