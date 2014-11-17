@@ -97,9 +97,9 @@ namespace OSBLE.Controllers
 
             foreach (CourseMeeting cm in course.CourseMeetings)
             {
-                DateTime evtStart = DateTime.SpecifyKind(course.StartDate, DateTimeKind.Utc);
+                DateTime evtStart = DateTime.SpecifyKind(course.StartDate.Date, DateTimeKind.Utc);
                 evtStart = evtStart.Add(cm.StartTime.TimeOfDay);
-                DateTime evtEnd = DateTime.SpecifyKind(course.StartDate, DateTimeKind.Utc);
+                DateTime evtEnd = DateTime.SpecifyKind(course.StartDate.Date, DateTimeKind.Utc);
                 evtEnd = evtEnd.Add(cm.EndTime.TimeOfDay);
 
                 dtlocal.Add(evtStart);
