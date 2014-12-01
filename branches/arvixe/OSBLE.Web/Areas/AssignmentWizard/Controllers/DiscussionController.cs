@@ -120,21 +120,23 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 }
 
                 //account for local client time, reset to UTC
-                int utcOffset = 0;
-                try
-                {
-                    Int32.TryParse(Request.Form["utc-offset"].ToString(), out utcOffset);
-                }
-                catch (Exception)
-                {
-                }
                 CourseController cc = new CourseController();
-                TimeZoneInfo tz = cc.getTimeZone((Assignment.Course as Course).TimeZoneOffset);
+                var course = ActiveCourseUser.AbstractCourse as Course;
+                if (course != null)
+                {
+                    //get the timezone of the course 
+                    int utcOffset = course.TimeZoneOffset;
+                    TimeZoneInfo tz = cc.getTimeZone(utcOffset);
+                    Assignment.DiscussionSettings.InitialPostDueDate = TimeZoneInfo.ConvertTimeToUtc(Assignment.DiscussionSettings.InitialPostDueDate, tz);
+                    db.SaveChanges();
+                    WasUpdateSuccessful = true;
+                }
+                else
+                {
+                    WasUpdateSuccessful = false;
+                }
 
-                Assignment.DiscussionSettings.InitialPostDueDate = cc.convertToUtc((Assignment.Course as Course).TimeZoneOffset, Assignment.DiscussionSettings.InitialPostDueDate);
-
-                db.SaveChanges();
-                WasUpdateSuccessful = true;
+                
             }
             else
             {
