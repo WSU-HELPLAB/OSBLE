@@ -27,6 +27,8 @@
   Boolean editable = ViewBag.isEditable;
   List<CourseUser> cuList = ViewBag.ObserverCU;
 
+  List<AssignmentTeam> atList = (from t in @Model.TeamList as IEnumerable<AssignmentTeam>
+                                 select t).Reverse().ToList();
 }
 <script type="text/javascript">
 
@@ -225,9 +227,6 @@ function create_and_open_downloading_submission_dialog() {
                               int userCount;
                               AssignmentTeam at;
 
-                              List<AssignmentTeam> atList = (from t in @Model.TeamList as IEnumerable<AssignmentTeam>
-                                                             select t).Reverse().ToList();
-
                               //We reversed the list so the last person is our first person
                               if (atList.LastOrDefault().TeamID == @Model.SelectedTeam.TeamID)
                               {
@@ -339,14 +338,25 @@ function create_and_open_downloading_submission_dialog() {
             <tr>
                 @if (Model.SelectedAssignment.HasDeliverables)
                 {
-                    string downloadText = "Download submission files";
-                    if (Model.SelectedAssignment.Deliverables.First().DeliverableType == DeliverableType.PDF)
+
+                    if (Model.SelectedTeam.GetSubmissionTime() != null)
                     {
-                        downloadText = "View and annotate PDF submission";
+                        string downloadText = "Download submission files";
+                        if (Model.SelectedAssignment.Deliverables.First().DeliverableType == DeliverableType.PDF)
+                        {
+                            downloadText = "View and annotate PDF submission";
+                        }
+                        <td>
+                            @Html.ActionLink(downloadText, "GetSubmissionZip", "FileHandler", new {assignmentID = Model.SelectedAssignment.ID, teamID = Model.SelectedTeam.TeamID}, new {onclick = "create_and_open_downloading_submission_dialog()"})
+                        </td>
                     }
-                    <td>
-                        @Html.ActionLink(downloadText, "GetSubmissionZip", "FileHandler", new { assignmentID = Model.SelectedAssignment.ID, teamID = Model.SelectedTeam.TeamID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
-                    </td>
+                    else
+                    {
+                        string downloadText = "No Submissions";
+                        <td>
+                            <a href="#">@downloadText</a>
+                        </td>
+                    }
                 }
                 @if (Model.SelectedAssignment.HasCommentCategories)
                 {
