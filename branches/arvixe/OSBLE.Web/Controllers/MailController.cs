@@ -511,13 +511,33 @@ namespace OSBLE.Controllers
                     {
                         recipientList.Add(mail.FromUserProfile); //Adds the sender to the reply list
                     }
-                    mail.Subject = "RE: " + mail.Subject;
-                    // Prefix each line with a '> '
-                    //TODO: check if mail.Posted is the correct time (if UTC needs to convert to local!)
-                    mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
-                                    mail.FromUserProfile.LastName + "\nSent at: " + mail.Posted.ToString() + "\n\n" +
-                                    Regex.Replace(mail.Message, "^.*$", "> $&",
-                                    RegexOptions.Multiline);
+
+                    //get the timezone of the course 
+                    CourseController cc = new CourseController();
+                    Course course = ActiveCourseUser.AbstractCourse as Course;
+                    if (course != null)
+                    {
+                        int utcOffset = course.TimeZoneOffset;
+                        TimeZoneInfo tz = cc.getTimeZone(utcOffset);
+
+                        mail.Subject = "RE: " + mail.Subject;
+                        // Prefix each line with a '> '
+                        mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
+                                       mail.FromUserProfile.LastName + "\nSent at: " + 
+                                       TimeZoneInfo.ConvertTimeFromUtc(mail.Posted, tz).ToString() + "\n\n" +
+                                       Regex.Replace(mail.Message, "^.*$", "> $&",
+                                           RegexOptions.Multiline);
+                    }
+                    else
+                    {
+
+                        mail.Subject = "RE: " + mail.Subject;
+                        // Prefix each line with a '> '
+                        mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
+                                       mail.FromUserProfile.LastName + "\nSent at: " + mail.Posted.ToString() + "\n\n" +
+                                       Regex.Replace(mail.Message, "^.*$", "> $&",
+                                           RegexOptions.Multiline);
+                    }
                 }
             }
 
@@ -535,14 +555,34 @@ namespace OSBLE.Controllers
             {
                 if ((mail = db.Mails.Find(replyto)) != null)
                 {
-                    recipientList.Add(mail.FromUserProfile); //Adds the sender to the reply list
-                    mail.Subject = "RE: " + mail.Subject;
-                    // Prefix each line with a '> '
-                    //TODO: check if mail.Posted is the correct time (if UTC needs to convert to local!)
-                    mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
-                                    mail.FromUserProfile.LastName + "\nSent at: " + mail.Posted.ToString() + "\n\n" +
-                                    Regex.Replace(mail.Message, "^.*$", "> $&",
-                                    RegexOptions.Multiline);
+                    //get the timezone of the course 
+                    CourseController cc = new CourseController();
+                    Course course = ActiveCourseUser.AbstractCourse as Course;
+                    if (course != null)
+                    {
+                        int utcOffset = course.TimeZoneOffset;
+                        TimeZoneInfo tz = cc.getTimeZone(utcOffset);
+
+                        recipientList.Add(mail.FromUserProfile); //Adds the sender to the reply list
+                        mail.Subject = "RE: " + mail.Subject;
+                        // Prefix each line with a '> '
+                        mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
+                                       mail.FromUserProfile.LastName + "\nSent at: " +
+                                       TimeZoneInfo.ConvertTimeFromUtc(mail.Posted, tz).ToString() + "\n\n" +
+                                       Regex.Replace(mail.Message, "^.*$", "> $&",
+                                           RegexOptions.Multiline);
+                    }
+                    else
+                    {
+
+                        recipientList.Add(mail.FromUserProfile); //Adds the sender to the reply list
+                        mail.Subject = "RE: " + mail.Subject;
+                        // Prefix each line with a '> '
+                        mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
+                                       mail.FromUserProfile.LastName + "\nSent at: " + mail.Posted.ToString() + "\n\n" +
+                                       Regex.Replace(mail.Message, "^.*$", "> $&",
+                                           RegexOptions.Multiline);
+                    }
                 }
             }
 
@@ -559,13 +599,31 @@ namespace OSBLE.Controllers
             {
                 if ((mail = db.Mails.Find(forwardto)) != null)
                 {
-                    mail.Subject = "FW: " + mail.Subject;
-                    // Prefix each line with a '> '
-                    //TODO: check if mail.Posted is the correct time (if UTC needs to convert to local!)
-                    mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
-                                    mail.FromUserProfile.LastName + "\nSent at: " + mail.Posted.ToString() + "\n\n" +
-                                    Regex.Replace(mail.Message, "^.*$", "> $&",
-                                    RegexOptions.Multiline);
+                    //get the timezone of the course 
+                    CourseController cc = new CourseController();
+                    Course course = ActiveCourseUser.AbstractCourse as Course;
+                    if (course != null)
+                    {
+                        int utcOffset = course.TimeZoneOffset;
+                        TimeZoneInfo tz = cc.getTimeZone(utcOffset);
+
+                        mail.Subject = "FW: " + mail.Subject;
+                        // Prefix each line with a '> '
+                        mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
+                                       mail.FromUserProfile.LastName + "\nSent at: " + 
+                                       TimeZoneInfo.ConvertTimeFromUtc(mail.Posted, tz).ToString() + "\n\n" +
+                                       Regex.Replace(mail.Message, "^.*$", "> $&",
+                                           RegexOptions.Multiline);
+                    }
+                    else
+                    {
+                        mail.Subject = "FW: " + mail.Subject;
+                        // Prefix each line with a '> '
+                        mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
+                                       mail.FromUserProfile.LastName + "\nSent at: " + mail.Posted.ToString() + "\n\n" +
+                                       Regex.Replace(mail.Message, "^.*$", "> $&",
+                                           RegexOptions.Multiline);
+                    }
                 }
             }
 
