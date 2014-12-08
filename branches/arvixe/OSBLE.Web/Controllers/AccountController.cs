@@ -22,6 +22,7 @@ using OSBLE.Utility;
 using OSBLE.Attributes;
 using OSBLE.Services;
 using System.Net;
+using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Controllers
 {
@@ -147,7 +148,7 @@ namespace OSBLE.Controllers
             //was last logged into a different course.  In these situations, we need to automatically
             //switch to the relevant assignment for the user.
             string[] pieces = destinationUrl.Split('/');
-            
+
             //is the user trying to get to the assignment details page?
             if (pieces[pieces.Length - 2].ToLower().CompareTo("assignmentdetails") == 0)
             {
@@ -162,7 +163,7 @@ namespace OSBLE.Controllers
                         if (destinationAssignment.CourseID != null)
                         {
                             HomeController hc = new HomeController();
-                            hc.SetCourseID((int) destinationAssignment.CourseID);
+                            hc.SetCourseID((int)destinationAssignment.CourseID);
                         }
                     }
                 }
@@ -180,6 +181,52 @@ namespace OSBLE.Controllers
             context.Session.Clear(); // Clear session on signout.
 
             return RedirectToAction("Index", "Home");
+        }
+
+        //
+        // POST: /Account/UpdateEmailAddress
+        [OsbleAuthorize]
+        [HttpPost]
+        public ActionResult UpdateEmailAddress(string newEmail)
+        {
+            bool changeEmailSucceeded = false;
+            //verify proper email syntax
+            bool validEmail = new EmailAddressAttribute().IsValid(newEmail);
+
+            if (validEmail)
+            {
+                try
+                {
+                    UserProfile currentUser = db.UserProfiles.Find(OsbleAuthentication.CurrentUser.ID);
+                    if (currentUser != null)
+                    {
+                        //change and save email
+                        currentUser.UserName = newEmail;
+                        db.Entry(currentUser).State = EntityState.Modified;
+                        db.SaveChanges();
+                        changeEmailSucceeded = true;
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("NewEmail", "OSBLE was unable to change user email.");
+                }
+            }
+            if (changeEmailSucceeded)
+            {
+                return RedirectToAction("Profile");
+            }
+            else if (!validEmail)
+            {
+                ModelState.AddModelError("NewEmail", "Please enter a valid email.");
+            }
+            else
+            {
+                ModelState.AddModelError("NewEmail", "OSBLE was unable to change user email.");
+            }
+            //we were unable to update the user email
+            return View("Profile");
         }
 
         [OsbleAuthorize]
@@ -400,13 +447,13 @@ namespace OSBLE.Controllers
                 SchoolID = Convert.ToInt32(Request.QueryString["schoolid"])
             };
 
-            if(WTmodel != null)
+            if (WTmodel != null)
                 return View(WTmodel);
             else
                 return View();
 
 
-           
+
         }
 
         //
@@ -435,17 +482,17 @@ namespace OSBLE.Controllers
                     }
 
                     takenName = (from d in db.UserProfiles
-                        where d.Identification == model.Identification &&
-                              d.SchoolID == model.SchoolID
-                        select d).FirstOrDefault();
-                    
+                                 where d.Identification == model.Identification &&
+                                       d.SchoolID == model.SchoolID
+                                 select d).FirstOrDefault();
+
                     if (takenName != null)
                     {
                         //add an error message then get us out of here
                         ModelState.AddModelError("", "The Student ID provided is already associated with an OSBLE account for the school you provided.");
                         return AcademiaRegister();
                     }
-                
+
                     //try creating the account
                     UserProfile profile = new UserProfile();
                     try
