@@ -1,4 +1,5 @@
-﻿@using OSBLE.Models
+﻿@using System.Web.UI.WebControls
+@using OSBLE.Models
 @using OSBLE.Models.Users
 @using OSBLE.Models.Courses
 
@@ -7,6 +8,62 @@
 @{
     ViewBag.Title = "Profile";
 }
+
+<h2>Current User Information @Helpers.CreateToolTip(ToolTips.CurrentuserInformation)</h2>
+<div>
+    
+@using (Html.BeginForm("UpdateEmailAddress", "Account"))
+{
+
+    <table>
+        <tr>
+            <th>
+                Name:
+            </th>
+            <td style="background: #E4E4E4; text-align: center">
+                @ViewBag.CurrentUser.LastName, @ViewBag.CurrentUser.FirstName
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>
+                Email<br />Address: 
+            </th>
+            <td style="background: #E4E4E4; text-align: center">
+                <br />
+                @ViewBag.CurrentUser.UserName
+            </td>
+            <td>
+                
+                
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>@Html.Editor("newEmail")</td>
+            <td>
+                <input type="submit" value="Change Email" />
+                (<strong>NOTE:</strong> changing your email will require you to re-log in.)
+                
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>@Html.ValidationMessage("NewEmail")</td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>
+                User ID:
+            </th>
+            <td style="background: #E4E4E4; text-align: center">
+                @ViewBag.CurrentUser.Identification
+            </td>
+            <td></td>
+        </tr>
+    </table>
+}
+</div>
 
 <h2>Upload Profile Picture @Helpers.CreateToolTip(ToolTips.AccountProfilePicture) </h2>
 @Helpers.ProfilePicture(Url.Action("Picture", "User", new { id = ViewBag.CurrentUser.ID }))
@@ -96,7 +153,7 @@
 <h2>Course and Community Menu @Helpers.CreateToolTip(ToolTips.AccountMenuOptions) </h2>
 
 <p>Hidden courses/communities will not appear in your course list or your activity feed and must be unchecked to access again.</p>
-<p>Withdrawing from a course will remove you from all course activity. To be readded you must ask the instructor of the course to add you manually</p>
+<p>Withdrawing from a course will remove you from all course activity. To be re-added you must ask the instructor of the course to add you manually or use the course search to request access.</p>
 <p>Your default course will be the active course each time you log on to OSBLE.</p>
 @{
 }
