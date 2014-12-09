@@ -352,7 +352,7 @@ namespace OSBLE.Controllers
                 {
                     for (int j = 0; j < studentTable[i].Count; j++)
                     {
-                        if (studentTable[i][j].Length > 0 && studentTable[i][j][0] == '!')
+                        if (studentTable[i][j].Length > 0 && studentTable[i][j][0] == '!' || studentTable[i][j].Length > 0 && studentTable[i][j][studentTable[i][j].Length-1] == '!')
                         {
                             columnsToRemove.Add(j);
                         }
