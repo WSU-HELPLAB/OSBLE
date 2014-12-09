@@ -187,19 +187,22 @@ namespace OSBLE.Controllers
         // POST: /Account/UpdateEmailAddress
         [OsbleAuthorize]
         [HttpPost]
-        public ActionResult UpdateEmailAddress(string newEmail)
+        public ActionResult UpdateEmailAddress(string newEmail, string matchingEmail)
         {
             bool changeEmailSucceeded = false;
             //verify proper email syntax
             bool validEmail = new EmailAddressAttribute().IsValid(newEmail);
+            bool matchingEmails = String.Equals(newEmail, matchingEmail);
 
-            if (validEmail)
+            if (validEmail && matchingEmails)
             {
                 try
                 {
                     UserProfile currentUser = db.UserProfiles.Find(OsbleAuthentication.CurrentUser.ID);
                     if (currentUser != null)
                     {
+                        //TODO: check for matching email in the user profile db perhaps?
+
                         //change and save email
                         currentUser.UserName = newEmail;
                         db.Entry(currentUser).State = EntityState.Modified;
@@ -220,6 +223,10 @@ namespace OSBLE.Controllers
             else if (!validEmail)
             {
                 ModelState.AddModelError("NewEmail", "Please enter a valid email.");
+            }
+            else if (!matchingEmails)
+            {
+                ModelState.AddModelError("NewEmail", "New email and verify email do not match!");
             }
             else
             {

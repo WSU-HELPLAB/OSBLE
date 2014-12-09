@@ -40,16 +40,25 @@
         </tr>
         <tr>
             <td></td>
-            <td>@Html.Editor("newEmail")</td>
+            <td>
+                <input name="newEmail" id="newEmail" placeholder="Enter new email." />
+            </td>
+            <td>@Html.ValidationMessage("NewEmail")</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <input name="matchingEmail" id="matchingEmail" placeholder="Verify new email." />
+            </td>
             <td>
                 <input type="submit" value="Change Email" />
                 (<strong>NOTE:</strong> changing your email will require you to re-log in.)
-                
+
             </td>
         </tr>
         <tr>
             <td></td>
-            <td>@Html.ValidationMessage("NewEmail")</td>
+            <td></td>
             <td></td>
         </tr>
         <tr>
