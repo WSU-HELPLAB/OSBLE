@@ -414,6 +414,7 @@ namespace OSBLE.Controllers
 
         private void setCurrentUserProfile()
         {
+            ViewBag.UserSchool = db.Schools.FirstOrDefault(s => s.ID == OsbleAuthentication.CurrentUser.SchoolID).Name;
             ViewBag.CurrentUser = OsbleAuthentication.CurrentUser;
         }
 
