@@ -12,7 +12,7 @@
 <h2>Current User Information @Helpers.CreateToolTip(ToolTips.CurrentuserInformation)</h2>
 <div>
     
-@using (Html.BeginForm("UpdateEmailAddress", "Account"))
+@using (Html.BeginForm("UpdateUserEmail", "Account"))
 {
 
     <table>
@@ -20,7 +20,7 @@
             <th>
                 Institution:
             </th>
-            <td style="background: #E4E4E4; text-align: center">
+            <td style="background: #E4E4E4; text-align: center; width: 300px;">
                 @ViewBag.UserSchool
             </td>
             <td></td>
@@ -50,34 +50,62 @@
         <tr>
             <td></td>
             <td>
-                <input name="newEmail" id="newEmail" placeholder="Enter new email." />
+                <input name="newEmail" id="newEmail" class="fillInput" placeholder="Enter new email." />
             </td>
             <td>@Html.ValidationMessage("NewEmail")</td>
         </tr>
         <tr>
             <td></td>
-            <td>
-                <input name="matchingEmail" id="matchingEmail" placeholder="Verify new email." />
+            <td class="topAlignContent">
+                <input name="matchingEmail" id="matchingEmail" class="fillInput" placeholder="Verify new email." />
             </td>
             <td>
-                <input type="submit" value="Change Email" />
-                (<strong>NOTE:</strong> changing your email will require you to re-log in.)
+                <input type="submit" value="Change Email" class="profileSubmitButton" />
+                <div class="profileWarning">
+                    (<strong>NOTE:</strong> changing your email will require you to re-log in.)    
+                </div>
+                
 
             </td>
         </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+        </table>
+ }       
+@using (Html.BeginForm("UpdateUserIdentification", "Account"))
+{
+    <table>
         <tr>
             <th>
-                User ID:
+                School ID:
             </th>
-            <td style="background: #E4E4E4; text-align: center">
+            <td style="background: #E4E4E4; text-align: center; width: 300px;">
                 @ViewBag.CurrentUser.Identification
             </td>
             <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td >
+                <input name="changeIdentification" id="changeIdentification" class="fillInput" placeholder="Enter School ID." />
+            </td>
+            <td>@Html.ValidationMessage("ChangeIdentification")</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td class="topAlignContent">
+                <input name="matchingIdentification" id="matchingIdentification" class="fillInput" placeholder="Verify School ID." />
+            </td>
+            <td>
+                <input type="submit" value="Change Identification" class="profileSubmitButton" />
+                <div class="profileWarning">
+                    (<strong>WARNING:</strong> This MUST match the identification used by instructors on course rosters!)
+                </div>
+
+            </td>
         </tr>
     </table>
 }

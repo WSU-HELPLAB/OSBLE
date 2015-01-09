@@ -184,14 +184,69 @@ namespace OSBLE.Controllers
         }
 
         //
-        // POST: /Account/UpdateEmailAddress
+        // POST: /Account/UpdateUserIdentification
         [OsbleAuthorize]
         [HttpPost]
-        public ActionResult UpdateEmailAddress(string newEmail, string matchingEmail)
+        public ActionResult UpdateUserIdentification(string changeIdentification, string matchingIdentification)
+        {
+            bool changeIdentificationSucceeded = false;
+            //verify matching changes
+            bool matchingIdentifications = String.Equals(changeIdentification, matchingIdentification);
+
+            //change identification
+            if (!String.IsNullOrEmpty(changeIdentification) && matchingIdentifications)
+            {
+                try
+                {
+                    UserProfile currentUser = db.UserProfiles.Find(OsbleAuthentication.CurrentUser.ID);
+                    //check to make sure the user is not changing their identification to one already existing in the db
+                    UserProfile verificationUser =
+                        db.UserProfiles.FirstOrDefault(vu => vu.Identification.Equals(changeIdentification) && vu.SchoolID == currentUser.SchoolID);
+                    if (verificationUser == null)
+                    {
+                        if (currentUser != null)
+                        {
+                            //change and save identification
+                            currentUser.Identification = changeIdentification;
+                            db.Entry(currentUser).State = EntityState.Modified;
+                            db.SaveChanges();
+                            changeIdentificationSucceeded = true;
+                        }    
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("ChangeIdentification", "OSBLE was unable to change user identification. (Error saving changes)");
+                }
+
+            }
+
+            if (changeIdentificationSucceeded)
+            {
+                return RedirectToAction("Profile");
+            }
+            else if (!matchingIdentifications)
+            {
+                ModelState.AddModelError("ChangeIdentification", "New identification and verification identification do not match!");
+            }
+            else
+            {
+                ModelState.AddModelError("ChangeIdentification", "OSBLE was unable to change user identification.");
+            }
+            //we were unable to update the user email
+            return View("Profile");
+        }
+
+        //
+        // POST: /Account/UpdateUserEmail
+        [OsbleAuthorize]
+        [HttpPost]
+        public ActionResult UpdateUserEmail(string newEmail, string matchingEmail)
         {
             bool changeEmailSucceeded = false;
             //verify proper email syntax
             bool validEmail = new EmailAddressAttribute().IsValid(newEmail);
+            //verify matching changes
             bool matchingEmails = String.Equals(newEmail, matchingEmail);
 
             if (validEmail && matchingEmails)
@@ -213,9 +268,10 @@ namespace OSBLE.Controllers
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("NewEmail", "OSBLE was unable to change user email.");
+                    ModelState.AddModelError("NewEmail", "OSBLE was unable to change user email. (Error saving changes)");
                 }
             }
+
             if (changeEmailSucceeded)
             {
                 return RedirectToAction("Profile");
@@ -226,7 +282,7 @@ namespace OSBLE.Controllers
             }
             else if (!matchingEmails)
             {
-                ModelState.AddModelError("NewEmail", "New email and verify email do not match!");
+                ModelState.AddModelError("NewEmail", "New email and verification email do not match!");
             }
             else
             {
