@@ -79,8 +79,12 @@
 
 </div>
 
-<div id="dashboard_right">    
+<div id="dashboard_right">
     
+    <div id="search_hint">
+        Click the @Helpers.SearchButton() icon above to request access to a course. <a id="hide_search">(close)</a>
+        <div style=""></div>
+    </div>
     @*@Helpers.CreateToolTip(ToolTips.FileUploader)*@
 
     <!-- File manager for course files -->    
@@ -148,6 +152,16 @@
 
 <script type="text/javascript">
     $(document).ready(function (e) {
+        
+        var hideHint = $.cookie('hide_hint');
+        if (hideHint == "true") {
+            $("#search_hint").hide();
+        }
+
+        $("#hide_search").click(function () {
+            $("#search_hint").hide();
+            $.cookie('hide_hint', 'true');
+        });
 
         $(".partialContents").each(function (index, item) {
             var startPost = $(location).attr('search');
