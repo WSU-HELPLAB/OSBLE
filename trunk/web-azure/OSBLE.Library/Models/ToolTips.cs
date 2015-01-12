@@ -220,6 +220,7 @@ namespace OSBLE.Models
 
         public static string AccountRegisterLogin = "Your email address will be the name you use to log in to OSBLE and will not be shared with anyone else using the system <br /><br /> Your password must be at least " + Membership.MinRequiredPasswordLength + " characters long.";
         public static string AccountRegisterID = "This identification number is your school identification number. This allows instructors to use OSBLE to identify users based on their school identification numbers. ";
+        public static string CurrentuserInformation = "This is your current user information. You can verify your institution/name/email/ID and update your email address or school identification.";
 
         #endregion
 

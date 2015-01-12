@@ -1,4 +1,5 @@
-﻿@using OSBLE.Models
+﻿@using System.Web.UI.WebControls
+@using OSBLE.Models
 @using OSBLE.Models.Users
 @using OSBLE.Models.Courses
 
@@ -7,6 +8,108 @@
 @{
     ViewBag.Title = "Profile";
 }
+
+<h2>Current User Information @Helpers.CreateToolTip(ToolTips.CurrentuserInformation)</h2>
+<div>
+    
+@using (Html.BeginForm("UpdateUserEmail", "Account"))
+{
+
+    <table>
+        <tr>
+            <th>
+                Institution:
+            </th>
+            <td style="background: #E4E4E4; text-align: center; width: 300px;">
+                @ViewBag.UserSchool
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>
+                Name:
+            </th>
+            <td style="background: #E4E4E4; text-align: center">
+                @ViewBag.CurrentUser.LastName, @ViewBag.CurrentUser.FirstName
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>
+                Email<br />Address: 
+            </th>
+            <td style="background: #E4E4E4; text-align: center">
+                <br />
+                @ViewBag.CurrentUser.UserName
+            </td>
+            <td>
+                
+                
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <input name="newEmail" id="newEmail" class="fillInput" placeholder="Enter new email." />
+            </td>
+            <td>@Html.ValidationMessage("NewEmail")</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td class="topAlignContent">
+                <input name="matchingEmail" id="matchingEmail" class="fillInput" placeholder="Verify new email." />
+            </td>
+            <td>
+                <input type="submit" value="Change Email" class="profileSubmitButton" />
+                <div class="profileWarning">
+                    (<strong>NOTE:</strong> changing your email will require you to re-log in.)    
+                </div>
+                
+
+            </td>
+        </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+        </table>
+ }       
+@using (Html.BeginForm("UpdateUserIdentification", "Account"))
+{
+    <table>
+        <tr>
+            <th>
+                School ID:
+            </th>
+            <td style="background: #E4E4E4; text-align: center; width: 300px;">
+                @ViewBag.CurrentUser.Identification
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td >
+                <input name="changeIdentification" id="changeIdentification" class="fillInput" placeholder="Enter School ID." />
+            </td>
+            <td>@Html.ValidationMessage("ChangeIdentification")</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td class="topAlignContent">
+                <input name="matchingIdentification" id="matchingIdentification" class="fillInput" placeholder="Verify School ID." />
+            </td>
+            <td>
+                <input type="submit" value="Change Identification" class="profileSubmitButton" />
+                <div class="profileWarning">
+                    (<strong>WARNING:</strong> This MUST match the identification used by instructors on course rosters!)
+                </div>
+
+            </td>
+        </tr>
+    </table>
+}
+</div>
 
 <h2>Upload Profile Picture @Helpers.CreateToolTip(ToolTips.AccountProfilePicture) </h2>
 @Helpers.ProfilePicture(Url.Action("Picture", "User", new { id = ViewBag.CurrentUser.ID }))
@@ -96,7 +199,7 @@
 <h2>Course and Community Menu @Helpers.CreateToolTip(ToolTips.AccountMenuOptions) </h2>
 
 <p>Hidden courses/communities will not appear in your course list or your activity feed and must be unchecked to access again.</p>
-<p>Withdrawing from a course will remove you from all course activity. To be readded you must ask the instructor of the course to add you manually</p>
+<p>Withdrawing from a course will remove you from all course activity. To be re-added you must ask the instructor of the course to add you manually or use the course search to request access.</p>
 <p>Your default course will be the active course each time you log on to OSBLE.</p>
 @{
 }

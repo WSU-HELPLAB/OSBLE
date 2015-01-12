@@ -22,6 +22,7 @@ using OSBLE.Utility;
 using OSBLE.Attributes;
 using OSBLE.Services;
 using System.Net;
+using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Controllers
 {
@@ -150,7 +151,7 @@ namespace OSBLE.Controllers
             //was last logged into a different course.  In these situations, we need to automatically
             //switch to the relevant assignment for the user.
             string[] pieces = destinationUrl.Split('/');
-            
+
             //is the user trying to get to the assignment details page?
             if (pieces[pieces.Length - 2].ToLower().CompareTo("assignmentdetails") == 0)
             {
@@ -165,7 +166,7 @@ namespace OSBLE.Controllers
                         if (destinationAssignment.CourseID != null)
                         {
                             HomeController hc = new HomeController();
-                            hc.SetCourseID((int) destinationAssignment.CourseID);
+                            hc.SetCourseID((int)destinationAssignment.CourseID);
                         }
                     }
                 }
@@ -183,6 +184,115 @@ namespace OSBLE.Controllers
             context.Session.Clear(); // Clear session on signout.
 
             return RedirectToAction("Index", "Home");
+        }
+
+        //
+        // POST: /Account/UpdateUserIdentification
+        [OsbleAuthorize]
+        [HttpPost]
+        public ActionResult UpdateUserIdentification(string changeIdentification, string matchingIdentification)
+        {
+            bool changeIdentificationSucceeded = false;
+            //verify matching changes
+            bool matchingIdentifications = String.Equals(changeIdentification, matchingIdentification);
+
+            //change identification
+            if (!String.IsNullOrEmpty(changeIdentification) && matchingIdentifications)
+            {
+                try
+                {
+                    UserProfile currentUser = db.UserProfiles.Find(OsbleAuthentication.CurrentUser.ID);
+                    //check to make sure the user is not changing their identification to one already existing in the db
+                    UserProfile verificationUser =
+                        db.UserProfiles.FirstOrDefault(vu => vu.Identification.Equals(changeIdentification) && vu.SchoolID == currentUser.SchoolID);
+                    if (verificationUser == null)
+                    {
+                        if (currentUser != null)
+                        {
+                            //change and save identification
+                            currentUser.Identification = changeIdentification;
+                            db.Entry(currentUser).State = EntityState.Modified;
+                            db.SaveChanges();
+                            changeIdentificationSucceeded = true;
+                        }    
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("ChangeIdentification", "OSBLE was unable to change user identification. (Error saving changes)");
+                }
+
+            }
+
+            if (changeIdentificationSucceeded)
+            {
+                return RedirectToAction("Profile");
+            }
+            else if (!matchingIdentifications)
+            {
+                ModelState.AddModelError("ChangeIdentification", "New identification and verification identification do not match!");
+            }
+            else
+            {
+                ModelState.AddModelError("ChangeIdentification", "OSBLE was unable to change user identification.");
+            }
+            //we were unable to update the user email
+            return View("Profile");
+        }
+
+        //
+        // POST: /Account/UpdateUserEmail
+        [OsbleAuthorize]
+        [HttpPost]
+        public ActionResult UpdateUserEmail(string newEmail, string matchingEmail)
+        {
+            bool changeEmailSucceeded = false;
+            //verify proper email syntax
+            bool validEmail = new EmailAddressAttribute().IsValid(newEmail);
+            //verify matching changes
+            bool matchingEmails = String.Equals(newEmail, matchingEmail);
+
+            if (validEmail && matchingEmails)
+            {
+                try
+                {
+                    UserProfile currentUser = db.UserProfiles.Find(OsbleAuthentication.CurrentUser.ID);
+                    if (currentUser != null)
+                    {
+                        //TODO: check for matching email in the user profile db perhaps?
+
+                        //change and save email
+                        currentUser.UserName = newEmail;
+                        db.Entry(currentUser).State = EntityState.Modified;
+                        db.SaveChanges();
+                        changeEmailSucceeded = true;
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("NewEmail", "OSBLE was unable to change user email. (Error saving changes)");
+                }
+            }
+
+            if (changeEmailSucceeded)
+            {
+                return RedirectToAction("Profile");
+            }
+            else if (!validEmail)
+            {
+                ModelState.AddModelError("NewEmail", "Please enter a valid email.");
+            }
+            else if (!matchingEmails)
+            {
+                ModelState.AddModelError("NewEmail", "New email and verification email do not match!");
+            }
+            else
+            {
+                ModelState.AddModelError("NewEmail", "OSBLE was unable to change user email.");
+            }
+            //we were unable to update the user email
+            return View("Profile");
         }
 
         [OsbleAuthorize]
@@ -403,13 +513,13 @@ namespace OSBLE.Controllers
                 SchoolID = Convert.ToInt32(Request.QueryString["schoolid"])
             };
 
-            if(WTmodel != null)
+            if (WTmodel != null)
                 return View(WTmodel);
             else
                 return View();
 
 
-           
+
         }
 
         //
@@ -438,17 +548,17 @@ namespace OSBLE.Controllers
                     }
 
                     takenName = (from d in db.UserProfiles
-                        where d.Identification == model.Identification &&
-                              d.SchoolID == model.SchoolID
-                        select d).FirstOrDefault();
-                    
+                                 where d.Identification == model.Identification &&
+                                       d.SchoolID == model.SchoolID
+                                 select d).FirstOrDefault();
+
                     if (takenName != null)
                     {
                         //add an error message then get us out of here
                         ModelState.AddModelError("", "The Student ID provided is already associated with an OSBLE account for the school you provided.");
                         return AcademiaRegister();
                     }
-                
+
                     //try creating the account
                     UserProfile profile = new UserProfile();
                     try

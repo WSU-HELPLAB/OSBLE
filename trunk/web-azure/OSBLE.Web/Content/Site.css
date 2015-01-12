@@ -1859,3 +1859,42 @@ a:link.searchResultsText {
     border-left:none;
     text-align:center;
 }
+
+.fillInput {
+    width: 100%;
+}
+
+.profileSubmitButton {
+    margin-left: 10px;
+    width: 200px;
+}
+
+.topAlignContent {
+    vertical-align: top;
+}
+
+.profileWarning {
+    margin-left: 10px;
+    margin-top: 5px;
+}
+
+#search_hint {
+    
+    text-align: center;
+    border: 1px #1e458a solid;
+    padding: 8px;
+    color: #002157;
+    font-size: inherit;
+    font-weight: inherit;
+    font-family: inherit;
+    font-style: inherit;
+    text-decoration: inherit;
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+
+    -moz-box-shadow: 0px 0px 10px 0px #333333;
+    -webkit-box-shadow: 0px 0px 10px 0px #333333;
+    box-shadow: 0px 0px 10px 0px #333333;
+
+}
