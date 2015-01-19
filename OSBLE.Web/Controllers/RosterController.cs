@@ -707,30 +707,52 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index");
         }
 
-    
+
         /// <summary>
         /// yc: get- approve pending user for current course enrollment, clean up notifcation to instructor, change student status
         /// </summary>
         /// <param name="userId"></param>
+        /// <param name="courseId"> optional parameter, used in the case of adding a whitelisted user</param>
         /// <returns>back to index with notice the current pending user has been enrolled</returns>
         [CanModifyCourse]
-        public ActionResult ApprovePending(int userId)
+        public ActionResult ApprovePending(int userId, int courseId = 0)
         {
-            CourseUser pendingUser = getCourseUser(userId);
-            Course thisCourse = ActiveCourseUser.AbstractCourse as Course;
-            Notification n = db.Notifications.Where(item => item.SenderID == pendingUser.ID && item.RecipientID == ActiveCourseUser.ID).FirstOrDefault();
+            CourseUser pendingUser = getCourseUser(userId, courseId);
+            Course thisCourse = null;
+            if (ActiveCourseUser == null)
+            {
+                //Handle the case of whitelisted users
+                //(a user wont be logged on here so ActiveCourseUser should be null)
+                thisCourse = db.AbstractCourses.FirstOrDefault(ac => ac.ID == courseId) as Course;
+            }
+            else
+            {
+                
+                thisCourse = ActiveCourseUser.AbstractCourse as Course;    
+            }
+
+            Notification n = null;
+            if (ActiveCourseUser == null)
+            {
+                //do nothing for now...
+                //in the current use case (Whitelisted user) we don't need to send a just approved whitelist user a notification.
+            }
+            else
+            {
+                n = db.Notifications.Where(item => item.SenderID == pendingUser.ID && item.RecipientID == ActiveCourseUser.ID).FirstOrDefault();    
+            }
+
+            
             //there is not always a notification for a pending user, say a instructor manually adds them to the pending list?
             if(n != null)
             {
                 n.Read = true;
                 db.SaveChanges();
             }
-           
 
             //set user to active student
             if (pendingUser.AbstractRoleID == (int)CourseRole.CourseRoles.Pending)
             {
-                
                 pendingUser.Hidden = false;
                 pendingUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
                 db.Entry(pendingUser).State = EntityState.Modified;
@@ -1131,12 +1153,26 @@ namespace OSBLE.Controllers
                     where w.ID == wtuID && w.CourseID == ActiveCourseUser.AbstractCourseID
                     select w).FirstOrDefault();
         }
-        private CourseUser getCourseUser(int userProfileId)
+        private CourseUser getCourseUser(int userProfileId, int courseId = 0)
         {
-            return (from c in db.CourseUsers
+            if (ActiveCourseUser == null)
+            {
+                //Handle the case of whitelisted users
+                //(a user wont be logged on here so ActiveCourseUser should be null)
+                return (from c in db.CourseUsers
+                        where c.AbstractCourseID == courseId
+                        && c.UserProfileID == userProfileId
+                        select c).FirstOrDefault();
+            }
+            else
+            {
+                return (from c in db.CourseUsers
                     where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID
                     && c.UserProfileID == userProfileId
                     select c).FirstOrDefault();
+            }
+
+            
         }
 
         /// <summary>
@@ -1314,7 +1350,19 @@ namespace OSBLE.Controllers
             if (courseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student)
             {
                 //If we already have assignments in the course, we need to add the new student into these assignments
-                int currentCourseId = ActiveCourseUser.AbstractCourseID;
+                int currentCourseId = 0;
+                
+                if (ActiveCourseUser == null)
+                {
+                    //Handle the case of whitelisted users
+                    //(a user wont be logged on here so ActiveCourseUser should be null)
+                    currentCourseId = courseUser.AbstractCourseID;
+                }
+                else
+                {
+                    currentCourseId = ActiveCourseUser.AbstractCourseID;
+                }
+                 
                 List<Assignment> assignments = (from a in db.Assignments
                                                 where a.CourseID == currentCourseId
                                                 select a).ToList();
