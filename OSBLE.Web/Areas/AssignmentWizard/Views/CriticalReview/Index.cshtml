@@ -83,7 +83,15 @@
             }
             <div id="teamDiv_@(aTeam.TeamID)" class="TeamDiv @hasDeliverableClass">
                 <input class="selectorCheckBox" type="checkbox" id="teamDiv_checkbox_@(aTeam.TeamID)" name="teamDiv_checkbox_@(aTeam.TeamID)" @selectorChecked />
-                <label for="teamDiv_checkbox_@(aTeam.TeamID)">@aTeam.Team.Name</label>
+                @if (aTeam.Team.TeamMembers.Count == 1)
+                {
+                    <label for="teamDiv_checkbox_@(aTeam.TeamID)">@aTeam.Team.TeamMembers[0].CourseUser.UserProfile.LastAndFirst()</label>
+                }
+                else
+                {
+                    <label for="teamDiv_checkbox_@(aTeam.TeamID)">@aTeam.Team.Name</label>    
+                }
+                
                 <ul id="team_@(@aTeam.TeamID)" class="TeamSortable">
                     @foreach (ReviewTeam reviewTeam in assignment.ReviewTeams.Where(rt => rt.AuthorTeamID == aTeam.TeamID))
                     {
