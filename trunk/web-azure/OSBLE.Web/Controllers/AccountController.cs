@@ -608,11 +608,25 @@ namespace OSBLE.Controllers
                                 //we have 
                                 CourseUser newUser = new CourseUser();
                                 newUser.UserProfile = profile;
-                                newUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+                                //make pending so we can approve pending to workaround issue of whitelisted user not being added to assignments
+                                newUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending; 
                                 newUser.AbstractCourseID = wtu.CourseID;
+                                newUser.AbstractCourse = (from c in db.AbstractCourses
+                                                          where c.ID == newUser.AbstractCourseID 
+                                                          select c).FirstOrDefault();
                                 newUser.UserProfileID = profile.ID;
                                 db.CourseUsers.Add(newUser);
                                 db.WhiteTableUsers.Remove(wtu);
+
+                                //save changes so we can add to pending
+                                db.SaveChanges();
+
+                                //push the user to the student list
+                                using (RosterController rc = new RosterController())
+                                {
+                                    rc.ApprovePending(newUser.UserProfileID, newUser.AbstractCourseID);
+                                }
+
                             }
                         }
 

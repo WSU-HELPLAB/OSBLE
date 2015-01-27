@@ -50,7 +50,9 @@ namespace OSBLE.Models.Annotate
 
                 //step 2: get all comments for each reviewer on the team
                 AnnotateResult documentResult = UploadDocument((int)criticalReview.PrecededingAssignmentID, authorTeamID);
-                string rawNoteUrl = "http://helplab.org/annotate/php/listNotes.php?" +
+                //TODO: the following line was replaced when helplab went down. change again when needed.
+                //string rawNoteUrl = "http://helplab.org/annotate/php/listNotes.php?" +
+                string rawNoteUrl = "http://104.40.86.251:8080/annotate/php/listNotes.php?" +
                                  "api-user={0}" +           //Annotate admin user name (see web config)
                                  "&api-requesttime={1}" +   //UNIX timestamp
                                  "&api-annotateuser={2}" +  //the current user (reviewer)
@@ -135,7 +137,9 @@ namespace OSBLE.Models.Annotate
 #endif
 
                 string apiKey = GenerateAnnotateKey("uploadDocument.php", ApiUser, epoch);
-                string uploadString = "http://helplab.org/annotate/php/uploadDocument.php?" +
+                //TODO: this was changed when helplab.org went down.
+                //string uploadString = "http://helplab.org/annotate/php/uploadDocument.php?" +
+                string uploadString = "http://104.40.86.251:8080/annotate/php/uploadDocument.php?" +
                                       "api-user={0}" +           //Annotate admin user name (see web config)
                                       "&api-requesttime={1}" +   //UNIX timestamp
                                       "&api-annotateuser={2}" +  //the current user (reviewer)
@@ -216,7 +220,9 @@ namespace OSBLE.Models.Annotate
 
             //create annotate account for user
             string apiKey = GenerateAnnotateKey("createAccount.php", osbleUser.UserName, epoch);
-            string createString = "http://helplab.org/annotate/php/createAccount.php?" +
+            //TODO: this was changed when helplab.org went down.
+            //string createString = "http://helplab.org/annotate/php/createAccount.php?" +
+            string createString = "http://104.40.86.251:8080/annotate/php/createAccount.php?" +
                                  "api-user={0}" +           //Annotate admin user name (see web config)
                                  "&api-requesttime={1}" +   //UNIX timestamp
                                  "&api-annotateuser={2}" +  //the current user (reviewer)
@@ -238,7 +244,9 @@ namespace OSBLE.Models.Annotate
             if (osbleUser.IsAdmin == false)
             {
                 apiKey = GenerateAnnotateKey("updateAccount.php", osbleUser.UserName, epoch);
-                string updateString = "http://helplab.org/annotate/php/updateAccount.php?" +
+                //TODO: this was changed when helplab.org went down.
+                //string updateString = "http://helplab.org/annotate/php/updateAccount.php?" +
+                string updateString = "http://104.40.86.251:8080/annotate/php/updateAccount.php?" +
                                      "api-user={0}" +           //Annotate admin user name (see web config)
                                      "&api-requesttime={1}" +   //UNIX timestamp
                                      "&api-annotateuser={2}" +  //the current user (reviewer)
@@ -283,7 +291,9 @@ namespace OSBLE.Models.Annotate
 
             //give user access to the new document
             string apiKey = GenerateAnnotateKey("authorizeReader.php", osbleUser.UserName, epoch);
-            string authorizeString = "http://helplab.org/annotate/php/authorizeReader.php?" +
+            //TODO: this was changed when helplab.org went down.
+            //string authorizeString = "http://helplab.org/annotate/php/authorizeReader.php?" +
+            string authorizeString = "http://104.40.86.251:8080/annotate/php/authorizeReader.php?" +
                                  "api-user={0}" +           //Annotate admin user name (see web config)
                                  "&api-requesttime={1}" +   //UNIX timestamp
                                  "&api-annotateuser={2}" +  //the current user (reviewer)
@@ -320,12 +330,14 @@ namespace OSBLE.Models.Annotate
             //log user into annotate
             long epoch = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds;
             string apiKey = GenerateAnnotateKey("loginAs.php", osbleUser.UserName, epoch);
-            string loginString = "http://helplab.org/annotate/php/loginAs.php?" +
+            //TODO: this was changed when helplab.org went down.
+            //string loginString = "http://helplab.org/annotate/php/loginAs.php?" +
+            string loginString = "http://104.40.86.251:8080/annotate/php/loginAs.php?" +
                                  "api-user={0}" +           //Annotate admin user name (see web config)
                                  "&api-requesttime={1}" +   //UNIX timestamp
                                  "&loc=pdfnotate.php?{2}" + //redirect to annotate server
                                  "&remember=1" +          //store user info in cookie
-                                 "&errloc=http://helplab.org/annotate/php/error.php" +
+                                 "&errloc=http://104.40.86.251:8080/annotate/php/error.php" +
                                  "&api-annotateuser={3}" +  //the current user (reviewer)
                                  "&api-auth={4}";           //Annotate admin auth key (see web config)
 
@@ -451,7 +463,9 @@ namespace OSBLE.Models.Annotate
             {
                 enable = 0;
             }
-            string anonString = "http://helplab.org/annotate/php/apiAddUserMapping.php?" +
+            //TODO: this was changed when helplab went down.
+            //string anonString = "http://helplab.org/annotate/php/apiAddUserMapping.php?" +
+            string anonString = "http://104.40.86.251:8080/annotate/php/apiAddUserMapping.php?" +
                                  "api-user={0}" +           //Annotate admin user name (see web config)
                                  "&api-auth={1}" +          //Annotate admin auth key
                                  "&api-requesttime={2}" +   //UNIX timestamp
