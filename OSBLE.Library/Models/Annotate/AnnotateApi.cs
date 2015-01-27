@@ -452,6 +452,8 @@ namespace OSBLE.Models.Annotate
             WebClient client = new WebClient();
             string webResult = "";
             long epoch = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds;
+            //apiAddUserMapping.php does not exist! it appears to be a custom file...
+            //TODO: re-create...
             string apiKey = GenerateAnnotateKey("apiAddUserMapping.php", user.UserName, epoch);
 
             Dictionary<string, string> mapping = new Dictionary<string, string>();
