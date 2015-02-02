@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Net;
@@ -9,6 +10,7 @@ using OSBLE.Models.Users;
 using System.Web.Helpers;
 using System.Web.Script.Serialization;
 
+
 namespace OSBLE.Models.Annotate
 {
     public class AnnotateApi
@@ -16,10 +18,13 @@ namespace OSBLE.Models.Annotate
         public string ApiKey { get; set; }
         public string ApiUser { get; set; }
 
+        public string AnnotateURL { get; set; }
+
         public AnnotateApi(string apiUser, string apiKey)
         {
             ApiKey = apiKey;
             ApiUser = apiUser;
+            AnnotateURL = ConfigurationManager.AppSettings["AnnotateURL"];
         }
 
         public AnnotateResult ToggleCommentVisibility(int criticalReviewAssignmentID, int authorTeamID, bool makeVisible)
@@ -52,7 +57,7 @@ namespace OSBLE.Models.Annotate
                 AnnotateResult documentResult = UploadDocument((int)criticalReview.PrecededingAssignmentID, authorTeamID);
                 //TODO: the following line was replaced when helplab went down. change again when needed.
                 //string rawNoteUrl = "http://helplab.org/annotate/php/listNotes.php?" +
-                string rawNoteUrl = "http://104.40.86.251:8080/annotate/php/listNotes.php?" +
+                string rawNoteUrl = AnnotateURL + "/annotate/php/listNotes.php?" +
                                  "api-user={0}" +           //Annotate admin user name (see web config)
                                  "&api-requesttime={1}" +   //UNIX timestamp
                                  "&api-annotateuser={2}" +  //the current user (reviewer)
@@ -73,8 +78,16 @@ namespace OSBLE.Models.Annotate
                                                documentResult.DocumentDate,
                                                documentResult.DocumentCode
                                                );
-                    webResult = client.DownloadString(noteUrl);
-                    dynamic jsonResult = Json.Decode(webResult);
+                    try
+                    {
+                        webResult = client.DownloadString(noteUrl);
+                        dynamic jsonResult = Json.Decode(webResult);
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                    
                 }
 
             }
@@ -139,7 +152,7 @@ namespace OSBLE.Models.Annotate
                 string apiKey = GenerateAnnotateKey("uploadDocument.php", ApiUser, epoch);
                 //TODO: this was changed when helplab.org went down.
                 //string uploadString = "http://helplab.org/annotate/php/uploadDocument.php?" +
-                string uploadString = "http://104.40.86.251:8080/annotate/php/uploadDocument.php?" +
+                string uploadString = AnnotateURL + "/annotate/php/uploadDocument.php?" +
                                       "api-user={0}" +           //Annotate admin user name (see web config)
                                       "&api-requesttime={1}" +   //UNIX timestamp
                                       "&api-annotateuser={2}" +  //the current user (reviewer)
@@ -222,7 +235,7 @@ namespace OSBLE.Models.Annotate
             string apiKey = GenerateAnnotateKey("createAccount.php", osbleUser.UserName, epoch);
             //TODO: this was changed when helplab.org went down.
             //string createString = "http://helplab.org/annotate/php/createAccount.php?" +
-            string createString = "http://104.40.86.251:8080/annotate/php/createAccount.php?" +
+            string createString = AnnotateURL + "/annotate/php/createAccount.php?" +
                                  "api-user={0}" +           //Annotate admin user name (see web config)
                                  "&api-requesttime={1}" +   //UNIX timestamp
                                  "&api-annotateuser={2}" +  //the current user (reviewer)
@@ -246,7 +259,7 @@ namespace OSBLE.Models.Annotate
                 apiKey = GenerateAnnotateKey("updateAccount.php", osbleUser.UserName, epoch);
                 //TODO: this was changed when helplab.org went down.
                 //string updateString = "http://helplab.org/annotate/php/updateAccount.php?" +
-                string updateString = "http://104.40.86.251:8080/annotate/php/updateAccount.php?" +
+                string updateString = AnnotateURL + "/annotate/php/updateAccount.php?" +
                                      "api-user={0}" +           //Annotate admin user name (see web config)
                                      "&api-requesttime={1}" +   //UNIX timestamp
                                      "&api-annotateuser={2}" +  //the current user (reviewer)
@@ -258,8 +271,17 @@ namespace OSBLE.Models.Annotate
                                             osbleUser.UserName,
                                             apiKey
                                             );
-                webResult = client.DownloadString(updateString);
-                result.RawMessage = webResult;
+                try
+                {
+                    webResult = client.DownloadString(updateString);
+                    result.RawMessage = webResult;
+                }
+                catch (Exception)
+                {
+                    
+                    throw;
+                }
+                
             }
             result.RawMessage = webResult;
             if (webResult.Substring(0, 2) == "OK")
@@ -293,7 +315,7 @@ namespace OSBLE.Models.Annotate
             string apiKey = GenerateAnnotateKey("authorizeReader.php", osbleUser.UserName, epoch);
             //TODO: this was changed when helplab.org went down.
             //string authorizeString = "http://helplab.org/annotate/php/authorizeReader.php?" +
-            string authorizeString = "http://104.40.86.251:8080/annotate/php/authorizeReader.php?" +
+            string authorizeString = AnnotateURL + "/annotate/php/authorizeReader.php?" +
                                  "api-user={0}" +           //Annotate admin user name (see web config)
                                  "&api-requesttime={1}" +   //UNIX timestamp
                                  "&api-annotateuser={2}" +  //the current user (reviewer)
@@ -308,8 +330,17 @@ namespace OSBLE.Models.Annotate
                                         docDate,
                                         docCode
                                         );
-            webResult = client.DownloadString(authorizeString);
-            result.RawMessage = webResult;
+            try
+            {
+                webResult = client.DownloadString(authorizeString);
+                result.RawMessage = webResult;
+            }
+            catch (Exception)
+            {
+                
+                throw;
+            }
+            
             if (webResult.Substring(0, 2) == "OK")
             {
                 result.Result = ResultCode.OK;
@@ -332,7 +363,7 @@ namespace OSBLE.Models.Annotate
             string apiKey = GenerateAnnotateKey("loginAs.php", osbleUser.UserName, epoch);
             //TODO: this was changed when helplab.org went down.
             //string loginString = "http://helplab.org/annotate/php/loginAs.php?" +
-            string loginString = "http://104.40.86.251:8080/annotate/php/loginAs.php?" +
+            string loginString = AnnotateURL + "/annotate/php/loginAs.php?" +
                                  "api-user={0}" +           //Annotate admin user name (see web config)
                                  "&api-requesttime={1}" +   //UNIX timestamp
                                  "&loc=pdfnotate.php?{2}" + //redirect to annotate server
@@ -364,6 +395,7 @@ namespace OSBLE.Models.Annotate
             {
                 annotateUser = ApiUser;
             }
+
             string apiUser = ApiUser;
 
             //build our string, convert into bytes for sha1
@@ -467,7 +499,7 @@ namespace OSBLE.Models.Annotate
             }
             //TODO: this was changed when helplab went down.
             //string anonString = "http://helplab.org/annotate/php/apiAddUserMapping.php?" +
-            string anonString = "http://104.40.86.251:8080/annotate/php/apiAddUserMapping.php?" +
+            string anonString = AnnotateURL + "/annotate/php/apiAddUserMapping.php?" +
                                  "api-user={0}" +           //Annotate admin user name (see web config)
                                  "&api-auth={1}" +          //Annotate admin auth key
                                  "&api-requesttime={2}" +   //UNIX timestamp
@@ -489,8 +521,17 @@ namespace OSBLE.Models.Annotate
                                         enable
                 //""
                                         );
-            webResult = client.DownloadString(anonString);
-            result.RawMessage = webResult;
+            try
+            {
+                webResult = client.DownloadString(anonString);
+                result.RawMessage = webResult;
+            }
+            catch (Exception)
+            {
+                
+                throw;
+            }
+            
             if (webResult.Substring(0, 2) == "OK")
             {
                 result.Result = ResultCode.OK;
