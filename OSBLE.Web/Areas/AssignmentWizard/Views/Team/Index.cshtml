@@ -75,7 +75,11 @@
             <ul id="team_@(counter)_@(@aTeam.TeamID)" class="TeamSortable">
                 @foreach (TeamMember member in aTeam.Team.TeamMembers)
                 {
-                    <li id="cu_@(member.CourseUserID)" class="ui-state-default Student">@member.CourseUser.UserProfile.LastName, @member.CourseUser.UserProfile.FirstName</li>
+                    if (member.CourseUser != null) //catch the case where a withdrawn users is part of a team. They will be a member nut no longer a courseuser
+                    {
+                        <li id="cu_@(member.CourseUserID)" class="ui-state-default Student">@member.CourseUser.UserProfile.LastName, @member.CourseUser.UserProfile.FirstName</li>    
+                    }
+                    
                 }
             </ul>
         </div>
