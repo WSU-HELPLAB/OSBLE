@@ -368,7 +368,7 @@ namespace OSBLE.Models.Annotate
                                  "&api-requesttime={1}" +   //UNIX timestamp
                                  "&loc=pdfnotate.php?{2}" + //redirect to annotate server
                                  "&remember=1" +          //store user info in cookie
-                                 "&errloc=http://104.40.86.251:8080/annotate/php/error.php" +
+                                 "&errloc=" + AnnotateURL + "/annotate/php/error.php" +
                                  "&api-annotateuser={3}" +  //the current user (reviewer)
                                  "&api-auth={4}";           //Annotate admin auth key (see web config)
 
