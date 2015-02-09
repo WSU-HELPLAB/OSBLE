@@ -59,9 +59,7 @@ namespace OSBLE.Controllers
                         //instructors get to see everyone, regardless of CR settings
                         CriticalReviewSettings settings = new CriticalReviewSettings();
                         settings.AnonymizeComments = false;
-                        //mapping api does not exist in the new version...
-                        //TODO: create mapping api...
-                        //api.SetDocumentAnonymity(CurrentUser, uploadResult.DocumentCode, uploadResult.DocumentDate, settings);
+                        api.SetDocumentAnonymity(CurrentUser, uploadResult.DocumentCode, uploadResult.DocumentDate, settings);
                         api.GiveAccessToDocument(CurrentUser, uploadResult.DocumentCode, uploadResult.DocumentDate);
 
                         //log the user in to annotate
@@ -153,9 +151,8 @@ namespace OSBLE.Controllers
                             {
                                 settings.AnonymizeComments = false;
                             }
-                            //mapping api does not exist in the new version...
-                            //TODO: create mapping api...
-                            //api.SetDocumentAnonymity(CurrentUser, uploadResult.DocumentCode, uploadResult.DocumentDate, settings);
+                            
+                            api.SetDocumentAnonymity(CurrentUser, uploadResult.DocumentCode, uploadResult.DocumentDate, settings);
                             api.GiveAccessToDocument(CurrentUser, uploadResult.DocumentCode, uploadResult.DocumentDate);
 
                             //log the user in to annotate
@@ -220,10 +217,8 @@ namespace OSBLE.Controllers
                                 settings = new CriticalReviewSettings();
                                 settings.Assignment = CRassignment;
                             }
-
-                            //mapping api does not exist in the new version...
-                            //TODO: create mapping api...
-                            //api.SetDocumentAnonymity(CurrentUser, uploadResult.DocumentCode, uploadResult.DocumentDate, settings);
+                            
+                            api.SetDocumentAnonymity(CurrentUser, uploadResult.DocumentCode, uploadResult.DocumentDate, settings);
                             api.GiveAccessToDocument(CurrentUser, uploadResult.DocumentCode, uploadResult.DocumentDate);
 
                             //log the user in to annotate
