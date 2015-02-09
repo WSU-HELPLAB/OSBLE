@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Net;
@@ -25,6 +26,7 @@ namespace OSBLE.Models.Annotate
             ApiKey = apiKey;
             ApiUser = apiUser;
             AnnotateURL = ConfigurationManager.AppSettings["AnnotateURL"];
+            //AnnotateURL = "http://104.45.232.112:8080";
         }
 
         public AnnotateResult ToggleCommentVisibility(int criticalReviewAssignmentID, int authorTeamID, bool makeVisible)
@@ -81,6 +83,7 @@ namespace OSBLE.Models.Annotate
                     try
                     {
                         webResult = client.DownloadString(noteUrl);
+                        WriteLog("ToggleCommentVisibility: "+webResult);
                         dynamic jsonResult = Json.Decode(webResult);
                     }
                     catch (Exception)
@@ -168,6 +171,7 @@ namespace OSBLE.Models.Annotate
                 try
                 {
                     sendResult = client.DownloadString(uploadString);
+                    WriteLog("UploadDocument: "+sendResult);
                 }
                 catch (Exception ex)
                 {
@@ -252,6 +256,7 @@ namespace OSBLE.Models.Annotate
                                         osbleUser.LastName
                                         );
             webResult = client.DownloadString(createString);
+            WriteLog("CreateAccount1: " + webResult);
 
             //downgrade user to unlicensed if not OSBLE admin
             if (osbleUser.IsAdmin == false)
@@ -274,6 +279,7 @@ namespace OSBLE.Models.Annotate
                 try
                 {
                     webResult = client.DownloadString(updateString);
+                    WriteLog("CreateAccount2: " + webResult); 
                     result.RawMessage = webResult;
                 }
                 catch (Exception)
@@ -333,6 +339,7 @@ namespace OSBLE.Models.Annotate
             try
             {
                 webResult = client.DownloadString(authorizeString);
+                WriteLog("GiveAccessToDocument: " + webResult); 
                 result.RawMessage = webResult;
             }
             catch (Exception)
@@ -379,6 +386,7 @@ namespace OSBLE.Models.Annotate
                                         osbleUser.UserName,
                                         apiKey
                                         );
+            WriteLog("LOGINSTRING: " + loginString);
             return loginString;
         }
 
@@ -524,6 +532,7 @@ namespace OSBLE.Models.Annotate
             try
             {
                 webResult = client.DownloadString(anonString);
+                WriteLog("SetDocumentAnnonymity: " + webResult); 
                 result.RawMessage = webResult;
             }
             catch (Exception)
@@ -537,6 +546,27 @@ namespace OSBLE.Models.Annotate
                 result.Result = ResultCode.OK;
             }
             return result;
+        }
+
+        public void WriteLog(string result)
+        {
+            string path = @"c:\temp\log.txt";
+            // This text is added only once to the file. 
+            if (!File.Exists(path))
+            {
+                // Create a file to write to. 
+                using (StreamWriter sw = File.CreateText(path))
+                {
+                    sw.WriteLine(DateTime.Now + "\n");
+                }
+            }
+
+            // This text is always added, making the file longer over time 
+            // if it is not deleted. 
+            using (StreamWriter sw = File.AppendText(path))
+            {
+                sw.WriteLine(result);
+            }
         }
     }
 }
