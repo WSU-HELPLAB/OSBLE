@@ -18,7 +18,7 @@
 }
 </div>
 
-@if (ViewBag.Assignments.Count == 0)
+@if (ViewBag.Assignments != null && ViewBag.Assignments.Count == 0)
 { 
     <h4>No Active Assignments</h4>
 }

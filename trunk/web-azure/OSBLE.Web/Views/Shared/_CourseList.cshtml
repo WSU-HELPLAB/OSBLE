@@ -130,10 +130,10 @@ else
            '<div id="course_create_dialog" title="Create"> \
         <p>Would you like to create a course, community or an assessment committee?</p><ul> \
         <li>@Html.ActionLink("Create Course", "Create", "Course", new { area = "" }, null) </li> \
-        <li>@Html.ActionLink("Clone Course", "CloneCourse", "Course", new { area = "" }, null) </li> \
-        <li>@Html.ActionLink("Create Community", "Create", "Community", new { area = "" }, null) </li> \
-        <li>@Html.ActionLink("Create Assessment Committee", "Create", "Committee", new { area = "" }, null) </li> \
-        </ul></div>');
+@*<li>@Html.ActionLink("Clone Course", "CloneCourse", "Course", new { area = "" }, null) </li>*@ \
+<li>@Html.ActionLink("Create Community", "Create", "Community", new { area = "" }, null) </li> \
+<li>@Html.ActionLink("Create Assessment Committee", "Create", "Committee", new { area = "" }, null) </li> \
+    </ul></div>');
 
             //make the div we just created into a dialog box
 
