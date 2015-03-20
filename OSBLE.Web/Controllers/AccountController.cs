@@ -879,7 +879,9 @@ namespace OSBLE.Controllers
                     string body = model.Message;
                     body += "<br />reply to: " + model.Email;
                     List<MailAddress> to = new List<MailAddress>();
-                    to.Add(new MailAddress("support@osble.org"));
+                    to.Add(new MailAddress("daniel.olivares@wsu.edu"));
+                    to.Add(new MailAddress("hundhaus@wsu.edu"));
+                    //to.Add(new MailAddress("me@adam-carter.com"));
                     Email.Send(subject, body, to);
                     ViewBag.CUName = model.Name;
                     return View("ContactUsSuccess");
