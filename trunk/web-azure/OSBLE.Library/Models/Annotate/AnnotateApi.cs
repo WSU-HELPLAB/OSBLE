@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Net;
@@ -537,6 +538,36 @@ namespace OSBLE.Models.Annotate
                 result.Result = ResultCode.OK;
             }
             return result;
+        }
+
+        public void WriteLog(string result)
+        {
+
+            string path = AppDomain.CurrentDomain.BaseDirectory + "Content/logs/";
+
+            //check if it exists
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            path = @AppDomain.CurrentDomain.BaseDirectory + "Content/logs/" + "log.txt";
+            // This text is added only once to the file. 
+            if (!File.Exists(path))
+            {
+                // Create a file to write to. 
+                using (StreamWriter sw = File.CreateText(path))
+                {
+                    sw.WriteLine(DateTime.Now + "\n");
+                }
+            }
+
+            // This text is always added, making the file longer over time 
+            // if it is not deleted. 
+            using (StreamWriter sw = File.AppendText(path))
+            {
+                sw.WriteLine(result);
+            }
         }
     }
 }

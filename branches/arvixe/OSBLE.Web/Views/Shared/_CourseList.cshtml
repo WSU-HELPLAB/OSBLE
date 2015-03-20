@@ -122,47 +122,47 @@ else
   
     <script type="text/javascript">
 
-        function create_and_open_course_create_dialog() {
+    function create_and_open_course_create_dialog() {
 
-            //create the div that we will then make into a dialog
+        //create the div that we will then make into a dialog
 
-            $('body').append(
-           '<div id="course_create_dialog" title="Create"> \
+        $('body').append(
+       '<div id="course_create_dialog" title="Create"> \
         <p>Would you like to create a course, community or an assessment committee?</p><ul> \
         <li>@Html.ActionLink("Create Course", "Create", "Course", new { area = "" }, null) </li> \
-<li>@Html.ActionLink("Clone Course", "CloneCourse", "Course", new { area = "" }, null) </li> \
+@*<li>@Html.ActionLink("Clone Course", "CloneCourse", "Course", new { area = "" }, null) </li>*@ \
 <li>@Html.ActionLink("Create Community", "Create", "Community", new { area = "" }, null) </li> \
 <li>@Html.ActionLink("Create Assessment Committee", "Create", "Committee", new { area = "" }, null) </li> \
     </ul></div>');
 
-            //make the div we just created into a dialog box
+        //make the div we just created into a dialog box
 
-            $('#course_create_dialog').dialog({
-                modal: true,
-                autoOpen: true,
-                resizable: false,
-                width: 350,
-                height: 220,
-                closeOnEscape: true,
-                close: remove_course_create_dialog
-            });
+        $('#course_create_dialog').dialog({
+            modal: true,
+            autoOpen: true,
+            resizable: false,
+            width: 350,
+            height: 220,
+            closeOnEscape: true,
+            close: remove_course_create_dialog
+        });
 
 
 
-            $('#course_create_dialog').dialog('open');
+        $('#course_create_dialog').dialog('open');
 
-            return false;
+        return false;
 
-        }
+    }
 
-        function remove_course_create_dialog() {
+    function remove_course_create_dialog() {
 
-            //change the dialog back into a normal div (that is what destroy does although it does not destroy the div)
-            $('#course_create_dialog').dialog("destroy");
+        //change the dialog back into a normal div (that is what destroy does although it does not destroy the div)
+        $('#course_create_dialog').dialog("destroy");
 
-            //then remove the div
-            $('#course_create_dialog').remove();
-        }
+        //then remove the div
+        $('#course_create_dialog').remove();
+    }
     </script>
 
     <script type="text/javascript">

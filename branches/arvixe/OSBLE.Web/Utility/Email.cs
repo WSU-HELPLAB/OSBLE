@@ -8,7 +8,7 @@ namespace OSBLE.Utility
     {
         public static void Send(string subject, string message, ICollection<MailAddress> to)
         {
-#if !DEBUG
+
             //ignore empty sends
             if (to.Count == 0)
             {
@@ -28,13 +28,14 @@ namespace OSBLE.Utility
                 mm.Subject = subject;
                 mm.Body = message;
                 mm.IsBodyHtml = true;
-
+#if !DEBUG
                 //bomb's away!
                 mailClient.Send(mm);
+#endif
             }
             
             mailClient.Dispose();
-#endif
+
         }
     }
 }

@@ -1,11 +1,14 @@
 ﻿@using OSBLE.Models
 @using OSBLE.Models.Assignments
 @{
-    List<Assignment> assignments = ViewBag.Assignments;
+    List<Assignment> assignments = (ViewBag.Assignments == null) ? new List<Assignment>() : ViewBag.Assignments;
+    
     List<TeamEvaluation> teamEvals = ViewBag.TeamEvaluations;
-    int PastCount = ViewBag.PastCount;
-    int PresentCount = ViewBag.PresentCount;
-    int FutureCount = ViewBag.FutureCount;
+    int PastCount = (ViewBag.PastCount == null) ? 0 : ViewBag.PastCount;
+    //int PresentCount = ViewBag.PresentCount;
+    int PresentCount = (ViewBag.PresentCount == null) ? 0 : ViewBag.PresentCount;
+    //int FutureCount = ViewBag.FutureCount;
+    int FutureCount = (ViewBag.FutureCount == null) ? 0 : ViewBag.FutureCount;
     bool isFutureAssignment = false;
     AjaxOptions options = new AjaxOptions()
     {
