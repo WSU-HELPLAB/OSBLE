@@ -6,8 +6,8 @@
 <script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
 <p>
-    To complete roster import, please select the appropriate headers for Student IDs
-    and Sections:</p>
+    To complete roster import, please identify the header corresponding to student IDs. You can also optionally identify the headers associated with course section, 
+    student e-mail, and student name:</p>
 <div class="selector">
     <h3>
         Student Identification Header:</h3>
@@ -36,7 +36,7 @@
     <div class="selector">
         <br />
         <h3>
-            Student Email:
+            Student Email (optional):
         </h3>
         <ul id="email_selector" class="selector">
             <li class="@if (ViewBag.GuessedEmail == null)

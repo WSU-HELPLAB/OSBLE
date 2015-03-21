@@ -1558,21 +1558,24 @@ namespace OSBLE.Controllers
 
         private void emailCourseUser(CourseUser user)
         {
-            string subject = "Welcome to " + user.AbstractCourse.Name;
-            string link = "https://osble.org";
+            if (user != null && user.AbstractCourse != null && user.UserProfile != null)
+            {
+                string subject = "Welcome to " + user.AbstractCourse.Name;
+                string link = "https://osble.org";
 
-            string message = "Dear " + user.UserProfile.FirstName + " " + user.UserProfile.LastName + @", <br/>
+                string message = "Dear " + user.UserProfile.FirstName + " " + user.UserProfile.LastName + @", <br/>
             <br/>
             Congratulations! You have been enrolled in the following course at osble.org: " + ActiveCourseUser.AbstractCourse.Name +
-            "You may access this course by <a href='" + link + @"'>clicking on this link</a>. 
+                "You may access this course by <a href='" + link + @"'>clicking on this link</a>. 
             <br/>
             <br/>
             ";
 
-            message += @"Best regards,<br/>
+                message += @"Best regards,<br/>
             The OSBLE Team in the <a href='www.helplab.org'>HELP lab</a> at <a href='www.wsu.edu'>Washington State University</a>";
 
-            Email.Send(subject, message, new List<MailAddress>() { new MailAddress(user.UserProfile.UserName) });
+                Email.Send(subject, message, new List<MailAddress>() { new MailAddress(user.UserProfile.UserName) });
+            }
         }
 
         private void emailWhiteTableUser(WhiteTable whitetable)
