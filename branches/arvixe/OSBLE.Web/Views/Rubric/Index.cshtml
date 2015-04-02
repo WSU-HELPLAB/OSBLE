@@ -9,7 +9,7 @@
   double totalRubricPoints = (from c in Model.Rubric.Criteria
                               select c.Weight).Sum();
   bool student = Model.Student;
-  
+
   string critInputPrefix = ViewBag.CritInputPrefix;
   string critSliderPrefix = ViewBag.CritSliderPrefix;
   string critCommentPrefix = ViewBag.CritCommentPrefix;
@@ -21,14 +21,19 @@
   int sliderTableLength = 880;
   int textInputLenght = 25;
   int sliderTableCellWidth = (sliderTableLength / maxLevelScore) - textInputLenght;
-  
+
   DateTime? publishTime = Model.Evaluation.DatePublished;
 
   Boolean editable = ViewBag.isEditable;
   List<CourseUser> cuList = ViewBag.ObserverCU;
 
-  List<AssignmentTeam> atList = (from t in @Model.TeamList as IEnumerable<AssignmentTeam>
-                                 select t).Reverse().ToList();
+  List<AssignmentTeam> atList = new List<AssignmentTeam>();
+
+    if (null != Model.TeamList)
+    {
+        atList = (from t in @Model.TeamList as IEnumerable<AssignmentTeam>
+                  select t).Reverse().ToList();
+    }
 }
 <script type="text/javascript">
 
