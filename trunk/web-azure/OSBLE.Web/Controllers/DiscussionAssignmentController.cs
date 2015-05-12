@@ -54,7 +54,7 @@ namespace OSBLE.Controllers
             else //set return value since one exists
             {
                 returnVal = lastVisited.LastVisit;
-                
+
             }
             lastVisited.LastVisit = DateTime.UtcNow; //update LastVisit time & save changes
             db.SaveChanges();
@@ -85,7 +85,7 @@ namespace OSBLE.Controllers
             ZipFile zipFile = new ZipFile();
 
             Dictionary<int, MemoryStream> parentStreams = new Dictionary<int, MemoryStream>();
-            Dictionary<int, string> parentStreamNames = new Dictionary<int,string>();
+            Dictionary<int, string> parentStreamNames = new Dictionary<int, string>();
 
             //loop through all review teams
             foreach (ReviewTeam reviewTeam in criticalReviewAssignment.ReviewTeams)
@@ -109,7 +109,7 @@ namespace OSBLE.Controllers
                         MemoryStream outputStream = new MemoryStream();
 
                         //Only want to add the original file to the stream once.
-                        if(parentStreams.ContainsKey(reviewTeam.AuthorTeamID) == false)
+                        if (parentStreams.ContainsKey(reviewTeam.AuthorTeamID) == false)
                         {
                             string originalFile =
                                 Models.FileSystem.Directories.GetAssignment(
@@ -170,7 +170,7 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         public ActionResult Index(int assignmentId, int discussionTeamId, bool? displayNewPosts = false)
         {
-            
+
             Assignment assignment = null;
             DiscussionTeam discussionTeam = null;
 
@@ -185,7 +185,7 @@ namespace OSBLE.Controllers
             }
 
             //Make sure ActiveCourseUser is a valid discussion member
-                //Valid discussion members are in the discussion team, or in the class of a classwide discussion assignment
+            //Valid discussion members are in the discussion team, or in the class of a classwide discussion assignment
             bool allowedInDiscussion = false;
             if (assignment != null && assignment.HasDiscussionTeams == false)//Classwide discussion
             {
@@ -297,7 +297,7 @@ namespace OSBLE.Controllers
                                                  select dt).FirstOrDefault();
 
                 DiscussionViewModel dvm = new DiscussionViewModel(discussionTeam, ActiveCourseUser);
-                
+
                 //anonymize if requested
                 if (anonymous == true)
                 {
@@ -464,6 +464,7 @@ You may view the discussion on OSBLE by visiting the following link: <a href=""{
                 }
             }
 
+            //TODO: check this to see if it's not working as it should... user claims they got an email before they should have.
             if (assignment.DiscussionSettings.RequiresPostBeforeView == true)
             {
                 Dictionary<int, string> PossibleUsers = db.CourseUsers
@@ -495,8 +496,9 @@ You may view the discussion on OSBLE by visiting the following link: <a href=""{
 
                 foreach (DiscussionPost post in db.DiscussionPosts)
                 {
+                    //TODO: check here... why is this not working?
                     if (PossibleUsers.ContainsKey(post.CourseUserID) && !(emailAddresses.Contains(PossibleUsers[post.CourseUserID].ToString())))
-                    {                      
+                    {
                         emailAddresses.Add(PossibleUsers[post.CourseUserID].ToString());
                     }
                 }
@@ -549,16 +551,16 @@ You may view the discussion on OSBLE by visiting the following link: <a href=""{
 
             foreach (string address in emailAddresses)
             {
-            
-                    //AC: sometimes this fails.  Not sure why
-                    try
-                    {
-                        to.Add(new MailAddress(address));
-                    }
-                    catch (Exception)
-                    {
-                    }
-                
+
+                //AC: sometimes this fails.  Not sure why
+                try
+                {
+                    to.Add(new MailAddress(address));
+                }
+                catch (Exception)
+                {
+                }
+
             }
 
             bool anonSettings = false;
@@ -570,23 +572,23 @@ You may view the discussion on OSBLE by visiting the following link: <a href=""{
             string subject = "[OSBLE][Discussion] - New Post";
             string linkUrl = string.Format("http://osble.org{0}", Url.Action("TeacherIndex", "DiscussionAssignment", new { assignmentID = assignment.ID, discussionTeamID = newPost.DiscussionTeamID }));
             string body = @"
-Greetings,
+                            Greetings,
 
-{0} has posted the following message on the discussion assignment ""{1}."":
-{2}
+                            {0} has posted the following message on the discussion assignment ""{1}."":
+                            {2}
 
-You may view the discussion on OSBLE by visiting the following link: <a href=""{3}"">{4}</a>.
+                            You may view the discussion on OSBLE by visiting the following link: <a href=""{3}"">{4}</a>.
 
 
-";
+                            ";
 
             body = string.Format(body,
-    ActiveCourseUser.UserProfile.DisplayName(ActiveCourseUser.AbstractRoleID, true, anonSettings),
-    assignment.AssignmentName,
-    newPost.Content,
-    linkUrl,
-    linkUrl
-    );
+            ActiveCourseUser.UserProfile.DisplayName(   ActiveCourseUser.AbstractRoleID, true, anonSettings),
+                                                        assignment.AssignmentName,
+                                                        newPost.Content,
+                                                        linkUrl,
+                                                        linkUrl
+                                                        );
             Email.Send(subject, body, to);
 
         }
