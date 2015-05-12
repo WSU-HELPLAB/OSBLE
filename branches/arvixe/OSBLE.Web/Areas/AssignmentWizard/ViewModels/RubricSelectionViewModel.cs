@@ -38,9 +38,12 @@ namespace OSBLE.Areas.AssignmentWizard.ViewModels
 
         public void AddCourse(Course course)
         {
-            if (course != null && course.Assignments.Where(a => a.HasRubric).Count() > 0)
+            if (course != null)
             {
-                rubricSelection.Add(course.ID, new CourseViewModel(course));
+                if (course.Assignments.Where(a => a.HasRubric).Count() > 0 || course.Assignments.Where(a => a.HasStudentRubric).Count() > 0)
+                {
+                    rubricSelection.Add(course.ID, new CourseViewModel(course));
+                }    
             }
         }
     }
@@ -60,6 +63,17 @@ namespace OSBLE.Areas.AssignmentWizard.ViewModels
                 {
                     rubricViewModel.Add(new RubricViewModel(
                         assignment.Rubric.Description,
+                        assignment.AssignmentName,
+                        assignment.ID,
+                        assignment.RubricID,
+                        assignment.StudentRubricID
+                        ));
+                }
+
+                if (assignment.HasStudentRubric)
+                {
+                    rubricViewModel.Add(new RubricViewModel(
+                        assignment.StudentRubric.Description,
                         assignment.AssignmentName,
                         assignment.ID,
                         assignment.RubricID,
