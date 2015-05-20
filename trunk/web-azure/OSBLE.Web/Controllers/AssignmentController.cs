@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Web.Mvc;
 using OSBLE.Attributes;
 using OSBLE.Models;
@@ -564,6 +565,79 @@ namespace OSBLE.Controllers
             assignment.CriticalReviewPublishDate = DateTime.UtcNow;
             db.SaveChanges();
             return RedirectToAction("Index", "Home", new { area = "AssignmentDetails", assignmentId = assignmentID });
-        }       
+        }
+
+        /// <summary>
+        /// This function will export all student grades for the selected assignment.
+        /// </summary>
+        /// <param name="assignmentID">assignment ID</param>
+        /// <returns></returns>
+        [CanModifyCourse]
+        public ActionResult ExportAssignmentGrades(int assignmentID)
+        {
+            //find all students for current course
+            List<CourseUser> students = (from c in db.CourseUsers
+                                         where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                                         c.AbstractRoleID == (int)CourseRole.CourseRoles.Student
+                                         select c).ToList();
+            //key-value pair for names-grades
+            Dictionary<string, string> grades = new Dictionary<string, string>();
+            //seed dictionary with student last, first names
+            foreach (CourseUser student in students)
+            {
+                grades.Add(student.DisplayName(), "");
+            }
+            //get graded rubrics
+            List<RubricEvaluation> rubricEvaluations = null;
+            rubricEvaluations = db.RubricEvaluations.Where(re => re.Evaluator.AbstractRole.CanGrade &&
+                                                                     re.AssignmentID == assignmentID).ToList();
+
+            if (rubricEvaluations.Count > 0) //make sure there are rubrics saved
+            {
+                foreach (RubricEvaluation rubricEvaluation in rubricEvaluations)
+                {
+                    string rubricStudentName = "";
+
+                    //we need to go through teams to handle team assignments. this works for individuals because an individual is a team of 1
+                    foreach (var teamMember in rubricEvaluation.Recipient.TeamMembers)
+                    {
+                        rubricStudentName= teamMember.CourseUser.UserProfile.LastAndFirst();
+                        
+                        if (rubricEvaluation.IsPublished)
+                        {
+                            //update value to match key
+                            grades[rubricStudentName] = RubricEvaluation.GetGradeAsDouble(rubricEvaluation.ID).ToString();    
+                        }
+                    }
+                }
+
+                //sort the grades A-Z by last name
+                var sortedGradesList = grades.Keys.ToList();
+                sortedGradesList.Sort();
+                
+                //make a csv for export
+                var csv = new StringBuilder();
+
+                foreach (var key in sortedGradesList)
+                {
+                    //place quotes around name so the first, last format doesn't break the csv
+                    string temp = "\"" + key + "\"";
+                    var newLine = String.Format("{0},{1}{2}", temp, grades[key], Environment.NewLine);
+                    csv.Append(newLine);
+                }
+                
+                const string contentType = "text/plain";
+                var bytes = Encoding.UTF8.GetBytes(csv.ToString());
+
+                return File(bytes, contentType, rubricEvaluations.First().Assignment.AssignmentName + " "+ DateTime.Now + " (Exported Grades).csv");
+            }
+
+            if (Request.UrlReferrer != null) 
+                return Redirect(Request.UrlReferrer.ToString());
+            else
+                return RedirectToAction("Index", "Home", new { area = "AssignmentDetails", assignmentId = assignmentID }); 
+                
+            
+        }
     }
 }
