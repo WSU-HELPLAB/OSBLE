@@ -12,12 +12,14 @@
 
 <tr>
 <th>Grading Progress:</th>
-<td>
-    @publishedString
-    <br/>
-    @if (showDraftString)
-    {
-        @:@draftString&nbsp @Html.ActionLink("Publish All","PublishAllRubrics","Assignment",new { area = "", assignmentId = AssignmentID }, new { })
-    }
-</td>
+    <td>
+        @publishedString
+        <br/>
+        @if (showDraftString)
+        {
+            @:@draftString&nbsp @Html.ActionLink("Publish All","PublishAllRubrics","Assignment",new { area = "", assignmentId = AssignmentID }, new { })
+        }
+        <br/>
+        @Html.ActionLink("Export grades to CSV", "ExportAssignmentGrades", "Assignment",new { area = "", assignmentId = AssignmentID }, new { })
+    </td>
 </tr>
