@@ -5,7 +5,7 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Routing;
 
-namespace Helplab.Services
+namespace OSBLEPlus.Services
 {
     public class WebApiApplication : System.Web.HttpApplication
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 
-namespace Helplab.Services
+namespace OSBLEPlus.Services
 {
     public static class WebApiConfig
     {
