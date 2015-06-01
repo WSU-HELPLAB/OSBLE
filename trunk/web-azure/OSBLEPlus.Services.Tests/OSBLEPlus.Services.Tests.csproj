@@ -72,6 +72,7 @@
   <ItemGroup>
     <Compile Include="Activities\FeedControllerMock.cs" />
     <Compile Include="Activities\FeedControllerTests.cs" />
+    <Compile Include="Analytics\CalendarDay.cs" />
     <Compile Include="Analytics\Calendar.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
