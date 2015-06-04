@@ -165,6 +165,4 @@ function parseDates() {
         //omthrow new Error(errMsg);
     }
 
-    function completed() {
-        location.reload();
-    }
+

@@ -3,17 +3,12 @@
 @if (ViewBag.CurrentCourses != null && ViewBag.CurrentCourses.Count > 0)
 {
     @:(@ViewBag.CourseListTitle):<br />
-    //using (Html.BeginForm("SetCourse", "Home", new { area = "" }, FormMethod.Post, new { id = "set_course" }))
-    using (Ajax.BeginForm("SetCourse", "Home", 
-        new { area = "" }, 
-        new AjaxOptions
-            {
-                HttpMethod = "POST",
-                OnComplete = "completed",
-            }, 
-            new { id = "set_course" }))
+    
+    // Use an HTML form to call Home/SetCourse when the user makes a new selection, DO NOT use AJAX for this, 
+    // because it will not be able to reset the page to the dashboard, and there is no need for it to be async.
+    using (Html.BeginForm("SetCourse", "Home", new { area = "" }, FormMethod.Post, new { id = "set_course" }))
     {
-    @:<select name="course" id="course_select">
+        @:<select name="course" id="course_select">
         bool courseOptGroup = false;
         bool communityOptGroup = false;
         bool committeeOptGroup = false;
@@ -106,10 +101,13 @@
                 @:</optgroup>   
             }
         @:</select>
-    <input type="hidden" name="redirect" value="@Request.Path" />
+
+        <input type="hidden" name="redirect" value="@Request.Path" />
     }       
+    
     <script type="text/javascript">
         $('#course_select').change(function () {
+            // use the above form to call /Home/SetCourse when the course dropdown is changed
             $('#set_course').submit();
         });
     </script>
@@ -118,6 +116,8 @@ else
 {
     @:No Courses!
 }
+
+
 @if (ViewBag.CurrentUser != null && ViewBag.CurrentUser.CanCreateCourses)
 {
     <a href="#" onclick="create_and_open_course_create_dialog()" title="Create Course or Community" id="course_create_button" class="course_modify_buttons">@Helpers.AddButton()</a>

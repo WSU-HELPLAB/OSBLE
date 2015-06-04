@@ -383,34 +383,15 @@ namespace OSBLE.Controllers
             // Sets active course and redirects back to where we came from.
             if (Request.Form["course"] != null)
             {
-                try
+                int courseId = 0;
+                if (Int32.TryParse(Request.Form["course"].ToString(), out courseId))
                 {
-                    int courseId = 0;
-                    if (Int32.TryParse(Request.Form["course"].ToString(), out courseId))
-                    {
-                        SetCourseID(courseId);
-                    }
-                    else
-                    {
-                        return RedirectToAction("Index"); 
-                    }
-                }
-                catch (System.FormatException)
-                {
-                    // Non-integer entered. Ignore and redirect to root.
-                    return RedirectToAction("Index"); 
+                    SetCourseID(courseId);
                 }
             }
 
-            if (Request.Form["redirect"] != null)
-            {
-                //return Redirect(Request.Form["redirect"]);
-                return RedirectToAction("Index");
-            }
-            else
-            {
-                return RedirectToAction("Index");
-            }
+            // regardless of whether or not we are successful, we want to return to the dashboard.
+            return RedirectToAction("Index");
         }
 
         /// <summary>
