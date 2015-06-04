@@ -42,10 +42,10 @@
             <input id="people_finder" /></li>
         <li>
             <div>
-                <input type="checkbox" id="InstructorCB" value="Instructors" />
+                <input type="checkbox" id="InstructorCB" value="Instructors" onclick="AddInstructors()" />
                 Add Instructors
                 <br />
-                <input type="checkbox" id="TACB" value="TAs" />
+                <input type="checkbox" id="TACB" value="TAs" onclick="AddTAs()" />
                 Add TAs
             </div>
         </li>
@@ -245,17 +245,16 @@
             .appendTo( ul );
         }
 
-         $('#InstructorCB').click(function(){
+        function AddInstructors() {
             var id_list = $('#InstructorIdList').val();
             var idArray = id_list.split(',');
 
-            if ($(this).is (':checked')) //add instructors
+            if (document.getElementById("InstructorCB").checked) //add instructors
             {
                 var name_list = $('#InstructorNameList').val();
                 var nameArray = name_list.split(',');
-                for(var j = 0; j<idArray.length;j++)
-                {
-                    if(getIndexInRecipientList(idArray[j]) == -1) //if element is not in list..
+                for (var j = 0; j < idArray.length; j++) {
+                    if (getIndexInRecipientList(idArray[j]) == -1) //if element is not in list..
                     {
                         addRecipient(idArray[j], nameArray[j]);
                     }
@@ -263,24 +262,22 @@
             }
             else //remove instructors
             {
-                for(j = 0; j<idArray.length;j++)
-                {
+                for (j = 0; j < idArray.length; j++) {
                     removeRecipient(idArray[j]);
                 }
             }
-        });
+        }
 
-        $('#TACB').click(function(){
+        function AddTAs() {
             var id_list = $('#TaIdList').val();
             var idArray = id_list.split(',');
 
-            if ($(this).is (':checked')) //add TAs
+            if (document.getElementById("TACB").checked) //add TAs
             {
                 var name_list = $('#TaNameList').val();
                 var nameArray = name_list.split(',');
-                for(j = 0; j<idArray.length;j++)
-                {
-                    if(getIndexInRecipientList(idArray[j]) == -1) //if element is not in list...
+                for (j = 0; j < idArray.length; j++) {
+                    if (getIndexInRecipientList(idArray[j]) == -1) //if element is not in list...
                     {
                         addRecipient(idArray[j], nameArray[j]);
                     }
@@ -288,14 +285,11 @@
             }
             else //remove TAs
             {
-                for(j = 0; j<idArray.length;j++)
-                {
+                for (j = 0; j < idArray.length; j++) {
                     removeRecipient(idArray[j]);
                 }
             }
-        });
-
-        
+        }
 
     </script>
 
