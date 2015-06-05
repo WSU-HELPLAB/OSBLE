@@ -14,13 +14,16 @@
 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
 {
     <a href="@Url.Action("Index", "Home", new { area = "AssignmentWizard"})" class="add_link" id="assignment_create_button">@Helpers.AddButton() Create New Assignment</a>
-    <a href="@Url.Action("CloneAssignment", "Clone")" class="add_link">@Helpers.AddButton() Clone A Previous Assignment</a><br /><br />
+    <a href="@Url.Action("CloneAssignment", "Clone")" class="add_link" id="clone_assignment">@Helpers.AddButton() Clone A Previous Assignment</a><br /><br />
 }
 </div>
 
 @if (ViewBag.Assignments != null && ViewBag.Assignments.Count == 0)
 { 
     <h4>No Active Assignments</h4>
+    <script>
+        document.getElementById("clone_assignment").style.visibility = "hidden";
+    </script>
 }
 else
 {
