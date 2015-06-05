@@ -519,6 +519,25 @@ namespace OSBLE.Controllers
 
         }
 
+        private string removeFrontZeros(string s)
+        {
+            string newString = "";
+            int i = 0;
+
+            while (i < s.Length)
+            {
+                if (s[i] != '0')
+                {
+                    break;
+                }
+                i++;
+            }
+
+            newString = s.Substring(i);
+
+            return newString;
+        }
+
         //
         // POST: /Account/Register
 
@@ -535,6 +554,9 @@ namespace OSBLE.Controllers
                     //used for email verification
                     string randomHash = GenerateRandomString(40);
 
+                    //id without leading 0's
+                    string noZeroId = removeFrontZeros(model.Identification);
+
                     //make sure that the user name isn't already taken
                     UserProfile takenName = db.UserProfiles.Where(u => u.UserName == model.Email).FirstOrDefault();
                     if (takenName != null)
@@ -544,8 +566,9 @@ namespace OSBLE.Controllers
                         return AcademiaRegister();
                     }
 
+                    // check for duplicate student id by checking noZeroId
                     takenName = (from d in db.UserProfiles
-                                 where d.Identification == model.Identification &&
+                                 where d.Identification == noZeroId &&
                                        d.SchoolID == model.SchoolID
                                  select d).FirstOrDefault();
 
