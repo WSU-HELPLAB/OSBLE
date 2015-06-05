@@ -13,15 +13,18 @@
         if (at.GetSubmissionTime() != null)
         {
             <time class="utc-time-link"
-                  datetime="@Helpers.DateAsUnixTime((DateTime)sub)"
-                  data-original-date="@Helpers.RawDate((DateTime)sub)"
+                  datetime="@Helpers.DateAsUnixTime((DateTime) sub)"
+                  data-original-date="@Helpers.RawDate((DateTime) sub)"
                   data-date-format="MM/DD/YY hh:mm:ss A">
-                @Html.ActionLink(sub.ToString() + " (UTC)", "GetSubmissionZip", "FileHandler", new { area = "", assignmentID = currentTeam.Assignment.ID, teamID = currentTeam.Team.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
+                @Html.ActionLink(sub.ToString() + " (UTC)", "GetSubmissionZip", "FileHandler", new {area = "", assignmentID = currentTeam.Assignment.ID, teamID = currentTeam.Team.ID}, new {onclick = "create_and_open_downloading_submission_dialog()"})
             </time>
-            string currentTeamId = "annotate_" + currentTeam.AssignmentID+ "_" + currentTeam.TeamID;
-            string currentId = "annotateId_" + currentTeam.TeamID;
-            <a href="#" title="Note: -ALL- previous annotations for this document will be lost!" id="@currentId"  class="@currentTeamId">@Helpers.Refresh()</a>
-            <div id="dialog-confirm"></div>
+            if (at.Assignment.IsAnnotatable) // Show the Annotate force refresh if the submission is annotatable
+            {
+                string currentTeamId = "annotate_" + currentTeam.AssignmentID + "_" + currentTeam.TeamID;
+                string currentId = "annotateId_" + currentTeam.TeamID;
+                <a href="#" title="Note: -ALL- previous annotations for this document will be lost!" id="@currentId" class="@currentTeamId">@Helpers.Refresh()</a>
+                <div id="dialog-confirm"></div>
+            }
         }
         else
         {
