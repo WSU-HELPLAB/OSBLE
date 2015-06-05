@@ -17,6 +17,7 @@
         bool communityOptGroup = false;
         bool committeeOptGroup = false;
         var pastCourses = ViewBag.pastCourses;
+        int courseAssignmentCount = 0;
 
         foreach (OSBLE.Models.Courses.CourseUser cu in ViewBag.pastCourses)
         {
@@ -29,6 +30,10 @@
             if (check.Assignments.Count == 0)
             {
                 continue;
+            }
+            else
+            {
+                courseAssignmentCount++;
             }
                 
 
@@ -88,12 +93,21 @@
                 <option value=@cu.AbstractCourseID>@courseDisplay</option>
             }
         }
-        if (courseOptGroup || communityOptGroup)
+        if ((courseOptGroup || communityOptGroup) && courseAssignmentCount > 0)
         {
             @:</optgroup>
+            @:</select>
+            <input type="submit" value="Select Course"  name="Clone Course" />
         }
-        @:</select>
-        <input type="submit" value="Select Course"  name="Clone Course" />
+        else
+        {
+            @:</select>
+            <script>
+                document.getElementById("clone_select").style.visibility = "hidden";
+            </script>
+            @:<h3>No Assignments To Clone</h3>
+        }
+        
     }
 }
 else
