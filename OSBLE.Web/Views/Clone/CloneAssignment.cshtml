@@ -24,6 +24,14 @@
             string semester = "";
             string year = "";
 
+            Course check = cu.AbstractCourse as Course;
+
+            if (check.Assignments.Count == 0)
+            {
+                continue;
+            }
+                
+
             if (cu.AbstractCourse is Course)
             {
                 foreach (var course in pastCourses)
