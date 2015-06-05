@@ -590,7 +590,7 @@ namespace OSBLE.Controllers
                         profile.AuthenticationHash = randomHash;
                         profile.FirstName = model.FirstName;
                         profile.LastName = model.LastName;
-                        profile.Identification = model.Identification;
+                        profile.Identification = noZeroId;
                         profile.SchoolID = model.SchoolID;
                         profile.School = db.Schools.Find(model.SchoolID);
 
