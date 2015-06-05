@@ -61,6 +61,13 @@
 
 @helper RawDate(DateTime dt)
 {
+    // prevents the system from crashing if there was an error in conversion somewhere:
+    if (dt.Equals(dt.ToUniversalTime()))// if dt is in UTC
+    {
+        @dt.ToString("M/d/y hh:mm tt"); // UTC does not have a timezone prefix, so it will crash trying to parse 'z's
+        return;
+    }
+
     @dt.ToString("M/d/y hh:mm tt zzz")
 }
 

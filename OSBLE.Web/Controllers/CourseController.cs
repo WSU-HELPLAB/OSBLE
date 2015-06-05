@@ -753,7 +753,7 @@ namespace OSBLE.Controllers
 
             if (course.ID != ActiveCourseUser.AbstractCourseID)
             {
-                return RedirectToAction("Home");
+                return RedirectToAction("Index", "Home");
             }
 
             NameValueCollection parameters = Request.Params;
@@ -993,7 +993,10 @@ namespace OSBLE.Controllers
                     na.Deliverables = new List<Deliverable>();
     
                     // add course users to assignment
-                    PutDefaultTeamsInAssignment(na);
+                    if (!p.HasTeams)
+                    {
+                        PutDefaultTeamsInAssignment(na);
+                    }
 
                     //recalcualte new offsets for due dates on assignment
                     if (p.CriticalReviewPublishDate != null)
