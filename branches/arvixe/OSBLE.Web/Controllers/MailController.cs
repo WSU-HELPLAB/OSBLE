@@ -358,15 +358,10 @@ namespace OSBLE.Controllers
                 {
                     mail.ContextID = Convert.ToInt16(currentCourse); 
                 }
-                else
-                {
-                    //we want the default context if it's a reply
-                    mail.ContextID = ActiveCourseUser.AbstractCourseID;                    
-                }
-                //mail.ContextID = ActiveCourseUser.AbstractCourseID;
+                // AJ: Keep the ContextID the same if this is a reply to avoid confusion
 
                 mail.Context = db.Courses.Where(b => b.ID == mail.ContextID).FirstOrDefault();
-
+                
                 if (recipient_string != null)
                 {
                     recipients = recipient_string.Split(',');
