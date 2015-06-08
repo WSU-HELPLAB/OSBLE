@@ -71,7 +71,7 @@ namespace OSBLE.Controllers
             CourseController cc = new CourseController();
             //all times will display based off of course timezone.
             int utcOffset = (ActiveCourseUser.AbstractCourse as Course).TimeZoneOffset;
-            TimeZoneInfo tz = cc.getTimeZone(utcOffset);
+  //          TimeZoneInfo tz = cc.getTimeZone(utcOffset);
 
 
             Event e = new Event();
@@ -121,8 +121,8 @@ namespace OSBLE.Controllers
                 }
             }
             //convert times to local course time for user viewing here 
-            e.StartTime = TimeZoneInfo.ConvertTimeFromUtc(e.StartTime, tz);
-            e.EndTime = TimeZoneInfo.ConvertTimeFromUtc((DateTime)e.EndTime, tz);
+            e.StartTime = e.StartTime.UTCToCourse(ActiveCourseUser.AbstractCourseID);
+            e.EndTime = ((DateTime) (e.EndTime)).CourseToUTC(ActiveCourseUser.AbstractCourseID);
 
             return View(e);
         }
