@@ -331,6 +331,7 @@
     <Compile Include="Services\UploaderWebService.svc.cs">
       <DependentUpon>UploaderWebService.svc</DependentUpon>
     </Compile>
+    <Compile Include="Utility\DateTimeExtensions.cs" />
     <Compile Include="Utility\ActionResultExtensions.cs" />
     <Compile Include="Utility\Constants.cs" />
     <Compile Include="Utility\Email.cs" />
