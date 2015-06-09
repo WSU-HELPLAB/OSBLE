@@ -25,8 +25,7 @@ namespace OSBLE.Models.Annotate
         {
             ApiKey = apiKey;
             ApiUser = apiUser;
-            AnnotateURL = ConfigurationManager.AppSettings["AnnotateURL"];
-            //AnnotateURL = "http://104.45.232.112:8080";
+            AnnotateURL = ConfigurationManager.AppSettings["AnnotateURL"];            
         }
 
         public AnnotateResult ToggleCommentVisibility(int criticalReviewAssignmentID, int authorTeamID, bool makeVisible)
@@ -82,8 +81,7 @@ namespace OSBLE.Models.Annotate
                                                );
                     try
                     {
-                        webResult = client.DownloadString(noteUrl);
-                        WriteLog("ToggleCommentVisibility: "+webResult);
+                        webResult = client.DownloadString(noteUrl);                        
                         dynamic jsonResult = Json.Decode(webResult);
                     }
                     catch (Exception)
