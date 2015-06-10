@@ -1023,14 +1023,21 @@ namespace OSBLE.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    CourseUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+                    // make pending so we can approve pending to workaround issue of withdrawn user not being added to the assignments
+                    CourseUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending;
                     db.Entry(CourseUser).State = EntityState.Modified;
                     db.SaveChanges();
+
+                    using (RosterController rc = new RosterController())
+                    {
+                        rc.ApprovePending(CourseUser.UserProfileID, CourseUser.AbstractCourseID);
+                    }
                     return RedirectToAction("Index");
                 }
                 ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", CourseUser.UserProfileID);
                 ViewBag.AbstractCourse = new SelectList(db.Courses, "ID", "Prefix", CourseUser.AbstractCourseID);
                 ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name", CourseUser.AbstractRoleID);
+
                 return View(CourseUser);
             }
             return RedirectToAction("Index");
