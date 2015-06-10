@@ -1,0 +1,69 @@
+﻿@using OSBLE.Models
+@using OSBLE.Models.Courses
+@using OSBLE.Models.Assignments
+@model List<Assignment>
+
+@{
+    ViewBag.Title = "Select Assignments To Clone";
+}
+
+<h2>Assignment Clone: Select Assignments @Helpers.CreateToolTip(ToolTips.CloneAssignments)</h2>
+
+<h3>Note:</h3>
+<p> The following assignments will be created and saved as draft for futher editing.</p>
+
+@using (Html.BeginForm("SelectAssignmentsToClone", "Clone", FormMethod.Post))
+{
+    if (Model != null)
+    {
+        <input type="hidden" name="count" value="@Model.Count" />
+        <input type="hidden" name="cID" value="@ViewBag.cid" />
+        <table class="checkbox_table">
+
+            <tr>
+                <td class="check_all_left"><input type="checkbox" class="assignment_check" value="Check All" /></td>
+                <td class="check_all_right"><em>None</em> Selected</td>
+            </tr>
+
+            <tr>
+                <th></th>
+                <th>Assignment Name</th>
+            </tr>
+
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                <tr>
+                    <td class="checkbox_td"><input type="checkbox" id="a_@Model[i].ID" name="a_@Model[i].ID" /></td>
+                    <td>@Html.DisplayFor(model => Model[i].AssignmentName)</td>
+                </tr>
+            }
+            <tr>
+                <td class="checkbox_td">
+                    <input type="submit" name="select" value="Continue" />
+                </td>
+                <td></td>
+            </tr>
+        </table>
+
+
+    }
+}
+
+<script type="text/javascript">
+    $(".assignment_check").click(function () {
+        var toggle = $(this).prop("checked");
+
+        if (toggle) {
+            $("[id^=a_]").each(function (index) {
+                $(this).prop('checked', true);
+                $(".check_all_right").html("<em>All</em> Selected");
+            });
+        }
+        else {
+            $("[id^=a_]").each(function (index) {
+                $(this).prop('checked', false);
+                $(".check_all_right").html("<em>None</em> Selected");
+            });
+        }
+    });
+</script>
