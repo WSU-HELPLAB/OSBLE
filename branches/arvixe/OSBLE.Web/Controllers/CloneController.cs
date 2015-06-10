@@ -136,7 +136,7 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult AssignmentSetup(int courseid)
         {
-            return RedirectToAction("SelectAssignmentsToClone", "Course", new { courseID = courseid });
+            return RedirectToAction("SelectAssignmentsToClone", new { courseID = courseid });
 
         }
         /// <summary>
@@ -207,11 +207,13 @@ namespace OSBLE.Controllers
                     na.AssociatedEvent = null;
                     na.AssociatedEventID = null;
                     na.PrecededingAssignmentID = null;
-                    na.AssignmentTeams = new List<AssignmentTeam>();
+                    na.AssignmentTeams = new List<AssignmentTeam>();      
                     na.DiscussionTeams = new List<DiscussionTeam>();
                     na.ReviewTeams = new List<ReviewTeam>();
                     na.Deliverables = new List<Deliverable>();
 
+                    // AJ: add distinguishability for debugging
+                    // na.AssignmentName += "_clone";
 
                     //recalcualte new offsets for due dates on assignment
                     if (p.CriticalReviewPublishDate != null)
@@ -237,6 +239,10 @@ namespace OSBLE.Controllers
                     db.Assignments.Add(na);
                     db.SaveChanges();
 
+                    // setup assignment teams
+                    SetUpClonedAssignmentTeams(na);
+                    db.Entry(na).State = EntityState.Modified;
+                    db.SaveChanges();
 
                     //fix the link now
                     foreach (Assignment link in previouslyLinked)
@@ -540,6 +546,48 @@ namespace OSBLE.Controllers
                 CopyAssignments((ActiveCourseUser.AbstractCourse as Course), o, n);
 
             return RedirectToAction("Index", "Assignment");
+        }
+
+        // this creates the assignment teams for the coned assignment
+        private void SetUpClonedAssignmentTeams(Assignment assignment)
+        {
+
+            bool assignmentTeamsExist = (from at in db.AssignmentTeams
+                                         where at.AssignmentID == assignment.ID
+                                         select at).Any();
+            //Only set up default teams if teams don't already exist
+            if (assignment.ID == 0 || !assignmentTeamsExist)
+            {
+                        List<CourseUser> users = (from cu in db.CourseUsers
+                                          where cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID
+                                          && cu.AbstractRole.CanSubmit
+                                          orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
+                                          select cu).ToList();
+
+                //Creates an assignment team for each CourseUser who can submit documents (students)
+                //The team name will be "FirstName LastName"
+                foreach (CourseUser cu in users)
+                {
+                    //Creating team
+                    Team team = new Team();
+                    team.Name = cu.UserProfile.FirstName + " " + cu.UserProfile.LastName;
+
+                    //Creating Tm and adding them to team
+                    TeamMember tm = new TeamMember()
+                    {
+                        CourseUserID = cu.ID
+                    };
+                    team.TeamMembers.Add(tm);
+
+                    //Creating the assignment team and adding it to the assignment
+                    AssignmentTeam at = new AssignmentTeam()
+                    {
+                        Team = team,
+                        Assignment = assignment
+                    };
+                    assignment.AssignmentTeams.Add(at);
+                }
+            }
         }
     }
 }
