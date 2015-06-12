@@ -241,20 +241,14 @@ namespace OSBLE.Controllers
             // " " for poster of post/reply.
             CourseUser posterCu = courseList.FirstOrDefault(c => c.UserProfileID == post.CourseUser.UserProfileID);
 
-            // Setup Display Name/Display Title/Profile Picture/Mail Button/Delete Button
+            
+            /*** Setup Display Name/Display Title/Profile Picture/Mail Button/Delete Button ***/
 
             // If user is not anonymous, this post was written by current user, or the poster is an Instructor/TA, display name and picture.
             if (currentCu != null && ((posterCu == null) || !currentCu.AbstractRole.Anonymized || (currentCu.UserProfileID == posterCu.UserProfileID) || posterCu.AbstractRole.CanGrade))
             {
-                // Display Name
-                if (posterCu != null)
-                {
-                    post.DisplayName = posterCu.UserProfile.FirstName + " " + posterCu.UserProfile.LastName;
-                }
-                else
-                {
-                    post.DisplayName = "Deleted User";
-                }
+                // Display Name (may be anonymous depending on currentCu's AbstractRoleID)
+                post.DisplayName = posterCu != null ? posterCu.DisplayName(currentCu.AbstractRoleID, true) : "Deleted User";
 
                 // Allow deletion if current user is poster or is an instructor
                 if (currentCu.AbstractRole.CanModify || ((posterCu != null) && (posterCu.UserProfileID == currentCu.UserProfileID)))
@@ -271,18 +265,14 @@ namespace OSBLE.Controllers
                 if (posterCu != null)
                 {
                     // Display Titles for Instructors/TAs for Courses, or Leader of Communities.
-
                     post.DisplayTitle = GetRoleTitle(posterCu.AbstractRoleID);
-
                     post.ShowProfilePicture = true;
                 }
             }
-            else // Display anonymous name.
+            else
             {
-                if (posterCu != null)
-                    post.DisplayName = posterCu.DisplayName(ActiveCourseUser.AbstractRoleID);
-                else
-                    post.DisplayName = "Deleted User";
+                // Display Anonymous name (or "Deleted User")
+                post.DisplayName = posterCu != null ? posterCu.DisplayName((int)CourseRole.CourseRoles.Observer, true) : "Deleted User";
 
                 // Profile picture will display default picture.
                 post.ShowProfilePicture = false;
