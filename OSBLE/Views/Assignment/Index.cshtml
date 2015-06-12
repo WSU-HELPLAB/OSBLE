@@ -1,0 +1,135 @@
+﻿@using OSBLE.Models
+@using OSBLE.Models.Assignments
+
+<script src="@Url.Content("~/Scripts/osble.assignment_list.js")" type="text/javascript"></script>
+<script type="text/javascript">
+@{
+    ViewBag.Title = "Assignments";
+}
+</script>
+
+<h2>Assignments</h2>
+
+@if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+{
+    <a href="@Url.Action("Index", "Home", new { area = "AssignmentWizard"})" class="add_link" id="assignment_create_button">@Helpers.AddButton() Create New Assignment</a><br /><br />
+}
+
+@if (ViewBag.Assignments.Count == 0)
+{ 
+    <h4>No Active Assignments</h4>
+}
+else
+{
+    if (ViewBag.ActiveCourse.AbstractRole.CanGrade)
+    {
+       @Html.Partial("_TeacherIndex");
+    }
+    else if (ViewBag.ActiveCourse.AbstractRole.CanSubmit)
+    {
+        @Html.Partial("_StudentIndex");
+    }
+    else if( ViewBag.ActiveCourse.AbstractRoleID == (int)OSBLE.Models.Courses.CourseRole.CourseRoles.Moderator)
+    {
+        @Html.Partial("_ModeratorIndex");
+    }
+}
+<script type="text/javascript">
+
+    function create_and_open_downloading_submission_dialog() {
+
+        //create the div that we will then make into a dialog
+        $('body').append(
+      '<div id="downloading_submission_dialog" title="Download Submission"> \
+       <p>Please wait while we prepare your download.</p> \
+   </div>');
+
+        //make the div we just created into a dialog box
+
+        $('#downloading_submission_dialog').dialog({
+            modal: false,
+            autoOpen: true,
+            resizable: true,
+            width: 350,
+            height: 300,
+            closeOnEscape: true,
+            close: remove_downloading_submission_dialog,
+            buttons: { "OK": remove_downloading_submission_dialog }
+        });
+
+        $('#downloading_submission_dialog').dialog('open');
+        return false;
+    }
+
+    function remove_downloading_submission_dialog() {
+
+        //change the dialog back into a normal div (that is what destroy does although it does not destroy the div)
+        $('#downloading_submission_dialog').dialog("destroy");
+
+        //then remove the div
+        $('#downloading_submission_dialog').remove();
+    }
+
+
+    function SubmissionLoaded() {
+        $('#submit_files_dialog').dialog('open');
+
+    }
+
+    /*Functions and variables for deleteAssignment modal box*/
+    var assignmentToDeleteID = -1;
+    function openConfirmDeleteWindow(assignmentID) {
+        assignmentToDeleteID = assignmentID;
+        $("#confirmDeleteWindow").dialog({
+            modal: true,
+            resizable: false,
+            width: 310,
+            height: 135,
+            closeOnEscape: false
+        });
+    }
+   
+    function deleteAssignment()
+    {
+        $.ajax({
+            async: false,
+            url: "/Assignment/Delete",
+            data: { id: assignmentToDeleteID },
+        });
+        //window.location.reload(true);
+    }
+
+   function hideConfirmDeleteWindow() {
+        $("#confirmDeleteWindow").dialog('close');
+    }
+</script>
+
+<!--Element for modal confirmation box-->
+<div id="confirmDeleteWindow" style="display:none;" title="Delete Assignment">
+    <form id="confirmForm" onsubmit="deleteAssignment();">
+        <text>Are you sure you want to delete that assignment?</text>
+        <div class="yesAndNoDiv">
+            <input value="Delete" type="submit"/>
+            <input value="Cancel" type="button" onclick="hideConfirmDeleteWindow()" />
+        </div>
+    </form>
+</div>
+
+<!--Elements for submission modal box and loading message-->
+<text id="Loading" style="display:none"> <br />Please Wait...</text>
+
+<div id="submit_files_dialog" style="display:none">
+    <div id= "submitFiles"></div>
+    <script type="text/javascript">
+        $(function () {
+            $('#submit_files_dialog').dialog(
+            {
+                modal: true,
+                autoOpen: false,
+                height: 600,
+                width: 500
+            });
+        });
+    </script>
+    </div>
+</div>

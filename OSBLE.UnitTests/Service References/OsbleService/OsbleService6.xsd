@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:17532/Services/OsbleService.svc?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments" />
+  <xs:import schemaLocation="http://localhost:17532/Services/OsbleService.svc?xsd=xsd4" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Users" />
+  <xs:complexType name="ArrayOfCourse">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Course" nillable="true" type="tns:Course" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfCourse" nillable="true" type="tns:ArrayOfCourse" />
+  <xs:complexType name="Course">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:AbstractCourse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="AllowDashboardReplies" type="xs:boolean" />
+          <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments" minOccurs="0" name="Assignments" nillable="true" type="q1:ArrayOfAssignment" />
+          <xs:element minOccurs="0" name="CourseBreaks" nillable="true" type="tns:ArrayOfCourseBreak" />
+          <xs:element minOccurs="0" name="CourseMeetings" nillable="true" type="tns:ArrayOfCourseMeeting" />
+          <xs:element minOccurs="0" name="EndDate" type="xs:dateTime" />
+          <xs:element minOccurs="0" name="HoursLatePerPercentPenalty" type="xs:int" />
+          <xs:element minOccurs="0" name="HoursLateUntilZero" type="xs:int" />
+          <xs:element minOccurs="0" name="Inactive" type="xs:boolean" />
+          <xs:element minOccurs="0" name="LetterGrades" nillable="true" type="tns:ArrayOfLetterGrade" />
+          <xs:element minOccurs="0" name="MinutesLateWithNoPenalty" type="xs:int" />
+          <xs:element minOccurs="0" name="Number" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="PercentPenalty" type="xs:int" />
+          <xs:element minOccurs="0" name="Prefix" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="RequireInstructorApprovalForEventPosting" type="xs:boolean" />
+          <xs:element minOccurs="0" name="Semester" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="ShowMeetings" type="xs:boolean" />
+          <xs:element minOccurs="0" name="StartDate" type="xs:dateTime" />
+          <xs:element minOccurs="0" name="Year" nillable="true" type="xs:string" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="Course" nillable="true" type="tns:Course" />
+  <xs:complexType name="AbstractCourse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="AllowDashboardPosts" type="xs:boolean" />
+      <xs:element minOccurs="0" name="AllowEventPosting" type="xs:boolean" />
+      <xs:element minOccurs="0" name="CalendarWindowOfTime" type="xs:int" />
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="AbstractCourse" nillable="true" type="tns:AbstractCourse" />
+  <xs:complexType name="Community">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:AbstractCourse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="Description" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="Nickname" nillable="true" type="xs:string" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="Community" nillable="true" type="tns:Community" />
+  <xs:complexType name="CourseUser">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="AbstractCourse" nillable="true" type="tns:AbstractCourse" />
+      <xs:element minOccurs="0" name="AbstractCourseID" type="xs:int" />
+      <xs:element minOccurs="0" name="AbstractRole" nillable="true" type="tns:AbstractRole" />
+      <xs:element minOccurs="0" name="AbstractRoleID" type="xs:int" />
+      <xs:element minOccurs="0" name="Hidden" type="xs:boolean" />
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="Section" type="xs:int" />
+      <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments" minOccurs="0" name="TeamMemberships" nillable="true" type="q2:ArrayOfTeamMember" />
+      <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/OSBLE.Models.Users" minOccurs="0" name="UserProfile" nillable="true" type="q3:UserProfile" />
+      <xs:element minOccurs="0" name="UserProfileID" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CourseUser" nillable="true" type="tns:CourseUser" />
+  <xs:complexType name="AbstractRole">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Anonymized" type="xs:boolean" />
+      <xs:element minOccurs="0" name="CanGrade" type="xs:boolean" />
+      <xs:element minOccurs="0" name="CanModify" type="xs:boolean" />
+      <xs:element minOccurs="0" name="CanSeeAll" type="xs:boolean" />
+      <xs:element minOccurs="0" name="CanSubmit" type="xs:boolean" />
+      <xs:element minOccurs="0" name="CanUploadFiles" type="xs:boolean" />
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="AbstractRole" nillable="true" type="tns:AbstractRole" />
+  <xs:complexType name="ArrayOfCourseBreak">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="CourseBreak" nillable="true" type="tns:CourseBreak" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfCourseBreak" nillable="true" type="tns:ArrayOfCourseBreak" />
+  <xs:complexType name="CourseBreak">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="EndDate" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="StartDate" type="xs:dateTime" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CourseBreak" nillable="true" type="tns:CourseBreak" />
+  <xs:complexType name="ArrayOfCourseMeeting">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="CourseMeeting" nillable="true" type="tns:CourseMeeting" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfCourseMeeting" nillable="true" type="tns:ArrayOfCourseMeeting" />
+  <xs:complexType name="CourseMeeting">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="EndTime" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="Friday" type="xs:boolean" />
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="Location" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Monday" type="xs:boolean" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Saturday" type="xs:boolean" />
+      <xs:element minOccurs="0" name="StartTime" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="Sunday" type="xs:boolean" />
+      <xs:element minOccurs="0" name="Thursday" type="xs:boolean" />
+      <xs:element minOccurs="0" name="Tuesday" type="xs:boolean" />
+      <xs:element minOccurs="0" name="Wednesday" type="xs:boolean" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CourseMeeting" nillable="true" type="tns:CourseMeeting" />
+  <xs:complexType name="ArrayOfLetterGrade">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="LetterGrade" nillable="true" type="tns:LetterGrade" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfLetterGrade" nillable="true" type="tns:ArrayOfLetterGrade" />
+  <xs:complexType name="LetterGrade">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Course" nillable="true" type="tns:Course" />
+      <xs:element minOccurs="0" name="CourseID" type="xs:int" />
+      <xs:element minOccurs="0" name="Grade" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="MinimumRequired" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="LetterGrade" nillable="true" type="tns:LetterGrade" />
+  <xs:complexType name="CourseRole">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:AbstractRole">
+        <xs:sequence />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="CourseRole" nillable="true" type="tns:CourseRole" />
+</xs:schema>

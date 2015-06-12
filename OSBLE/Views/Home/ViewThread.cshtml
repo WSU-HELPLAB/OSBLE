@@ -1,0 +1,14 @@
+﻿@model OSBLE.Models.HomePage.DashboardPost
+
+@{
+    ViewBag.Title = "View Thread";
+    ViewBag.CurrentTab = "Dashboard";
+}
+
+<h2>Dashboard Discussion Thread</h2>
+
+<div>
+@Html.ActionLink("Back to Dashboard","Index")
+</div>
+
+@Html.Partial("_DashboardPost",Model)

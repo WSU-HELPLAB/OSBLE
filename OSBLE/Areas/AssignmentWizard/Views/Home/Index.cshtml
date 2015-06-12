@@ -1,0 +1,48 @@
+﻿@using OSBLE.Models.Assignments;
+@using System.Collections;
+@model ICollection<AssignmentTypes>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section Header
+{
+    <link href="@Url.Content("~/AssignmentWizard/Content/css/home.css")" type="text/css" rel="Stylesheet" />
+}
+<h1>Assignment Wizard</h1>
+<p>This wizard will guide you through the creation of a new assignment.  To begin, please select the type of assignment you would like to create.</p>
+@using (Html.BeginForm())
+{
+    <table id="TypeSelectTable">
+        <thead>
+            <tr>
+                <th>&nbsp;</th>
+                <th>Assignment Type</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+        @{
+            int counter = 0;
+            string altText = "";
+          }
+        @foreach (AssignmentTypes type in Model)
+        {
+            if (counter % 2 == 0)
+            {
+                altText = "AltRow";
+            }
+            else
+            {
+                altText = "";
+            }
+            <tr class="@altText">
+                <td><input id="type@(counter)" type="radio" value="@type" name="@ViewBag.AssignmentTypeRadioName" /></td>
+                <td><label for="type@(counter)">@type.Explode()</label></td>
+                <td style="max-width: 800px">@type.Description()</td>
+            </tr>    
+            counter++;
+        }   
+        </tbody>
+    </table>
+    <input type="submit" value="Begin" name="@ViewBag.BeginWizardButton" id="@ViewBag.BeginWizardButton" />
+}

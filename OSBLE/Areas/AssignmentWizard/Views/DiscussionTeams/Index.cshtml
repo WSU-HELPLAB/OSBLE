@@ -1,0 +1,177 @@
+﻿@using OSBLE.Models.Courses;
+@using OSBLE.Models.Assignments;
+@using System.Collections.Generic;
+@using OSBLE.Models;
+@model Assignment          
+@{
+    List<CourseUser> moderators = ViewBag.Moderators;
+    List<CourseUser> unassignedUsers = ViewBag.UnassignedUsers;
+    List<IAssignmentTeam> teams = ViewBag.Teams;
+    List<CourseUser> allUsers = ViewBag.AllUsers;
+    List<Assignment> previousTeamAssignments = ViewBag.PreviousTeamAssignments;
+    ViewBag.ComponentName = "Discussion Team Settings";
+}
+
+@section Header
+{
+    <link href="@Url.Content("~/AssignmentWizard/Content/css/team.css")" type="text/css" rel="Stylesheet" />
+    <script src="@Url.Content("~/AssignmentWizard/Content/js/discussionTeam.js")" type="text/javascript"></script>
+}
+
+<table>
+    <tr>
+        <td>
+            Will the class participate in this discussion as a whole?
+        </td>
+        <td style="padding-left:15px;">
+            @if (!Model.HasDiscussionTeams)
+            {
+                @:Yes<input id="radioYes" name="teamRadio" type="radio" checked="checked"/>
+                @:No <input id="radioNo"  name="teamRadio" type="radio" />
+            }
+            else
+            {
+                @:Yes<input id="radioYes" name="teamRadio" type="radio" />
+                @:No <input id="radioNo"  name="teamRadio" type="radio" checked="checked" />
+            }
+                
+        </td>
+    </tr>
+</table>
+
+@if (Model.HasDiscussionTeams)
+{
+    @:<div id="teamDiv" >
+}
+else
+{
+    @:<div id="teamDiv" style="display:none;">
+}
+<p>
+</p> 
+@Html.HiddenFor(m => m.ID)
+<div>
+<h3>Generate Teams Automatically</h3>
+<ul>
+    <li>
+        Create a configuration with at least <input type="text" id="AutoGenByStudentTextBox"  /> students per team
+        <button type="button" id="AutoGenByStudentButton" onclick="generateTeamsByNumberOfStudents()">Go</button>
+    </li>
+    <li>
+        Create a configuration with <input type="text" id="AutoGenByteamTextBox" size="3" /> total teams
+        <button type="button" id="AutoGenByTeamButton" onclick="generateTeamsByNumberOfTeams()">Go</button>
+    </li>
+    <li>
+        Use an assignment team from the previous assignment: 
+        <select id="AutoGenFromPastSelect" name="AutoGenFromPastSelect">
+            @foreach (Assignment assignment in previousTeamAssignments)
+            {
+                <option value="@assignment.ID">@assignment.AssignmentName</option>
+            }
+        </select>
+        <button type="submit" name="AutoGenFromPastButton" id="AutoGenFromPastButton">Go</button>
+    </li>
+</ul>
+</div>
+
+<div id="ErrorBox">
+        This is the error box</div>
+
+<h3>Create Teams Manually</h3>
+<div id="TeamCreationOptions">
+    <a id="CreateTeamLink">
+        <img src="@Url.Content("~/Content/images/add_up.png")" alt="Create New Team" title="Create New Team" />
+        Create New Team </a>
+</div>
+    
+<div id="AvailableStudentList">
+    <h3>
+        Unassigned Students/Teams</h3>
+    <ul id="AvailableStudent">
+        @foreach (CourseUser cu in unassignedUsers)
+        {
+            string studentDisplayName = cu.DisplayName((int)CourseRole.CourseRoles.Instructor);
+            <li id="cu_@(cu.ID)" class="ui-state-default Student" style="list-style-type:none">@studentDisplayName
+                <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @studentDisplayName" title="remove @studentDisplayName" onclick="removeFromTeam(this)" />
+            </li>
+        }
+    </ul>
+    <div id="AvailableModeratorList" style="display:@(ViewBag.DisplayModeratorList)">
+        <h3>
+            @ViewBag.ModeratorListTitle</h3>
+        <ul id="AvailableModerators" class="ModeratorsDraggable">
+            @foreach (CourseUser cu in moderators)
+            {
+                string modDisplayName = cu.DisplayNameWithRole((int)CourseRole.CourseRoles.Instructor);
+            
+                <li data-id="cu_@(cu.ID)" id="cu_@(cu.ID)" class="ui-state-default Moderator">@modDisplayName
+                    <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @modDisplayName" title="remove @modDisplayName" onclick="removeFromTeam(this)" />
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+
+
+    
+<div id="TeamsDiv">
+    <h3>Discussion Teams</h3>
+
+    @{int counter = 0;
+      string displayName = "";
+      string roleClass = "";}
+    @foreach (IAssignmentTeam aTeam in teams.OrderBy(t => t.Team.Name))
+    {
+        counter++;
+        <div id="teamDiv_@(counter)_@(aTeam.TeamID)" class="TeamDiv">
+            <input type="text" class="TeamNameTextBox" value="@aTeam.Team.Name" />
+            <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" alt="remove team" title="remove team" onclick="removeTeam('teamDiv_@(counter)_@(aTeam.TeamID)')" />
+            <ul id="team_@(counter)_@(@aTeam.TeamID)" class="TeamSortable">
+                @foreach (TeamMember member in aTeam.Team.TeamMembers)
+                {
+                    
+                    if (member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA || member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
+                    {
+                        displayName = member.CourseUser.DisplayNameWithRole((int)CourseRole.CourseRoles.Instructor);
+                        roleClass = "Moderator";
+                    }
+                    else
+                    {
+                        displayName = member.CourseUser.DisplayName((int)CourseRole.CourseRoles.Instructor);
+                        roleClass = "Student";
+                    }
+                    <li id="cu_@(member.CourseUserID)" data-id="cu_@(member.CourseUserID)" class="ui-state-default @roleClass">@displayName
+                        <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @displayName" title="remove @displayName" onclick="removeFromTeam(this)" />
+                    </li>
+                }
+            </ul>
+        </div>
+                if (counter % 3 == 0)
+                {
+            <div style="clear:both;"></div>
+                }
+    }
+</div>
+
+<!-- hidden form values needed for team assignment -->
+@foreach (CourseUser cu in allUsers)
+{
+    <input type="hidden" id="student_@(cu.ID)" name="student_@(cu.ID)" value="@(cu.UserProfile.FirstName) @(cu.UserProfile.LastName)" />
+}
+@foreach (CourseUser cu in moderators)
+{
+    <input type="hidden" id="moderator_@(cu.ID)" name="moderator_@(cu.ID)" value="" />
+}
+@foreach (IAssignmentTeam team in teams)
+{
+    //we only care about teams that already have DB values
+    if (team.TeamID == 0)
+    {
+        continue;
+    }
+    <input type="hidden" id="team_@(team.TeamID)" name="team_@(team.TeamID)" value="@team.Team.Name" />
+}
+
+</div>
+<br />
+<br />

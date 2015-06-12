@@ -1,0 +1,45 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@using OSBLE.Models.Courses
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+    CourseUser cu = dataModel.CRdownload.student;
+}
+
+<tr>
+<th>Download Your <br />Reviewed Assignment</th>
+<td>
+@if (dataModel.CRdownload.hasPublished)
+{
+    if (dataModel.CRdownload.hasRecievedReview)
+    {
+        @(Html.ActionLink("Download your reviewed submission", "GetReviewsOfAuthor", "FileHandler",
+        new { area = "", assignmentId = dataModel.CRdownload.assignmentID, receiverId = cu.ID },
+        new { onclick = "create_and_open_downloading_submission_dialog()" }))
+    }
+    else
+    {
+        @:You have not received any reviews
+    }
+    if(dataModel.CRdownload.hasRubricToView)
+    {
+        <br />
+        @Html.ActionLink("Rubric",
+        "ViewForCriticalReview",
+        "Rubric",
+        new
+        {
+            assignmentId = dataModel.CRdownload.assignmentID,
+            authorTeamId = dataModel.CRdownload.teamID,
+            area = ""
+        },
+        new { })
+    }
+}
+else
+{
+    @:Your instructor has not yet published your reviewed deliverable
+}
+</td>
+</tr>

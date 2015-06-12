@@ -1,0 +1,50 @@
+﻿@using OSBLE.Models.Assignments;
+@model Assignment
+@Html.ValidationSummary() 
+@Html.HiddenFor(m => m.ID)
+@Html.HiddenFor(m => m.RubricID)
+@Html.HiddenFor(m => m.StudentRubricID)
+@Html.HiddenFor(m => m.PrecededingAssignmentID)
+@Html.HiddenFor(m => m.CommentCategoryID)
+@Html.HiddenFor(m => m.IsDraft)
+@Html.HiddenFor(m => m.Type)
+@Html.HiddenFor(m => m.IsAnnotatable)
+@Html.HiddenFor(m => m.AssociatedEventID)
+<table class="wizard_entry_table">
+<tr>
+    <th>@Html.LabelFor(m => m.AssignmentName):</th>
+    <td class="entryField">@Html.EditorFor(m => m.AssignmentName)</td>
+    <td>@Html.ValidationMessageFor(m => m.AssignmentName)</td>
+</tr>
+<tr>
+    <th>@Html.LabelFor(m => m.AssignmentDescription):</th>
+    <td>@Html.TextAreaFor(m => m.AssignmentDescription, new {cols = 50, rows =  4, style="width: 30em"})<img style="vertical-align:top" src="/Content/images/light-bulb-pencil.png" title="Tip: To add links to the description, encapsulate them in wiki-linking format. Example: &quot[url:Click Here|http://www.google.com]&quot" alt="Tip: To add links to the description, encapsulate them in wiki-linking format. Example: &quot[url:Click Here|http://www.google.com]&quot"/></td>
+    <td>@Html.ValidationMessageFor(m => m.AssignmentDescription)</td>
+</tr>
+<tr>
+    <th>@Html.LabelFor(m => m.Type):</th>
+    <td>@Model.Type.Explode()</td>
+    <td>&nbsp;</td>
+</tr>
+<tr>
+    <th>@Html.LabelFor(m => m.ReleaseDate):</th>
+    <td>@Html.EditorFor(m => m.ReleaseDate) at @Html.EditorFor(m => m.ReleaseTime)</td>
+    <td>@Html.ValidationMessageFor(m => m.ReleaseDate)</td>
+</tr>
+<tr>
+    <th>@Html.LabelFor(m => m.DueDate):</th>
+    <td>@Html.EditorFor(m => m.DueDate) at @Html.EditorFor(m => m.DueTime)</td>
+    <td>@Html.ValidationMessageFor(m => m.DueDate)</td>
+</tr>
+<tr>
+    <th>@Html.LabelFor(m => m.HoursLateWindow):</th>
+    <td>@Html.EditorFor(m => m.HoursLateWindow) hour(s)</td>
+    <td>@Html.ValidationMessageFor(m => m.HoursLateWindow)</td>
+</tr>
+<tr>
+    <th>@Html.LabelFor(m => m.DeductionPerUnit):</th>
+    <td>@Html.EditorFor(m => m.DeductionPerUnit)% per @Html.EditorFor(m => m.HoursPerDeduction) @Html.LabelFor(m => m.HoursPerDeduction)</td>
+    <td>@Html.ValidationMessageFor(m => m.DeductionPerUnit)</td>
+    <td>@Html.ValidationMessageFor(m => m.HoursPerDeduction)</td>
+</tr>
+</table>

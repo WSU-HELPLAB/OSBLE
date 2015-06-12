@@ -1,0 +1,175 @@
+﻿@model OSBLE.Models.HomePage.AbstractDashboard
+       
+@using OSBLE.Models.HomePage;
+@using OSBLE.Models.Courses;
+@{
+    AbstractCourse course = new Course();
+    
+    if (Model is DashboardPost) {
+        course = (Model as DashboardPost).CourseUser.AbstractCourse;
+    }
+    else if (Model is DashboardReply)
+    {
+        course = (Model as DashboardReply).Parent.CourseUser.AbstractCourse;
+    }
+    
+}
+
+<script type="text/javascript">
+
+    function RemainingCharsReply(id) {
+        var remainingReply = $('#MaxContentChars').val() - $('#dp_replybox_content_' + id).val().length;
+        $('#remCharsReply').val("(" + remainingReply + ") Characters left");
+    }
+
+    //refreshes the count of how many charecters you can input
+    function refreshCount() {
+        $('body').css('cursor', 'wait');
+        $('#remCharsReply').val("(" + $('#MaxContentChars').val() + ") Characters left");
+    }
+
+</script>
+        <div class="dp_post" id="dp_post_@(Model.ID)">
+            <div class="dp_post_header">
+                @* Reply Only *@
+                @if (Model is DashboardReply)
+                {
+                    <script>
+                        @* Updates maximum reply for this post so new replies can return any interim posts. *@
+                        $(function() {
+                            $('#latest_reply_@((Model as DashboardReply).Parent.ID)').val(Math.max($('#latest_reply_@((Model as DashboardReply).Parent.ID)').val(),@(Model.ID)));
+                        });
+                    </script>
+
+                }
+
+                @* Profile Picture *@
+
+                @if (Model.ShowProfilePicture)
+                {
+                    @Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = course.ID, userprofile = Model.CourseUser.UserProfileID }));
+                }
+                else
+                {
+                    @Helpers.DefaultProfilePicture();
+                }
+
+                @* Show course tag if viewing posts for all courses *@
+
+                @if (!ViewBag.DashboardSingleCourseMode)
+                {
+                    <span class="dp_course">@Helpers.CourseTag(course)</span>
+                }
+                
+                @* Poster's Name *@
+                
+                @Helpers.DisplayNameForDashboard(Model)
+
+                @* Mail and Delete Buttons *@
+                <span class="dp_tools">
+                @if (Model.CanMail)
+                {
+                    <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { id = Model.CourseUser.UserProfileID })">@Helpers.MailButton()</a>
+                }
+                @if (Model.CanDelete)
+                {
+                    string deleteAction = "";
+                    string deleteConfirm = "";
+                    if (Model is DashboardPost)
+                    {
+                        deleteAction = "DeletePost";
+                        deleteConfirm = "Are you sure you want to delete this post and all its replies?";
+                    }
+                    else if (Model is DashboardReply)
+                    {
+                        deleteAction = "DeleteReply";
+                        deleteConfirm = "Are you sure you want to delete this reply?";
+                    }
+                        
+                    <form action="@Url.Action(deleteAction)"
+                        style="display: inline;"
+                        data-ajax="true"
+                        data-ajax-success="$('#dp_post_@(Model.ID)').hide('blind',{},'slow',function(){$(this).remove();})"
+                        data-ajax-confirm="@deleteConfirm"
+                        method="post">
+                        <input type="hidden" name="ID" value="@Model.ID" />
+                        @Helpers.DeleteSubmit("Delete This Dashboard Post")
+                    </form>
+                }
+                </span>
+                <br />
+                @* Posting Date *@
+
+                <span class="dp_posted">@Helpers.DisplayDate(Model.Posted)</span>
+            </div>
+
+            @* Post Content *@
+            <div class="dp_content">
+             @{
+                 string content = Helpers.Linkify(Model.Content).ToHtmlString();
+                 content = content.Replace("\n", "<br />");
+                    }
+                    @Html.Raw(content)
+            </div>
+
+            @if (Model is DashboardPost)
+            {
+            @* Post Replies *@
+            <div class="dp_replies">
+                <div id="dp_replies_for_@(Model.ID)">
+                @foreach (DashboardReply dr in (Model as DashboardPost).Replies)
+                {
+                    @Html.Partial("_DashboardPost",dr);
+                }
+                </div>
+
+                @* New Reply Box *@
+
+                @if ((Model as DashboardPost).CanReply)
+                {
+                <div class="dp_replylink">
+                    <a href="#" id="reply_@(Model.ID)">Reply</a>
+                </div>
+                <div class="dp_replybox" id="replybox_@(Model.ID)" >   
+                    <form action="@Url.Action("NewReply")"
+                        data-ajax="true"
+                        data-ajax-update="#dp_replies_for_@(Model.ID)"
+                        data-ajax-begin="$('#reply_@(Model.ID)_button').attr('disabled', 'disabled')"
+                        data-ajax-failure="alert('There was an error sending your reply.')"
+                        data-ajax-complete="$('#reply_@(Model.ID)_button').removeAttr('disabled'); $('body').css('cursor', 'default');"
+                        data-ajax-success="$('.dp_new_post').show('blind',{},'slow',function(){$(this).removeClass('dp_new_post');}); $('#dp_replybox_content_@(Model.ID)').val('')"
+                        data-ajax-mode="after"
+                        method="post">
+                        <input type="hidden" name="reply_to" value="@Model.ID" />
+                        <input type="hidden" name="latest_reply" value="0" id="latest_reply_@(Model.ID)" />
+                        <span id="remCharsReply" name="remainingCharsReply" readonly="true" value="(@ViewBag.MaxActivityFeedLength) Characters left"></span><br />
+                        <textarea name="Content" rows="5" cols="40" id="dp_replybox_content_@(Model.ID)" placeholder="Enter reply here..."
+                            onkeyup="RemainingCharsReply(@(Model.ID))" onkeydown="RemainingCharsReply(@(Model.ID))" ></textarea><br />
+                        <input id="reply @(Model.ID) button" type="submit" name="post_reply" value="Post Reply" onclick="refreshCount()" />
+                    </form>
+
+                    <br />
+                    <div class="dp_replylink">
+                        <a href="#" id="replycancel_@(Model.ID)">Cancel</a>
+                    </div>
+                </div>
+                <script type="text/javascript">
+                    $("#reply_@(Model.ID)").click(function () {
+                        $("#reply_@(Model.ID)").hide();
+                        $("#replybox_@(Model.ID)").show('blind');
+                        return false;
+                    });
+
+                    $("#replycancel_@(Model.ID)").click(function () {
+                        $("#reply_@(Model.ID)").show('highlight');
+                        $("#replybox_@(Model.ID)").hide('blind');
+                        return false;
+                    });
+
+                </script>
+                }
+                <div id="after_replies_@(Model.ID)"></div>
+            
+            </div>
+            } @* End of Replies *@
+        </div>
