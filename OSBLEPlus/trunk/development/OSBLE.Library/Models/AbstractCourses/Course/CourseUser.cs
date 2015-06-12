@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using OSBLE.Models.Users;
-using System.Collections;
 using System.Collections.Generic;
 using OSBLE.Models.Assignments;
 using System;
@@ -40,9 +39,10 @@ namespace OSBLE.Models.Courses
         public virtual IList<TeamMember> TeamMemberships { get; set; }
 
         public CourseUser()
-            : base()
         {
             Hidden = false;
+
+            // ReSharper disable once DoNotCallOverridableMethodsInConstructor
             TeamMemberships = new List<TeamMember>();
         }
 
@@ -64,7 +64,7 @@ namespace OSBLE.Models.Courses
         [Obsolete("Use non-obsolete DisplayName() method")]
         public string DisplayName(string separator = ", ")
         {
-            return this.UserProfile.LastName + separator + this.UserProfile.FirstName;
+            return UserProfile.LastName + separator + UserProfile.FirstName;
         }
 
         [Obsolete("Use non-obsolete DisplayName() method")]
@@ -102,23 +102,21 @@ namespace OSBLE.Models.Courses
         /// <summary>
         /// This is the only function that should be used to display a courseusers name (with the exception of those that use this). By default it displays the name as "LastName, FirstName" 
         /// </summary>
-        /// <param name="AbstractRoleId">The AbstroleRoleId of the current user who will see this name</param>
-        /// <param name="LastThenFirst">This is an optional boolean parameter that should be sent in as true when you want names displayed in "FirstName, LastName" format.</param>
-        /// <param name="AssignmentHasAnonymousPosts">This is an optional boolean parameter that should be sent in when DisplayName is used within a specific assignment scenario (to mask users if anonymous settings turned on) Simply pass in <see cref="Assignment.DiscussionSettings.HasAnonymousPosts"/></param>
+        /// <param name="abstractRoleId">The AbstroleRoleId of the current user who will see this name</param>
+        /// <param name="firstThenLast">This is an optional boolean parameter that should be sent in as true when you want names displayed in "FirstName, LastName" format.</param>
         /// <returns></returns>
-        public string DisplayName(int AbstractRoleId, bool? FirstThenLast = false)
+        public string DisplayName(int abstractRoleId, bool? firstThenLast = false)
         {
-            return UserProfile.DisplayName(AbstractRoleId, FirstThenLast, false);
+            return UserProfile.DisplayName(abstractRoleId, firstThenLast, false);
         }
 
         /// <summary>
         /// This function displays the users name as "(RoleAbbreviation) LastName, FirstName" i.e. "(TA) Morgan, John"
         /// </summary>
-        /// <param name="AbstractRoleId">The AbstroleRoleId of the current user who will see this name</param>
-        /// <param name="LastThenFirst">This is an optional boolean parameter that should be sent in as true when you want names displayed in "FirstName, LastName" format.</param>
-        /// <param name="AssignmentHasAnonymousPosts">This is an optional boolean parameter that should be sent in when DisplayName is used within a specific assignment scenario (to mask users if anonymous settings turned on) Simply pass in <see cref="Assignment.DiscussionSettings.HasAnonymousPosts"/></param>
+        /// <param name="abstractRoleId">The AbstroleRoleId of the current user who will see this name</param>
+        /// <param name="firstThenLast">This is an optional boolean parameter that should be sent in as true when you want names displayed in "FirstName, LastName" format.</param>
         /// <returns></returns>
-        public string DisplayNameWithRole(int AbstractRoleId, bool? FirstThenLast = false)
+        public string DisplayNameWithRole(int abstractRoleId, bool? firstThenLast = false)
         {
             string roleAbbreviation = "";
             switch (AbstractRoleID)
@@ -142,7 +140,7 @@ namespace OSBLE.Models.Courses
                     roleAbbreviation = "P";
                     break;
             }
-            return string.Format("({0}) {1}", roleAbbreviation, UserProfile.DisplayName(AbstractRoleId, FirstThenLast, false));
+            return string.Format("({0}) {1}", roleAbbreviation, UserProfile.DisplayName(abstractRoleId, firstThenLast, false));
         }
 
         public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
