@@ -64,7 +64,7 @@ function cfm_listcompletion(args, targetDIVID) {
     //alert(args.target.responseText);
 
     var root = doc.firstChild;
-    if (null == doc) {
+    if (null == root) {
         theDIV.innerHTML = "Error: Root element in XML document from service is null! " +
             "Please contact support for help with this issue.";
         return;

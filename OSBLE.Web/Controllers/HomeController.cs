@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
 using System.Linq;
 using System.Net.Mail;
 using System.Web.Mvc;
 using OSBLE.Attributes;
-using OSBLE.Models;
 using OSBLE.Models.Courses;
 using OSBLE.Models.HomePage;
-using OSBLE.Models.Services.Uploader;
 using OSBLE.Models.Users;
 using OSBLE.Utility;
 
@@ -33,15 +29,10 @@ namespace OSBLE.Controllers
             // Get optional start post from query for pagination
             if (Request.Params["startPost"] != null)
             {
-                setupActivityFeed(Convert.ToInt32(Request.Params["startPost"]));
+                SetupActivityFeed(Convert.ToInt32(Request.Params["startPost"]));
             }
 
-            setupNotifications(); // Individual notifications (mail, grades, etc.)        
-
-            //changed to load partial view
-            //setupEvents(); // Events & Deadlines
-
-            setupCourseLinks(); // Quickly accessible course files
+            SetupNotifications(); // Individual notifications (mail, grades, etc.)        
 
             return View("Index");
         }
@@ -55,12 +46,12 @@ namespace OSBLE.Controllers
         {
             DashboardPost dp = db.DashboardPosts.Find(id);
             // Ensure post exists and that user is in the course.
-            if (dp == null || (currentCourses.Where(cc => cc.AbstractCourseID == dp.CourseUser.AbstractCourseID).Count() < 1))
+            if (dp == null || (currentCourses.Any(cc => cc.AbstractCourseID == dp.CourseUser.AbstractCourseID)))
             {
                 return RedirectToAction("Index");
             }
 
-            setupPostDisplay(dp);
+            SetupPostDisplay(dp);
 
             ViewBag.DashboardPost = dp;
 
@@ -71,7 +62,7 @@ namespace OSBLE.Controllers
 
         public ActionResult ActivityFeed()
         {
-            setupActivityFeed();
+            SetupActivityFeed();
             return PartialView("_ActivityFeed");
         }
 
@@ -84,10 +75,9 @@ namespace OSBLE.Controllers
             List<DashboardPost> dashboardPosts = db.DashboardPosts.Where(d => viewedCourses.Contains(d.CourseUser.AbstractCourseID))
                 .OrderByDescending(d => d.Posted).ToList();
             ViewBag.DashboardPostCount = dashboardPosts.Count();
-            return;
         }
 
-        private void setupActivityFeed(int startPost = 0, bool showAll = false)
+        private void SetupActivityFeed(int startPost = 0, bool showAll = false)
         {
             // Pagination defaults
             //int startPost = 0; //default set to 0
@@ -127,7 +117,7 @@ namespace OSBLE.Controllers
             if (showAll)
             {
                 postsPerPage = dashboardPosts.Count();
-                ViewBag.ShowAll = showAll;
+                ViewBag.ShowAll = true;
             }
             else
             {
@@ -150,11 +140,11 @@ namespace OSBLE.Controllers
             // Set up display settings for each post (recursively sets up replies.)
             foreach (DashboardPost dp in pagedDashboardPosts)
             {
-                setupPostDisplay(dp);
+                SetupPostDisplay(dp);
             }
 
             // Getting the maximum comment length for an activity feed
-            getMaxCommentLength();
+            GetMaxCommentLength();
 
             // Only send items in page to the dashboard.
             ViewBag.DashboardPostCount = dashboardPosts.Count();
@@ -163,39 +153,42 @@ namespace OSBLE.Controllers
             ViewBag.PostsPerPage = postsPerPage;
         }
 
-        private void setupCourseLinks()
-        {
-            DirectoryListing listing = FileSystem.GetCourseDocumentsFileList(ActiveCourseUser.AbstractCourse, false);
-            SilverlightObject fileUploader = new SilverlightObject
-            {
-                CSSId = "file_uploader",
-                XapName = "FileUploader",
-                Width = "45",
-                Height = "25",
-                OnLoaded = "SLObjectLoaded",
-                Parameters = new Dictionary<string, string>()
-                {
-                }
-            };
 
-            //AC: I don't think that this is the best way to restrict access.  Might be worth
-            //revisiting at a later date.
-            ViewBag.CanEditCourseLinks = false;
-            if (ActiveCourseUser.AbstractRole.CanModify)
-            {
-                ViewBag.CanEditCourseLinks = true;
-            }
-            ViewBag.CourseLinks = listing;
-            ViewBag.Uploader = fileUploader;            
-        }
+        // This method can be deleted if there haven't been any problems since 
+        // commenting it out (6/12/15)
+        //private void SetupCourseLinks()
+        //{
+        //    DirectoryListing listing = FileSystem.GetCourseDocumentsFileList(ActiveCourseUser.AbstractCourse, false);
+        //    SilverlightObject fileUploader = new SilverlightObject
+        //    {
+        //        CSSId = "file_uploader",
+        //        XapName = "FileUploader",
+        //        Width = "45",
+        //        Height = "25",
+        //        OnLoaded = "SLObjectLoaded",
+        //        Parameters = new Dictionary<string, string>()
+        //        {
+        //        }
+        //    };
+
+        //    //AC: I don't think that this is the best way to restrict access.  Might be worth
+        //    //revisiting at a later date.
+        //    ViewBag.CanEditCourseLinks = false;
+        //    if (ActiveCourseUser.AbstractRole.CanModify)
+        //    {
+        //        ViewBag.CanEditCourseLinks = true;
+        //    }
+        //    ViewBag.CourseLinks = listing;
+        //    ViewBag.Uploader = fileUploader;            
+        //}
 
         public ActionResult Notifications()
         {
-            setupNotifications();
+            SetupNotifications();
             return PartialView("_ConsolidatedNotifications");
         }
 
-        private void setupNotifications()
+        private void SetupNotifications()
         {
             // Load all unread notifications for the current user to display on the dashboard.
             ViewBag.Notifications = db.Notifications.Where(n => (n.RecipientID == ActiveCourseUser.ID) && (n.Read == false)).OrderByDescending(n => n.Posted).ToList();
@@ -203,12 +196,12 @@ namespace OSBLE.Controllers
 
         public ActionResult Events()
         {
-            setupEvents();
+            SetupEvents();
            
             return PartialView("_Events", (List<Event>)ViewBag.Events);
         }
 
-        private void setupEvents()
+        private void SetupEvents()
         {
             // Set start and end dates of event viewing to current viewing settings for the course
             int eventDays = 7 * ActiveCourseUser.AbstractCourse.CalendarWindowOfTime;
@@ -226,28 +219,27 @@ namespace OSBLE.Controllers
         /// Sets up display settings for dashboard posts and replies.
         /// </summary>
         /// <param name="post">The post or reply to be set up</param>
-        /// <param name="courseList"></param>
-        private void setupPostDisplay(AbstractDashboard post)
+        private void SetupPostDisplay(AbstractDashboard post)
         {
             List<CourseUser> courseList = new List<CourseUser>();
 
             // Get list of users in course, either from the root post or its parent in the case of a reply.
             if (post is DashboardPost)
             {
-                DashboardPost dp = post as DashboardPost;
+                DashboardPost dp = (DashboardPost)post;
                 courseList = db.CourseUsers.Where(c => c.AbstractCourseID == dp.CourseUser.AbstractCourseID).ToList();
             }
             else if (post is DashboardReply)
             {
-                DashboardReply dr = post as DashboardReply;
+                DashboardReply dr = (DashboardReply)post;
                 courseList = db.CourseUsers.Where(c => c.AbstractCourseID == dr.Parent.CourseUser.AbstractCourseID).ToList();
             }
 
             // Get Course/User link for current user.
-            CourseUser currentCu = courseList.Where(c => c.UserProfileID == CurrentUser.ID).FirstOrDefault();
+            CourseUser currentCu = courseList.FirstOrDefault(c => c.UserProfileID == CurrentUser.ID);
 
             // " " for poster of post/reply.
-            CourseUser posterCu = courseList.Where(c => c.UserProfileID == post.CourseUser.UserProfileID).FirstOrDefault();
+            CourseUser posterCu = courseList.FirstOrDefault(c => c.UserProfileID == post.CourseUser.UserProfileID);
 
             // Setup Display Name/Display Title/Profile Picture/Mail Button/Delete Button
 
@@ -265,7 +257,7 @@ namespace OSBLE.Controllers
                 }
 
                 // Allow deletion if current user is poster or is an instructor
-                if (currentCu != null && (currentCu.AbstractRole.CanModify || ((posterCu != null) && (posterCu.UserProfileID == currentCu.UserProfileID))))
+                if (currentCu.AbstractRole.CanModify || ((posterCu != null) && (posterCu.UserProfileID == currentCu.UserProfileID)))
                 {
                     post.CanDelete = true;
                 }
@@ -280,15 +272,17 @@ namespace OSBLE.Controllers
                 {
                     // Display Titles for Instructors/TAs for Courses, or Leader of Communities.
 
-                    post.DisplayTitle = getRoleTitle(posterCu.AbstractRoleID);
+                    post.DisplayTitle = GetRoleTitle(posterCu.AbstractRoleID);
 
                     post.ShowProfilePicture = true;
                 }
             }
             else // Display anonymous name.
             {
-                // Anonymous number is currently the number of the student in the course list.
-                post.DisplayName = posterCu.DisplayName(ActiveCourseUser.AbstractRole);
+                if (posterCu != null)
+                    post.DisplayName = posterCu.DisplayName(ActiveCourseUser.AbstractRoleID);
+                else
+                    post.DisplayName = "Deleted User";
 
                 // Profile picture will display default picture.
                 post.ShowProfilePicture = false;
@@ -299,7 +293,7 @@ namespace OSBLE.Controllers
             // For root posts only
             if (post is DashboardPost)
             {
-                DashboardPost thisDp = post as DashboardPost;
+                DashboardPost thisDp = (DashboardPost)post;
 
                 // For posts, set reply box display if the course allows replies or if Instructor/TA/Observer.
                 if (currentCu != null && ((currentCu.AbstractCourse is Course &&
@@ -316,7 +310,7 @@ namespace OSBLE.Controllers
                 // recursively set the display for post's replies.
                 foreach (DashboardReply dr in thisDp.Replies)
                 {
-                    setupPostDisplay(dr);
+                    SetupPostDisplay(dr);
                 }
             }
         }
@@ -325,11 +319,11 @@ namespace OSBLE.Controllers
         /// Gets optional role title for certain roles in a course/community
         /// (Instructors/TAs in courses, Leaders in communities)
         /// </summary>
-        /// <param name="AbstractRoleID">The Role ID of the user in question</param>
+        /// <param name="abstractRoleID">The Role ID of the user in question</param>
         /// <returns>Returns a title for a user in a course if they are in a leadership role in that course</returns>
-        private static string getRoleTitle(int AbstractRoleID)
+        private static string GetRoleTitle(int abstractRoleID)
         {
-            switch (AbstractRoleID)
+            switch (abstractRoleID)
             {
                 case (int)CommunityRole.OSBLERoles.Leader:
                     return "Leader";
@@ -364,8 +358,6 @@ namespace OSBLE.Controllers
         /// Same as SetCourse() below, but gets the course from the GET instead of
         /// the POST.  Created to allow auto-navigating to specific dashboard posts.
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         public string Course(int courseId, int? postId)
         {
             Cache["ActiveCourse"] = courseId;
@@ -383,8 +375,8 @@ namespace OSBLE.Controllers
             // Sets active course and redirects back to where we came from.
             if (Request.Form["course"] != null)
             {
-                int courseId = 0;
-                if (Int32.TryParse(Request.Form["course"].ToString(), out courseId))
+                int courseId;
+                if (Int32.TryParse(Request.Form["course"], out courseId))
                 {
                     SetCourseID(courseId);
                 }
@@ -424,7 +416,7 @@ namespace OSBLE.Controllers
                 {
                     Cache["DashboardSingleCourseMode"] = Convert.ToBoolean(Request.Form["mode"]);
                 }
-                catch (System.FormatException)
+                catch (FormatException)
                 {
                     // Non-integer input. Default to false.
                     Cache["DashboardSingleCourseMode"] = true;
@@ -439,7 +431,7 @@ namespace OSBLE.Controllers
         /// Gets the maximum Activity Feed comment length
         /// </summary>
         /// <returns></returns>
-        public void getMaxCommentLength()
+        public void GetMaxCommentLength()
         {
             ViewBag.MaxActivityFeedLength = 4000;
         }
@@ -450,32 +442,30 @@ namespace OSBLE.Controllers
             dp.CourseUser = ActiveCourseUser;
             dp.Posted = DateTime.UtcNow;
 
-            List<CourseUser> CoursesToPost = new List<CourseUser>();
+            List<CourseUser> coursesToPost = new List<CourseUser>();
 
             bool sendEmail = Convert.ToBoolean(Request.Form["send_email"]);
 
             if (Request.Form["post_active"] != null)
             { // Post to active course only.
-                CoursesToPost.Add(ActiveCourseUser);
+                coursesToPost.Add(ActiveCourseUser);
             }
             else if (Request.Form["post_all"] != null)
             { // Post to all courses.
-                CoursesToPost = currentCourses.Where(cu => cu.AbstractCourse is Course && cu.AbstractRole.CanModify && !cu.Hidden).ToList();
+                coursesToPost = currentCourses.Where(cu => cu.AbstractCourse is Course && cu.AbstractRole.CanModify && !cu.Hidden).ToList();
             }
 
-            foreach (CourseUser cu in CoursesToPost)
+            foreach (CourseUser cu in coursesToPost)
             {
-                AbstractCourse c = null;
-                if (cu.AbstractCourse is AbstractCourse)
-                {
-                    c = (AbstractCourse)cu.AbstractCourse;
-                }
+                AbstractCourse c = cu.AbstractCourse;
                 if (cu.AbstractRole.CanGrade || ((c != null) && (c.AllowDashboardPosts)))
                 {
-                    DashboardPost newDp = new DashboardPost();
-                    newDp.Content = dp.Content;
-                    newDp.Posted = dp.Posted;
-                    newDp.CourseUser = dp.CourseUser;
+                    DashboardPost newDp = new DashboardPost
+                    {
+                        Content = dp.Content,
+                        Posted = dp.Posted,
+                        CourseUser = dp.CourseUser
+                    };
 
                     if (ModelState.IsValid)
                     {
@@ -498,19 +488,19 @@ namespace OSBLE.Controllers
                         {
                             Course course = c as Course;
                             subject = "[" + course.Prefix + " " + course.Number + "] New Activity Post from " + CurrentUser.FirstName + " " + CurrentUser.LastName;
-                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message to the class at " + TimeZoneInfo.ConvertTimeFromUtc(dp.Posted, tz).ToString() + ":";
+                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message to the class at " + TimeZoneInfo.ConvertTimeFromUtc(dp.Posted, tz) + ":";
                         }
                         else if (c is Community)
                         {
                             Community community = c as Community;
                             subject = "[" + community.Nickname + "] New Activity Post from " + CurrentUser.FirstName + " " + CurrentUser.LastName;
-                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message to the community at " + TimeZoneInfo.ConvertTimeFromUtc(dp.Posted, tz).ToString() + ":";
+                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message to the community at " + TimeZoneInfo.ConvertTimeFromUtc(dp.Posted, tz) + ":";
                         }
                         else
                         {
                             //this should never execute, but just in case...
                             subject = "OSBLE Activity Post";
-                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message at " + TimeZoneInfo.ConvertTimeFromUtc(dp.Posted, tz).ToString() + ":";
+                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message at " + TimeZoneInfo.ConvertTimeFromUtc(dp.Posted, tz) + ":";
                         }
                         body += "<br /><br />";
                         body += dp.Content.Replace("\n", "<br />");
@@ -519,12 +509,12 @@ namespace OSBLE.Controllers
                             newDp.ID
                             );
 
-                        List<CourseUser> CourseUser = db.CourseUsers.Where(couseuser => couseuser.AbstractCourseID == c.ID).ToList();
+                        List<CourseUser> courseUser = db.CourseUsers.Where(couseuser => couseuser.AbstractCourseID == c.ID).ToList();
 
                         //Who gets this email?  If the instructor desires, we send to everyone
                         if (c != null && sendEmail && cu.AbstractRole.CanModify)
                         {
-                            foreach (CourseUser member in CourseUser)
+                            foreach (CourseUser member in courseUser)
                             {
                                 if (member.UserProfile.UserName != null) // Ignore pending users
                                 {
@@ -536,7 +526,7 @@ namespace OSBLE.Controllers
                         //that want to receive everything
                         else
                         {
-                            foreach (CourseUser member in CourseUser)
+                            foreach (CourseUser member in courseUser)
                             {
                                 if (member.UserProfile.UserName != null && member.UserProfile.EmailAllActivityPosts) // Ignore pending users
                                 {
@@ -584,9 +574,9 @@ namespace OSBLE.Controllers
                                        select c).FirstOrDefault();
 
                     AbstractCourse ac = null;
-                    if (cu != null && cu.AbstractCourse is AbstractCourse)
+                    if (cu != null)
                     {
-                        ac = (AbstractCourse)cu.AbstractCourse;
+                        ac = cu.AbstractCourse;
                     }
                     if ((cu != null) && (cu.AbstractRole.CanGrade || ((ac != null) && (ac.AllowDashboardPosts))))
                     {
@@ -612,19 +602,19 @@ namespace OSBLE.Controllers
                         {
                             Course course = (Course)ac;
                             subject = "[" + course.Prefix + " " + course.Number + "] Reply from " + CurrentUser.FirstName + " " + CurrentUser.LastName;
-                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following reply to the Dashboard post " + replyToPost.DisplayTitle + " at " + TimeZoneInfo.ConvertTimeFromUtc(dr.Posted, tz).ToString() + ":";
+                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following reply to the Dashboard post " + replyToPost.DisplayTitle + " at " + TimeZoneInfo.ConvertTimeFromUtc(dr.Posted, tz) + ":";
                         }
                         else if (ac is Community)
                         {
                             Community community = ac as Community;
                             subject = "[" + community.Nickname + "] Reply from " + CurrentUser.FirstName + " " + CurrentUser.LastName;
-                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following reply to the Dashboard post " + replyToPost.DisplayTitle + " at " + TimeZoneInfo.ConvertTimeFromUtc(dr.Posted, tz).ToString() + ":";
+                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following reply to the Dashboard post " + replyToPost.DisplayTitle + " at " + TimeZoneInfo.ConvertTimeFromUtc(dr.Posted, tz) + ":";
                         }
                         else
                         {
                             //this should never execute, but just in case...
                             subject = "OSBLE Activity Post";
-                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message at " + TimeZoneInfo.ConvertTimeFromUtc(dr.Posted, tz).ToString() + ":";
+                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message at " + TimeZoneInfo.ConvertTimeFromUtc(dr.Posted, tz) + ":";
                         }
                         body += "<br /><br />";
                         body += dr.Content.Replace("\n", "<br />");
@@ -653,7 +643,7 @@ namespace OSBLE.Controllers
 
                         foreach (DashboardReply r in replys)
                         {
-                            setupPostDisplay(r);
+                            SetupPostDisplay(r);
                         }
 
                         replys.Clear();
