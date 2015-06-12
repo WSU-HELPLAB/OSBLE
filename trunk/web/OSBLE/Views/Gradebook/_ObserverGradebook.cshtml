@@ -1,0 +1,610 @@
+﻿@using OSBLE.Controllers;
+@using OSBLE.Models.Courses;
+@using OSBLE.Models.Assignments;
+@using OSBLE.Models.Assignments;
+@using OSBLE.Models.Users;
+@using OSBLE.Utility;
+
+@{
+    ViewBag.Title = "_ObserverGradebook";
+}
+
+@{
+    Layout = null;
+}
+<style type="text/css">
+
+</style>
+<br />
+
+@Html.Partial("_Tabs")
+
+
+<div id="tableContent">
+    <table id="grades" class="gradebook">
+        <tr class="colHeader">
+            
+            @{var j = 1;
+              var r = 0;
+                <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectColumn(event, this);"></td>
+                j += 1;
+                r++;
+                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectColumn(event, this);"></td>
+                j += 1;
+                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectColumn(event, this);"></td>
+                j += 1;
+                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectColumn(event, this);"></td>
+                j += 1;
+                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectColumn(event, this);"></td>
+                j += 1;
+                foreach (Category item in ViewBag.Categories)
+                {
+                    if (item.Name != Constants.UnGradableCatagory)
+                    {
+                        <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8; text-align:center;" onclick="selectColumn(event, this);">
+                            
+                        </td>
+                        j += 1;
+                    }
+                }
+            }
+        </tr>
+        
+        <tr>
+            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8; width: 25px;" onclick="selectRow(this, event);"></td>
+            @{r++;}
+            <td></td>
+            <td><b>Weights</b></td>
+            <td></td>
+            <td></td>
+            @foreach (Category item in ViewBag.Categories)
+            {
+                if (item.Name != Constants.UnGradableCatagory)
+                {
+                    <td></td>
+                }
+            }
+        </tr>
+        <tr id="weights">
+            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectRow(this, event);"></td>
+            @{r++;}
+            <td id="sectionHolder"></td>
+            <td id="catScheme">&nbsp  Weight1</td>
+            <td id="grade"></td>
+            @{
+                double totalCategoryPoints = 0;
+                foreach (Category item in ViewBag.Categories)
+                {
+                    if (item.Name != Constants.UnGradableCatagory)
+                    {
+                        totalCategoryPoints += item.Points;
+                    }
+                }
+            }
+            <td id="categoryTotal">@totalCategoryPoints</td>
+            
+            @foreach (Category item in ViewBag.Categories)
+            {
+                if (item.Name != Constants.UnGradableCatagory)
+                {
+                    <td id="weight-@item.ID">@item.Points</td>
+                }
+            }
+        </tr>
+        <tr id="perfectScore">
+            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectRow(this, event);"></td>
+            @{r++;}
+            <td></td>
+            <td id="th2"><b>Perfect Score</b></td>
+            @{string grade = (from lg in ViewBag.LetterGrades as IEnumerable<LetterGrade>
+                              select lg.Grade).FirstOrDefault();
+            }
+            <td>@grade</td>
+            <td id="perfectTotal">100%</td>
+
+            @foreach (Category item in ViewBag.Categories)
+            {
+                if (item.Name != Constants.UnGradableCatagory)
+                {
+                    <td id="@item.ID">100%</td>   
+                }
+            }
+        </tr>
+        <tr>
+            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectRow(this, event);"></td>
+            @{r++;}
+            <td></td>
+            <td id="th3">
+                <b>Average Score</b>
+            </td>
+            
+            @{
+                double totalAverage = 0;
+
+                //Holds the total grade
+                double totalGrade = 0;
+
+                totalCategoryPoints = 0;
+                double totalCategoryPossible = 0;
+
+                double categoryTotalWeight = 0;
+                //Get the total score for the class
+
+                int studentCount = 0;
+                
+
+                foreach (CourseUser user in ViewBag.CoursesUser)
+                {
+                    int studentAssignmentCount = 0;
+                    categoryTotalWeight = ViewBag.TotalCategoryWeights;
+                    foreach (Category category in ViewBag.CatsWithWeightsAndScores)
+                    {
+                        if (category.Name != Constants.UnGradableCatagory)
+                        {
+                            List<Score> userScore = (from score in ViewBag.AllGrades as IEnumerable<Score>
+                                                     where score.Assignment.CategoryID == category.ID &&
+                                                     score.CourseUserID == user.ID
+                                                     select score).ToList();
+
+                            if (userScore.Count() == 0)
+                            {
+                                categoryTotalWeight -= category.Points;
+                            }
+                        }
+                    }
+                    foreach (Category category in ViewBag.CatsWithWeightsAndScores)
+                    {
+                        if (category.Name != Constants.UnGradableCatagory)
+                        {
+                            double categoryPoints = 0;
+                            double categoryPossible = 0;
+                            double categoryTotal = 0;
+
+                            List<Score> totalScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
+                                                       where score.CourseUserID == user.ID &&
+                                                       score.Assignment.CategoryID == category.ID
+                                                       select score).ToList();
+                            if (totalScores.Count() > 0)
+                            {
+                                
+                                foreach (Score score in totalScores)
+                                {
+                                    if (score.Assignment.CategoryID == category.ID)
+                                    {
+                                        //We only want to count the student if they have assignments. They should only get counted
+                                        //for one assignment in there category so we have this check to stop incrementing
+                                        //student count after the first assignment
+                                        studentAssignmentCount++;
+                                        if (studentAssignmentCount < 2)
+                                        {
+                                            studentCount++;
+                                        }
+                                        
+                                        categoryPoints += score.Points;
+                                        categoryPossible += score.Assignment.PointsPossible;
+                                    }
+                                }
+                                categoryTotal = categoryPoints / categoryPossible;
+                                if (ViewBag.TotalCategoryWeights > 0)
+                                {
+                                    totalGrade += categoryTotal * (category.Points / categoryTotalWeight) * 100;
+                                }
+                                else
+                                {
+                                    totalCategoryPoints += categoryPoints;
+                                    totalCategoryPossible += categoryPossible;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (ViewBag.TotalCategoryWeights == 0)
+                {
+                    totalGrade = (totalCategoryPoints / totalCategoryPossible) * 100;
+                }
+                else
+                {
+                    totalGrade = (totalGrade / (studentCount * 100) * 100);
+                }
+
+                var letter = "";
+                foreach (LetterGrade item in ViewBag.LetterGrades)
+                {
+                    if (totalGrade >= item.MinimumRequired)
+                    {
+                        letter = item.Grade;
+                        break;
+                    }
+                }
+                
+                <td>@letter</td>
+                <td>@totalGrade.ToString(".##")%</td>
+                
+                int totalStudents = 0;
+
+                foreach (Category item in ViewBag.Categories)
+                {
+                    if (item.Name != Constants.UnGradableCatagory)
+                    {
+                        totalAverage = 0;
+                        double averagePoints = 0;
+                        double averagePossible = 0;
+
+                        //Make sure there is at least one score in the category
+                        bool oneScore = false;
+                        foreach (Score score in ViewBag.CategoryTotalPercent)
+                        {
+                            if (score.Assignment.CategoryID == item.ID)
+                            {
+                                oneScore = true;
+                                averagePoints += score.Points;
+                                averagePossible += score.Assignment.PointsPossible;
+                            }
+                        }
+                        double categoryScore = averagePoints / averagePossible;
+                        totalAverage += categoryScore * 100;
+                        if (oneScore == true)
+                        {
+                            <td id="averageScore">@totalAverage.ToString(".##")%</td>  
+                        }
+                        else
+                        {
+                            <td id="averageScore">NG</td>
+                        }
+                    }
+                }
+            }
+        </tr>
+        <tr id="categoryHeaders">
+            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectRow(this, event);"></td>
+            @{r++;}
+            <th>Section</th>
+            <th>Name</th>
+            <th id="gradeHeader" ondblclick="displayLetterGrades();">Grade</th>
+            <th>Total Grade</th>
+            
+            @foreach (Category item in ViewBag.Categories)
+            {
+                if (item.Name != Constants.UnGradableCatagory)
+                {
+                    <th id="@item.ID" class="colHeader" style="background:@item.TabColor">@item.Name</th>
+                }
+            }
+        </tr>
+
+        @{
+            List<Category> cats = (from cat in ViewBag.Categories as IEnumerable<Category>
+                                   select cat).ToList();
+
+            List<LetterGrade> letterList = (from lg in ViewBag.LetterGrades as IEnumerable<LetterGrade>
+                                            select lg).ToList();
+
+            bool categoryHasPoints = false;
+            foreach (Category category in ViewBag.Categories)
+            {
+                if (category.Points != 0)
+                {
+                    categoryHasPoints = true;
+                }
+            }
+        }
+        <!--loop through all users -->
+        @foreach (CourseUser student in ViewBag.CoursesUser)
+        {        
+            <tr id="studentGrades">
+                <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectRow(this, event);"></td>
+                @{r++;}
+
+            @{
+                 <td>@student.Section</td>                                               
+                
+                <td id="@student.ID" >@student.DisplayName(ViewBag.ActiveCourse.AbstractRole)</td> 
+                
+                  totalGrade = 0;
+                  totalCategoryPoints = 0;
+                  totalCategoryPossible = 0;
+                  double totalCategoryWeight = ViewBag.TotalCategoryWeights;
+                  int studentGradeCount = 0;
+                  foreach (Category c in ViewBag.CatsWithWeightsAndScores)
+                  {
+                      if (c.Name != Constants.UnGradableCatagory)
+                      {
+                          List<Score> userScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
+                                                    where score.CourseUserID == student.ID &&
+                                                    score.Assignment.CategoryID == c.ID
+                                                    select score).ToList();
+                          if (userScores.Count() == 0)
+                          {
+                              totalCategoryWeight -= c.Points;
+                          }
+                      }
+                  }
+
+                  foreach (Category c in ViewBag.Categories)
+                  {
+                      if (c.Name != Constants.UnGradableCatagory)
+                      {
+                          List<Score> userScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
+                                                    where score.CourseUserID == student.ID &&
+                                                    score.Assignment.CategoryID == c.ID
+                                                    select score).ToList();
+
+                          double points = 0;
+                          double possible = 0;
+                          double totalCategoryGrade = 0;
+                          if (userScores.Count() > 0)
+                          {
+                              foreach (Score score in userScores)
+                              {
+                                  //Used to make sure students have grades.
+                                  studentGradeCount++;
+                                  points += score.Points;
+                                  possible += score.Assignment.PointsPossible;
+                              }
+
+                              totalCategoryGrade = (points / possible);
+                              if (ViewBag.TotalCategoryWeights > 0)
+                              {
+                                  totalGrade += totalCategoryGrade * (c.Points / totalCategoryWeight) * 100;
+                              }
+                              else
+                              {
+                                  totalCategoryPoints += points;
+                                  totalCategoryPossible += possible;
+                              }
+                          }
+                          else
+                          {
+
+                          }
+                      }
+                  }
+                  if (ViewBag.TotalCategoryWeights == 0)
+                  {
+                      totalGrade = (totalCategoryPoints / totalCategoryPossible) * 100;
+                  }
+                  letter = "";
+                  foreach (LetterGrade item in ViewBag.LetterGrades)
+                  {
+                      if (totalGrade >= item.MinimumRequired && studentGradeCount > 0)
+                      {
+                          letter = item.Grade;
+                          break;
+                      }
+                  }
+                  <td>@letter</td>
+                
+                  if (totalGrade > 0 && studentGradeCount > 0)
+                  {
+                    <td>@totalGrade.ToString(".##")%</td>
+                  }
+                  else if (totalGrade == 0 && studentGradeCount > 0)
+                  {
+                    <td>@String.Format("{0}", 0)%</td>
+                  }
+                  else
+                  {
+                      <td>NG</td>
+                  }
+                  totalGrade = 0;
+
+                  foreach (Category c in ViewBag.Categories)
+                  {
+                      if (c.Name != Constants.UnGradableCatagory)
+                      {
+                          List<Score> userScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
+                                                    where score.CourseUserID == student.ID &&
+                                                    score.Assignment.CategoryID == c.ID
+                                                    select score).ToList();
+
+                          double points = 0;
+                          double possible = 0;
+                          double totalCategoryGrade = 0;
+                          foreach (Score score in userScores)
+                          {
+                              points += score.Points;
+                              possible += score.Assignment.PointsPossible;
+                          }
+
+                          totalCategoryGrade = (points / possible) * 100;
+                          //totalGrade = totalCategoryGrade * (c.Points / ViewBag.TotalCategoryWeights) * 100;
+                          if (totalCategoryGrade >= 0)
+                          {
+                              //It didn't like to put a 0, so I had to use string format to make it display
+                              if (totalCategoryGrade == 0)
+                              {
+                                  <td id="categoryGrade" onclick="goToCategoryTab(@c.ID, @student.ID)" style="cursor:pointer;">@String.Format("{0}", 0)%</td>
+                              }
+                              else
+                              {
+                                  <td id="categoryGrade" onclick="goToCategoryTab(@c.ID, @student.ID)" style="cursor:pointer;">@totalCategoryGrade.ToString(".##")%</td>
+                              }
+                          }
+                          else
+                          {
+                              <td id="categoryGrade" onclick="goToCategoryTab(@c.ID, @student.ID)" style="cursor:pointer;">NG</td>
+                          }
+                      }
+                  }
+            }
+            </tr>
+        }
+    </table>
+    @{
+        totalAverage = (totalAverage / (totalStudents * 100)) * 100;
+        string averageLetter = "";
+        foreach (LetterGrade item in letterList)
+        {
+            if (totalAverage >= item.MinimumRequired)
+            {
+                averageLetter = item.Grade;
+                break;
+            }
+        }   
+    }
+    <input type="hidden" id="totalAverageHidden" value="@averageLetter" />
+</div>
+
+
+<script type="text/javascript">
+    var count = 0;
+    var currentHeader = null;
+    //holds the index of the header that was clicked to select all
+    var currentHeaderCell = null;
+    var header = false;
+    //display if the letter grade menu is showing
+    var isShowing = false;
+    var isHighlighted = false;
+    var lastFocusedAssignment = null;
+    var lastFocusedCell = null;
+    var tabShowing = false;
+
+    $(document).ready(function () {
+        $("#averageLetter").html($("#totalAverageHidden").val());
+    });
+    
+    function displayLetterGrades() {
+        $("#letterGradesID").animate({ "height": "show" }, { duration: 300 });
+        isShowing = true;
+    }
+
+    function goToCategoryTab(catID, stuID) {
+        $.ajax({
+            type: "POST",
+            url: "/Gradebook/SetTabStudent",
+            data: { studentId: stuID.toString() },
+            success: function () {
+                location.href = "/Gradebook/Tab/?categoryId=" + catID;
+            }
+        });
+        hideTabColors();
+    }
+    
+    function selectColumn(evt, col) {
+        evt.cancelBubble = true;
+        if (header == true) {
+            clearLastAssignmentFocus();
+        } 
+
+        hideTabColors();
+        resetTableColors();
+
+        currentHeader = $(col).attr("id").split("-");
+        if (currentHeader[1] == null) {
+            $("#" + currentHeader).css("background-color", "#AAAAAA");
+            $("#div-" + currentHeader).css("background-color", "#AAAAAA");
+
+            $("#grades tr").each(function () {
+                $(this).find("td:nth-child(" + currentHeader + ")").each(function () {
+                    if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+                    }
+                    else {
+                        $(this).css("background-color", "DeepSkyBlue");
+                    }
+                });
+
+                $(this).find("th:nth-child(" + currentHeader + ")").each(function () {
+                    if ($(this).attr("class") == "colHeader" && $(col).attr("id") > 4) {
+                    }
+                    else {
+                        $(this).css("background-color", "DeepSkyBlue ");
+                    }
+                });
+            });
+        }
+
+    }
+
+    function selectRow(row, e) {
+        hideTabColors();
+        if (header == true) {
+            clearLastAssignmentFocus();
+        }
+
+        resetTableColors();
+
+        e.cancelBubble = true;
+
+        var container = row.id.split("-");
+        var count = 0;
+        $('#grades tr').each(function () {
+            if (count == container[1] && container[1] != 0) {
+                $(this).find("td").each(function () {
+                    if ($(this).attr("class") == "rowHeader") {
+                        $(this).css("background-color", "#AAAAAA");
+                    } else if ($(this).attr("class") != "colHeader") {
+                        $(this).css("background-color", "DeepSkyBlue");
+                    }
+                });
+                $(this).find("th").each(function () {
+                    if ($(this).attr("class") != "colHeader") {
+                        $(this).css("background-color", "DeepSkyBlue");
+                    }
+                });
+            }
+            count++;
+        });
+    }
+
+    function resetTableColors() {
+        $("#grades tr").each(function () {
+            $(this).find("td").each(function () {
+                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+                    $(this).css("background-color", "#DCDCDC");
+                    $(this).find("div").css("background-color", "#DCDCDC");
+                }
+                else {
+                    $(this).css("background-color", "white");
+                }
+            });
+            $(this).find("th").each(function () {
+                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+                }
+                else {
+                    $(this).css("background-color", "white");
+                }
+            });
+        });
+    }
+
+    function hideTabColors() {
+        $("#selectMenuID").animate({ "height": "hide" }, { duration: 0 });
+        $("#displayColorsID").animate({ "height": "hide" }, { duration: 0 });
+    }
+
+    function clearRowColumnHeader() {
+        $("#grades tr").each(function () {
+            $(this).find("td").each(function () {
+                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+                    $(this).css("background-color", "#DCDCDC");
+                    $(this).find("div").css("background-color", "#DCDCDC");
+                    $(this).attr("onmouseout", "hideButton(this);");
+                }
+            });
+        });
+    }
+
+    function clearLastAssignmentFocus() {
+        if (lastFocusedAssignment != null) {
+
+            clearRowColumnHeader();
+
+            newCategoryId = lastFocusedAssignment.attr("id");
+            var cellValue = lastFocusedAssignment.children().val();
+            lastFocusedAssignment.html(cellValue);
+            lastFocusedAssignment.attr("onclick", 'changeAssignmentName(event, this)');
+            lastFocusedAssignment = null;
+
+            $.ajax({
+                type: "POST",
+                url: "/Gradebook/ModifyCategoryName",
+                data: { value: cellValue, categoryId: newCategoryId },
+                success: function (response) {
+                    $("#tabHeader").html(response);
+                }
+            });
+        }
+    }
+
+</script>

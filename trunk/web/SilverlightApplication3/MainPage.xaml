@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="SilverlightApplication3.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="338" d:DesignWidth="710" xmlns:riaControls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.DomainServices" xmlns:my="clr-namespace:OSBLE.Models.Courses" xmlns:my1="clr-namespace:OSBLE.Services" xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+
+    <Grid x:Name="LayoutRoot" Background="White">
+        <riaControls:DomainDataSource AutoLoad="True" d:DesignData="{d:DesignInstance my:Course, CreateList=true}" Height="0" LoadedData="courseDomainDataSource_LoadedData" Name="courseDomainDataSource" QueryName="GetCoursesQuery" Width="0">
+            <riaControls:DomainDataSource.DomainContext>
+                <my1:DomainService1 />
+            </riaControls:DomainDataSource.DomainContext>
+        </riaControls:DomainDataSource>
+        <sdk:DataGrid AutoGenerateColumns="False" ItemsSource="{Binding ElementName=courseDomainDataSource, Path=Data}" Name="courseDataGrid" RowDetailsVisibilityMode="VisibleWhenSelected" SelectionChanged="courseDataGrid_SelectionChanged">
+            <sdk:DataGrid.Columns>
+                <sdk:DataGridTextColumn x:Name="nameColumn" Binding="{Binding Path=Name}" Header="Name" Width="300" />
+                <sdk:DataGridTextColumn x:Name="numberColumn" Binding="{Binding Path=Number}" Header="Number" Width="SizeToHeader" />
+                <sdk:DataGridTextColumn x:Name="prefixColumn" Binding="{Binding Path=Prefix}" Header="Prefix" Width="SizeToHeader" />
+                <sdk:DataGridTextColumn x:Name="semesterColumn" Binding="{Binding Path=Semester}" Header="Semester" Width="SizeToHeader" />
+                <sdk:DataGridTextColumn x:Name="yearColumn" Binding="{Binding Path=Year}" Header="Year" Width="SizeToHeader" />
+            </sdk:DataGrid.Columns>
+        </sdk:DataGrid>
+    </Grid>
+</UserControl>

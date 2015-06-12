@@ -1,0 +1,36 @@
+﻿@using OSBLE.Models.Assignments;
+@model Assignment
+
+@section Header
+{
+
+}
+<table class="wizard_entry_table">
+    <tr>
+        <th>Who will perform the review?</th>
+    </tr>
+    <tr>
+        <th>Course Instructors</th>
+        <td>@Html.RadioButton("yes", Model.AssignmentName)</td>
+    </tr>
+    <tr>
+        <td>Allow instructor(s) to change their assessment rubrics after they've submitted them </td>
+        <td>@Html.CheckBox("checkupload")</td>
+    </tr>
+    <tr>
+        <th>Assessment Committee</th>
+        <td>@Html.RadioButton("yes", Model.AssignmentName)</td>
+    </tr>
+    <tr>
+        <td>Allow committee members to access others' assessment rubrics once they've submitted their own assessment rubrics</td>
+        <td>@Html.CheckBox("checkupload")</td>
+    </tr>
+    <tr>
+        <td>Allow committee members to change their assessment rubrics after they've submitted them</td>
+        <td>@Html.CheckBox("checkupload")</td>
+    </tr>
+    <tr>
+        <td>Committee chair will participate in review </td>
+        <td>@Html.CheckBox("checkupload")</td>
+    </tr>
+</table>

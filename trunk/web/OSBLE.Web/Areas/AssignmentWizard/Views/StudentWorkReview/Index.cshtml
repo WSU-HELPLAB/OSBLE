@@ -1,0 +1,49 @@
+﻿@using OSBLE.Models.Assignments;
+@model Assignment
+
+@section Header
+{
+
+}
+<table class="wizard_entry_table">
+    <tr>
+        <th>Where will the student work to be assessed come from?</th>
+        <td class="entryField">@Html.TextBox(" ")</td>
+    </tr>
+    <tr>
+        <th>Course Instructors can upload files</th>
+        <td>@Html.CheckBox("checkupload")</td>
+    </tr>
+    <tr>
+        <th>Instructors:</th>
+        <td>Choose Instructor(s) 
+            <img src="/Content/images/add_up.png" alt="Add Button">
+            <br />
+            <i>Zhe Dang</i>
+            <br />
+            <i>Andy O' Fallon</i>
+        </td>
+    </tr>
+    <tr>
+        <th>
+            <input type="submit" value="Compose Request Email"></th>
+    </tr>
+    <tr>
+        <th>Assessment committee members can upload files</th>
+        <td>@Html.CheckBox("checkupload")</td>
+    </tr>
+    <tr>
+        <th>Student work will be imported directly from a OSBLE course </th>
+        <td>@Html.CheckBox("checkupload")</td>
+    </tr>
+    <tr>
+        <th>Choose OSBLE course: </th>
+        @{
+            List<string> tmpCourse = new List<string>();
+            tmpCourse.Add("Course 1");
+            tmpCourse.Add("Course 2");
+            tmpCourse.Add("Course 3");
+        }
+        <td>@Html.DropDownList("Courses", new SelectList(tmpCourse))</td>
+    </tr>
+</table>

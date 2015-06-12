@@ -1,0 +1,22 @@
+﻿@using OSBLE.Models.Assignments;
+@model Assignment
+
+@section Header
+{
+
+}
+<table class="wizard_entry_table">
+    <tr>
+        <th>Send reviewers who have not yet submitted their assessment rubrics an initial reminder e-mail </th>
+        <td>@Html.EditorFor(m => m.ReleaseDate) hours before due date.</td>
+    </tr>
+    <tr>
+        <th>Send reviewers who have not yet submitted their assessment rubrics a follow-up reminder every   </th>
+        <td>@Html.EditorFor(m => m.ReleaseDate) hours until they submit their assessment rubrics.</td>
+    </tr>
+    <tr>
+        <th>
+            <input type="submit" value="Compose Reminder Email">
+        </th>
+    </tr>
+</table>

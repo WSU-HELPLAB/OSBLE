@@ -1,0 +1,26 @@
+﻿@{
+    ViewBag.Title = "GradebookHelp.cshtml";
+}
+
+<h2>Gradebook Help</h2>
+<h4>Uploading</h4>
+OSBLE Gradebook allows you to upload your gradebook from any spreadsheet program. To do so, simply save your spreadsheet as a comma seperated file (denoted by the .csv extension) and make sure you have the required formatting (see "Required Formatting" below).
+<br /><br />
+For a multi-tabbed gradebook, put all your .csv files into a folder, compress it into ".zip" format, and upload it as you would a ".csv." Keep in mind every ".csv" must have ID in first column and name in second column.
+<h4>Required Formating</h4>
+    <ul>
+    <li>The first column must be used for student school ID numbers. This is used to display students the correct grading information</li>
+    <li>The second column should be used for student names. This will allow you to search through students in the gradebook</li>
+    <li><h5 style="display:inline">Example of required columns (Columns 'A' and 'B') in spreadsheet:</h5><br /><img src="/Content/images/gradebookexamples/RequiredFormatingExample.PNG"/></li>
+    </ul>
+    
+<h4>Gradebook Markup</h4>
+OSBLE Gradebook allows you to use special markup characters to display your spreadsheet differently. The following are the markup options available
+    <ul>
+    <li>Adding '#' as the leading character in the first cell of a row will make the entire row "global." A global row will be displayed to all students and will be displayed with a different font</li>
+    <li><h5 style="display:inline">Example of marking up spreadsheet with '#' and instructor's view after using '#' markup:</h5><br /><img src="/Content/images/gradebookexamples/PoundExample.PNG"/></li>
+    <li>Adding '!' as the leading character in a cell will make that column "hidden" to students. If the cell was in a global row (see '#' above) that column will be hidden to all students. If the cell was in a student's grade row, it will only be hidden for that student.
+    <li><h5 style="display:inline">Example of marking up spreadsheet with '!' and example student Paul Harris' view after using '!' markup:</h5><br /><img src="/Content/images/gradebookexamples/ExclimationExample.PNG"/></li>
+    <li>Adding '!!' as the leading character in a cell will make that column completely "hidden." Neither instructors or students will see this column. This can be useful if your spreadsheet contains values used for your reference, but not needed directly in your gradebook.</li>
+    <li><h5 style="display:inline">Example of marking up spreadsheet with '!!' and instructor's view after using '!!' markup:</h5><br /><img src="/Content/images/gradebookexamples/DblExclimationExample.PNG"/></li>
+    </ul>

@@ -1,0 +1,26 @@
+﻿@using OSBLE.Models.Assignments;
+@using OSBLE.Models;
+@model CriticalReviewSettings
+@section Header
+{
+
+}
+@Html.HiddenFor(m => m.AssignmentID)
+<table class="wizard_entry_table">
+    <tr>
+        <th>@Html.LabelFor(m => m.AnonymizeAuthor)</th>
+        <td>@Html.CheckBoxFor(m => m.AnonymizeAuthor)</td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.AllowDownloadAfterPublish)</th>
+        <td>@Html.CheckBoxFor(m => m.AllowDownloadAfterPublish)</td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.AnonymizeComments)</th>
+        <td>@Html.CheckBoxFor(m => m.AnonymizeComments)</td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.AnonymizeCommentsAfterPublish)</th>
+        <td>@Html.CheckBoxFor(m => m.AnonymizeCommentsAfterPublish)</td>
+    </tr>
+</table>

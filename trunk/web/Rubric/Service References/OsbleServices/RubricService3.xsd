@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments.Activities.Scores" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments.Activities.Scores" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:17532/Services/RubricService.svc?xsd=xsd8" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments.Activities" />
+  <xs:import schemaLocation="http://localhost:17532/Services/RubricService.svc?xsd=xsd5" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Users" />
+  <xs:complexType name="ArrayOfScore">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Score" nillable="true" type="tns:Score" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfScore" nillable="true" type="tns:ArrayOfScore" />
+  <xs:complexType name="Score">
+    <xs:sequence>
+      <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments.Activities" minOccurs="0" name="AssignmentActivity" nillable="true" type="q1:AbstractAssignmentActivity" />
+      <xs:element minOccurs="0" name="AssignmentActivityID" type="xs:int" />
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="Multiplier" type="xs:double" />
+      <xs:element minOccurs="0" name="Points" type="xs:double" />
+      <xs:element minOccurs="0" name="Published" type="xs:boolean" />
+      <xs:element minOccurs="0" name="PublishedDate" nillable="true" type="xs:dateTime" />
+      <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/OSBLE.Models.Users" minOccurs="0" name="UserProfile" nillable="true" type="q2:UserProfile" />
+      <xs:element minOccurs="0" name="UserProfileID" type="xs:int" />
+      <xs:element minOccurs="0" name="isDropped" type="xs:boolean" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Score" nillable="true" type="tns:Score" />
+</xs:schema>

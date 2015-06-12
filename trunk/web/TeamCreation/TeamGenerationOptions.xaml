@@ -1,0 +1,47 @@
+﻿<controls:ChildWindow x:Class="TeamCreation.TeamGenerationOptions"
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+           xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"
+           xmlns:toolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit"
+           Width="400" Height="300"
+           Title="TeamGenerationOptions">
+    <Grid x:Name="LayoutRoot" Margin="2">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Margin="0" Width="450" Height="175">
+            <Grid Width="Auto" Height="Auto">
+                <Grid.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="#FFB4B4B8" Offset="0"/>
+                        <GradientStop Color="White" Offset="1"/>
+                        <GradientStop Color="#FFC8C8CB" Offset="0.181"/>
+                    </LinearGradientBrush>
+                </Grid.Background>
+                <Button Content="Close" HorizontalAlignment="Left" Margin="8,0,0,8" VerticalAlignment="Bottom" Width="75" Click="Close_Click"/>
+                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Generate Teams" VerticalAlignment="Top" Margin="11,5,0,0" FontWeight="Bold"/>
+                <RadioButton x:Name="rbManual" Content="Generate Teams Manually" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="11,30,0,0" GroupName="AssignmentMode" Checked="AssignmentMode_Change"/>
+                <RadioButton x:Name="rbRandom" Content="Generate Teams Randomly" HorizontalAlignment="Left" Margin="11,53,0,0" GroupName="AssignmentMode" Checked="AssignmentMode_Change" VerticalAlignment="Top"/>
+                <RadioButton x:Name="rbNumTeams" VerticalAlignment="Top" Margin="206,30,0,0" GroupName="AssignmentValue" IsEnabled="{Binding}" Height="25" HorizontalAlignment="Left" Width="160">
+                    <Grid>
+                        <TextBlock Margin="0" TextWrapping="Wrap" Text="# of Teams" Width="140"/>
+                        <toolkit:NumericUpDown x:Name="TeamsUpDown" Height="Auto" Margin="0" HorizontalAlignment="Right" Width="50" Minimum="1" Maximum="10000" GotFocus="TeamsUpDown_GotFocus" ValueChanged="TeamsUpDown_ValueChanged"/>
+                    </Grid>
+                </RadioButton>
+                <RadioButton x:Name="rbNumStudents" VerticalAlignment="Top" Margin="206,62,0,0" Width="160" GroupName="AssignmentValue" Height="25" HorizontalAlignment="Left">
+                    <Grid>
+                        <TextBlock TextWrapping="Wrap" Text="# of Students" Width="140"/>
+                        <toolkit:NumericUpDown x:Name="StudentsUpDown" HorizontalAlignment="Right" Margin="0" Width="50" Height="24" Minimum="1" Maximum="10000" GotFocus="StudentsUpDown_GotFocus" ValueChanged="StudentsUpDown_ValueChanged"/>
+                    </Grid>
+                </RadioButton>
+                <Button Content="Generate" Margin="0,0,8,8" VerticalAlignment="Bottom" Click="DoGenerate"   HorizontalAlignment="Right" Width="75"/>
+                <RadioButton x:Name="rbCopy" Content="Copy From Another Assignment" HorizontalAlignment="Left" Margin="11,76,0,0" GroupName="AssignmentMode" Checked="AssignmentMode_Change" VerticalAlignment="Top"/>
+                <ComboBox x:Name="copyFrom" Margin="220,76,30,0" Width="200" VerticalAlignment="Top"/>
+                <CheckBox x:Name="cbOnlySubmitted" Content="Use only students who have submitted assignment." HorizontalAlignment="Left" Margin="11,0,0,40" VerticalAlignment="Bottom"/>
+            </Grid>
+        </Border>
+        <Button x:Name="CancelButton" Content="Cancel" Click="CancelButton_Click" Width="75" Height="23" HorizontalAlignment="Right" Margin="0,12,0,0" Grid.Row="1" />
+        <Button x:Name="OKButton" Content="OK" Click="OKButton_Click" Width="75" Height="23" HorizontalAlignment="Right" Margin="0,12,79,0" Grid.Row="1" />
+    </Grid>
+</controls:ChildWindow>

@@ -1,0 +1,73 @@
+﻿@using OSBLE.Models.Assignments;
+@using OSBLE.Areas.ABETTagging.Models;
+@model ABETTaggingViewModel
+@{
+    ViewBag.Title = "Index";
+}
+
+<link href="/AssignmentDetails/Content/css/Home.css" type="text/css" rel="Stylesheet">
+
+<h2>ABET Tagging for @Model.Assignment.AssignmentName</h2>
+
+@{    
+    if (null == Model.Assignment.ABETDepartment)
+    {
+        @Html.Raw("Assignment not found");
+        return;
+    }
+    
+    if (null == Model.Assignment.ABETDepartment)
+    {
+        // The department string is the indicator of whether or not this 
+        // assignment was intended to have ABET tagging. If it's null then 
+        // we don't allow this option.
+        @Html.Raw("This assignment has not been labeled with a department for ABET tagging. ");
+        @Html.Raw("Please contact your system administrator if you think you have reached this page in error.");
+        return;
+    }
+    
+    // Get the number of assignment submissions. If there aren't any, then we 
+    // want to show a message stating this.
+    int sc = Model.Assignment.GetSubmissionCount();
+    if (0 == sc)
+    {
+        @Html.Raw("No submissions have been made for this assignment.");
+        return;    
+    }
+
+    @Html.Raw("<form>");
+    
+    <input type="hidden" name="courseid" value="@Model.Assignment.CourseID.Value" />
+    <input type="hidden" name="assignmentid" value="@Model.Assignment.ID" />
+    
+    // Now we make the list of submissions for this assignment
+    <table cellpadding="5" cellspacing="0" id="StudentsTable">
+        <tr>
+            <th>@Model.NameHeader</th>
+            <th>Outcomes Achieved</th>
+            <th>Proficiency Level</th>
+        </tr>            
+        
+        @{
+            foreach (ABETTaggingViewModel.Submission sub in Model.Submissions)
+            {
+                @Html.Raw("<tr><td>");
+                for (int i = 0; i < sub.TeamMembers.Count; i++)
+                {
+                    @Html.Raw(sub.TeamMembers[i] + "<br />");    
+                }
+                @Html.Raw("</td>");
+                
+                <td>@Html.Raw(sub.CategoryOptionsHTML)</td>
+                <td>@Html.Raw(sub.ProficiencyOptionsHTML)</td>
+
+                @Html.Raw("</tr>");
+            }
+        }
+    </table>
+    
+    <input type="submit" value="Save" formmethod="post" />
+    
+    @Html.Raw("</form>");
+}
+

@@ -1,0 +1,370 @@
+﻿@model OSBLE.Models.ViewModels.RubricViewModel
+
+@using OSBLE.Models.Courses.Rubrics;
+@using OSBLE.Models.Users;
+
+@{
+    string critInputPrefix = ViewBag.CritInputPrefix;
+    string critSliderPrefix = ViewBag.CritSliderPrefix;
+    string critCommentPrefix = ViewBag.CritCommentPrefix;
+    int sliderTableLength = 880;
+    int maxLevelScore = (from c in Model.Rubric.Levels
+                         select c.PointSpread).Sum();
+    int textInputLenght = 25;
+    int sliderTableCellWidth = (sliderTableLength / maxLevelScore) - textInputLenght;
+    string selectedAssignment = ViewBag.AssignmentSelectId;
+    string selectedTeam = ViewBag.TeamSelectId;
+    bool isEditable = ViewBag.isEditable;
+    string textBoxDisabled = "";
+    List<double?> averageScores = ViewBag.averageScores;
+
+    if (!isEditable)
+    {
+        textBoxDisabled = "disabled=disabled";
+    }
+
+    int i = 0;
+
+}
+
+<script type="text/javascript">
+    //loads all sliders after document load
+
+    function loadSliders() {
+
+    @{foreach (RubricEvaluation re in Model.MergedEvaluations)
+      {
+          foreach (CriterionEvaluation critEval in re.CriterionEvaluations)
+          {
+              string sliderUpdateFunction = "";
+              string disabledOption = "";
+              if (isEditable)
+              {
+                  sliderUpdateFunction = "slide: updateSlider ";
+              }
+              else
+              {
+                  disabledOption = "disabled: true";
+              }
+
+              int id = critEval.Criterion.ID;
+              if (Model.MergedEvaluations.Count > 1)
+              {
+                  id = critEval.ID;
+              }
+
+              string sliderId = String.Format("\"#{0}_{1}\"", critSliderPrefix, id);
+              string js = String.Concat("\t$(", sliderId, ").slider({",
+                              "value: " + critEval.Score + ", ",
+                              "min: 0, ",
+                              "max: ", maxLevelScore, ", ",
+                              "step: 1, ",
+                              sliderUpdateFunction,
+                              disabledOption,
+                                  "});\n");
+        @Html.Raw(js)
+          }
+      }  
+    }
+        if(@(isEditable.ToString().ToLower()))
+        {
+        $('#@selectedAssignment').change(switchEvaluation);
+        $('#@selectedTeam').change(switchEvaluation);
+        updateGrade();
+        }
+    }
+
+    $(document).ready(function () {
+    
+        loadSliders();
+        var width = parseFloat($(window).width());
+    
+        $("#criterion_div").width(width + "px");
+
+    });
+
+</script>
+
+<style type="text/css">
+
+.criterion_div
+{
+    background: #9BB7C4;
+    margin-bottom:15px;
+    padding:15px;
+    font-size:12px;
+}
+
+.criterion_header
+{
+    font-size:18px;
+    font-weight:bold;
+}
+
+.level_header
+{
+    font-size:14px;
+    font-weight:bold;
+}
+
+.selector_table
+{
+    width:@(sliderTableLength)px;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+.selector_table th
+{
+    padding:3px;
+    margin:0;
+}
+
+.text_input_score
+{
+    width: @(textInputLenght)px;
+    background: #9BB7C4;
+}
+
+.zero_score
+{
+    width:@(sliderTableCellWidth)px;
+    background: #CFCFCF;
+}
+
+.level_1
+{
+    background: #FF8991;
+}
+
+.level_2
+{
+    background: #FF9335;
+}
+
+.level_3
+{
+    background: #00DD04;
+}
+
+.level_4
+{
+    background: #75BAFF;
+}
+
+</style>
+
+        <div style="clear: both">
+
+            @foreach (CriterionEvaluation critEval in Model.MergedEvaluations.FirstOrDefault().CriterionEvaluations)
+            {
+                @*This HTML will be the same for each each RubricEvaluation, so FirstOrDefault() will work*@
+                <div class="criterion_div">
+                    <div class="criterion_header">@critEval.Criterion.CriterionTitle (Weight: @critEval.Criterion.Weight)</div>
+                    @{List<CellDescription> descriptions = (from d in Model.Rubric.CellDescriptions
+                                                            where d.CriterionID == critEval.Criterion.ID
+                                                            select d).ToList();
+                    }
+             
+                        <div >
+                            <ul>
+                                @{int previousMax = 1;
+                                  foreach (CellDescription desc in descriptions)
+                                  {
+                                    <li><span class="level_header"><em>@(desc.Level.LevelTitle)</em> (@previousMax - @(previousMax + desc.Level.PointSpread - 1))</span>
+                                        @{previousMax += desc.Level.PointSpread;}
+                                        <br />
+                                        @Html.Raw(desc.Description.Replace("\r\n", "\n").Replace("\r", "<br />").Replace("\n", "<br />"))
+                                    </li>
+                                  }
+                                }
+                            </ul>
+                        </div>
+
+                        @*Show a slider with the average score*@
+                        @if (Model.MergedEvaluations.Count > 1)
+                        {
+                            @:<text class="level_header">Average</text>
+                            <table class="selector_table">
+                        <tr>
+                            <th class="zero_score">
+                                0
+                            </th>
+                            @{previousMax = 1;
+                              int counter = 0;
+                              foreach (Level level in Model.Rubric.Levels)
+                              {
+                                  counter++;
+                                  string cssClass = "level_4";
+                                  if (counter < 5)
+                                  {
+                                      cssClass = "level_" + counter.ToString();
+                                  } 
+                                    <th class="@cssClass" style="width:@(sliderTableCellWidth * level.PointSpread)px;">@level.LevelTitle
+                                        (@previousMax - @(previousMax + level.PointSpread - 1))
+                                    </th>
+                                  previousMax += level.PointSpread;
+                              }
+                              }
+                        </tr>
+                        <tr>
+                            <td colspan="@(Model.Rubric.Levels.Count + 1)">
+
+                                @{string left = "left:";
+                                  left += (averageScores[i] / maxLevelScore)*100 + "%";
+                                  }
+                               <div id="crit_slider_0" 
+                               class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all ui-slider-disabled ui-disabled">
+                                <a href="#" class="ui-slider-handle ui-state-default ui-corner-all" style="@left"></a></div>
+
+                            </td>
+                            <td class="text_input_score">
+                                <input class="text_input_score" 
+                                    type="text" value="@averageScores[i]"
+                                    style="border:0; 
+                                    padding-left:7px;" 
+                                    size="1" 
+                                    readonly="readonly" />
+                            </td>
+                        </tr>
+                    </table>
+                            <br />
+                            
+                            
+                            
+                            
+                            
+                            
+                        }
+
+                    @*If there are multiple RubricEvaluations, we want to generate a comments and slider 
+                    for each one*@
+                    @foreach (RubricEvaluation re in Model.MergedEvaluations)
+                    {
+                        @*First loop i = 0 so for each RubricEvaluation, we only want the first one, which
+                        would be criterion #1 for each RubricEvaluation*@
+                        CriterionEvaluation crit = re.CriterionEvaluations.ElementAt(i);
+                        if (Model.MergedEvaluations.Count > 1)
+                        {
+                            @:<text class="level_header">@re.Evaluator.UserProfile.FirstName @re.Evaluator.UserProfile.LastName's Evaluation:</text>
+                        }
+                    <table class="selector_table">
+                        <tr>
+                            <th class="zero_score">
+                                0
+                            </th>
+                            @{previousMax = 1;
+                              int counter = 0;
+                              foreach (Level level in Model.Rubric.Levels)
+                              {
+                                  counter++;
+                                  string cssClass = "level_4";
+                                  if (counter < 5)
+                                  {
+                                      cssClass = "level_" + counter.ToString();
+                                  } 
+                                    <th class="@cssClass" style="width:@(sliderTableCellWidth * level.PointSpread)px;">@level.LevelTitle
+                                        (@previousMax - @(previousMax + level.PointSpread - 1))
+                                    </th>
+                                  previousMax += level.PointSpread;
+                              }
+                              }
+                            
+                            <th class="text_input_score">
+                            </th>
+                        </tr>
+                        <tr>
+                            <td colspan="@(Model.Rubric.Levels.Count + 1)">
+
+                            @*crit.Criterion.ID is used for editable rubrics so that that updateGrade javascript
+                            function in Index can match the slider with the corresponding criterion without knowing
+                            the specific criterionEvaluation. However, with a merged rubric, the Criterion.ID is not
+                            necessarily unique, so the ID of the criterionEvaluation is used in this case.*@
+                                @{
+                              int id = crit.Criterion.ID;
+                              if (Model.MergedEvaluations.Count > 1)
+                              {
+                                  id = crit.ID;
+                              }
+                                }
+                                <div id="@(String.Format("{0}_{1}", critSliderPrefix, id))">
+                                </div>
+                            </td>
+                            <td class="text_input_score">
+                                <input class="text_input_score" 
+                                    id="@(String.Format("{0}_{1}", critInputPrefix, crit.Criterion.ID))" 
+                                    name="@(String.Format("{0}_{1}", critInputPrefix, crit.Criterion.ID))" 
+                                    type="text" value="@crit.Score"
+                                    style="border:0; 
+                                    padding-left:7px;" 
+                                    size="1" 
+                                    readonly="readonly" />
+                            </td>
+                        </tr>
+                        @if (Model.Rubric.HasCriteriaComments)
+                        {
+                            <tr>
+                                <td colspan="@(Model.Rubric.Levels.Count + 2)" >
+                                    &nbsp;
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="@(Model.Rubric.Levels.Count + 2)" >
+                                    Comments:
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="@(Model.Rubric.Levels.Count + 2)" >
+                                    <textarea 
+                                id="@(String.Format("{0}_{1}", critCommentPrefix, crit.Criterion.ID))"
+                                name="@(String.Format("{0}_{1}", critCommentPrefix, crit.Criterion.ID))"
+                                rows="10"
+                                cols="80"
+                                style="width:95%; height:75px; margin-left:auto; margin-right:auto;"
+                                @textBoxDisabled
+                                >@crit.Comment</textarea>
+                                </td>
+                            </tr>
+                        }
+                        
+                    </table>
+                        <br />
+                        
+                    }
+                </div>
+                    i++;
+            }
+            
+            
+        </div>
+
+              @if (Model.Rubric.HasGlobalComments)
+              {
+                  <div class="criterion_div">
+                  @foreach (RubricEvaluation eval in Model.MergedEvaluations)
+                  {
+                      string title = "Overall Comments";
+                
+                      @*If there are multiple evaluations, then a unique title is created by using the reviewer's name*@
+                      @* NOTE: this should be changed to support anonymization *@
+                      if (Model.MergedEvaluations.Count > 1)
+                      {
+                          title += " from "
+                          + eval.Evaluator.UserProfile.FirstName +
+                              " " +
+                              eval.Evaluator.UserProfile.LastName;
+                      }
+                            <div class="criterion_header">
+                            @title</div>
+                        <textarea 
+                            id="@ViewBag.GlobalCommentId"
+                            name="@ViewBag.GlobalCommentId"
+                            rows="10"
+                            cols="80"
+                            style="width:95%; height:75px; margin-left:auto; margin-right:auto;"
+                            @textBoxDisabled
+                            >@eval.GlobalComment</textarea>
+                
+                  }
+              </div>
+              }

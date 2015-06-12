@@ -1,0 +1,246 @@
+﻿@using OSBLE.Models.ViewModels
+@using OSBLE.Models.Assignments.Activities
+@using OSBLE.Models.Assignments
+@using OSBLE.Utility
+@using OSBLE.Models.Assignments
+@model ActivityTeacherTableViewModel
+@{
+    Layout = "";
+    int submissionInfoCounter = 0;
+
+    bool inlineReviewAllowed = Model.Activity is SubmissionActivity && (Model.Activity as SubmissionActivity).InstructorCanReview;
+    bool hasRubric = Model.Activity is SubmissionActivity && Model.Assignment.RubricID != null && Model.Assignment.RubricID != 0;
+    bool hasDeliverables = Model.Assignment is StudioAssignment && (Model.Assignment as StudioAssignment).Deliverables.Count > 0;
+    bool isGradable = Model.Assignment.Category.Name != Constants.UnGradableCatagory;
+    bool isTeam = Model.Activity.isTeam;
+}
+<script type="text/javascript">
+
+    function create_and_open_downloading_submission_dialog() {
+
+        //create the div that we will then make into a dialog
+
+        $('body').append(
+       '<div id="downloading_submission_dialog" title="Download Submission"> \
+        <p>The zip is being generated and will automatically start downloading when it is ready, please do not leave the page or click the link again</p> \
+    </div>');
+
+        //make the div we just created into a dialog box
+
+        $('#downloading_submission_dialog').dialog({
+            modal: false,
+            autoOpen: true,
+            resizable: true,
+            width: 350,
+            height: 300,
+            closeOnEscape: true,
+            close: remove_downloading_submission_dialog,
+            buttons: { "OK": remove_downloading_submission_dialog }
+        });
+
+        $('#downloading_submission_dialog').dialog('open');
+        return false;
+    }
+
+    function remove_downloading_submission_dialog() {
+
+        //change the dialog back into a normal div (that is what destroy does although it does not destroy the div)
+        $('#downloading_submission_dialog').dialog("destroy");
+
+        //then remove the div
+        $('#downloading_submission_dialog').remove();
+    }
+</script>
+
+<!-- Pop-up window for editing late percentage -->
+<div id="EditLatePercentWindowID" style="display: none;" title="Edit Score">
+	<text>Adjust Score:</text>
+	<input id="newScoreValue"/>
+    <td align="right" colspan="3"><input type="button" onclick="adjustLatePenalty(1);" value="Apply Changes" /></td>
+    <td align="right" colspan="3"><input type="button" onclick="hideEditLatePercentWindow();" value="Cancel" /></td>
+    <td align="right" colspan="3"><input type="button" onclick="adjustLatePenalty(2);" value="Restore Default Value" /></td>
+</div>
+
+<div>
+    <p>
+        <text>@ViewBag.NumberOfSubmissions of @ViewBag.ExpectedSubmissionsAndGrades submissions have been recieved.</text>
+        <br />
+        <br />@Html.ActionLink("Download all submissions for this activity", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentActivityID = ViewBag.activityID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
+    </p>
+</div>
+<table class="TeacherActivityTable">
+    <tr>
+        <th>
+            Name
+        </th>
+        @if (hasDeliverables)
+        { 
+            <th>
+                Time Submitted
+            </th>
+        }
+        @if (isGradable)
+        { 
+        <th>
+            Grade
+        </th>
+       
+        <th>
+            Late Penalty
+        </th> 
+        }
+        @if (inlineReviewAllowed)
+        { 
+            <th>
+                Inline Comments
+            </th>
+        }
+        @if (hasDeliverables)
+        {
+            <th>
+                Submission
+            </th>
+        }
+    </tr>
+    @foreach (ActivityTeacherTableViewModel.SubmissionInfo info in Model.SubmissionsInfo)
+    {
+        string nameID = "TeamUserID_" + info.SubmitterID.ToString();
+        bool hasSubbmitted = info.Time != null;
+        <tr>
+            <td>
+                @if (isTeam)
+                { 
+                    <span style="text-decoration: underline">@info.Name</span>
+                    <a title="Email this team" href="@Url.Action("CreateEntireTeam", "Mail", new { teamID = info.TeamID })">@Helpers.MailButton()</a>
+                    <br/>
+                    @info.TeamList            
+                    
+                }
+                else
+                { 
+                    @info.Name
+                    <a title="Email this User" href="@Url.Action("CreateUser", "Mail", new { id = info.SubmitterID })">@Helpers.MailButton()</a>
+                }
+                <div id="@nameID">
+                </div>
+            </td>
+            @if (hasDeliverables)
+            { 
+                <td>
+                    @if (hasSubbmitted == false)
+                    {
+                        //if we have graded display Not Submitted in back else display it in red
+                        if (info.Graded)
+                        { 
+                        <span>Not Submitted</span>
+                        }
+                        else
+                        { 
+                        <span style="color: Red">Not Submitted</span>
+                        }
+                    }
+                    else
+                    {
+                        //if it is on time (including the grace period) then display when it was submitted else display how late it is in hrs and in red
+                        if (info.Time.Value.AddMinutes(-Model.Activity.MinutesLateWithNoPenalty) < ViewBag.DueDate)
+                        {
+                            <span>@info.Time</span>
+                        }
+                        else
+                        {
+                            TimeSpan time = info.Time.Value - ((DateTime)ViewBag.DueDate);
+
+                            //Purposefully rounding up
+                            <span style="color: Red">@((int)time.TotalHours + 1) Hours Late</span> 
+                        }
+                    }
+                </td>
+            }
+            @if (isGradable)
+            { 
+           <td>
+            
+                @if (info.Graded)
+                {
+                    OSBLE.Models.Assignments.Score userScore = (from scores in ViewBag.StudentScores as IEnumerable<OSBLE.Models.Assignments.Score>
+                                                                                  where scores.TeamUserMemberID == info.SubmitterID
+                                                                                  select scores).FirstOrDefault();
+                    if (hasRubric)
+                    {  
+                        
+                            @Html.ActionLink(userScore.Points.ToString() + "%", "Index", "Rubric", new { abstractAssignmentActivityId = ViewBag.activityID, teamUserId = info.SubmitterID }, new { })
+                        
+                    }
+                    else
+                    {
+                        int catId = ViewBag.CategoryID;
+                        <span>@Html.ActionLink(userScore.Points.ToString() + "%", "Tab", "Gradebook", new { categoryId = catId }, new { })</span>
+                    }
+                }
+                else
+                {
+                    if (hasRubric)
+                    {
+                            @Html.ActionLink("Not Graded", "Index", "Rubric", new { abstractAssignmentActivityId = ViewBag.activityID, teamUserId = info.SubmitterID }, new { @style = "color: Red; text-align: center" })
+                    }
+                    else
+                    {
+                        <span style="color: Red">Not Graded</span>
+                    }
+                }
+            </td>
+                
+            <td class="LPClass">
+                @if (info.LatePenaltyPercent != 0)
+                {
+                    <span>@info.LatePenaltyPercent.ToString(".##")%</span>
+                    //This will not be commented out with future checkin <a class="editLatePercentText" onclick="showEditLatePercentWindow(@info.SubmitterID);">Edit</a>
+                }
+                else
+                {
+                    if (hasSubbmitted)
+                    {
+                        <span>0.0%</span>
+                        //This will not be commented out with future checkin a class="editLatePercentText" onclick="showEditLatePercentWindow(@info.SubmitterID);">Edit</a>
+                    }
+                    else
+                    {
+                        <span>Not Submitted</span>
+                    }
+                }
+            </td>
+            }
+            
+            
+            @if (inlineReviewAllowed)
+            {
+                
+                <td>
+                @if (hasSubbmitted)
+                {
+                    @Html.ActionLink("View/Edit...", "InlineReview", "Assignment", new { assignmentActivityID = ViewBag.activityID, teamUserID = info.SubmitterID }, new { })
+                }
+                else
+                {
+                    <span>Nothing to Review</span>
+                }
+                </td>
+                
+            }
+            @if (hasDeliverables)
+            {
+                <td>
+                    @if (info.Time != null)
+                    { 
+                        @Html.ActionLink("Download", "GetSubmissionZip", "FileHandler", new { teamUserID = info.SubmitterID, assignmentActivityID = ViewBag.activityID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
+                    }
+                    else
+                    { 
+                        <text>Nothing Received</text>
+                    }
+                </td>
+            }
+        </tr>   
+            submissionInfoCounter++;
+    }
+</table>

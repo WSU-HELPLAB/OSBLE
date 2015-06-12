@@ -1,0 +1,266 @@
+﻿@using OSBLE.Models.HomePage
+@using OSBLE.Models.Courses
+@using OSBLE.Models.Users
+@using OSBLE.Models
+@using System.Text.RegularExpressions
+@using System.Collections
+@using System.Web.Mvc
+@* Section headers for user tabs. *@
+@helper DisplaySection(string sectionNum)
+    {
+        if (sectionNum != "0")
+        {
+    <text>Section @sectionNum</text>
+        }
+        else
+        {
+    <text>All Sections</text>
+        }
+}
+@* Only use this helper in a place that requires an active course (uses [RequireActiveCourse] attribute) *@
+@helper DisplayName(UserProfile user, CourseUser activeCourse, bool show = false)
+    {
+        if (!activeCourse.AbstractRole.Anonymized && (activeCourse.AbstractRole.CanGrade || (user.ID == activeCourse.UserProfileID) || show))
+        {
+    <text>@user.FirstName @user.LastName</text>
+        }
+        else
+        {
+    <text>Anonymous</text>
+        }
+}
+@* For dashboard posts/replies, echos display name along with optional title. *@
+@helper DisplayNameForDashboard(AbstractDashboard d)
+    {
+    <text>@d.DisplayName</text>
+        string text = "";
+        if (d.DisplayTitle != "")
+        {
+            text += d.DisplayTitle;
+        }
+        AbstractDashboard dash = d;
+        if (d is DashboardReply)
+        {
+            dash = (d as DashboardReply).Parent;
+        }
+        if (dash is DashboardPost)
+        {
+            DashboardPost dp = dash as DashboardPost;
+            if (dp.CourseUser.AbstractCourse is Community)
+            {
+                text += ", " + d.CourseUser.UserProfile.School.Name;
+            }
+        }
+    <text><small><em>@(text)</em></small></text>
+}
+
+@helper DateAsUnixTime(DateTime dt)
+{
+    @Convert.ToInt64((dt - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds);
+}
+
+@helper RawDate(DateTime dt)
+{
+    @dt.ToString("s")
+}
+
+@* Formats date consistently for display *@
+@helper DisplayDate(DateTime dt)
+    {
+    @dt.ToLongDateString()<text> </text>@dt.ToShortTimeString()
+}
+@* Buttons for editing/submitting *@
+@helper MailButton()
+    {<img src="/Content/images/mail_up.png" />}
+@helper AddButton()
+    {<img src="/Content/images/add_up.png" alt="Add Button" />}
+@helper EditButton()
+    {<img src="/Content/images/edit_up.png" alt="Edit Button" />}
+@helper DeleteButton()
+    {<img src="/Content/images/delete_up.png" alt="Delete Button" />}
+@helper PublishButton()
+    {<img src="/Content/images/publish.png" alt="Publish Button" />}
+@helper UnPublishButton()
+    {<img src="/Content/images/unpublish.png" alt="Unpublish Button" />}
+@helper DeleteSubmit(string title)
+    {<input type="image" title="@title" src="../../Content/images/delete_up.png" alt="Delete Button" />}
+@* Returns last 4 digits of student ID for pending students *@
+@helper DisplayLastFourID(string Identification)
+    { <text>(@Identification.Substring(Math.Max(Identification.Length - 4, 0), Math.Min(Identification.Length, 4)))</text>}
+@* For Users tab, either shows user's name or 'Pending' plus the last 4 of their ID *@
+@helper DisplayFullNameOrPending(UserProfile user)
+    {
+        if (user.UserName != null)
+        {
+    <text>@user.FirstName @user.LastName</text>
+        }
+        else if (user.FirstName == "Pending")
+        {
+    <text><em>Pending @Helpers.DisplayLastFourID(user.Identification) </em></text>
+        }
+        else
+        {
+    <text><em>@user.FirstName @user.LastName</em></text>
+        }
+}
+@helper DisplayFullNameOrPending(CourseUser cu)
+    {
+        if (cu.UserProfile.UserName != null)
+        {
+    <text>@cu.UserProfile.FirstName @cu.UserProfile.LastName</text>
+        }
+        else
+        {
+    <text><em>Pending @Helpers.DisplayLastFourID(cu.UserProfile.Identification) </em></text>
+        }
+}
+@* Standard wrapper for profile pic *@
+@helper ProfilePicture(string url)
+    {
+    <img src="@url" alt="Profile Picture" class="profile_picture" />
+}
+@* Smaller thumbnail for profile pic *@
+@helper SmallProfilePicture(string url)
+    {
+    <img src="@url" alt="Profile Picture" class="small_profile_picture" />
+}
+@* Finds http links in content and turns them into clickable links.
+Also runs content through nl2br to convert newlines to <br /> tags. *@
+@helper Linkify(string text)
+    {
+        string[] punctuation = { "!", ".", ",", ";", ":" };
+        string pattern = @"(http:\/\/|https:\/\/)([^ \r\n\t\[\]]+)";
+        MatchCollection matches = Regex.Matches(text, pattern);
+        foreach(Match match in matches)
+        {
+            string rawUrl = match.Groups[0].Value;
+            
+            //trim off any ending punctuation
+            if(punctuation.Contains(rawUrl.Substring(rawUrl.Length - 1)))
+            {
+                rawUrl = rawUrl.Substring(0, rawUrl.Length - 1);
+            }
+            string anchorFormat = "<a href=\"{0}\">{1}</a>";
+            string anchor = string.Format(anchorFormat, rawUrl, rawUrl);
+            text = text.Replace(rawUrl, anchor);
+        }
+        text = text.Replace("\n", "<br />");
+        <text>@text</text>
+}
+@* Returns default profile picture (saves lookups to the controller for profile pic) *@
+@helper DefaultProfilePicture()
+    {
+    <img src="/Content/images/default.jpg" alt="Profile Picture" class="profile_picture" />
+}
+
+@helper SmallDefaultProfilePicture()
+    {
+    <img src="/Content/images/default.jpg" alt="Profile Picture" class="small_profile_picture" />
+}
+@* Converts new lines to html <br /> tags in a content area. *@
+@helper nl2br(string content)
+    {
+    <text> @content </text>
+    /* This used to convert new lines to <br/> tags but was found unneeded left in just incase I am wrong
+        string[] s = content.Split("\r\n".ToCharArray(), StringSplitOptions.None);
+        for (int i = 0; i < s.Length; i++)
+        {
+            if (s[i].Length != 0)
+            {
+                @s[i]
+            }
+            else
+            {
+                <text><br /></text>
+            }
+        }*/
+}
+@* Displays the tag for the course/community (e.g. CptS 121 or Comm) *@
+@helper CourseTag(AbstractCourse ac)
+    {
+        if (ac is Community)
+        {
+            Community c = (Community)ac;
+    @c.Nickname
+        }
+        else if (ac is Course)
+        {
+            Course c = (Course)ac;
+    @c.Prefix<text> </text>@c.Number
+        }
+}
+@* this returns html with the links in place of any wiki links (i.e. [url:google|http://www.google.com])
+ Note: it must be wrapped in Html.Raw(HttpUtility.HtmlDecode(WikiUrlLinking(str))) *@
+@helper WikiUrlLinking(string strToLink)
+    {
+        string pattern = @"\[url:([^\|]+)\|(http:\/\/|https:\/\/)?([^\|]+)\]";
+        MatchCollection matches = Regex.Matches(strToLink, pattern);
+        foreach(Match match in matches)
+        {
+            //match.Groups[0] = whole link
+            //match.Groups[1] = link title
+            //match.Groups[2] = http/https (optional)
+            //match.Groups[3] = url
+            
+            string anchorFormat = "<a href=\"{0}\">{1}</a>";
+            string urlFormat = "{0}{1}";
+            string protocol = "http://";
+            if (match.Groups[2].Value.Length > 0)
+            {
+                protocol = match.Groups[2].Value;
+            }
+            string url = string.Format(urlFormat, protocol, match.Groups[3].Value);
+            string anchor = string.Format(anchorFormat, url, match.Groups[1].Value);
+            strToLink = strToLink.Replace(match.Groups[0].Value, anchor);            
+        }
+        strToLink = strToLink.Replace("\n", "<br />"); //changing new lines to breaks
+
+    <text>@strToLink</text>
+}
+@helper CreateToolTip(string tooltip)
+    {
+        HtmlString output = new HtmlString(tooltip);
+
+    <div class='popup-bubbleInfo'>
+        <img class='popup-trigger' src='../../Content/images/tooltip/109_AllAnnotations_Help_16x16_72.png'
+            alt='(?)' height='16px' width='16px' />
+        <div class='popup'>
+            <table cellpadding='0px' cellspacing='0px'>
+                <tbody>
+                    <tr>
+                        <td class='topleft'>
+                        </td>
+                        <td class='top'>
+                        </td>
+                        <td class='topright'>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class='left'>
+                        </td>
+                        <td class='popup-contents'>
+                            @output
+                        </td>
+                        <td class='right'>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class='bottomleft'>
+                        </td>
+                        <td class='bottom'>
+                        </td>
+                        <td class='bottomright'>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+}
+@functions{
+    #region C# functions
+
+
+#endregion
+    }
