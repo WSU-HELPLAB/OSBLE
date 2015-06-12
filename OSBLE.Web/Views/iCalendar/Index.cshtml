@@ -1,0 +1,13 @@
+﻿@model OSBLE.Models.HomePage.Event
+
+@{
+    ViewBag.Title = "Calendar";
+}
+
+<h2>Course Calendar</h2>
+
+<p>@Html.ActionLink("Back to Dashboard", "Index", "Home")</p>
+<p>@Html.ActionLink("Go to Events", "Index", "Event")</p>
+<p>@Html.ActionLink("Download Course Calendar", "DownloadCourseCalendar", new { id = ViewBag.CourseID })</p>
+<p>@Html.ActionLink("Add Course Calendar to Your Google Calendar (Experimental)", "SubscribeToCalendar", new { id = ViewBag.CourseID })</p>
+

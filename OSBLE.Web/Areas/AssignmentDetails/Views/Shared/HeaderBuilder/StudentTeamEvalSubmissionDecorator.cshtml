@@ -1,0 +1,16 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+    string displayValue = dataModel.TeamEval.displayValue;
+}
+<tr>
+<th>Team Evaluation:</th>
+<td>
+    @Html.ActionLink(displayValue, 
+                    "StudentTeamEvaluation", 
+                    "Assignment", 
+                    new { assignmentId = dataModel.TeamEval.assignmentId, area=""}, new { })
+</td>
+</tr>

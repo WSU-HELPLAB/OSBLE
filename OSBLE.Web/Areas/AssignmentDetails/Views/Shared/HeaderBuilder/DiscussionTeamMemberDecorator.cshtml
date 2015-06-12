@@ -1,0 +1,120 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Courses
+@using OSBLE.Models.Assignments
+@using OSBLE.Models.Users;
+@using OSBLE.Models.ViewModels;
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+    List<List<Poster>> ListOfListOfPosters = dataModel.DiscussionTeam.ListOfListOfPosters;
+    List<string> ListOfTeamNames = dataModel.DiscussionTeam.ListOfTeamNames;
+    List<int> ListOfTeamIDs = dataModel.DiscussionTeam.ListOfTeamIDs;
+    List<bool> ListOfHideMailIcon = dataModel.DiscussionTeam.ListOfHideMailIcon;
+    Assignment assignment = dataModel.DiscussionTeam.Assignment;
+    List<int> ListOfNewPostCounts = dataModel.DiscussionTeam.ListOfNewPostCounts;
+    Dictionary<int, int> TeamsToAuthors = dataModel.DiscussionTeam.TeamsToAuthors;
+    
+}
+<tr>
+    <!--Team members row-->
+    <th>
+        @if (ListOfListOfPosters.Count == 1)
+        {
+            @:Discussion:
+        }
+        else
+        {
+            @:Discussions:
+        }
+    </th>
+    <td>
+        <table class="UserList">
+            @*Row 1: Iterate over names, display in first row, each in own cell*@
+            @*Row 2: Iterate over list of lists. For each list create an UL with its team members*@
+            <tr>
+                @for (int i = 0; i < ListOfTeamNames.Count; i++)
+                {
+                    <td style="border: none">
+                        @Html.ActionLink("Discussion for " + ListOfTeamNames[i],
+                                            "Index", "DiscussionAssignment",
+                                              new { assignmentId = assignment.ID, discussionTeamId = ListOfTeamIDs[i], area = "" },
+                                             new { })
+
+                        @if (ListOfHideMailIcon[i] == false)
+                        {
+                            <a title="Email whole team" href="@Url.Action("CreateDiscussionTeam", "Mail", new { discussionTeamId = ListOfTeamIDs[i], area = "" })">@Helpers.MailButton()</a>
+                        }
+                        @if (ListOfNewPostCounts[i] > 0)
+                        {
+                            <br />
+                            @Html.ActionLink("View " + ListOfNewPostCounts[i] + " Unread Posts",
+                                            "Index", "DiscussionAssignment",
+                                                new { assignmentId = assignment.ID, discussionTeamId = ListOfTeamIDs[i], displayNewPosts = true, area = "" },
+                                                new { }) 
+                        
+                        }
+                    </td>
+                }
+            </tr>
+
+
+            <tr>
+                @if (assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
+                {
+                    for (int i = 0; i < ListOfTeamIDs.Count; i++)
+                    {
+                    <td style="border: none">
+                        @Html.ActionLink("Access reviewed items to discuss",
+                                    "GetDocumentsForCriticalReviewDiscussion",
+                                    "FileHandler",
+                                    new { area = "", discussionTeamID = ListOfTeamIDs[i] },
+                                    new { onclick = "create_and_open_downloading_submission_dialog()" })
+                        @if (assignment.PreceedingAssignment != null)
+                        {
+                            if (assignment.PreceedingAssignment.HasStudentRubric == true)
+                            {
+                                <br />
+                                @Html.ActionLink("Access merged rubrics to discuss",
+                                            "ViewForCriticalReview",
+                                            "Rubric",
+                                            new { area = "", assignmentId = assignment.PrecededingAssignmentID, authorTeamId = TeamsToAuthors[ListOfTeamIDs[i]] },
+                                             new { });
+                            }
+                        }
+                    </td>
+                    }
+                }
+            </tr>
+            <tr>
+
+                @foreach (List<Poster> posterList in ListOfListOfPosters)
+                {
+                    <td style="vertical-align: top; border: none">
+                        @foreach (Poster poster in posterList.OrderBy(p => p.Anonymize).ThenBy(p => p.CourseUser.AbstractRoleID, new CourseRole.CourseRolesInOrder()).ToList())
+                        {
+                            <li>
+                                <div class="UserControls">
+                                    @if (poster.Anonymize == false && poster.CourseUser.UserProfile.UserName != null)
+                                    {
+                                        <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { id = poster.CourseUser.ID, area = "" })">@Helpers.MailButton()</a>
+                                    }
+                                </div>
+                                <div>
+                                    @if (poster.Anonymize == false)
+                                    {
+                                        @Helpers.SmallProfilePicture(Url.Action("ProfilePicture", "Roster", new { userProfile = poster.CourseUser.UserProfile.ID, area = "" }))
+                                    }
+                                    else
+                                    {
+                                        @Helpers.SmallDefaultProfilePicture();
+                                    }
+                                </div>
+                                <span class="roster_name">@poster.DisplayName</span>
+                            </li> 
+                        }
+                    </td>
+                }
+            </tr>
+        </table>
+    </td>
+</tr>

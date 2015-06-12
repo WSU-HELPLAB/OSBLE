@@ -1,0 +1,76 @@
+﻿@using OSBLE.Models.Assignments;
+@using OSBLE.Models.Courses;
+@model Assignment
+@{
+    List<CourseUser> moderators = ViewBag.Moderators;   
+}
+
+@section Header{
+    <link href="@Url.Content("~/areas/AssignmentWizard/Content/css/team.css")" type="text/css" rel="Stylesheet" />
+    <script src="@Url.Content("~/areas/AssignmentWizard/Content/js/criticalReviewDiscussionTeams.js")" type="text/javascript"></script>
+}
+
+<input type="hidden" value="@Html.AttributeEncode(Model.ID)" name="ID" />
+<div id="AvailableModeratorList" style="display:@(ViewBag.DisplayModeratorList)">
+    <h3>
+        @ViewBag.ModeratorListTitle</h3>
+    <ul id="AvailableModerators" class="ModeratorsDraggable">
+        @foreach (CourseUser cu in moderators)
+        {
+            string modDisplayName = cu.DisplayNameWithRole((int)CourseRole.CourseRoles.Instructor);
+            <li data-id="cu_@(cu.ID)" id="cu_@(cu.ID)" class="ui-state-default Moderator">@modDisplayName
+                <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @modDisplayName" title="remove @modDisplayName" onclick="removeFromTeam(this)" />
+            </li>
+        }
+    </ul>
+</div>
+
+<div id="TeamsDiv">
+    <div id="ErrorBox">
+        This is the error box</div>
+
+    <h3>Teams</h3>
+
+    @{int counter = 0;
+      string displayName = "";
+      string roleClass = "";  }
+    @foreach (DiscussionTeam dt in ViewBag.criticalReviewDiscussionTeams)
+    {
+        counter++;
+        <div class="TeamDiv">
+            <input name="discussionTeamName_@(dt.ID)" type="text" class="TeamNameTextBox" value="@dt.Team.Name" />
+            <ul id="discussionTeam_@(dt.ID)" class="TeamSortable">
+                @foreach (TeamMember member in dt.GetAllTeamMembers())
+                {
+                    if (member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA || member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
+                    {
+                        displayName = member.CourseUser.DisplayNameWithRole((int)CourseRole.CourseRoles.Instructor);
+                        roleClass = "Moderator";
+                    }
+                    else
+                    {
+                        displayName = member.CourseUser.DisplayName((int)CourseRole.CourseRoles.Instructor);
+                        roleClass = "Student";    
+                    }
+                    <li data-id="cu_@(member.CourseUserID)" id="cu_@(member.CourseUserID)" class="ui-state-default @roleClass">@displayName
+                    @if (roleClass == "Moderator")
+                    {
+                        <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @displayName" title="remove @displayName" onclick="removeFromTeam(this)" />
+                    }
+                    </li>
+                }
+            </ul>
+        </div>
+                if (counter % 3 == 0)
+                {
+                    <div style="clear:both;"></div>
+                }
+    }
+</div>
+
+
+<!--hidden inputs for keep track of moderators-->
+@foreach (CourseUser cu in moderators)
+{
+    <input type="hidden" id="moderator_@(cu.ID)" name="moderator_@(cu.ID)" value="" />
+}

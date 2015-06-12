@@ -1,0 +1,172 @@
+﻿@model List<OSBLE.Models.HomePage.Event>
+@using OSBLE.Models.HomePage
+@using OSBLE.Resources
+@{
+    //Get time zone cookie
+    DateTime lastDate = DateTime.Parse("1/1/1990");
+    HttpCookie cookieOffset = new HttpCookie("utcOffset");
+    cookieOffset = Request.Cookies["utcOffset"];
+    int utcOffset;
+    if(cookieOffset != null)
+    {
+        string UtcOffsetString = cookieOffset.Value;
+        utcOffset = Convert.ToInt32(UtcOffsetString);
+    }
+    else
+    {
+        utcOffset = 0;
+    }
+}
+
+<script type="text/javascript">
+    //we need to update the events timestamps when it's done loading
+    $(document).ready(function () {
+        parseDates();
+    });
+</script>
+
+<ul id="event_list">
+    @{
+        DateTime tmpLastDate = lastDate;
+    }
+
+    @foreach (Event e in Model)
+    {
+        //Check to see if the utc adjusted times are different if they are
+        //then the event is truly on a new day in the user's time zone
+        DateTime tmpDateNew = e.StartDate;// .AddMinutes(-utcOffset);
+             
+        if (tmpLastDate.Date != tmpDateNew.Date)
+        {
+            lastDate = e.StartDate;
+            tmpLastDate = tmpDateNew;           
+        <li class="event_date">
+            <time class="utc-time"
+                datetime="@Helpers.DateAsUnixTime(lastDate)" 
+                data-original-date="@Helpers.RawDate(lastDate)" 
+                data-date-format="dddd, MMMM D, YYYY">
+                @ShowDate(lastDate)
+            </time>
+        </li>
+        }
+        <li id="event_@(e.ID)" class="event">
+            <div class="event_tools">
+                @if (ViewBag.ActiveCourse.AbstractCourse.AllowEventPosting)
+                {
+                    <a href="@Url.Action("Create", "Event", new { start = e.StartDate })" title="Add Event At This Time">@Helpers.AddButton()</a>
+                }
+                @if (ViewBag.ActiveCourse.AbstractRole.CanModify && !e.HideDelete)
+                {
+                    <a title="Modify This Event" href="@Url.Action("Edit", "Event", new { ID = e.ID })">@Helpers.EditButton()</a>
+                }
+                @if (ViewBag.ActiveCourse.AbstractRole.CanModify && !e.HideDelete)
+                {
+                    <form action="@Url.Action("Delete", "Event")"
+                        style="display: inline;"
+                        data-ajax="true"
+                        data-ajax-success="$('#event_@(e.ID)').hide('blind',{},'slow',function(){$(this).remove();})"
+                        data-ajax-confirm="Are you sure you want to delete this event?"
+                        method="post">
+                        <input type="hidden" name="ID" value="@e.ID" />
+                        @Helpers.DeleteSubmit("Delete This Event")
+                    </form>
+                }
+            </div>
+            @if (!e.NoDateTime)
+            {
+                <div class="event_time">
+                    <time class="utc-time-events"
+                style="font-size:small;"
+                datetime="@Helpers.DateAsUnixTime(e.StartDate)" 
+                data-original-date="@Helpers.RawDate(e.StartDate)" 
+                data-date-format="hh:mm A">
+                        @ShowEventTime(e.StartDate, e) (UTC)
+                    </time>
+             
+                    @if ((e.EndDate != null))
+                    {
+
+                        DateTime endDate = (DateTime)(e.EndDate.Value);
+                        string dateFormatString = "hh:mm A";
+                        if (endDate.Date.CompareTo(e.StartDate.Date) != 0)
+                        {
+                            dateFormatString = "dddd hh:mm A";
+                        }
+                        @:&mdash;
+
+                        <time class="utc-time-events"
+                style="font-size:small;"
+                datetime="@Helpers.DateAsUnixTime(endDate)" 
+                data-original-date="@Helpers.RawDate(endDate)" 
+                data-date-format="@dateFormatString">
+                            @ShowEventTime(endDate, e) (UTC)
+                       </time>
+                    }
+
+@*                                            <time class="utc-time"
+                style="font-size:small;"
+                datetime="@Helpers.DateAsUnixTime(e.StartDate)" 
+                data-original-date="@Helpers.RawDate(e.StartDate)" 
+                data-date-format="hh:mm A"
+                >
+                    <span style="font-size: small;">@ShowEventTime(e.StartDate, e)</span>
+                                                </time>
+                    @if ((e.EndDate != null))
+                    {
+                        DateTime endDate = (DateTime)e.EndDate;
+                        string dateFormatString = "hh:mm A";
+                        if (endDate.Date.CompareTo(e.StartDate.Date) != 0)
+                        {
+                            dateFormatString = "dddd hh:mm A";
+                        }
+                        @:&mdash;
+
+                        <time class="utc-time"
+                style="font-size:small;"
+                datetime="@Helpers.DateAsUnixTime(endDate)" 
+                data-original-date="@Helpers.RawDate(endDate)" 
+                data-date-format="@dateFormatString"
+                >
+                            <span style="font-size: small">@ShowEventTime(endDate, e) Test</span>
+                        </time>
+                    }*@
+                </div>
+            }
+            <div>
+                <small><b>@e.Title</b></small>
+            </div>
+            @if (e.Description != null)
+            {
+                <div class="event_description">
+                    @{
+                //@Html.Raw(HttpUtility.HtmlDecode(Helpers.WikiUrlLinking(e.Description.Replace("\n", "<br />").ToString()))
+                string description = e.Description;
+                description = description.Replace("\n", "<br />");
+                    }
+                    <small>@Html.Raw(HttpUtility.HtmlDecode(Helpers.WikiUrlLinking(e.Description).ToString()))</small>
+                </div>
+            }
+        </li>
+    }
+</ul>
+
+@helper ShowDayAndTime(DateTime dt)
+{
+    @dt.ToString("ddd @ h:mm tt");
+}
+
+@helper ShowTime(DateTime dt)
+{
+    @dt.ToString("h:mm tt");
+}
+@helper ShowEventTime(DateTime dt, Event e)
+{
+    if (!e.HideTime)
+    {
+    @dt.ToString("h:mm tt");
+    }
+}
+@helper ShowDate(DateTime dt)
+{
+    @dt.ToString("dddd, MMMM D, YYYY");
+}

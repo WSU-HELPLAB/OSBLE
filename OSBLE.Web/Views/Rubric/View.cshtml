@@ -1,0 +1,22 @@
+﻿@model OSBLE.Models.ViewModels.RubricViewModel
+@using OSBLE.Models.Courses.Rubrics;
+@using OSBLE.Models.Assignments;
+
+@{
+    ViewBag.Title = "Rubric Evaluation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Rubric Evaluation of @ViewBag.AssignmentName </h2>
+@*<a href="/Rubric/ExportAllToCSV">Export Rubric For Each Student</a>*@
+@Html.ActionLink("Export All Rubric's", "ExportAllToCSV", new { assignID = Model.SelectedAssignment.ID }, new { })
+<a href="/Rubric/ImportAllToCSV">Import Rubric For Each Student</a>
+<div><br /></div>
+
+@if (ViewBag.DisplayGrade)
+{
+    <h3>Grade: @ViewBag.Grade</h3>
+}
+          
+@Html.Partial("_Display", Model)
+          
