@@ -1,0 +1,397 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{85886C57-E5B3-4009-8743-4A7C0228E6ED}</ProjectGuid>
+    <ProjectTypeGuids>{A1591282-1198-4647-A2B1-27E5FF5F6F3B};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ReviewInterfaceBase</RootNamespace>
+    <AssemblyName>Osble</AssemblyName>
+    <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
+    <SilverlightApplication>true</SilverlightApplication>
+    <SupportedCultures>
+    </SupportedCultures>
+    <XapOutputs>true</XapOutputs>
+    <GenerateSilverlightManifest>true</GenerateSilverlightManifest>
+    <XapFilename>ReviewInterfaceBase.xap</XapFilename>
+    <SilverlightManifestTemplate>Properties\AppManifest.xml</SilverlightManifestTemplate>
+    <SilverlightAppEntry>ReviewInterfaceBase.App</SilverlightAppEntry>
+    <TestPageFileName>OsbleTestPage.html</TestPageFileName>
+    <CreateTestPage>true</CreateTestPage>
+    <ValidateXaml>true</ValidateXaml>
+    <EnableOutOfBrowser>true</EnableOutOfBrowser>
+    <OutOfBrowserSettingsFile>Properties\OutOfBrowserSettings.xml</OutOfBrowserSettingsFile>
+    <UsePlatformExtensions>false</UsePlatformExtensions>
+    <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
+    <LinkedServerProject>..\..\..\web\OSBLE\OSBLE.csproj</LinkedServerProject>
+    <Utf8Output>true</Utf8Output>
+    <ExpressionBlendVersion>4.0.20901.0</ExpressionBlendVersion>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+      <DisableAutoServiceReference>true </DisableAutoServiceReference>
+  </PropertyGroup>
+  <!-- This property group is only here to support building this project using the 
+       MSBuild 3.5 toolset. In order to work correctly with this older toolset, it needs 
+       to set the TargetFrameworkVersion to v3.5 -->
+  <PropertyGroup Condition="'$(MSBuildToolsVersion)' == '3.5'">
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Bin\Release</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Behaviors">
+      <HintPath>..\Behaviors.dll</HintPath>
+    </Reference>
+    <Reference Include="ChemProV">
+      <HintPath>..\ChemProV.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Expression.Interactions" />
+    <Reference Include="mscorlib" />
+    <Reference Include="Silverlight.Controls">
+      <HintPath>..\Silverlight.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="SizeableBorder">
+      <HintPath>..\SizeableBorder.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations, Version=2.0.5.0, Culture=neutral, PublicKeyToken=ddd0da4d3e678217, processorArchitecture=MSIL" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.DomainServices.Client, Version=2.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.ServiceModel.DomainServices.Client.Web, Version=2.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.ServiceModel.Web.Extensions, Version=2.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows" />
+    <Reference Include="system" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Windows.Controls, Version=2.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
+    <Reference Include="System.Windows.Controls.Data.DataForm.Toolkit, Version=4.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.Data.Input, Version=2.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
+    <Reference Include="System.Windows.Controls.Data.Toolkit, Version=4.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.DataVisualization.Toolkit, Version=4.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.Input.Toolkit, Version=4.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.Layout.Toolkit, Version=4.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.Theming.Toolkit, Version=4.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.Toolkit, Version=4.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.Toolkit.Internals, Version=4.0.5.0, Culture=neutral, PublicKeyToken=2c5c654d367bf4a7, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Interactivity, Version=4.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Windows.Browser" />
+    <Reference Include="System.Xml.Linq, Version=2.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="HelperClasses\HelperClass.cs" />
+    <Compile Include="HelperClasses\InvokeDelegateCommandAction.cs" />
+    <Compile Include="HelperClasses\NoteAuthor.cs" />
+    <Compile Include="HelperClasses\SwitchedTabEventArgs.cs" />
+    <Compile Include="HelperClasses\DocumentInfo.cs" />
+    <Compile Include="ViewModel\Comment\Location\ISpatialLocation.cs" />
+    <Compile Include="ViewModel\Comment\Location\TextLocation.cs" />
+    <Compile Include="ViewModel\Comment\ViewPeerReviewCommentViewModel.cs" />
+    <Compile Include="ViewModel\Comment\Location\XpsLocation.cs" />
+    <Compile Include="ViewModel\DocumentHolder\IDocumentHolderViewModel.cs" />
+    <Compile Include="ViewModel\DocumentHolder\SpatialDocumentHolderViewModel.cs" />
+    <Compile Include="ViewModel\Document\ChemProVDocument\ChemProVAssetViewModel.cs" />
+    <Compile Include="ViewModel\DocumentHolder\CommentManipulation.cs" />
+    <Compile Include="ViewModel\Document\XpsDocument\GlyphSelection.cs" />
+    <Compile Include="ViewModel\Document\XpsDocument\XpsSelectionHighlighting.cs" />
+    <Compile Include="ViewModel\Document\XpsDocument\XpsDocumentViewModel.cs" />
+    <Compile Include="ViewModel\Document\XpsDocument\XpsToSilverlightXamlReader.cs" />
+    <Compile Include="ViewModel\Document\XpsDocument\XpsConverter.cs" />
+    <Compile Include="ViewModel\Comment\AbstractCommentViewModel.cs" />
+    <Compile Include="ViewModel\Comment\CommentFactory.cs" />
+    <Compile Include="ViewModel\Comment\ICommentViewModel.cs" />
+    <Compile Include="ViewModel\Comment\IssueVotingCommentViewModel.cs" />
+    <Compile Include="ViewModel\FindWindow\FindWindowViewModel.cs" />
+    <Compile Include="ViewModel\Document\IDocumentViewModel.cs" />
+    <Compile Include="ViewModel\FindWindow\SearchInOptions.cs" />
+    <Compile Include="ViewModel\Document\TextDocument\HighlightingRichTextBox.cs" />
+    <Compile Include="ViewModel\Document\ISpatialDocumentViewModel.cs" />
+    <Compile Include="ViewModel\Document\TextDocument\Language\CLanguage.cs" />
+    <Compile Include="ViewModel\Document\TextDocument\Language\CPlusPlusLanguage.cs" />
+    <Compile Include="ViewModel\Document\TextDocument\Language\CSharpLanguage.cs" />
+    <Compile Include="ViewModel\Document\TextDocument\Language\ILanguage.cs" />
+    <Compile Include="ViewModel\Document\TextDocument\Language\JavaLanguage.cs" />
+    <Compile Include="ViewModel\Document\TextDocument\Language\LanguageFactory.cs" />
+    <Compile Include="ViewModel\Document\TextDocument\Language\NullLanguage.cs" />
+    <Compile Include="ViewModel\Document\TextDocument\Language\PythonLanguage.cs" />
+    <Compile Include="ViewModel\Document\TextDocument\SyntaxHighlighter.cs" />
+    <Compile Include="ViewModel\DocumentHolder\VideoDocumentHolderViewModel.cs" />
+    <Compile Include="ViewModel\Document\VideoDocument\VideoPlayerControls\TimeLineViewModel.cs" />
+    <Compile Include="ViewModel\Document\VideoDocument\VideoDocumentViewModel.cs" />
+    <Compile Include="ViewModel\Document\VideoDocument\VideoPlayerControls\VolumeControlViewModel.cs" />
+    <Compile Include="ViewModel\Behaviors\MovePopupHeader.cs" />
+    <Compile Include="ViewModel\Behaviors\ResizePopupBorder.cs" />
+    <Compile Include="ViewModel\CategoryHolder\CategoriesHolderViewModel.cs" />
+    <Compile Include="ViewModel\Category\CategoryViewModel.cs" />
+    <Compile Include="ViewModel\CustomTabControlViewModel.cs" />
+    <Compile Include="ViewModel\FindWindow\SearchOption.cs" />
+    <Compile Include="ViewModel\Rubric\CustomDataGridViewModel.cs" />
+    <Compile Include="ViewModel\Rubric\RubricViewModel.cs" />
+    <Compile Include="HelperClasses\VisualTreeHelpers.cs" />
+    <Compile Include="ViewModel\Tag\TagViewModel.cs" />
+    <Compile Include="ViewModel\Comment\PeerReviewCommentViewModel.cs" />
+    <Compile Include="Model\FindWindow\FindWindowModel.cs" />
+    <Compile Include="Model\Category\CategoryModel.cs" />
+    <Compile Include="Model\CategoryHolder\CategoryHolderModel.cs" />
+    <Compile Include="Model\Comment\CommentModel.cs" />
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModel\Comment\Location\ChemProVLocation.cs" />
+    <Compile Include="ViewModel\Comment\Location\VideoLocation.cs" />
+    <Compile Include="Model\IModel.cs" />
+    <Compile Include="Model\Rubric\CriterionModel.cs" />
+    <Compile Include="Model\Rubric\RubicModel.cs" />
+    <Compile Include="Model\Rubric\RubricHeaderModel.cs" />
+    <Compile Include="View\DocumentHolder\IDocumentHolderView.cs" />
+    <Compile Include="View\DocumentHolder\SpatialDocumentHolderView.xaml.cs">
+      <DependentUpon>SpatialDocumentHolderView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Document\ChemProVDocumentView.xaml.cs">
+      <DependentUpon>ChemProVDocumentView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Document\FindWindow\FindWindowView.xaml.cs">
+      <DependentUpon>FindWindowView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Document\FindWindow\HeaderControl.xaml.cs">
+      <DependentUpon>HeaderControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Document\IDocumentView.cs" />
+    <Compile Include="View\DocumentHolder\VideoDocumentView.xaml.cs">
+      <DependentUpon>VideoDocumentView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Document\VideoPlayerControls\TimelineView.xaml.cs">
+      <DependentUpon>TimelineView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Document\VideoDocumentView.xaml.cs">
+      <DependentUpon>VideoDocumentView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Document\VideoPlayerControls\VolumeControlView.xaml.cs">
+      <DependentUpon>VolumeControlView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Document\XpsDocumentView.xaml.cs">
+      <DependentUpon>XpsDocumentView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\CategoryHolder\CategoriesHolderView.xaml.cs">
+      <DependentUpon>CategoriesHolderView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Category\CategoryView.xaml.cs">
+      <DependentUpon>CategoryView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Comment\CollapsedCommentView.xaml.cs">
+      <DependentUpon>CollapsedCommentView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Comment\AbstractCommentView.cs" />
+    <Compile Include="View\Comment\IssueVotingCommentView.xaml.cs">
+      <DependentUpon>IssueVotingCommentView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\CustomTabControlView.xaml.cs">
+      <DependentUpon>CustomTabControlView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\LoadingWindow.xaml.cs">
+      <DependentUpon>LoadingWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Rubric\RubicView.xaml.cs">
+      <DependentUpon>RubicView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Tag\TagView.cs" />
+    <Compile Include="View\MainPageView.xaml.cs">
+      <DependentUpon>MainPageView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModel\Document\TextDocument\TextDocumentViewModel.cs" />
+    <Compile Include="ViewModel\MainPageModelView.cs" />
+    <Compile Include="ViewModel\Comment\Location\ILocation.cs" />
+    <Compile Include="Model\Tag\TagModel.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="View\Document\TextDocumentView.xaml.cs">
+      <DependentUpon>TextDocumentView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Comment\PeerReviewCommentView.xaml.cs">
+      <DependentUpon>PeerReviewCommentView.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </ApplicationDefinition>
+    <Page Include="View\DocumentHolder\SpatialDocumentHolderView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Document\ChemProVDocumentView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Document\FindWindow\FindWindowView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\Document\FindWindow\HeaderControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\DocumentHolder\VideoDocumentView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Document\VideoPlayerControls\TimelineView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\Document\VideoDocumentView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\Document\VideoPlayerControls\VolumeControlView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\Document\XpsDocumentView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\CategoryHolder\CategoriesHolderView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Category\CategoryView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Comment\CollapsedCommentView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Comment\IssueVotingCommentView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\CustomTabControlView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\LoadingWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\MainPageView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Document\TextDocumentView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Comment\PeerReviewCommentView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\Rubric\RubicView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\AppManifest.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="UI\Icons\logo128.png" />
+    <Resource Include="UI\Icons\logo16.png" />
+    <Resource Include="UI\Icons\logo32.png" />
+    <Resource Include="UI\Icons\logo48.png" />
+    <Resource Include="UI\Icons\logo_about.png" />
+    <Resource Include="UI\Icons\palette_select.png" />
+    <Resource Include="UI\Icons\palette_stickyNote.png" />
+    <Resource Include="UI\Icons\pu.png" />
+    <Resource Include="UI\Icons\pu_blank.png" />
+    <Resource Include="UI\Icons\pu_generic.png" />
+    <Resource Include="UI\Icons\pu_heat_exchanger.png" />
+    <Resource Include="UI\Icons\pu_heat_exchanger_no_utility.png" />
+    <Resource Include="UI\Icons\pu_heat_stream.png" />
+    <Resource Include="UI\Icons\pu_mixer.png" />
+    <Resource Include="UI\Icons\pu_reactor.png" />
+    <Resource Include="UI\Icons\pu_separator.png" />
+    <Resource Include="UI\Icons\pu_sink.png" />
+    <Resource Include="UI\Icons\pu_source.png" />
+    <Resource Include="UI\Icons\pu_stream.png" />
+    <Resource Include="UI\Icons\toolbar_about.png" />
+    <Resource Include="UI\Icons\toolbar_install.png" />
+    <Resource Include="UI\Icons\toolbar_new.png" />
+    <Resource Include="UI\Icons\toolbar_open.png" />
+    <Resource Include="UI\Icons\toolbar_print.png" />
+    <Resource Include="UI\Icons\toolbar_redo.png" />
+    <Resource Include="UI\Icons\toolbar_save.png" />
+    <Resource Include="UI\Icons\toolbar_save_all.png" />
+    <Resource Include="UI\Icons\toolbar_settings.png" />
+    <Resource Include="UI\Icons\toolbar_stickynote.png" />
+    <Resource Include="UI\Icons\toolbar_undo.png" />
+    <Resource Include="View\Icons\CloseButton.png" />
+    <Resource Include="View\Icons\NewComment.png" />
+    <Resource Include="View\Icons\toolbar_rightView.png" />
+    <Resource Include="View\Icons\toolbar_search.png" />
+    <Resource Include="View\Icons\toolbar_showAllComments.png" />
+    <None Include="Properties\OutOfBrowserSettings.xml" />
+    <Resource Include="View\Icons\JumpBack.png" />
+    <Resource Include="View\Icons\JumpForward.png" />
+    <Resource Include="View\Icons\FullScreen.png" />
+    <Resource Include="View\Icons\mutedSpeaker.png" />
+    <Resource Include="View\Icons\NoteHS.png" />
+    <Resource Include="View\Icons\Pause.png" />
+    <Resource Include="View\Icons\Play.png" />
+    <Resource Include="View\Icons\speaker.png" />
+    <Resource Include="View\Icons\StepBack.png" />
+    <Resource Include="View\Icons\StepForward.png" />
+    <Resource Include="View\Icons\Stop.png" />
+    <Resource Include="View\Icons\toolbar_hideAllComments.png" />
+    <Resource Include="View\Icons\toolbar_open.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Model\Document\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Icons\saveHS.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{A1591282-1198-4647-A2B1-27E5FF5F6F3B}">
+        <SilverlightProjectProperties />
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>
