@@ -1,0 +1,137 @@
+﻿@model OSBLE.Models.Courses.Course
+
+@using OSBLE.Models;
+@using OSBLE.Controllers;
+
+@{
+    ViewBag.Title = "Course Search";
+    bool atLeastOneResult = false;
+}
+
+<h2>Course Search @Helpers.CreateToolTip(ToolTips.CourseSearch)</h2>
+
+@using (Html.BeginForm("SearchResults", "Course", FormMethod.Post, new { @class = "form-class" }))
+{
+    <fieldset>
+        <legend><b>Search For Courses</b></legend>
+        @Html.Label("Search for courses to join:")
+        @Html.DropDownList("Course", ViewBag.CourseName as SelectList, "Select a Course Prefix", new { id = "Course" })
+        
+
+        @Html.Label("Course Number")
+        <select id="Number" name="Number"> </select>
+
+       
+        <p> <input type="submit" id="submitSearch" value="Search"/> </p>
+
+
+        @if (ViewBag.SearchResults != null)
+        {
+            var results = ViewBag.SearchResults;
+            <fieldset>
+                <legend>Search Results</legend>
+                <table id="searchTable">
+
+                    <tr>
+                        <th >Join</th>
+                        <th >Course Name</th>                        
+                        <th >Course Number</th>                      
+                        <th >Semester</th>                                                
+                        <th>Instructors</th>
+                    </tr>
+
+                    @foreach (var result in results)
+                    {
+                        bool isDeleted = result.IsDeleted;
+                        if (result.EndDate > DateTime.Now && !isDeleted)
+                        {
+                            atLeastOneResult = true;
+                        <tr>
+                            <td>
+                                <a style="margin-right:5px; margin-left:5px;" title="Request to join Course" href="@Url.Action("ReqestCourseJoin", "Course", new { id = result.ID })">@Helpers.AddButton()</a>
+                            </td>
+                            <td>@result.Name</td>
+                            <td>@result.Prefix @result.Number</td>
+                            <td>@result.Semester @result.Year</td>
+                            <td>
+                                @if (ViewBag.SearchResultsInstructors != null)
+                                {
+                                    <table id="searchInstructorTable">
+                                        @{
+                                            var instructors = ViewBag.SearchResultsInstructors;                                
+                                            }
+                                        <tr>
+                                            @foreach (var instructor in instructors)
+                                            {
+                                                if (instructor.AbstractCourseID == result.ID)
+                                                {
+                                                    <td>
+                                                        @instructor.UserProfile.LastName, @instructor.UserProfile.FirstName;
+                                                    </td>
+                                                }
+                                            }
+                                        </tr>
+
+                                    </table>
+                                }
+                            </td>
+                            
+                        </tr>
+                        }
+                        
+                        
+                    }
+                    @if(!atLeastOneResult)
+                    {
+                    <tr>
+                        <td>
+                            <strong>No Results.</strong>
+                        </td>
+                    </tr>
+                    }
+                </table>
+
+            </fieldset>
+        }
+
+    </fieldset>
+}
+
+<script type="text/jscript">
+    $(function () {
+        $('#Number').prop('disabled', true);
+        $('#submitSearch').prop('disabled', true);
+        $('#Course').change(function () {
+            $('#Number').prop('disabled', false);
+            $('#submitSearch').prop('disabled', false);
+            $.getJSON('/Course/CourseNumber/' + $('#Course').val(), function (data) {
+                var items = '<option>Search All</option>';
+                var prefix = new Array();               
+                $.each(data, function (i, Number) {
+                    if ($.inArray(Number.Text, prefix) == -1) {
+                        prefix.push(Number.Text);
+                    }
+                });
+                $.each(prefix, function (i, Number) {
+                    items += "<option value='" + Number + "'>" + Number + "</option>";
+                });
+                $('#Number').html(items);
+            });
+        });
+    });
+
+</script>
+
+
+
+   
+
+
+
+
+
+
+
+
+
+

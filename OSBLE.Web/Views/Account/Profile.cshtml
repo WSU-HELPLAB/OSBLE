@@ -1,0 +1,276 @@
+﻿@using System.Web.UI.WebControls
+@using OSBLE.Models
+@using OSBLE.Models.Users
+@using OSBLE.Models.Courses
+
+@model OSBLE.Models.ChangePasswordModel
+
+@{
+    ViewBag.Title = "Profile";
+}
+
+<h2>Current User Information @Helpers.CreateToolTip(ToolTips.CurrentuserInformation)</h2>
+<div>
+    
+@using (Html.BeginForm("UpdateUserEmail", "Account"))
+{
+
+    <table>
+        <tr>
+            <th>
+                Institution:
+            </th>
+            <td style="background: #E4E4E4; text-align: center; width: 300px;">
+                @ViewBag.UserSchool
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>
+                Name:
+            </th>
+            <td style="background: #E4E4E4; text-align: center">
+                @ViewBag.CurrentUser.LastName, @ViewBag.CurrentUser.FirstName
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>
+                Email<br />Address: 
+            </th>
+            <td style="background: #E4E4E4; text-align: center">
+                <br />
+                @ViewBag.CurrentUser.UserName
+            </td>
+            <td>
+                
+                
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <input name="newEmail" id="newEmail" class="fillInput" placeholder="Enter new email." />
+            </td>
+            <td>@Html.ValidationMessage("NewEmail")</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td class="topAlignContent">
+                <input name="matchingEmail" id="matchingEmail" class="fillInput" placeholder="Verify new email." />
+            </td>
+            <td>
+                <input type="submit" value="Change Email" class="profileSubmitButton" />
+                <div class="profileWarning">
+                    (<strong>NOTE:</strong> changing your email will require you to re-log in.)    
+                </div>
+                
+
+            </td>
+        </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+        </table>
+ }       
+@using (Html.BeginForm("UpdateUserIdentification", "Account"))
+{
+    <table>
+        <tr>
+            <th>
+                School ID:
+            </th>
+            <td style="background: #E4E4E4; text-align: center; width: 300px;">
+                @ViewBag.CurrentUser.Identification
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td >
+                <input name="changeIdentification" id="changeIdentification" class="fillInput" placeholder="Enter School ID." />
+            </td>
+            <td>@Html.ValidationMessage("ChangeIdentification")</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td class="topAlignContent">
+                <input name="matchingIdentification" id="matchingIdentification" class="fillInput" placeholder="Verify School ID." />
+            </td>
+            <td>
+                <input type="submit" value="Change Identification" class="profileSubmitButton" />
+                <div class="profileWarning">
+                    (<strong>WARNING:</strong> This MUST match the identification used by instructors on course rosters!)
+                </div>
+
+            </td>
+        </tr>
+    </table>
+}
+</div>
+
+<h2>Upload Profile Picture @Helpers.CreateToolTip(ToolTips.AccountProfilePicture) </h2>
+@Helpers.ProfilePicture(Url.Action("Picture", "User", new { id = ViewBag.CurrentUser.ID }))
+
+<div id="picture_upload">
+    @using (Html.BeginForm("UploadPicture", "Account", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <input type="file" name="file" />
+        <input type="submit" value="Upload Picture" />
+        <input name="remove" type="submit" value="Reset Picture" id="remove_picture" onclick="return confirm('Are you sure you want to reset your profile picture?')" />
+    }
+</div>
+
+<p><em>Supported Formats: BMP, GIF, EXIF, JPG, PNG and TIFF</em></p>
+
+<h2>Change Password @Helpers.CreateToolTip(ToolTips.AccountChangePassword) </h2>
+<p>
+    Use the form below to change your password.
+</p>
+<p>
+    New passwords are required to be a minimum of @Membership.MinRequiredPasswordLength characters in length.
+</p>
+
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+
+@using (Html.BeginForm())
+{
+    @Html.ValidationSummary(true, "Password change was unsuccessful. Please correct the errors and try again.")
+    <div>
+
+        <div class="editor-label">
+            @Html.LabelFor(m => m.OldPassword)
+        </div>
+        <div class="editor-field">
+            @Html.PasswordFor(m => m.OldPassword)
+            @Html.ValidationMessageFor(m => m.OldPassword)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(m => m.NewPassword)
+        </div>
+        <div class="editor-field">
+            @Html.PasswordFor(m => m.NewPassword)
+            @Html.ValidationMessageFor(m => m.NewPassword)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(m => m.ConfirmPassword)
+        </div>
+        <div class="editor-field">
+            @Html.PasswordFor(m => m.ConfirmPassword)
+            @Html.ValidationMessageFor(m => m.ConfirmPassword)
+        </div>
+
+        <p>
+            <input type="submit" value="Change Password" />
+        </p>
+    </div>
+}
+
+<h2>Email Notifications @Helpers.CreateToolTip(ToolTips.AccountEmailNotifications) </h2>
+
+@using (Html.BeginForm("UpdateEmailSettings", "Account"))
+{
+    <p>
+        <input type="checkbox" value="True" name="EmailAllNotifications" @if (ViewBag.CurrentUser.EmailAllNotifications) { <text> checked="checked" </text> } />
+        <text>Send all OSBLE notifications to my e-mail address.</text>
+    </p>
+
+    <p>
+        <input type="checkbox" value="True" name="EmailAllActivityPosts" @if (ViewBag.CurrentUser.EmailAllActivityPosts) { <text> checked="checked" </text> } />
+        <text>Send all activity feed posts to my e-mail address.</text>
+    </p>
+
+    <p>
+        <input type="checkbox" value="True" name="EmailNewDiscussionPosts" @if (ViewBag.CurrentUser.EmailNewDiscussionPosts) { <text> checked="checked" </text> } />
+        <text>Send all discussion posts to my e-mail.</text>
+    </p>
+
+    <p>
+        <input type="submit" value="Update Email Settings" />
+    </p>
+
+}
+
+<h2>Course and Community Menu @Helpers.CreateToolTip(ToolTips.AccountMenuOptions) </h2>
+
+<p>Hidden courses/communities will not appear in your course list or your activity feed and must be unchecked to access again.</p>
+<p>Withdrawing from a course will remove you from all course activity. To be re-added you must ask the instructor of the course to add you manually or use the course search to request access.</p>
+<p>Your default course will be the active course each time you log on to OSBLE.</p>
+@{
+}
+@using (Html.BeginForm("UpdateMenu", "Account"))
+{
+    @Html.ValidationSummary()
+    <div>
+
+        <table>
+            <tr>
+                <th>Default</th>
+                <th>Name</th>
+                <th>Hidden</th>
+                <th>Withdraw</th>
+            </tr>
+            @{
+    bool firstCourse = true;
+            }
+            @foreach (CourseUser cu in ViewBag.CurrentCourses)
+            {
+                if (cu.AbstractRoleID != (int)CourseRole.CourseRoles.Pending)
+                {
+
+
+                    <tr>
+                        <td class="coursemenu_option">
+                            <input type="radio" name="defaultCourse" value="@cu.AbstractCourseID" @if ((cu.AbstractCourseID == ViewBag.CurrentUser.DefaultCourse) || ((ViewBag.CurrentCourses as List<CourseUser>).Where(c => c.AbstractCourseID == ViewBag.CurrentUser.DefaultCourse).Count() == 0 && firstCourse)) { <text> checked="checked" </text>  } />
+                        </td>
+
+                        <td>
+
+                            @if (cu.AbstractCourse is Course)
+                            {
+                                Course c = cu.AbstractCourse as Course;
+                                <small>Course [@c.Semester @c.Year]</small>
+                            }
+                            else
+                            {
+                                <small>Community</small>
+                            }
+
+                            @Helpers.CourseTag(cu.AbstractCourse) &mdash; @cu.AbstractCourse.Name (@cu.AbstractRole.Name)
+                        </td>
+                        <!--Dont show hidden button if the user is Pending-->
+                        @if(cu.AbstractRole.Name == "Pending")
+                        {
+                            <td class="coursemenu_option">
+                                <input type="hidden" value="True" name="cu_hidden_@(cu.AbstractCourseID)" @if (cu.Hidden) { <text> checked="checked" </text> } />
+                            </td>
+                            <!--yc adding withdraw-->
+                            <td class="coursemenu_option">
+                                <input type="checkbox" value="True" name="cu_withdraw_@(cu.AbstractCourseID)" />
+                            </td>
+                        }
+                        else
+                        {
+                            <td class="coursemenu_option">
+                                <input type="checkbox" value="True" name="cu_hidden_@(cu.AbstractCourseID)" @if (cu.Hidden) { <text> checked="checked" </text> } />
+                            </td>
+                            <!--yc adding withdraw-->
+                            <td class="coursemenu_option">
+                                <input type="checkbox" value="True" name="cu_withdraw_@(cu.AbstractCourseID)" />
+                            </td>
+                        }
+                    </tr>
+                    firstCourse = false;
+                }
+            }
+        </table>
+        <p>
+            <input type="submit" value="Update Menu" />
+        </p>
+    </div>
+}

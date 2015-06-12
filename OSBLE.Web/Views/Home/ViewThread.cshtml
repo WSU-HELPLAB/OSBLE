@@ -1,0 +1,18 @@
+﻿@model OSBLE.Models.HomePage.DashboardPost
+
+@{
+    ViewBag.Title = "View Thread";
+    ViewBag.CurrentTab = "Dashboard";
+    var dp = ViewBag.DashboardPost;
+}
+
+<h2>
+    Dashboard Discussion Thread
+    <a href="@Url.Action("DownloadDashboardPosts", "Course", new {id = dp.ID })" title="Download Dashboard Posts as csv">@Helpers.UnPublishButton()</a>
+</h2>
+
+<div>
+@Html.ActionLink("Back to Dashboard","Index")
+</div>
+
+@Html.Partial("_DashboardPost",Model)

@@ -1,0 +1,175 @@
+﻿@{
+    ViewBag.Title = "Gradebook";
+    List<string> TabNames = ViewBag.TabNames;
+    string SelectedTab = ViewBag.SelectedTab;
+    List<List<string>> Table = ViewBag.TableData;
+    bool GradeBookExists = ViewBag.GradeBookExists;
+    bool IsInstructorOrTa = ViewBag.CanUpload;
+    bool DisplaySearch = false;
+    int NameColumnIndex = -1;
+    List<int> hiddenColumnIndicies = ViewBag.Instructor_ColumnsToHide;
+    if(ViewBag.NameColumnIndex != null)
+    {
+        DisplaySearch = true;
+        NameColumnIndex = ViewBag.NameColumnIndex;
+    }
+    List<int> globalRowIndicies = ViewBag.GlobalRows;
+}
+
+
+    @if (IsInstructorOrTa)
+    {
+        <!--Upload Gradebook Form-->
+        <form id="upload_gradebook" enctype="multipart/form-data" method="post" action="/Gradebook/UploadGradebook">
+            <legend>@ViewBag.LastUploadMessage</legend>
+            <input type="file" id="file" name="file"/ onchange="check_extension(this.value)"><br />
+            <input id="upload" type="submit" value="Upload" disabled="disabled"/> 
+            @{string helpLink = Url.Action("GradebookHelp", "Gradebook", new { area = "" });}
+            <a style="font-size:small; text-decoration:none" href="@helpLink">Learn More...</a>
+            <br />
+            <text id="errorMsg">@ViewBag.UploadErrorMsg</text>
+            <a href="~/Content/gradebook.zip">download Excel plugin</a>
+        </form>
+    }
+    else
+    {
+        @:<text id="upload_gradebook">@ViewBag.LastUploadMessage</text>
+    }
+    
+    
+    <h2>@ViewBag.Title </h2>
+
+    @if (GradeBookExists == false)
+    {
+        <h3>No Gradebook Uploaded.</h3>
+    }
+    else
+    {
+        <ul id="GradebookNav">
+            @foreach (string tabName in TabNames)
+            {
+                string liClasses = "GradebookNavItem";
+                if (tabName == SelectedTab)
+                {
+                    liClasses += " GradebookNavActive";
+                    <li class="@liClasses"><text>@tabName</text></li>
+                }
+                else
+                {
+                    string actionLink = Url.Action("Index", "Gradebook", new { area = "", gradebookName = tabName });
+                    liClasses += " GradebookNavNotActive";
+                    <li class="@liClasses"><a href="@actionLink">@tabName</a></li>
+                }
+            }
+        </ul>
+        <br />
+        <div>
+                @if (DisplaySearch)
+                {
+                    <span>Search by name:</span>
+                    <input id="search"></input>
+                    <br />
+                }
+
+                <!--table here-->
+                <table id="Gradebook">
+                @for (int i = 0; i < Table.Count; i++)
+                {
+                    string rowClass = "";
+                    if (i == 0)
+                    {
+                        rowClass = "HeaderRow";
+                    }
+
+                    if (globalRowIndicies != null && globalRowIndicies.Contains(i))
+                    {
+                        rowClass += " GlobalRow";
+                    }
+                    <tr class="@rowClass">
+                        
+                        @for (int j = 0; j < Table[i].Count; j++)
+                        {
+                            if (hiddenColumnIndicies == null || hiddenColumnIndicies.Contains(j) == false)
+                            {
+                                string tdId = "";
+                                string tdClass = "";
+                                if (DisplaySearch && j == NameColumnIndex)
+                                {
+                                    tdId = Table[i][j].ToLower();
+                                    tdClass = "searchableName";
+                                }
+
+                                string displayValue = Table[i][j];
+                                if (displayValue.Length > 0 && (displayValue[0] == '!' || displayValue[0] == '#'))
+                                {
+                                    displayValue = displayValue.Substring(1, displayValue.Length - 1);
+                                }
+
+                                if (globalRowIndicies.Contains(i) || i == 0)
+                                {
+                                <th>@displayValue</th>
+                                }
+                                else
+                                {
+                                <td class="@tdClass" id="@tdId">@displayValue</td>
+                                
+                                }
+                            }
+
+                        }
+                    </tr>
+                }
+
+                </table>
+        </div>
+    }
+
+<script type="text/javascript">
+
+    $('#search').keyup(function (event) {
+        if (event.keyCode == 13) {
+            filterTable($('#search').val().toLowerCase());
+        }
+        
+    });
+
+    function filterTable(input) {
+        $('.searchableName').each(function () {
+            var parentRow = this.parentElement;
+            if ($(parentRow).hasClass("GlobalRow") == false) {
+                $(parentRow).hide();
+            }
+            
+        });
+
+        var selector = ".searchableName[id*=\"" + input + "\"]'";
+        $(selector).each(function () {
+
+            var parentRow = this.parentElement;
+            $(parentRow).show();
+        });
+    }
+
+    
+    var hash = {
+    '.csv' : 1,
+    '.zip' : 1,
+    '.zip.zip' : 1, //accept ".zip.zip" and ".csv.csv" because they are valid types, the user just named them with extension as well
+    '.csv.csv' : 1
+    };
+
+    function check_extension(filename) {
+        var re = /\..+$/;
+        var ext = filename.match(re);
+        if (hash[ext] ==  1) {
+            $('#upload').removeAttr("disabled");
+            $("#errorMsg").text("");
+            return true;
+        } 
+        else {
+            $("#errorMsg").text("Invalid File Type");
+            $('#upload').attr("disabled", "disabled");
+            return false;
+        }
+    }
+</script>
