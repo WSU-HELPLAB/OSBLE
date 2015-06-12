@@ -1,0 +1,17 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;               
+}
+
+<tr>
+    <th>Rubric</th>
+    <td>
+         @Html.ActionLink("View Rubric", 
+         "ViewAsUneditable", 
+         "Rubric", 
+         new { assignmentId = dataModel.rubric.assignmentID, area = "" }, 
+         new { })
+    </td>
+</tr>

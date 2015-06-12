@@ -1,0 +1,23 @@
+﻿@{
+    Layout = "~/Views/Shared/_LogOn.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Error</title>
+    <h2>Error Encountered</h2>
+</head>
+<body>
+    <p>
+        We have an encountered an error when trying to process your request. <br />
+    </p>
+    <p>
+    If you were in the middle of completing an action, please check to see if the action was completed. If it was not, please try again.<br />
+    </p>
+    <p>
+    If you continue to receive this error when trying to complete the same action, please @Html.ActionLink("contact us", "ContactUs", "Account")<br />
+    </p>
+</body>
+</html>

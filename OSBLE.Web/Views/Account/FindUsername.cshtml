@@ -1,0 +1,34 @@
+﻿@model OSBLE.Models.FindUserNameModel
+
+@using OSBLE.Models
+
+@{
+    ViewBag.Title = "Find Username";
+    Layout = "~/Views/Shared/_LogOn.cshtml";
+}
+
+<h2>Find Username</h2>
+
+@using (Html.BeginForm())
+{
+    <div>
+        <div class="editor-label">
+            @Html.LabelFor(m => m.SchoolName)
+        </div>
+        <div class="editor-label">
+            @Html.DropDownListFor(m => m.SchoolName, new SelectList(Model.Schools))
+        </div>
+        <div class="editor-label">
+            @Html.LabelFor(m => m.SchoolID)
+        </div>
+        <div class="editor-label">
+            @Html.TextBoxFor(m => m.SchoolID)
+        </div>
+        <div>
+            @*@Html.Partial("_ReCaptcha")*@
+        </div>
+        <p>
+            <input type="submit" value="Find Username" />
+        </p>
+    </div>
+}

@@ -1,0 +1,191 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{6873CAF7-4914-4B62-AF7E-BFFFA0A9FFD4}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OSBLE</RootNamespace>
+    <AssemblyName>OSBLE.Library</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="Ionic.Zip">
+      <HintPath>..\packages\DotNetZip.1.9.1.8\lib\net20\Ionic.Zip.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.DomainServices.Server, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.4.0.20710.0\lib\net40\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Attributes\EmailAttribute.cs" />
+    <Compile Include="FileSystem.cs" />
+    <Compile Include="IdenticonRenderer.cs" />
+    <Compile Include="Models\AbstractCourses\AbstractCourse.cs" />
+    <Compile Include="Models\AbstractCourses\AbstractRole.cs" />
+    <Compile Include="Models\AbstractCourses\AssessmentCommittee\ABETEvaluatorRole.cs" />
+    <Compile Include="Models\AbstractCourses\AssessmentCommittee\AssessmentCommittee.cs" />
+    <Compile Include="Models\AbstractCourses\AssessmentCommittee\AssessmentCommitteeChairRole.cs" />
+    <Compile Include="Models\AbstractCourses\AssessmentCommittee\AssessmentCommitteeMemberRole.cs" />
+    <Compile Include="Models\AbstractCourses\AssessmentCommittee\AssessmentCommitteeRole.cs" />
+    <Compile Include="Models\AbstractCourses\Community\Community.cs" />
+    <Compile Include="Models\AbstractCourses\Community\CommunityRole.cs" />
+    <Compile Include="Models\AbstractCourses\CourseRubric.cs" />
+    <Compile Include="Models\AbstractCourses\Course\Course.cs" />
+    <Compile Include="Models\AbstractCourses\Course\CourseBreak.cs" />
+    <Compile Include="Models\AbstractCourses\Course\CourseMeeting.cs" />
+    <Compile Include="Models\AbstractCourses\Course\CourseRole.cs" />
+    <Compile Include="Models\AbstractCourses\Course\CourseUser.cs" />
+    <Compile Include="Models\AbstractCourses\Course\CourseWhiteTable.cs" />
+    <Compile Include="Models\AbstractCourses\Course\Rubrics\CellDescription.cs" />
+    <Compile Include="Models\AbstractCourses\Course\Rubrics\CriterionEvaluation.cs" />
+    <Compile Include="Models\AbstractCourses\Course\Rubrics\Criterion.cs" />
+    <Compile Include="Models\AbstractCourses\Course\Rubrics\Level.cs" />
+    <Compile Include="Models\AbstractCourses\Course\Rubrics\Rubric.cs" />
+    <Compile Include="Models\AbstractCourses\Course\Rubrics\RubricEvaluation.cs" />
+    <Compile Include="Models\AbstractCourses\Course\WhiteTableUser.cs" />
+    <Compile Include="Models\AccountModels.cs" />
+    <Compile Include="Models\ActivityLog.cs" />
+    <Compile Include="Models\Annotate\AnnotateApi.cs" />
+    <Compile Include="Models\Annotate\AnnotateDocumentReference.cs" />
+    <Compile Include="Models\Annotate\AnnotateResult.cs" />
+    <Compile Include="Models\Assessments\Assessment.cs" />
+    <Compile Include="Models\Assessments\AssessmentTypes.cs" />
+    <Compile Include="Models\Assignments\AbetAssignmentOutcome.cs" />
+    <Compile Include="Models\Assignments\AbetSubmissionTag.cs" />
+    <Compile Include="Models\Assignments\Assignment.cs" />
+    <Compile Include="Models\Assignments\AssignmentTeam.cs" />
+    <Compile Include="Models\Assignments\AssignmentTypes.cs" />
+    <Compile Include="Models\Assignments\CommentCategory.cs" />
+    <Compile Include="Models\Assignments\CommentCategoryConfiguration.cs" />
+    <Compile Include="Models\Assignments\CommentCategoryOption.cs" />
+    <Compile Include="Models\Assignments\CriticalReviewSettings.cs" />
+    <Compile Include="Models\Assignments\Deliverable.cs" />
+    <Compile Include="Models\Assignments\DiscussionAssignmentMetaInfo.cs" />
+    <Compile Include="Models\Assignments\DiscussionSettings.cs" />
+    <Compile Include="Models\Assignments\DiscussionTeam.cs" />
+    <Compile Include="Models\Assignments\IAssignmentTeam.cs" />
+    <Compile Include="Models\Assignments\IReviewTeam.cs" />
+    <Compile Include="Models\Assignments\ReviewTeam.cs" />
+    <Compile Include="Models\Assignments\Team.cs" />
+    <Compile Include="Models\Assignments\TeamConverter.cs" />
+    <Compile Include="Models\Assignments\TeamEvaluation.cs" />
+    <Compile Include="Models\Assignments\TeamEvaluationComment.cs" />
+    <Compile Include="Models\Assignments\TeamEvaluationSettings.cs" />
+    <Compile Include="Models\Assignments\TeamMember.cs" />
+    <Compile Include="Models\ContextBase.cs" />
+    <Compile Include="Models\DiscussionAssignment\DiscussionPost.cs" />
+    <Compile Include="Models\FileSystem\AssignmentFilePath.cs" />
+    <Compile Include="Models\FileSystem\OSBLEFile.cs" />
+    <Compile Include="Models\FileSystem\OSBLEDirectory.cs" />
+    <Compile Include="Models\FileSystem\FileCollection.cs" />
+    <Compile Include="Models\FileSystem\Directories.cs" />
+    <Compile Include="Models\FileSystem\GradebookFilePath.cs" />
+    <Compile Include="Models\HomePage\AbstractDashboard.cs" />
+    <Compile Include="Models\HomePage\DashboardPost.cs" />
+    <Compile Include="Models\HomePage\DashboardReply.cs" />
+    <Compile Include="Models\HomePage\Event.cs" />
+    <Compile Include="Models\HomePage\Notification.cs" />
+    <Compile Include="Models\IModelBuilderExtender.cs" />
+    <Compile Include="Models\OSBLEContext.cs" />
+    <Compile Include="Models\School.cs" />
+    <Compile Include="Models\Services\Uploader\AbstractListing.cs" />
+    <Compile Include="Models\Services\Uploader\DirectoryListing.cs" />
+    <Compile Include="Models\Services\Uploader\FileListing.cs" />
+    <Compile Include="Models\Services\Uploader\ParentDirectoryListing.cs" />
+    <Compile Include="Models\Services\Uploader\UserSession.cs" />
+    <Compile Include="Models\Setting.cs" />
+    <Compile Include="Models\SilverlightObject.cs" />
+    <Compile Include="Models\SimpleContext.cs" />
+    <Compile Include="Models\ToolTips.cs" />
+    <Compile Include="Models\Triggers\CourseUserDeleteTrigger.cs" />
+    <Compile Include="Models\Triggers\DiscussionTeamDeleteTrigger.cs" />
+    <Compile Include="Models\Triggers\ModelTrigger.cs" />
+    <Compile Include="Models\Triggers\TeamDeleteTrigger.cs" />
+    <Compile Include="Models\Users\Mail.cs" />
+    <Compile Include="Models\Users\ProfileImage.cs" />
+    <Compile Include="Models\Users\UserProfile.cs" />
+    <Compile Include="Models\ViewModels\DiscussionViewModel.cs" />
+    <Compile Include="Models\ViewModels\ReviewInterfaceModels.cs" />
+    <Compile Include="Models\ViewModels\RubricViewModel.cs" />
+    <Compile Include="Models\ViewModels\SerializableTeamMembers.cs" />
+    <Compile Include="Models\ViewModels\StudioAssignmentViewModel.cs" />
+    <Compile Include="Models\ViewModels\TeamCreationViewModel.cs" />
+    <Compile Include="Models\WhiteTable.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

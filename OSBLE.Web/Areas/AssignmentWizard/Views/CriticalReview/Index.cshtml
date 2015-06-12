@@ -1,0 +1,113 @@
+﻿@using OSBLE.Models.Courses;
+@using OSBLE.Models.Assignments;
+@using System.Collections.Generic;
+@using OSBLE.Models;
+@model CriticalReviewSettings          
+@{
+    List<Team> teams = ViewBag.Teams;
+    List<CourseUser> allUsers = ViewBag.AllUsers;
+    List<Assignment> previousTeamAssignments = ViewBag.PreviousTeamAssignments;
+    Assignment assignment = Model.Assignment;
+}
+@section Header
+{
+    <link href="@Url.Content("~/areas/AssignmentWizard/Content/css/criticalReview.css")" type="text/css" rel="Stylesheet" />
+    <script src="@Url.Content("~/areas/AssignmentWizard/Content/js/criticalReview.js")" type="text/javascript"></script>
+}
+<div id="teamDiv">
+    <p>
+    </p>
+    @Html.HiddenFor(m => m.AssignmentID)
+    <div>
+        <h3>Review Settings</h3>
+        <table class="wizard_entry_table">
+            <tr>
+                <th>@Html.LabelFor(m => m.AnonymizeAuthor)</th>
+                <td>@Html.CheckBoxFor(m => m.AnonymizeAuthor)</td>
+            </tr>
+            <tr>
+                <th>@Html.LabelFor(m => m.AllowDownloadAfterPublish)</th>
+                <td>@Html.CheckBoxFor(m => m.AllowDownloadAfterPublish)</td>
+            </tr>
+            <tr>
+                <th>@Html.LabelFor(m => m.AnonymizeComments)</th>
+                <td>@Html.CheckBoxFor(m => m.AnonymizeComments)</td>
+            </tr>
+            <tr>
+                <th>@Html.LabelFor(m => m.AnonymizeCommentsAfterPublish)</th>
+                <td>@Html.CheckBoxFor(m => m.AnonymizeCommentsAfterPublish)</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h3>
+            Auto Generation Options</h3>
+        <ul>
+            <li>Assign
+                <input id="ReviewItemsText" type="text" />
+                items to each reviewer.
+                <button type="button" id="AutoAssignReviewTeamsButton" onclick="buildTeams();">
+                    Go</button>
+                <button type="button" onclick="clearReviewTeams()">Clear All Teams</button>
+            </li>
+        </ul>
+    </div>
+    <div id="ErrorBox">
+        This is the error box</div>
+    <div id="AvailableStudentList">
+        <h3>
+            Reviewers</h3>
+        <ul id="AvailableStudent">
+            @foreach (Team team in teams)
+            {
+                <li data-id="reviewTeam_@(team.ID)" class="ui-state-default StudentListItem">
+                    @team.Name
+                    <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @team.Name" title="remove @team.Name" onclick="removeFromTeam(this)" />
+                </li>
+            }
+        </ul>
+    </div>
+    <div id="TeamsDiv">
+        <h3>
+            Items to be Reviewed from &quot;@assignment.PreceedingAssignment.AssignmentName&quot;</h3>
+        @{int counter = 0;}
+        @foreach (AssignmentTeam aTeam in assignment.PreceedingAssignment.AssignmentTeams.OrderBy(t => t.Team.Name))
+        {
+            counter++;
+            string hasDeliverableClass = "hasDeliverable";
+            string selectorChecked = @"checked=""checked""";
+            if (aTeam.GetSubmissionTime() == null)
+            {
+                hasDeliverableClass = "noDeliverable";
+                selectorChecked = "";
+            }
+            <div id="teamDiv_@(aTeam.TeamID)" class="TeamDiv @hasDeliverableClass">
+                <input class="selectorCheckBox" type="checkbox" id="teamDiv_checkbox_@(aTeam.TeamID)" name="teamDiv_checkbox_@(aTeam.TeamID)" @selectorChecked />
+                <label for="teamDiv_checkbox_@(aTeam.TeamID)">@aTeam.Team.Name</label>
+                <ul id="team_@(@aTeam.TeamID)" class="TeamSortable">
+                    @foreach (ReviewTeam reviewTeam in assignment.ReviewTeams.Where(rt => rt.AuthorTeamID == aTeam.TeamID))
+                    {
+                        <li data-id="reviewTeam_@(reviewTeam.ReviewingTeam.ID)" class="ui-state-default StudentListItem">@reviewTeam.ReviewingTeam.Name
+                        <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @reviewTeam.ReviewingTeam.Name" title="remove @reviewTeam.ReviewingTeam.Name" onclick="removeFromTeam(this)" />
+                        </li>
+                    }
+                </ul>
+            </div>
+                    if (counter % 3 == 0)
+                    {
+            <div style="clear: both;">
+            </div>
+                    }
+        }
+    </div>
+</div>
+
+<!--houses the values that will get sent back to the server -->
+<div id="FormInputs">
+    @foreach (Team team in teams)
+            {
+                <input type="hidden" id="reviewTeam_@(team.ID)" name="reviewTeam_@(team.ID)" value="0" />
+            }
+</div>
+<br />
+<br />

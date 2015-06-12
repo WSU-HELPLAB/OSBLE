@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="Rubric">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="CellDescriptions" nillable="true" type="tns:ArrayOfCellDescription" />
+      <xs:element minOccurs="0" name="Criteria" nillable="true" type="tns:ArrayOfCriterion" />
+      <xs:element minOccurs="0" name="Description" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="HasCriteriaComments" type="xs:boolean" />
+      <xs:element minOccurs="0" name="HasGlobalComments" type="xs:boolean" />
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="Levels" nillable="true" type="tns:ArrayOfLevel" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Rubric" nillable="true" type="tns:Rubric" />
+  <xs:complexType name="ArrayOfCellDescription">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="CellDescription" nillable="true" type="tns:CellDescription" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfCellDescription" nillable="true" type="tns:ArrayOfCellDescription" />
+  <xs:complexType name="CellDescription">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Criterion" nillable="true" type="tns:Criterion" />
+      <xs:element minOccurs="0" name="CriterionID" type="xs:int" />
+      <xs:element minOccurs="0" name="Description" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Level" nillable="true" type="tns:Level" />
+      <xs:element minOccurs="0" name="LevelID" type="xs:int" />
+      <xs:element minOccurs="0" name="Rubric" nillable="true" type="tns:Rubric" />
+      <xs:element minOccurs="0" name="RubricID" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CellDescription" nillable="true" type="tns:CellDescription" />
+  <xs:complexType name="Criterion">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="CriterionTitle" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="Rubric" nillable="true" type="tns:Rubric" />
+      <xs:element minOccurs="0" name="RubricID" type="xs:int" />
+      <xs:element minOccurs="0" name="Weight" type="xs:double" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Criterion" nillable="true" type="tns:Criterion" />
+  <xs:complexType name="Level">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="LevelTitle" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="PointSpread" type="xs:int" />
+      <xs:element minOccurs="0" name="Rubric" nillable="true" type="tns:Rubric" />
+      <xs:element minOccurs="0" name="RubricID" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Level" nillable="true" type="tns:Level" />
+  <xs:complexType name="ArrayOfCriterion">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Criterion" nillable="true" type="tns:Criterion" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfCriterion" nillable="true" type="tns:ArrayOfCriterion" />
+  <xs:complexType name="ArrayOfLevel">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Level" nillable="true" type="tns:Level" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfLevel" nillable="true" type="tns:ArrayOfLevel" />
+</xs:schema>

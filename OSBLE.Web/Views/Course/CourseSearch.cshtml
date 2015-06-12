@@ -1,0 +1,81 @@
+﻿@model OSBLE.Models.Courses.Course
+
+@using OSBLE.Models;
+@using OSBLE.Controllers;
+
+@{
+    ViewBag.Title = "Course Search";
+}
+
+<h2>Course Search @Helpers.CreateToolTip(ToolTips.CourseSearch)</h2>
+
+@using (Html.BeginForm("SearchResults", "Course", FormMethod.Post, new { @class = "form-class" }))
+{
+    <fieldset>
+        <legend>Search Menu</legend>
+        @Html.Label("Course Prefix")
+        @Html.DropDownList("Course", ViewBag.CourseName as SelectList, "Select a Course Prefix", new { id = "Course" })
+        
+
+        @Html.Label("Course Prefix Number")
+        <select id="Number" name="Number"> </select>
+
+       
+        <p> <input type="submit" value="Search"/> </p>
+
+        @if (ViewBag.SearchResults != null)
+        {
+            var results = ViewBag.SearchResults;
+            <fieldset>
+                <legend>Search Results</legend>
+                <table>
+                    <tr>
+                        @foreach (var result in results)
+                        {
+                            <td>
+                                <ol>
+                                    <div class="search_results">
+                                        <a title="Request to join Course" href="@Url.Action("ReqestCourseJoin", "Course", new { id = result.ID })"> @Helpers.AddButton() </a>
+                                    </div>
+                                    <p>@result.Prefix  @result.Number <br /> @result.Name <br /> @result.Semester @result.Year</p>
+                                </ol>
+                            </td>
+                        }
+                    </tr>
+                </table>
+            </fieldset>
+        }
+
+    </fieldset>
+}
+@Scripts.Render("~/bundles/jquery")
+<script type="text/jscript">
+    $(function () {
+        $('#Number').prop('disabled', true);
+        $('#Course').change(function () {
+            $('#Number').prop('disabled', false);
+            $.getJSON('/Course/CourseNumber/' + $('#Course').val(), function (data) {
+                var items = '<option>Search All</option>';
+                $.each(data, function (i, Number) {
+                    items += "<option value='" + Number.Value + "'>" + Number.Text + "</option>";
+                });
+                $('#Number').html(items);
+            });
+        });
+    });
+
+</script>
+
+
+
+   
+
+
+
+
+
+
+
+
+
+

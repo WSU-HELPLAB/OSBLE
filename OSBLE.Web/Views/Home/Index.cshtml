@@ -1,0 +1,118 @@
+﻿@using OSBLE.Models.HomePage
+@using OSBLE.Models
+@using System.Web.Configuration
+
+@{
+    ViewBag.Title = "Dashboard";
+}
+
+<div id="dashboard_left">
+<h3>Notifications</h3>
+  
+<div id="notifications">
+@if (ViewBag.Notifications.Count == 0)
+{
+    <p>No Unread Notifications!</p>
+}
+
+@{ViewBag.ShowNotificationDelete = true;}
+@Html.Partial("_Notifications")
+
+@if (ViewBag.Notifications.Count != 0)
+{
+    <div id="markAllAsReadDiv">
+        <form id="MarkAllForm" action="@Url.Action("MarkAllAsRead", "Notification")"
+                data-ajax="true"
+                data-ajax-success="$('#notifications_list').hide('slow');$('#markAllAsReadDiv').hide('slow')"
+                method="post">
+            <a href="#" onclick="$('#MarkAllForm').submit()">Mark All Notifications As Read</a>
+        </form>
+    </div>
+}
+
+<p>@Html.ActionLink("Show All Notifications", "Index", "Notification")</p>
+</div>
+
+<h3>Events &amp; Deadlines 
+@if (@ViewBag.ActiveCourse.AbstractRole.CanModify || @ViewBag.ActiveCourse.AbstractCourse.AllowEventPosting)
+{
+<a href="@Url.Action("Create", "Event")" title="Add New Event or Deadline">@Helpers.AddButton()</a>
+}
+</h3>
+
+<div id="important_dates">
+<p>Next @ViewBag.ActiveCourse.AbstractCourse.CalendarWindowOfTime Weeks</p>
+@Html.Partial("_Events", (List<Event>)ViewBag.Events)
+<p>@Html.ActionLink("Show All Events", "Index", "Event")</p>
+</div>
+
+</div>
+
+<div id="dashboard_right">
+
+        
+    
+<!-- File manager for course files -->
+<div id="divFileManager" style="float:right;">
+    @Helpers.CreateToolTip(ToolTips.FileUploader)
+    (Please wait, loading files...)
+</div>
+
+    <!--yc: file upload size change!-->
+        
+    <!-- Scripts for file manager -->
+<!--yc: currently cant find a way to put this line of code into the script so its placed here for now-->
+    
+    <script src="../../Scripts/CourseFilesUploader.js" type="text/javascript"></script>
+    <script src="../../Scripts/CourseFileManager.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        // Write the HTML for the file manager control
+        if (XMLHttpRequest)
+        {
+            cfm_getListing("divFileManager");
+        }
+        else
+        {
+            document.write("File upload not supported. Please upgrade your web browser.");
+        }
+    </script>
+
+
+@if (false)
+{
+    // Obviously this code will not be hit because of the if-false above. This is 
+    // intentional. The new JavaScript-based file manager should make it so that 
+    // this is no longer needed. In the case that we might need to revert to the 
+    // old Silverlight uploaded in the future, I figured it would be easier to 
+    // comment this out than just delete it. In the future if the new file manager 
+    // has been holding up well for a long enough time then this block can be 
+    // removed entirely.
+    /*
+    <h3>Advanced File Manager (Silverlight)
+    @{if (ViewBag.CanEditCourseLinks)
+      {
+          <span id="file_upload_silverlight_span">
+          @{ SilverlightObject so = ViewBag.Uploader as SilverlightObject; }
+          @Html.DisplayFor(m => so, "SilverlightObject")
+          </span>
+      }
+    }
+    </h3>
+     * */
+}
+
+</div>
+
+<div id="dashboard_middle">
+<h3>Activity Feed</h3>
+
+<div id="activity_feed">
+@Html.Partial("_ActivityFeed")
+
+    
+
+
+</div>
+
+<p>
+</p>

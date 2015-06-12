@@ -1,0 +1,12 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;               
+}
+<tr>
+    <th>Late Policy:</th>
+    <td>
+        @dataModel.LatePolicy.Message
+    </td>
+</tr>

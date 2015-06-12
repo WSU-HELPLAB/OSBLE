@@ -1,0 +1,24 @@
+﻿@using OSBLE.Models.Assignments;
+@using OSBLE.Models;
+@{
+    List<Assignment> previousAssignments = ViewBag.PreviousAssignments as List<Assignment>;
+}
+@model Assignment
+@Html.HiddenFor(m => m.ID)
+<p>
+This assignment type depends on a previously created assignment.  Please select that assignment from the dropdown list.  
+</p>
+<select name="PreviousAssignmentSelect">
+    @foreach (Assignment previousAssignment in previousAssignments)
+    {
+        if (ViewBag.PrecedingAssignmentID == previousAssignment.ID)
+        {
+            <option selected="selected" value="@previousAssignment.ID">@previousAssignment.AssignmentName</option>
+        }
+        else
+        {
+            <option value="@previousAssignment.ID">@previousAssignment.AssignmentName</option>
+        }
+        
+    }
+</select>
