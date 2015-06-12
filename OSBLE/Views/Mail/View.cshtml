@@ -1,0 +1,160 @@
+﻿@model OSBLE.Models.Users.Mail
+@using OSBLE.Models
+@using OSBLE.Models.Users
+
+@{
+    ViewBag.Title = "Mail";
+}
+
+<style type="text/css">
+    form 
+    {
+        float:left;
+    }
+</style>
+
+<h2>Subject:  @Model.Subject</h2>
+<p>Sent: @Model.Posted.ToString()</p>
+    <div class="mail_user">
+        <b>From:</b><br />
+        @Helpers.ProfilePicture(@Url.Action("ProfilePicture", new { ID = Model.FromUserProfileID }))
+        @Model.FromUserProfile.FirstName @Model.FromUserProfile.LastName
+    </div>
+
+    <div class="mail_user">
+        <b>To:</b><br />
+        @if (ViewBag.AllRecipients == null)
+        {
+            @Helpers.ProfilePicture(@Url.Action("ProfilePicture", new { ID = Model.ToUserProfileID }))
+            @Model.ToUserProfile.FirstName @Model.ToUserProfile.LastName
+        }
+        else
+        {
+            foreach (UserProfile p in ViewBag.AllRecipients)
+            {
+                var id = p.ID;
+                var name = p.FirstName + " " + p.LastName;
+        
+                <div id="@p.ID" class="recipient" >
+                    <a>
+                        <img src="@Url.Action("ProfilePicture")/@p.ID" class="small_profile_picture" alt="Profile Picture" />
+                        @p.FirstName @p.LastName
+                    </a>
+                </div>
+            }
+        }
+    </div>
+    <br />
+
+    <div style="margin-top: 115px">
+    <p>
+        @if (ViewBag.CurrentUser == Model.ToUserProfile)
+        {
+            //Replying
+            using (Html.BeginForm("CreateReply", "Mail", FormMethod.Get))
+            {
+                <input type="hidden" name="recipientID" value="@Model.FromUserProfileID" />
+                <input type="hidden" name="replyTo" value="@Model.ID" />
+                <input type="submit" value="Reply" />  
+                //@Helpers.CreateToolTip(ToolTips.MailReply)  
+            }
+
+            //Reply all
+            using (Html.BeginForm("CreateReplyAll", "Mail", FormMethod.Get))
+            {
+                <input type="hidden" name="recipientID" value="@Model.FromUserProfileID" />
+                <input type="hidden" name="replyAll" value="@Model.ThreadID" />
+                <input type="submit" value="Reply All" />  
+                //@Helpers.CreateToolTip(ToolTips.MailReply)  
+            }
+
+            //Forwarding
+            using (Html.BeginForm("CreateForward", "Mail", FormMethod.Get))
+            {
+                <input type="hidden" name="recipientID" value="0" />
+                <input type="hidden" name="forwardTo" value="@Model.ID" />
+                <input type="submit" value="Forward" />  
+                //@Helpers.CreateToolTip(ToolTips.MailReply)  
+            }
+
+            //Delete
+            using (Html.BeginForm("Delete", "Mail", FormMethod.Post))
+            {
+                <input type="hidden" name="ID" value="@Model.ID" />
+                <input type="submit" value="Delete" onclick="return confirm('Are you sure you want to delete this message?')" /> 
+                //@Helpers.CreateToolTip(ToolTips.MailDelete)
+            }
+        }
+    </p>
+    </div>
+
+    <div id="mail_message">
+        @Helpers.Linkify(Model.Message)
+    </div>
+<p>
+@if (ViewBag.CurrentUser == Model.ToUserProfile)
+{
+    //Replying
+    using (Html.BeginForm("CreateReply", "Mail", FormMethod.Get))
+    {
+                <input type="hidden" name="recipientID" value="@Model.FromUserProfileID" />
+                <input type="hidden" name="replyTo" value="@Model.ID" />
+                <input type="submit" value="Reply" />  
+        //@Helpers.CreateToolTip(ToolTips.MailReply)  
+    }
+
+    //Reply all
+    using (Html.BeginForm("CreateReplyAll", "Mail", FormMethod.Get))
+    {
+                <input type="hidden" name="recipientID" value="@Model.FromUserProfileID" />
+                <input type="hidden" name="replyAll" value="@Model.ThreadID" />
+                <input type="submit" value="Reply All" />  
+        //@Helpers.CreateToolTip(ToolTips.MailReply)  
+    }
+
+    //Forwarding
+    using (Html.BeginForm("CreateForward", "Mail", FormMethod.Get))
+    {
+                <input type="hidden" name="recipientID" value="0" />
+                <input type="hidden" name="forwardTo" value="@Model.ID" />
+                <input type="submit" value="Forward" />  
+        //@Helpers.CreateToolTip(ToolTips.MailReply)  
+    }
+
+    //Delete
+    using (Html.BeginForm("Delete", "Mail", FormMethod.Post))
+    {
+        <input type="hidden" name="ID" value="@Model.ID" />
+        <input type="submit" value="Delete" onclick="return confirm('Are you sure you want to delete this message?')" /> 
+        //@Helpers.CreateToolTip(ToolTips.MailDelete)
+    }
+    <br /><br />
+    <table>
+        <tr>
+            <td class="email_view_links">
+            @if (ViewBag.Prev < Model.ID)
+            {
+                @Html.ActionLink("Older", "View", new { id = ViewBag.Prev }) <a>&nbsp;</a>
+            }
+            else{
+            }
+            </td>
+            <td class="email_view_links">
+            @Html.ActionLink("Back to Inbox\t", "Index") <a>&nbsp;</a>
+            </td>
+            <td class="email_view_links">
+            @if (ViewBag.Next > Model.ID)  
+            {
+                @Html.ActionLink("Newer", "View", new { id = ViewBag.Next })
+            }
+            else{
+            }
+            </td>
+        </tr>
+    </table>
+}
+else
+{
+    @Html.ActionLink("Back to Outbox", "Outbox")
+}
+</p>

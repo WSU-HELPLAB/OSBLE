@@ -1,0 +1,13 @@
+﻿@model OSBLE.Models.ViewModels.InlineReviewViewModel
+@using OSBLE.Models.Assignments.Activities
+@using OSBLE.Models.Users;
+@using OSBLE.Models
+@{
+    ViewBag.Title = "InlineReview";
+}
+
+<h2>Inline Review of @(ViewBag.activity.Name) for @(ViewBag.TeamUser.Name)</h2>
+
+<div style="width:99%; height:1000px">
+@Html.DisplayFor(m=>m.ReviewInterface)
+</div>

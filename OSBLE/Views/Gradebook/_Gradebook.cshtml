@@ -1,0 +1,274 @@
+﻿@using OSBLE.Controllers;
+@using OSBLE.Models.Assignments;
+@using OSBLE.Models.Assignments.Activities;
+@using OSBLE.Models.Assignments.Activities.Scores;
+@using OSBLE.Models.Courses;
+@{
+    Layout = null;
+    var index = 0;
+
+    int numDropped = ViewBag.Dropped;
+    <input type="hidden" id="numDropped" value="@numDropped" />
+    var customize_option = (Category.GradeOptions)ViewBag.Customize;
+    <input type="hidden" id="customize_option" value="@customize_option" />
+}
+
+<table id="grades" class="gradebook">
+    <tr class="colHeader">
+        @{var j = 1;
+            <td id="_row-@index" class="rowHeader" style="background:#DCDCDC; border:outset 2px; border-color: #E8E8E8; width: 25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(event, this);"></td>
+            index++;
+            j += 1;
+            <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(event, this);"></td>
+            j += 1;
+            <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(event, this);"></td>
+            j += 1;
+            foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
+            {
+                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8; text-align:center; min-width: 45px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(event, this);">  
+                <div id="div-@j" style="display: none; margin:0 auto;">
+                    <img id="imgLeft-@item.ID" src="/Content/images/arrow_left.png" onclick="moveLeft(this);" style="cursor:pointer; float:left; padding-top:1px;"/>
+                    <img id="imgDown-@item.ID" src="/Content/images/arrow_down.png" onclick="ShowHide(event, this);" style="cursor:pointer; padding-bottom:2px;"/>
+                    <img id="imgRight-@item.ID" src="/Content/images/arrow_right.png" onclick="moveRight(this);" style="cursor:pointer; float:right;" />
+                </div>
+                </td>
+                j += 1;
+            }
+        }
+    </tr>
+    <tr id="perfectScore">
+        <td id="_row-@index" class="rowHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8; width:25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(event, this);"></td>
+        @{index++;}
+        <td id="th2"><b>Perfect Score</b></td>
+        <td id="perfectTotal">100%</td>
+        @foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
+        {
+            <td id="pointsPossible-@item.ID" onclick="cellGainsFocus(event, this)">@item.PointsPossible</td>
+        }
+        
+    </tr>
+    <tr id="averageRow">
+        <td id="_row-@index" class="rowHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8; width:5px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(event, this);"></td>
+        @{index++;}
+        <td id="th3">
+            <b>Average Score</b>
+        </td>
+        @{       //Holds the total grade
+                double totalGrade = 0;
+                
+                //Holds the users total score
+                double totalGradePoints = 0;
+                
+                //Holds the category weight / total of all category weights
+                double totalGradePossible = 0;
+                
+                //Holds to total of all category weights
+                double catPossibleWeight = 0;
+
+                double assignPoints = 0;
+                double assignPossible = 0;
+                
+                //Get the total score for the class
+                foreach (AbstractAssignmentActivity assign in ViewBag.Assignments)
+                {
+                    foreach (Score userScore in ViewBag.Grades)
+                    {
+                        if (userScore.isDropped == false)
+                        {
+                            assignPoints += userScore.Points;
+                            assignPossible += userScore.AssignmentActivity.PointsPossible;
+                        }
+                    }
+                }
+                totalGrade = (assignPoints / assignPossible) * 100;
+            
+                if (totalGrade.ToString() == "NaN")
+                {
+                    <td id="averageTotal">
+                        NG
+                    </td>
+                }
+                else
+                {
+                    <td id="averageTotal">
+                        @totalGrade.ToString(".#")%
+                    </td>
+                }
+            }
+            @foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
+            {
+                var score = (from scores in ViewBag.Grades as IEnumerable<Score>
+                             where scores.AssignmentActivityID == item.ID
+                             select scores);
+
+                double totalAverage = 0;
+                double averagePoints = 0;
+                int numStudents = 0;
+
+                //Make sure there is at least one score in the category
+                bool oneScore = false;
+                foreach (Score s in score)
+                {
+                    oneScore = true;
+                    averagePoints += s.Points;
+                    numStudents++;
+                }
+                double categoryScore = averagePoints / numStudents;
+                totalAverage += categoryScore;
+                if (oneScore == true)
+                {
+                    if (totalAverage > 0)
+                    {
+                        <td id="averageScore">@totalAverage.ToString(".#")</td>  
+                    }
+                    else
+                    {
+                        <td id="averageScore">0</td>
+                    }
+                }
+                else
+                {
+                    <td id="averageScore">NG</td>
+                }
+            }
+    </tr>
+    <tr>
+        <td id="_row-@index" class="rowHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8; width:25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(event, this);"></td>
+        @{index++;}
+        @{
+            <th id="th4" >
+                Name
+            </th>
+        
+            if (customize_option == Category.GradeOptions.XtoDrop && numDropped != 0)
+            {
+                    <th id="totalCustomize">Total <input id="dropLowestButton" type="button" onclick="displayCustomizeGrades();" value="Average [Drop @numDropped lowest]" /> </th>
+            }
+            else if (customize_option == Category.GradeOptions.XtoTake)
+            {
+                <th id="totalCustomize">Total <input id="dropLowestButton" type="button" onclick="displayCustomizeGrades();" value="Average [Keep @numDropped highest]" /> </th>
+            }
+            else
+            {
+                <th id="totalCustomize">Total <input id="dropLowestButton" type="button" onclick="displayCustomizeGrades();" value="Average" /></th>
+            }
+        
+            int i = 2;
+            foreach (AbstractAssignmentActivity a in ViewBag.Assignments)
+            {
+
+                if (a.addedPoints > 0)
+                {   
+                    <th id="header-@a.ID" onclick="changeHeaderName(event, this)">@a.Name (Added @a.addedPoints)</th>
+                }
+                else
+                {
+                    <th id="header-@a.ID" onclick="changeHeaderName(event, this)">@a.Name </th>
+                }
+                i += 1;
+            }
+        }
+    </tr>
+    <!--loop through all users -->
+    @foreach (OSBLE.Models.Users.UserProfile user in ViewBag.Users)
+    {        
+        <tr id="studentGrades">
+            <td id="_row-@index" class="rowHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8; width:25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(event, this);"></td>
+            @{index++;}
+            <td id="@user.Identification" >@user.LastName, @user.FirstName</td>
+                    
+            @{
+              var percent = from p in ViewBag.Percents as IEnumerable<Score>
+                            where p.TeamUserMember.Contains(user)
+                            select p;
+              if (percent.Count() > 0)
+              {
+                  if (percent.First().Points > 0)
+                  {
+                      <td id="total">@percent.First().Points.ToString(".#")%</td>
+                  }
+                  else
+                  {
+                      <td id="total">@String.Format("{0}", 0)%</td>
+                  }
+              }
+              else
+              {
+                    <td id="total">NG</td>
+              }
+            }
+                
+            @foreach (AbstractAssignmentActivity gradeAssignmentActivity in ViewBag.Assignments)
+            {
+                var gradableQuery = from g in ViewBag.Grades as IEnumerable<Score>
+                                    where g.AssignmentActivityID == gradeAssignmentActivity.ID
+                                    && g.TeamUserMember.Contains(user)
+                                    //&& g.Points >= 0
+                                    select g;
+                //use the stored score if possible.  Otherwise, just use a "0"
+                if (gradableQuery.Count() > 0)
+                {
+                    if (gradeAssignmentActivity.AbstractAssignment.Rubric != null)
+                    { 
+                        if(gradableQuery.First().ManualLatePenaltyPercent == 0)
+                        {
+                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", gradableQuery.First().Points), "Index", "Rubric", new { abstractAssignmentActivityId = gradableQuery.First().AssignmentActivityID, teamUserID = gradableQuery.First().TeamUserMemberID }, new { @class = "rubric" })</td>
+                        }
+                        else if (gradableQuery.First().LatePenaltyPercent > 0 || gradableQuery.First().ManualLatePenaltyPercent > 0)
+                        {
+                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", gradableQuery.First().Points), "Index", "Rubric", new { abstractAssignmentActivityId = gradableQuery.First().AssignmentActivityID, teamUserID = gradableQuery.First().TeamUserMemberID }, new { @class = "rubric", @style = "color:Red;" })</td>
+                        }
+                        else
+                        {                            
+                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", gradableQuery.First().Points), "Index", "Rubric", new { abstractAssignmentActivityId = gradableQuery.First().AssignmentActivityID, teamUserID = gradableQuery.First().TeamUserMemberID }, new { @class = "rubric" })</td>
+                        }
+                    }
+                    else
+                    {
+                        if (gradableQuery.First().ManualLatePenaltyPercent == 0)
+                        {
+                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" onclick="cellGainsFocus(event, this)">@gradableQuery.First().Points</td>
+                        }
+                        else if (gradableQuery.First().LatePenaltyPercent > 0 || gradableQuery.First().ManualLatePenaltyPercent > 0)
+                        { 
+                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic; color:Red;"  onclick="cellGainsFocus(event, this)">@gradableQuery.First().Points</td>
+                        }
+                        else
+                        {
+                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" onclick="cellGainsFocus(event, this)">@gradableQuery.First().Points</td>
+                        }
+                    }
+                }
+                else
+                {
+                    if (gradeAssignmentActivity.AbstractAssignment.Rubric != null)
+                    {
+                        var teamUser = from tu in gradeAssignmentActivity.TeamUsers where tu.Contains(user) select tu;
+                        if (teamUser.Count() > 0)
+                        {
+                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic;">@Html.ActionLink("NG", "Index", "Rubric", new { abstractAssignmentActivityId = gradeAssignmentActivity.ID, teamUserID = teamUser.First().ID }, new { @class = "rubric" })</td>
+                        }
+                    }
+                    else
+                    {
+                        <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" onclick="cellGainsFocus(event, this)">NG</td>
+                    }
+                }
+            }
+        </tr>
+    }
+</table>
+
+@foreach (AbstractAssignmentActivity assignment in ViewBag.Assignments)
+{
+    <input id="addedPoints-@assignment.ID" type="hidden" value="@assignment.addedPoints" />    
+}
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        keyControls();
+    });
+
+</script>
+

@@ -1,0 +1,242 @@
+﻿@model OSBLE.Models.Assignments.Activities.PeerReviewActivity
+@using OSBLE.Models.Assignments.Activities
+@using OSBLE.Models
+@{
+    ViewBag.Title = "Create Peer Review";
+}
+<h2>Create Peer Review</h2>
+
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/osble.assignments.js")" type="text/javascript"></script>
+
+<script type="text/javascript">
+
+    $(function () {
+
+        $('#can_student_access_reviews').change(function () {
+            if ($(this).attr('checked')) {
+                DisplayCanStudentAccessReviewsOptions();
+            }
+            else {
+                HideCanStudentAccessReviewsOptions();
+            }
+        });
+
+        $('#can_reviewer_view_others_reviews').change(function () {
+            if ($(this).attr('checked')) {
+                DisplayCanReviewerViewOthersReviewsOptions();
+            }
+            else {
+                HideCanReviewerViewOthersReviewsOptions();
+            }
+        });
+
+        $('#use_rubric').change(function () {
+            if ($(this).attr('checked')) {
+                DisplayUseRubricOptions();
+            }
+            else {
+                HideUseRubricOptions();
+            }
+        });
+        // only all reviews or random reviews can be checked
+        $('#instructor_completes_rubric_all_reviews').change(function () {
+            if ($(this).attr('checked')) {
+                $('#instructor_completes_rubric_random_review').removeAttr('checked');
+            }
+            else {
+                $('#instructor_completes_rubric_random_review').attr('checked', true);
+            }
+        });
+        // only all reviews or random reviews can be checked
+        $('#instructor_completes_rubric_random_review').change(function () {
+            if ($(this).attr('checked')) {
+                $('#instructor_completes_rubric_all_reviews').removeAttr('checked');
+            }
+            else {
+                $('#instructor_completes_rubric_all_reviews').attr('checked', true);
+            }
+        });
+    });
+
+    function DisplayCanStudentAccessReviewsOptions() {
+        $('#can_student_access_reviews_options').show('highlight');
+        // default
+        $('#has_student_completed_assigned_reviews').attr('checked', true);
+    }
+
+    function HideCanStudentAccessReviewsOptions() {
+        $('#can_student_access_reviews_options').hide('highlight');
+        // unchecking default box
+        $('#has_student_completed_assigned_reviews').removeAttr('checked');
+    }
+
+    function DisplayCanReviewerViewOthersReviewsOptions() {
+        $('#can_reviewer_access_reviews_options').show('highlight');
+        // default
+        $('#has_reviewer_completed_assigned_reviews').attr('checked', true);
+    }
+
+    function HideCanReviewerViewOthersReviewsOptions() {
+        $('#can_reviewer_access_reviews_options').hide('highlight');
+        $('#has_reviewer_completed_assigned_reviews').removeAttr('checked');
+    }
+
+    function DisplayUseRubricOptions() {
+        $('#use_rubric_options').show('highlight');
+    }
+
+    function HideUseRubricOptions() {
+        $('#use_rubric_options').hide('highlight');
+    }
+
+</script>
+
+@{
+   
+    using (Html.BeginForm())
+    {
+        @Html.ValidationSummary(true)
+        <fieldset>
+            <legend>PeerReviewActivity</legend>
+
+            <div class="editor-label">
+                @Html.LabelFor(model => model.Name)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewName)
+            </div>
+            <div class="editor-field">
+                @Html.EditorFor(model => model.Name)
+                @Html.ValidationMessageFor(model => model.Name)
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor(model => model.AbstractAssignmentID, "Abstract Assignment")
+                @Helpers.CreateToolTip(ToolTips.PeerReviewAbstractAssignmentID)
+            </div>
+            <div class="editor-field">
+                @Html.DropDownList("AbstractAssignmentID", String.Empty)
+                @Html.ValidationMessageFor(model => model.AbstractAssignmentID)
+            </div>
+
+            <h2>Settings</h2>
+
+            <div class="editor-field">
+                @Html.CheckBoxFor(model => model.UseOnlySubmittedStudents, new { id = "use_only_submitted_student" })
+                @Html.LabelFor(model => model.UseOnlySubmittedStudents)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewUseOnlySubmittedStudents)
+                @Html.ValidationMessageFor(model => model.UseOnlySubmittedStudents)
+            </div>
+
+            <div class="editor-field">
+                @Html.CheckBoxFor(model => model.UseModerators, new { id = "use_moderators" })
+                @Html.LabelFor(model => model.UseModerators)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewUseModerators)
+                @Html.ValidationMessageFor(model => model.UseModerators)
+            </div>
+
+            <h4>Anonymity of Review</h4>
+
+            <div class="editor-field">
+                @Html.CheckBoxFor(model => model.IsAuthorAnonymous, new { id = "is_author_anonymous" })
+                @Html.LabelFor(model => model.IsAuthorAnonymous)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewIsAuthorAnonymous)
+                @Html.ValidationMessageFor(model => model.IsAuthorAnonymous)
+            </div>
+
+            <div class="editor-field">
+                @Html.CheckBoxFor(model => model.IsReviewersAnonymous, new { id = "is_reviewer_anonymous" })
+                @Html.LabelFor(model => model.IsReviewersAnonymous)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewIsReviewersAnonymous)
+                @Html.ValidationMessageFor(model => model.IsReviewersAnonymous)
+            </div>
+
+            <div class="editor-field">
+                @Html.CheckBoxFor(model => model.IsReviewersRoleAnonymous, new { id = "is_reviewers_role_anonymous" })
+                @Html.LabelFor(model => model.IsReviewersRoleAnonymous)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewIsReviewersRoleAnonymous)
+                @Html.ValidationMessageFor(model => model.IsReviewersRoleAnonymous)
+            </div>
+
+            <h4>Basis of Review (Must Check at least one)</h4>
+
+            <div class="editor-field">
+                @Html.CheckBoxFor(model => model.UseInlineComments, new { id = "use_inline_comments" })
+                @Html.LabelFor(model => model.UseInlineComments)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewUseInlineComments)
+                @Html.ValidationMessageFor(model => model.UseInlineComments)
+            </div>
+
+            <div class="editor-field">
+                @Html.CheckBoxFor(model => model.UseRubric, new { id = "use_rubric" })
+                @Html.LabelFor(model => model.UseRubric)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewUseRubric)
+                @Html.ValidationMessageFor(model => model.UseRubric)
+            </div>
+            <div id="use_rubric_options" class="indented_options" style="display: none">
+                <div>
+                    <input type="radio" name="RubricOptions" value="InstructorCompletesRubricRandomReview" checked="true"/>
+                    Instructor completes rubric for randomly selected review
+                    @Helpers.CreateToolTip(ToolTips.PeerReviewInstructorCompletesRubricRandomReview)
+                    <br />
+               </div>
+
+               <div>
+                    <input type="radio" name="RubricOptions" value="InstructorCompletesRubricAllReviews" />
+                    Instructor completes rubric for all reviews
+                    @Helpers.CreateToolTip(ToolTips.PeerReviewInstructorCompletesRubricAllReviews)
+                    <br />
+               </div>
+            </div>
+
+            <h4>Author access to completed reviews</h4>
+
+            <div class="editor-field">
+                @Html.CheckBoxFor(model => model.CanStudentAccessReviews, new { id = "can_student_access_reviews" })
+                @Html.LabelFor(model => model.CanStudentAccessReviews)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewCanStudentAccessReviews)
+                @Html.ValidationMessageFor(model => model.CanStudentAccessReviews)
+            </div>
+            <div id="can_student_access_reviews_options"  class="indented_options" style="display: none">
+                <div class="editor-field">
+                    @Html.CheckBoxFor(model => model.HasStudentCompletedAssignedReviews, new { id = "has_student_completed_assigned_reviews" })
+                    @Html.LabelFor(model => model.HasStudentCompletedAssignedReviews)
+                    @Helpers.CreateToolTip(ToolTips.PeerReviewHasStudentCompletedAssignedReviews)
+                    @Html.ValidationMessageFor(model => model.HasStudentCompletedAssignedReviews)
+                </div>
+            </div>
+
+            <h4>Reviewer access to completed reviews of other reviewers</h4>
+
+            <div class="editor-field">
+                @Html.CheckBoxFor(model => model.CanReviewerViewOthersReviews, new { id = "can_reviewer_view_others_reviews" })
+                @Html.LabelFor(model => model.CanReviewerViewOthersReviews)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewCanReviewerViewOthersReviews)
+                @Html.ValidationMessageFor(model => model.CanReviewerViewOthersReviews)
+            </div>
+            <div id="can_reviewer_access_reviews_options"  class="indented_options" style="display: none">
+                <div class="editor-field">
+                    @Html.CheckBoxFor(model => model.HasReviewerCompletedAssignedReviews, new { id = "has_reviewer_completed_assigned_reviews" })
+                    @Html.LabelFor(model => model.HasReviewerCompletedAssignedReviews)
+                    @Helpers.CreateToolTip(ToolTips.PeerReviewHasReviewerCompletedAssignedReviews)
+                    @Html.ValidationMessageFor(model => model.HasReviewerCompletedAssignedReviews)
+                </div>
+            </div>
+
+            <h4>Grades</h4>
+
+            <div>
+                @Html.Partial("_AddToGradebook")
+            </div>
+
+            <p>
+                <input type="submit" value="Create Peer Review" id="submitButton"/>
+            </p>
+        </fieldset>
+    }
+
+    <div>
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+}
+

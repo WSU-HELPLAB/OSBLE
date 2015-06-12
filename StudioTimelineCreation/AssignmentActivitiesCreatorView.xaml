@@ -1,0 +1,71 @@
+﻿<UserControl xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk" 
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:cna="clr-namespace:CreateNewAssignment"
+    xmlns:toolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit"
+    x:Class="CreateNewAssignment.AssignmentActivitiesCreatorView"
+    >
+
+
+        <Canvas x:Name="MouseLayer">
+            <!--Main Grid-->
+            <Grid x:Name="LayoutRoot" Background="White" MinWidth="800">
+                <Grid.RowDefinitions>
+                    <!--This Row is for the Assignment Activities Button things-->
+                    <RowDefinition Height="Auto"/>
+                    <!--This Row is for the calendar-->
+                    <RowDefinition Height="Auto"/>
+
+                    <RowDefinition/>
+                    <!--This Row is for the timeline-->
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition MaxWidth="100" MinWidth="20"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Row="0" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Center">
+
+                    <Image x:Name="SubmissionIcon" Height="20" Width="20" Source="Icons/submit-01.png" Cursor="Hand" />
+                    <TextBlock FontSize="14" Text="Submission Begins" Margin="2,5,0,0"/>
+                    <Image Source="Icons/tip.png" Margin="0,0,20,0"/>
+
+                    <Image x:Name="PeerReviewIcon" Height="20" Width="20" Source="Icons/peer-01.png" Cursor="Hand"/>
+                    <TextBlock FontSize="14" Text="Peer Review Begin" Margin="2,5,0,0"/>
+                    <Image Source="Icons/tip.png" Margin="0,0,20,0"/>
+
+                    <Image x:Name="IssueVotingIcon" Height="20" Width="20" Source="Icons/voting-01.png" Cursor="Hand"/>
+                    <TextBlock FontSize="14" Text="Voting Begins" Margin="2,5,0,0"/>
+                    <Image Source="Icons/tip.png" Margin="0,0,20,0"/>
+
+                    <Image x:Name="AuthorRebuttalIcon" Height="20" Width="20" Source="Icons/rebuttal-01.png" Cursor="Hand"/>
+                    <TextBlock FontSize="14" Text="Rebuttal Begins" Margin="2,5,0,0"/>
+                    <Image Source="Icons/tip.png" Margin="0,0,20,0"/>
+
+                    <Image x:Name="StopIcon" Height="20" Width="20" Source="Icons/stop.png" Cursor="Hand"/>
+                    <TextBlock FontSize="14" Text="Stop" Margin="2,5,0,0"/>
+                    <Image Source="Icons/tip.png" Margin="0,0,20,0"/>
+                </StackPanel>
+                <Button Grid.Row="1" Grid.Column="0" x:Name="LeftCalendarScrollButton" Content="&lt;" HorizontalAlignment="Left" />
+                <Button Grid.Row="1" Grid.Column="2" x:Name="RightCalendarScrollButton" Content="&gt;" HorizontalAlignment="Right" />
+                <toolkit:ListBoxDragDropTarget HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" Margin="0,0,0,-52" Grid.RowSpan="3" VerticalContentAlignment="Stretch" Width="100"/>
+
+                <StackPanel x:Name="EntireTimeline" Grid.Row="3" Grid.ColumnSpan="3" Orientation="Vertical">
+                    <StackPanel x:Name="TimelineDates1" Orientation="Horizontal"/>
+                    <StackPanel x:Name="TimelineTimes" Orientation="Horizontal"/>
+                    <StackPanel x:Name="Timeline"  Orientation="Horizontal"/>
+                </StackPanel>
+                <StackPanel x:Name="TimelineIcons" Grid.Row="3" Grid.ColumnSpan="3" Margin="0,0,0,0" Orientation="Horizontal"/>
+                <StackPanel x:Name="TimelineLines" Grid.Row="3" Grid.ColumnSpan="3" Margin="0,0,0,0" Orientation="Horizontal"/>
+
+            </Grid>
+        </Canvas>
+
+</UserControl>

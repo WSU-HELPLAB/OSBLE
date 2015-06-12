@@ -1,0 +1,94 @@
+﻿@model IEnumerable<OSBLE.Models.Users.Mail>
+@using OSBLE.Models
+@using OSBLE.Models.Courses
+
+@{
+    ViewBag.Title = "Mail";
+}
+    <p>
+        @Html.ActionLink("Compose new message", "Create")&nbsp &nbsp
+        @Html.ActionLink("Compose new message to Instructor(s)", "CreateInstructor")&nbsp &nbsp
+        @Html.ActionLink("Compose new message to TA(s)", "CreateTA")&nbsp &nbsp
+        @Html.ActionLink("Compose new message to Instructor(s) and TA(s)", "CreateInstructorTA")
+    </p>
+
+    @if (ViewBag.BoxHeader == "Inbox")
+    {
+        <h2>Inbox</h2>
+        <p>@Html.ActionLink("Go to Outbox","Outbox")</p>
+    }
+    else
+    {
+        <h2>Outbox</h2>
+        <p>@Html.ActionLink("Go to Inbox", "Index")</p>
+    }
+
+
+<table class="inbox_table">
+    <thead>
+        <tr>
+            <th id="0" class="inbox_time_header" onclick="">Date</th>
+            <th id="1" class="inbox_context_header" onclick="">Context</th>
+            <th id="2" class="inbox_from_header" onclick="">From:</th>
+            <th id="3" class="inbox_subject_header" onclick="">Subject:</th>
+            <th id="4" class="inbox_tools_header" onclick=""></th>
+        </tr>
+    </thead>
+
+    @foreach (var item in Model)
+    {
+        <tr id="mail_item_@(item.ID)" class="@if (!item.Read)
+                                             {<text>inbox_unread</text>}">
+            <td id="0" class="inbox_time">
+                <small>@item.Posted.ToShortDateString() @item.Posted.ToShortTimeString()</small>
+            </td>
+            <td id="1" class="inbox_context">
+                @if (item.Context != null)
+                {
+                    if (item.Context is Course)
+                    {
+                        Course c = item.Context as Course;
+                        <small>@String.Format("{0} {1}", c.Prefix, c.Number)</small>
+                    }
+                    else if (item.Context is Community)
+                    {
+                        Community comm = item.Context as Community;
+                        <small>@comm.Nickname</small>
+                    }
+                }
+            </td>
+            <td id="2" class="inbox_from">
+                @if (ViewBag.BoxHeader == "Inbox")
+                {
+                    <small>@item.FromUserProfile.FirstName @item.FromUserProfile.LastName</small>
+                }
+                else
+                {
+                    <small>@item.ToUserProfile.FirstName @item.ToUserProfile.LastName</small>
+                }
+            </td>
+            <td id="3" class="inbox_subject">
+                @Html.ActionLink(item.Subject, "View", new { id = item.ID })
+            </td>
+            <td id="4" class="inbox_tools">
+                            @*inbox deletion                                 outbox deletion*@
+                @if (item.ToUserProfile == ViewBag.CurrentUser || item.FromUserProfile == ViewBag.CurrentUser)
+                {
+                    <form action="@Url.Action("Delete")"
+                        style="display: inline;"
+                        data-ajax="true"
+                        data-ajax-success="$('#mail_item_@(item.ID)').hide('blind',{},'slow',function(){$(this).remove();})"
+                        data-ajax-confirm="Are you sure you want to delete this message?"
+                        method="post">
+                        <input type="hidden" name="ID" value="@item.ID" />
+                        @Helpers.DeleteSubmit("Delete This Mail Message")
+                    </form>
+                }
+            </td>
+        </tr>
+    }
+</table>
+
+<script type="text/javascript">
+
+</script>

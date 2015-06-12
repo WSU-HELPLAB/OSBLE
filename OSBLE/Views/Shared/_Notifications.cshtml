@@ -1,0 +1,69 @@
+﻿@using OSBLE.Models.HomePage
+<ul id="notifications_list">
+    @foreach (Notification n in ViewBag.Notifications)
+    {
+        <li id="notification_@(n.ID)" @if (n.Read)
+                                      {<text>class="read"</text>}><small>@n.Posted.ToShortDateString() @n.Posted.ToShortTimeString()</small>&nbsp;
+            @if (ViewBag.ShowNotificationDelete == true)
+            {
+                <div class="notification_tools">
+                    <form action="@Url.Action("MarkAsRead", "Notification", new { ID = @n.ID })"
+                                style="display: inline;"
+                                data-ajax="true"
+                                data-ajax-success="$('#notification_@(n.ID)').hide('highlight',{},'slow',function(){
+                                        $(this).remove();
+                                    });"
+                                method="post">
+                    @Helpers.DeleteSubmit("Mark This Notification As Read")
+                    </form>
+                </div>
+            }
+            <div class="notification_text">
+                @switch (n.ItemType)
+                {
+                    case Notification.Types.Mail:
+                        { 
+                    <text><em>@n.Sender.FirstName @n.Sender.LastName</em> sent you a @NotificationLink(n.ID, "message")</text>
+                            break;
+                        }
+                    case Notification.Types.EventApproval:
+                        {                                            
+                    <text><em>@n.Sender.FirstName @n.Sender.LastName</em> submitted an @NotificationLink(n.ID, "event for approval")</text>
+                            break;
+                        }
+                    case Notification.Types.Dashboard:
+                        { 
+                    <text><em>@n.Sender.FirstName @n.Sender.LastName</em> posted in a @NotificationLink(n.ID, "dashboard thread")
+                    that you participated in</text>
+                            break;
+                        }
+                    case Notification.Types.InlineReviewCompleted:
+                        {
+                            string[] args = n.Data.Split(new char[] { ';' });
+                    <text><em>@n.Sender.FirstName @n.Sender.LastName</em> has published an
+                    @Html.ActionLink("inline review", "ViewInlineReview", "Assignment", new { abstractAssignmentActivityId = args[0], teamUserID = args[1] }, new { }) of your @args[2]</text>
+                            break;
+                        }
+                    case Notification.Types.RubricEvaluationCompleted:
+                        {
+                            string[] args = n.Data.Split(new char[] { ';' });
+                    <text><em>@n.Sender.FirstName @n.Sender.LastName</em> completed an @Html.ActionLink("evaluation rubric", "View", "Rubric", new { abstractAssignmentActivityId = args[0], teamUserID = args[1] }, new { }) of your @args[2]
+                    </text>
+                            break;
+                        }
+                    case Notification.Types.FileSubmitted:
+                        {
+                            string[] args = n.Data.Split(new char[] { ';' });
+                    <text><em>@args[3]</em> submitted the file @args[4] for the activity '@args[2]' at @args[5] download it
+                    @Html.ActionLink("here", "GetSubmissionZip", "FileHandler", new { teamUserID = args[1], assignmentActivityID = args[0] }, new { })</text>
+                            break;
+                        }
+                }
+            </div>
+        </li>
+    }
+</ul>
+@helper NotificationLink(int id, string name)
+    {
+    @Html.ActionLink(name, "Dispatch", "Notification", new { ID = id }, new { });
+}

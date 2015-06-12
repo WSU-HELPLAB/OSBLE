@@ -1,0 +1,86 @@
+﻿@{
+    ViewBag.Title = "Import CSV";
+}
+
+<h2>Import Columns From CSV</h2>
+
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+
+<p>To complete roster import, please select the appropriate header for Student IDs</p>
+
+<div class="selector">
+<h3>Student Identification Header:</h3>
+
+<ul id="id_selector" class="selector">
+    @foreach (string h in ViewBag.Headers)
+    {
+        <li>@h</li>
+    }
+</ul>
+
+</div>
+
+<div class="selector">
+<br />
+
+<h3>Assignments to Import</h3>
+
+<ul id="assignment_selector" class="selector">
+    @foreach (string h in ViewBag.Headers)
+    {
+        <li>@h</li>
+    }
+</ul>
+
+
+<script type="text/javascript">
+
+    var list = new Array();
+
+    $('#assignment_selector > li').click(function () {
+
+        if ($(this).hasClass("selected")) {
+            $(this).removeClass("selected");
+            var val = $(this).html();            
+            $(list).each(function (index, value) {
+                if (value == val) {
+                    list.splice(index, 1);
+                }
+            });
+            $("#assignment_column").val(list);
+            $("#assignment_column").serializeArray();
+        }
+        else {
+            $(this).addClass("selected");
+            list.push($(this).html());
+
+            $("#assignment_column").val(list);
+            $("#assignment_column").serializeArray();
+        }
+
+    });
+
+    $('#id_selector > li').click(function () {
+        $(this).siblings().removeClass("selected");
+        $(this).addClass("selected");
+        $("#id_column").val($(this).html());
+
+    });
+
+</script>
+
+
+<div id="import_assignment_tools">
+
+@using (Html.BeginForm("ApplyAssignments", "Gradebook", FormMethod.Post))
+{
+    
+    <input type="hidden" id="id_column" name="idColumn" value="" />
+    <input type="hidden" id="assignment_column" name="assignmentColumn" value="" />
+    <input type="submit" value="Import Assignment(s)" />
+}
+    <br />
+    @Html.ActionLink("Back to Gradebook", "Index");
+</div>
+</div>

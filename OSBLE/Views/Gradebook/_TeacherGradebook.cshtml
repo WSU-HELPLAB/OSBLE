@@ -1,0 +1,1146 @@
+﻿@using OSBLE.Controllers;
+@using OSBLE.Models.Courses;
+@using OSBLE.Models.Assignments;
+@using OSBLE.Models.Assignments.Activities.Scores;
+@using OSBLE.Models.Users
+@using OSBLE.Models.Assignments.Activities
+@using OSBLE.Utility;
+@{
+    Layout = null;
+}
+<style type="text/css">
+
+</style>
+
+<div>
+    <a href="/Gradebook/ExportToCSV">Export Gradebook</a>
+</div>
+<br />
+
+@Html.Partial("_Tabs")
+
+<div class="selectMenu" id="selectMenuID" style="display: none; position: absolute;" onmouseout="hideDisplayColors()">
+    <table class="selectMenuTable" title="Options">
+		<tr>
+		    <th align="center">Options</th>
+		</tr>        
+        <tr>
+            <td><a style="cursor:pointer" onclick="displayConfirmDeleteCategory();">Delete Category</a></td>
+        </tr>
+        <tr>
+			<td id="changeColor" onmouseover="displayColors();"><a id="changeColorId" style="cursor:pointer" >Change Category Color</a></td>
+		</tr>
+	</table>
+</div>
+
+<div id="confirmDeleteCategory" style="display:none" title="Confirm Delete">
+        Are you sure you want to permanently delete this category and all the assignments within it?
+    <div class="yesAndNoDiv">
+        <input value="Yes" type="button" onclick="deleteCategory()" />
+        <input value="No" type="button" onclick="hideConfirmDeleteCategory();" />
+    </div>
+</div>
+
+<div class="displayColors" id="displayColorsID" style="display: none; position: absolute;" onmouseover="displayColors();" onmouseout="hideDisplayColors();">
+    <table class="displayColorsTable">
+		<tr>
+		    <th align="center" colspan="3">Colors</th>
+		</tr>
+		<tr>
+			<td style="background:Silver;"><a style="cursor:pointer;" href"#" onclick="changeColor('Silver');">Silver</a></td>
+		</tr>
+        <tr>
+			<td style="background:Tomato;"><a style="cursor:pointer;" href"#" onclick="changeColor('Tomato');">Red</a></td>
+		</tr>
+        <tr>
+			<td style="background:LightBlue;"><a style="cursor:pointer;" href"#" onclick="changeColor('LightBlue');">Blue</a></td>
+		</tr>
+        <tr>
+			<td style="background:SpringGreen;"><a style="cursor:pointer;" href"#" onclick="changeColor('SpringGreen');">Green</a></td>
+		</tr>
+        <tr>
+			<td style="background:BurlyWood;"><a style="cursor:pointer;" href"#" onclick="changeColor('BurlyWood');">Brown</a></td>
+		</tr>
+        <tr>
+			<td style="background:Yellow;"><a style="cursor:pointer;" href"#" onclick="changeColor('Yellow');">Yellow</a></td>
+		</tr>
+        <tr>
+			<td style="background:Plum;"><a style="cursor:pointer;" href"#" onclick="changeColor('Plum');">Purple</a></td>
+        </tr>
+        <tr>
+			<td style="background:Orange;"><a style="cursor:pointer;" href"#" onclick="changeColor('Orange');">Orange</a></td>
+        </tr>
+        <tr>
+			<td style="background:Pink;"><a style="cursor:pointer;" href"#" onclick="changeColor('Pink');">Pink</a></td>
+		</tr>
+	</table>
+</div>
+
+<div id="tableContent">
+    <table id="grades" class="gradebook">
+        <tr class="colHeader">
+            
+            @{var j = 1;
+              var r = 0;
+                <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectColumn(event, this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+                j += 1;
+                r++;
+                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectColumn(event, this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+                j += 1;
+                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectColumn(event, this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+                j += 1;
+                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectColumn(event, this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+                j += 1;
+                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectColumn(event, this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+                j += 1;
+                foreach (Category item in ViewBag.Categories)
+                {
+                    if (item.Name != Constants.UnGradableCatagory)
+                    {
+                        <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8; text-align:center;" onclick="selectColumn(event, this);" onmouseover="showButton(this);" onmouseout="hideButton(this);">
+                            <div id="div-@j" style="display: none;">
+                                <img id="imgLeft-@item.ID" src="/Content/images/arrow_left.png" onclick="moveLeft(this);" style="cursor:pointer; float:left; padding-top:1px;"/>
+                                <img id="img-@item.ID" src="/Content/images/arrow_down.png" onclick="ShowHide(event, this);" style="cursor:pointer;" />
+                                <img id="imgRight-@item.ID" src="/Content/images/arrow_right.png" onclick="moveRight(this);" style="cursor:pointer; float:right;" />
+                            </div>
+                        </td>
+                        j += 1;
+                    }
+                }
+            }
+        </tr>
+        
+        <tr>
+            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8; width: 25px;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            @{r++;}
+            <td></td>
+            <td><b>Weights</b></td>
+            <td></td>
+            <td></td>
+            @foreach (Category item in ViewBag.Categories)
+            {
+                if (item.Name != Constants.UnGradableCatagory)
+                {
+                    <td></td>
+                }
+            }
+        </tr>
+        <tr id="weights">
+            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            @{r++;}
+            <td id="sectionHolder"></td>
+            <td id="catScheme" onclick="cellGainsFocus(event, this);">&nbsp  Weight1</td>
+            <td id="grade"></td>
+            @{
+                double totalCategoryPoints = 0;
+                foreach (Category item in ViewBag.Categories)
+                {
+                    if (item.Name != Constants.UnGradableCatagory)
+                    {
+                        totalCategoryPoints += item.Points;
+                    }
+                }
+            }
+            <td id="categoryTotal">@totalCategoryPoints</td>
+            
+            @foreach (Category item in ViewBag.Categories)
+            {
+                if (item.Name != Constants.UnGradableCatagory)
+                {
+                    <td id="weight-@item.ID" onclick="cellGainsFocus(event, this)">@item.Points</td>
+                }
+            }
+        </tr>
+        <tr id="perfectScore">
+            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            @{r++;}
+            <td></td>
+            <td id="th2"><b>Perfect Score</b></td>
+            @{string grade = (from lg in ViewBag.LetterGrades as IEnumerable<LetterGrade>
+                              select lg.Grade).FirstOrDefault();
+            }
+            <td>@grade</td>
+            <td id="perfectTotal">100%</td>
+
+            @foreach (Category item in ViewBag.Categories)
+            {
+                if (item.Name != Constants.UnGradableCatagory)
+                {
+                    <td id="@item.ID">100%</td>   
+                }
+            }
+        </tr>
+        <tr>
+            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            @{r++;}
+            <td></td>
+            <td id="th3">
+                <b>Average Score</b>
+            </td>
+            
+            @{
+                double totalAverage = 0;
+
+                //Holds the total grade
+                double totalGrade = 0;
+
+                totalCategoryPoints = 0;
+                double totalCategoryPossible = 0;
+
+                double categoryTotalWeight = 0;
+                //Get the total score for the class
+
+                int studentCount = 0;
+
+                foreach (UserProfile user in ViewBag.Students)
+                {
+                    studentCount++;
+                    categoryTotalWeight = ViewBag.TotalCategoryWeights;
+                    foreach (Category category in ViewBag.CatsWithWeightsAndScores)
+                    {
+                        if (category.Name != Constants.UnGradableCatagory)
+                        {
+                            List<Score> userScore = (from score in ViewBag.AllGrades as IEnumerable<Score>
+                                                     where score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID &&
+                                                     score.TeamUserMember.Contains(user) 
+                                                     select score).ToList();
+
+                            if (userScore.Count() == 0)
+                            {
+                                categoryTotalWeight -= category.Points;
+                            }
+                        }
+                    }
+                    foreach (Category category in ViewBag.CatsWithWeightsAndScores)
+                    {
+                        if (category.Name != Constants.UnGradableCatagory)
+                        {
+                            double categoryPoints = 0;
+                            double categoryPossible = 0;
+                            double categoryTotal = 0;
+
+                            List<Score> totalScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
+                                                       where score.TeamUserMember.Contains(user) &&
+                                                       score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID
+                                                       select score).ToList();
+                            if (totalScores.Count() > 0)
+                            {
+                                
+                                foreach (Score score in totalScores)
+                                {
+                                    
+                                    if (score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID)
+                                    {
+                                        categoryPoints += score.Points;
+                                        categoryPossible += score.AssignmentActivity.PointsPossible;
+                                    }
+                                }
+                                categoryTotal = categoryPoints / categoryPossible;
+                                if (ViewBag.TotalCategoryWeights > 0)
+                                {
+                                    totalGrade += categoryTotal * (category.Points / categoryTotalWeight) * 100;
+                                }
+                                else
+                                {
+                                    totalCategoryPoints += categoryPoints;
+                                    totalCategoryPossible += categoryPossible;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (ViewBag.TotalCategoryWeights == 0)
+                {
+                    totalGrade = (totalCategoryPoints / totalCategoryPossible) * 100;
+                }
+                else
+                {
+                    totalGrade = (totalGrade / (studentCount * 100) * 100);
+                }
+
+                var letter = "";
+                foreach (LetterGrade item in ViewBag.LetterGrades)
+                {
+                    if (totalGrade >= item.MinimumRequired)
+                    {
+                        letter = item.Grade;
+                        break;
+                    }
+                }
+                
+                <td>@letter</td>
+                <td>@totalGrade.ToString(".#")%</td>
+                
+                int totalStudents = 0;
+
+                foreach (Category item in ViewBag.Categories)
+                {
+                    if (item.Name != Constants.UnGradableCatagory)
+                    {
+                        totalAverage = 0;
+                        double averagePoints = 0;
+                        double averagePossible = 0;
+
+                        //Make sure there is at least one score in the category
+                        bool oneScore = false;
+                        foreach (Score score in ViewBag.CategoryTotalPercent)
+                        {
+                            if (score.AssignmentActivity.AbstractAssignment.CategoryID == item.ID)
+                            {
+                                oneScore = true;
+                                averagePoints += score.Points;
+                                averagePossible += score.AssignmentActivity.PointsPossible;
+                            }
+                        }
+                        double categoryScore = averagePoints / averagePossible;
+                        totalAverage += categoryScore * 100;
+                        if (oneScore == true)
+                        {
+                            <td id="averageScore">@totalAverage.ToString(".#")%</td>  
+                        }
+                        else
+                        {
+                            <td id="averageScore">NG</td>
+                        }
+                    }
+                }
+            }
+        </tr>
+        <tr id="categoryHeaders">
+            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            @{r++;}
+            <th>Section</th>
+            <th>Name</th>
+            <th id="gradeHeader" ondblclick="displayLetterGrades();">Grade</th>
+            <th>Total Grade</th>
+            
+            @foreach (Category item in ViewBag.Categories)
+            {
+                if (item.Name != Constants.UnGradableCatagory)
+                {
+                    <th id="@item.ID" class="colHeader" onclick="changeAssignmentName(event, this);" style="background:@item.TabColor">@item.Name</th>
+                }
+            }
+        </tr>
+
+        @{
+            List<Category> cats = (from cat in ViewBag.Categories as IEnumerable<Category>
+                                   select cat).ToList();
+
+            List<LetterGrade> letterList = (from lg in ViewBag.LetterGrades as IEnumerable<LetterGrade>
+                                            select lg).ToList();
+
+            bool categoryHasPoints = false;
+            foreach (Category category in ViewBag.Categories)
+            {
+                if (category.Points != 0)
+                {
+                    categoryHasPoints = true;
+                }
+            }
+        }
+        <!--loop through all users -->
+        @foreach (UserProfile student in ViewBag.Students)
+        {        
+            <tr id="studentGrades">
+                <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+                @{r++;}
+
+            @{
+                
+                  List<CoursesUsers> courseUser = (from course in ViewBag.CoursesUser as IEnumerable<CoursesUsers>
+                                                   where course.UserProfileID == student.ID
+                                                   select course).ToList();
+                  if (courseUser.Count() > 0)
+                  {
+                      foreach (CoursesUsers item in courseUser)
+                      {
+                           <td>@item.Section</td>
+                      }
+                  }                                                   
+                
+                <td id="@student.ID" >@student.LastName, @student.FirstName</td>   
+                
+                  totalGrade = 0;
+                  totalCategoryPoints = 0;
+                  totalCategoryPossible = 0;
+                  double totalCategoryWeight = ViewBag.TotalCategoryWeights;
+                  foreach (Category c in ViewBag.CatsWithWeightsAndScores)
+                  {
+                      if (c.Name != Constants.UnGradableCatagory)
+                      {
+                          List<Score> userScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
+                                                    where score.TeamUserMember.Contains(student) &&
+                                                    score.AssignmentActivity.AbstractAssignment.CategoryID == c.ID
+                                                    select score).ToList();
+                          if (userScores.Count() == 0)
+                          {
+                              totalCategoryWeight -= c.Points;
+                          }
+                      }
+                  }
+
+                  foreach (Category c in ViewBag.Categories)
+                  {
+                      if (c.Name != Constants.UnGradableCatagory)
+                      {
+                          List<Score> userScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
+                                                    where score.TeamUserMember.Contains(student) &&
+                                                    score.AssignmentActivity.AbstractAssignment.CategoryID == c.ID
+                                                    select score).ToList();
+
+                          double points = 0;
+                          double possible = 0;
+                          double totalCategoryGrade = 0;
+                          if (userScores.Count() > 0)
+                          {
+                              foreach (Score score in userScores)
+                              {
+                                  points += score.Points;
+                                  possible += score.AssignmentActivity.PointsPossible;
+                              }
+
+                              totalCategoryGrade = (points / possible);
+                              if (ViewBag.TotalCategoryWeights > 0)
+                              {
+                                  totalGrade += totalCategoryGrade * (c.Points / totalCategoryWeight) * 100;
+                              }
+                              else
+                              {
+                                  totalCategoryPoints += points;
+                                  totalCategoryPossible += possible;
+                              }
+                          }
+                          else
+                          {
+
+                          }
+                      }
+                  }
+                  if (ViewBag.TotalCategoryWeights == 0)
+                  {
+                      totalGrade = (totalCategoryPoints / totalCategoryPossible) * 100;
+                  }
+                  letter = "";
+                  foreach (LetterGrade item in ViewBag.LetterGrades)
+                  {
+                      if (totalGrade >= item.MinimumRequired)
+                      {
+                          letter = item.Grade;
+                          break;
+                      }
+                  }
+                  <td>@letter</td>
+                
+                  if (totalGrade > 0)
+                  {
+                    <td>@totalGrade.ToString(".#")%</td>
+                  }
+                  else if (totalGrade == 0)
+                  {
+                    <td>@String.Format("{0}", 0)%</td>
+                  }
+                  else
+                  {
+                      <td>NG</td>
+                  }
+                  totalGrade = 0;
+
+                  foreach (Category c in ViewBag.Categories)
+                  {
+                      if (c.Name != Constants.UnGradableCatagory)
+                      {
+                          List<Score> userScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
+                                                    where score.TeamUserMember.Contains(student) &&
+                                                    score.AssignmentActivity.AbstractAssignment.CategoryID == c.ID
+                                                    select score).ToList();
+
+                          double points = 0;
+                          double possible = 0;
+                          double totalCategoryGrade = 0;
+                          foreach (Score score in userScores)
+                          {
+                              points += score.Points;
+                              possible += score.AssignmentActivity.PointsPossible;
+                          }
+
+                          totalCategoryGrade = (points / possible) * 100;
+                          //totalGrade = totalCategoryGrade * (c.Points / ViewBag.TotalCategoryWeights) * 100;
+                          if (totalCategoryGrade >= 0)
+                          {
+                              //It didn't like to put a 0, so I had to use string format to make it display
+                              if (totalCategoryGrade == 0)
+                              {
+                                  <td id="categoryGrade" onclick="goToCategoryTab(@c.ID, @student.Identification)" style="cursor:pointer;">@String.Format("{0}", 0)%</td>
+                              }
+                              else
+                              {
+                                  <td id="categoryGrade" onclick="goToCategoryTab(@c.ID, @student.Identification)" style="cursor:pointer;">@totalCategoryGrade.ToString(".#")%</td>
+                              }
+                          }
+                          else
+                          {
+                              <td id="categoryGrade" onclick="goToCategoryTab(@c.ID, @student.Identification)" style="cursor:pointer;">NG</td>
+                          }
+                      }
+                  }
+            }
+            </tr>
+        }
+    </table>
+    @{
+        totalAverage = (totalAverage / (totalStudents * 100)) * 100;
+        string averageLetter = "";
+        foreach (LetterGrade item in letterList)
+        {
+            if (totalAverage >= item.MinimumRequired)
+            {
+                averageLetter = item.Grade;
+                break;
+            }
+        }   
+    }
+    <input type="hidden" id="totalAverageHidden" value="@averageLetter" />
+    <div class="slidingDiv" id="slidingDivID" style="display: none; position: absolute;">
+        <form id="columnOptionsForm" method="post" action="/Gradebook/ModifyColumn" data-ajax="true"
+        data-ajax-success="">
+        <input id="actionRequested" name="actionRequested" type="hidden" value="null" />
+        <input id="assignmentId" name="assignmentId" type="hidden" value="null" />
+        <table class="menu" id="menuID">
+            <tr>
+                <td>
+                    <a href="#" onclick="setGradableAction('@GradebookController.ColumnAction.InsertLeft.ToString()'); $('#columnOptionsForm').submit();">
+                        Insert 1 left</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#" onclick="setGradableAction('@GradebookController.ColumnAction.InsertRight.ToString()'); $('#columnOptionsForm').submit();">
+                        Insert 1 right</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#" onclick="setGradableAction('@GradebookController.ColumnAction.Delete.ToString()'); $('#columnOptionsForm').submit();">
+                        Delete column</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#" onclick="setGradableAction('@GradebookController.ColumnAction.Clear.ToString()'); $('#columnOptionsForm').submit();">
+                        Clear column</a>
+                </td>
+            </tr>
+        </table>
+        </form>
+
+        <script type="text/javascript">
+            function setGradableAction(actionName) {
+                $('#actionRequested').val(actionName);
+            }
+            $('#columnOptionsForm').submit(function () {
+                $('#assignmentId').val(currentCol);
+                return;
+            });
+        </script>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    var count = 0;
+    var currentHeader = null;
+    //holds the index of the header that was clicked to select all
+    var currentHeaderCell = null;
+    var header = false;
+    //display if the letter grade menu is showing
+    var isShowing = false;
+    var isHighlighted = false;
+    var lastFocusedAssignment = null;
+    var lastFocusedCell = null;
+    var tabShowing = false;
+    
+    $(document).click(function () {
+        if (isShowing == true) {
+            $("#letterGradesID").animate({ "height": "hide" }, { duration: 300 });
+            isShowing = false;
+        }
+        else {
+            isShowing = true;
+        }
+
+        if (header == true) {
+            clearLastAssignmentFocus();
+        } else {
+            clearLastCellFocus();
+        }
+        resetTableColors();
+        hideTabColors();
+    });
+
+    $(document).ready(function () {
+        $("#averageLetter").html($("#totalAverageHidden").val());
+    });
+
+    $("#grades").keydown(function (e) {
+        //This means enter was clicked when the header was highlighted
+        if (e.keyCode == 13) {
+            clearLastAssignmentFocus();
+            clearLastCellFocus();
+        }
+    });
+
+    $("#grades td").keydown(function (e) {
+        var cell = null;
+
+        //13 means enter was pressed
+        if (e.keyCode == 13) {
+            clearLastAssignmentFocus();
+            clearLastCellFocus();
+        }
+
+        //9 means tab was pressed
+        if (e.keyCode == 9) {
+            try { e.preventDefault(); }
+            catch (er) { e.returnValue = false; }
+            var row = $(this).parent("tr");
+            var colIndex = $(this).prevAll().length;
+            colIndex = parseInt(colIndex);
+            colIndex += 1;
+            row.each(function () {
+                cell = $(this).find("td:eq(" + colIndex + ")");
+            });
+            cellGainsFocus(e, cell);
+        }
+    });
+
+    $("#grades th").keydown(function (e) {
+        if (e.keyCode == 13) {
+            clearLastAssignmentFocus();
+        }
+        else if (e.keyCode == 9) {
+            try { e.preventDefault(); }
+            catch (er) { e.returnValue = false; }
+            var cell = null;
+            var row = $(this).parent("tr");
+            var colIndex = $(this).prevAll().length;
+            row.each(function () {
+                cell = $(this).find("th:eq(" + colIndex + ")");
+            });
+            if (cell.html() == null) {
+                clearLastAssignmentFocus();
+                return false;
+            }
+            changeAssignmentName(e, cell);
+        }
+    });
+
+    $("#letterGradesID td").keydown(function (e) {
+        var cell = null;
+        //13 means entered was clicked
+        if (e.keyCode == 13) {
+            var row = $(this).parent("tr").next("tr");
+            var colIndex = $(this).prevAll().length;
+            row.each(function () {
+                cell = $(this).find("td:eq(" + colIndex + ")");
+            });
+            cellGainsFocus(e, cell);
+        }
+    });
+
+    function calculateCols() {
+        //We start at 3 because rows 1 and 2 are the student names and total
+        var colIndex = 2;
+
+        //Starting in the gradebook on the student grade rows
+        //This bypasses the headers so we don't look through them
+        $("#grades #studentGrades").each(function () {
+            $(this).find("td:nth-child(" + colIndex + ")").each(function () {
+                getSum(colIndex);
+            });
+            colIndex += 1;
+        });
+    }
+
+    function calculateRows() {
+        var totalPerfect = 0;
+        var totalAverage = 0;
+        var total = 0;
+        var count = 0;
+        var counter = 0;
+        var isTrue = false;
+        var a = [];
+
+        $("#grades #weights").each(function () {
+            $(this).find("td").each(function () {
+                var id = $(this).attr("id").split("-");
+                if (id[0] == "weight") {
+                    a.push(parseFloat($(this).text()));
+                    total += parseFloat($(this).text());
+                }
+            });
+
+            $(this).find("td").each(function () {
+                if ($(this).attr("id") == "categoryTotal") {
+                    $(this).text((total).toFixed(2));
+                }
+                var id = $(this).attr("id").split("-");
+                if (id[0] == "weight") {
+                    if (a[count] > 0) {
+                        a[count] = a[count] / total;
+                    }
+                    else {
+                        counter += 1;
+                    }
+                    count += 1;
+                }
+            });
+        });
+    }
+
+    function cellGainsFocus(evt, someCell) {
+        evt.cancelBubble = true;
+        if ($(lastFocusedCell).attr("id") == $(someCell).attr("id")) {
+            return false;
+        }
+
+        hideTabColors();
+        resetTableColors();
+
+        //do this once so we don't have to constantly do it later
+        someCell = $(someCell);
+
+        //Header needs to lose focus
+        if (header == true) {
+            clearLastAssignmentFocus();
+            header = false;
+        } else {
+            //clear any previous focus
+            clearLastCellFocus();
+        }
+
+        var textValue = someCell.text();
+        var inputText = $('<input class="cellInput" type="text" value="' + textValue + '" />');
+        someCell.html(inputText);
+        inputText.focus();
+        inputText.select();
+        lastFocusedCell = someCell;
+        try { evt.preventDefault(); }
+        catch (er) { evt.returnValue = false; }
+
+        //Highlights the row and column headers of the selected cell
+        selectRowColumnHeaderOfSelected(someCell);
+    }
+
+    function changeAssignmentName(evt, someAssignment) {
+        evt.cancelBubble = true;
+        if ($(lastFocusedAssignment).attr("id") == $(someAssignment).attr("id")) {
+            return false;
+        }
+
+        //do this once so we don't have to constantly do it later
+        someAssignment = $(someAssignment);
+
+        hideTabColors();
+        resetTableColors();
+
+        //clear any previous focus
+        if (header == true) {
+            clearLastAssignmentFocus();
+            header = false;
+        } else {
+            clearLastCellFocus();
+        }
+
+        var textValue = someAssignment.text();
+        var inputText = $('<input class="cellInput" type="text" value="' + textValue + '" />');
+        someAssignment.html(inputText);
+        inputText.focus();
+        inputText.select();
+        lastFocusedAssignment = someAssignment;
+        try { evt.preventDefault(); }
+        catch (er) { evt.returnValue = false; }
+        header = true;
+
+        //Highlights the row and column headers of the selected cell
+        selectRowColumnHeaderOfSelected(someAssignment);
+    }
+
+    function changeColor(color) {
+        var cell = $("#categoryHeaders").find("th:nth-child(" + currentHeader + ")");
+        var catId = cell.attr("id");
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: "/Gradebook/ChangeTabColor",
+            data: { categoryId: catId, value: color }
+        });
+        window.location.reload(true);
+        hideTabColors();
+    }
+
+    function clearLastAssignmentFocus() {
+        if (lastFocusedAssignment != null) {
+
+            clearRowColumnHeader();
+
+            newCategoryId = lastFocusedAssignment.attr("id");
+            var cellValue = lastFocusedAssignment.children().val();
+            lastFocusedAssignment.html(cellValue);
+            lastFocusedAssignment.attr("onclick", 'changeAssignmentName(event, this)');
+            lastFocusedAssignment = null;
+
+            $.ajax({
+                type: "POST",
+                url: "/Gradebook/ModifyCategoryName",
+                data: { value: cellValue, categoryId: newCategoryId },
+                success: function (response) {
+                    $("#tabHeader").html(response);
+                }
+            });
+        }
+    }
+
+    function clearLastCellFocus() {
+        //if a prior cell has already received focus in the past, we need to turn it back into
+        //a normal table cell
+        if (lastFocusedCell != null) {
+            clearRowColumnHeader();
+
+            var catId = lastFocusedCell.attr("id").split("-");
+            var cellValue = lastFocusedCell.children().val();
+            lastFocusedCell.html("");
+            lastFocusedCell.text(cellValue);
+            lastFocusedCell.attr("onclick", 'cellGainsFocus(event, this)');
+            lastFocusedCell = null;
+
+            $.ajax({
+                type: "POST",
+                url: "/Gradebook/ModifyCategoryPoints",
+                data: { value: cellValue, categoryId: catId[1] },
+                success: function (response) {
+                    $("#tabHeader").html(response);
+                }
+            });
+        }
+    }
+
+    function clearRowColumnHeader() {
+        $("#grades tr").each(function () {
+            $(this).find("td").each(function () {
+                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+                    $(this).css("background-color", "#DCDCDC");
+                    $(this).find("div").css("background-color", "#DCDCDC");
+                    $(this).attr("onmouseout", "hideButton(this);");
+                }
+            });
+        });
+    }
+
+    function deleteCategory() {
+        var cell = $("#categoryHeaders").find("th:nth-child(" + currentHeader + ")");
+        var catId = cell.attr("id");
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: "/Gradebook/DeleteCategory",
+            data: { categoryId: catId }
+        });
+        window.location.reload(true);
+        hideTabColors();
+    }
+
+    function displayColors() {
+        var x = 0;
+        var y = 0;
+
+        //alert(container);
+        //aligning the menu under the buttons
+        x = $("#selectMenuID").position().left;
+        y = $("#selectMenuID").position().top;
+        y += 49;
+        x += 172;
+
+        //Moving the menu to the button that clicked it
+        $("#displayColorsID").css("left", x + "px");
+        $("#displayColorsID").css("top", y + "px");
+
+        //Animation for menu
+        $("#displayColorsID").animate({ "height": "show" }, { duration: 0 });
+        tabShowing = true;
+    }
+
+    function displayConfirmDeleteCategory() {
+        $("#confirmDeleteCategory").dialog({
+            modal: true,
+            resizable: false,
+            width: 310,
+            closeOnEscape: false
+        });
+    }
+
+    function displayLetterGrades() {
+        $("#letterGradesID").animate({ "height": "show" }, { duration: 300 });
+        isShowing = true;
+    }
+
+    function getSum(Index) {
+        var colTotal = 0;
+        var count = 0;
+        $("#grades #studentGrades").children("td:nth-child(" + Index + ")").each(function () {
+            if ($(this).text() == "NG") {
+            }
+            else {
+                colTotal += parseFloat($(this).text());
+                count += 1;
+            }
+        });
+
+        $("#grades tr").children("td:nth-child(" + Index + ")").each(function () {
+            if ($(this).attr("id") == "averageTotal") {
+                colTotal = parseFloat(colTotal / count).toFixed(2);
+                $(this).html(colTotal + "%");
+            }
+            if ($(this).attr("id") == "averageScore") {
+                colTotal = parseFloat(colTotal / count).toFixed(2);
+                $(this).html(colTotal + "%");
+            }
+        });
+    }
+
+    function goToCategoryTab(catID, stuID) {
+        $.ajax({
+            type: "POST",
+            url: "/Gradebook/SetTabStudent",
+            data: { studentId: stuID.toString() },
+            success: function () {
+                location.href = "/Gradebook/Tab/?categoryId=" + catID;
+            }
+        });
+        hideTabColors();
+    }
+
+    function hideButton(column) {
+        var container = column.id;
+        $("#div-" + container).animate({ "height": "hide" }, { duration: 0 });
+
+        if ($("#" + container).css("background-color") != "rgb(170, 170, 170)" && $("#div-" + container).css("background-color") != "rgb(170, 170, 170)") {
+
+            $("#div-" + container).css("background-color", "#DCDCDC");
+            $('#' + container).css("background-color", "#DCDCDC");
+        }
+    }
+
+    function hideConfirmDeleteCategory() {
+        $("#confirmDeleteCategory").dialog('close');
+    }
+
+    function hideDisplayColors() {
+        $("#displayColorsID").animate({ "height": "hide" }, { duration: 0 });
+    }
+
+    function hideOnlyButton(column) {
+        var container = column.id;
+        $("#div-" + container).animate({ "height": "hide" }, { duration: 0 });
+    }
+
+    function hideTabColors() {
+        $("#selectMenuID").animate({ "height": "hide" }, { duration: 0 });
+        $("#displayColorsID").animate({ "height": "hide" }, { duration: 0 });
+    }
+
+    function moveLeft(header) {
+        var id = header.id.split("-");
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: "/Gradebook/MoveCategoryLeft",
+            data: { categoryId: id[1] }
+        });
+        window.location.reload(true);
+    }
+
+    function moveRight(header) {
+        var id = header.id.split("-");
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: "/Gradebook/MoveCategoryRight",
+            data: { categoryId: id[1] } 
+        });
+        window.location.reload(true);
+    }
+
+    function newTab() {
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: "/Gradebook/AddCategory"
+        });
+        window.location.reload(true);
+    }
+
+    function resetTableColors() {
+        $("#grades tr").each(function () {
+            $(this).find("td").each(function () {
+                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+                    $(this).css("background-color", "#DCDCDC");
+                    $(this).find("div").css("background-color", "#DCDCDC");
+                }
+                else {
+                    $(this).css("background-color", "white");
+                }
+            });
+            $(this).find("th").each(function () {
+                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+                }
+                else {
+                    $(this).css("background-color", "white");
+                }
+            });
+        });
+    }
+
+    function selectColumn(evt, col) {
+        evt.cancelBubble = true;
+        if (header == true) {
+            clearLastAssignmentFocus();
+        } else {
+            clearLastCellFocus();
+        }
+
+        hideTabColors();
+        resetTableColors();
+
+        currentHeader = $(col).attr("id").split("-");
+        if (currentHeader[1] == null) {
+            $("#" + currentHeader).css("background-color", "#AAAAAA");
+            $("#div-" + currentHeader).css("background-color", "#AAAAAA");
+
+            $("#grades tr").each(function () {
+                $(this).find("td:nth-child(" + currentHeader + ")").each(function () {
+                    if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+                    }
+                    else {
+                        $(this).css("background-color", "DeepSkyBlue");
+                    }
+                });
+
+                $(this).find("th:nth-child(" + currentHeader + ")").each(function () {
+                    if ($(this).attr("class") == "colHeader" && $(col).attr("id") > 4) {
+                    }
+                    else {
+                        $(this).css("background-color", "DeepSkyBlue ");
+                    }
+                });
+            });
+        }
+
+    }
+
+    function selectRow(row, e) {
+        hideTabColors();
+        if (header == true) {
+            clearLastAssignmentFocus();
+        } else {
+            clearLastCellFocus();
+        }
+        resetTableColors();
+
+        e.cancelBubble = true;
+
+        var container = row.id.split("-");
+        var count = 0;
+        $('#grades tr').each(function () {
+            if (count == container[1] && container[1] != 0) {
+                $(this).find("td").each(function () {
+                    if ($(this).attr("class") == "rowHeader") {
+                        $(this).css("background-color", "#AAAAAA");
+                    } else if ($(this).attr("class") != "colHeader") {
+                        $(this).css("background-color", "DeepSkyBlue");
+                    }
+                });
+                $(this).find("th").each(function () {
+                    if ($(this).attr("class") != "colHeader") {
+                        $(this).css("background-color", "DeepSkyBlue");
+                    }
+                });
+            }
+            count++;
+        });
+    }
+
+    function selectRowColumnHeaderOfSelected(someCell) {
+        var row = $(someCell).parent("tr").prevAll().length;
+        var colIndex = $(someCell).prevAll().length;
+
+        var cell = $("#grades").find("tr:eq(0)");
+        cell = cell.find("td:eq(" + colIndex + ")");
+
+        //change the current column headers background to highlighted
+        cell.css("background-color", "#FFFF84");
+        cell.find("div").css("background-color", "#FFFF84");
+
+        //change the mouseout function so we don't change the color and only hide the div
+        cell.attr("onmouseout", "hideOnlyButton(this);");
+
+        //find the current rows header
+        var cell2 = $("#grades").find("tr:eq(" + row + ")");
+        cell2 = cell2.find("td:eq(0)");
+
+        //change the current rows header background to highlighted
+        cell2.css("background-color", "#FFFF84");
+        cell2.find("div").css("background-color", "#FFFF84");
+
+        //remove the current rows onmouseout function so it doesn't become unhighlighted (for IE removeAttr is not supported)
+        if (navigator.appName == "Microsoft Internet Explorer") {
+            cell2.prop("onmouseout", null);
+        }
+        else {
+            cell2.removeAttr("onmouseout");
+        }
+    }
+
+    function showButton(column) {
+        currentHeaderCell = column;
+        var container = column.id;
+
+        $("#div-" + container).animate({ "height": "show" }, { duration: 0 });
+
+        if ($("#" + container).css("background-color") != "rgb(170, 170, 170)" && $("#div-" + container).css("background-color") != "rgb(170, 170, 170)") {
+
+            $("#" + container).css("background-color", "#FFFF84");
+            $("#div-" + container).css("background-color", "#FFFF84");
+        }
+    }
+
+    function ShowHide(evt, buttonClick) {
+        selectColumn(evt, currentHeaderCell);
+
+        evt.cancelBubble = true;
+
+        //Store which assignment button was clicked so we can use it with Add Points
+        points = buttonClick
+        var x = 0;
+        var y = 0;
+
+        var container = buttonClick.id;
+        containerId = container.split("-");
+        currentCol = containerId[1];
+
+        //aligning the menu under the buttons
+        x = $("#" + container).position().left;
+        y = $("#" + container).position().top;
+        y += 9;
+
+        //Moving the menu to the button that clicked it
+        $("#selectMenuID").css("left", x + "px");
+        $("#selectMenuID").css("top", y + "px");
+
+        //Animation for menu
+        $("#selectMenuID").animate({ "height": "show" }, { duration: 75 });
+
+    }
+
+</script>
