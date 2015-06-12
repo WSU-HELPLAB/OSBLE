@@ -1,0 +1,183 @@
+﻿@using OSBLE.Models.HomePage
+
+<ul id="notifications_list">
+@{
+    List<Notification> notifications = ViewBag.Notifications;
+    var ConsolidatedNotifications = notifications.Where(n => (n.ItemType != Notification.Types.JoinCourseApproval && n.ItemType != Notification.Types.JoinCommunityApproval && n.ItemType != Notification.Types.Dashboard)).ToList();
+    var CourseApprovalNotifications = notifications.Where(n => (n.ItemType == Notification.Types.JoinCourseApproval)).OrderBy(x => x.Posted).ToList();
+    var CommunityApprovalNotifications = notifications.Where(n => (n.ItemType == Notification.Types.JoinCommunityApproval)).OrderBy(x => x.Posted).ToList();
+    
+    if (CourseApprovalNotifications.Count() > 0)
+    {
+        ConsolidatedNotifications.Add(CourseApprovalNotifications.First());
+    }
+        
+    if(CommunityApprovalNotifications.Count() > 0)
+    {
+        ConsolidatedNotifications.Add(CommunityApprovalNotifications.First());
+    }
+
+    var DashBoardNotifications = notifications.Where(n => n.ItemType == Notification.Types.Dashboard).ToList();
+
+    var foo = from item in DashBoardNotifications
+              group item by new { ItemID = item.ItemID } into g
+              select new { ItemID = g.Key.ItemID, Count = g.Count() };
+              
+    if(foo.Count() > 0)
+    {
+        foreach (var item in foo)
+        {
+            var bar = DashBoardNotifications.Where(n => n.ItemID == item.ItemID).OrderByDescending(m => m.Posted).First();
+            ConsolidatedNotifications.Add(bar);
+        }
+    }
+    
+}
+
+                                
+    @foreach (Notification n in ConsolidatedNotifications)
+    {
+
+        if (n == null || n.Sender == null)
+        {
+            continue;
+        }
+        string classToAppend = "";
+        if (n.Read)
+        {
+            classToAppend = "read";
+        }
+        <li class="notification @classToAppend" id="notification_@(n.ID)">
+            <time class="utc-time"
+                  style="font-size:small;"
+                  datetime="@Helpers.DateAsUnixTime(n.Posted)"
+                  data-original-date="@Helpers.RawDate(n.Posted)"
+                  data-date-format="MM/DD/YYYY hh:mm A">
+                @n.Posted.ToShortDateString() @n.Posted.ToShortTimeString() (UTC)
+            </time>&nbsp;
+
+            @if (ViewBag.ShowNotificationDelete == true)
+            {
+                <div class="notification_tools">
+                    <form action="@Url.Action("MarkAsRead", "Notification", new { ID = @n.ID })"
+                          style="display: inline;"
+                          data-ajax="true"
+                          data-ajax-success="$('#notification_@(n.ID)').hide('highlight',{},'slow',function(){
+                          $(this).remove();
+                          });"
+                          method="post">
+                        @Helpers.DeleteSubmit("Mark This Notification As Read")
+                    </form>
+                </div>
+            }
+            <div class="notification_text">
+                @switch (n.ItemType)
+                {
+                    case Notification.Types.Mail:
+                        {
+
+                            <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> sent you a @NotificationLink(n.ID, "message")</text>
+                            break;
+
+                        }
+                    case Notification.Types.EventApproval:
+                        {
+                            
+                            <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> submitted an @NotificationLink(n.ID, "event for approval")</text>
+                            break;
+                        }
+                    case Notification.Types.JoinCourseApproval:
+                        {
+                            //this means there is only one person: [name] and 0 others
+                            if (CourseApprovalNotifications.Count() < 2)
+                            {
+                                <text><em>@n.Sender.DisplayNameFirstLast(ViewBag.ActiveCourse.AbstractRole)</em> sent you a @NotificationLink(n.ID, "request to join course")</text>
+                                break;
+                            }
+                            else
+                            {
+                                <text><em>@n.Sender.DisplayNameFirstLast(ViewBag.ActiveCourse.AbstractRole)</em> and <b>@((CourseApprovalNotifications.Count() - 1).ToString())</b> other(s) sent you a @NotificationLink(n.ID, "request to join course")</text>
+                                break;
+                            }
+                        }
+                    case Notification.Types.JoinCommunityApproval:
+                        {
+                            //this means there is only one person, or [name] and 0 others
+                            if (CommunityApprovalNotifications.Count() < 2)
+                            {
+                                <text><em>@n.Sender.DisplayNameFirstLast(ViewBag.ActiveCourse.AbstractRole)</em> sent you a @NotificationLink(n.ID, "request to join community")</text>
+                                break;
+                            }
+                            else
+                            {
+                                <text><em>@n.Sender.DisplayNameFirstLast(ViewBag.ActiveCourse.AbstractRole)</em> and <b>@((CommunityApprovalNotifications.Count() - 1).ToString())</b> other(s) sent you a @NotificationLink(n.ID, "request to join community")</text>
+                                break;
+                            }
+                        }
+                    case Notification.Types.Dashboard:
+                        {
+                            int myCount = 0;
+                            foreach (var item in foo)
+                            {
+                                if (item.ItemID == n.ItemID)
+                                {
+                                    myCount = item.Count;
+                                }
+                                    
+                            }
+                            
+                            if (myCount > 1)
+                            {
+                                <text>You have <b>@myCount</b> <em>unread</em> replies in a @NotificationLink(n.ID, "dashboard thread")
+                                that you participated in</text>
+                                break;
+                            }
+                            else
+                            {
+                                <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> posted in a @NotificationLink(n.ID, "dashboard thread")
+                                that you participated in</text>
+                                break;
+                            }
+                            
+                        }
+                    case Notification.Types.InlineReviewCompleted:
+                        {
+                            string[] args = n.Data.Split(new char[] { ';' });
+                            <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> has published an
+                            @Html.ActionLink("inline review", "ViewInlineReview", "Assignment", new { assignmentID = args[0], teamID = args[1] }, new { }) of your @args[2]</text>
+                            break;
+                        }
+                    case Notification.Types.RubricEvaluationCompleted:
+                        {
+                            string[] args1 = n.Data.Split(new char[] { ';' });
+                            <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> completed an @Html.ActionLink("evaluation rubric", "View", "Rubric", new { assignmentId = args1[0], cuId = args1[1] }, new { }) of your @args1[2]
+                            </text>
+                            break;
+                        }
+                    case Notification.Types.FileSubmitted:
+                        {
+                            string[] args2 = n.Data.Split(new char[] { ';' });
+                            <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> submitted the file @args2[4] for the assignment '@args2[2]' at @args2[5] download it
+                            @Html.ActionLink("here", "GetSubmissionZip", "FileHandler", new { assignmentID = args2[0], teamID = args2[1] }, new { })</text>
+                            break;
+                        }
+                    case Notification.Types.TeamEvaluationDiscrepancy:
+                        {
+                            string[] args = n.Data.Split(new char[] { ';' });
+                            <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> submitted a
+                            @Html.ActionLink("team evaluation", "TeacherTeamEvaluation", "Assignment", new { precedingTeamId = args[0], TeamEvaluationAssignmentId = args[1] }, new { })
+                            with a large percent spread</text>
+                            break;
+                        }
+
+                }
+            </div>
+        </li>
+    }
+</ul>
+@helper NotificationLink(int id, string name)
+{
+    @Html.ActionLink(name, "Dispatch", "Notification", new { ID = id }, new { });
+        
+}
+

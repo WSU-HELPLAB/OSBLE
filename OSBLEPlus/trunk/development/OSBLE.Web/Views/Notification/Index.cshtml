@@ -1,0 +1,14 @@
+﻿@using OSBLE.Models
+
+<h2>Notifications @Helpers.CreateToolTip(ToolTips.NotificationMain) </h2>
+
+<p>@Html.ActionLink("Back to Dashboard","Index","Home")</p>
+
+<div id="notifications_read_legend">Read</div>
+
+<div id="notifications_unread_legend">Unread</div>
+
+<div id="notifications">
+    @Html.Partial("_Notifications")
+</div>
+

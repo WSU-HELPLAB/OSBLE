@@ -1,0 +1,39 @@
+﻿@model OSBLE.Models.SilverlightObject
+           
+<div class="silverlightControlHost" style="width: @Model.Width; height: @Model.Height;">
+    <object 
+        id="@Model.CSSId"
+        data="data:application/x-silverlight-2,"
+        type="application/x-silverlight-2"
+        width="@Model.Width"
+        height="@Model.Height"
+        style="width: @Model.Width; height: @Model.Height; display: block;"
+        >
+        <param name="source"
+            value="@Url.Content("~/ClientBin/" + Model.XapName + ".xap")" />
+        <param name="onError"
+            value="@Model.OnSilverlightError" />
+        <param name="background"
+            value="@Model.BackgroundColor.Name" />
+        <param name="minRuntimeVersion"
+            value="@Model.MinimumRuntimeVersion" />
+        <param name="autoUpgrade"
+            value="@Model.AutoUpgrade" />
+            @{
+        if (Model.OnLoaded != null && Model.OnLoaded != "")
+        { 
+            <param name="OnLoaded" value="@Model.OnLoaded" />
+        }
+        }
+        @if (Model.Parameters != null && Model.Parameters.Count > 0)
+        {
+            <param name="initParams" value="@Model.ParameterString" />
+        }
+
+        <a href="http://go.microsoft.com/fwlink/?LinkID=149156&v=4.0.50401.0" style="text-decoration: none">
+            <img src="http://go.microsoft.com/fwlink/?LinkId=161376" alt="Get Microsoft Silverlight" style="border-style: none"/>
+        </a>
+
+    </object>
+    <iframe id="_sl_historyFrame" style="visibility: hidden; height: 0px; width: 0px; border: 0px;"></iframe>
+</div>

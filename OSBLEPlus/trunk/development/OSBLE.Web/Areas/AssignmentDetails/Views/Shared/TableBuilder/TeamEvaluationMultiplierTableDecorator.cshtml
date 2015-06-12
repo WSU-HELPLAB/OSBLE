@@ -1,0 +1,9 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;  
+}
+<td style="text-align:center"> 
+    @dataModel.Multiplier.MultiplierText
+</td>

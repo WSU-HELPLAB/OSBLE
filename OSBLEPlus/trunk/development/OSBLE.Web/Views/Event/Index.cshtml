@@ -1,0 +1,76 @@
+﻿@model IEnumerable<OSBLE.Models.HomePage.Event>
+
+@using OSBLE.Models
+@using OSBLE.Models.HomePage
+
+@{
+    ViewBag.Title = "Events";
+
+    bool courseCalendarFlag = false;
+    string activeCourseRole = ViewBag.ActiveCourse.AbstractRole.Name;
+    int courseID = ViewBag.ActiveCourse.AbstractCourse.ID;
+    switch (activeCourseRole)
+    {
+        case "Instructor":
+            courseCalendarFlag = true;
+            break;
+        case "Leader":
+            break;
+        case "Assessment Committee Chair":
+            break;
+        default:
+            break;
+    }
+}
+
+<h2>Events &amp; Deadlines
+    @if (courseCalendarFlag)
+{
+    <a href="@Url.Action("DownloadCourseCalendar", "iCalendar", new { id = courseID })" title="Download Course Calendar">@Helpers.UnPublishButton()</a>
+    <a href="@Url.Action("SubscribeToCalendar", "iCalendar", new { id = courseID })" title="Subscribe to Course Calendar ()">@Helpers.CalendarButton()</a>
+}</h2>
+
+
+<p>@Html.ActionLink("Back to Dashboard", "Index", "Home")</p>
+
+<p>
+    @if (ViewBag.ActiveCourse.AbstractRole.CanModify || ViewBag.ActiveCourse.AbstractCourse.AllowEventPosting)
+    {
+        @Html.ActionLink("Create New Event", "Create")
+    }
+</p>
+
+@{
+    DateTime today = DateTime.UtcNow.Date;
+
+    // First get events before today
+    List<Event> pastEvents = Model.Where(e => e.StartDate < today).ToList();
+    List<Event> currentEvents = Model.Where(e => e.StartDate >= today).ToList();
+}
+
+@if (pastEvents.Count > 0)
+{
+    
+<h3>
+    <a href="#" onclick="$('#past_events').toggle('blind'); return false;">Past Events (@pastEvents.Count)</a>
+    @Helpers.CreateToolTip(ToolTips.EventPastEvents) 
+</h3>
+
+    <div id="past_events">
+    @Html.Partial("_Events", pastEvents)
+    </div>
+}
+
+@if (currentEvents.Count > 0)
+{
+    
+<h3>
+    <a href="#" onclick="$('#current_events').toggle('blind'); return false;">Current Events (@currentEvents.Count)</a>
+    @Helpers.CreateToolTip(ToolTips.EventCurrentEvents) 
+</h3>
+
+    <div id="current_events">
+    @Html.Partial("_Events", currentEvents)
+    </div>
+
+}

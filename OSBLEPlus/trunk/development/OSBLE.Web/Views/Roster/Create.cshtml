@@ -1,0 +1,73 @@
+﻿@model OSBLE.Models.Courses.CourseUser
+@using OSBLE.Models
+
+@{
+    ViewBag.Title = "Add User";
+}
+
+<h2>Add User By School ID</h2>
+
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.UserProfileID, "ID Number")
+            @Helpers.CreateToolTip(ToolTips.RosterSchoolID) 
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.UserProfile.Identification)
+            @Html.ValidationMessageFor(model => model.UserProfile.Identification)
+        </div>
+        
+        <div class="editor-label">
+            @Html.LabelFor(model => model.UserProfile.SchoolID, "School")
+            @Helpers.CreateToolTip(ToolTips.RosterSchoolID) 
+        </div>
+        <div class="editor-field">
+            @Html.DropDownList("SchoolID", String.Empty)
+            @Html.ValidationMessage("School")
+            <input type="hidden" id="CurrentlySelectedSchool" name="CurrentlySelectedSchool" value="" />
+        </div>    
+    
+    
+    
+        <div class="editor-label">
+            @Html.LabelFor(model => model.AbstractRoleID, "Course Role")
+            @Helpers.CreateToolTip(ToolTips.RosterRole) 
+        </div>
+        <div class="editor-field">
+            @Html.DropDownList("AbstractRoleID", String.Empty)
+            @Html.ValidationMessage("Course Role")
+            <input type="hidden" id="CurrentlySelectedAbstractRoleID" name="CurrentlySelectedAbstractRoleID" value="" />
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Section)
+            @Helpers.CreateToolTip(ToolTips.RosterSection) 
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Section, "0")
+            @Html.ValidationMessageFor(model => model.Section)
+        </div>
+
+    <p>
+        <input type="submit" value="Add User" />
+    </p>
+    
+    <script type="text/javascript">
+    $('#SchoolID').change(function () {
+        $("#CurrentlySelectedSchool").val($("#SchoolID :selected").val());
+    });
+    $('#AbstractRoleID').change(function () {
+        $("#CurrentlySelectedAbstractRoleID").val($("#AbstractRoleID :selected").val());
+    });
+</script>
+    
+}
+
+<div>
+    @Html.ActionLink("Back to Users", "Index")
+</div>

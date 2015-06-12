@@ -1,0 +1,139 @@
+﻿@{
+    ViewBag.Title = "Import Roster";
+}
+<h2>
+    Import Roster</h2>
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+<p>
+    To complete roster import, please identify the header corresponding to student IDs. You can also optionally identify the headers associated with course section, 
+    student e-mail, and student name:</p>
+<div class="selector">
+    <h3>
+        Student Identification Header:</h3>
+    <ul id="id_selector" class="selector">
+        @foreach (string h in ViewBag.headers)
+        {
+            <li @if (h == ViewBag.GuessedIdentification)
+                {<text>class="selected"</text>}>@h</li>
+        }
+    </ul>
+</div>
+<div class="selector">
+    <br />
+    <h3>
+        Section Header (optional):
+    </h3>
+    <ul id="section_selector" class="selector">
+        <li 
+            class="@if (ViewBag.GuessedSection == null)
+                   {<text>selected</text>} none_select">None</li>
+        @foreach (string h in ViewBag.headers)
+        {
+            <li @if (h == ViewBag.GuessedSection) { <text> class="selected" </text> }>@h</li>
+        }
+    </ul>
+    <div class="selector">
+        <br />
+        <h3>
+            Student Email (optional):
+        </h3>
+        <ul id="email_selector" class="selector">
+            <li class="@if (ViewBag.GuessedEmail == null)
+                   {<text>selected</text>} none_select">None</li>
+            @foreach (string h in ViewBag.headers)
+            {
+                <li @if (h == ViewBag.GuessedEmail) { <text> class="selected" </text> }>@h</li>
+            }
+        </ul>
+        @if (ViewBag.GuessedName2 == null)
+        {
+            <div class="selector">
+                <br />
+                <h3>
+                    Student Name Header (optional):
+                </h3>
+                <ul id="name_selector" class="selector">
+                    <li class="@if (ViewBag.GuessedName == null)
+                           {<text>selected</text>} none_select">None</li>
+                    @foreach (string h in ViewBag.headers)
+                    {
+                        <li @if (h == ViewBag.GuessedName) { <text> class="selected" </text> }>@h</li>
+                    }
+                </ul>
+            </div>
+        }
+        else
+        {
+            <div class="selector">
+                <br />
+                <h3>
+                    Student First Name Header (optional):
+                </h3>
+                <ul id="name_selector" class="selector">
+                    <li class="@if (ViewBag.GuessedName == null)
+                           {<text>selected</text>} none_select">None</li>
+                    @foreach (string h in ViewBag.headers)
+                    {
+                        <li @if (h == ViewBag.GuessedName) { <text> class="selected" </text> }>@h</li>
+                    }
+                </ul>
+            </div>
+            <div class="selector">
+                <br />
+                <h3>
+                    Student Last Name Header (optional):
+                </h3>
+                <ul id="name2_selector" class="selector">
+                    <li class="@if (ViewBag.GuessedName2 == null)
+                           {<text>selected</text>} none_select">None</li>
+                    @foreach (string h in ViewBag.headers)
+                    {
+                        <li @if (h == ViewBag.GuessedName2) { <text> class="selected" </text> }>@h</li>
+                    }
+                </ul>
+            </div>
+        }
+        <script type="text/javascript">
+
+            $('.selector > li').click(function () {
+                $(this).siblings().removeClass("selected");
+                $(this).addClass("selected");
+            });
+
+            $('#id_selector > li').click(function () {
+                $('#id_column').val($(this).html());
+            });
+
+            $('#email_selector > li').click(function () {
+                if (!$(this).hasClass('none_select')) {
+                    $('#email_column').val($(this).html());
+                } else {
+                    $('#email_column').val(null);
+                }
+            });
+
+            $('#name_selector > li').click(function () {
+                if (!$(this).hasClass('none_select')) {
+                    $('#name_column').val($(this).html());
+                } else {
+                    $('#name_column').val(null);
+                }
+            });
+
+        </script>
+        <div id="import_roster_tools">
+            @using (Html.BeginForm("ApplyRoster", "Roster", FormMethod.Post))
+            {
+                <input type="hidden" id="id_column" name="idColumn" value="@ViewBag.GuessedIdentification" />
+                <input type="hidden" id="section_column" name="sectionColumn" value="@ViewBag.GuessedSection" />
+                <input type="hidden" id="name_column" name="nameColumn" value="@ViewBag.GuessedName" />
+                <input type="hidden" id="name2_column" name="name2Column" value="@ViewBag.GuessedName2" />
+                <input type="hidden" id="email_column" name="emailColumn" value="@ViewBag.GuessedEmail" />
+                <input type="submit" value="Import Roster" />
+
+            }
+            <br />
+            @Html.ActionLink("Back to Roster", "Index")
+        </div>
+    </div>

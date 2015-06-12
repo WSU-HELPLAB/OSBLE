@@ -1,0 +1,18 @@
+﻿@model OSBLE.Models.Courses.Course
+
+@{
+    ViewBag.Title = "CourseAwaitingApproval";
+    string CourseName = ViewBag.CourseName;
+}
+
+<h2>Request To Join [@CourseName] is Awaiting Instructor Approval</h2>
+
+
+<p>
+    Your request to join <strong>[@CourseName]</strong> has been received. Before you are enrolled, you must first recieve approval from the course instructor.
+    <br /><br />
+    The instructor has been notified of your request.
+</p>
+
+<br />
+@Html.ActionLink("Back to Course Search", "CourseSearch")

@@ -1,0 +1,48 @@
+﻿@{
+    ViewBag.Title = "Creating a Basic Assignment";
+}
+<h1>Creating a Basic Assignment</h1>
+<p>
+    In OSBLE, basic assignments are those in which students submit one or more deliverables to be 
+    evaluated by the instructor.  To create a basic assignment, first click on the &quot;Assignments&quot; navigation tab. 
+     Once on this page, click the &quot;Create New Assignment&quot; link near the top of the page:
+</p>
+<img src="@Url.Content("~/Content/images/help/basic_1.png")" alt="click the create new assignment link" />
+<p>
+    Clicking this link will bring you to the start of the assignment creation wizard.  
+    Note that the assignment wizard handles the creation of several types of assignments.  
+    However, as we are concerned with creating a basic assignment, we will simply click the radio 
+    button next to the &quot;Basic&quot; selection and click the &quot;Begin&quot; button.
+</p>
+<img src="@Url.Content("~/Content/images/help/basic_2.png")" alt="click the basic radio buttion" />
+<p>
+    The next step brings us to the component selection page.  Basic assignments have optional team, rubric, 
+    and submission components.  For the purposes of this example, we will assume that our assignment is 
+    individual-based and does not contain a grading rubric.  Therefore, we will click the last checkbox and 
+    click the &quot;Continue&quot; button.
+</p>
+<img src="@Url.Content("~/Content/images/help/basic_3.png")" alt="select only the third option" />
+<p>
+    We are next brought to the &quot;Basic Settings&quot; page, which allows us to specify various settings for our 
+    basic assignment.  When satisfied, with the settings, click the &quot;Next&quot; button.  Note that the 
+    description field allows the insertion of @Html.ActionLink("web links", "AddWebLinks").
+</p>
+<img src="@Url.Content("~/Content/images/help/basic_4.png")" alt="fill out basic settings" />
+<p>
+    In the next step, we must specify the assignment's deliverables.  
+    In this example, we are having students submit a ChemProV document entitled &quot;submission&quot; 
+    (note: OSBLE automatically handles the renaming of all student submissions).  Once this 
+    information is filled out, click the &quot;Add Deliverable&quot; link.
+</p>
+<img src="@Url.Content("~/Content/images/help/basic_5.png")" alt="add deliverables" />
+<p>
+    After clicking the &quot;Add Deliverable&quot; link, the deliverable is added to the list of required 
+    deliverables and the &quot;File Name&quot; and &quot;Deliverable Type&quot; are reset:
+</p>
+<img src="@Url.Content("~/Content/images/help/basic_6.png")" alt="a deliverable has been added" />
+<p>
+    Clicking the &quot;Next&quot; button brings us to the final screen of the assignment creation wizard.  
+    From here, we can go back and edit the assignment's details, publish the assignment, or return 
+    to the main assignment page.
+</p>
+<img src="@Url.Content("~/Content/images/help/basic_7.png")" alt="wizard complete" />

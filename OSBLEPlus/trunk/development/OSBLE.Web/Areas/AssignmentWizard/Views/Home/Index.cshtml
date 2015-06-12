@@ -1,0 +1,116 @@
+﻿@using OSBLE.Models.Assignments;
+@using System.Collections;
+@model ICollection<AssignmentTypes>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section Header
+{
+    <link href="@Url.Content("~/areas/AssignmentWizard/Content/css/home.css")" type="text/css" rel="Stylesheet" />
+}
+<h1>Assignment Wizard</h1>
+<p>This wizard will guide you through the creation of a new assignment.  To begin, please select the type of assignment you would like to create.</p>
+@using (Html.BeginForm())
+{
+    <table id="TypeSelectTable">
+        <thead>
+            <tr>
+                <th>&nbsp;</th>
+                <th>Assignment Type</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+        @{
+            int counter = 0;
+            string altText = "";
+            
+            //put assignment types in a list so we can remove the ones we don't want to display
+            List<AssignmentTypes> assignmentTypes = Model.ToList();
+            List<AssignmentTypes> filteredAssignmentTypes = new List<AssignmentTypes>();            
+            //get the current course role to filter assignment types
+            string activeCourseRole = ViewBag.ActiveCourse.AbstractRole.Name;
+
+            //TODO: as of 7/25/2014 community, committee, and ABET roles do not have implemented assignment types. 
+            //this filter will need to be adjusted when those are implemented.
+            switch (activeCourseRole)
+            {
+                case "Instructor": //instructors only want to see course assignment types.
+                    List<AssignmentTypes> temp = new List<AssignmentTypes>();
+                    foreach(var type in assignmentTypes)
+                    {
+                        switch (type)
+                        {
+                            case AssignmentTypes.Basic:
+                            case AssignmentTypes.CriticalReview:                                
+                            case AssignmentTypes.DiscussionAssignment:                                
+                            case AssignmentTypes.TeamEvaluation:
+                            case AssignmentTypes.CriticalReviewDiscussion:
+                            case AssignmentTypes.AnchoredDiscussion:
+                                temp.Add(type);
+                                break;
+                            case AssignmentTypes.CommitteeDiscussion:
+                                break;
+                            case AssignmentTypes.ReviewOfStudentWork:
+                                break;
+                            case AssignmentTypes.CommitteeReview:
+                                break;
+                            case AssignmentTypes.AggregateAssessment:
+                                break;
+                            default:
+                                break;
+                        }                                             
+                    }
+                    //re-order assignment types                                        
+                    //Basic>>Discussion>>Anchored Discussion>>Critical Review>>Critical Review Discussion>>Team Evaluation
+                    filteredAssignmentTypes.Add(temp[1]);
+                    filteredAssignmentTypes.Add(temp[4]);
+                    filteredAssignmentTypes.Add(temp[0]);
+                    filteredAssignmentTypes.Add(temp[2]);
+                    filteredAssignmentTypes.Add(temp[3]);
+                    filteredAssignmentTypes.Add(temp[5]);
+
+                    //8-1-14: REMOVE Anchored discussion assignment until completely implemented in order to push changes to live server
+                    filteredAssignmentTypes.Remove(temp[0]);
+                    
+                    break;
+                case "Leader":
+                    break;
+                case "Assessment Committee Chair":
+                    break;
+                default:
+                    break;
+            }
+            
+          }
+         
+
+        @foreach (AssignmentTypes type in filteredAssignmentTypes)
+        {
+            if (counter % 2 == 0)
+            {
+                altText = "AltRow";
+            }
+            else
+            {
+                altText = "";
+            }
+            <tr class="@altText @type">
+                <td><input id="type@(counter)" type="radio" value="@type" name="@ViewBag.AssignmentTypeRadioName" /></td>
+                @if(type.ToString() == "Basic")
+                {
+                    <td><label for="type@(counter)">@type.Explode() Assignment</label></td>
+                }
+                else
+                {
+                    <td><label for="type@(counter)">@type.Explode()</label></td>    
+                }
+                
+                <td style="max-width: 800px">@type.Description()</td>
+            </tr>    
+            counter++;
+        }   
+        </tbody>
+    </table>
+    <input type="submit" value="Begin" name="@ViewBag.BeginWizardButton" id="@ViewBag.BeginWizardButton" />
+}

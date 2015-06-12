@@ -1,0 +1,16 @@
+﻿@model OSBLE.Models.Courses.Course
+
+@{
+    ViewBag.Title = "CommunityCurrentlyEnrolled";
+    string CommunityName = ViewBag.CommunityName;
+}
+
+<h2>You are Already a Participant in This Community!</h2>
+
+<p>
+    Your attempt to join <strong>[@CommunityName]</strong> was not successful.
+    <br /><br />
+     You are either already a participant or have a pending status for this community.
+</p>
+
+@Html.ActionLink("Back to Community Search", "CommunitySearch")

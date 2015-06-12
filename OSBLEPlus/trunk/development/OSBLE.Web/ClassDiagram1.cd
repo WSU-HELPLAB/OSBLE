@@ -1,0 +1,1624 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="OSBLE.BundleConfig" Collapsed="true">
+    <Position X="108.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAA=</HashCode>
+      <FileName>App_Start\BundleConfig.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.FilterConfig" Collapsed="true">
+    <Position X="108.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAA=</HashCode>
+      <FileName>App_Start\FilterConfig.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.RouteConfig" Collapsed="true">
+    <Position X="120.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAA=</HashCode>
+      <FileName>App_Start\RouteConfig.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.WebApiConfig" Collapsed="true">
+    <Position X="120.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>App_Start\WebApiConfig.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.MvcApplication" Collapsed="true">
+    <Position X="117.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAA=</HashCode>
+      <FileName>Global.asax.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssessmentWizard.AssessmentWizardAreaRegistration" Collapsed="true">
+    <Position X="112" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAAAAEBAgAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Areas\AssessmentWizard\AssessmentWizardAreaRegistration.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssessmentWizard.Controllers.AssessmentBaseController" Collapsed="true">
+    <Position X="40.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAggAgEIREgAAAAACkgABAEAAUAAEAAAABEAA=</HashCode>
+      <FileName>Areas\AssessmentWizard\Controllers\AssessmentBaseController.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="OSBLE.Areas.AssessmentWizard.Controllers.AssessmentBasicsController" Collapsed="true">
+    <Position X="36.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAABAAAAAAAAgAABAEAAQAAEAAAAAAAA=</HashCode>
+      <FileName>Areas\AssessmentWizard\Controllers\AssessmentBasicsController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssessmentWizard.Controllers.CommitteeDiscussionController" Collapsed="true">
+    <Position X="39" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAABAAAAAAAAgAABAEAAQAAEAAAAAAAA=</HashCode>
+      <FileName>Areas\AssessmentWizard\Controllers\CommitteeDiscussionController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssessmentWizard.Controllers.CommitteeReviewController" Collapsed="true">
+    <Position X="41.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAABAAAAAAAAgAABAEAAQAAEAAAAAAAA=</HashCode>
+      <FileName>Areas\AssessmentWizard\Controllers\CommitteeReviewController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssessmentWizard.Controllers.HomeController" Collapsed="true">
+    <Position X="93" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QACAAAAAAAAAAAAAAAEQAAAEAAAAAAAAAAEAgAQAAAA=</HashCode>
+      <FileName>Areas\AssessmentWizard\Controllers\HomeController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssessmentWizard.Controllers.ReviewOfStudentWorkController" Collapsed="true">
+    <Position X="43.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAABAAAAAAAAgAABAEAAQAAEAAAAAAAA=</HashCode>
+      <FileName>Areas\AssessmentWizard\Controllers\ReviewOfStudentWorkController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssessmentWizard.Models.AssessmentWizardComponentManager" Collapsed="true">
+    <Position X="2.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAASAAAAEEEBAAAAABAAAAAAAAAAABAQAAAAAAA=</HashCode>
+      <FileName>Areas\AssessmentWizard\Models\AssessmentWizardComponentManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.AssignmentDetailsAreaRegistration" Collapsed="true">
+    <Position X="113.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAgAAAAAAEAAAAAAAAIAAAAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\AssignmentDetailsAreaRegistration.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Controllers.ContentController" Collapsed="true">
+    <Position X="7.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAAAAAAAAAAAAAAAAAAAAAAAQAAEAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Controllers\ContentController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Controllers.HomeController" Collapsed="true">
+    <Position X="16.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAAAAAAAAAgAAAAAAAAAAAAAAEEAAAAEAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Controllers\HomeController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.DefaultBuilder" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="108.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\DefaultBuilder.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder.ABETOutcomesDecorator" Collapsed="true">
+    <Position X="11.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\HeaderBuilder\ABETOutcomesDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder.CriticalReviewStudentDownloadDecorator" Collapsed="true">
+    <Position X="16" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\HeaderBuilder\CriticalReviewStudentDownloadDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder.CriticalReviewSubmissionDecorator" Collapsed="true">
+    <Position X="20.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\HeaderBuilder\CriticalReviewSubmissionDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder.DiscussionTeamMemberDecorator" Collapsed="true">
+    <Position X="25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAQ=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\HeaderBuilder\DiscussionTeamMemberDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder.DownloadDiscussionItemsDecorator" Collapsed="true">
+    <Position X="29.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\HeaderBuilder\DownloadDiscussionItemsDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder.HeaderDecorator" Collapsed="true">
+    <Position X="22.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAhAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\HeaderBuilder\HeaderDecorator.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder.InitialFinalDueDecorator" Collapsed="true">
+    <Position X="38.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\HeaderBuilder\InitialFinalDueDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder.LatePolicyHeaderDecorator" Collapsed="true">
+    <Position X="43" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\HeaderBuilder\LatePolicyHeaderDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder.PreviousAssignmentDecorator" Collapsed="true">
+    <Position X="2.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\HeaderBuilder\PreviousAssignmentDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder.PublishCriticalReviewDecorator" Collapsed="true">
+    <Position X="4.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\HeaderBuilder\PublishCriticalReviewDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder.RubricDecorator" Collapsed="true">
+    <Position X="7" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\HeaderBuilder\RubricDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder.RubricGradeDecorator" Collapsed="true">
+    <Position X="9.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\HeaderBuilder\RubricGradeDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder.RubricGradingProgressDecorator" Collapsed="true">
+    <Position X="13.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\HeaderBuilder\RubricGradingProgressDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder.StudentDiscussionLinkDecorator" Collapsed="true">
+    <Position X="18.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\HeaderBuilder\StudentDiscussionLinkDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder.StudentSubmissionDecorator" Collapsed="true">
+    <Position X="22.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\HeaderBuilder\StudentSubmissionDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder.StudentTeamEvalSubmissionDecorator" Collapsed="true">
+    <Position X="27.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAAAAAAAAABAQAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\HeaderBuilder\StudentTeamEvalSubmissionDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder.TeacherDeliverablesHeaderDecorator" Collapsed="true">
+    <Position X="31.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\HeaderBuilder\TeacherDeliverablesHeaderDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder.TeacherDiscussionLinkDecorator" Collapsed="true">
+    <Position X="34" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAQ=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\HeaderBuilder\TeacherDiscussionLinkDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder.TeamEvalProgressDecorator" Collapsed="true">
+    <Position X="36.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\HeaderBuilder\TeamEvalProgressDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder.TeamMembersDecorator" Collapsed="true">
+    <Position X="40.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAQ=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\HeaderBuilder\TeamMembersDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.TableBuilder.ABETProficiencyDecorator" Collapsed="true">
+    <Position X="26.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\TableBuilder\ABETProficiencyDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.TableBuilder.CriticalReviewsPerformedDecorator" Collapsed="true">
+    <Position X="1.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAgAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\TableBuilder\CriticalReviewsPerformedDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.TableBuilder.CriticalReviewsReceivedDecorator" Collapsed="true">
+    <Position X="6.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAgAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\TableBuilder\CriticalReviewsReceivedDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.TableBuilder.DeliverablesTableDecorator" Collapsed="true">
+    <Position X="8.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\TableBuilder\DeliverablesTableDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.TableBuilder.DiscussionPostsTableDecorator" Collapsed="true">
+    <Position X="10.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\TableBuilder\DiscussionPostsTableDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.TableBuilder.DiscussionRepliesTableDecorator" Collapsed="true">
+    <Position X="13" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\TableBuilder\DiscussionRepliesTableDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.TableBuilder.DiscussionTotalTableDecorator" Collapsed="true">
+    <Position X="15.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\TableBuilder\DiscussionTotalTableDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.TableBuilder.InlineReviewTableDecorator" Collapsed="true">
+    <Position X="17.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\TableBuilder\InlineReviewTableDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.TableBuilder.LatePenaltyTableDecorator" Collapsed="true">
+    <Position X="19.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\TableBuilder\LatePenaltyTableDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.TableBuilder.RubricTableDecorator" Collapsed="true">
+    <Position X="22" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\TableBuilder\RubricTableDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.TableBuilder.StudentRubricsReceivedDecorator" Collapsed="true">
+    <Position X="24.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\TableBuilder\StudentRubricsReceivedDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.TableBuilder.TableDecorator" Collapsed="true">
+    <Position X="15.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\TableBuilder\TableDecorator.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.TableBuilder.TeamEvaluationMultiplierTableDecorator" Collapsed="true">
+    <Position X="28.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\TableBuilder\TeamEvaluationMultiplierTableDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.Models.TableBuilder.TeamEvaluationProgressTableDecorator" Collapsed="true">
+    <Position X="4" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAABAAAAAAAgAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\TableBuilder\TeamEvaluationProgressTableDecorator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.ViewModels.AssignmentDetailsFactory" Collapsed="true">
+    <Position X="115.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAAAAAAAAAABAAAAAAgAAAAAAAAAAQAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\ViewModels\AssignmentDetailsFactory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.ViewModels.AssignmentDetailsViewModel" Collapsed="true">
+    <Position X="117.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAIAAAAAAAAAAAAACAAAAAAAAAAAwAAAAAAAAAAQ=</HashCode>
+      <FileName>Areas\AssignmentDetails\ViewModels\AssignmentDetailsViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentDetails.ViewModels.CriticalReviewsReceivedTeam" Collapsed="true">
+    <Position X="115.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAABAAQgAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\ViewModels\CriticalReviewsReceivedTeam.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentWizard.AssignmentWizardAreaRegistration" Collapsed="true">
+    <Position X="120.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CCAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAABA=</HashCode>
+      <FileName>Areas\AssignmentWizard\AssignmentWizardAreaRegistration.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentWizard.Controllers.ABETController" Collapsed="true">
+    <Position X="63.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAgAAAAAAIAAAAgAABAAAAQAAEAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentWizard\Controllers\ABETController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentWizard.Controllers.BasicsController" Collapsed="true">
+    <Position X="66" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAgAAIAAAAgAABAEAAQAAEAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentWizard\Controllers\BasicsController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentWizard.Controllers.CommentCategoryController" Collapsed="true">
+    <Position X="70.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAQAgAAAAgAIAAAAAAEBCEAAQAAEAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentWizard\Controllers\CommentCategoryController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentWizard.Controllers.ContentController" Collapsed="true">
+    <Position X="54.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAAAAAAAAAAAAAAAAAAAAAAAQAAEAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentWizard\Controllers\ContentController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentWizard.Controllers.CriticalReviewController" Collapsed="true">
+    <Position X="75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAAACgAAAAAAIAAAAgAABAEAAQAAEAAAAAEAA=</HashCode>
+      <FileName>Areas\AssignmentWizard\Controllers\CriticalReviewController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentWizard.Controllers.CriticalReviewDiscussionTeamsController" Collapsed="true">
+    <Position X="77.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAgAAAAAAIAAAAgAABAEgAQAAEAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentWizard\Controllers\CriticalReviewDiscussionTeamsController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentWizard.Controllers.DeliverablesController" Collapsed="true">
+    <Position X="79.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAgAAAAAAIAAAAAAABAAAAQAAEAAAAAEAA=</HashCode>
+      <FileName>Areas\AssignmentWizard\Controllers\DeliverablesController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentWizard.Controllers.DiscussionController" Collapsed="true">
+    <Position X="81.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAIAAAAgAABAEAAQAAEAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentWizard\Controllers\DiscussionController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentWizard.Controllers.DiscussionTeamsController" Collapsed="true">
+    <Position X="68.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAgAAAAAAIAAAAgAABAEgAQAAEAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentWizard\Controllers\DiscussionTeamsController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentWizard.Controllers.HomeController" Collapsed="true">
+    <Position X="9.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QACAAAAAAAAAAAAAAAEQAAAMAAAAAAAAAAEAgAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentWizard\Controllers\HomeController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentWizard.Controllers.PreviousAssignmentController" Collapsed="true">
+    <Position X="57" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAIAAAAgAABAEAAQAAEAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentWizard\Controllers\PreviousAssignmentController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentWizard.Controllers.RubricBaseController" Collapsed="true">
+    <Position X="60.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAEIAYAAAAEIAwAAAAAAAgAACAAAAAABAEIAAAAAQg=</HashCode>
+      <FileName>Areas\AssignmentWizard\Controllers\RubricBaseController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentWizard.Controllers.RubricController" Collapsed="true">
+    <Position X="59.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAIAAAAAAABAAAAQAAEAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentWizard\Controllers\RubricController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentWizard.Controllers.StudentRubricController" Collapsed="true">
+    <Position X="61.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAIAAAAAAABAEAAQAAEAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentWizard\Controllers\StudentRubricController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentWizard.Controllers.TeamController" Collapsed="true">
+    <Position X="68.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAgBAAAAAIAAAAgAABAEAAQAAEAAAAAEAA=</HashCode>
+      <FileName>Areas\AssignmentWizard\Controllers\TeamController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentWizard.Controllers.TeamEvaluationController" Collapsed="true">
+    <Position X="72.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAIAAAAgAABAEAAQAAEAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentWizard\Controllers\TeamEvaluationController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentWizard.Controllers.WizardBaseController" Collapsed="true">
+    <Position X="69.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABABAggAgEIQEgAIAAQCkgABAEAAQAAEAAAAAEAA=</HashCode>
+      <FileName>Areas\AssignmentWizard\Controllers\WizardBaseController.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentWizard.Models.AssignmentWizardComponentManager" Collapsed="true">
+    <Position X="0.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAAAAEAAUEAAAAQAEAAAAAAQBABAAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentWizard\Models\AssignmentWizardComponentManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentWizard.Models.WizardComparer" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="106.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgAAAAAAAAAAAAIAAAABAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentWizard\Models\WizardComparer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentWizard.Models.WizardComponentManagerBase" Collapsed="true">
+    <Position X="1.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAgAQAEAAABBUAAAsSACMAABAABCQAoAgBAAiAAAAIA=</HashCode>
+      <FileName>Areas\AssignmentWizard\Models\WizardComponentManagerBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentWizard.Models.WizardSortOrderComparer" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="108.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentWizard\Models\WizardSortOrderComparer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentWizard.ViewModels.RubricSelectionViewModel" Collapsed="true">
+    <Position X="106.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAAgAAAAAABAAAAAAAAAAAAABAAAAEAAA=</HashCode>
+      <FileName>Areas\AssignmentWizard\ViewModels\RubricSelectionViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentWizard.ViewModels.CourseViewModel" Collapsed="true">
+    <Position X="113.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>Areas\AssignmentWizard\ViewModels\RubricSelectionViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Areas.AssignmentWizard.ViewModels.RubricViewModel" Collapsed="true">
+    <Position X="108.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAAEgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKA=</HashCode>
+      <FileName>Areas\AssignmentWizard\ViewModels\RubricSelectionViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Attributes.CanCreateCourses" Collapsed="true">
+    <Position X="110.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Attributes\CanCreateCourses.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Attributes.CanGradeCourse" Collapsed="true">
+    <Position X="112" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Attributes\CanGradeCourse.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Attributes.CanModifyCourse" Collapsed="true">
+    <Position X="113.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Attributes\CanModifyCourse.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Attributes.CanPostEvent" Collapsed="true">
+    <Position X="115.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Attributes\CanPostEvent.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Attributes.CanSeeAllCourse" Collapsed="true">
+    <Position X="117.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Attributes\CanSeeAllCourse.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Attributes.CanSubmitAssignments" Collapsed="true">
+    <Position X="119" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Attributes\CanSubmitAssignments.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Attributes.EmailAttribute" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="115.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>Attributes\EmailAttribute.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Attributes.EmailValidationRule" Collapsed="true">
+    <Position X="117.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Attributes\EmailAttribute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Attributes.FileCacheAttribute" Collapsed="true">
+    <Position X="120.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAAACAQAAAIAAAAAAAAAAAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>Attributes\FileCacheAttribute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Attributes.IsAdmin" Collapsed="true">
+    <Position X="112" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Attributes\IsAdmin.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Attributes.IsCommunity" Collapsed="true">
+    <Position X="113.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Attributes\IsCommunity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Attributes.IsNotAnonymized" Collapsed="true">
+    <Position X="115.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Attributes\IsNotAnonymized.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Attributes.NotForCommunity" Collapsed="true">
+    <Position X="119" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Attributes\NotForCommunity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Attributes.OsbleAuthorize" Collapsed="true">
+    <Position X="110.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Attributes\OsbleAuthorize.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Attributes.RequireActiveCourse" Collapsed="true">
+    <Position X="117.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Attributes\RequireActiveCourse.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.ABETOutcomesAdminController" Collapsed="true">
+    <Position X="50.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAIAAAQAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAA=</HashCode>
+      <FileName>Controllers\ABETOutcomesAdminController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.AccountController" Collapsed="true">
+    <Position X="84" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAACgAgAAAAAEICAQAEAEAAAAACAABIUABEAAYQAIAI=</HashCode>
+      <FileName>Controllers\AccountController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.AdminController" Collapsed="true">
+    <Position X="88.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACABAACAAAAAAAAAAAEAAAACAAEAAAAAAAI=</HashCode>
+      <FileName>Controllers\AdminController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.AssignmentController" Collapsed="true">
+    <Position X="95.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAAAAAAAAACAAAAAEAAAAAAgMAAAAgEAA=</HashCode>
+      <FileName>Controllers\AssignmentController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.CommitteeController" Collapsed="true">
+    <Position X="99.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAEAAAAAAAA=</HashCode>
+      <FileName>Controllers\CommitteeController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.CommunityController" Collapsed="true">
+    <Position X="104.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAAAEACAAEAAAAAAAA=</HashCode>
+      <FileName>Controllers\CommunityController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.CookieTestController" Collapsed="true">
+    <Position X="106.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAIA=</HashCode>
+      <FileName>Controllers\CookieTestController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.CourseController" Collapsed="true">
+    <Position X="12" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEASAAAAAAAAAAAEAAAAEAAEACAAEAAAAAAAA=</HashCode>
+      <FileName>Controllers\CourseController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.DepartmentsController" Collapsed="true">
+    <Position X="18.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAA=</HashCode>
+      <FileName>Controllers\DepartmentsController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.DiscussionAssignmentController" Collapsed="true">
+    <Position X="23.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABQAAAAIAEAAAAAAAAAAAAAABAAAAACEAAAAAAIA=</HashCode>
+      <FileName>Controllers\DiscussionAssignmentController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.EventController" Collapsed="true">
+    <Position X="27.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAgAAAAAACAAAIAAAAAQAAAAAAEAAEECoAEAAAAAAIA=</HashCode>
+      <FileName>Controllers\EventController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.FileHandlerController" Collapsed="true">
+    <Position X="32.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAABAAAACAEAQQAAAAAAEQAAAAAAEgAAAABAA=</HashCode>
+      <FileName>Controllers\FileHandlerController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.GradebookController" Collapsed="true">
+    <Position X="45.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAACAAAAAAAIAAAAAAAAAAEAAAAAAAAEAAAAAAAg=</HashCode>
+      <FileName>Controllers\GradebookController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.HelpController" Collapsed="true">
+    <Position X="52.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAgAQAABAAhAAAABAAACAAAAAgAAAAAEAAAAAAAA=</HashCode>
+      <FileName>Controllers\HelpController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.HomeController" Collapsed="true">
+    <Position X="86.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CiCABAAAAACICAAAAIAAAAAAIIBAIABAAAGAAgAAEYA=</HashCode>
+      <FileName>Controllers\HomeController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.MailController" Collapsed="true">
+    <Position X="90.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gABAACAAASCAAEAAADAAAAAAAAEJAEAABAGEEAEwAAA=</HashCode>
+      <FileName>Controllers\MailController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.NotificationController" Collapsed="true">
+    <Position X="97.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAYAAIACAAAAAAAAEgAEAgAAAAAAAAEAUAJIAAAAA=</HashCode>
+      <FileName>Controllers\NotificationController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.OpenIdController" Collapsed="true">
+    <Position X="102" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAEAABAAAAAABAQAAAAAIAQAAABABBAAAA=</HashCode>
+      <FileName>Controllers\OpenIdController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.OSBLEController" Collapsed="true">
+    <Position X="54.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIRCAAAgQIAQAQECIMAAAQAAAAQEAABBSAgQwCEBAgA=</HashCode>
+      <FileName>Controllers\OSBLEController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.PdfCriticalReviewController" Collapsed="true">
+    <Position X="5.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAEAAAA=</HashCode>
+      <FileName>Controllers\PdfCriticalReviewController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.RosterController" Collapsed="true">
+    <Position X="14.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAACAACAAACAAAoAAKABEAMEACBCEAAAAAAAA=</HashCode>
+      <FileName>Controllers\RosterController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.RubricController" Collapsed="true">
+    <Position X="21" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAJQAQAAAAAAABBAAAAAAAVBAgAAAEAIIAAAQE=</HashCode>
+      <FileName>Controllers\RubricController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.SchoolController" Collapsed="true">
+    <Position X="25.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACABAACAAAAAAAAAAAEAAEACAAEAAAAAAAA=</HashCode>
+      <FileName>Controllers\SchoolController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.StudioAssignmentController" Collapsed="true">
+    <Position X="30" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAEAAAAAAAA=</HashCode>
+      <FileName>Controllers\StudioAssignmentController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.SubmissionController" Collapsed="true">
+    <Position X="34.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACABAAAAAAAAAAQAAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controllers\SubmissionController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.UserController" Collapsed="true">
+    <Position X="48" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAkAAAAAAAgA=</HashCode>
+      <FileName>Controllers\UserController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Controllers.Odata.CoursesController" Collapsed="true">
+    <Position X="112" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAQAADACAAAAAAAAAAAAAAAAAAAAAAIAIA=</HashCode>
+      <FileName>Controllers\Odata\CoursesController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Resources.CsvParser" Collapsed="true">
+    <Position X="119" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAEAA=</HashCode>
+      <FileName>Resources\CsvParser.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Resources.DateTimeExtensions" Collapsed="true">
+    <Position X="106.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>Resources\DateTimeExtensions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Resources.DynamicDictionary" Collapsed="true">
+    <Position X="112" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAACAAAAIQECAAAAQAAAAAgAAAAAAA=</HashCode>
+      <FileName>Resources\DynamicDictionary.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Resources.StringExtensions" Collapsed="true">
+    <Position X="113.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Resources\StringExtensions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Resources.CSVReader.CSVDriver" Collapsed="true">
+    <Position X="117.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAEAAEkAAAAQAABAABAQAhAAEAMAAAAgAIBE=</HashCode>
+      <FileName>Resources\CSVReader\CSVDriver.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Resources.CSVReader.CSVReader" Collapsed="true">
+    <Position X="120.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Resources\CSVReader\CSVReader.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Resources.CSVReader.DefaultState" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="110.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAACAAAAAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>Resources\CSVReader\DefaultState.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Resources.CSVReader.EndState" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="119" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAACAAAAAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>Resources\CSVReader\EndState.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Resources.CSVReader.QuoteState" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="113.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAACAAAAAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>Resources\CSVReader\QuoteState.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Resources.CSVReader.SecondQuoteState" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="110.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAACAAAAAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>Resources\CSVReader\SecondQuoteState.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Services.AssignmentSubmissionService" Collapsed="true">
+    <Position X="119" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAEAAAAAAA=</HashCode>
+      <FileName>Services\AssignmentSubmissionService.svc.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Services.AuthenticationService" Collapsed="true">
+    <Position X="106.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgCAgAIBAAAAAAAAAAAAAAAAAAAAACAAgAAAAAAA=</HashCode>
+      <FileName>Services\AuthenticationService.svc.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Services.CourseFilesOps" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="108.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEABAgAAAACIhAAAAAAAAJAAAABAAQAAAAAAQA=</HashCode>
+      <FileName>Services\CourseFilesOps.ashx.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Services.CourseFilesUploader" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="110.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAQA=</HashCode>
+      <FileName>Services\CourseFilesUploader.ashx.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Services.OsbleService" Collapsed="true">
+    <Position X="112" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQEAgIAAACAAABAAAAAAAAAwAAAAAAQAQAAEAAAAACA=</HashCode>
+      <FileName>Services\OsbleService.svc.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Services.SilverlightFaultBehavior" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="112" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAACAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\SilverlightFaultBehavior.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Services.UploaderWebService" Collapsed="true">
+    <Position X="115.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAiAAAAMSAAQAIgAIAAAAQACIAGAIDgEAAAAAEAA=</HashCode>
+      <FileName>Services\UploaderWebService.svc.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ActionResultExtensions" Collapsed="true">
+    <Position X="108.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAA=</HashCode>
+      <FileName>Utility\ActionResultExtensions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ResponseCapture" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="119" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAACAAACAEIAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Utility\ActionResultExtensions.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Utility.Constants" Collapsed="true">
+    <Position X="120.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAABAAAAAAAAAAAAAAAAAAAgAAAAgAAAAAAAA=</HashCode>
+      <FileName>Utility\Constants.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Utility.Email" Collapsed="true">
+    <Position X="113.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Utility\Email.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Utility.FileCacheHelper" Collapsed="true">
+    <Position X="106.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Utility\FileCacheHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Utility.NTree&lt;T&gt;" Collapsed="true">
+    <Position X="120.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAAAAAAAQAABAAAAACAAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>Utility\NTree.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Utility.ObjectBinder" Collapsed="true">
+    <Position X="106.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Utility\ObjectBinder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.Utility.OsbleAuthentication" Collapsed="true">
+    <Position X="108.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAMAQAAAQAgAAAAAAAAAAABAAABAAAAAEABA=</HashCode>
+      <FileName>Utility\OsbleAuthentication.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenIdProviderMvc.Code.AccountMembershipService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="106.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAQAAgAAAAQAAAAAAAAAAAAAACAAAAAAAAAA=</HashCode>
+      <FileName>Utility\OpenId\AccountMembershipService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OpenIdProviderMvc.Code.AnonymousIdentifierProvider" Collapsed="true">
+    <Position X="110.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAA=</HashCode>
+      <FileName>Utility\OpenId\AnonymousIdentifierProvider.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenIdProviderMvc.Code.FormsAuthenticationService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="110.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACCAAAAAAAAAAAAAAAABAAAAAAAAACAAAAAAAAA=</HashCode>
+      <FileName>Utility\OpenId\FormsAuthenticationService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OpenIdProviderMvc.Code.ReadOnlyXmlMembershipProvider" Collapsed="true">
+    <Position X="115.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IQQAAAAAAQgEgQiMEYAEAAAQQQIAAAICHAEAAAkABAQ=</HashCode>
+      <FileName>Utility\OpenId\ReadOnlyXmlMembershipProvider.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenIdProviderMvc.Code.Util" Collapsed="true">
+    <Position X="119" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAA=</HashCode>
+      <FileName>Utility\OpenId\Util.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OpenIdProviderMvc.Models.User" Collapsed="true">
+    <Position X="117.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAAAIAAEAAAAAAABA=</HashCode>
+      <FileName>Utility\OpenId\User.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OSBLE.FileSystem" Collapsed="true">
+    <Position X="20.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.IdenticonRenderer" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="25.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.Courses.AbstractCourse" Collapsed="true">
+    <Position X="13" Y="3.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Courses.AbstractRole" Collapsed="true">
+    <Position X="5.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Courses.ABETEvaluatorRole" Collapsed="true">
+    <Position X="3" Y="3.25" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Courses.AssessmentCommittee" Collapsed="true">
+    <Position X="13" Y="4.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Courses.AssessmentCommitteeChairRole" Collapsed="true">
+    <Position X="5.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Courses.AssessmentCommitteeMemberRole" Collapsed="true">
+    <Position X="7.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Courses.AssessmentCommitteeRole" Collapsed="true">
+    <Position X="5.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Courses.Community" Collapsed="true">
+    <Position X="15.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Courses.CommunityRole" Collapsed="true">
+    <Position X="9.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Courses.Course" Collapsed="true">
+    <Position X="10.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Courses.CourseBreak" Collapsed="true">
+    <Position X="34.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Courses.CourseMeeting" Collapsed="true">
+    <Position X="20.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Courses.CourseRole" Collapsed="true">
+    <Position X="0.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Courses.CourseUser" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="23.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.AbstractCourses.Course.WhiteTable" Collapsed="true">
+    <Position X="32.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.AbstractCourses.Course.WhiteTableUser" Collapsed="true">
+    <Position X="34.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Courses.Rubrics.CellDescription" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="23.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.Courses.Rubrics.Criterion" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="25.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.Courses.Rubrics.CriterionEvaluation" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="27.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.Courses.Rubrics.Level" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="27.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.Courses.Rubrics.Rubric" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="32.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.Courses.Rubrics.RubricEvaluation" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="34.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.AbstractCourses.CourseRubric" Collapsed="true">
+    <Position X="22" Y="2.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.ChangePasswordModel" Collapsed="true">
+    <Position X="25.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.LogOnModel" Collapsed="true">
+    <Position X="29" Y="4.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.RegisterModel" Collapsed="true">
+    <Position X="27.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.ResetPasswordModel" Collapsed="true">
+    <Position X="29" Y="5.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.FindUserNameModel" Collapsed="true">
+    <Position X="22" Y="4.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.ContactUsModel" Collapsed="true">
+    <Position X="32.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.ActivityLog" Collapsed="true">
+    <Position X="23.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.ContextBase" Collapsed="true">
+    <Position X="3.5" Y="8.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.OSBLEContext" Collapsed="true">
+    <Position X="3.5" Y="9.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.OSBLEContextAlwaysCreateInitializer" Collapsed="true">
+    <Position X="34.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.OSBLEContextModelChangeInitializer" Collapsed="true">
+    <Position X="20.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.School" Collapsed="true">
+    <Position X="22" Y="6.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Setting" Collapsed="true">
+    <Position X="25.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.SilverlightObject" Collapsed="true">
+    <Position X="27.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.ToolTips" Collapsed="true">
+    <Position X="27.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Annotate.AnnotateApi" Collapsed="true">
+    <Position X="25.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Annotate.AnnotateDocumentReference" Collapsed="true">
+    <Position X="27.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Annotate.AnnotateResult" Collapsed="true">
+    <Position X="29" Y="0.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Assessments.Assessment" Collapsed="true">
+    <Position X="30.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Assessments.AssessmentTypesExtensions" Collapsed="true">
+    <Position X="32.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Assignments.AbetAssignmentOutcome" Collapsed="true">
+    <Position X="20.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Assignments.AbetSubmissionTag" Collapsed="true">
+    <Position X="22" Y="0.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Assignments.Assignment" Collapsed="true">
+    <Position X="34.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Assignments.AssignmentTeam" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="20.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.Assignments.AssignmentTypeExtensions" Collapsed="true">
+    <Position X="22" Y="1.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Assignments.CommentCategory" Collapsed="true">
+    <Position X="27.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Assignments.CommentCategoryConfiguration" Collapsed="true">
+    <Position X="29" Y="1.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Assignments.CommentCategoryOption" Collapsed="true">
+    <Position X="30.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Assignments.CriticalReviewSettings" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="29" Y="2.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.Assignments.FileExtensions" Collapsed="true">
+    <Position X="34.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Assignments.Deliverable" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="30.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.Assignments.DiscussionAssignmentMetaInfo" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="34.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.Assignments.DiscussionSetting" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="23.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.Assignments.DiscussionTeam" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="25.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.Assignments.ReviewTeam" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="30.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.Assignments.Team" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="30.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.Assignments.TeamConverter" Collapsed="true">
+    <Position X="32.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Assignments.TeamEvaluation" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="20.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.Assignments.TeamEvaluationComment" Collapsed="true">
+    <Position X="22" Y="7.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Assignments.TeamEvaluationSettings" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="23.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.Assignments.TeamMember" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="25.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.DiscussionAssignment.DiscussionPost" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="20.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.FileSystem.AssignmentFilePath" Collapsed="true">
+    <Position X="15.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.FileSystem.Directories" Collapsed="true">
+    <Position X="32.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.FileSystem.FileCollection" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="32.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.FileSystem.GradebookFilePath" Collapsed="true">
+    <Position X="17.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.FileSystem.OSBLEDirectory" Collapsed="true">
+    <Position X="16.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.FileSystem.OSBLEFile" Collapsed="true">
+    <Position X="22" Y="5.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.HomePage.AbstractDashboard" Collapsed="true">
+    <Position X="11.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="OSBLE.Models.HomePage.DashboardPost" Collapsed="true">
+    <Position X="10.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.HomePage.DashboardReply" Collapsed="true">
+    <Position X="12.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.HomePage.Event" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="30.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.HomePage.icalEvent" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="23.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.HomePage.Notification" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="32.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.Services.Uploader.AbstractListing" Collapsed="true">
+    <Position X="6.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Services.Uploader.DirectoryListing" Collapsed="true">
+    <Position X="5.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Services.Uploader.FileListing" Collapsed="true">
+    <Position X="7.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Services.Uploader.ParentDirectoryListing" Collapsed="true">
+    <Position X="5.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Services.Uploader.UserSession" Collapsed="true">
+    <Position X="30.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Triggers.CourseUserDeleteTrigger" Collapsed="true">
+    <Position X="12.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Triggers.DiscussionTeamDeleteTrigger" Collapsed="true">
+    <Position X="15" Y="1.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Triggers.ModelTrigger" Collapsed="true">
+    <Position X="15" Y="0.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Triggers.TeamDeleteTrigger" Collapsed="true">
+    <Position X="17.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.Users.Mail" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="30.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.Users.ProfileImage" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="25.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.Users.UserProfile" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="29" Y="7.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.ViewModels.Poster" Collapsed="true">
+    <Position X="23.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.ViewModels.GeneralPost" Collapsed="true">
+    <Position X="1.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.ViewModels.ReplyViewModel" Collapsed="true">
+    <Position X="0.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.ViewModels.DiscussionViewModel" Collapsed="true">
+    <Position X="27.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.ViewModels.DiscussionPostViewModel" Collapsed="true">
+    <Position X="2.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.ViewModels.DiscussionPostComparer" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="22" Y="3.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.ViewModels.RubricViewModel" Collapsed="true">
+    <Position X="20.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.ViewModels.SerializableTeamMember" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="23.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="OSBLE.Models.ViewModels.StudioAssignmentViewModel" Collapsed="true">
+    <Position X="29" Y="6.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.ViewModels.TeamCreationViewModel" Collapsed="true">
+    <Position X="34.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="OSBLE.Models.ViewModels.ReviewInterface.DocumentLocation" Collapsed="true">
+    <Position X="29" Y="3.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Interface Name="OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder.IHeaderBuilder" Collapsed="true">
+    <Position X="110.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\HeaderBuilder\IHeaderBuilder.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="OSBLE.Areas.AssignmentDetails.Models.TableBuilder.ITableBuilder" Collapsed="true">
+    <Position X="113.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>Areas\AssignmentDetails\Models\TableBuilder\ITableBuilder.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="OSBLE.Areas.AssignmentWizard.Models.IWizardBaseController" Collapsed="true">
+    <Position X="115.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAgEAAAAAAAAAAggABAEAAQAAEAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentWizard\Models\IWizardBaseController.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="OSBLE.Resources.CSVReader.CSVState" Collapsed="true">
+    <Position X="106.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>Resources\CSVReader\CSVState.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="OpenIdProviderMvc.Code.IFormsAuthentication" Collapsed="true">
+    <Position X="108.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACCAAAAAAAAAAAAAAAABAAAAAAAAACAAAAAAAAA=</HashCode>
+      <FileName>Utility\OpenId\IFormsAuthentication.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="OpenIdProviderMvc.Code.IMembershipService" Collapsed="true">
+    <Position X="112" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAQAAgAAAAQAAAAAAAAAAAAAACAAAAAAAAAA=</HashCode>
+      <FileName>Utility\OpenId\IMembershipService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="OSBLE.Models.IModelBuilderExtender" Collapsed="true">
+    <Position X="0.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="OSBLE.Models.Assignments.IAssignmentTeam" Collapsed="true">
+    <Position X="0.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="OSBLE.Models.Assignments.IReviewTeam" Collapsed="true">
+    <Position X="20.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Enum Name="OSBLE.Areas.AssignmentWizard.Models.WizardNavButtons" Collapsed="true">
+    <Position X="106.75" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAICAAAAAAAIgAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Areas\AssignmentWizard\Models\IWizardBaseController.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="OSBLE.Models.Annotate.ResultCode" Collapsed="true">
+    <Position X="30.75" Y="9.75" Width="1.5" />
+    <TypeIdentifier />
+  </Enum>
+  <Enum Name="OSBLE.Models.Assessments.AssessmentType" Collapsed="true">
+    <Position X="22" Y="9.75" Width="1.5" />
+    <TypeIdentifier />
+  </Enum>
+  <Enum Name="OSBLE.Models.Assignments.AbetSubmissionLevel" Collapsed="true">
+    <Position X="20.25" Y="9.75" Width="1.5" />
+    <TypeIdentifier />
+  </Enum>
+  <Enum Name="OSBLE.Models.Assignments.AssignmentTypes" Collapsed="true">
+    <Position X="23.75" Y="9.75" Width="1.5" />
+    <TypeIdentifier />
+  </Enum>
+  <Enum Name="OSBLE.Models.Assignments.ReviewSettings" Collapsed="true">
+    <Position X="32.5" Y="9.75" Width="1.5" />
+    <TypeIdentifier />
+  </Enum>
+  <Enum Name="OSBLE.Models.Assignments.DeliverableType" Collapsed="true">
+    <Position X="27.25" Y="9.75" Width="1.5" />
+    <TypeIdentifier />
+  </Enum>
+  <Enum Name="OSBLE.Models.Assignments.DiscussionSettings" Collapsed="true">
+    <Position X="29" Y="9.75" Width="1.5" />
+    <TypeIdentifier />
+  </Enum>
+  <Enum Name="OSBLE.Models.ViewModels.ReviewInterface.AuthorClassification" Collapsed="true">
+    <Position X="25.5" Y="9.75" Width="1.5" />
+    <TypeIdentifier />
+  </Enum>
+  <Delegate Name="OSBLE.Utility.TreeVisitor&lt;T&gt;" Collapsed="true">
+    <Position X="106.75" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Utility\NTree.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
