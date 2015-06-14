@@ -120,14 +120,13 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 }
 
                 //account for local client time, reset to UTC
-                CourseController cc = new CourseController();
                 var course = ActiveCourseUser.AbstractCourse as Course;
                 if (course != null)
                 {
                     //get the timezone of the course 
-                    int utcOffset = course.TimeZoneOffset;
-                    TimeZoneInfo tz = cc.getTimeZone(utcOffset);
-                    Assignment.DiscussionSettings.InitialPostDueDate = TimeZoneInfo.ConvertTimeToUtc(Assignment.DiscussionSettings.InitialPostDueDate, tz);
+                    Assignment.DiscussionSettings.InitialPostDueDate =
+                        Assignment.DiscussionSettings.InitialPostDueDate.UTCToCourse(course.ID);
+
                     db.SaveChanges();
                     WasUpdateSuccessful = true;
                 }
@@ -135,8 +134,6 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 {
                     WasUpdateSuccessful = false;
                 }
-
-                
             }
             else
             {

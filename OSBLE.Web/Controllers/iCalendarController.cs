@@ -61,10 +61,7 @@ namespace OSBLE.Controllers
                               d.CourseBreaks,
                               d.ID
                           }).FirstOrDefault();
-            //get the timezone of the course 
-            CourseController cc = new CourseController();
-            int utcOffset = (ActiveCourseUser.AbstractCourse as Course).TimeZoneOffset;
-            TimeZoneInfo tz = cc.getTimeZone(utcOffset);
+
 
             //get course events
             var events = (from e in db.Events
@@ -83,7 +80,7 @@ namespace OSBLE.Controllers
             //Create the calendar object 
             iCalendar courseCalendar = new iCalendar();
             //initalize the Calendar object 
-            courseCalendar.AddTimeZone(tz);
+            courseCalendar.AddTimeZone(DateTimeExtensions.GetTimeZone(((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset));
             courseCalendar.Method = "PUBLISH";
             courseCalendar.Name = "VCALENDAR";
             courseCalendar.Version = "2.0";
@@ -97,7 +94,7 @@ namespace OSBLE.Controllers
                 foreach (CourseMeeting cm in course.CourseMeetings)
                 {
                     StringBuilder rpPattern = new StringBuilder("FREQ=WEEKLY;UNTIL=");
-                    rpPattern.Append(new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(course.EndDate, tz)).ToString(@"yyyyMMdd\THHmmss\Z"));
+                    rpPattern.Append(new iCalDateTime(course.EndDate.UTCToCourse(ActiveCourseUser.AbstractCourseID)).ToString(@"yyyyMMdd\THHmmss\Z"));
                     rpPattern.Append(";WKST=SU;BYDAY=");
                     if (cm.Sunday)
                         rpPattern.Append("SU,");
@@ -132,12 +129,12 @@ namespace OSBLE.Controllers
                     //case: course starts during DST, and it's now after DST, result: after DST event is now wrong.
                     DateTime currentTime = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day,
                                                         evtStart.Hour, evtStart.Minute, evtStart.Second, DateTimeKind.Utc);
-                    bool isDaylight = TimeZoneInfo.Local.IsDaylightSavingTime(TimeZoneInfo.ConvertTimeFromUtc(currentTime, tz));
+                    bool isDaylight = TimeZoneInfo.Local.IsDaylightSavingTime(currentTime.UTCToCourse(ActiveCourseUser.AbstractCourseID));
 
                     if (isDaylight)
                     {
-                        evt.Start = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(evtStart, tz));
-                        evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(evtEnd, tz));
+                        evt.Start = new iCalDateTime(evtStart.UTCToCourse(ActiveCourseUser.AbstractCourseID));
+                        evt.End = new iCalDateTime(evtEnd.UTCToCourse(ActiveCourseUser.AbstractCourseID));
                         evt.LastModified = new iCalDateTime(DateTime.Now);
                         evt.Summary = cm.Name;
                         evt.Location = cm.Location;
@@ -190,8 +187,8 @@ namespace OSBLE.Controllers
                             }
                         }
 
-                        evt.Start = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(currentTime, tz));
-                        evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(evtEnd, tz));
+                        evt.Start = new iCalDateTime(currentTime.UTCToCourse(ActiveCourseUser.AbstractCourseID));
+                        evt.End = new iCalDateTime(evtEnd.UTCToCourse(ActiveCourseUser.AbstractCourseID));
                         evt.LastModified = new iCalDateTime(DateTime.Now);
                         evt.Summary = cm.Name;
                         evt.Location = cm.Location;
@@ -221,15 +218,15 @@ namespace OSBLE.Controllers
             {
                 DDay.iCal.Event evt = courseCalendar.Create<DDay.iCal.Event>();
 
-                evt.Start = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(e.StartDate, tz));
+                evt.Start = new iCalDateTime(e.StartDate.UTCToCourse(ActiveCourseUser.AbstractCourseID));
                 if (e.EndDate == null)
                 {
-                    evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(e.StartDate, tz));
+                    evt.End = new iCalDateTime(e.StartDate.UTCToCourse(ActiveCourseUser.AbstractCourseID));
                     evt.End.AddMinutes(1);
                 }
                 else
                 {
-                    evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(e.EndDate.Value, tz));
+                    evt.End = new iCalDateTime(((DateTime)e.EndDate).UTCToCourse(ActiveCourseUser.AbstractCourseID));
                 }
 
                 evt.Summary = e.Title;
@@ -261,11 +258,6 @@ namespace OSBLE.Controllers
             //Get the Course
             Course course = ActiveCourseUser.AbstractCourse as Course;
 
-            //get the timezone of the course 
-            CourseController cc = new CourseController();
-            int utcOffset = (ActiveCourseUser.AbstractCourse as Course).TimeZoneOffset;
-            TimeZoneInfo tz = cc.getTimeZone(utcOffset);
-
             //get course events
             var events = (from e in db.Events
                           where e.Poster.AbstractCourseID == ActiveCourseUser.AbstractCourseID
@@ -283,7 +275,7 @@ namespace OSBLE.Controllers
             //Create the calendar object 
             iCalendar courseCalendar = new iCalendar();
             //initalize the Calendar object 
-            courseCalendar.AddTimeZone(tz);
+            courseCalendar.AddTimeZone(DateTimeExtensions.GetTimeZone(((Course) ActiveCourseUser.AbstractCourse).TimeZoneOffset));
             courseCalendar.Method = "PUBLISH";
             courseCalendar.Name = "VCALENDAR";
             courseCalendar.Version = "2.0";
@@ -298,7 +290,7 @@ namespace OSBLE.Controllers
                 foreach (CourseMeeting cm in course.CourseMeetings)
                 {
                     StringBuilder rpPattern = new StringBuilder("FREQ=WEEKLY;UNTIL=");
-                    rpPattern.Append(new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(course.EndDate, tz)).ToString(@"yyyyMMdd\THHmmss\Z"));
+                    rpPattern.Append(new iCalDateTime(course.EndDate.UTCToCourse(ActiveCourseUser.AbstractCourseID)).ToString(@"yyyyMMdd\THHmmss\Z"));
                     rpPattern.Append(";WKST=SU;BYDAY=");
                     if (cm.Sunday)
                         rpPattern.Append("SU,");
@@ -333,12 +325,12 @@ namespace OSBLE.Controllers
                     //case: course starts during DST, and it's now after DST, result: after DST event is now wrong.
                     DateTime currentTime = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day,
                                                         evtStart.Hour, evtStart.Minute, evtStart.Second, DateTimeKind.Utc);
-                    bool isDaylight = TimeZoneInfo.Local.IsDaylightSavingTime(TimeZoneInfo.ConvertTimeFromUtc(currentTime, tz));
+                    bool isDaylight = TimeZoneInfo.Local.IsDaylightSavingTime(currentTime.UTCToCourse(ActiveCourseUser.AbstractCourseID));
 
                     if (isDaylight)
                     {
-                        evt.Start = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(evtStart, tz));
-                        evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(evtEnd, tz));
+                        evt.Start = new iCalDateTime(evtStart.UTCToCourse(ActiveCourseUser.AbstractCourseID));
+                        evt.End = new iCalDateTime(evtEnd.UTCToCourse(ActiveCourseUser.AbstractCourseID));
                         evt.LastModified = new iCalDateTime(DateTime.Now);
                         evt.Summary = cm.Name;
                         evt.Location = cm.Location;
@@ -391,8 +383,8 @@ namespace OSBLE.Controllers
                             }
                         }
 
-                        evt.Start = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(currentTime, tz));
-                        evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(evtEnd, tz));
+                        evt.Start = new iCalDateTime(currentTime.UTCToCourse(ActiveCourseUser.AbstractCourseID));
+                        evt.End = new iCalDateTime(evtEnd.UTCToCourse(ActiveCourseUser.AbstractCourseID));
                         evt.LastModified = new iCalDateTime(DateTime.Now);
                         evt.Summary = cm.Name;
                         evt.Location = cm.Location;
@@ -423,16 +415,16 @@ namespace OSBLE.Controllers
             {
                 DDay.iCal.Event evt = courseCalendar.Create<DDay.iCal.Event>();
 
-                evt.Start = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(e.StartDate, tz));
+                evt.Start = new iCalDateTime(e.StartDate.UTCToCourse(ActiveCourseUser.AbstractCourseID));
                 if (e.EndDate == null)
                 {
-                    evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(e.StartDate, tz));
+                    evt.End = new iCalDateTime(e.StartDate.UTCToCourse(ActiveCourseUser.AbstractCourseID));
                     evt.End.AddMinutes(1);
 
                 }
                 else
                 {
-                    evt.End = new iCalDateTime(TimeZoneInfo.ConvertTimeFromUtc(e.EndDate.Value, tz));
+                    evt.End = new iCalDateTime(((DateTime)e.EndDate).UTCToCourse(ActiveCourseUser.AbstractCourseID));
                 }
 
                 evt.Summary = e.Title;

@@ -84,7 +84,7 @@ namespace OSBLE.Controllers
             int postsPerPage = 10;
 
             // Single course mode. Only display posts for the active course.
-            List<int> viewedCourses = DashboardSingleCourseMode ? new List<int> {ActiveCourseUser.AbstractCourseID} : currentCourses.Where(cu => !cu.Hidden).Select(cu => cu.AbstractCourseID).ToList();
+            List<int> viewedCourses = DashboardSingleCourseMode ? new List<int> { ActiveCourseUser.AbstractCourseID } : currentCourses.Where(cu => !cu.Hidden).Select(cu => cu.AbstractCourseID).ToList();
 
             if (ActiveCourseUser.AbstractCourse is Course && ActiveCourseUser.AbstractRole.CanModify)
             {
@@ -130,9 +130,9 @@ namespace OSBLE.Controllers
                     {
                         postsPerPage = dashboardPosts.Count();
                     }
-                }    
+                }
             }
-            
+
             List<DashboardPost> pagedDashboardPosts = dashboardPosts.Skip(startPost)
                 .Take(postsPerPage)
                 .ToList();
@@ -197,7 +197,7 @@ namespace OSBLE.Controllers
         public ActionResult Events()
         {
             SetupEvents();
-           
+
             return PartialView("_Events", (List<Event>)ViewBag.Events);
         }
 
@@ -207,7 +207,7 @@ namespace OSBLE.Controllers
             int eventDays = 7 * ActiveCourseUser.AbstractCourse.CalendarWindowOfTime;
 
             DateTime today = DateTime.Now.Date;
-            
+
             DateTime upto = today.AddDays(eventDays);
             using (EventController ec = new EventController())
             {
@@ -241,7 +241,7 @@ namespace OSBLE.Controllers
             // " " for poster of post/reply.
             CourseUser posterCu = courseList.FirstOrDefault(c => c.UserProfileID == post.CourseUser.UserProfileID);
 
-            
+
             /*** Setup Display Name/Display Title/Profile Picture/Mail Button/Delete Button ***/
 
             // If user is not anonymous, this post was written by current user, or the poster is an Instructor/TA, display name and picture.
@@ -442,7 +442,7 @@ namespace OSBLE.Controllers
             }
             else if (Request.Form["post_all"] != null)
             { // Post to all courses.
-                coursesToPost = currentCourses.Where(cu => cu.AbstractCourse is Course && cu.AbstractRole.CanModify && !cu.Hidden).ToList();
+               coursesToPost = currentCourses.Where(cu => cu.AbstractCourse is Course && cu.AbstractRole.CanModify && !cu.Hidden).ToList();
             }
 
             foreach (CourseUser cu in coursesToPost)
@@ -467,30 +467,25 @@ namespace OSBLE.Controllers
                         string body = "";
                         List<MailAddress> addresses = new List<MailAddress>();
 
-                        //dp.posted needs to have a converetd time for mailing
-                        //locate timezone offset
-                        int courseOffset = (ActiveCourseUser.AbstractCourse).GetType() != typeof(Community) ? ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset : 0;
-                        CourseController cc = new CourseController();
-                        TimeZoneInfo tz = cc.getTimeZone(courseOffset);
 
                         //slightly different messages depending on course type
                         if (c is Course)
                         {
                             Course course = c as Course;
                             subject = "[" + course.Prefix + " " + course.Number + "] New Activity Post from " + CurrentUser.FirstName + " " + CurrentUser.LastName;
-                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message to the class at " + TimeZoneInfo.ConvertTimeFromUtc(dp.Posted, tz) + ":";
+                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message to the class at " + dp.Posted.UTCToCourse(ActiveCourseUser.AbstractCourseID).ToString() + ":";
                         }
                         else if (c is Community)
                         {
                             Community community = c as Community;
                             subject = "[" + community.Nickname + "] New Activity Post from " + CurrentUser.FirstName + " " + CurrentUser.LastName;
-                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message to the community at " + TimeZoneInfo.ConvertTimeFromUtc(dp.Posted, tz) + ":";
+                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message to the community at " + dp.Posted.UTCToCourse(ActiveCourseUser.AbstractCourseID).ToString() + ":";
                         }
                         else
                         {
                             //this should never execute, but just in case...
                             subject = "OSBLE Activity Post";
-                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message at " + TimeZoneInfo.ConvertTimeFromUtc(dp.Posted, tz) + ":";
+                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message at " + dp.Posted.UTCToCourse(ActiveCourseUser.AbstractCourseID).ToString() + ":";
                         }
                         body += "<br /><br />";
                         body += dp.Content.Replace("\n", "<br />");
@@ -581,30 +576,24 @@ namespace OSBLE.Controllers
                         ViewBag.dp = replyToPost;
                         List<DashboardReply> replys = replyToPost.Replies.Where(r => r.ID > latestReply).ToList();
 
-                        //dr.posted needs to have a converetd time for mailing
-                        //locate timezone offset
-                        int courseOffset = (ActiveCourseUser.AbstractCourse).GetType() != typeof(Community) ? ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset : 0;
-                        CourseController cc = new CourseController();
-                        TimeZoneInfo tz = cc.getTimeZone(courseOffset);
-
                         //slightly different messages depending on course type
                         if (ac is Course && (ac as Course).AllowDashboardReplies)
                         {
                             Course course = (Course)ac;
                             subject = "[" + course.Prefix + " " + course.Number + "] Reply from " + CurrentUser.FirstName + " " + CurrentUser.LastName;
-                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following reply to the Dashboard post " + replyToPost.DisplayTitle + " at " + TimeZoneInfo.ConvertTimeFromUtc(dr.Posted, tz) + ":";
+                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following reply to the Dashboard post " + replyToPost.DisplayTitle + " at " + dr.Posted.UTCToCourse(ActiveCourseUser.AbstractCourseID).ToString() + ":";
                         }
                         else if (ac is Community)
                         {
                             Community community = ac as Community;
                             subject = "[" + community.Nickname + "] Reply from " + CurrentUser.FirstName + " " + CurrentUser.LastName;
-                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following reply to the Dashboard post " + replyToPost.DisplayTitle + " at " + TimeZoneInfo.ConvertTimeFromUtc(dr.Posted, tz) + ":";
+                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following reply to the Dashboard post " + replyToPost.DisplayTitle + " at " + dr.Posted.UTCToCourse(ActiveCourseUser.AbstractCourseID).ToString() + ":";
                         }
                         else
                         {
                             //this should never execute, but just in case...
                             subject = "OSBLE Activity Post";
-                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message at " + TimeZoneInfo.ConvertTimeFromUtc(dr.Posted, tz) + ":";
+                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message at " + dr.Posted.UTCToCourse(ActiveCourseUser.AbstractCourseID).ToString() + ":";
                         }
                         body += "<br /><br />";
                         body += dr.Content.Replace("\n", "<br />");

@@ -913,7 +913,6 @@
     <Content Include="Views\Clone\CourseSetup.cshtml" />
     <Content Include="Views\Clone\CloneAssignment.cshtml" />
     <Content Include="Views\Course\CloneCourse.cshtml" />
-    <Content Include="Views\Clone\SelectAssignmentsToClone.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

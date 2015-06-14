@@ -372,7 +372,7 @@ function create_and_open_downloading_submission_dialog() {
                 @if (Model.SelectedAssignment.AssignmentTypeID == 3)
                 {
                     <td>
-                        @(Html.ActionLink("View " + Model.Evaluation.Recipient.Name + "'s discussion contributions", "TeacherIndex", "DiscussionAssignment", new { assignmentId = Model.SelectedAssignment.ID, courseUserId = Model.Evaluation.Recipient.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 2 }, new { })) 
+                        @(Html.ActionLink("View " + Model.Evaluation.Recipient.Name + "'s discussion contributions", "TeacherIndex", "DiscussionAssignment", new {assignmentId = Model.SelectedAssignment.ID, courseUserId = Model.Evaluation.Recipient.TeamMembers.FirstOrDefault().CourseUserID, discussionTeamID = Model.SelectedAssignment.AssignmentTeams.IndexOf(Model.SelectedTeam)+1, hightlightValue = "PostsAndReplies"}, new {}))
                     </td>
                 }
             </tr>

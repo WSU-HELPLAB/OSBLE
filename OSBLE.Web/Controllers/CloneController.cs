@@ -207,13 +207,11 @@ namespace OSBLE.Controllers
                     na.AssociatedEvent = null;
                     na.AssociatedEventID = null;
                     na.PrecededingAssignmentID = null;
-                    na.AssignmentTeams = new List<AssignmentTeam>();      
+                    na.AssignmentTeams = new List<AssignmentTeam>();
                     na.DiscussionTeams = new List<DiscussionTeam>();
                     na.ReviewTeams = new List<ReviewTeam>();
                     na.Deliverables = new List<Deliverable>();
 
-                    // AJ: add distinguishability for debugging
-                    // na.AssignmentName += "_clone";
 
                     //recalcualte new offsets for due dates on assignment
                     if (p.CriticalReviewPublishDate != null)
@@ -222,27 +220,34 @@ namespace OSBLE.Controllers
                     }
                     CourseController cc = new CourseController();
                     // to retain the time incase of in differt daylightsavings .. shifts
-                    DateTime dd = cc.convertFromUtc(courseSource.TimeZoneOffset, na.DueDate);
-                    DateTime dt = cc.convertFromUtc(courseSource.TimeZoneOffset, na.DueTime);
-                    DateTime rd = cc.convertFromUtc(courseSource.TimeZoneOffset, na.ReleaseDate);
-                    DateTime rt = cc.convertFromUtc(courseSource.TimeZoneOffset, na.ReleaseTime);
+                    //DateTime dd = cc.convertFromUtc(courseSource.TimeZoneOffset, na.DueDate);
+                    //DateTime dt = cc.convertFromUtc(courseSource.TimeZoneOffset, na.DueTime);
+                    //DateTime rd = cc.convertFromUtc(courseSource.TimeZoneOffset, na.ReleaseDate);
+                    //DateTime rt = cc.convertFromUtc(courseSource.TimeZoneOffset, na.ReleaseTime);
+
+                    DateTime dd = na.DueDate.UTCToCourse(courseSource.ID);
+                    DateTime dt = na.DueTime.UTCToCourse(courseSource.ID);
+                    DateTime rd = na.ReleaseDate.UTCToCourse(courseSource.ID);
+                    DateTime rt = na.ReleaseTime.UTCToCourse(courseSource.ID);
+
                     dd = dd.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
                     dt = dt.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
                     rd = rd.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
                     rt = rt.Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
                     //convert back to utc
-                    na.DueDate = cc.convertToUtc(courseDestination.TimeZoneOffset, dd);
-                    na.DueTime = cc.convertToUtc(courseDestination.TimeZoneOffset, dt);
-                    na.ReleaseDate = cc.convertToUtc(courseDestination.TimeZoneOffset, rd);
-                    na.ReleaseTime = cc.convertToUtc(courseDestination.TimeZoneOffset, rt);
+                    //na.DueDate = cc.convertToUtc(courseDestination.TimeZoneOffset, dd);
+                    //na.DueTime = cc.convertToUtc(courseDestination.TimeZoneOffset, dt);
+                    //na.ReleaseDate = cc.convertToUtc(courseDestination.TimeZoneOffset, rd);
+                    //na.ReleaseTime = cc.convertToUtc(courseDestination.TimeZoneOffset, rt);
+
+                    na.DueDate = dd.CourseToUTC(courseDestination.ID);
+                    na.DueTime = dt.CourseToUTC(courseDestination.ID);
+                    na.ReleaseDate = rd.CourseToUTC(courseDestination.ID);
+                    na.ReleaseTime = rt.CourseToUTC(courseDestination.ID);
                     //we now have a base to save
                     db.Assignments.Add(na);
                     db.SaveChanges();
 
-                    // setup assignment teams
-                    SetUpClonedAssignmentTeams(na);
-                    db.Entry(na).State = EntityState.Modified;
-                    db.SaveChanges();
 
                     //fix the link now
                     foreach (Assignment link in previouslyLinked)
@@ -523,12 +528,12 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult SelectAssignmentsToClone(int cID, int count)
         {
-            Course o = (Course)(from c in db.AbstractCourses
-                                where c.ID == cID
-                                select c).FirstOrDefault();
+            Course o = (Course) (from c in db.AbstractCourses
+                where c.ID == cID
+                select c).FirstOrDefault();
             List<Assignment> previousAssignments = (from a in db.Assignments
-                                                    where a.CourseID == cID
-                                                    select a).ToList();
+                where a.CourseID == cID
+                select a).ToList();
             List<int> i = new List<int>(); //the home of assignments we want to copy
             List<Assignment> n = new List<Assignment>();
             foreach (Assignment a in previousAssignments)
