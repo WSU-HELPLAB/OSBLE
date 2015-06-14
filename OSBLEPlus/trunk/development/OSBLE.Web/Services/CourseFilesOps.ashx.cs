@@ -1,9 +1,7 @@
 ﻿// Added 5-23-13 by Evan Olds for the OSBLE project
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using Microsoft.Ajax.Utilities;
 using OSBLE.Models;
 using OSBLE.Models.Courses;
 using OSBLE.Models.FileSystem;

@@ -63,7 +63,8 @@ namespace OSBLE.Models.HomePage
         [NotMapped]
         public bool CanDelete { get; set; }
 
-        protected AbstractDashboard()
+        public AbstractDashboard()
+            : base()
         {
             Posted = DateTime.UtcNow;
 

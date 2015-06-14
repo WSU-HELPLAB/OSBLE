@@ -7,9 +7,12 @@
 <tr>
     <th>Initial Post Due:</th>
     <td>
-        <time class  ="course-local-time" >
-            @dataModel.InitialPostDue.UTCToCourse(((IAssignmentTeam) dataModel.AssignmentTeam).Assignment.CourseID).ToShortDateString()
-             @dataModel.InitialPostDue.UTCToCourse(((IAssignmentTeam)dataModel.AssignmentTeam).Assignment.CourseID).ToShortTimeString()
+        <time 
+                class="utc-time"
+                datetime="@Helpers.DateAsUnixTime(dataModel.InitialPostDue)" 
+                data-original-date="@Helpers.RawDate(dataModel.InitialPostDue)" 
+                data-date-format="MM/DD/YYYY hh:mm A">
+            @dataModel.InitialPostDue.ToShortDateString() @dataModel.InitialPostDue.ToShortTimeString()
         </time>
     </td>
 </tr>
@@ -17,9 +20,12 @@
 <tr>
     <th>Final Post Due:</th>
     <td>
-        <time class="course-local-time">
-            @dataModel.DueDate.UTCToCourse(((IAssignmentTeam) dataModel.AssignmentTeam).Assignment.CourseID).ToShortDateString() 
-            @dataModel.DueDate.UTCToCourse(((IAssignmentTeam)dataModel.AssignmentTeam).Assignment.CourseID).ToShortTimeString()
+        <time 
+                class="utc-time"
+                datetime="@Helpers.DateAsUnixTime(dataModel.DueDate)" 
+                data-original-date="@Helpers.RawDate(dataModel.DueDate)" 
+                data-date-format="MM/DD/YYYY hh:mm A">
+        @dataModel.DueDate.ToShortDateString() @dataModel.DueDate.ToShortTimeString()
             </time>
     </td>
 </tr>

@@ -1,24 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Data.Entity;
-using OSBLE.Models.Assignments;
-using OSBLE.Models.DiscussionAssignment;
-using OSBLE.Models.Courses;
-using OSBLE.Models.HomePage;
-using OSBLE.Models.Courses.Rubrics;
-using OSBLE.Models.Users;
+using System.Linq;
+using System.Reflection;
+
 using OSBLE.Models.AbstractCourses;
 using OSBLE.Models.AbstractCourses.Course;
-using System.Data.Common;
-using System.Data.Entity.Infrastructure;
-using System.Data.Objects;
 using OSBLE.Models.Annotate;
-using System.Reflection;
-using OSBLE.Models.Triggers;
 using OSBLE.Models.Assessments;
-using System.IO;
+using OSBLE.Models.Assignments;
+using OSBLE.Models.Courses;
+using OSBLE.Models.Courses.Rubrics;
+using OSBLE.Models.DiscussionAssignment;
+using OSBLE.Models.HomePage;
+using OSBLE.Models.Users;
 
 namespace OSBLE.Models
 {
@@ -27,145 +21,13 @@ namespace OSBLE.Models
     /// </summary>
     public abstract class ContextBase : DbContext
     {
-        //this should prevent us from trying to create triggers more than once per build
-        public static bool dbTriggersInitialized = false;
-
-        public ContextBase()
-            : base()
+        protected ContextBase()
         {
-            init();
         }
 
-        public ContextBase(DbConnection existingConnection, DbCompiledModel model, bool contextOwnsConnection)
-            : base(existingConnection, model, contextOwnsConnection)
-        {
-            init();
-        }
-
-        public ContextBase(string nameOrConnectionString, DbCompiledModel model)
-            : base(nameOrConnectionString, model)
-        {
-            init();
-        }
-
-        public ContextBase(ObjectContext objectContext, bool dbContextOwnsObjectContext)
-            : base(objectContext, dbContextOwnsObjectContext)
-        {
-            init();
-        }
-
-        public ContextBase(DbConnection existingConnection, bool contextOwnsConnection)
-            : base(existingConnection, contextOwnsConnection)
-        {
-            init();
-        }
-
-        public ContextBase(string nameOrConnectionString)
+        protected ContextBase(string nameOrConnectionString)
             : base(nameOrConnectionString)
         {
-            init();
-        }
-
-        public ContextBase(DbCompiledModel model)
-            : base(model)
-        {
-            init();
-        }
-
-        private void init()
-        {
-
-            if (!dbTriggersInitialized) //we only want to try to create triggers if we haven't already done so
-            {
-                //AC: Not sure if the best method to accomplish this, but I'd like to 
-                //set up database triggers automatically.  As I couldn't find any
-                //EF-based event handler that I could hook into, my solution is to 
-                //create a trigger-based setting to track whether or not triggers
-                //have been set up.
-                Setting setting = this.Settings.Where(s => s.Key == "TriggerInit").FirstOrDefault();
-                if (setting == null)
-                {
-                    setting = new Setting();
-                    setting.Value = "0";
-                    setting.Key = "TriggerInit";
-                }
-
-                if (setting.Value == "0")
-                {
-                    try
-                    {
-                        //load all triggers using reflection
-                        List<Type> componentObjects = (from type in Assembly.GetExecutingAssembly().GetTypes()
-                                                       where
-                                                       type.IsSubclassOf(typeof(ModelTrigger)) == true
-                                                       &&
-                                                       type.IsAbstract == false
-                                                       select type).ToList();
-                        foreach (Type component in componentObjects)
-                        {
-                            ModelTrigger trigger = Activator.CreateInstance(component) as ModelTrigger;
-                            trigger.CreateTrigger(this);
-                        }
-                        setting.Value = "1";
-
-                    }
-                    catch (Exception)
-                    {
-                    }
-                    dbTriggersInitialized = true; //set to true so we don't try to create the triggers again.
-                }
-                this.SaveChanges();
-            }
-        }
-
-        /// <summary>
-        /// Adds course roles to db
-        /// </summary>
-        public void SeedRoles()
-        {
-            // Set up "static" values for Course Roles.
-
-            // Instructor: Can Modify Course, See All, Can Grade
-            this.CourseRoles.Add(new CourseRole(CourseRole.CourseRoles.Instructor.ToString(), true, true, true, false, true, false));
-
-            // TA: Can See All, Can Grade
-            this.CourseRoles.Add(new CourseRole(CourseRole.CourseRoles.TA.ToString(), false, true, true, false, true, false));
-
-            // Student: Can Submit Assignments, All Anonymized
-            this.CourseRoles.Add(new CourseRole(CourseRole.CourseRoles.Student.ToString(), false, false, false, true, false, false));
-
-            // Moderator: No Special Privileges
-            this.CourseRoles.Add(new CourseRole(CourseRole.CourseRoles.Moderator.ToString(), false, false, false, false, false, false));
-
-            // Observer: Can See All, All Anonymized
-            this.CourseRoles.Add(new CourseRole(CourseRole.CourseRoles.Observer.ToString(), false, true, false, false, false, true));
-
-            // Withdrawn: The student has withdrawn from the course
-            this.CourseRoles.Add(new CourseRole(CourseRole.CourseRoles.Withdrawn.ToString(), false, false, false, false, false, false));
-
-            //FIX THIS NOW FORREST
-            // Pending: The student is pending being added to the course, as of 6/6/2014 only course controller uses this for handling enrollment requests from users
-            this.CourseRoles.Add(new CourseRole(CourseRole.CourseRoles.Pending.ToString(), false, false, false, false, false, false));
-
-
-            // Community Roles
-
-
-            // Leader: Can Modify Community
-            this.CommunityRoles.Add(new CommunityRole(CommunityRole.OSBLERoles.Leader.ToString(), true, true, true, true));
-
-            // Participant: Cannot Modify Community
-            this.CommunityRoles.Add(new CommunityRole(CommunityRole.OSBLERoles.Participant.ToString(), false, true, true, false));
-
-            //trusted communityt member: same as participant, but can upload files to the server
-            this.CommunityRoles.Add(new CommunityRole(CommunityRole.OSBLERoles.TrustedCommunityMember.ToString(), false, true, true, true));
-
-            this.CommunityRoles.Add(new CommunityRole(CommunityRole.OSBLERoles.Pending.ToString(), false, false, false, false));
-
-            // Assessment committee roles (don't change statement order here)
-            this.CommitteeRoles.Add(new AssessmentCommitteeChairRole());
-            this.CommitteeRoles.Add(new AssessmentCommitteeMemberRole());
-            this.CommitteeRoles.Add(new ABETEvaluatorRole());
         }
 
         public DbSet<Setting> Settings { get; set; }
@@ -301,7 +163,7 @@ namespace OSBLE.Models
 
             //load in any model builder extensions (usually foreign key relationships)
             //from the models
-            List<Type> componentObjects = (from type in Assembly.GetExecutingAssembly().GetTypes()
+            var componentObjects = (from type in Assembly.GetExecutingAssembly().GetTypes()
                                            where
                                            type.GetInterface("IModelBuilderExtender") != null
                                            &&

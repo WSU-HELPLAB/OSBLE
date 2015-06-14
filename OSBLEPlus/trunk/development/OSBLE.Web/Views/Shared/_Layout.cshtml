@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using System.Configuration
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE" />
@@ -67,7 +68,7 @@
     <nav>
         @Html.Partial("_MenuControl")
     </nav>
-    <section id="main">
+    <section id="main" data-service-path="@ConfigurationManager.AppSettings["DataServiceUrl"]">
         <div id="content">
             @RenderBody()
         </div>

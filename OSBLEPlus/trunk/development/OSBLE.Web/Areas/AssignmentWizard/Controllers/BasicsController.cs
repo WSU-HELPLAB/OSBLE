@@ -93,9 +93,9 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
 
             //yc:daylightsavings shift!
-            //CourseController cc = new CourseController();
-            //int utcOffset = (ActiveCourseUser.AbstractCourse as Course).TimeZoneOffset;
-            //TimeZoneInfo tz = cc.getTimeZone(utcOffset);
+            CourseController cc = new CourseController();
+            int utcOffset = (ActiveCourseUser.AbstractCourse as Course).TimeZoneOffset;
+            TimeZoneInfo tz = cc.getTimeZone(utcOffset);
 
             return View(Assignment);
         }
@@ -110,16 +110,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
                 Assignment.CourseID = ActiveCourseUser.AbstractCourseID;
 
-                //CourseController cc = new CourseController();
-                //int utcOffset = (ActiveCourseUser.AbstractCourse as Course).TimeZoneOffset;
-                //TimeZoneInfo tz = cc.getTimeZone(utcOffset);
+                CourseController cc = new CourseController();
+                int utcOffset = (ActiveCourseUser.AbstractCourse as Course).TimeZoneOffset;
+                TimeZoneInfo tz = cc.getTimeZone(utcOffset);
 
-                //Assignment.ReleaseDate = TimeZoneInfo.ConvertTimeToUtc(Assignment.ReleaseDate, tz);
-                //Assignment.DueDate = TimeZoneInfo.ConvertTimeToUtc(Assignment.DueDate, tz);
 
-                Assignment.ReleaseDate = Assignment.ReleaseDate.CourseToUTC(ActiveCourseUser.AbstractCourseID);
-                Assignment.DueDate = Assignment.DueDate.CourseToUTC(ActiveCourseUser.AbstractCourseID);
-               
+
+                Assignment.ReleaseDate = TimeZoneInfo.ConvertTimeToUtc(Assignment.ReleaseDate, tz);
+                Assignment.DueDate = TimeZoneInfo.ConvertTimeToUtc(Assignment.DueDate, tz);
 
                 //update our DB
                 if (Assignment.ID == 0)
@@ -195,11 +193,11 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         /// If teams already exist, it does nothing.
         /// </summary>
         void SetUpDefaultAssignmentTeams()
-        {            
+        {
 
             bool assignmentTeamsExist = (from at in db.AssignmentTeams
                                          where at.AssignmentID == Assignment.ID
-                                         select at).Any();
+                                         select at).Count() > 0;
             //Only set up default teams if teams don't already exist
             if (Assignment.ID == 0 || !assignmentTeamsExist)
             {

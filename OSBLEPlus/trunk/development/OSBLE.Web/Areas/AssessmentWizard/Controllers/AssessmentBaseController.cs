@@ -1,20 +1,20 @@
-﻿using OSBLE.Areas.AssessmentWizard.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Web.Mvc;
+
+using OSBLE.Areas.AssessmentWizard.Models;
 using OSBLE.Areas.AssignmentWizard.Models;
 using OSBLE.Attributes;
 using OSBLE.Controllers;
 using OSBLE.Models.Assessments;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
 
 namespace OSBLE.Areas.AssessmentWizard.Controllers
 {
     public abstract class AssessmentBaseController : OSBLEController, IWizardBaseController
     {
-        protected AssessmentWizardComponentManager manager;
+        protected AssessmentWizardComponentManager Manager;
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace OSBLE.Areas.AssessmentWizard.Controllers
             }
         }
 
-        public AssessmentBaseController()
+        protected AssessmentBaseController()
         {
             WasUpdateSuccessful = true;
             SortOrder = 0;
@@ -117,46 +117,32 @@ namespace OSBLE.Areas.AssessmentWizard.Controllers
 
         private void SetUpViewBag()
         {
-            ViewBag.Components = manager.SelectedComponents;
-            ViewBag.ActiveComponent = manager.ActiveComponent;
+            ViewBag.Components = Manager.SelectedComponents;
+            ViewBag.ActiveComponent = Manager.ActiveComponent;
             ViewBag.Assessment = Assessment;
-            if (manager.IsNewAssessment)
+            if (Manager.IsNewAssessment)
             {
                 ViewBag.IsNewAssignment = true;
 
                 //AC Note: clean this up.
                 if (Assessment != null)
                 {
-                    if (string.IsNullOrEmpty(Assessment.AssessmentName) == false)
-                    {
-                        ViewBag.Title = string.Format(@"Create New {0} Assignment ""{1}"": {2}", manager.ActiveAssessmentType.Explode(), Assessment.AssessmentName, manager.ActiveComponent.PrettyName);
-                    }
-                    else
-                    {
-                        ViewBag.Title = string.Format(@"Create New {0} Assignment: {1}", manager.ActiveAssessmentType.Explode(), manager.ActiveComponent.PrettyName);
-                    }
+                    ViewBag.Title = string.IsNullOrEmpty(Assessment.AssessmentName) == false ? string.Format(@"Create New {0} Assignment ""{1}"": {2}", Manager.ActiveAssessmentType.Explode(), Assessment.AssessmentName, Manager.ActiveComponent.PrettyName) : string.Format(@"Create New {0} Assignment: {1}", Manager.ActiveAssessmentType.Explode(), Manager.ActiveComponent.PrettyName);
                 }
                 else
                 {
-                    ViewBag.Title = string.Format(@"Create New {0} Assignment: {1}", manager.ActiveAssessmentType.Explode(), manager.ActiveComponent.PrettyName);
+                    ViewBag.Title = string.Format(@"Create New {0} Assignment: {1}", Manager.ActiveAssessmentType.Explode(), Manager.ActiveComponent.PrettyName);
                 }
             }
             else
             {
                 if (Assessment != null)
                 {
-                    if (string.IsNullOrEmpty(Assessment.AssessmentName) == false)
-                    {
-                        ViewBag.Title = string.Format(@"Edit {0} Assignment ""{1}"": {2}", manager.ActiveAssessmentType.Explode(), Assessment.AssessmentName, manager.ActiveComponent.PrettyName);
-                    }
-                    else
-                    {
-                        ViewBag.Title = string.Format(@"Edit {0} Assignment: {1}", manager.ActiveAssessmentType.Explode(), manager.ActiveComponent.PrettyName);
-                    }
+                    ViewBag.Title = string.IsNullOrEmpty(Assessment.AssessmentName) == false ? string.Format(@"Edit {0} Assignment ""{1}"": {2}", Manager.ActiveAssessmentType.Explode(), Assessment.AssessmentName, Manager.ActiveComponent.PrettyName) : string.Format(@"Edit {0} Assignment: {1}", Manager.ActiveAssessmentType.Explode(), Manager.ActiveComponent.PrettyName);
                 }
                 else
                 {
-                    ViewBag.Title = string.Format(@"Edit {0} Assignment: {1}", manager.ActiveAssessmentType.Explode(), manager.ActiveComponent.PrettyName);
+                    ViewBag.Title = string.Format(@"Edit {0} Assignment: {1}", Manager.ActiveAssessmentType.Explode(), Manager.ActiveComponent.PrettyName);
                 }
                 ViewBag.IsNewAssignment = false;
             }
@@ -166,15 +152,8 @@ namespace OSBLE.Areas.AssessmentWizard.Controllers
         public virtual ActionResult Index()
         {
             Assessment = new Assessment();
-            manager = new AssessmentWizardComponentManager(CurrentUser);
-            if (manager.ActiveAssessmentId != 0)
-            {
-                Assessment = db.Assessments.Find(manager.ActiveAssessmentId);
-            }
-            else
-            {
-                Assessment = new Assessment();
-            }
+            Manager = new AssessmentWizardComponentManager(CurrentUser);
+            Assessment = Manager.ActiveAssessmentId != 0 ? db.Assessments.Find(Manager.ActiveAssessmentId) : new Assessment();
             SetUpViewBag();
             return View();
         }
@@ -182,36 +161,34 @@ namespace OSBLE.Areas.AssessmentWizard.Controllers
         [HttpPost]
         protected ActionResult PostBack(dynamic model)
         {
-            manager = new AssessmentWizardComponentManager(CurrentUser);
+            Manager = new AssessmentWizardComponentManager(CurrentUser);
             if (WasUpdateSuccessful)
             {
                 //update the assignment ID.  Probably not necessary when working
                 //with existing assignments, but needed for new assignments.
-                manager.ActiveAssessmentId = Assessment.ID;
+                Manager.ActiveAssessmentId = Assessment.ID;
 
                 //Check manager context.  If for some reason the user lost their
                 //SESSION context, we need to detect this and redirect them
                 //to a safe place.  Otherwise, they will get an error when we
                 //try to redirect them to a non-existant page
-                if (manager.SelectedComponents.Count == 0)
+                if (Manager.SelectedComponents.Count == 0)
                 {
                     return RedirectToRoute(new { controller = "Home", action = "ContextLost", assignmentId = Assessment.ID });
                 }
 
-                string errorPath = "Home";
-                string action = "ContextLost";
-                int id = Assessment.ID;
+                var errorPath = "Home";
+                var action = "ContextLost";
+                var id = Assessment.ID;
                 IWizardBaseController comp = null;
                 if (Request.Form.AllKeys.Contains(WizardNavButtons.PreviousButton.ToString()))
                 {
-                    comp = manager.GetPreviousComponent();
-                    errorPath = "Home";
+                    comp = Manager.GetPreviousComponent();
                     action = "SelectComponent";
                 }
                 else if (Request.Form.AllKeys.Contains(WizardNavButtons.NextButton.ToString()))
                 {
-                    comp = manager.GetNextComponent();
-                    errorPath = "Home";
+                    comp = Manager.GetNextComponent();
                     action = "Summary";
                 }
                 else if (Request.Form.AllKeys.Contains(WizardNavButtons.SaveAndExitButton.ToString()))
@@ -236,21 +213,18 @@ namespace OSBLE.Areas.AssessmentWizard.Controllers
                     return RedirectToRoute(AssessmentWizardAreaRegistration.AssessmentWizardRoute,
                                           new
                                           {
-                                              controller = manager.ActiveComponent.ControllerName
+                                              controller = Manager.ActiveComponent.ControllerName
                                           }
                                           );
                 }
-                else
-                {
-                    return RedirectToRoute(AssessmentWizardAreaRegistration.AssessmentWizardRoute,
-                                          new
-                                          {
-                                              controller = errorPath,
-                                              action = action,
-                                              assignmentId = id
-                                          }
-                                          );
-                }
+                return RedirectToRoute(AssessmentWizardAreaRegistration.AssessmentWizardRoute,
+                    new
+                    {
+                        controller = errorPath,
+                        action = action,
+                        assignmentId = id
+                    }
+                    );
             }
             try
             {
@@ -266,12 +240,12 @@ namespace OSBLE.Areas.AssessmentWizard.Controllers
         [HttpPost]
         public ActionResult QuickNav()
         {
-            string componentName = Request.Form["ComponentName"];
-            manager = new AssessmentWizardComponentManager(CurrentUser);
-            IWizardBaseController componentToFind = manager.GetComponentByName(componentName);
+            var componentName = Request.Form["ComponentName"];
+            Manager = new AssessmentWizardComponentManager(CurrentUser);
+            var componentToFind = Manager.GetComponentByName(componentName);
 
             //start at the beginning
-            while (manager.GetPreviousComponent() != null) ;
+            while (Manager.GetPreviousComponent() != null) ;
 
             //empty component name = start at the beginning (component selection)
             if (componentName.Length == 0)
@@ -281,26 +255,26 @@ namespace OSBLE.Areas.AssessmentWizard.Controllers
                                     {
                                         controller = "Home",
                                         action = "SelectComponent",
-                                        assignmentId = manager.ActiveAssessmentId
+                                        assignmentId = Manager.ActiveAssessmentId
                                     }
                                   );
             }
 
             //from the beginning, find the component that we want to jump to
-            bool found = false;
+            var found = false;
             while (!found)
             {
-                if (manager.ActiveComponent == null)
+                if (Manager.ActiveComponent == null)
                 {
                     found = true;
                 }
-                else if (manager.ActiveComponent.ControllerName.CompareTo(componentToFind.ControllerName) == 0)
+                else if (Manager.ActiveComponent.ControllerName.CompareTo(componentToFind.ControllerName) == 0)
                 {
                     found = true;
                 }
                 else
                 {
-                    manager.GetNextComponent();
+                    Manager.GetNextComponent();
                 }
             }
 
@@ -316,15 +290,15 @@ namespace OSBLE.Areas.AssessmentWizard.Controllers
 
         public int CompareTo(object obj)
         {
-            return this.ToString().CompareTo(obj.ToString());
+            return string.Compare(ToString(), obj.ToString(), StringComparison.Ordinal);
         }
 
         public override string ToString()
         {
-            return string.Format("{0}", this.ControllerName);
+            return ControllerName;
         }
 
-        private void NotifyPropertyChanged(String info)
+        private void NotifyPropertyChanged(string info)
         {
             if (PropertyChanged != null)
             {
@@ -334,11 +308,7 @@ namespace OSBLE.Areas.AssessmentWizard.Controllers
 
         public bool Equals(IWizardBaseController other)
         {
-            if (this.ControllerName.CompareTo(other.ControllerName) == 0)
-            {
-                return true;
-            }
-            return false;
+            return string.Compare(ControllerName, other.ControllerName, StringComparison.Ordinal) == 0;
         }
     }
 

@@ -1,26 +1,27 @@
-﻿using OSBLE.Areas.AssessmentWizard.Models;
+﻿using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Web.Mvc;
+
+using OSBLE.Areas.AssessmentWizard.Models;
 using OSBLE.Areas.AssignmentWizard.Models;
 using OSBLE.Attributes;
 using OSBLE.Controllers;
 using OSBLE.Models.Assessments;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+using OSBLE.Models.Assignments;
 
 namespace OSBLE.Areas.AssessmentWizard.Controllers
 {
     [CanCreateCourses]
     public class HomeController : OSBLEController
     {
-        private AssessmentWizardComponentManager manager;
-        public static string beginWizardButton = "StartWizardButton";
+        private readonly AssessmentWizardComponentManager _manager;
+        public static string BeginWizardButton = "StartWizardButton";
 
         public HomeController()
         {
             ViewBag.AssessmentTypeRadioName = "AssessmentType";
-            manager = new AssessmentWizardComponentManager(CurrentUser);
+            _manager = new AssessmentWizardComponentManager(CurrentUser);
         }
 
         #region action results
@@ -33,15 +34,15 @@ namespace OSBLE.Areas.AssessmentWizard.Controllers
                 Assessment assessment = db.Assessments.Find(assessmentId);
 
                 //prime the manager for the new assignment
-                manager.ActiveAssessmentId = assessment.ID;
-                manager.SetActiveAssessmentType((AssessmentType)assessment.AssessmentTypeID);
-                manager.IsNewAssessment = false;
+                _manager.ActiveAssessmentId = assessment.ID;
+                _manager.SetActiveAssessmentType((AssessmentType)assessment.AssessmentTypeID);
+                _manager.IsNewAssessment = false;
 
                 //load in any secondary (non-required) components
                 ActivateAssessmentComponents(assessment);
 
                 //now, load in essential components
-                List<AssessmentBaseController> components = (from comp in manager.GetComponentsForAssignmentType(assessment.Type)
+                List<AssessmentBaseController> components = (from comp in _manager.GetComponentsForAssignmentType(assessment.Type)
                                                          where comp.IsRequired == true
                                                          select comp).ToList();
                 foreach (AssessmentBaseController component in components)
@@ -50,12 +51,12 @@ namespace OSBLE.Areas.AssessmentWizard.Controllers
                 }
 
                 //finally, request that the list be sorted
-                manager.SortComponents();
+                _manager.SortComponents();
 
                 //begin wizard
-                return RedirectToRoute(AssessmentWizardAreaRegistration.AssessmentWizardRoute, new { controller = manager.ActiveComponent.ControllerName });
+                return RedirectToRoute(AssessmentWizardAreaRegistration.AssessmentWizardRoute, new { controller = _manager.ActiveComponent.ControllerName });
             }
-            manager.IsNewAssessment = true;
+            _manager.IsNewAssessment = true;
             return View(Assessment.AllAssessmentTypes.OrderBy(e => e.ToString()).ToList());
         }
 
@@ -63,17 +64,13 @@ namespace OSBLE.Areas.AssessmentWizard.Controllers
         public ActionResult Index(ICollection<AssessmentType> assignments)
         {
             string keyName = ViewBag.AssessmentTypeRadioName;
-            if (Request.Form.AllKeys.Contains(keyName))
-            {
-                //set the assignment type and carry on to the next screen.
-                manager.SetActiveAssessmentType(Request.Form[keyName]);
-                return RedirectToRoute(new { controller = "Home", action = "SelectComponent", area = "AssessmentWizard" });
-            }
-            else
-            {
-                //send back to the old page if we didn't get anything.
-                return View(Assessment.AllAssessmentTypes);
-            }
+            if (!Request.Form.AllKeys.Contains(keyName)) return View(Assessment.AllAssessmentTypes);
+
+            //set the assignment type and carry on to the next screen.
+            _manager.SetActiveAssessmentType(Request.Form[keyName]);
+            return RedirectToRoute(new { controller = "Home", action = "SelectComponent", area = "AssessmentWizard" });
+
+            //send back to the old page if we didn't get anything.
         }
 
         public ActionResult SelectComponent(int? assignmentId)
@@ -82,46 +79,40 @@ namespace OSBLE.Areas.AssessmentWizard.Controllers
             //from the DB
             if (assignmentId != null && assignmentId != 0)
             {
-                int aid = (int)assignmentId;
-                manager.ActiveAssessmentId = aid;
+                var aid = (int)assignmentId;
+                _manager.ActiveAssessmentId = aid;
                 ActivateAssessmentComponents(db.Assessments.Find(aid));
-                Assessment assignment = db.Assessments.Find(aid);
-                manager.SetActiveAssessmentType((AssessmentType)assignment.AssessmentTypeID);
+                var assignment = db.Assessments.Find(aid);
+                _manager.SetActiveAssessmentType((AssessmentType)assignment.AssessmentTypeID);
             }
             else
             {
-                manager.ActiveAssessmentId = 0;
-                manager.DeactivateAllComponents();
+                _manager.ActiveAssessmentId = 0;
+                _manager.DeactivateAllComponents();
             }
-            ViewBag.BeginWizardButton = beginWizardButton;
-            ViewBag.AssignmentType = manager.ActiveAssessmentType.Explode();
-            return View(manager.GetComponentsForAssignmentType(manager.ActiveAssessmentType));
+            ViewBag.BeginWizardButton = BeginWizardButton;
+            ViewBag.AssignmentType = _manager.ActiveAssessmentType.Explode();
+            return View(_manager.GetComponentsForAssignmentType(_manager.ActiveAssessmentType));
         }
 
         [HttpPost]
         public ActionResult SelectComponent(ICollection<AssessmentBaseController> components)
         {
             ActivateSelectedComponents();
-            return RedirectToRoute(AssessmentWizardAreaRegistration.AssessmentWizardRoute, new { controller = manager.ActiveComponent.ControllerName });
+            return RedirectToRoute(AssessmentWizardAreaRegistration.AssessmentWizardRoute, new { controller = _manager.ActiveComponent.ControllerName });
         }
 
         public ActionResult Summary(int? assessmentId)
         {
-            Assessment assessment = new Assessment();
-            if (assessmentId != null)
-            {
-                assessment = db.Assessments.Find((int)assessmentId);
-            }
-            else
-            {
-                assessment = db.Assessments.Find(manager.ActiveAssessmentId);
-            }
+            var assessment = assessmentId.HasValue
+                           ? db.Assessments.Find(assessmentId.Value)
+                           : db.Assessments.Find(_manager.ActiveAssessmentId);
             return View(assessment);
         }
 
         public ActionResult ContextLost(int? assessmentId)
         {
-            Assessment model = new Assessment();
+            var model = new Assessment();
             if (assessmentId != null)
             {
                 model = db.Assessments.Find((int)assessmentId);
@@ -134,7 +125,7 @@ namespace OSBLE.Areas.AssessmentWizard.Controllers
         #region helper methods
         private void ActivateAssessmentComponents(Assessment assignment)
         {
-            manager.DeactivateAllComponents();
+            _manager.DeactivateAllComponents();
 
             //AC TODO: Add components based on assignment properties.  See 
             // AssignmentWizard -> HomeController for examples.
@@ -142,26 +133,24 @@ namespace OSBLE.Areas.AssessmentWizard.Controllers
 
         private void ActivateSelectedComponents()
         {
-            manager.DeactivateAllComponents();
-            string componentPrefix = "component_";
-            foreach (string key in Request.Form.AllKeys)
+            _manager.DeactivateAllComponents();
+            const string componentPrefix = "component_";
+            foreach (var comp in from key in Request.Form.AllKeys
+                                 where key.Substring(0, componentPrefix.Length) == componentPrefix
+                                 select _manager.GetComponentByName(Request.Form[key]))
             {
-                if (key.Substring(0, componentPrefix.Length) == componentPrefix)
-                {
-                    IWizardBaseController comp = manager.GetComponentByName(Request.Form[key]);
-                    comp.IsSelected = true;
-                }
+                comp.IsSelected = true;
             }
 
             //if we're loading a previous assignment, we need to go through and 
             //remove links to any unselected items
-            if (manager.ActiveAssessmentId != 0)
+            if (_manager.ActiveAssessmentId != 0)
             {
-                Assessment assessment = db.Assessments.Find(manager.ActiveAssessmentId);
+                var assessment = db.Assessments.Find(_manager.ActiveAssessmentId);
 
                 //AC TODO: Add components based on assignment properties.  See 
                 // AssignmentWizard -> HomeController for examples.
-                db.Entry(assessment).State = System.Data.EntityState.Modified;
+                db.Entry(assessment).State = EntityState.Modified;
                 db.SaveChanges();
             }
         }
