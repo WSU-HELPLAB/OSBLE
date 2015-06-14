@@ -5,18 +5,6 @@
 @{
     //Get time zone cookie
     DateTime lastDate = DateTime.Parse("1/1/1990");
-    HttpCookie cookieOffset = new HttpCookie("utcOffset");
-    cookieOffset = Request.Cookies["utcOffset"];
-    int utcOffset;
-    if(cookieOffset != null)
-    {
-        string UtcOffsetString = cookieOffset.Value;
-        utcOffset = Convert.ToInt32(UtcOffsetString);
-    }
-    else
-    {
-        utcOffset = 0;
-    }
 }
 
 <script type="text/javascript">
@@ -35,18 +23,18 @@
     {
         //Check to see if the utc adjusted times are different if they are
         //then the event is truly on a new day in the user's time zone
-        DateTime tmpDateNew = e.StartDate.UTCToCourse(e.Poster.AbstractCourseID); //.AddMinutes(-utcOffset);
+        
+        //Convert from UTC to course time, so we can check which events 
+        //actually will appear as the same day
+        DateTime tmpDateNew = e.StartDate.UTCToCourse(e.Poster.AbstractCourseID);
              
         if (tmpLastDate.Date != tmpDateNew.Date)
         {
             lastDate = e.StartDate;
             tmpLastDate = tmpDateNew;           
         <li class="event_date">
-            <time class="utc-time"
-                datetime="@Helpers.DateAsUnixTime(lastDate)" 
-                data-original-date="@Helpers.RawDate(lastDate)" 
-                data-date-format="dddd, MMMM D, YYYY">
-                @ShowDate(lastDate)
+            <time class="course-local-time">
+                @ShowDate(lastDate.UTCToCourse(e.Poster.AbstractCourseID))
             </time>
         </li>
         }
@@ -76,12 +64,8 @@
             @if (!e.NoDateTime)
             {
                 <div class="event_time">
-                    <time class="utc-time-events"
-                style="font-size:small;"
-                datetime="@Helpers.DateAsUnixTime(e.StartDate)" 
-                data-original-date="@Helpers.RawDate(e.StartDate)" 
-                data-date-format="hh:mm A">
-                        @ShowEventTime(e.StartDate, e) (UTC)
+                    <time class="course-local-time">
+                        @ShowEventTime(e.StartDate.UTCToCourse(e.Poster.AbstractCourseID), e)
                     </time>
              
                     @if ((e.EndDate != null))
@@ -95,12 +79,8 @@
                         }
                         @:&mdash;
 
-                        <time class="utc-time-events"
-                style="font-size:small;"
-                datetime="@Helpers.DateAsUnixTime(endDate)" 
-                data-original-date="@Helpers.RawDate(endDate)" 
-                data-date-format="@dateFormatString">
-                            @ShowEventTime(endDate, e) (UTC)
+                        <time class="course-local-time">
+                            @ShowEventTime(endDate.UTCToCourse(e.Poster.AbstractCourseID), e) 
                        </time>
                     }
 
