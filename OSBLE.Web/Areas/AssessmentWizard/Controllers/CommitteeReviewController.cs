@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 using System.Web.Mvc;
+
 using OSBLE.Areas.AssignmentWizard.Models;
-using OSBLE.Models.Assignments;
-using OSBLE.Models.Courses;
 using OSBLE.Models.Assessments;
 
 namespace OSBLE.Areas.AssessmentWizard.Controllers
@@ -42,9 +38,7 @@ namespace OSBLE.Areas.AssessmentWizard.Controllers
         {
             get
             {
-                List<AssessmentType> Assessments = new List<AssessmentType>();
-                Assessments.Add(AssessmentType.CommitteeReview);
-                return Assessments;
+                return new List<AssessmentType> {AssessmentType.CommitteeReview};
             }
         }
 
@@ -59,7 +53,7 @@ namespace OSBLE.Areas.AssessmentWizard.Controllers
         public override ActionResult Index()
         {
             base.Index();
-            Assessment.Type = manager.ActiveAssessmentType;
+            Assessment.Type = Manager.ActiveAssessmentType;
             return View(Assessment);
         }
 
@@ -67,7 +61,7 @@ namespace OSBLE.Areas.AssessmentWizard.Controllers
         public ActionResult Index(Assessment model)
         {
             Assessment = db.Assessments.Find(model.ID);
-            return base.PostBack(model);
+            return PostBack(model);
         }
     }
 }

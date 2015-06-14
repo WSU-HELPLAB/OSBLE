@@ -62,7 +62,7 @@ namespace OSBLE.Areas.AssessmentWizard.Controllers
         public override ActionResult Index()
         {
             base.Index();
-            Assessment.Type = manager.ActiveAssessmentType;
+            Assessment.Type = Manager.ActiveAssessmentType;
             return View(Assessment);
         }
 

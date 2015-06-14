@@ -1,0 +1,77 @@
+﻿@using OSBLEPlus.Logic.DataAccess.Lookups
+@using OSBLEPlus.Logic.DomainObjects.Analytics
+@using OSBLEPlus.Logic.Utility
+
+@model CalendarAttributes
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Styles.Render("~/Content/bootstrap.min.css")
+@Styles.Render("~/Areas/Analytics/Content/Calendar.css")
+
+<section data-tab="Analytics" id="calendar-section">
+
+    <div class="col-xs-3">
+        <div class="row">
+            <div>
+                @Html.DropDownListFor(m => m.CourseId, new SelectList(Courses.GetCourses(), "Value", "Name"))
+            </div>
+            <div>
+                <input type="radio" id="total" name="AggregationFunction" value="@AggregateFunction.Total" checked="checked" /><label for="total">Total&nbsp;&nbsp;</label>
+                <input type="radio" id="average" name="AggregationFunction" value="@AggregateFunction.Avg" /><label for="average">Average</label>
+            </div>
+        </div>
+
+        <div class="row">
+            @foreach (var category in MeasureDefinitions.All.Keys)
+            {
+                <div>
+                    <h4>@category.ToString().ToDisplayText()</h4>
+                    @foreach (var measure in MeasureDefinitions.All[category])
+                    {
+                        var checkedStatus = !string.IsNullOrWhiteSpace(Model.SelectedMeasures) && Model.SelectedMeasures.Split(',').Contains(measure.MeasureType.ToString("d")) ? "checked='checked'" : string.Empty;
+                        var aggregateFunction = measure.AggregateFunction.HasValue ? "agg-func=" + measure.AggregateFunction.Value + "" : string.Empty;
+                        <div>
+                            <input type="checkbox" @checkedStatus @aggregateFunction id="@measure.MeasureType.ToString()" name="SelectedMeasureTypes" value="@(measure.MeasureType)" data-color="@measure.Color" />
+                            <label for="@measure.MeasureType.ToString()">@measure.MeasureType.ToString().ToDisplayText()</label>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+    <div class="col-xs-8">
+        <div class="row calendar-section">
+            <div id="calendar">
+                <div class="row">
+                    <div class="col-xs-5"><h4 id="currentMonth">May 2013</h4></div>
+                    <div class="col-xs-3">
+                        <button id="back" name="back"><</button>
+                        <button id="forward" name="forward">></button>
+                    </div>
+                </div>
+
+                <div id="chart"></div>
+            </div>
+            <div id="hourly">
+                <div class="row">
+                    <div class="col-xs-5"><h4 id="currentDay">December 21, 2014</h4></div>
+                    <div class="col-xs-3"><a href="javascript:">back to calendar view</a></div>
+                </div>
+                <div id="hourlychart"></div>
+            </div>
+        </div>
+        @*<div data-type="spinner">
+            <div class="col-xs-4"></div>
+            <img src="@Url.Content("~/Areas/Analytics/Content/loading.gif")" class="col-xs-1" alt="loading ..." />
+        </div>*@
+    </div>
+</section>
+
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.5.2/d3.min.js"></script>
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.6.3/d3-tip.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+<script type="text/javascript" src="@Url.Content("~/Areas/Analytics/Scripts/TrendingCalendar.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Areas/Analytics/Scripts/Calendar.js")"></script>

@@ -17,8 +17,11 @@
         </th>
         <td>
             <time 
-                class="course-local-time" >
-                @Model.CurrentAssignment.DueDate.UTCToCourse(Model.CurrentAssignment.CourseID).ToShortDateString() @Model.CurrentAssignment.DueDate.UTCToCourse(Model.CurrentAssignment.CourseID).ToShortTimeString()
+                class="utc-time"
+                datetime="@Helpers.DateAsUnixTime(Model.CurrentAssignment.DueDate)" 
+                data-original-date="@Helpers.RawDate(Model.CurrentAssignment.DueDate)" 
+                data-date-format="MM/DD/YYYY hh:mm A">
+                @Model.CurrentAssignment.DueDate.ToShortDateString() @Model.CurrentAssignment.DueDate.ToShortTimeString() (UTC)
             </time>
         </td>
     </tr>

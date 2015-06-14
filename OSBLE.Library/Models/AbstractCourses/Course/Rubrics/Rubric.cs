@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ServiceModel.DomainServices.Server;
-using System.ComponentModel;
-using System.Linq;
 using System.Data.Entity;
 
 namespace OSBLE.Models.Courses.Rubrics

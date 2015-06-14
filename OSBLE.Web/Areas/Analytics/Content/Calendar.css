@@ -1,0 +1,80 @@
+﻿/* calendar */
+
+
+ div[data-wzstep="DataVisualization"] h2
+,div[data-wzstep="DataVisualization"] select {
+     display: inline-block;
+     width: auto;
+ }
+ div[data-wzstep="DataVisualization"] h2 {
+     position: relative;
+     top: 5px;
+ }
+ div[data-wzstep="DataVisualization"] div.category {
+     padding-right: 10px;
+     white-space: nowrap;
+     overflow-x: visible;
+ }
+div[data-wzstep="DataVisualization"] div[data-type="spinner"] img {
+    display: block;
+    padding-top: 100px;
+}
+
+#calendar-section path {
+    stroke-width: 1;
+    fill: none;
+}
+
+.d3-tip {
+    line-height: 1;
+    font-weight: bold;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    border-radius: 2px;
+}
+
+    .d3-tip:after {
+        box-sizing: border-box;
+        display: inline;
+        font-size: 15px;
+        width: 100%;
+        line-height: 1;
+        color: rgba(0, 0, 0, 0.8);
+        content: "\25BC";
+        position: absolute;
+        text-align: center;
+    }
+
+    .d3-tip.n:after {
+        margin: -1px 0 0 0;
+        top: 100%;
+        left: 0;
+    }
+/* hourly */
+#calendar-section .axis path,
+#calendar-section .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+#calendar-section .x.axis path {
+    display: none;
+}
+
+.calendar-section {
+    margin-top: 15px;
+}
+
+.calendar-section h4 {
+    text-align: right;
+    margin-right: 15px;
+}
+
+#hourly a {
+    display: inline-block;
+    position: relative;
+    top: 10px;
+}
+

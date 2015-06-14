@@ -14,8 +14,10 @@
         {
             <text>Published </text>
             <time 
-                class="course-local-time">@dataModel.PublishDate.UTCToCourse(((IAssignmentTeam)dataModel.AssignmentTeam).Assignment.CourseID).toShortDateString()
-         @dataModel.PublishDate.UTCToCourse(((IAssignmentTeam)dataModel.AssignmentTeam).Assignment.CourseID).ToShortTimeString()</time>
+                class="utc-time"
+                datetime="@Helpers.DateAsUnixTime(dataModel.PublishDate)" 
+                data-original-date="@Helpers.RawDate(dataModel.PublishDate)" 
+                data-date-format="MM/DD/YYYY hh:mm A">@dataModel.PublishDate.ToShortDateString() @dataModel.PublishDate.ToShortTimeString()</time>
         }
         else
         {

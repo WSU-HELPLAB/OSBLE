@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using OSBLE.Models.Assignments;
 using System.Linq;
 using System.Security.Cryptography;
@@ -73,7 +74,7 @@ namespace OSBLE.Models.Users
         [DataMember]
         public bool EmailNewDiscussionPosts { get; set; }
 
-        public enum SortEmailBy
+        public enum sortEmailBy
         {
             POSTED = 0,
             CONTEXT = 1,
@@ -82,6 +83,7 @@ namespace OSBLE.Models.Users
         }
 
         public UserProfile()
+            : base()
         {
             IsAdmin = false;
             CanCreateCourses = false;
@@ -96,6 +98,7 @@ namespace OSBLE.Models.Users
         /// </summary>
         /// <param name="up"></param>
         public UserProfile(UserProfile up)
+            : base()
         {
             this.CanCreateCourses = up.CanCreateCourses;
             this.DefaultCourse = up.DefaultCourse;
@@ -127,19 +130,19 @@ namespace OSBLE.Models.Users
         /// <summary>
         /// This is the only function that should be used to display users names. By default it displays the name as "FirstName LastName" 
         /// </summary>
-        /// <param name="abstractRoleID">The AbstroleRoleId of the current user who will see this name</param>
-        /// <param name="firstThenLast">This is an optional boolean parameter that should be sent in as true when you want names displayed in "LastName, FirstName" format.</param>
-        /// <param name="assignmentHasAnonymousPosts">This is an optional boolean parameter that should be sent in when DisplayName is used within a specific assignment scenario (to mask users if anonymous settings turned on) Simply pass in <see cref="Assignment.DiscussionSettings"/></param>
+        /// <param name="AbstractRoleId">The AbstroleRoleId of the current user who will see this name</param>
+        /// <param name="LastThenFirst">This is an optional boolean parameter that should be sent in as true when you want names displayed in "LastName, FirstName" format.</param>
+        /// <param name="AssignmentHasAnonymousPosts">This is an optional boolean parameter that should be sent in when DisplayName is used within a specific assignment scenario (to mask users if anonymous settings turned on) Simply pass in <see cref="Assignment.DiscussionSettings.HasAnonymousPosts"/></param>
         /// <returns></returns>
-        public string DisplayName(int abstractRoleID, bool? firstThenLast = null, bool? assignmentHasAnonymousPosts = null)
+        public string DisplayName(int AbstractRoleId, bool? FirstThenLast = null, bool? AssignmentHasAnonymousPosts = null)
         {
             string returnValue = "";
-            if ((assignmentHasAnonymousPosts != null && assignmentHasAnonymousPosts == true)
-                || abstractRoleID == (int)CourseRole.CourseRoles.Observer)
+            if ((AssignmentHasAnonymousPosts != null && AssignmentHasAnonymousPosts == true)
+                || AbstractRoleId == (int)CourseRole.CourseRoles.Observer)
             {
                 returnValue = string.Format("Anonymous {0}", this.ID);
             }
-            else if (firstThenLast != null && firstThenLast == true)
+            else if (FirstThenLast != null && FirstThenLast == true)
             {
                 returnValue = this.ToString();
             }
@@ -179,6 +182,8 @@ namespace OSBLE.Models.Users
         /// <returns></returns>
         public static string GetPasswordHash(string rawPassword)
         {
+            SHA256Managed algorithm = new SHA256Managed();
+
             SHA1 sha = new SHA1CryptoServiceProvider();
             byte[] unhashedPassword = System.Text.Encoding.UTF8.GetBytes(rawPassword);
             byte[] hashedBytes = sha.ComputeHash(unhashedPassword);
@@ -207,7 +212,7 @@ namespace OSBLE.Models.Users
             int count = 0;
             using (OSBLEContext db = new OSBLEContext())
             {
-                string hashedPassword = GetPasswordHash(password);
+                string hashedPassword = UserProfile.GetPasswordHash(password);
                 count = (from user in db.UserProfiles
                          where
                          user.UserName.CompareTo(userName) == 0

@@ -1,5 +1,5 @@
 ﻿@using OSBLE.Models.Assessments;
-@using System.Collections;
+
 @model ICollection<AssessmentType>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -22,19 +22,11 @@
         </thead>
         <tbody>
         @{
-            int counter = 0;
-            string altText = "";
-          }
-        @foreach (AssessmentType type in Model)
+            var counter = 0;
+        }
+        @foreach (var type in Model)
         {
-            if (counter % 2 == 0)
-            {
-                altText = "AltRow";
-            }
-            else
-            {
-                altText = "";
-            }
+            var altText = counter % 2 == 0 ? "AltRow" : string.Empty;
             <tr class="@altText">
                 <td><input id="type@(counter)" type="radio" value="@type" name="@ViewBag.AssessmentTypeRadioName" /></td>
                 <td><label for="type@(counter)">@type.Explode()</label></td>

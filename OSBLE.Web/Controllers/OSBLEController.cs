@@ -1,57 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Configuration;
+using System.Data;
 using System.Linq;
-using System.Reflection;
+using System.Runtime.Caching;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 using System.Web.SessionState;
-using OSBLE.Models;
 
+using OSBLE.Models;
+using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
-using OSBLE.Models.Assignments;
-using System.Configuration;
 using OSBLE.Utility;
-using System.Runtime.Caching;
 
 namespace OSBLE.Controllers
 {
     [SessionState(SessionStateBehavior.Default)]
     public abstract class OSBLEController : Controller
     {
-        
+
         protected OSBLEContext db = new OSBLEContext();
 
         public FileCache Cache { get; private set; }
         private UserProfile _currentUser = OsbleAuthentication.CurrentUser;
         public UserProfile CurrentUser
         {
-            get 
-            {
-                //reduces db calls
-                if (_currentUser == null)
-                {
-                    _currentUser = OsbleAuthentication.CurrentUser;
-                }
-                return _currentUser;
-            }
-        }
-
-        private CourseUser activeCourseUser = null;
-
-        public CourseUser ActiveCourseUser
-        {
             get
             {
-                return activeCourseUser;
-            }
-            protected set
-            {
-                activeCourseUser = value;
+                return _currentUser ?? (_currentUser = OsbleAuthentication.CurrentUser);
             }
         }
+
+        public CourseUser ActiveCourseUser { get; protected set; }
 
         protected HttpContext context = System.Web.HttpContext.Current;
         protected List<CourseUser> currentCourses = new List<CourseUser>();
@@ -74,6 +56,7 @@ namespace OSBLE.Controllers
             public string Controller { get; set; }
 
             public string Action { get; set; }
+            public string Area { get; set; }
 
             public bool ModifierOnly { get; set; }
 
@@ -99,16 +82,16 @@ namespace OSBLE.Controllers
             /// <param name="action"></param>
             public MenuItem(string name, string controller, string action)
             {
-                this.Name = name;
-                this.Controller = controller;
-                this.Action = action;
+                Name = name;
+                Controller = controller;
+                Action = action;
 
-                this.ModifierOnly = false;
-                this.ViewerOnly = false;
-                this.AdminOnly = false;
-                this.NotInCommunityPage = false;
-                this.CommunityOnlyPage = false;
-                this.ShownInAssessmentCommittees = true;
+                ModifierOnly = false;
+                ViewerOnly = false;
+                AdminOnly = false;
+                NotInCommunityPage = false;
+                CommunityOnlyPage = false;
+                ShownInAssessmentCommittees = true;
             }
 
             /// <summary>
@@ -125,44 +108,47 @@ namespace OSBLE.Controllers
             /// <param name="notInCommunityPage">This tab should not appear in communities</param>
             /// <param name="communityOnlyPage">This tab should only appear on communities</param>
             /// <param name="shownInAssessmentCommittees">This tab appears in assessment comittees</param>
+            /// <param name="assessmentComitteesOnly"></param>
+            /// <param name="area">allow area views to be launched by menu item</param>
             public MenuItem(string name, string controller, string action, bool modifierOnly, bool graderOnly,
                 bool viewerOnly, bool adminOnly, bool notInCommunityPage, bool communityOnlyPage,
-                bool shownInAssessmentCommittees = false, bool assessmentComitteesOnly = false)
+                bool shownInAssessmentCommittees = false, bool assessmentComitteesOnly = false, string area = "")
             {
-                this.Name = name;
-                this.Controller = controller;
-                this.Action = action;
+                Name = name;
+                Controller = controller;
+                Action = action;
+                Area = area;
 
-                this.ModifierOnly = modifierOnly;
-                this.GraderOnly = graderOnly;
-                this.ViewerOnly = viewerOnly;
-                this.AdminOnly = adminOnly;
-                this.NotInCommunityPage = notInCommunityPage;
-                this.CommunityOnlyPage = communityOnlyPage;
-                this.ShownInAssessmentCommittees = shownInAssessmentCommittees;
-                this.ShownInAssessmentCommitteesOnly = assessmentComitteesOnly;
+                ModifierOnly = modifierOnly;
+                GraderOnly = graderOnly;
+                ViewerOnly = viewerOnly;
+                AdminOnly = adminOnly;
+                NotInCommunityPage = notInCommunityPage;
+                CommunityOnlyPage = communityOnlyPage;
+                ShownInAssessmentCommittees = shownInAssessmentCommittees;
+                ShownInAssessmentCommitteesOnly = assessmentComitteesOnly;
             }
 
-            public bool IsVisibleTo(UserProfile CurrentUser, CourseUser ActiveCourse)
+            public bool IsVisibleTo(UserProfile currentUser, CourseUser activeCourse)
             {
                 // If the course is an assessment committee...
-                if (ActiveCourse.AbstractCourse is AssessmentCommittee)
+                if (activeCourse.AbstractCourse is AssessmentCommittee)
                 {
-                    if (null == ActiveCourse) { return false; }
-                    return ShownInAssessmentCommittees;
+                    return null != activeCourse && ShownInAssessmentCommittees;
                 }
-                else if (((CurrentUser != null) && (!AdminOnly || CurrentUser.IsAdmin))
-                   &&
-                   (!ModifierOnly || ((ActiveCourse != null) && ActiveCourse.AbstractRole.CanModify))
-                   &&
-                   (!GraderOnly || ((ActiveCourse != null) && ActiveCourse.AbstractRole.CanGrade))
-                   &&
-                   (!ViewerOnly || ((ActiveCourse != null) && ActiveCourse.AbstractRole.CanSeeAll))
-                   &&
-                   ((!CommunityOnlyPage && !NotInCommunityPage) ||
-                   (NotInCommunityPage && ActiveCourse != null && !(ActiveCourse.AbstractCourse is Community)
-                   || (CommunityOnlyPage && ActiveCourse != null && ActiveCourse.AbstractCourse is Community)))
-                  )
+
+                if (((currentUser != null) && (!AdminOnly || currentUser.IsAdmin))
+                    &&
+                    (!ModifierOnly || ((activeCourse != null) && activeCourse.AbstractRole.CanModify))
+                    &&
+                    (!GraderOnly || ((activeCourse != null) && activeCourse.AbstractRole.CanGrade))
+                    &&
+                    (!ViewerOnly || ((activeCourse != null) && activeCourse.AbstractRole.CanSeeAll))
+                    &&
+                    ((!CommunityOnlyPage && !NotInCommunityPage) ||
+                     (NotInCommunityPage && activeCourse != null && !(activeCourse.AbstractCourse is Community)
+                      || (CommunityOnlyPage && activeCourse != null && activeCourse.AbstractCourse is Community)))
+                    )
                 {
                     return !ShownInAssessmentCommitteesOnly;
                 }
@@ -176,17 +162,19 @@ namespace OSBLE.Controllers
         /// </summary>
         public OSBLEController()
         {
+            ActiveCourseUser = null;
             Initialize();
         }
 
         public OSBLEController(OSBLEContext context)
         {
+            ActiveCourseUser = null;
             db = context;
             Initialize();
         }
 
         private void Initialize()
-        {            
+        {
             // If logged in, feed user profile to view.
             if (Convert.ToBoolean(ConfigurationManager.AppSettings["RequireLoginValidation"]) == true)
             {
@@ -194,17 +182,15 @@ namespace OSBLE.Controllers
                 {
                     Cache = FileCacheHelper.GetCacheInstance(OsbleAuthentication.CurrentUser);
 
-                    setupInitialDatabaseData();
+                    SetupMenu();
 
-                    setupMenu();
-
-                    setCurrentUserProfile();
+                    SetCurrentUserProfile();
 
                     GetEnrolledCourses();
 
-                    setCourseListTitle();
+                    SetCourseListTitle();
 
-                    setDashboardDisplayMode();
+                    SetDashboardDisplayMode();
                 }
             }
         }
@@ -215,52 +201,18 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-        /// Checks to see if the Course/Community roles have been populated.
-        /// Also adds WSU to schools if none exist.
-        /// This is different from the sample data generation in OSBLEContext, which
-        /// is meant for development purposes only.
-        /// </summary>
-        private void setupInitialDatabaseData()
-        {
-            if (db.AbstractRoles.Count() == 0)
-            {
-                db.SeedRoles();
-                db.SaveChanges();
-            }
-
-            if (db.Schools.Count() == 0)
-            {
-                db.Schools.Add(
-                        new School()
-                        {
-                            Name = "Washington State University"
-                        }
-                    );
-
-                db.SaveChanges();
-            }
-        }
-
-        /// <summary>
         /// Sets title of course list title based on whether or not
         /// user is in any communities. Will display "Course" for courses
         /// or "Course/Community" if at least one community is present.
         /// </summary>
-        private void setCourseListTitle()
+        private void SetCourseListTitle()
         {
-            bool hasCommunities = (currentCourses.Where(c => c.AbstractCourse is Community).Count() > 0);
-            bool hasCommittees = (currentCourses.Where(c => c.AbstractCourse is AssessmentCommittee).Count() > 0);
-            
+            var hasCommunities = currentCourses.Any(c => c.AbstractCourse is Community);
+            var hasCommittees = currentCourses.Any(c => c.AbstractCourse is AssessmentCommittee);
+
             if (hasCommunities)
             {
-                if (hasCommittees)
-                {
-                    ViewBag.CourseListTitle = "Course/Community/Committee";
-                }
-                else
-                {
-                    ViewBag.CourseListTitle = "Course/Community";
-                }
+                ViewBag.CourseListTitle = hasCommittees ? "Course/Community/Committee" : "Course/Community";
             }
             else if (hasCommittees)
             {
@@ -282,15 +234,15 @@ namespace OSBLE.Controllers
         /// is displaying only the active course in the dashboard feed,
         /// or displaying all courses.
         /// </summary>
-        private void setDashboardDisplayMode()
+        private void SetDashboardDisplayMode()
         {
             // if not set or erroniously set
             //     set the activity feed to display a single course
             // otherwise
             //     do nothing because it has been set by the user (call to HomeController's SetDashboardMode method)
-            bool returnValue = false;
-            object cacheResult = Cache["DashboardSingleCourseMode"];
-            if(cacheResult == null || bool.TryParse(cacheResult.ToString(), out returnValue))
+            var returnValue = false;
+            var cacheResult = Cache["DashboardSingleCourseMode"];
+            if (cacheResult == null || bool.TryParse(cacheResult.ToString(), out returnValue))
             {
                 returnValue = true;
                 Cache["DashboardSingleCourseMode"] = returnValue;
@@ -302,19 +254,23 @@ namespace OSBLE.Controllers
         /// <summary>
         /// Creates menu items (with permissions) for tabbed main menu on most OSBLE screens.
         /// </summary>
-        private void setupMenu()
+        private void SetupMenu()
         {
-            List<MenuItem> menu = new List<MenuItem>();
-
-            menu.Add(new MenuItem("Dashboard", "Home", "Index"));
-            menu.Add(new MenuItem("Assignments", "Assignment", "Index", false, false, false, false, true, false, false, false));
-            menu.Add(new MenuItem("Assessments", "Committee", "Index", false, false, false, false, true, false, true, true));
-            menu.Add(new MenuItem("Grades", "Gradebook", "Index", false, false, false, false, true, false, false));
-            menu.Add(new MenuItem("Users", "Roster", "Index", true, false, false, false, false, false, true));
-            menu.Add(new MenuItem("Course Settings", "Course", "Edit", true, true, true, false, true, false, false, false));
-            menu.Add(new MenuItem("Community Settings", "Community", "Edit", true, true, true, false, false, true, false, false));
-            menu.Add(new MenuItem("Committee Settings", "Committee", "Edit", true, true, true, false, false, true, true, true));
-            menu.Add(new MenuItem("Administration", "Admin", "Index", false, false, false, true, false, false, false));
+            var menu = new List<MenuItem>
+            {
+                new MenuItem("Dashboard", "Home", "Index"),
+                new MenuItem("Assignments", "Assignment", "Index", false, false, false, false, true, false, false, false),
+                new MenuItem("Assessments", "Committee", "Index", false, false, false, false, true, false, true, true),
+                new MenuItem("Grades", "Gradebook", "Index", false, false, false, false, true, false, false),
+                new MenuItem("Users", "Roster", "Index", true, false, false, false, false, false, true),
+                new MenuItem("Course Settings", "Course", "Edit", true, true, true, false, true, false, false, false),
+                new MenuItem("Community Settings", "Community", "Edit", true, true, true, false, false, true, false,
+                    false),
+                new MenuItem("Committee Settings", "Committee", "Edit", true, true, true, false, false, true, true, true),
+                new MenuItem("Administration", "Admin", "Index", false, false, false, true, false, false, false),
+                new MenuItem("Analytics", "Calendar", "Index", false, false, false, true, false, false, false, false,
+                    "Analytics")
+            };
 
             ViewBag.Menu = menu;
         }
@@ -331,10 +287,10 @@ namespace OSBLE.Controllers
             {
                 // Sends the ViewBag the amount of unread mail messages the user has.
                 SetUnreadMessageCount();
-                List<CourseUser> allUsersCourses = db.CourseUsers.Where(cu => cu.UserProfileID == CurrentUser.ID).ToList();
+                var allUsersCourses = db.CourseUsers.Where(cu => cu.UserProfileID == CurrentUser.ID).ToList();
 
                 // Get list of courses this user is connected to. Remove inactive (for anyone other than instructors or observers) or hidden (for all) courses.
-                currentCourses = allUsersCourses.Where(cu => (cu.AbstractCourse is Course) 
+                currentCourses = allUsersCourses.Where(cu => (cu.AbstractCourse is Course)
                     &&
                     cu.AbstractCourse.IsDeleted == false
                     &&
@@ -368,9 +324,9 @@ namespace OSBLE.Controllers
                     .ToList();
 
                 // Only consider non-hidden courses as the active course.
-                List<CourseUser> activeCoursePool = currentCourses.Where(cu => cu.Hidden == false).ToList();
+                var activeCoursePool = currentCourses.Where(cu => cu.Hidden == false).ToList();
 
-                int activeCourseID;
+                int activeCourseId;
 
                 //int sessionAc = 0;// = Cache["ActiveCourse"];
                 var sessionAc = Cache["ActiveCourse"];
@@ -379,21 +335,21 @@ namespace OSBLE.Controllers
                 if (sessionAc == null || !(sessionAc is int))
                 {
                     // On login or invalid ActiveCourse, set to user's default course.
-                    activeCourseID = CurrentUser.DefaultCourse;
+                    activeCourseId = CurrentUser.DefaultCourse;
                 }
                 else if (sessionAc is int)
                 {
                     // If ActiveCourse is valid in session, try it for our active course.
-                    activeCourseID = (int)sessionAc;
+                    activeCourseId = (int)sessionAc;
                 }
                 else
                 {
-                    activeCourseID = 0;
+                    activeCourseId = 0;
                 }
 
                 // Load currently selected course, as long as user is actually a member of said course.
                 // Otherwise, load first course.
-                if ((ActiveCourseUser = activeCoursePool.Where(cu => cu.AbstractCourseID == activeCourseID).FirstOrDefault()) == null)
+                if ((ActiveCourseUser = activeCoursePool.FirstOrDefault(cu => cu.AbstractCourseID == activeCourseId)) == null)
                 {
                     ActiveCourseUser = activeCoursePool.FirstOrDefault();
                 }
@@ -412,27 +368,21 @@ namespace OSBLE.Controllers
             }
         }
 
-        private void setCurrentUserProfile()
+        private void SetCurrentUserProfile()
         {
-            ViewBag.UserSchool = db.Schools.FirstOrDefault(s => s.ID == OsbleAuthentication.CurrentUser.SchoolID).Name;
+            ViewBag.UserSchool = db.Schools.Single(s => s.ID == OsbleAuthentication.CurrentUser.SchoolID).Name;
             ViewBag.CurrentUser = OsbleAuthentication.CurrentUser;
         }
 
         public void SetUnreadMessageCount()
         {
-            ViewBag.UnreadMessageCount = (int)db.Mails.Where(m => (m.ToUserProfileID == CurrentUser.ID) && (m.Read == false) && (m.DeleteFromInbox == false)).Count();
+            ViewBag.UnreadMessageCount = db.Mails.Count(m => (m.ToUserProfileID == CurrentUser.ID) && (m.Read == false) && (m.DeleteFromInbox == false));
         }
 
         public static List<UserProfile> GetAllUsers(AssignmentTeam team)
         {
-            List<UserProfile> users = new List<UserProfile>();
-
             //Searching through the Assignment teams and adding all the Users
-            foreach (TeamMember tm in team.Team.TeamMembers)
-            {
-                users.Add(tm.CourseUser.UserProfile);
-            }
-            return users;
+            return team.Team.TeamMembers.Select(tm => tm.CourseUser.UserProfile).ToList();
         }
 
 
@@ -441,28 +391,16 @@ namespace OSBLE.Controllers
         /// </summary>
         public static List<CourseUser> GetAllCourseUsers(AssignmentTeam team)
         {
-            List<CourseUser> users = new List<CourseUser>();
-
-            foreach (TeamMember tm in team.Team.TeamMembers)
-            {
-                users.Add(tm.CourseUser);
-            }
-            return users;
+            return team.Team.TeamMembers.Select(tm => tm.CourseUser).ToList();
         }
 
         public static TeamMember GetTeamUser(Assignment assignment, UserProfile user)
         {
-            TeamMember teamMember = new TeamMember();
-            List<AssignmentTeam> assignmentTeams = assignment.AssignmentTeams.ToList();
-            foreach (AssignmentTeam at in assignmentTeams)
+            var teamMember = new TeamMember();
+            var assignmentTeams = assignment.AssignmentTeams.ToList();
+            foreach (var tm in from at in assignmentTeams from tm in at.Team.TeamMembers where tm.CourseUser.UserProfileID == user.ID select tm)
             {
-                foreach (TeamMember tm in at.Team.TeamMembers)
-                {
-                    if (tm.CourseUser.UserProfileID == user.ID)
-                    {
-                        teamMember = tm;
-                    }
-                }
+                teamMember = tm;
             }
 
             return teamMember;
@@ -478,33 +416,22 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         public static AssignmentTeam GetAssignmentTeam(Assignment assignment, CourseUser user)
         {
-            AssignmentTeam returnValue = user.TeamMemberships
-                                             .SelectMany(t => t.Team.UsedAsAssignmentTeam)
-                                             .Where(a => a.AssignmentID == assignment.ID)
-                                             .FirstOrDefault();
-            return returnValue;
+            return user.TeamMemberships
+                       .SelectMany(t => t.Team.UsedAsAssignmentTeam)
+                       .FirstOrDefault(a => a.AssignmentID == assignment.ID);
         }
 
-        
+
         /// <summary>
         /// Returns a discussion team for a discussion assignment. 
         /// Note: this isn't reliable for Critical Review Discussions as a user can be on multiple discussion teams
         /// </summary>
         /// <param name="assignment">Discussion Assignment</param>
+        /// <param name="user"></param>
         /// <returns>discussionteam user is on</returns>
         public static DiscussionTeam GetDiscussionTeam(Assignment assignment, CourseUser user)
         {
-            foreach(DiscussionTeam dt in assignment.DiscussionTeams)
-            {
-                foreach(TeamMember tm in dt.Team.TeamMembers)
-                {
-                    if(user.ID == tm.CourseUserID)
-                    {
-                        return dt;
-                    }
-                }
-            }
-            return null;
+            return (from dt in assignment.DiscussionTeams from tm in dt.Team.TeamMembers where user.ID == tm.CourseUserID select dt).FirstOrDefault();
         }
 
         /// <summary>
@@ -526,9 +453,9 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         public static double GetLatePenalty(IAssignmentTeam team)
         {
-            double latePenalty = 0.0;
+            var latePenalty = 0.0;
             DateTime? submissionTime = null;
-            DateTime dueDate = team.Assignment.DueDate + TimeSpan.FromMinutes(1); //Need initial value to get compiler to be quiet.
+            var dueDate = team.Assignment.DueDate + TimeSpan.FromMinutes(1); //Need initial value to get compiler to be quiet.
             if (team.Assignment.HasDeliverables)
             {
                 //Handle late penaly based off deliverable submission time
@@ -542,9 +469,9 @@ namespace OSBLE.Controllers
                 //Handle late penalty based off of initial post due date.
 
                 //Note that the team sent in is a non-db saved, forged team. The teamID corrisponds to the correct team, but there is only one teammember
-                    //and that is the user we want the late penaly for.
+                //and that is the user we want the late penaly for.
 
-                int cuID = team.Team.TeamMembers.FirstOrDefault().CourseUserID;
+                var cuID = team.Team.TeamMembers.First().CourseUserID;
 
                 using (OSBLEContext db = new OSBLEContext())
                 {
@@ -554,7 +481,7 @@ namespace OSBLE.Controllers
                                       orderby dp.Posted
                                       select dp.Posted).FirstOrDefault();
                 }
-                
+
                 dueDate = team.Assignment.DiscussionSettings.InitialPostDueDate + TimeSpan.FromMinutes(1);
             }
 
@@ -562,11 +489,11 @@ namespace OSBLE.Controllers
 
             if (submissionTime != null && submissionTime != DateTime.MinValue)
             {
-                lateness = (DateTime)submissionTime - (DateTime)dueDate;
+                lateness = (DateTime)submissionTime - dueDate;
             }
             else //if the assignment has not been submitted, use the current time to calculate late penalty.
             {
-                lateness = DateTime.UtcNow - (DateTime)dueDate;
+                lateness = DateTime.UtcNow - dueDate;
             }
 
             if (lateness.TotalHours >= team.Assignment.HoursLateWindow)
@@ -588,7 +515,7 @@ namespace OSBLE.Controllers
                 //gets 2 deductions. 1 for the (0,24] hour late range, and then another for the (24,48] hour late range.
                 //Notice begining of ranges are non-inclusive. This was handled by adding 1 minute to dueDate above.
 
-                int numberOfDeductions = 1;
+                var numberOfDeductions = 1;
                 numberOfDeductions += ((int)lateness.TotalHours / (int)team.Assignment.HoursPerDeduction);
                 latePenalty = numberOfDeductions * team.Assignment.DeductionPerUnit;
 
@@ -600,57 +527,56 @@ namespace OSBLE.Controllers
             }
 
             return latePenalty;
-            
+
         }
 
         public static string[] GetFileExtensions(DeliverableType deliverableType)
         {
-            Type type = deliverableType.GetType();
+            var type = deliverableType.GetType();
 
-            FieldInfo fi = type.GetField(deliverableType.ToString());
+            var fi = type.GetField(deliverableType.ToString());
 
             //we get the attributes of the selected language
-            FileExtensions[] attrs = (fi.GetCustomAttributes(typeof(FileExtensions), false) as FileExtensions[]);
+            var attrs = (fi.GetCustomAttributes(typeof(FileExtensions), false) as FileExtensions[]);
 
             //make sure we have more than (should be exactly 1)
-            if (attrs.Length > 0 && attrs[0] is FileExtensions)
+            if (attrs != null && (attrs.Length > 0 && attrs[0] != null))
             {
                 return attrs[0].Extensions;
             }
-            else
-            {
-                //throw and exception if not decorated with any attrs because it is a requirement
-                throw new Exception("Languages must have be decorated with a FileExtensionAttribute");
-            }
+
+            //throw and exception if not decorated with any attrs because it is a requirement
+            throw new Exception("Languages must have be decorated with a FileExtensionAttribute");
         }
 
         protected List<SelectListItem> GetListOfDeliverableTypes()
         {
-            List<SelectListItem> fileTypes = new List<SelectListItem>();
-            int i = 0;
-            DeliverableType deliverable = (DeliverableType)i;
+            var fileTypes = new List<SelectListItem>();
+            var i = 0;
+            var deliverable = (DeliverableType)i;
             while (Enum.IsDefined(typeof(DeliverableType), i))
             {
-                Type type = deliverable.GetType();
+                var type = deliverable.GetType();
 
-                FieldInfo fi = type.GetField(deliverable.ToString());
+                var fi = type.GetField(deliverable.ToString());
 
                 //we get the attributes of the selected language
-                FileExtensions[] attrs = (fi.GetCustomAttributes(typeof(FileExtensions), false) as FileExtensions[]);
+                var attrs = (fi.GetCustomAttributes(typeof(FileExtensions), false) as FileExtensions[]);
 
                 //make sure we have more than (should be exactly 1)
-                if (attrs.Length > 0 && attrs[0] is FileExtensions)
+                if (attrs != null && (attrs.Length > 0 && attrs[0] != null))
                 {
                     //we get the first attributes value which should be the fileExtension
-                    string s = deliverable.ToString();
+                    var s = deliverable.ToString();
                     s += " (";
                     s += string.Join(", ", attrs[0].Extensions);
                     s += ")";
 
-                    SelectListItem sli = new SelectListItem();
-
-                    sli.Text = s;
-                    sli.Value = i.ToString();
+                    var sli = new SelectListItem
+                    {
+                        Text = s,
+                        Value = i.ToString()
+                    };
 
                     fileTypes.Add(sli);
                 }
@@ -673,20 +599,20 @@ namespace OSBLE.Controllers
         /// <param name="user"></param>
         public void RemoveUserFromCourse(UserProfile user)
         {
-            CourseUser cu =  (from c in db.CourseUsers
-                    where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID
-                    && c.UserProfileID == user.ID
-                    select c).FirstOrDefault();
+            var cu = (from c in db.CourseUsers
+                      where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID
+                      && c.UserProfileID == user.ID
+                      select c).FirstOrDefault();
             if (cu != null)
             {
                 db.CourseUsers.Remove(cu);
             }
             db.SaveChanges();
 
-            List<AssignmentTeam> teamsWithNoMembers = (from at in db.AssignmentTeams
-                                                       where at.Team.TeamMembers.Count == 0
-                                                       select at).ToList();
-            foreach (AssignmentTeam team in teamsWithNoMembers)
+            var teamsWithNoMembers = (from at in db.AssignmentTeams
+                                      where at.Team.TeamMembers.Count == 0
+                                      select at).ToList();
+            foreach (var team in teamsWithNoMembers)
             {
                 db.AssignmentTeams.Remove(team);
             }
@@ -699,38 +625,20 @@ namespace OSBLE.Controllers
         /// <param name="user"></param>
         public void WithdrawUserFromCourse(UserProfile user)
         {
-            CourseUser cu = (from c in db.CourseUsers
-                             where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID
-                             && c.UserProfileID == user.ID
-                             select c).FirstOrDefault();
+            var cu = (from c in db.CourseUsers
+                      where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID
+                      && c.UserProfileID == user.ID
+                      select c).FirstOrDefault();
             if (cu != null)
             {
-                if(cu.AbstractRole.GetType() == typeof(CommunityRole))
+                if (cu.AbstractRole.GetType() == typeof(CommunityRole))
                 {
                     RemoveUserFromCourse(user);
                 }
                 cu.AbstractRoleID = (int)CourseRole.CourseRoles.Withdrawn;
-                db.Entry(cu).State = System.Data.EntityState.Modified;
+                db.Entry(cu).State = EntityState.Modified;
             }
             db.SaveChanges();
         }
-
-       
-        //Give the Target's AssignmentTeam, this returns True if TargetTeam should be anonymized for current user based off assignment settings.
-        public bool AnonymizeBasedOnCriticalReviewSettings(AssignmentTeam TargetTeam, CourseUser Target = null)
-        {
-            bool Anon = false;
-
-            Assignment CRAssignment = TargetTeam.Assignment;
-
-            if (CRAssignment.Type == AssignmentTypes.CriticalReview)
-            {
-                
-            }
-
-            return Anon;
-            
-        }
-
     }
 }

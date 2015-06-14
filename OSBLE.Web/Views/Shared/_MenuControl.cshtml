@@ -9,7 +9,7 @@
             {
                 if (m.IsVisibleTo(ViewBag.CurrentUser, ViewBag.ActiveCourse))
                 {
-        @Html.ActionLink(@m.Name, @m.Action, @m.Controller, new { area = "" }, new { Class = ViewBag.CurrentTab == @m.Name ? "tab_current" : "" })
+        @Html.ActionLink(@m.Name, @m.Action, @m.Controller, new { area = @m.Area }, new { Class = ViewBag.CurrentTab == @m.Name ? "tab_current" : "" })
                 }
             }
         }
