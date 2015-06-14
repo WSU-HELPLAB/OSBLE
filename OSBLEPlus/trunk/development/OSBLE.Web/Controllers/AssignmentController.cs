@@ -96,9 +96,6 @@ namespace OSBLE.Controllers
                     //Value: tuple(submissionTime (as string), discussion team ID as int or null)
                 Dictionary<int, string> submissionInfo = new Dictionary<int,string>();
                 Dictionary<int, DiscussionTeam> dtInfo = new Dictionary<int, DiscussionTeam>();
-                int courseOffset = (ActiveCourseUser.AbstractCourse).GetType() != typeof(Community) ? ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset : 0;
-                CourseController cc = new CourseController();
-                TimeZoneInfo tz = cc.getTimeZone(courseOffset);
 
                 foreach (Assignment a in Assignments)
                 {
@@ -111,7 +108,7 @@ namespace OSBLE.Controllers
                         {
                             DateTime convertedSubTime = new DateTime(subTime.Value.Ticks, DateTimeKind.Unspecified);
                             //Submission time comes back in UTC
-                            convertedSubTime = TimeZoneInfo.ConvertTimeFromUtc(convertedSubTime, tz);
+                            convertedSubTime = convertedSubTime.UTCToCourse(ActiveCourseUser.AbstractCourseID);
                             submissionTime = convertedSubTime.ToString();
                             
                         }

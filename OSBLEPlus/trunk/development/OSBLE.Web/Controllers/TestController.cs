@@ -88,9 +88,9 @@ namespace OSBLE.Controllers
                               de.CourseBreaks,
                               de.ID
                           }).FirstOrDefault();
-            CourseController cb = new CourseController();
-            int utcOffset = (ActiveCourseUser.AbstractCourse as Course).TimeZoneOffset;
-            TimeZoneInfo tz = cb.getTimeZone(utcOffset);
+            //CourseController cb = new CourseController();
+            //int utcOffset = (ActiveCourseUser.AbstractCourse as Course).TimeZoneOffset;
+            //TimeZoneInfo tz = cb.getTimeZone(utcOffset);
 
             List<DateTime> dt = new List<DateTime>();
             List<DateTime> dtlocal = new List<DateTime>();
@@ -104,7 +104,8 @@ namespace OSBLE.Controllers
 
                 dtlocal.Add(evtStart);
 
-                evtStart = TimeZoneInfo.ConvertTimeFromUtc(evtStart, tz);
+                //evtStart = TimeZoneInfo.ConvertTimeFromUtc(evtStart, tz);
+                evtStart = evtStart.UTCToCourse(ActiveCourseUser.AbstractCourseID);
 
                 dt.Add(evtStart);
 

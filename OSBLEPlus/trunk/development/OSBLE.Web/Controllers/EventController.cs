@@ -66,13 +66,8 @@ namespace OSBLE.Controllers
         [CanPostEvent]
         public ActionResult Create()
         {
-            DateTime StartTime = new DateTime();
-            DateTime Endtime = new DateTime();
-            CourseController cc = new CourseController();
             //all times will display based off of course timezone.
-            int utcOffset = (ActiveCourseUser.AbstractCourse as Course).TimeZoneOffset;
-  //          TimeZoneInfo tz = cc.getTimeZone(utcOffset);
-
+            int utcOffset = ((Course) ActiveCourseUser.AbstractCourse).TimeZoneOffset;
 
             Event e = new Event();
 
@@ -167,15 +162,20 @@ namespace OSBLE.Controllers
             if (ModelState.IsValid)
             {
                 //locate timezone offset
-                int courseOffset = (ActiveCourseUser.AbstractCourse).GetType() != typeof(Community) ? ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset : 0;
-                CourseController cc = new CourseController();
-                TimeZoneInfo tz = cc.getTimeZone(courseOffset);
+                //int courseOffset = (ActiveCourseUser.AbstractCourse).GetType() != typeof(Community) ? ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset : 0;
+                //CourseController cc = new CourseController();
+                //TimeZoneInfo tz = cc.getTimeZone(courseOffset);
 
                 //now convert the time to utc
-                if (e.EndDate != null)
-                    e.EndDate = TimeZoneInfo.ConvertTimeToUtc((DateTime)e.EndDate, tz);
+                //if (e.EndDate != null)
+                //    e.EndDate = TimeZoneInfo.ConvertTimeToUtc((DateTime)e.EndDate, tz);
 
-                e.StartDate = TimeZoneInfo.ConvertTimeToUtc(e.StartDate, tz);
+                //e.StartDate = TimeZoneInfo.ConvertTimeToUtc(e.StartDate, tz);
+
+                if (e.EndDate != null)
+                    e.EndDate = ((DateTime) e.EndDate).CourseToUTC(ActiveCourseUser.AbstractCourseID);
+
+                e.StartDate = e.StartDate.CourseToUTC(ActiveCourseUser.AbstractCourseID);
 
                 db.Events.Add(e);
                 db.SaveChanges();
@@ -385,16 +385,13 @@ namespace OSBLE.Controllers
                 ViewBag.IncludeEndDate = "";
             }
 
-            //locate timezone offset
-            int courseOffset = (ActiveCourseUser.AbstractCourse).GetType() != typeof(Community) ? ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset : 0;
-            CourseController cc = new CourseController();
-            TimeZoneInfo tz = cc.getTimeZone(courseOffset);
-
             //convert times from utc to show correctly for editing
-            e.StartTime = TimeZoneInfo.ConvertTimeFromUtc(e.StartDate, tz);
+  //          e.StartTime = e.StartTime.UTCToCourse(ActiveCourseUser.AbstractCourseID);
+            e.StartDate = e.StartDate.UTCToCourse(ActiveCourseUser.AbstractCourseID);
+
             if (e.EndDate != null)
             {
-                e.EndTime = TimeZoneInfo.ConvertTimeFromUtc((DateTime)e.EndDate, tz);
+                e.EndTime = ((DateTime)e.EndDate).UTCToCourse(ActiveCourseUser.AbstractCourseID);
             }
             else
             {
@@ -444,14 +441,9 @@ namespace OSBLE.Controllers
             originalEvent.Title = e.Title;
             originalEvent.Description = e.Description;
 
-            //locate timezone offset
-            int courseOffset = (ActiveCourseUser.AbstractCourse).GetType() != typeof(Community) ? ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset : 0;
-            CourseController cc = new CourseController();
-            TimeZoneInfo tz = cc.getTimeZone(courseOffset);
 
-
-            originalEvent.StartDate = TimeZoneInfo.ConvertTimeToUtc(e.StartDate, tz);
-            originalEvent.StartTime = TimeZoneInfo.ConvertTimeToUtc(e.StartTime, tz);
+            originalEvent.StartDate = e.StartDate.CourseToUTC(ActiveCourseUser.AbstractCourseID);
+            originalEvent.StartTime = e.StartTime.CourseToUTC(ActiveCourseUser.AbstractCourseID);
 
             if (!Request.Form.AllKeys.Contains("IncludeEndDate"))
             {
@@ -459,8 +451,8 @@ namespace OSBLE.Controllers
             }
             else
             {
-                originalEvent.EndDate = TimeZoneInfo.ConvertTimeToUtc((DateTime)e.EndDate, tz);
-                originalEvent.EndTime = TimeZoneInfo.ConvertTimeToUtc((DateTime)e.EndTime, tz);
+                originalEvent.EndDate = ((DateTime)e.EndDate).CourseToUTC(ActiveCourseUser.AbstractCourseID);
+                originalEvent.EndTime = ((DateTime)e.EndTime).CourseToUTC(ActiveCourseUser.AbstractCourseID);
                 //make sure that the end date happens after the start
                 if ((DateTime)originalEvent.EndDate < originalEvent.StartDate)
                 {

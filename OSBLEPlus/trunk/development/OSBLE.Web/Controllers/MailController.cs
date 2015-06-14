@@ -361,7 +361,7 @@ namespace OSBLE.Controllers
                 // AJ: Keep the ContextID the same if this is a reply to avoid confusion
 
                 mail.Context = db.Courses.Where(b => b.ID == mail.ContextID).FirstOrDefault();
-                
+
                 if (recipient_string != null)
                 {
                     recipients = recipient_string.Split(',');
@@ -512,14 +512,12 @@ namespace OSBLE.Controllers
                     Course course = ActiveCourseUser.AbstractCourse as Course;
                     if (course != null)
                     {
-                        int utcOffset = course.TimeZoneOffset;
-                        TimeZoneInfo tz = cc.getTimeZone(utcOffset);
 
                         mail.Subject = "RE: " + mail.Subject;
                         // Prefix each line with a '> '
                         mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
-                                       mail.FromUserProfile.LastName + "\nSent at: " + 
-                                       TimeZoneInfo.ConvertTimeFromUtc(mail.Posted, tz).ToString() + "\n\n" +
+                                       mail.FromUserProfile.LastName + "\nSent at: " +
+                                       mail.Posted.UTCToCourse(ActiveCourseUser.AbstractCourseID).ToString() + "\n\n" +
                                        Regex.Replace(mail.Message, "^.*$", "> $&",
                                            RegexOptions.Multiline);
                     }
@@ -555,15 +553,13 @@ namespace OSBLE.Controllers
                     Course course = ActiveCourseUser.AbstractCourse as Course;
                     if (course != null)
                     {
-                        int utcOffset = course.TimeZoneOffset;
-                        TimeZoneInfo tz = cc.getTimeZone(utcOffset);
 
                         recipientList.Add(mail.FromUserProfile); //Adds the sender to the reply list
                         mail.Subject = "RE: " + mail.Subject;
                         // Prefix each line with a '> '
                         mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
                                        mail.FromUserProfile.LastName + "\nSent at: " +
-                                       TimeZoneInfo.ConvertTimeFromUtc(mail.Posted, tz).ToString() + "\n\n" +
+                                       mail.Posted.UTCToCourse(ActiveCourseUser.AbstractCourseID).ToString() + "\n\n" +
                                        Regex.Replace(mail.Message, "^.*$", "> $&",
                                            RegexOptions.Multiline);
                     }
@@ -599,14 +595,12 @@ namespace OSBLE.Controllers
                     Course course = ActiveCourseUser.AbstractCourse as Course;
                     if (course != null)
                     {
-                        int utcOffset = course.TimeZoneOffset;
-                        TimeZoneInfo tz = cc.getTimeZone(utcOffset);
 
                         mail.Subject = "FW: " + mail.Subject;
                         // Prefix each line with a '> '
                         mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
-                                       mail.FromUserProfile.LastName + "\nSent at: " + 
-                                       TimeZoneInfo.ConvertTimeFromUtc(mail.Posted, tz).ToString() + "\n\n" +
+                                       mail.FromUserProfile.LastName + "\nSent at: " +
+                                       mail.Posted.UTCToCourse(ActiveCourseUser.AbstractCourseID).ToString() + "\n\n" +
                                        Regex.Replace(mail.Message, "^.*$", "> $&",
                                            RegexOptions.Multiline);
                     }

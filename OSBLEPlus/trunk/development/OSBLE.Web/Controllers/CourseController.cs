@@ -753,7 +753,7 @@ namespace OSBLE.Controllers
 
             if (course.ID != ActiveCourseUser.AbstractCourseID)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Home");
             }
 
             NameValueCollection parameters = Request.Params;
@@ -977,8 +977,7 @@ namespace OSBLE.Controllers
 
                     //tmp holders
                     if (p.RubricID != null)
-                        prid = (int)p.RubricID;                 
-
+                        prid = (int)p.RubricID;
                     //we are now ready for copying
                     Assignment na = new Assignment();
                     na = p;
@@ -992,11 +991,6 @@ namespace OSBLE.Controllers
                     na.ReviewTeams = new List<ReviewTeam>();
                     na.Deliverables = new List<Deliverable>();
     
-                    // add course users to assignment
-                    if (!p.HasTeams)
-                    {
-                        PutDefaultTeamsInAssignment(na);
-                    }
 
                     //recalcualte new offsets for due dates on assignment
                     if (p.CriticalReviewPublishDate != null)
@@ -1118,7 +1112,6 @@ namespace OSBLE.Controllers
                         db.Entry(na).State = EntityState.Modified;
                         db.SaveChanges();
                     }
-
                     //abet stuff should prolly go here
                 }
                 return true;
@@ -1126,40 +1119,6 @@ namespace OSBLE.Controllers
             catch
             {
                 return false;
-            }
-        }
-
-        private void PutDefaultTeamsInAssignment(Assignment a)
-        {
-            // Get the list of Course Users
-            List<CourseUser> users = (from cu in db.CourseUsers
-                                      where cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID
-                                      && cu.AbstractRole.CanSubmit
-                                      orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
-                                      select cu).ToList();
-
-            //Creates an assignment team for each CourseUser who can submit documents (students)
-            //The team name will be "FirstName LastName"
-            foreach (CourseUser cu in users)
-            {
-                //Creating team
-                Team team = new Team();
-                team.Name = cu.UserProfile.FirstName + " " + cu.UserProfile.LastName;
-
-                //Creating Tm and adding them to team
-                TeamMember tm = new TeamMember()
-                {
-                    CourseUserID = cu.ID
-                };
-                team.TeamMembers.Add(tm);
-
-                //Creating the assignment team and adding it to the assignment
-                AssignmentTeam at = new AssignmentTeam()
-                {
-                    Team = team,
-                    Assignment = a
-                };
-                a.AssignmentTeams.Add(at);
             }
         }
 
