@@ -5,6 +5,7 @@ using System.Web;
 using System.ComponentModel.DataAnnotations;
 using OSBLE.Models.HomePage;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.SqlTypes;
 
 namespace OSBLE.Models.Assignments
 {
@@ -101,6 +102,9 @@ namespace OSBLE.Models.Assignments
         {
             if (other == null)
             {
+                // need to set this to the min value otherwise there is a conversion error on null
+                this.InitialPostDueDate = (DateTime) SqlDateTime.MinValue;
+                this.InitialPostDueDueTime = (DateTime) SqlDateTime.MinValue;
                 return;
             }
             this.AnonymitySettings = other.AnonymitySettings;

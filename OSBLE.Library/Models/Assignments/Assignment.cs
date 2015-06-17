@@ -32,6 +32,10 @@ namespace OSBLE.Models.Assignments
         {
             this.AssignmentDescription = other.AssignmentDescription;
             this.AssignmentName = other.AssignmentName;
+            foreach (AssignmentTeam at in other.AssignmentTeams)
+            {
+                this.AssignmentTeams.Add(new AssignmentTeam(at));
+            }
             this.AssignmentTypeID = other.AssignmentTypeID;
             this.AssociatedEventID = other.AssociatedEventID;
             this.CommentCategoryID = other.CommentCategoryID;
@@ -47,7 +51,7 @@ namespace OSBLE.Models.Assignments
             this.DueDate = other.DueDate;
             this.HoursLateWindow = other.HoursLateWindow;
             this.HoursPerDeduction = other.HoursPerDeduction;
-            this.ID = other.ID;
+            //this.ID = other.ID;  make sure not to copy 
             this.IsDraft = other.IsDraft;
             this.PrecededingAssignmentID = other.PrecededingAssignmentID;
             this.ReleaseDate = other.ReleaseDate;
@@ -493,8 +497,6 @@ namespace OSBLE.Models.Assignments
                 return Enum.GetValues(typeof(AssignmentTypes)).Cast<AssignmentTypes>().ToList();
             }
         }
-
-
 
         #endregion
     }
