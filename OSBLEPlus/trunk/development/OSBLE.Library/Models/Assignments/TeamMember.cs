@@ -8,8 +8,21 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OSBLE.Models.Assignments
 {
+    [Serializable]
     public class TeamMember : IModelBuilderExtender
     {
+        public TeamMember()
+        {
+            
+        }
+
+        public TeamMember(TeamMember other)
+        {
+            this.CourseUserID = other.CourseUserID;
+            this.CourseUser = other.CourseUser;
+            this.TeamID = other.TeamID;
+            this.Team = other.Team;
+        }
         [Key]
         [Column(Order=0)]
         public int TeamID { get; set; }

@@ -7,10 +7,28 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OSBLE.Models.Assignments
 {
+    [Serializable]
     public class AssignmentTeam : IAssignmentTeam
     {
         private DateTime? _submissionTime;
         private bool _submissionTimeAccessed = false;
+
+        public AssignmentTeam()
+        {
+            
+        }
+
+        public AssignmentTeam(AssignmentTeam other)
+        {
+            if (other == null)
+            {
+                return;
+            }
+
+            this.AssignmentID = other.AssignmentID;
+            this.Team = other.Team;
+        }
+
 
         [Key]
         [Column(Order=0)]

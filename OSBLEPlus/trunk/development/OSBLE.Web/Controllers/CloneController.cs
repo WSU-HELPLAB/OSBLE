@@ -200,8 +200,8 @@ namespace OSBLE.Controllers
                     if (p.RubricID != null)
                         prid = (int)p.RubricID;
                     //we are now ready for copying
-                    Assignment na = new Assignment();
-                    na = p;
+                    Assignment na = new Assignment(p);
+                    //na = p;
                     na.CourseID = courseDestination.ID; //rewrite course id
                     na.IsDraft = true;
                     na.AssociatedEvent = null;
@@ -212,13 +212,14 @@ namespace OSBLE.Controllers
                     na.ReviewTeams = new List<ReviewTeam>();
                     na.Deliverables = new List<Deliverable>();
 
+                    SetUpClonedAssignmentTeams(p, na);
 
                     //recalcualte new offsets for due dates on assignment
                     if (p.CriticalReviewPublishDate != null)
                     {
                         na.CriticalReviewPublishDate = ((DateTime)(p.CriticalReviewPublishDate)).Add(new TimeSpan(Convert.ToInt32(difference), 0, 0, 0));
                     }
-                    CourseController cc = new CourseController();
+                    //CourseController cc = new CourseController();
                     // to retain the time incase of in differt daylightsavings .. shifts
                     //DateTime dd = cc.convertFromUtc(courseSource.TimeZoneOffset, na.DueDate);
                     //DateTime dt = cc.convertFromUtc(courseSource.TimeZoneOffset, na.DueTime);
@@ -553,22 +554,37 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index", "Assignment");
         }
 
-        // this creates the assignment teams for the coned assignment
-        private void SetUpClonedAssignmentTeams(Assignment assignment)
+        // this creates the assignment teams for the cloned assignment
+        private void SetUpClonedAssignmentTeams(Assignment oldAssignment, Assignment newAssignment)
         {
+            List<CourseUser> users = (from cu in db.CourseUsers
+                                      where cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID
+                                      && cu.AbstractRole.CanSubmit
+                                      orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
+                                      select cu).ToList();
 
-            bool assignmentTeamsExist = (from at in db.AssignmentTeams
-                                         where at.AssignmentID == assignment.ID
-                                         select at).Any();
-            //Only set up default teams if teams don't already exist
-            if (assignment.ID == 0 || !assignmentTeamsExist)
+            bool teams = false;
+            int students = users.Count;
+            int numberOfTeams = oldAssignment.AssignmentTeams.Count;
+
+            //get actual number of users from the old assignment
+            int oldAmountOfUsers = 0;
+            List<AssignmentTeam> teamsFromPreviousAssignment = oldAssignment.AssignmentTeams.ToList();
+
+            foreach (AssignmentTeam at in teamsFromPreviousAssignment)
             {
-                        List<CourseUser> users = (from cu in db.CourseUsers
-                                          where cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID
-                                          && cu.AbstractRole.CanSubmit
-                                          orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
-                                          select cu).ToList();
+                oldAmountOfUsers += at.Team.TeamMembers.Count;
+            }
 
+            // base the logic off of the previous assignment
+            if ((int)Math.Round((decimal)oldAmountOfUsers / numberOfTeams) != 1)
+            {
+                teams = true;
+            }
+
+            //No teams, students each get their own team
+            if (!teams)
+            {
                 //Creates an assignment team for each CourseUser who can submit documents (students)
                 //The team name will be "FirstName LastName"
                 foreach (CourseUser cu in users)
@@ -588,9 +604,46 @@ namespace OSBLE.Controllers
                     AssignmentTeam at = new AssignmentTeam()
                     {
                         Team = team,
-                        Assignment = assignment
+                        Assignment = newAssignment
                     };
-                    assignment.AssignmentTeams.Add(at);
+                    newAssignment.AssignmentTeams.Add(at);
+                }
+            }
+            // use the same number of teams from the previous assignment
+            else
+            {
+                int i = 0;
+                const string teamName = "Team ";
+                int teamNameNumber = 1;
+                while (students > 0)
+                {
+                    // get the maximum amount of students per team on each iteration
+                    int maxStudentsPerTeam = (int) Math.Ceiling((decimal)students/numberOfTeams);
+
+                    Team team = new Team();
+                    team.Name = teamName + teamNameNumber;
+                    while (maxStudentsPerTeam > 0)
+                    {
+                        TeamMember tm = new TeamMember()
+                        {
+                            CourseUserID = users[i].ID
+                        };
+                        team.TeamMembers.Add(tm);
+
+                        i++;
+                        students--;
+                        maxStudentsPerTeam--;
+                    }
+
+                    AssignmentTeam at = new AssignmentTeam()
+                    {
+                        Team = team,
+                        Assignment = newAssignment
+                    };
+                    newAssignment.AssignmentTeams.Add(at);
+
+                    numberOfTeams--;
+                    teamNameNumber++;
                 }
             }
         }
