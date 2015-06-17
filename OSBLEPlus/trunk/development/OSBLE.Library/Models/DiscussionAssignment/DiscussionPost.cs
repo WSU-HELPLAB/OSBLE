@@ -53,6 +53,15 @@ namespace OSBLE.Models.DiscussionAssignment
             Posted = DateTime.UtcNow;
         }
 
+        public DiscussionPost(DiscussionPost src) : this()
+        {
+            AssignmentID = src.AssignmentID;
+            CourseUserID = src.CourseUserID;
+            DiscussionTeamID = src.DiscussionTeamID;
+            ParentPostID = src.ParentPostID;
+            Content = src.Content;
+        }
+
         public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
         {
             modelBuilder.Entity<DiscussionPost>()

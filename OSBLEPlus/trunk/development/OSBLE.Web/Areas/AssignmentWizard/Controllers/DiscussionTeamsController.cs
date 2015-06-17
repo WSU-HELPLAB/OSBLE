@@ -214,6 +214,9 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     int courseUserId = 0;
                     Int32.TryParse(studentKey.Split('_')[1], out courseUserId);
 
+                    // Copy any initial posts made on a different team
+                    CopyInitialPosts(team, courseUserId);
+
                     TeamMember tm = new TeamMember();
                     tm.TeamID = team.ID;
                     tm.CourseUserID = courseUserId;
@@ -267,7 +270,26 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
         }
 
+        // CT: Work in progress
+        private void CopyInitialPosts(Team team, int courseUserId)
+        {
+            return;
 
+            foreach (DiscussionPost post in Assignment.GetInitialPostsForCourseUserID(courseUserId))
+            {
+                int dtID = 0;
+                // TODO: Make Dapper Call to get discussion team id from team id/
+
+                if (post.DiscussionTeamID != dtID) // user was moved, take their inital posts with them.
+                {
+                    // Make a copy
+                    DiscussionPost postCopy = new DiscussionPost(post);
+                    postCopy.DiscussionTeamID = dtID;
+                    db.DiscussionPosts.Add(postCopy);
+                    db.SaveChanges();
+                }
+            }
+        }
 
         [HttpPost]
         public override ActionResult Index(Assignment model)
