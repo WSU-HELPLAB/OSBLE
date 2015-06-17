@@ -8,6 +8,7 @@ using System.ComponentModel.DataAnnotations;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.HomePage;
 using System.ComponentModel.DataAnnotations.Schema;
+using OSBLE.Models.DiscussionAssignment;
 
 namespace OSBLE.Models.Assignments
 {
@@ -429,6 +430,11 @@ namespace OSBLE.Models.Assignments
                 }
             }
             return returnVal;
+        }
+
+        public List<DiscussionPost> GetInitialPostsForCourseUserID(int courseUserID)
+        {
+            return new List<DiscussionPost>();
         }
 
         /// <summary>
