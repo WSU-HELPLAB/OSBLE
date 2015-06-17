@@ -92,7 +92,7 @@ SELECT UserName = a.Email,
        Identification = Cast(a.InstitutionId AS VARCHAR(32)),
        IsAdmin = CASE WHEN a.RoleValue = 8 THEN 1 ELSE 0 END,
        CanCreateCourses = CASE WHEN a.RoleValue = 4 or a.RoleValue = 8 THEN 1 ELSE 0 END,
-       DefaultCourse = a.DefaultCourseId,-- convert
+       DefaultCourse = ac.ID,
        EmailAllNotifications = a.ReceiveNotificationEmails,
        EmailAllActivityPosts = a.ReceiveEmailOnNewFeedPost,
        EmailNewDiscussionPosts = a.ReceiveEmailOnNewAskForHelp
