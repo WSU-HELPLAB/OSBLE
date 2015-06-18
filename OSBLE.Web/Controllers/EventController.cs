@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Entity;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Web.Mvc;
 using System.IO;
@@ -9,9 +11,13 @@ using OSBLE.Models.Courses;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Assignments;
 using OSBLE.Models;
-
-
-
+using Dapper;
+using DotNetOpenAuth.OpenId.Extensions.SimpleRegistration;
+using OSBLEPlus.Logic;
+using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
+using System.Configuration;
+using OSBLE.Models.Users;
+using OSBLEPlus.Logic.Utility;
 
 
 namespace OSBLE.Controllers
@@ -525,6 +531,39 @@ namespace OSBLE.Controllers
                                    && e.StartDate <= EndDate
                                    && e.Approved
                                    select e).ToList();
+
+            // NOTE to AJ: This is where I need to change the type from Event to List<FeedItems> for OSBLEPlus
+
+            //List<FeedItems> events;
+
+            /////////////////////////////////////
+            /// TEST CODE FOR AJ USING DAPPER ///
+            /////////////////////////////////////
+            /*using (SqlConnection sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                                List<CourseUser> users = (from cu in db.CourseUsers
+                                      where cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID
+                                      && cu.AbstractRole.CanSubmit
+                                      orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
+                                      select cu).ToList();
+                
+                List<CourseUser>testUsers = sqlConnection.Query<CourseUser>("SELECT * FROM CourseUsers " +
+                                                                 "WHERE AbstractCourseID = @activeCourseId " +
+                                                                 "AND AbstractRoleID = @roleId",
+                    new {activeCourseId = ActiveCourseUser.AbstractCourseID, roleId = (int)CourseRole.CourseRoles.Student }).ToList();
+
+                foreach (CourseUser cu in testUsers)
+                {
+                    cu.AbstractCourse = ActiveCourseUser.AbstractCourse;
+
+                    cu.UserProfile = sqlConnection.Query<UserProfile>("SELECT * FROM UserProfiles " +
+                                                     "WHERE UserProfileID = ID").FirstOrDefault();
+
+                    
+
+                }
+            }*/
+            
             //yc: daylight savings thigns
             //int courseOffset = ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset;
             int courseOffset = (ActiveCourseUser.AbstractCourse).GetType() != typeof(Community) ? ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset : 0;
