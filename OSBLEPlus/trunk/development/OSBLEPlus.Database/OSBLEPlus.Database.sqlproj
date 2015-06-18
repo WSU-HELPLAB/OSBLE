@@ -215,7 +215,4 @@
   <ItemGroup>
     <Build Include="Schema\Tables\FeedPostUserTags.sql" />
   </ItemGroup>
-  <ItemGroup>
-    <RefactorLog Include="OSBLEPlus.Database.refactorlog" />
-  </ItemGroup>
 </Project>
