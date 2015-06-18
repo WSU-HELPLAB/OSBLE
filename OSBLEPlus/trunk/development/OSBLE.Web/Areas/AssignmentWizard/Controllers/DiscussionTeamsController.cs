@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -7,6 +8,8 @@ using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Models.DiscussionAssignment;
 using OSBLE.Areas.AssignmentWizard.Models;
+using OSBLEPlus.Logic.Utility;
+using Dapper;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -273,18 +276,32 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         // CT: Work in progress
         private void CopyInitialPosts(Team team, int courseUserId)
         {
-            return;
-
-            foreach (DiscussionPost post in Assignment.GetInitialPostsForCourseUserID(courseUserId))
+            using (var connection = new SqlConnection(StringConstants.ConnectionString))
             {
-                int dtID = 0;
-                // TODO: Make Dapper Call to get discussion team id from team id/
+                // Get the DiscussionTeamID from the team ID
+                var discussionTeamID = connection.Query<int>(
+                        "SELECT Top 1 [ID] FROM DiscussionTeams WHERE TeamID = @id",
+                        new {id = team.ID}).First();
+                
+                // Check to see if this user has made any posts as part of this team, if they have, then they
+                // haven't been switched from a previous team, and we don't need to worry about copying their posts. 
+                // This also helps to iliminate duplicating posts more than once.
+                var existingPosts = connection.Query(
+                        "SELECT * FROM DiscussionPosts WHERE DiscussionTeamID = @did AND CourseUserID = @cid",
+                        new {did = discussionTeamID, cid = courseUserId});
+                if (existingPosts.Any())
+                    return;
+                
+                // Get all initial posts made by this user for this assignment (note: initial posts have null ParentPostID)
+                var initialPosts = connection.Query<DiscussionPost>(
+                    "SELECT * FROM DiscussionPosts WHERE CourseUserID = @cid AND AssignmentID = @aid AND ParentPostID IS NULL",
+                    new {cid = courseUserId, aid = Assignment.ID});
 
-                if (post.DiscussionTeamID != dtID) // user was moved, take their inital posts with them.
+                foreach (DiscussionPost post in initialPosts)
                 {
-                    // Make a copy
+                    //// Make a copy
                     DiscussionPost postCopy = new DiscussionPost(post);
-                    postCopy.DiscussionTeamID = dtID;
+                    postCopy.DiscussionTeamID = discussionTeamID;
                     db.DiscussionPosts.Add(postCopy);
                     db.SaveChanges();
                 }

@@ -432,11 +432,6 @@ namespace OSBLE.Models.Assignments
             return returnVal;
         }
 
-        public List<DiscussionPost> GetInitialPostsForCourseUserID(int courseUserID)
-        {
-            return new List<DiscussionPost>();
-        }
-
         /// <summary>
         /// Returns the number of new posts across all teams for the given user, for this assignment
         /// </summary>
