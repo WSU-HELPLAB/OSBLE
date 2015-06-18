@@ -281,7 +281,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 // Get the DiscussionTeamID from the team ID
                 var discussionTeamID = connection.Query<int>(
                         "SELECT Top 1 [ID] FROM DiscussionTeams WHERE TeamID = @id",
-                        new {id = team.ID}).First();
+                        new {id = team.ID}).SingleOrDefault();
                 
                 // Check to see if this user has made any posts as part of this team, if they have, then they
                 // haven't been switched from a previous team, and we don't need to worry about copying their posts. 
@@ -297,14 +297,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     "SELECT * FROM DiscussionPosts WHERE CourseUserID = @cid AND AssignmentID = @aid AND ParentPostID IS NULL",
                     new {cid = courseUserId, aid = Assignment.ID});
 
+                // Change the DiscussionTeamID to corespond to the new team
                 foreach (DiscussionPost post in initialPosts)
-                {
-                    //// Make a copy
-                    DiscussionPost postCopy = new DiscussionPost(post);
-                    postCopy.DiscussionTeamID = discussionTeamID;
-                    db.DiscussionPosts.Add(postCopy);
-                    db.SaveChanges();
-                }
+                    post.DiscussionTeamID = discussionTeamID;
+
+                // Copy all initial posts by re-inserting them with the new DiscussionTeamID
+                connection.Execute(
+                        "INSERT DiscussionPosts (Posted, CourseUserID, Content, AssignmentID, DiscussionTeamID) VALUES (@Posted, @CourseUserID, @Content, @AssignmentID, @DiscussionTeamID)",
+                        initialPosts);
             }
         }
 
