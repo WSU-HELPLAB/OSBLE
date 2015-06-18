@@ -11,11 +11,12 @@ SET IDENTITY_INSERT [dbo].[EventLogs] ON;
 
 
 INSERT INTO [dbo].[EventLogs]
-           ([Id], [EventTypeId], [EventDate], [SenderId])
+           ([Id], [EventTypeId], [EventDate], [SenderId], [CourseId])
 SELECT Id = a.ID, 
 EventTypeId = CASE WHEN a.Parent_ID IS NULL THEN 7 ELSE 9 END,
 EventDate = a.Posted,
-SenderId = u.UserProfileID
+SenderId = u.UserProfileID,
+CourseId = u.AbstractCourseID
 FROM [dbo].[AbstractDashboards] a
 INNER JOIN [dbo].[CourseUsers] u
 		ON a.CourseUserID = u.ID

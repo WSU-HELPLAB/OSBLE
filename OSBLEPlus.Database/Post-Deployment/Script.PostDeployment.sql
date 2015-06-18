@@ -19,10 +19,13 @@ Post-Deployment Script Template
 :r "Static Data\EventTypes.sql"
 :r "Static Data\Schools.sql"
 
+-- Move OSBLE dashboard posts to osbide
+--:r "Activity Imports\MovePosts.sql"
+
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 -- seeds
---------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 :r "Seeds\Courses.sql"
 :r "Seeds\UserProfiles.sql"
@@ -78,10 +81,6 @@ Post-Deployment Script Template
 --:r "Activity Imports\11_ErrorListItems.sql"
 --:r "Activity Imports\12_BuildEventErrorListItems.sql"
 --:r "Activity Imports\13_CodeDocumentErrorListItems.sql"
-
-
--- Move OSBLE dashboard posts to osbide
---:r "Activity Imports\MovePosts.sql"
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
