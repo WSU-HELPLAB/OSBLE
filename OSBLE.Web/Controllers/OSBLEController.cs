@@ -241,7 +241,14 @@ namespace OSBLE.Controllers
             // otherwise
             //     do nothing because it has been set by the user (call to HomeController's SetDashboardMode method)
             var returnValue = false;
-            var cacheResult = Cache["DashboardSingleCourseMode"];
+            bool? cacheResult;
+            try { cacheResult = (bool?)Cache["DashboardSingleCourseMode"]; }
+            catch (Exception) // IOException
+            {
+                // this occurs when the Cache file is being used by another program, usually this is because an instance of
+                // the FileCache is calculating the size or cleaning
+                cacheResult = null;
+            }
             if (cacheResult == null || bool.TryParse(cacheResult.ToString(), out returnValue))
             {
                 returnValue = true;
