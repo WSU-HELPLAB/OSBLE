@@ -137,6 +137,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Areas\Analytics\AnalyticsAreaRegistration.cs" />
+    <Compile Include="Areas\Analytics\Controllers\AnalyticsController.cs" />
     <Compile Include="Areas\Analytics\Controllers\CalendarController.cs" />
     <Compile Include="Areas\AssessmentWizard\AssessmentWizardAreaRegistration.cs" />
     <Compile Include="Areas\AssessmentWizard\Controllers\AssessmentBaseController.cs" />
@@ -338,7 +339,6 @@
     <Content Include="Areas\AssignmentWizard\Controllers\README.txt" />
     <Content Include="clientaccesspolicy.xml" />
     <Content Include="Content\bootstrap.min.css" />
-    <Content Include="Content\bootstrap.min.js" />
     <Content Include="Content\images\alert.png" />
     <Content Include="Content\favicon.ico" />
     <Content Include="Content\images\account.png" />
@@ -657,6 +657,7 @@
     <Content Include="Areas\AssessmentWizard\Views\ReviewOfStudentWork\Index.cshtml" />
     <Content Include="Areas\AssessmentWizard\Views\CommitteeReview\Index.cshtml" />
     <Content Include="Resources\CSVReader\CSVCellReaderStateMachine.png" />
+    <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\contextMenu.js" />
     <Content Include="Scripts\CourseFileManager.js" />
     <Content Include="Scripts\CourseFilesUploader.js" />
@@ -675,6 +676,7 @@
     <Content Include="Areas\AssignmentWizard\Views\AnchoredDiscussionDocuments\Index.cshtml" />
     <Content Include="Areas\Analytics\Views\Calendar\Calendar.cshtml" />
     <Content Include="Areas\Analytics\Views\Web.config" />
+    <Content Include="Areas\Analytics\Views\Analytics\Index.cshtml" />
     <None Include="Properties\PublishProfiles\filesystem.pubxml" />
     <None Include="Scripts\jquery-2.0.1.intellisense.js" />
     <Content Include="Scripts\jquery-2.0.1.js" />
