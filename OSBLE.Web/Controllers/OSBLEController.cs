@@ -275,7 +275,7 @@ namespace OSBLE.Controllers
                     false),
                 new MenuItem("Committee Settings", "Committee", "Edit", true, true, true, false, false, true, true, true),
                 new MenuItem("Administration", "Admin", "Index", false, false, false, true, false, false, false),
-                new MenuItem("Analytics", "Calendar", "Index", false, false, false, true, false, false, false, false,
+                new MenuItem("Analytics", "Analytics", "Index", false, false, false, true, false, false, false, false,
                     "Analytics")
             };
 
