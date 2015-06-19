@@ -207,6 +207,7 @@
     <Build Include="Schema\Stored Procedures\Activiities\InsertPostTags.sql" />
     <Build Include="Schema\Stored Procedures\Profiles\GetCourses.sql" />
     <Build Include="Schema\Stored Procedures\Profiles\LogUserTransaction.sql" />
+    <None Include="Post-Deployment\Activity Imports\MovePosts.sql" />
     <Build Include="Schema\Tables\FeedPostUserSettings.sql" />
   </ItemGroup>
   <ItemGroup>
@@ -215,4 +216,10 @@
   <ItemGroup>
     <Build Include="Schema\Tables\FeedPostUserTags.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="OSBLEPlus.Database.publish.xml" />
+  </ItemGroup>
+  <PropertyGroup>
+    <PostBuildEvent>sqlpackage /Action:Publish /SourceFile:"OSBLEPlus.Database.dacpac" /pr:..\..\OSBLEPlus.Database.publish.xml</PostBuildEvent>
+  </PropertyGroup>
 </Project>
