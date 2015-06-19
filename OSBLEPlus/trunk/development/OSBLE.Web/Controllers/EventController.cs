@@ -659,6 +659,20 @@ namespace OSBLE.Controllers
                 }
             }
 
+
+            // CT note: added this to keep some views from crashing when the event's poster was null.
+            // this should probably be consolidated with the rest of the dapper code once complete if possible
+            using (SqlConnection connection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                foreach(Event e in events)
+                {
+                    if (e.Poster == null)
+                    {
+                        e.Poster = connection.Query<CourseUser>("SELECT TOP 1 FROM CourseUsers WHERE ID = @id", new { id = e.PosterID }).SingleOrDefault();
+                    }
+                }
+            }
+
             return events.OrderBy(e => e.ID).OrderBy(e => e.StartDate).ToList();
         }
     
