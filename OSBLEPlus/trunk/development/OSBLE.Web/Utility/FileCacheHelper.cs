@@ -21,6 +21,7 @@ namespace OSBLE.Utility
             FileCache fc = new FileCache(FileSystem.GetCachePath(), new ObjectBinder());
             fc.DefaultRegion = client.ID.ToString();
             fc.DefaultPolicy = new CacheItemPolicy() { SlidingExpiration = new TimeSpan(7, 0, 0, 0) };
+            fc.MaxCacheSize = 2000000000; // 2GB
             return fc;
         }
 
