@@ -1,5 +1,30 @@
-﻿@{
+﻿@using OSBLE.Areas.Analytics.Controllers
+
+@{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Analytics</h1>
+@Styles.Render("~/Areas/Analytics/Content/AnalyticsIndex.css")
+<style type="text/css"></style>
+
+<div id="analyticsMenu">
+    <ul>
+        <li >
+        <a href="#" class="menu_item current">
+            DEFAULT
+        </a>
+    </li>
+        <li >
+            @Ajax.ActionLink("Calendar", "Index", "Calendar", null, new AjaxOptions { UpdateTargetId = "analytics_content" }, new { @class = "menu_item" })
+        </li>
+        <li >
+            @Ajax.ActionLink("Timeline", "Index", "Timeline", null, new AjaxOptions { UpdateTargetId = "analytics_content" }, new { @class = "menu_item" })
+        </li>
+    </ul>
+</div>
+<div id="analytics_content">
+    @Html.Partial("~/Areas/Analytics/Views/_Default.cshtml")
+</div>
+
+<script src="@Url.Content("~/Scripts/jquery.unobtrusive-ajax.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Areas/Analytics/Scripts/AnalyticsIndex.js")" type="text/javascript"></script>

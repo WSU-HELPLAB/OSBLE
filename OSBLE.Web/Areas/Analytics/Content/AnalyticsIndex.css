@@ -1,0 +1,56 @@
+﻿/* Analytics Menu starts here */
+#analyticsMenu {
+width: 200px;
+float:left;
+}
+
+#analyticsMenu ul
+{
+font-family: Arial, Helvetica, sans-serif;
+list-style-type: circle;
+list-style-position:inside;
+margin:0;
+padding:0;
+}
+#analyticsMenu li
+{
+display: inline;
+/* for IE5 and IE6 */
+}
+
+#analyticsMenu a
+{
+color: #483000;
+text-decoration: none;
+font-size: 14px;
+display: block;
+padding: 3px;
+width: 160px;
+background-color: #fff;
+border-bottom: 1px solid #fff;
+}
+
+#analyticsMenu a:link, #analyticsMenu a:visited
+{
+color: #483000;
+text-decoration: none;
+}
+
+#analyticsMenu a:hover
+{
+border-left: 3px solid cornflowerblue;
+color: #000;
+}
+
+.menu_item.current
+{
+border-left: 3px solid darkslategray;
+background: #F0F0F0;
+color: #000;
+    padding-left: 2px;
+}
+
+.menu_item li{
+    
+}
+/* Analytics Menu ends here */
