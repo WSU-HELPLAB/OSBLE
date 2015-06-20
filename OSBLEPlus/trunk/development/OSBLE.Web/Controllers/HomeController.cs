@@ -1,13 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Net.Mail;
 using System.Web.Mvc;
+using System.Threading.Tasks;
+using DotNetOpenAuth.Messaging;
 using OSBLE.Attributes;
 using OSBLE.Models.Courses;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;
 using OSBLE.Utility;
+using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
+using OSBLEPlus.Logic.Utility.Lookups;
+using OSBLEPlus.Services.Controllers;
 
 namespace OSBLE.Controllers
 {
@@ -136,6 +142,27 @@ namespace OSBLE.Controllers
             List<DashboardPost> pagedDashboardPosts = dashboardPosts.Skip(startPost)
                 .Take(postsPerPage)
                 .ToList();
+
+
+            // AJ: To get the feed items to populate our list we can get them from this method, we need to get the 
+            // results.Result to have a proper list of feed items.
+            //var results = new FeedController().Get(
+            //                        (DateTime)SqlDateTime.MinValue, // DateReceivedMin (DateTime)
+            //                        DateTime.Now, // DateRecievedMax (DateTime)
+            //                        null,         //EventLogIds (int)
+            //                        new List<int> { (int)EventType.FeedPostEvent, (int)EventType.LogCommentEvent }, // EventTypes (List<int>)
+            //                        ActiveCourseUser.AbstractCourseID, // CourseID (int)
+            //                        null, //roleId (int)
+            //                        null, //commentFilter (string)
+            //                        null);//SenderIds (List<int>)
+
+            //var awaiter = results.GetAwaiter();
+
+            //while (!awaiter.IsCompleted) { ; } // do nothing
+
+            //List<FeedItem> posts = (List<FeedItem>) awaiter.GetResult();
+            
+
 
             // Set up display settings for each post (recursively sets up replies.)
             foreach (DashboardPost dp in pagedDashboardPosts)
