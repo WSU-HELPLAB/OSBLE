@@ -139,6 +139,7 @@
     <Compile Include="Areas\Analytics\AnalyticsAreaRegistration.cs" />
     <Compile Include="Areas\Analytics\Controllers\AnalyticsController.cs" />
     <Compile Include="Areas\Analytics\Controllers\CalendarController.cs" />
+    <Compile Include="Areas\Analytics\Controllers\TimelineController.cs" />
     <Compile Include="Areas\AssessmentWizard\AssessmentWizardAreaRegistration.cs" />
     <Compile Include="Areas\AssessmentWizard\Controllers\AssessmentBaseController.cs" />
     <Compile Include="Areas\AssessmentWizard\Controllers\HomeController.cs" />
@@ -314,7 +315,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Code\Libraries\LumenWorks.Framework.IO.dll" />
+    <Content Include="Areas\Analytics\Content\AnalyticsIndex.css" />
     <Content Include="Areas\Analytics\Content\loading.gif" />
+    <Content Include="Areas\Analytics\Scripts\AnalyticsIndex.js" />
     <Content Include="Areas\Analytics\Scripts\Calendar.js" />
     <Content Include="Areas\Analytics\Scripts\TrendingCalendar.js" />
     <Content Include="Areas\AssignmentDetails\Content\css\Home.css" />
@@ -677,6 +680,9 @@
     <Content Include="Areas\Analytics\Views\Calendar\Calendar.cshtml" />
     <Content Include="Areas\Analytics\Views\Web.config" />
     <Content Include="Areas\Analytics\Views\Analytics\Index.cshtml" />
+    <Content Include="Areas\Analytics\Views\Calendar\_Calendar.cshtml" />
+    <Content Include="Areas\Analytics\Views\Timeline\_Timeline.cshtml" />
+    <Content Include="Areas\Analytics\Views\_Default.cshtml" />
     <None Include="Properties\PublishProfiles\filesystem.pubxml" />
     <None Include="Scripts\jquery-2.0.1.intellisense.js" />
     <Content Include="Scripts\jquery-2.0.1.js" />
