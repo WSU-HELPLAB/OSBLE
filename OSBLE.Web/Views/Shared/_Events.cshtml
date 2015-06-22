@@ -26,7 +26,8 @@
         
         //Convert from UTC to course time, so we can check which events 
         //actually will appear as the same day
-        DateTime tmpDateNew = e.StartDate.UTCToCourse(e.Poster.AbstractCourseID);
+        int courseID = ViewBag.ActiveCourseUser.AbstractCourseID;
+        DateTime tmpDateNew = e.StartDate.UTCToCourse(courseID);
              
         if (tmpLastDate.Date != tmpDateNew.Date)
         {
@@ -34,7 +35,7 @@
             tmpLastDate = tmpDateNew;           
         <li class="event_date">
             <time class="course-local-time">
-                @ShowDate(lastDate.UTCToCourse(e.Poster.AbstractCourseID))
+                @ShowDate(lastDate.UTCToCourse(courseID))
             </time>
         </li>
         }
@@ -65,7 +66,7 @@
             {
                 <div class="event_time">
                     <time class="course-local-time">
-                        @ShowEventTime(e.StartDate.UTCToCourse(e.Poster.AbstractCourseID), e)
+                        @ShowEventTime(e.StartDate.UTCToCourse(courseID), e)
                     </time>
              
                     @if ((e.EndDate != null))
@@ -80,7 +81,7 @@
                         @:&mdash;
 
                         <time class="course-local-time">
-                            @ShowEventTime(endDate.UTCToCourse(e.Poster.AbstractCourseID), e) 
+                            @ShowEventTime(endDate.UTCToCourse(courseID), e) 
                        </time>
                     }
 
