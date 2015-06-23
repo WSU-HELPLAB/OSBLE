@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using OSBLEPlus.Logic.DataAccess.Activities;
 using OSBLEPlus.Logic.DataAccess.Profiles;
 using OSBLEPlus.Logic.DomainObjects.Helpers;
+using OSBLEPlus.Logic.DomainObjects.Interfaces;
 using OSBLEPlus.Logic.DomainObjects.Profiles;
 using OSBLEPlus.Logic.Utility.Auth;
 
@@ -16,6 +17,36 @@ namespace OSBLEPlus.Services.Controllers
 {
     public class UserProfilesController : ApiController
     {
+        public HttpResponseMessage Login(string e, string hp, IAuthentication auth = null)
+        {
+            if (!UserDataAccess.ValidateUser(e, hp))
+                return new HttpResponseMessage { StatusCode = HttpStatusCode.Unauthorized };
+
+            var user = UserDataAccess.GetByName(e);
+            if (user == null)
+                return new HttpResponseMessage { StatusCode = HttpStatusCode.Unauthorized };
+
+            if (auth == null)
+                auth = new Authentication();
+
+            auth.LogIn(user);
+            UserDataAccess.LogUserTransaction(user.UserId, DateTime.Now);
+
+            return new HttpResponseMessage
+            {
+                Content = new StringContent(user.UserId.ToString()),
+                StatusCode = HttpStatusCode.OK
+            };
+        }
+
+        public IUser GetActiveUser(string a, IAuthentication auth = null)
+        {
+            if (auth == null)
+                auth = new Authentication();
+
+            return auth.GetActiveUser(a);
+        }
+
         public bool IsValidKey(string a, IAuthentication auth = null)
         {
             if (auth == null)
