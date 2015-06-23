@@ -459,6 +459,17 @@ namespace OSBLE.Controllers
             dp.CourseUser = ActiveCourseUser;
             dp.Posted = DateTime.UtcNow;
 
+            //AJ: Start of what we will need for a new post on the activity feed
+            //FeedItem f = new FeedItem();
+
+            //f.Comments = null;
+            //f.Event = new FeedPostEvent()
+            //{
+            //    Comment = Convert.ToString(Request.Form["Content"]),
+            //    EventDate = DateTime.Now,
+
+            //};
+
             List<CourseUser> coursesToPost = new List<CourseUser>();
 
             bool sendEmail = Convert.ToBoolean(Request.Form["send_email"]);
