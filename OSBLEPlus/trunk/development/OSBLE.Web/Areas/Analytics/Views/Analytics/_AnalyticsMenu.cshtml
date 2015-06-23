@@ -1,0 +1,18 @@
+﻿
+@Styles.Render("~/Areas/Analytics/Content/AnalyticsIndex.css")
+
+<div class="nav analytics">
+    <ul>
+        <li class="">
+            @Ajax.ActionLink("Default", "Index", "Default", null, new AjaxOptions { UpdateTargetId = "analytics_content" }, new { @class = "menu_item current" })           
+        </li>
+        <li class="">
+            @Ajax.ActionLink("Calendar", "GetCalendar", "Calendar", null, new AjaxOptions { UpdateTargetId = "analytics_content" }, new { @class = "menu_item" })
+        </li>
+        <li class="">
+            @Ajax.ActionLink("Timeline", "Index", "Timeline", null, new AjaxOptions { UpdateTargetId = "analytics_content" }, new { @class = "menu_item" })
+        </li>
+        <li class="menu_item"><a href="#">[Other]</a></li>
+    </ul>
+</div>
+

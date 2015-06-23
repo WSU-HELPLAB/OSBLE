@@ -65,6 +65,7 @@ div[data-wzstep="DataVisualization"] div[data-type="spinner"] img {
 
 .calendar-section {
     margin-top: 15px;
+    float: right;
 }
 
 .calendar-section h4 {
