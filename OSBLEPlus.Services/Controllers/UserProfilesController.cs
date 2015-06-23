@@ -29,12 +29,12 @@ namespace OSBLEPlus.Services.Controllers
             if (auth == null)
                 auth = new Authentication();
 
-            auth.LogIn(user);
+            var hash = auth.LogIn(user);
             UserDataAccess.LogUserTransaction(user.UserId, DateTime.Now);
 
             return new HttpResponseMessage
             {
-                Content = new StringContent(user.UserId.ToString()),
+                Content = new StringContent(hash),
                 StatusCode = HttpStatusCode.OK
             };
         }
