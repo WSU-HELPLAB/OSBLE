@@ -159,6 +159,7 @@
     <Compile Include="Areas\Analytics\AnalyticsAreaRegistration.cs" />
     <Compile Include="Areas\Analytics\Controllers\AnalyticsController.cs" />
     <Compile Include="Areas\Analytics\Controllers\CalendarController.cs" />
+    <Compile Include="Areas\Analytics\Controllers\DefaultController.cs" />
     <Compile Include="Areas\Analytics\Controllers\TimelineController.cs" />
     <Compile Include="Areas\AssessmentWizard\AssessmentWizardAreaRegistration.cs" />
     <Compile Include="Areas\AssessmentWizard\Controllers\AssessmentBaseController.cs" />
@@ -337,9 +338,12 @@
   <ItemGroup>
     <Content Include="App_Code\Libraries\LumenWorks.Framework.IO.dll" />
     <Content Include="Areas\Analytics\Content\AnalyticsIndex.css" />
+    <Content Include="Areas\Analytics\Content\Calendar.css" />
     <Content Include="Areas\Analytics\Content\loading.gif" />
     <Content Include="Areas\Analytics\Scripts\AnalyticsIndex.js" />
     <Content Include="Areas\Analytics\Scripts\Calendar.js" />
+    <Content Include="Areas\Analytics\Scripts\d3-tip.min.js" />
+    <Content Include="Areas\Analytics\Scripts\d3.min.js" />
     <Content Include="Areas\Analytics\Scripts\TrendingCalendar.js" />
     <Content Include="Areas\AssignmentDetails\Content\css\Home.css" />
     <Content Include="Areas\AssignmentDetails\Content\js\Home.js" />
@@ -698,12 +702,16 @@
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\AnchoredDiscussionSubmissionDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\AnchoredDiscussionSubmitDecorator.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\AnchoredDiscussionDocuments\Index.cshtml" />
-    <Content Include="Areas\Analytics\Views\Calendar\Calendar.cshtml" />
     <Content Include="Areas\Analytics\Views\Web.config" />
     <Content Include="Areas\Analytics\Views\Analytics\Index.cshtml" />
     <Content Include="Areas\Analytics\Views\Calendar\_Calendar.cshtml" />
     <Content Include="Areas\Analytics\Views\Timeline\_Timeline.cshtml" />
-    <Content Include="Areas\Analytics\Views\_Default.cshtml" />
+    <Content Include="Areas\Analytics\Views\Calendar\_CalendarOptions.cshtml" />
+    <Content Include="Areas\Analytics\Views\Analytics\_AnalyticsMenu.cshtml" />
+    <Content Include="Areas\Analytics\Views\Timeline\_TimelineOptions.cshtml" />
+    <Content Include="Areas\Analytics\Views\Analytics\_Default.cshtml" />
+    <Content Include="Areas\Analytics\Views\Default\_Default.cshtml" />
+    <Content Include="Areas\Analytics\Views\Default\_DefaultOptions.cshtml" />
     <None Include="Properties\PublishProfiles\filesystem.pubxml" />
     <None Include="Scripts\jquery-2.0.1.intellisense.js" />
     <Content Include="Scripts\jquery-2.0.1.js" />

@@ -1,56 +1,113 @@
-﻿/* Analytics Menu starts here */
-#analyticsMenu {
-width: 200px;
-float:left;
+﻿
+/* override Site.css content width*/
+#content {
+    width: 100%;
+    margin: 0px;
 }
 
-#analyticsMenu ul
-{
-font-family: Arial, Helvetica, sans-serif;
-list-style-type: circle;
-list-style-position:inside;
-margin:0;
-padding:0;
-}
-#analyticsMenu li
-{
-display: inline;
-/* for IE5 and IE6 */
+#analytics_menu {
+    clear: both;
 }
 
-#analyticsMenu a
-{
-color: #483000;
-text-decoration: none;
-font-size: 14px;
-display: block;
-padding: 3px;
-width: 160px;
-background-color: #fff;
-border-bottom: 1px solid #fff;
+#analytics_options {
+    float: left;
+    width: 20%;
+    margin-left: 1%;
+    margin-right: 1%;
+   /* background: green; */
 }
 
-#analyticsMenu a:link, #analyticsMenu a:visited
-{
-color: #483000;
-text-decoration: none;
+#analytics_content {
+    float: left;
+    width: 75%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 1%;
+    /*background: purple;*/
 }
 
-#analyticsMenu a:hover
-{
-border-left: 3px solid cornflowerblue;
-color: #000;
+/*Menu selection*/
+.menu_item.current {
+    border-left: 3px solid #0b4874;
+    border-right: 3px solid #0b4874;
+    background: #F0F0F0;
+    color: #000;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
-.menu_item.current
-{
-border-left: 3px solid darkslategray;
-background: #F0F0F0;
-color: #000;
-    padding-left: 2px;
+.menu_item a, .menu_item a:link, .menu_item a:visited, .menu_item a:hover, .menu_item a:active {
+    color: #0b4874;
 }
 
-.menu_item li{
-    
+* {
+    margin: 0;
+    padding: 0;
+    outline: none;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
-/* Analytics Menu ends here */
+
+.nav .analytics {
+    width: 100%;
+}
+
+.nav ul {
+    list-style: none;
+    background-color: #e6e6e6;
+    margin: 0;
+}
+
+.nav li {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.2em;
+    line-height: 40px;
+    height: 40px;
+    border-bottom: 1px solid #888;
+    text-align: center;
+}
+
+.nav a {
+    text-decoration: none;
+    color: #0b4874;
+    display: block;
+    -webkit-transition: .3s background-color;
+    -moz-transition: .3s background-color;
+    -ms-transition: .3s background-color;
+    -o-transition: .3s background-color;
+    transition: .3s background-color;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+    .nav a:hover {
+        background-color: #005f5f;
+    }
+
+    .nav a.active {
+        background-color: #191970;
+        color: #444;
+        cursor: default;
+    }
+
+@media screen and (min-width: 600px) {
+    .nav li {
+        width: auto;
+        border-bottom: none;
+        height: 50px;
+        line-height: 50px;
+        font-size: 1.4em;
+    }
+
+    .nav li {
+        float: left;
+    }
+
+    .nav ul {
+        overflow: auto;
+        width: auto;
+        margin: 0 auto;
+        clear: both;
+    }
+}
