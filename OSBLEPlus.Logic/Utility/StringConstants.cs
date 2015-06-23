@@ -154,6 +154,14 @@ namespace OSBLEPlus.Logic.Utility
             get { return Assembly.GetExecutingAssembly().GetName().Version.ToString(); }
         }
 
+        public static string DocumentationUrl
+        {
+            get
+            {
+                return "http://osble.codeplex.com/documentation";
+            }
+        }
+
         public const string SqlHelperScopeIdentityName = "@scope_id";
     }
 }
