@@ -11,4 +11,10 @@
         public LogCommentEvent[] LogCommentEvents { get; set; }
         public SubmitEvent[] SubmitEvents { get; set; }
     }
+
+    public class SubmissionRequest
+    {
+        public string AuthToken { get; set; }
+        public SubmitEvent SubmitEvent { get; set; }
+    }
 }

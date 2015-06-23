@@ -19,17 +19,17 @@ AS
               )
 
             INSERT INTO @hashtagTable
-            SELECT Tag=items,
+            SELECT Tag=Items,
                    isInTable = CASE
                                  WHEN b.Content IS NULL THEN 0
                                  ELSE 1
                                END
             FROM   dbo.Split(@hashtags, ',') a
                    LEFT JOIN dbo.HashTags b
-                          ON b.Content = a.items
+                          ON b.Content = a.Items
 
             INSERT INTO dbo.HashTags
-            SELECT content = tag
+            SELECT content = Tag
             FROM   @hashtagTable
             WHERE  isInTable = 0
 
@@ -49,7 +49,7 @@ AS
               )
 
             INSERT INTO @nameTable
-            SELECT NAME = items
+            SELECT NAME = Items
             FROM   dbo.Split(@usertags, ',')
 
             INSERT INTO FeedPostUserTags

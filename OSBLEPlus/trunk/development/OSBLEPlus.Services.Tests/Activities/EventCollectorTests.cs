@@ -1,17 +1,13 @@
 ﻿using System;
-using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using System.Web;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using OSBLEPlus.Logic.DataAccess.Profiles;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
 using OSBLEPlus.Logic.Utility;
 using OSBLEPlus.Logic.Utility.Lookups;
-using OSBLEPlus.Services.Controllers;
 
 namespace OSBLEPlus.Services.Tests.Activities
 {

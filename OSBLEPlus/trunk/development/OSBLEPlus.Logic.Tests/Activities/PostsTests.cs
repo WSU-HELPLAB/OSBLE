@@ -25,7 +25,7 @@ namespace OSBLEPlus.Logic.Tests.Activities
             var result = Posts.Post(events);
 
             // Assert
-            Assert.IsTrue(result);
+            Assert.IsTrue(result > 0);
         }
 
         private static IEnumerable<IActivityEvent> Events
