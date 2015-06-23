@@ -5,8 +5,8 @@
 GO
 
 ;
-CREATE NONCLUSTERED INDEX IX_EventLogs_CreatedDate
-  ON [dbo].[EventLogs] ([CreatedDate])
+CREATE NONCLUSTERED INDEX IX_EventLogs_DataReceived
+  ON [dbo].[EventLogs] ([DateReceived])
   INCLUDE ([Id], [EventTypeId], [SenderId])
 
 GO

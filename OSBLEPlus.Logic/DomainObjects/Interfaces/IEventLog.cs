@@ -11,5 +11,7 @@ namespace OSBLEPlus.Logic.DomainObjects.Interfaces
         DateTime EventDate { get; set; }
         int SenderId { get; set; }
         IUser Sender { get; set; }
+        int? CourseId { get; set; }
+        long? BatchId { get; set; }
     }
 }

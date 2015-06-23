@@ -18,9 +18,9 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
         public override string GetInsertScripts()
         {
             var sql = string.Format(@"
-INSERT INTO dbo.EventLogs (EventTypeID, EventDate, CreatedDate, SenderId) VALUES ({0}, '{1}', '{2}', {3})
+INSERT INTO dbo.EventLogs (EventTypeID, EventDate, CreatedDate, SenderId) VALUES ({0}, '{1}', '{2}', {3}, {6})
 INSERT INTO dbo.FeedPostEvents (EventLogId, EventDate, SolutionName, Comment)
-VALUES (SCOPE_IDENTITY(), '{1}', '{4}', '{5}')", EventTypeId, EventDate, DateTime.Now, SenderId, SolutionName, Comment);
+VALUES (SCOPE_IDENTITY(), '{1}', '{4}', '{5}')", EventTypeId, EventDate, DateTime.Now, SenderId, SolutionName, Comment, BatchId);
 
             var hashTags = GetMentionTags();
             var userTags = GetMentionTags();

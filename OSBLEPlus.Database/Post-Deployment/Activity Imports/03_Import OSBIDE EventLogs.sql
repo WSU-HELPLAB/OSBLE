@@ -14,7 +14,7 @@ IF NOT EXISTS(SELECT 1
            Id          INT IDENTITY,
            EventTypeId INT NOT NULL,
            EventDate   DATETIME NOT NULL,
-           CreatedDate DATETIME NOT NULL,
+           DateReceived DATETIME NOT NULL,
            SenderId    INT NOT NULL,
            CONSTRAINT PK_EventLogs_Id PRIMARY KEY CLUSTERED (Id),
            CONSTRAINT FK_EventLogs_EventTypes FOREIGN KEY (EventTypeId) REFERENCES EventTypes(EventTypeId),
@@ -54,7 +54,7 @@ WHEN NOT MATCHED BY Target THEN
   INSERT ([Id],
           [EventTypeId],
           [EventDate],
-          [CreatedDate],
+          [DateReceived],
           [SenderId])
   VALUES ( Source.[Id],
            Source.[EventTypeId],

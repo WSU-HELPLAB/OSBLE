@@ -136,8 +136,8 @@ AS
                              AND fp.Comment LIKE @CommentFilter
                              AND ef.EventTypeId = 7
                              AND fp.Id > 0
-            WHERE  s.CreatedDate BETWEEN @DateReceivedMin AND @DateReceivedMax
-            ORDER  BY s.CreatedDate DESC
+            WHERE  s.[DateReceived] BETWEEN @DateReceivedMin AND @DateReceivedMax
+            ORDER  BY s.[DateReceived] DESC
         END
       ELSE
         BEGIN
@@ -183,8 +183,8 @@ AS
                           ON eif1.Id = s.Id
                    LEFT JOIN #eventLogIdFilter eif2
                           ON Len(@EventLogIds) = 0
-            WHERE  s.CreatedDate BETWEEN @DateReceivedMin AND @DateReceivedMax
-            ORDER  BY s.CreatedDate DESC
+            WHERE  s.[DateReceived] BETWEEN @DateReceivedMin AND @DateReceivedMax
+            ORDER  BY s.[DateReceived] DESC
         END
 
       -- event logs' comments

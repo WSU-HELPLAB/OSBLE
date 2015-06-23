@@ -70,7 +70,6 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Activities\FeedControllerMock.cs" />
     <Compile Include="Activities\FeedControllerTests.cs" />
     <Compile Include="Activities\EventCollectorTests.cs" />
     <Compile Include="Analytics\CalendarDay.cs" />
@@ -88,6 +87,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Activities\EventCollectorTests.Mocks.cs" />
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>

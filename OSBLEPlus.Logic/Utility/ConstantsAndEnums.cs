@@ -5,6 +5,18 @@ using System.Text;
 
 namespace OSBLEPlus.Logic.Utility
 {
+    public enum VsComponent
+    {
+        None,
+        FeedOverview,
+        FeedDetails,
+        Chat,
+        UserProfile,
+        CreateAccount,
+        AskTheProfessor,
+        GenericComponent
+    };
+
     public enum DebugActions
     {
         Undefined = -1,

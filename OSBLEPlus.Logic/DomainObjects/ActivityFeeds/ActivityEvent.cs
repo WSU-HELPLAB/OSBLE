@@ -26,6 +26,8 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             get { return EventType.ToString().ToDisplayText(); }
         }
         public string SolutionName { get; set; }
+        public int? CourseId { get; set; }
+        public long? BatchId { get; set; }
 
         // Helper method to efficiently generate TSQL insert scripts
         // Don't use property, since the activities need to be serialized to go across the wire

@@ -3,7 +3,7 @@ BEGIN
 
 	SET IDENTITY_INSERT [dbo].[EventLogs] ON;
 
-	INSERT INTO [dbo].[EventLogs] ([Id], [EventTypeId],[EventDate],[CreatedDate],[SenderId], [CourseId])
+	INSERT INTO [dbo].[EventLogs] ([Id], [EventTypeId],[EventDate],[DateReceived],[SenderId],[CourseId])
 	VALUES
 	 (4699,4,'2014-02-01 00:00:45.807','2014-02-01 00:00:52.180',18, (ABS(CHECKSUM(NewId())) % 8)+1)
 	,(4700,10,'2014-02-01 00:02:02.483','2014-02-01 00:02:08.813',18, (ABS(CHECKSUM(NewId())) % 8)+1)

@@ -95,11 +95,14 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Attributes\AllowAdmin.cs" />
     <Compile Include="Attributes\AllowWebClients.cs" />
+    <Compile Include="Controllers\AssemblyInfoController.cs" />
     <Compile Include="Controllers\CalendarDayController.cs" />
     <Compile Include="Controllers\CalendarController.cs" />
+    <Compile Include="Controllers\CourseController.cs" />
     <Compile Include="Controllers\EventCollectionController.Helper.cs" />
     <Compile Include="Controllers\EventCollectionController.cs" />
     <Compile Include="Controllers\FeedController.cs" />
+    <Compile Include="Controllers\UserProfilesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

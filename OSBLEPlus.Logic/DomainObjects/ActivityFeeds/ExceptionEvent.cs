@@ -15,12 +15,12 @@
         public override string GetInsertScripts()
         {
             return string.Format(@"
-INSERT INTO dbo.EventLogs (EventTypeID, EventDate, SenderId) VALUES ({0}, '{1}', {2})
+INSERT INTO dbo.EventLogs (EventTypeID, EventDate, SenderId) VALUES ({0}, '{1}', {2}, {12})
 INSERT INTO dbo.ExceptionEvents (EventLogId,EventDate,SolutionName,ExceptionType,ExceptionName,ExceptionCode,ExceptionDescription,ExceptionAction,DocumentName,LineNumber,LineContent)
 VALUES (SCOPE_IDENTITY(), '{1}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}', '{11}')",
             EventTypeId, EventDate, SenderId, SolutionName,
             ExceptionType, ExceptionName, ExceptionCode, ExceptionDescription, ExceptionAction,
-            DocumentName, LineNumber, LineContent);
+            DocumentName, LineNumber, LineContent, BatchId);
         }
     }
 }

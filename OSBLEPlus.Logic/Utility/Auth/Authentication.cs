@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Runtime.Caching;
-using System.Security.Cryptography;
-using System.Text;
 using System.Web;
 
+using OSBLE.Models.Users;
 using OSBLEPlus.Logic.DataAccess.Profiles;
 using OSBLEPlus.Logic.DomainObjects.Interfaces;
 
 namespace OSBLEPlus.Logic.Utility.Auth
 {
-    public class Authentication
+    public class Authentication : IAuthentication
     {
         private readonly FileCache _cache;
         private const string UserNameKey = "UserName";
@@ -41,6 +40,7 @@ namespace OSBLEPlus.Logic.Utility.Auth
             try
             {
                 id = (int)_cache[authToken];
+                UserDataAccess.LogUserTransaction(id, DateTime.Now);
             }
             catch (Exception)
             {
@@ -104,7 +104,7 @@ namespace OSBLEPlus.Logic.Utility.Auth
             var cookie = new HttpCookie(ProfileCookieKey);
 
             //compute hash for this login attempt
-            var hash = ComputeHash(profile.Email);
+            var hash = GetPasswordHash(profile.Email);
 
             //store profile in the authentication hash
             _cache[hash] = profile.UserId;
@@ -137,26 +137,9 @@ namespace OSBLEPlus.Logic.Utility.Auth
                 httpCookie.Expires = DateTime.UtcNow.AddDays(-1d);
         }
 
-        /// <summary>
-        /// Computes a hash of the given text. Adds a bit of salt using the current date.
-        /// </summary>
-        /// <returns></returns>
-        public string ComputeHash(string text)
+        public static string GetPasswordHash(string text)
         {
-            //build our string to hash
-            var date = DateTime.UtcNow.ToLongTimeString();
-            var hashString = text + date;
-
-            //compute the hash
-            using (var sha1 = new SHA1Managed())
-            {
-                var textBytes = Encoding.ASCII.GetBytes(hashString);
-                var hashBytes = sha1.ComputeHash(textBytes);
-                var hashText = BitConverter.ToString(hashBytes);
-
-                //return the hash to the caller
-                return hashText;
-            }
+            return UserProfile.GetPasswordHash(text);
         }
     }
 }

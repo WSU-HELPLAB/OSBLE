@@ -68,9 +68,9 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             var solutionData = BitConverter.ToString(SolutionData ?? GetSolutionBinary());
             solutionData = solutionData.Replace("-", string.Empty);
             return string.Format(@"
-INSERT INTO dbo.EventLogs (EventTypeID, EventDate, SenderId) VALUES ({0}, '{1}', {2})
+INSERT INTO dbo.EventLogs (EventTypeID, EventDate, SenderId) VALUES ({0}, '{1}', {2}, {6})
 INSERT INTO dbo.SubmitEvents (EventLogId, EventDate, SolutionName, AssignmentId, SolutionData)
-VALUES (SCOPE_IDENTITY(), '{1}', '{3}', {4}, 0x{5})", EventTypeId, EventDate, SenderId, SolutionName, AssignmentId, solutionData);
+VALUES (SCOPE_IDENTITY(), '{1}', '{3}', {4}, 0x{5})", EventTypeId, EventDate, SenderId, SolutionName, AssignmentId, solutionData, BatchId);
         }
     }
 }

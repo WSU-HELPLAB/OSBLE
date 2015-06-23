@@ -5,6 +5,9 @@ using System.Linq;
 using System.Text;
 
 using Dapper;
+
+using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
+using OSBLEPlus.Logic.DomainObjects.Helpers;
 using OSBLEPlus.Logic.DomainObjects.Interfaces;
 using OSBLEPlus.Logic.Utility;
 
@@ -14,13 +17,14 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
     {
         private const int BatchSize = 100;
 
-        public static bool Post(IEnumerable<IActivityEvent> events)
+        public static long Post(IEnumerable<IActivityEvent> events)
         {
             try
             {
                 var sql = new StringBuilder();
                 var activityEvents = events as IActivityEvent[] ?? events.ToArray();
                 var batches = activityEvents.Length / BatchSize;
+                var batchId = DateTime.Now.Ticks;
 
                 for (var b = 0; b < batches + 1; b++)
                 {
@@ -33,6 +37,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                     for (var idx = from; idx < to; idx++)
                     {
                         var eventLog = activityEvents[idx];
+                        eventLog.BatchId = batchId;
                         sql.AppendFormat("{0}{1}", eventLog.GetInsertScripts(), Environment.NewLine);
                     }
 
@@ -43,12 +48,52 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                     }
                 }
 
-                return true;
+                return batchId;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //TODO: inject Log4Net to log error details into files
-                return false;
+                return -1;
+            }
+        }
+
+        public static int SubmitAssignment(SubmitEvent submit)
+        {
+            try
+            {
+                var sql = new StringBuilder();
+                sql.AppendFormat("DECLARE {0} INT{1}", StringConstants.SqlHelperScopeIdentityName, Environment.NewLine);
+                sql.AppendFormat("{0}{1}", submit.GetInsertScripts(), Environment.NewLine);
+
+                //execute sql batch insert statements
+                using (var connection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    connection.Execute(sql.ToString());
+                }
+
+                return submit.EventLogId;
+            }
+            catch (Exception)
+            {
+                //TODO: inject Log4Net to log error details into files
+                return -1;
+            }
+        }
+
+        public static int SubmitLocalErrorLog(LocalErrorLog errorLog)
+        {
+            try
+            {
+                //execute sql batch insert statements
+                using (var connection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    return connection.Execute(errorLog.GetInsertScripts());
+                }
+            }
+            catch (Exception)
+            {
+                //TODO: inject Log4Net to log error details into files
+                return -1;
             }
         }
     }
