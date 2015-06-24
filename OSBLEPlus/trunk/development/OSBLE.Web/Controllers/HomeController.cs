@@ -387,17 +387,10 @@ namespace OSBLE.Controllers
         /// Sets active course and redirects back to where we came from.
         /// </summary>
         /// <returns></returns>
-        public ActionResult SetCourse()
+        public ActionResult SetCourse(int courseID)
         {
-            // Sets active course and redirects back to where we came from.
-            if (Request.Form["course"] != null)
-            {
-                int courseId;
-                if (Int32.TryParse(Request.Form["course"], out courseId))
-                {
-                    SetCourseID(courseId);
-                }
-            }
+            // Sets active course.
+            SetCourseID(courseID);
 
             // regardless of whether or not we are successful, we want to return to the dashboard.
             return RedirectToAction("Index");

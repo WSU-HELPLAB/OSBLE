@@ -20,8 +20,8 @@ var cfm_boolMultipleSelected = false;
 // ID will be set.
 function cfm_getListing(targetDIVID) {
     // Get the current course ID
-    var selectCourseObj = document.getElementById("course_select");
-    var courseID = selectCourseObj.value;
+    var selectCourseObj = $("#course_select li.active");
+    var courseID = selectCourseObj != null? selectCourseObj.data("courseid") : 0;
 
     cfm_states = new Array();
 

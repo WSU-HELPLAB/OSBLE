@@ -8,8 +8,7 @@ using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Models.DiscussionAssignment;
 using OSBLE.Areas.AssignmentWizard.Models;
-using OSBLEPlus.Logic.Utility;
-using Dapper;
+using OSBLE.Utility;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -276,35 +275,27 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         // CT: Work in progress
         private void CopyInitialPosts(Team team, int courseUserId)
         {
-            using (var connection = new SqlConnection(StringConstants.ConnectionString))
+            using (var connection = DBHelper.GetNewConnection())
             {
                 // Get the DiscussionTeamID from the team ID
-                var discussionTeamID = connection.Query<int>(
-                        "SELECT Top 1 [ID] FROM DiscussionTeams WHERE TeamID = @id",
-                        new {id = team.ID}).SingleOrDefault();
+                var discussionTeamID = DBHelper.GetDiscussionTeamIDFromTeamID(team.ID, connection);
                 
                 // Check to see if this user has made any posts as part of this team, if they have, then they
                 // haven't been switched from a previous team, and we don't need to worry about copying their posts. 
                 // This also helps to iliminate duplicating posts more than once.
-                var existingPosts = connection.Query(
-                        "SELECT * FROM DiscussionPosts WHERE DiscussionTeamID = @did AND CourseUserID = @cid",
-                        new {did = discussionTeamID, cid = courseUserId});
+                var existingPosts = DBHelper.GetDiscussionPosts(courseUserId, discussionTeamID, connection);
                 if (existingPosts.Any())
                     return;
                 
                 // Get all initial posts made by this user for this assignment (note: initial posts have null ParentPostID)
-                var initialPosts = connection.Query<DiscussionPost>(
-                    "SELECT * FROM DiscussionPosts WHERE CourseUserID = @cid AND AssignmentID = @aid AND ParentPostID IS NULL",
-                    new {cid = courseUserId, aid = Assignment.ID});
+                var initialPosts = DBHelper.GetInitialDiscussionPosts(courseUserId, Assignment.ID, connection);
 
                 // Change the DiscussionTeamID to corespond to the new team
                 foreach (DiscussionPost post in initialPosts)
                     post.DiscussionTeamID = discussionTeamID;
 
                 // Copy all initial posts by re-inserting them with the new DiscussionTeamID
-                connection.Execute(
-                        "INSERT DiscussionPosts (Posted, CourseUserID, Content, AssignmentID, DiscussionTeamID) VALUES (@Posted, @CourseUserID, @Content, @AssignmentID, @DiscussionTeamID)",
-                        initialPosts);
+                DBHelper.InsertDiscussionPosts(initialPosts, connection);
             }
         }
 

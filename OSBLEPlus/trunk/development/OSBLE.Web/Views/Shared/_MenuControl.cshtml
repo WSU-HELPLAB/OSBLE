@@ -1,17 +1,13 @@
-﻿@using OSBLE.Models.Courses
-<div id="tabs">
-    @using OSBLE.Controllers
-    @if (ViewBag.Menu != null)
+﻿
+@if (ViewBag.Menu != null)
+{
+    foreach (OSBLE.Controllers.OSBLEController.MenuItem m in ViewBag.Menu)
     {
-        foreach (OSBLEController.MenuItem m in ViewBag.Menu)
+        if (ViewBag.CurrentUser != null && ViewBag.ActiveCourse != null && m.IsVisibleTo(ViewBag.CurrentUser, ViewBag.ActiveCourse))
         {
-            if (ViewBag.CurrentUser != null && ViewBag.ActiveCourse != null)
-            {
-                if (m.IsVisibleTo(ViewBag.CurrentUser, ViewBag.ActiveCourse))
-                {
-        @Html.ActionLink(@m.Name, @m.Action, @m.Controller, new { area = @m.Area }, new { Class = ViewBag.CurrentTab == @m.Name ? "tab_current" : "" })
-                }
-            }
+            <li class="@(ViewBag.CurrentTab == m.Name?"active":"")">
+                @Html.ActionLink(m.Name, m.Action, m.Controller, new { area = m.Area }, null)
+            </li>
         }
     }
-</div>
+}

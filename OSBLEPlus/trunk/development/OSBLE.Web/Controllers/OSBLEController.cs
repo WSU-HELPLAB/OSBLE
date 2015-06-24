@@ -336,7 +336,19 @@ namespace OSBLE.Controllers
                 int activeCourseId;
 
                 //int sessionAc = 0;// = Cache["ActiveCourse"];
-                var sessionAc = Cache["ActiveCourse"];
+                object sessionAc = null;
+                for (int i = 5; i > 0; i--)
+                {
+                    try
+                    {
+                        sessionAc = Cache["ActiveCourse"];
+                        break;
+                    }
+                    catch
+                    {
+                        System.Threading.Thread.Sleep(200);
+                    }
+                }
 
 
                 if (sessionAc == null || !(sessionAc is int))

@@ -1,13 +1,57 @@
 ﻿@using OSBLE.Models.Courses
+@using OSBLE.Utility
 
-@if (ViewBag.CurrentCourses != null && ViewBag.CurrentCourses.Count > 0)
+@if (ViewBag.ActiveCourseUser != null)
 {
-    @:(@ViewBag.CourseListTitle):<br />
+    using (var connection = DBHelper.GetNewConnection())
+    { 
+        <li class="dropdown" id="course_select">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">@DBHelper.GetCourseShortNameFromID(ViewBag.ActiveCourseUser.AbstractCourseID, connection) <span class="caret"></span></a>
+            <ul class="dropdown-menu">
     
+                @{
+                IEnumerable<CourseUser> courses = DBHelper.GetCoursesFromUserProfileID(ViewBag.ActiveCourseUser.UserProfileID, connection);
+                IEnumerable<CourseUser> communities = DBHelper.GetCommunitiesFromUserProfileID(ViewBag.ActiveCourseUser.UserProfileID, connection);
+                }
+
+                @* First, loop through just courses: *@
+                @if (courses.Any())
+                {
+                    <li class="dropdown-header">Courses</li>
+                    foreach (CourseUser cu in courses)
+                    {
+                        <li class="@(ViewBag.ActiveCourseUser.AbstractCourseID == cu.AbstractCourseID ? "active" : "")" data-courseid="@cu.AbstractCourseID">
+                            @Html.ActionLink(DBHelper.GetCourseFullNameFromCourseUser(cu, connection), "SetCourse", "Home", new { courseID = cu.AbstractCourseID }, null)
+                        </li>
+                    }
+                }
+
+                @* Then, loop through communities: *@
+                @if (communities.Any())
+                {
+                    <li class="dropdown-header">Communities</li>
+                    foreach (CourseUser cu in communities)
+                    {
+                        <li class="@(ViewBag.ActiveCourseUser.AbstractCourseID == cu.AbstractCourseID ? "active" : "")" data-courseid="@cu.AbstractCourseID">
+                            @Html.ActionLink(DBHelper.GetCourseFullNameFromCourseUser(cu, connection), "SetCourse", "Home", new { courseID = cu.AbstractCourseID }, null)
+                        </li>
+                    }
+                }
+
+                <li class="divider"></li>
+                <li><a href="#"><span class="glyphicon glyphicon-search"></span> Find a new course...</a></li>
+                <li><a href="#"><span class="glyphicon glyphicon-trash"></span> Withdraw from course...</a></li>
+                <li class="divider"></li>
+
+            </ul>
+        </li>   
+    }
+}
+    @*
     // Use an HTML form to call Home/SetCourse when the user makes a new selection, DO NOT use AJAX for this, 
     // because it will not be able to reset the page to the dashboard, and there is no need for it to be async.
     using (Html.BeginForm("SetCourse", "Home", new { area = "" }, FormMethod.Post, new { id = "set_course" }))
-    {
+    {        
         @:<select name="course" id="course_select">
         bool courseOptGroup = false;
         bool communityOptGroup = false;
@@ -137,8 +181,11 @@ else
         $('body').append(
        '<div id="course_create_dialog" title="Create"> \
         <p>Would you like to create a course, community or an assessment committee?</p><ul> \
-        <li>@Html.ActionLink("Create Course", "Create", "Course", new { area = "" }, null) </li> \
-@*<li>@Html.ActionLink("Clone Course", "CloneCourse", "Course", new { area = "" }, null) </li>*@ \
+        <li>@Html.ActionLink("Create Course", "Create", "Course", new { area = "" }, null) </li> \*@
+
+    @*<li>@Html.ActionLink("Clone Course", "CloneCourse", "Course", new { area = "" }, null) </li>*@
+
+ @*                                                                                                   
 <li>@Html.ActionLink("Create Community", "Create", "Community", new { area = "" }, null) </li> \
 <li>@Html.ActionLink("Create Assessment Committee", "Create", "Committee", new { area = "" }, null) </li> \
     </ul></div>');
@@ -323,5 +370,4 @@ else if (ViewBag.CurrentUser != null)    //yc adding a withdraw button this user
             }
 
         </script>
-    }
-}
+    }*@
