@@ -2,23 +2,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8" HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE" />
+  
+    <meta charset="utf-8" http-equiv="CACHE-CONTROL" content="NO-CACHE" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>OSBLE - @ViewBag.Title</title>
-    <link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" type="text/css" />
-    <link href="@Url.Content("~/Content/jquery.contextMenu.css")" rel="stylesheet" type="text/css" />
-    <link href="@Url.Content("~/Content/jquery-tooltip.css")" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="/Content/jquery-ui-1.8.13.custom.css" />
-    <link rel="stylesheet" type="text/css" href="/Content/jquery-ui-timepicker.css" />
-    <link rel="shortcut icon" type="text/css" href="/Content/favicon.ico" />
     
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/Site.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery.contextMenu.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery-tooltip.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery-ui-1.8.13.custom.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery-ui-timepicker.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/bootstrap-3.3.5/css/bootstrap.min.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/Site.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/navbar.css")" />
+    <link rel="shortcut icon" type="text/css" href="/Content/favicon.ico" />
+
     <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-2.0.1.min.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-ui-1.10.4.min.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.validate.min.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.unobtrusive-ajax.min.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.contextMenu.js")"></script>
-    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.ui.position.js")"></script>   
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.ui.position.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.cookie.js")"></script>
-    
+
     <script src="@Url.Content("~/Scripts/json2.min.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/modernizr-2.6.2.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/jquery.collapse.js")" type="text/javascript"></script>
@@ -32,48 +39,71 @@
     <script src="@Url.Content("~/Scripts/getUtcOffset.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/time.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/moment.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Content/bootstrap-3.3.5/js/bootstrap.min.js")" type="text/javascript"></script>
+
+
     @RenderSection("Header", required: false)
     @RenderSection("SubHeader", required: false)
-</head>
-<body >
-    <header>
-        <div id="header" >
-            <div id="top_bar">
-                <div id="top_content">
-                        <span class="top_item">
-                        @if (ViewBag.CurrentUser != null)
-                        {
-                            @ViewBag.CurrentUser.FirstName
-                            <text> </text>
-                            @ViewBag.CurrentUser.LastName
-                            
-                        }</span>
-                        <a href="@Url.Action("Index", "Mail", new { area="" })" title="Mail Messages" class="top_item"><img src="/Content/images/mail.png" alt="Mail" /> (@ViewBag.UnreadMessageCount)</a>
-                        <a href="@Url.Action("Profile", "Account", new { area = "" })" title="View Personal Settings" class="top_item"><img src="/Content/images/account.png" alt="Account" /></a>
-                    <a href="@Url.Action("Index", "Help", new { area = "" })" title="Help" class="top_item"><img src="@Url.Content("~/Content/images/help_top_menu.png")" alt="Help" /></a>
-                    <a href="@Url.Action("LogOff", "Account", new { area = "" })" title="Log Off" class="top_item"><img src="/Content/images/logoff.png" alt="Logoff" /></a>
+
+    </head>
+    <body>
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container-fluid">
+
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#osbleNavbar">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a href="/"><img src="@Url.Content("~/Content/images/navbar_logo.png")" alt="OSBLE" id="logo" /></a>
+                </div>
+
+                <div class="collapse navbar-collapse" id="osbleNavbar">
+                    <ul class="nav navbar-nav">
+                        @Html.Partial("_MenuControl")
+                        @Html.Partial("_CourseList")
+                    </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+
+                        <li class="dropdown">
+                            <a id="profile_selector" class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <img id="profile_pic" class="hidden-xs" src="@Url.Action("Picture", "User", new { id = ViewBag.ActiveCourseUser.UserProfileID, size = 30 })" />
+                                @ViewBag.CurrentUser.FirstName 
+                                @ViewBag.CurrentUser.LastName
+                                @if (ViewBag.UnreadMessageCount > 0)
+                                { 
+                                    <sup><span class="badge messages">@ViewBag.UnreadMessageCount</span></sup> 
+                                }
+                                <span class="caret"></span>
+                            </a>
+
+                            <ul class="dropdown-menu">
+                                <li><a href="@Url.Action("Index", "Mail", new { area="" })"><span class="glyphicon glyphicon-envelope"></span> Mail (@ViewBag.UnreadMessageCount)</a></li>
+                                <li><a href="@Url.Action("Profile", "Account", new { area = "" })"><span class="glyphicon glyphicon-user"></span> View Profile</a></li>
+                                <li><a href="@Url.Action("Profile", "Account", new { area = "" })"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
+                                <li class="divider"></li>
+                                <li><a href="@Url.Action("LogOff", "Account", new { area = "" })"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="@Url.Action("Index", "Help", new { area = "" })" title="Help">
+                                <span class="glyphicon glyphicon-question-sign"></span>
+                                <span id="helptext"> Help</span>
+                            </a>
+                        </li>
+
+                    </ul>
                 </div>
             </div>
-            <div id="logo">
-                <a href="/"><img src="/Content/images/logo.png" alt="OSBLE Logo" /></a>
+        </nav>
+        <section id="main" data-service-path="@ConfigurationManager.AppSettings["DataServiceUrl"]">
+            <div class="container-fluid" id="main_container">
+                @RenderBody()
             </div>
-            <div id="logo_text">
-                <a href="/"><img src="/Content/images/logo_text.png" alt="OSBLE" /></a>
-            </div>
-            <div id="courses">
-                @Html.Partial("_CourseList")
-            </div>
-        </div>
-    </header>
-    <nav>
-        @Html.Partial("_MenuControl")
-    </nav>
-    <section id="main" data-service-path="@ConfigurationManager.AppSettings["DataServiceUrl"]">
-        <div id="content">
-            @RenderBody()
-        </div>
-    </section>
-    <footer>
-    </footer>
+        </section>
 </body>
 </html>
