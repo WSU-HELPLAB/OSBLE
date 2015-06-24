@@ -4,15 +4,17 @@ using OSBLE.Models.Assignments;
 using System.Linq;
 using System.Security.Cryptography;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using OSBLE.Models.Courses;
 using System.Runtime.Serialization;
 using System.IO;
+using OSBLE.Interfaces;
 
 namespace OSBLE.Models.Users
 {
     [Serializable]
     [DataContract]
-    public class UserProfile : IModelBuilderExtender
+    public class UserProfile : IModelBuilderExtender, IUser
     {
         [DataMember]
         [Required]
@@ -73,6 +75,56 @@ namespace OSBLE.Models.Users
         /// </summary>
         [DataMember]
         public bool EmailNewDiscussionPosts { get; set; }
+
+        // extra items need by Dapper, and OSBLEPlus.Services, these are implemented as wrapper items
+
+        // Used by IModelBuilderExtender
+        public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
+        {
+        }
+
+        // IUser interface
+        [NotMapped]
+        public int UserId
+        {
+            get { return ID; }
+            set { ID = value; }
+        }
+
+        // IUser interface
+        [NotMapped]
+        public string Email
+        {
+            get { return UserName; }
+            set { UserName = value; }
+        }
+
+        // IUser interface
+        [NotMapped]
+        public string FullName
+        {
+            get { return FirstName + " " + LastName; }
+        }
+
+        // IUser interface
+        [NotMapped]
+        public int SchoolId
+        {
+            get { return SchoolID; }
+            set { SchoolID = value; }
+        }
+
+        // IUser interface
+        [NotMapped]
+        public int DefaultCourseId
+        {
+            get { return DefaultCourse; }
+            set { DefaultCourse = value; }
+        }
+
+        // IUser interface
+        [NotMapped]
+        public IProfileCourse DefalutCourse { get; set; }   // Mis-spelled but leaving it for all the references in Services
 
         public enum sortEmailBy
         {
@@ -226,10 +278,6 @@ namespace OSBLE.Models.Users
                 return true;
             }
             return false;
-        }
-
-        public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
-        {
         }
     }
 }

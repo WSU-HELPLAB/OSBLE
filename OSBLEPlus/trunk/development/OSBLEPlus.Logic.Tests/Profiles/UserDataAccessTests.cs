@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OSBLEPlus.Logic.DataAccess.Profiles;
 
+
 namespace OSBLEPlus.Logic.Tests.Profiles
 {
     [TestClass]

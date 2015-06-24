@@ -7,10 +7,11 @@ using System.Linq;
 using Dapper;
 
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
-using OSBLEPlus.Logic.DomainObjects.Interfaces;
+using OSBLEPlus.Logic.DomainObjects.Interface;
 using OSBLEPlus.Logic.DomainObjects.Profiles;
 using OSBLEPlus.Logic.Utility;
 using OSBLEPlus.Logic.Utility.Lookups;
+using OSBLE.Interfaces;
 
 namespace OSBLEPlus.Logic.DataAccess.Activities
 {

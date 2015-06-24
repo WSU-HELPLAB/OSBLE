@@ -1,6 +1,6 @@
 ﻿using System;
+using OSBLE.Interfaces;
 using OSBLE.Models.Assignments;
-using OSBLEPlus.Logic.DomainObjects.Interfaces;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {

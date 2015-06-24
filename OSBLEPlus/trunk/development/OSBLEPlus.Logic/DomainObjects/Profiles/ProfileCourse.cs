@@ -1,5 +1,5 @@
 ﻿using System;
-using OSBLEPlus.Logic.DomainObjects.Interfaces;
+using OSBLE.Interfaces;
 
 namespace OSBLEPlus.Logic.DomainObjects.Profiles
 {

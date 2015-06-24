@@ -124,6 +124,10 @@
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\OSBLE.Library\OSBLE.Library.csproj">
+      <Project>{6873caf7-4914-4b62-af7e-bfffa0a9ffd4}</Project>
+      <Name>OSBLE.Library</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OSBLEPlus.Logic\OSBLEPlus.Logic.csproj">
       <Project>{cd97e12a-c4c1-4319-8809-9a3a0eb9d302}</Project>
       <Name>OSBLEPlus.Logic</Name>

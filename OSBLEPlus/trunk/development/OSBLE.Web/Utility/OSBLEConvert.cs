@@ -1,7 +1,5 @@
-﻿using System.Web.Providers.Entities;
-using OSBLE.Controllers;
-using OSBLE.Models.Courses;
-using OSBLEPlus.Logic.DomainObjects.Interfaces;
+﻿using OSBLE.Controllers;
+using OSBLE.Interfaces;
 
 
 namespace OSBLE.Utility

@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Runtime.Caching;
 using System.Web;
-
+using OSBLE.Interfaces;
 using OSBLE.Models.Users;
 using OSBLEPlus.Logic.DataAccess.Profiles;
-using OSBLEPlus.Logic.DomainObjects.Interfaces;
 
 namespace OSBLEPlus.Logic.Utility.Auth
 {

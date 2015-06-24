@@ -1,5 +1,5 @@
 ﻿using System;
-using OSBLEPlus.Logic.DomainObjects.Interfaces;
+using OSBLE.Interfaces;
 using OSBLEPlus.Logic.Utility.Auth;
 
 namespace OSBLEPlus.Services.Tests.Activities

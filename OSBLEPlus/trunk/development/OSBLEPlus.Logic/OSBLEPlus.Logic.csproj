@@ -64,8 +64,8 @@
     <Compile Include="DataAccess\Profiles\CourseDataAccess.cs" />
     <Compile Include="DomainObjects\ActivityFeeds\SubmisionAssignment.cs" />
     <Compile Include="DomainObjects\Helpers\LocalErrorLog.cs" />
-    <Compile Include="DomainObjects\Interfaces\IAssignment.cs" />
-    <Compile Include="DomainObjects\Interfaces\ICourse.cs" />
+    <Compile Include="DomainObjects\Interface\IActivityEvent.cs" />
+    <Compile Include="DomainObjects\Interface\IEventLog.cs" />
     <Compile Include="DomainObjects\Profiles\ProfileCourse.cs" />
     <Compile Include="Utility\Auth\Authentication.cs" />
     <Compile Include="DataAccess\Profiles\QueryTemplates.cs" />
@@ -87,10 +87,6 @@
     <Compile Include="DomainObjects\Analytics\MeasureDefinitions.cs" />
     <Compile Include="Utility\Auth\IAuthentication.cs" />
     <Compile Include="Utility\ConstantsAndEnums.cs" />
-    <Compile Include="DomainObjects\Interfaces\IActivityEvent.cs" />
-    <Compile Include="DomainObjects\Interfaces\IProfileCourse.cs" />
-    <Compile Include="DomainObjects\Interfaces\IEventLog.cs" />
-    <Compile Include="DomainObjects\Interfaces\IUser.cs" />
     <Compile Include="Utility\Logging\ILogger.cs" />
     <Compile Include="Utility\Logging\LocalErrorLogger.cs" />
     <Compile Include="Utility\Logging\LogMessage.cs" />

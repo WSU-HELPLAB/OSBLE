@@ -5,11 +5,10 @@ using System.Net.Http;
 using System.Web.Http;
 
 using Newtonsoft.Json;
-
+using OSBLE.Interfaces;
 using OSBLEPlus.Logic.DataAccess.Activities;
 using OSBLEPlus.Logic.DataAccess.Profiles;
 using OSBLEPlus.Logic.DomainObjects.Helpers;
-using OSBLEPlus.Logic.DomainObjects.Interfaces;
 using OSBLEPlus.Logic.DomainObjects.Profiles;
 using OSBLEPlus.Logic.Utility.Auth;
 

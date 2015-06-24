@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using OSBLEPlus.Logic.DataAccess.Activities;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
-using OSBLEPlus.Logic.DomainObjects.Interfaces;
+using OSBLEPlus.Logic.DomainObjects.Interface;
 using OSBLEPlus.Logic.Utility.Lookups;
 
 namespace OSBLEPlus.Logic.Tests.Activities
