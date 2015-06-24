@@ -1,4 +1,4 @@
-﻿using OSBLEPlus.Logic.DomainObjects.Interfaces;
+﻿using OSBLEPlus.Logic.DomainObjects.Interface;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {

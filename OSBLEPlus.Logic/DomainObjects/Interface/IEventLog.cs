@@ -1,7 +1,8 @@
 ﻿using System;
+using OSBLE.Interfaces;
 using OSBLEPlus.Logic.Utility.Lookups;
 
-namespace OSBLEPlus.Logic.DomainObjects.Interfaces
+namespace OSBLEPlus.Logic.DomainObjects.Interface
 {
     public interface IEventLog
     {

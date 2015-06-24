@@ -8,7 +8,7 @@ using Dapper;
 
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
 using OSBLEPlus.Logic.DomainObjects.Helpers;
-using OSBLEPlus.Logic.DomainObjects.Interfaces;
+using OSBLEPlus.Logic.DomainObjects.Interface;
 using OSBLEPlus.Logic.Utility;
 
 namespace OSBLEPlus.Logic.DataAccess.Activities

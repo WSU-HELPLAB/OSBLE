@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
-
-using OSBLEPlus.Logic.DomainObjects.Interfaces;
+using OSBLEPlus.Logic.DomainObjects.Interface;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {

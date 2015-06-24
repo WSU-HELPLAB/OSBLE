@@ -5,9 +5,8 @@ using System.Data.SqlClient;
 using System.Linq;
 
 using Dapper;
-
+using OSBLE.Interfaces;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
-using OSBLEPlus.Logic.DomainObjects.Interfaces;
 using OSBLEPlus.Logic.DomainObjects.Profiles;
 using OSBLEPlus.Logic.Utility;
 

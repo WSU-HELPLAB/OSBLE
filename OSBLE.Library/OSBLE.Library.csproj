@@ -82,6 +82,10 @@
     <Compile Include="Attributes\EmailAttribute.cs" />
     <Compile Include="FileSystem.cs" />
     <Compile Include="IdenticonRenderer.cs" />
+    <Compile Include="Interfaces\IAssignment.cs" />
+    <Compile Include="Interfaces\ICourse.cs" />
+    <Compile Include="Interfaces\IProfileCourse.cs" />
+    <Compile Include="Interfaces\IUser.cs" />
     <Compile Include="Models\AbstractCourses\AbstractCourse.cs" />
     <Compile Include="Models\AbstractCourses\AbstractRole.cs" />
     <Compile Include="Models\AbstractCourses\AssessmentCommittee\ABETEvaluatorRole.cs" />

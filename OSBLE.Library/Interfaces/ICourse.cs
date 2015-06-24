@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OSBLEPlus.Logic.DomainObjects.Interfaces
+namespace OSBLE.Interfaces
 {
     public interface ICourse
     {

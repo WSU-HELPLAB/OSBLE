@@ -1,4 +1,4 @@
-﻿namespace OSBLEPlus.Logic.DomainObjects.Interfaces
+﻿namespace OSBLEPlus.Logic.DomainObjects.Interface
 {
     public interface IActivityEvent : IEventLog
     {

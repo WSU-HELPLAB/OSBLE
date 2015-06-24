@@ -1,6 +1,6 @@
 ﻿using System;
-
-using OSBLEPlus.Logic.DomainObjects.Interfaces;
+using OSBLE.Interfaces;
+using OSBLEPlus.Logic.DomainObjects.Interface;
 using OSBLEPlus.Logic.Utility;
 using OSBLEPlus.Logic.Utility.Lookups;
 

@@ -1,9 +1,9 @@
 ﻿using System;
 using OSBLE.Models.Assignments;
 
-namespace OSBLEPlus.Logic.DomainObjects.Interfaces
+namespace OSBLE.Interfaces
 {
-    interface IAssignment
+    public interface IAssignment
     {
         int Id { get; set; }
         AssignmentTypes AssignmentType { get; set; }

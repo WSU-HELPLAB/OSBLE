@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
-using OSBLEPlus.Logic.DomainObjects.Interfaces;
+using OSBLEPlus.Logic.DomainObjects.Interface;
 
 namespace OSBLEPlus.Services.Controllers
 {
