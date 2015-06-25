@@ -159,7 +159,6 @@
     <Compile Include="Areas\Analytics\AnalyticsAreaRegistration.cs" />
     <Compile Include="Areas\Analytics\Controllers\AnalyticsController.cs" />
     <Compile Include="Areas\Analytics\Controllers\CalendarController.cs" />
-    <Compile Include="Areas\Analytics\Controllers\DefaultController.cs" />
     <Compile Include="Areas\Analytics\Controllers\TimelineController.cs" />
     <Compile Include="Areas\AssessmentWizard\AssessmentWizardAreaRegistration.cs" />
     <Compile Include="Areas\AssessmentWizard\Controllers\AssessmentBaseController.cs" />
@@ -318,8 +317,8 @@
       <DependentUpon>UploaderWebService.svc</DependentUpon>
     </Compile>
     <Compile Include="Utility\ActionResultExtensions.cs" />
+    <Compile Include="Utility\DBHelper.cs" />
     <Compile Include="Utility\Constants.cs" />
-    <Compile Include="Utility\OSBLEConvert.cs" />
     <Compile Include="Utility\DateTimeExtensions.cs" />
     <Compile Include="Utility\Email.cs" />
     <Compile Include="Utility\FileCacheHelper.cs" />
@@ -338,12 +337,9 @@
   <ItemGroup>
     <Content Include="App_Code\Libraries\LumenWorks.Framework.IO.dll" />
     <Content Include="Areas\Analytics\Content\AnalyticsIndex.css" />
-    <Content Include="Areas\Analytics\Content\Calendar.css" />
     <Content Include="Areas\Analytics\Content\loading.gif" />
     <Content Include="Areas\Analytics\Scripts\AnalyticsIndex.js" />
     <Content Include="Areas\Analytics\Scripts\Calendar.js" />
-    <Content Include="Areas\Analytics\Scripts\d3-tip.min.js" />
-    <Content Include="Areas\Analytics\Scripts\d3.min.js" />
     <Content Include="Areas\Analytics\Scripts\TrendingCalendar.js" />
     <Content Include="Areas\AssignmentDetails\Content\css\Home.css" />
     <Content Include="Areas\AssignmentDetails\Content\js\Home.js" />
@@ -366,7 +362,14 @@
     <Content Include="Areas\AssignmentWizard\Content\js\team.js" />
     <Content Include="Areas\AssignmentWizard\Controllers\README.txt" />
     <Content Include="clientaccesspolicy.xml" />
-    <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\bootstrap-3.3.5\css\bootstrap-theme.css" />
+    <Content Include="Content\bootstrap-3.3.5\css\bootstrap-theme.min.css" />
+    <Content Include="Content\bootstrap-3.3.5\css\bootstrap.css" />
+    <Content Include="Content\bootstrap-3.3.5\css\bootstrap.min.css" />
+    <Content Include="Content\bootstrap-3.3.5\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Content\bootstrap-3.3.5\js\bootstrap.js" />
+    <Content Include="Content\bootstrap-3.3.5\js\bootstrap.min.js" />
+    <Content Include="Content\bootstrap-3.3.5\js\npm.js" />
     <Content Include="Content\images\alert.png" />
     <Content Include="Content\favicon.ico" />
     <Content Include="Content\images\account.png" />
@@ -507,6 +510,7 @@
     <Content Include="Content\images\mail_up.png" />
     <Content Include="Content\images\move_down.png" />
     <Content Include="Content\images\move_up.png" />
+    <Content Include="Content\images\navbar_logo.png" />
     <Content Include="Content\images\page_white_add.png" />
     <Content Include="Content\images\page_white_delete.png" />
     <Content Include="Content\images\page_white_edit.png" />
@@ -548,6 +552,7 @@
     <Content Include="Content\jquery-ui-1.8.13.custom.css" />
     <Content Include="Content\jquery-ui-timepicker.css" />
     <Content Include="Content\jquery.contextMenu.css" />
+    <Content Include="Content\navbar.css" />
     <Content Include="Content\themes\base\images\animated-overlay.gif" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
@@ -685,6 +690,7 @@
     <Content Include="Areas\AssessmentWizard\Views\ReviewOfStudentWork\Index.cshtml" />
     <Content Include="Areas\AssessmentWizard\Views\CommitteeReview\Index.cshtml" />
     <Content Include="Resources\CSVReader\CSVCellReaderStateMachine.png" />
+    <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\contextMenu.js" />
     <Content Include="Scripts\CourseFileManager.js" />
@@ -702,16 +708,18 @@
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\AnchoredDiscussionSubmissionDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\AnchoredDiscussionSubmitDecorator.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\AnchoredDiscussionDocuments\Index.cshtml" />
+    <Content Include="Areas\Analytics\Views\Calendar\Calendar.cshtml" />
     <Content Include="Areas\Analytics\Views\Web.config" />
     <Content Include="Areas\Analytics\Views\Analytics\Index.cshtml" />
     <Content Include="Areas\Analytics\Views\Calendar\_Calendar.cshtml" />
     <Content Include="Areas\Analytics\Views\Timeline\_Timeline.cshtml" />
-    <Content Include="Areas\Analytics\Views\Calendar\_CalendarOptions.cshtml" />
-    <Content Include="Areas\Analytics\Views\Analytics\_AnalyticsMenu.cshtml" />
-    <Content Include="Areas\Analytics\Views\Timeline\_TimelineOptions.cshtml" />
-    <Content Include="Areas\Analytics\Views\Analytics\_Default.cshtml" />
-    <Content Include="Areas\Analytics\Views\Default\_Default.cshtml" />
-    <Content Include="Areas\Analytics\Views\Default\_DefaultOptions.cshtml" />
+    <Content Include="Areas\Analytics\Views\_Default.cshtml" />
+    <Content Include="Content\bootstrap-3.3.5\css\bootstrap-theme.css.map" />
+    <Content Include="Content\bootstrap-3.3.5\css\bootstrap.css.map" />
+    <Content Include="Content\bootstrap-3.3.5\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Content\bootstrap-3.3.5\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="Content\bootstrap-3.3.5\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="Content\bootstrap-3.3.5\fonts\glyphicons-halflings-regular.woff2" />
     <None Include="Properties\PublishProfiles\filesystem.pubxml" />
     <None Include="Scripts\jquery-2.0.1.intellisense.js" />
     <Content Include="Scripts\jquery-2.0.1.js" />
@@ -747,6 +755,7 @@
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\moment.min.js" />
     <Content Include="Scripts\multifile.js" />
+    <Content Include="Scripts\npm.js" />
     <Content Include="Scripts\osble.assignments.js" />
     <Content Include="Scripts\osble.assignment_list.js" />
     <Content Include="Scripts\osble.courses.js" />
