@@ -74,6 +74,7 @@
     <Folder Include="Schema\Stored Procedures\Analytics" />
     <Folder Include="Schema\Stored Procedures\Profiles" />
     <Folder Include="Schema\Stored Procedures\Activiities" />
+    <Folder Include="Docs" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Schema\Functions\Split.sql" />
@@ -220,6 +221,6 @@
     <Build Include="Schema\Tables\FeedPostUserTags.sql" />
   </ItemGroup>
   <ItemGroup>
-    <RefactorLog Include="OSBLEPlus.Database.refactorlog" />
+    <None Include="Docs\AutoDeploy.txt" />
   </ItemGroup>
 </Project>
