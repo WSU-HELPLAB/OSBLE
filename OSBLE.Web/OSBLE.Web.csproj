@@ -727,6 +727,10 @@
     <Content Include="Content\bootstrap-3.3.5\fonts\glyphicons-halflings-regular.woff2" />
     <Content Include="Areas\Analytics\Views\Default\_Default.cshtml" />
     <Content Include="Areas\Analytics\Views\Default\_DefaultOptions.cshtml" />
+    <Content Include="Areas\Analytics\Views\Calendar\_CalendarOptions.cshtml" />
+    <Content Include="Areas\Analytics\Views\Analytics\_AnalyticsMenu.cshtml" />
+    <Content Include="Areas\Analytics\Views\Analytics\_Default.cshtml" />
+    <Content Include="Areas\Analytics\Views\Timeline\_TimelineOptions.cshtml" />
     <None Include="Properties\PublishProfiles\filesystem.pubxml" />
     <None Include="Scripts\jquery-2.0.1.intellisense.js" />
     <Content Include="Scripts\jquery-2.0.1.js" />
