@@ -10,6 +10,9 @@ using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using Ionic.Zip;
+using OSBLEPlus.Logic.DataAccess.Activities;
+using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
+using OSBLEPlus.Logic.Utility.Lookups;
 
 namespace OSBLE.Controllers
 {
@@ -74,6 +77,17 @@ namespace OSBLE.Controllers
         {
             if (id != null)
             {
+
+                var sub = new SubmitEvent
+                {
+                    AssignmentId = id.Value,
+                    EventDate = DateTime.UtcNow,
+                    EventTypeId = (int)EventType.SubmitEvent,
+                    SenderId = CurrentUser.ID
+                };
+                Posts.SubmitAssignment(sub);
+                
+
                 Assignment assignment = db.Assignments.Find(id);
 
                 if (assignment != null && (assignment.HasDeliverables == true ||
