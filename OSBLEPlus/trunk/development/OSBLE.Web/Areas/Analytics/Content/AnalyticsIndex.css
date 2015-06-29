@@ -27,7 +27,7 @@
 }
 
 /*Menu selection*/
-.menu_item.current {
+.nav-analytics .menu_item.current {
     border-left: 3px solid #0b4874;
     border-right: 3px solid #0b4874;
     background: #F0F0F0;
@@ -36,30 +36,30 @@
     padding-right: 5px;
 }
 
-.menu_item a, .menu_item a:link, .menu_item a:visited, .menu_item a:hover, .menu_item a:active {
+.nav-analytics .menu_item a, .nav-analytics .menu_item a:link, .nav-analytics .menu_item a:visited, .nav-analytics .menu_item a:hover, .nav-analytics .menu_item a:active {
     color: #0b4874;
 }
 
-* {
+/* {
     margin: 0;
     padding: 0;
     outline: none;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-}
+} */
 
-.nav .analytics {
+.nav-analytics {
     width: 100%;
 }
 
-.nav ul {
+.nav-analytics ul {
     list-style: none;
     background-color: #e6e6e6;
     margin: 0;
 }
 
-.nav li {
+.nav-analytics li {
     font-family: 'Oswald', sans-serif;
     font-size: 1.2em;
     line-height: 40px;
@@ -68,7 +68,7 @@
     text-align: center;
 }
 
-.nav a {
+.nav-analytics a {
     text-decoration: none;
     color: #0b4874;
     display: block;
@@ -81,18 +81,18 @@
     padding-right: 10px;
 }
 
-    .nav a:hover {
+    .nav-analytics a:hover {
         background-color: #005f5f;
     }
 
-    .nav a.active {
+    .nav-analytics a.active {
         background-color: #191970;
         color: #444;
         cursor: default;
     }
 
 @media screen and (min-width: 600px) {
-    .nav li {
+    .nav-analytics li {
         width: auto;
         border-bottom: none;
         height: 50px;
@@ -100,11 +100,11 @@
         font-size: 1.4em;
     }
 
-    .nav li {
+    .nav-analytics li {
         float: left;
     }
 
-    .nav ul {
+    .nav-analytics ul {
         overflow: auto;
         width: auto;
         margin: 0 auto;

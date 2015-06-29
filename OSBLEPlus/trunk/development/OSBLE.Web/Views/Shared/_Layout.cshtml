@@ -70,7 +70,7 @@
 
                         <li class="dropdown">
                             <a id="profile_selector" class="dropdown-toggle" data-toggle="dropdown" href="#">
-                                <img id="profile_pic" class="hidden-xs" src="@Url.Action("Picture", "User", new { id = ViewBag.ActiveCourseUser.UserProfileID, size = 30 })" />
+                                <img id="profile_pic" class="hidden-xs" src="@Url.Action("Picture", "User", new { area="", id = ViewBag.ActiveCourseUser.UserProfileID, size = 30 })" />
                                 @ViewBag.CurrentUser.FirstName 
                                 @ViewBag.CurrentUser.LastName
                                 @if (ViewBag.UnreadMessageCount > 0)

@@ -1,7 +1,7 @@
 ﻿
-@Styles.Render("~/Areas/Analytics/Content/AnalyticsIndex.css")
+@Styles.Render("~/Areas/Analytics/Content/AnalyticsIndex.css?version=1.1")
 
-<div class="nav analytics">
+<div class="nav nav-analytics">
     <ul>
         <li class="">
             @Ajax.ActionLink("Default", "Index", "Default", null, new AjaxOptions { UpdateTargetId = "analytics_content" }, new { @class = "menu_item current" })           
