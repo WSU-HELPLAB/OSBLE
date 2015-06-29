@@ -21,7 +21,7 @@
                     foreach (CourseUser cu in courses)
                     {
                         <li class="@(ViewBag.ActiveCourseUser.AbstractCourseID == cu.AbstractCourseID ? "active" : "")" data-courseid="@cu.AbstractCourseID">
-                            @Html.ActionLink(DBHelper.GetCourseFullNameFromCourseUser(cu, connection), "SetCourse", "Home", new { courseID = cu.AbstractCourseID }, null)
+                            @Html.ActionLink(DBHelper.GetCourseFullNameFromCourseUser(cu, connection), "SetCourse", "Home", new { area="", courseID = cu.AbstractCourseID }, null)
                         </li>
                     }
                 }
@@ -33,7 +33,7 @@
                     foreach (CourseUser cu in communities)
                     {
                         <li class="@(ViewBag.ActiveCourseUser.AbstractCourseID == cu.AbstractCourseID ? "active" : "")" data-courseid="@cu.AbstractCourseID">
-                            @Html.ActionLink(DBHelper.GetCourseFullNameFromCourseUser(cu, connection), "SetCourse", "Home", new { courseID = cu.AbstractCourseID }, null)
+                            @Html.ActionLink(DBHelper.GetCourseFullNameFromCourseUser(cu, connection), "SetCourse", "Home", new { area="", courseID = cu.AbstractCourseID }, null)
                         </li>
                     }
                 }
