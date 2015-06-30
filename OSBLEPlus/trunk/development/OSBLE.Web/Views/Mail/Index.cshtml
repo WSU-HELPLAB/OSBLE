@@ -8,12 +8,14 @@
 <h2>@ViewBag.BoxHeader</h2>
 @using (Html.BeginForm("Delete", "Mail", new { area = "" }, FormMethod.Post, new { id = "deleteForm" }))
 {
-<div class="MailMenu" style="float:left">
-    <a class="buttonAnchor" href="/Mail/Create"><button type="button">Compose</button></a><br />
-    <a class="buttonAnchor" href="/Mail/Index"><button type="button">Inbox</button></a><br />
-    <a class="buttonAnchor" href="/Mail/Outbox"><button type="button">Outbox</button></a><br />
-    <input id="FormSubmitButton" type="submit" disabled="disabled" value="Delete"/><br />
+
+<div class="btn-group-vertical" id="mail_menu">
+    <a class="btn btn-primary" href="/Mail/Create">Compose</a>
+    <a class="btn btn-primary" href="/Mail/Index">Inbox</a>
+    <a class="btn btn-primary" href="/Mail/Outbox">Outbox</a>
+    <input id="FormSubmitButton" type="submit" class="btn btn-primary" disabled="disabled" value="Delete" />
 </div>
+
 <div class="MailContent">
 
     <table class="inbox_table">
