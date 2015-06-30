@@ -7,6 +7,7 @@ using OSBLEPlus.Logic.Utility;
 using System.Data.SqlClient;
 using OSBLE.Models.Courses;
 using OSBLE.Models.DiscussionAssignment;
+using OSBLE.Models.HomePage;
 
 namespace OSBLE.Utility
 {
@@ -23,6 +24,9 @@ namespace OSBLE.Utility
             return new SqlConnection(StringConstants.ConnectionString);
         }
 
+
+        /*** Courses & Communities **********************************************************************************************/
+        #region Courses
         public static string GetCourseShortNameFromID(int courseID, SqlConnection connection = null)
         {
             string name = "";
@@ -42,6 +46,22 @@ namespace OSBLE.Utility
             return name;
         }
 
+        public static IEnumerable<CourseUser> GetAllCurrentCourses(int userProfileID, SqlConnection connection = null)
+        {
+            IEnumerable<CourseUser> currentCourses = null;
+
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection()) { currentCourses = GetAllCurrentCourses(userProfileID, sqlc); }
+            }
+            else
+            {
+                currentCourses = connection.Query<CourseUser>("SELECT * FROM CourseUsers WHERE UserProfileID = @uid",
+                    new { uid = userProfileID });
+            }
+
+            return currentCourses;
+        }
 
         public static IEnumerable<CourseUser> GetCoursesFromUserProfileID(int userProfileID, SqlConnection connection = null)
         {
@@ -139,11 +159,11 @@ namespace OSBLE.Utility
 
             return ids;
         }
+        #endregion
 
-        
-        
+
         /*** Discussion Teams **********************************************************************************************/
-
+        #region DiscussionTeams
         public static int GetDiscussionTeamIDFromTeamID(int teamID, SqlConnection connection = null)
         {
             int dtID;
@@ -211,5 +231,27 @@ namespace OSBLE.Utility
                         posts);
             }
         }
+        #endregion
+
+
+        /*** Events **********************************************************************************************/
+        #region Events
+        public static IEnumerable<Event> GetApprovedCourseEvents(int courseID, DateTime start, DateTime end, SqlConnection connection = null)
+        {
+            IEnumerable<Event> events = null;
+
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection()) { events = GetApprovedCourseEvents(courseID, start, end, sqlc); }
+                return events;
+            }
+
+            events = connection.Query<Event>("SELECT e.* FROM Events e INNER JOIN CourseUsers cu ON e.PosterID = cu.ID WHERE cu.AbstractCourseID = @cid AND e.StartDate >= @sd AND e.EndDate <= @ed AND e.Approved = '1'",
+                new { cid = courseID, sd = start, ed = end });
+
+            return events;
+        }
+
+        #endregion
     }
 }

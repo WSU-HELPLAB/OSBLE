@@ -18,6 +18,7 @@ using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
 using System.Configuration;
 using OSBLE.Models.Users;
 using OSBLEPlus.Logic.Utility;
+using OSBLE.Utility;
 
 
 namespace OSBLE.Controllers
@@ -525,12 +526,7 @@ namespace OSBLE.Controllers
         {
             //MG:Pulling all events for this course that approved and have a startdate that 
             //lies within the StartDate and EndDate parameters. 
-            List<Event> events = (from e in db.Events
-                                   where e.Poster.AbstractCourseID == ActiveCourseUser.AbstractCourseID
-                                   && e.StartDate >= StartDate
-                                   && e.StartDate <= EndDate
-                                   && e.Approved
-                                   select e).ToList();
+            List<Event> events = DBHelper.GetApprovedCourseEvents(ActiveCourseUser.AbstractCourseID, StartDate, EndDate).ToList<Event>();
 
             // NOTE to AJ: This is where I need to change the type from Event to List<FeedItems> for OSBLEPlus
 
