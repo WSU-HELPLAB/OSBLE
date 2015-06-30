@@ -17,8 +17,7 @@ function assignmentfilemanager_update(assignmentID)
     document.getElementById("solutionFilesDIV").innerHTML = "(please wait...)";
 
     // Get the current course ID
-    var selectCourseObj = document.getElementById("course_select");
-    var courseID = selectCourseObj.value;
+    var courseID = GetSelectedCourseID();
 
     globlCourseID = selectCourseObj.value;
 

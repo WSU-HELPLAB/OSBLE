@@ -100,7 +100,7 @@
         var recipientList = new Array(); //array that will hold only the Ids of those to be mailed
 
         $(document).ready(function () {
-            
+
             var ids = $("#RecipientIdList").val();
             var idArray = ids.split(',');
             var names = $("#RecipientNameList").val();
@@ -115,7 +115,7 @@
             HandleNoRecipientElement();
 
 
-            
+
             $.ajax({
                 dataType: "json",
                 type: "GET",
@@ -125,13 +125,13 @@
                     for(i = 0; i < data.length; i++)
                     {
                         var abstractIDTag = data[i].split(",");
-                        
+
                         $('#SendFromSelectList').append($('<option>', {
                             value: abstractIDTag[0],
                             text: abstractIDTag[1]
                         }));
-                    }                    
-                    $('#SendFromSelectList').val($("#course_select ul li.active").data("courseid"));
+                    }
+                    $('#SendFromSelectList').val(GetSelectedCourseID());
                 },
                 error: function (data) {
                     //TODO: handle error...
@@ -139,20 +139,19 @@
             });
 
             //get the currently selected course
-            var currentlySelectedCourse = $("#course_select :selected").text().split("-");
-            var coursePrefixAndNumber = currentlySelectedCourse[0].trim();
-            $('#CurrentlySelectedCourse').val($("#course_select ul li.active").data("courseid"));
-
+            // var currentlySelectedCourse = $("#course_select :selected").text().split("-");
+            // var coursePrefixAndNumber = currentlySelectedCourse[0].trim();
+            $("#CurrentlySelectedCourse").val(GetSelectedCourseID());
 
         });
 
-        $('#SendFromSelectList').change(function () {            
-            $("#CurrentlySelectedCourse").val($("#SendFromSelectList :selected").val());            
+        $('#SendFromSelectList').change(function () {
+            $("#CurrentlySelectedCourse").val($("#SendFromSelectList :selected").val());
         });
 
         //add recipient to mailing list and display them
         function addRecipient(upId, name)
-        {  
+        {
             if(upId != "" && name != "")
             {
                 if(getIndexInRecipientList(upId) == -1) //if the element is not in list...
@@ -167,9 +166,9 @@
                     $('#recipients_data').append('<div id="' + upId + '" class="recipient" />');
                     var newRecipient = $('#' + upId);
 
-                    // delete button  
-                    newRecipient.append('<div class="recipient_tools"><a href="#" title="Delete this recipient" onclick="removeRecipient(' + upId + ')" class="deleteIconDiv"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');                                                                                                                                                                                                  
-                    
+                    // delete button
+                    newRecipient.append('<div class="recipient_tools"><a href="#" title="Delete this recipient" onclick="removeRecipient(' + upId + ')" class="deleteIconDiv"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');
+
                     // main layout
                     newRecipient.append('<a><img src="@Url.Action("ProfilePicture")/' + upId + '" class="small_profile_picture" alt="Profile Picture" />' + name + "</a>");
                 }
@@ -218,7 +217,7 @@
             else
             {
                 $("#NoRecipient").hide();
-                $("#send_btn").removeAttr("disabled");  
+                $("#send_btn").removeAttr("disabled");
             }
         }
 

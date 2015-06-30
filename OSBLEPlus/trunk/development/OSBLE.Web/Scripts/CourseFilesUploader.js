@@ -84,8 +84,7 @@ function fileuploader_uploadRemaining(filesArray, fileIndex, progressDIV, extraS
     // First get the ID of the currently selected course. The uploader "control" produced 
     // by this script must be on a page with the "course_select" selector. As far as I know 
     // this is every single page in the OSBLE site.
-    var selectCourseObj = document.getElementById("course_select");
-    var courseID = selectCourseObj.value;    
+    var courseID = GetSelectedCourseID();
     var fd = new FormData();
     //clear out any special characters from file name
     var fileName = filesArray[fileIndex].name.replace(/[^a-z0-9._-]+/gi, "");    
