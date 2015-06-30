@@ -141,7 +141,7 @@
             //get the currently selected course
             var currentlySelectedCourse = $("#course_select :selected").text().split("-");
             var coursePrefixAndNumber = currentlySelectedCourse[0].trim();
-            $("#CurrentlySelectedCourse").val($("#course_select :selected").val());
+            $('#CurrentlySelectedCourse').val($("#course_select ul li.active").data("courseid"));
 
 
         });
