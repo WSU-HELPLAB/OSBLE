@@ -20,7 +20,7 @@
                     <li class="dropdown-header">Courses</li>
                     foreach (CourseUser cu in courses)
                     {
-                        <li class="@(ViewBag.ActiveCourseUser.AbstractCourseID == cu.AbstractCourseID ? "active" : "")" data-courseid="@cu.AbstractCourseID">
+                        <li class="course-item @(ViewBag.ActiveCourseUser.AbstractCourseID == cu.AbstractCourseID ? "active" : "")" data-courseid="@cu.AbstractCourseID">
                             @Html.ActionLink(DBHelper.GetCourseFullNameFromCourseUser(cu, connection), "SetCourse", "Home", new { area="", courseID = cu.AbstractCourseID }, null)
                         </li>
                     }
@@ -32,7 +32,7 @@
                     <li class="dropdown-header">Communities</li>
                     foreach (CourseUser cu in communities)
                     {
-                        <li class="@(ViewBag.ActiveCourseUser.AbstractCourseID == cu.AbstractCourseID ? "active" : "")" data-courseid="@cu.AbstractCourseID">
+                        <li class="course-item @(ViewBag.ActiveCourseUser.AbstractCourseID == cu.AbstractCourseID ? "active" : "")" data-courseid="@cu.AbstractCourseID">
                             @Html.ActionLink(DBHelper.GetCourseFullNameFromCourseUser(cu, connection), "SetCourse", "Home", new { area="", courseID = cu.AbstractCourseID }, null)
                         </li>
                     }

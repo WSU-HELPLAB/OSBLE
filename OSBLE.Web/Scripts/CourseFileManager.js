@@ -20,8 +20,7 @@ var cfm_boolMultipleSelected = false;
 // ID will be set.
 function cfm_getListing(targetDIVID) {
     // Get the current course ID
-    var selectCourseObj = $("#course_select li.active");
-    var courseID = selectCourseObj != null? selectCourseObj.data("courseid") : 0;
+    var courseID = GetSelectedCourseID();
 
     cfm_states = new Array();
 
@@ -108,8 +107,7 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         "\" style=\"" + styleString + "\">";
 
     // Get the current course ID
-    var selectCourseObj = document.getElementById("course_select");
-    var courseID = selectCourseObj.value;
+    var courseID = GetSelectedCourseID();
 
     var subdir_count = cfm_CountChildrenWithName(listNode, "folder");
     var file_count = cfm_CountChildrenWithName(listNode, "file");
@@ -197,7 +195,7 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
         if (stateObj.allowsCollapsing) {
             if (folderName == "Files and Links") {
                 result += "<h3 class=\"files_links_header\" style=\"-webkit-margin-before: .60em; -webkit-margin-after: .5em;\">Files and Links </h3>"
-                            + "<span><a  class=\"root_context_menu\" href=\"#\" > <img width=\"19\" height=\"19\" class=\"files_links_tooltip\" alt=\"(?)\" src=\"../../Content/images/folder_plus.png\"></a>"
+                            + "<span><a  class=\"root_context_menu\" href=\"#\" > <img width=\"19\" height=\"19\" class=\"files_links_tooltip\" alt=\"(?)\" src=\"../../Content/images/folder_plus.png\"></a></span>"
                             + "<span><a  class=\"files_links\" href=\"#\" > <img width=\"19\" height=\"19\" class=\"files_links_tooltip\" alt=\"(?)\" src=\"../../Content/images/tooltip/109_AllAnnotations_Help_19x19_72.png\">"
                             + "<span id=\"files_links_tooltip\"><p class=\"files_links_p\">Right clicking \"Files and Links\" or on uploaded Files/Folders will bring up a dialog for the current course file manager</p></span></a> </span>";
             } else {
@@ -420,8 +418,7 @@ function cfm_CreateFolder(stateObjectIndex) {
     var state = cfm_states[stateObjectIndex];
 
     // Get the current course ID
-    var selectCourseObj = document.getElementById("course_select");
-    var courseID = selectCourseObj.value;
+    var courseID = GetSelectedCourseID();
 
     // Find the textbox and get the folder name
     var tb = document.getElementById("tbSubfolder_" + stateObjectIndex.toString());
@@ -515,8 +512,7 @@ function cfm_DeleteFile(stateObjectIndex) {
     var state = cfm_states[stateObjectIndex];
 
     // Get the current course ID
-    var selectCourseObj = document.getElementById("course_select");
-    var courseID = selectCourseObj.value;
+    var courseID = GetSelectedCourseID();
 
     // Make an XML HTTP request to the service
     var req = new XMLHttpRequest();
@@ -549,8 +545,7 @@ function cfm_DeleteFolder(stateObjectIndex) {
     var elementTitle = $(element).attr("folder-name");
 
     // Get the current course ID
-    var selectCourseObj = document.getElementById("course_select");
-    var courseID = selectCourseObj.value;
+    var courseID = GetSelectedCourseID();
 
     // Make an XML HTTP request to the service
     var req = new XMLHttpRequest();
@@ -888,8 +883,7 @@ function cfm_RenameFile(stateObjectIndex) {
     var state = cfm_states[stateObjectIndex];
 
     // Get the current course ID
-    var selectCourseObj = document.getElementById("course_select");
-    var courseID = selectCourseObj.value;
+    var courseID = GetSelectedCourseID();
 
     // Find the textbox and get the folder name
     var tb = document.getElementById("tbRenameFile_" + stateObjectIndex.toString());
@@ -936,8 +930,7 @@ function cfm_RenameFolder(stateObjectIndex) {
     var elementTitle = $(element).attr("folder-name");
 
     // Get the current course ID
-    var selectCourseObj = document.getElementById("course_select");
-    var courseID = selectCourseObj.value;
+    var courseID = GetSelectedCourseID();
 
     // Find the textbox and get the folder name
     var tb = document.getElementById("tbRenameFolder_" + stateObjectIndex.toString());

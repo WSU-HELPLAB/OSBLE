@@ -165,4 +165,11 @@ function parseDates() {
         //omthrow new Error(errMsg);
     }
 
+    function GetSelectedCourseID()
+    {
+        var selectCourseObj = $(".course-item.active");
+        var courseID = selectCourseObj != null ? selectCourseObj.data("courseid") : 0;
+        return courseID;
+    }
+
 
