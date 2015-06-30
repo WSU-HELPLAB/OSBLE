@@ -865,6 +865,11 @@ body#layoutLogOn {
     width: 750px;
 }
 
+#mail_menu {
+    float: left;
+    margin-right: 10px;
+}
+
 #add_update_users {
     border: 1px solid #eeeeff;
     border-bottom: 5px solid #eeeeff;

@@ -114,11 +114,7 @@
             }
             HandleNoRecipientElement();
 
-        
-            //setup the send from dropdown
-            var currentUserID = $("input[name=redirect]").val();
-            currentUserID = currentUserID.split("/");
-            currentUserID = currentUserID[3];
+
             
             $.ajax({
                 dataType: "json",
@@ -135,7 +131,7 @@
                             text: abstractIDTag[1]
                         }));
                     }                    
-                    $('#SendFromSelectList').val($("#course_select :selected").val());
+                    $('#SendFromSelectList').val($("#course_select ul li.active").data("courseid"));
                 },
                 error: function (data) {
                     //TODO: handle error...
@@ -229,21 +225,22 @@
 
         $("#people_finder").autocomplete({
             source: "@(Url.Action("Search"))",
-            select: function(event, ui) {
+            select: function (event, ui) {
                 $(this).val("");
-                if(getIndexInRecipientList(ui.item.value) == -1) //if element is not in list...
+                if (getIndexInRecipientList(ui.item.value) == -1) //if element is not in list...
                 {
                     addRecipient(ui.item.value, ui.item.label);
                 }
                 return false;
             },
-            focus: function(event, ui) {return false;}
-        }).data("autocomplete")._renderItem = function( ul, item ) {
-            return $( "<li></li>" )
-            .data( "item.autocomplete", item )
-            .append( "<a>" + '<img src="@Url.Action("ProfilePicture")/' + item.value + '" class="small_profile_picture" alt="Profile Picture" /> ' + item.label + '</a>')
-            .appendTo( ul );
-        }
+            focus: function (event, ui) { return false; },
+            _renderItem: function (ul, item) {
+                return $("<li></li>")
+                .data("item.autocomplete", item)
+                .append("<a>" + '<img src="@Url.Action("ProfilePicture")/' + item.value + '" class="small_profile_picture" alt="Profile Picture" /> ' + item.label + '</a>')
+                .appendTo(ul);
+            }
+        });
 
         function AddInstructors() {
             var id_list = $('#InstructorIdList').val();
