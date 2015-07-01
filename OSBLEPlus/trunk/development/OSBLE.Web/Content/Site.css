@@ -26,6 +26,142 @@ input {
     z-index: 2000;
 }
 
+#main_content {
+    margin-top:60px;
+}
+
+/* Dashboard */
+
+ #dashboard_pills {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: none;
+}
+
+@media (max-width: 768px)
+{
+    #dashboard_pills {
+        display: block;
+    }
+    .unactiveContent {
+        display: none;
+    }
+    .activeContent {         
+        display: block;
+    }
+
+}
+
+#dashboard_left h4, #dashboard_middle h4, #dashboard_right h4 {
+    margin-top: 0.5em;
+    margin-bottom: 0.25em;
+}
+
+.roster_table tr td {
+    padding-right: 10px;
+    vertical-align: top;
+}
+
+#activity_new_post {
+    width: 100%;
+    text-align: left;
+    padding-right: 0%;
+    padding-left: 0%;
+}
+
+#activity_new_post textarea {
+    width: 100%;
+    height: 80px;
+    margin-bottom: 0.5em;
+}
+
+/* Dashboard Posts */
+
+.dp_course {
+    font-size: 10pt;
+    font-variant: small-caps;
+    border-right: 1px #aaa solid;
+    padding: 1px;
+    padding-right: 3px;
+}
+
+.dp_posted {
+    font-size: 10pt;
+}
+
+.dp_post {
+    width: 95%;
+    display: block;
+    margin-top: 0.2em;
+    padding-bottom: 0.5em;
+    margin-bottom: 0.5em;
+    border: 1px solid #eeeeff;
+    border-bottom: 5px solid #eeeeff;
+}
+
+.dp_new_post {
+    display: none;
+}
+
+.dp_post_header {
+    padding-top: 5px;
+    padding-left: 3px;
+    padding-right: 3px;
+    display: block;
+    color: #074974;
+}
+
+.dp_content {
+    padding: 3px;
+    width: 96%;
+    margin-left: 20px;
+    word-wrap: break-word;
+}
+
+.dp_replies {
+    display: block;
+    margin-left: 20px;
+    padding: 3px;
+}
+
+.dp_replylink {
+    font-size: 10pt;
+}
+
+.dp_replybox {
+    display: none;
+}
+
+    .dp_replybox textarea {
+        width: 90%;
+        height: 50px;
+    }
+
+.discussion_replybox {
+    display: none;
+}
+
+    .discussion_replybox textarea {
+        width: 90%;
+        width: 50px;
+        padding-left: 10px;
+    }
+
+.dp_post_header:hover .dp_tools {
+    display: inline;
+}
+
+.dp_post_header .dp_tools {
+    display: none;
+    float: right;
+}
+
+.dashboard_mode {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+/* End Dashboard Posts */
+
 /* Common layout elements */
 #header {
     position: absolute;
@@ -313,141 +449,6 @@ body#layoutLogOn {
 #contentLogOn table td {
     padding: 5px;
 }
-
-/* Dashboard */
-
-#dashboard_left, #dashboard_middle, #dashboard_right {
-    display: block;
-    margin: 0;
-    padding: 0;
-}
-
-#dashboard_left h4, #dashboard_middle h4, #dashboard_right h4 {
-    margin-top: 0.5em;
-    margin-bottom: 0.25em;
-}
-
-#dashboard_left {
-    width: 290px;
-    float: left;
-    padding-right: 1%;
-}
-
-#dashboard_middle {
-    margin-left: 310px;
-    margin-right: 310px;
-}
-
-#dashboard_right {
-    padding-left: 1%;
-    width: 300px;
-    float: right;
-}
-
-.roster_table tr td {
-    padding-right: 10px;
-    vertical-align: top;
-}
-
-#activity_new_post {
-    width: 100%;
-    text-align: left;
-    padding-right: 20%;
-    padding-left: 0%;
-}
-
-    #activity_new_post textarea {
-        width: 80%;
-        height: 80px;
-        margin-bottom: 0.5em;
-    }
-
-/* Dashboard Posts */
-
-.dp_course {
-    font-size: 10pt;
-    font-variant: small-caps;
-    border-right: 1px #aaa solid;
-    padding: 1px;
-    padding-right: 3px;
-}
-
-.dp_posted {
-    font-size: 10pt;
-}
-
-.dp_post {
-    width: 95%;
-    display: block;
-    margin-top: 0.2em;
-    padding-bottom: 0.5em;
-    margin-bottom: 0.5em;
-    border: 1px solid #eeeeff;
-    border-bottom: 5px solid #eeeeff;
-}
-
-.dp_new_post {
-    display: none;
-}
-
-.dp_post_header {
-    padding-top: 5px;
-    padding-left: 3px;
-    padding-right: 3px;
-    display: block;
-    color: #074974;
-}
-
-.dp_content {
-    padding: 3px;
-    width: 96%;
-    margin-left: 20px;
-    word-wrap: break-word;
-}
-
-.dp_replies {
-    display: block;
-    margin-left: 20px;
-    padding: 3px;
-}
-
-.dp_replylink {
-    font-size: 10pt;
-}
-
-.dp_replybox {
-    display: none;
-}
-
-    .dp_replybox textarea {
-        width: 90%;
-        height: 50px;
-    }
-
-.discussion_replybox {
-    display: none;
-}
-
-    .discussion_replybox textarea {
-        width: 90%;
-        width: 50px;
-        padding-left: 10px;
-    }
-
-.dp_post_header:hover .dp_tools {
-    display: inline;
-}
-
-.dp_post_header .dp_tools {
-    display: none;
-    float: right;
-}
-
-.dashboard_mode {
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
-}
-/* End Dashboard Posts */
 
 .profile_picture, .small_profile_picture {
     border: 1px solid #074974;
@@ -1043,7 +1044,6 @@ ul.selector {
 
 .event {
     word-wrap: break-word;
-    width: 267px;
     overflow: auto;
 }
 
