@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using OSBLE.Models.Courses;
 using OSBLE.Models.DiscussionAssignment;
 using OSBLE.Models.HomePage;
+using OSBLE.Models.Users;
 
 namespace OSBLE.Utility
 {
@@ -25,7 +26,26 @@ namespace OSBLE.Utility
         }
 
 
-        /*** Courses & Communities **********************************************************************************************/
+        /*** Users *********************************************************************************************************/
+        #region Users
+        public static UserProfile GetUserProfile(int id, SqlConnection connection = null)
+        {
+            UserProfile profile = null;
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection()) { profile = GetUserProfile(id, sqlc); }
+                return profile;
+            }
+
+            profile = connection.Query<UserProfile>("SELECT * FROM UserProfiles WHERE ID = @uid",
+                new { uid = id }).SingleOrDefault();
+
+            return profile;
+        }
+        #endregion
+
+
+        /*** Courses & Communities *****************************************************************************************/
         #region Courses
         public static string GetCourseShortNameFromID(int courseID, SqlConnection connection = null)
         {
@@ -234,7 +254,7 @@ namespace OSBLE.Utility
         #endregion
 
 
-        /*** Events **********************************************************************************************/
+        /*** Events ********************************************************************************************************/
         #region Events
         public static IEnumerable<Event> GetApprovedCourseEvents(int courseID, DateTime start, DateTime end, SqlConnection connection = null)
         {

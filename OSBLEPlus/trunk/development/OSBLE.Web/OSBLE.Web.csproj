@@ -698,6 +698,7 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\contextMenu.js" />
+    <Content Include="Scripts\CourseDialogs.js" />
     <Content Include="Scripts\CourseFileManager.js" />
     <Content Include="Scripts\CourseFilesUploader.js" />
     <Content Include="Areas\AssessmentWizard\Views\Shared\_Layout.cshtml" />
