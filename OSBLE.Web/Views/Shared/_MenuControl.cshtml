@@ -3,6 +3,10 @@
 {
     foreach (OSBLE.Controllers.OSBLEController.MenuItem m in ViewBag.Menu)
     {
+        var test1 = ViewBag.CurrentUser;
+        var test2 = ViewBag.ActiveCourse;
+        var test3 = m;
+        
         if (ViewBag.CurrentUser != null && ViewBag.ActiveCourse != null && m.IsVisibleTo(ViewBag.CurrentUser, ViewBag.ActiveCourse))
         {
             <li class="@(ViewBag.CurrentTab == m.Name?"active":"")">
