@@ -8,13 +8,20 @@
     @Html.Partial("~/Areas/Analytics/Views/Analytics/_AnalyticsMenu.cshtml")    
 </div>
 
-<div id="analytics_options">
+
+@*  Let each view use their own default options
+    <div id="analytics_options">
     @Html.Partial("~/Areas/Analytics/Views/Default/_DefaultOptions.cshtml")
-    @*@Html.Partial("~/Areas/Analytics/Views/Calendar/_CalendarOptions.cshtml")*@
-</div>
+    @Html.Partial("~/Areas/Analytics/Views/Calendar/_CalendarOptions.cshtml")
+</div>*@
 
 <div id="analytics_content">
     @Html.Partial("_Default")
 </div>
 
 <script type="text/javascript" src="@Url.Content("~/Areas/Analytics/Scripts/AnalyticsIndex.js")"></script>
+
+<script type="text/javascript" src="@Url.Content("~/Areas/Analytics/Scripts/d3.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Areas/Analytics/Scripts/bullet.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Areas/Analytics/Scripts/data-visualization.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Areas/Analytics/Scripts/jquery.datetimepicker.js")"></script>

@@ -1,3 +1,34 @@
-﻿<div >
-    <h1>TIMELINE</h1>
-</div>
+﻿@using OSBLEPlus.Logic.Utility
+@Styles.Render("~/Areas/Analytics/Content/jquery.datetimepicker.css")
+@Styles.Render("~/Areas/Analytics/Content/Timeline.css")
+
+<section data-tab="Analytics" id="analytics" class="container-fluid">
+            <div class="row">
+                <div class="col-xs-2">
+                     @Html.Partial("~/Areas/Analytics/Views/Timeline/_TimelineOptions.cshtml")
+                </div>
+                <div class="col-xs-10">
+                    <div data-type="chart-area">
+                        <div class="row" id="chartBody">
+                            <table>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        @Html.Partial("~/Areas/Analytics/Views/Timeline/DataVisualizationLegend.cshtml")
+                        @Html.Partial("~/Areas/Analytics/Views/Timeline/DataVisualizationLegendDetails.cshtml")
+                    </div>
+                    <div data-type="spinner">
+                        <div class="col-xs-4"></div>
+                        <img src="@Url.Content("~/Areas/Analytics/Content/loading.gif")" class="col-xs-1" />
+                    </div>
+                </div>
+            </div>
+</section>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        DataVisualization.Init();
+        Chart.Draw();
+    });
+</script>
+

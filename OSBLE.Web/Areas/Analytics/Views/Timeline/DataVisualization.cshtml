@@ -1,0 +1,85 @@
+﻿@model OSBIDE.Data.DomainObjects.VisualizationParams
+
+@using OSBIDE.Web.Models.Analytics
+@using OSBIDE.Data.DomainObjects
+
+@Styles.Render("~/Content/bootstrap.css")
+@Styles.Render("~/Content/jquery.datetimepicker.css")
+
+
+
+<section data-tab="Analytics" id="analytics" class="container-fluid">
+    @using (Html.BeginForm("GetCSVData", "DataVisualization", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+    {
+        <div data-wzstep="@WizardSteps.DataVisualization">
+            <div class="row">
+                <div class="col-xs-1">
+                </div>
+                <div class="col-xs-10">
+                    <div class="row">
+                        <div class="col-xs-9">
+                            <h2>Data Visualization</h2>
+                        </div>
+                        <div class="col-xs-2 wizard">
+                            <a data-wzstep="@WizardSteps.Procedure" href="@Url.Action("Procedure", "Analytics")">Prev</a>
+                            <a style="display:none" data-wzstep="@WizardSteps.Procedure">Next</a>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-xs-1 control-label">Time Scale:</label>
+                        <div class="col-xs-1">
+                            <select name="ScaleSetting" id="timescale-setting" class="form-control">
+                                @foreach (var e in Enum<TimeScale>.Get())
+                                {
+                                    var selected = (int)Model.TimeScale == e.Value ? "selected" : string.Empty;
+                                    <option value="@e.Value" @selected>@e.Text</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-xs-2 bootstrap-timepicker">
+                            @Html.TextBoxFor(m => m.TimeFrom, new { id = "timeFrom", Value = Model.TimeFrom.HasValue ? Model.TimeFrom.Value.ToString("yyyy/MM/dd hh:mm") : string.Empty, @class = "form-control", placeholder = "From" })
+                            <i class="icon-time"></i>
+                        </div>
+                        <div id="ad-hoc-date" class="col-xs-1 bootstrap-override">
+                            to
+                        </div>
+                        <div class="col-xs-2  bootstrap-timepicker">
+                            @Html.TextBoxFor(m => m.TimeTo, new { id = "timeTo", Value = Model.TimeTo.HasValue ? Model.TimeTo.Value.ToString("yyyy/MM/dd hh:mm") : string.Empty, @class = "form-control", placeholder = "To" })
+                            <i class="icon-time"></i>
+                        </div>
+                        <div class="col-xs-1"><a href="javascript:" class="btn btn-primary">redraw</a></div>
+                        <label class="col-xs-2 control-label">Idle Timeout (min):</label>
+                        <div class="col-xs-1"><input class="form-control" type="text" id="timeout" name="Timeout" placeholder="3" /></div>
+                        <label class="col-xs-1 control-label">Grayscale:</label><input type="checkbox" id="grayscale" />
+                    </div>
+                    <div data-type="chart-area">
+                        <div class="row">
+                            <span class="col-xs-2">
+                            </span>
+                            <a id="download">Export current visualization to CSV</a>
+                        </div>
+                        <div class="row" id="chartBody">
+                            <table>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        @Html.Partial("~/Views/Analytics/DataVisualizationLegend.cshtml")
+                        @Html.Partial("~/Views/Analytics/DataVisualizationLegendDetails.cshtml")
+                    </div>
+                    <div data-type="spinner">
+                        <div class="col-xs-4"></div>
+                        <img src="@Url.Content("~/Content/icons/loading.gif")" class="col-xs-1" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</section>
+
+@section Scripts
+{
+    <script type="text/javascript" src="~/Scripts/Charts/d3.js"></script>
+    <script type="text/javascript" src="~/Scripts/Charts/bullet.js"></script>
+    <script type="text/javascript" src="~/Scripts/Charts/data-visualization.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery.datetimepicker.js"></script>
+}

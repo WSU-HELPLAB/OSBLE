@@ -6,6 +6,7 @@
     [SenderId]     INT      NOT NULL,
     [CourseId]     INT,
     [BatchId]      BIGINT,
+    [SolutionName] VARCHAR(2000) NULL, 
     CONSTRAINT [PK_EventLogs_Id] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_EventLogs_EventTypes] FOREIGN KEY ([EventTypeId]) REFERENCES [dbo].[EventTypes] ([EventTypeId]),
     CONSTRAINT [FK_EventLogs_UserProfiles] FOREIGN KEY ([SenderId]) REFERENCES [dbo].[UserProfiles] ([ID]),
