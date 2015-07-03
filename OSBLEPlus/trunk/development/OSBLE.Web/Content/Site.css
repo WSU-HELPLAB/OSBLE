@@ -26,10 +26,6 @@ input {
     z-index: 2000;
 }
 
-#main_content {
-    margin-top:60px;
-}
-
 /* Dashboard */
 
  #dashboard_pills {
@@ -55,6 +51,11 @@ input {
 #dashboard_left h4, #dashboard_middle h4, #dashboard_right h4 {
     margin-top: 0.5em;
     margin-bottom: 0.25em;
+}
+
+/* this should be temporary, files and links is wierd and needs to be stuctured better... */
+#divFileManager {
+    margin-top: 20px;
 }
 
 .roster_table tr td {

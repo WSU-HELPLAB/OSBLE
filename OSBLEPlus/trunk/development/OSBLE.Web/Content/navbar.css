@@ -1,6 +1,8 @@
 .navbar-default {
   background-color: #0b4874;
   border-color: #003052;
+  margin-bottom: 10px;
+  border-radius: 0 !important;
 }
 .navbar-default .navbar-brand {
   color: #e4e4e4;
@@ -63,10 +65,6 @@
 	margin-top: 6px;
 	margin-right: 10px;
 	margin-left: 6px;
-}
-
-#main_container {		
-	margin-top: 60px;
 }
 
 #helptext {
