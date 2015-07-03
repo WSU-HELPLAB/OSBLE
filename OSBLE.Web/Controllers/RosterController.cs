@@ -796,9 +796,11 @@ namespace OSBLE.Controllers
 
             //mark notification read
             Notification n = db.Notifications.FirstOrDefault(item => item.SenderID == pendingUser.ID && item.RecipientID == ActiveCourseUser.ID);
-            if(n != null)
-                n.Read = true;
+            /*if(n != null)
+                n.Read = true;*/
 
+            // remove the notification rather than mark it as read, there is a conflict with the 
+            // database when we remove the pending user and they aren't associated with the notification anymore.
             db.Notifications.Remove(n);
 
             //remove the kid from the db
