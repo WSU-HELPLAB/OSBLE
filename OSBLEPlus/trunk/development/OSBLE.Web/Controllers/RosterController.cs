@@ -795,9 +795,11 @@ namespace OSBLE.Controllers
             string lastName = pendingUser.UserProfile.LastName;
 
             //mark notification read
-            Notification n = db.Notifications.Where(item => item.SenderID == pendingUser.ID && item.RecipientID == ActiveCourseUser.ID).FirstOrDefault();
+            Notification n = db.Notifications.FirstOrDefault(item => item.SenderID == pendingUser.ID && item.RecipientID == ActiveCourseUser.ID);
             if(n != null)
                 n.Read = true;
+
+            db.Notifications.Remove(n);
 
             //remove the kid from the db
             db.CourseUsers.Remove(pendingUser);
