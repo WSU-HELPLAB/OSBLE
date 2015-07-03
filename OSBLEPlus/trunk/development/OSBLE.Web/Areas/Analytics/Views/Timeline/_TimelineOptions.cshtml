@@ -1,2 +1,30 @@
-﻿
-<h1>Timeline OPTIONS</h1>
+﻿@using OSBLEPlus.Logic.Utility
+
+
+<div id="timeline-options">
+    <div>Time Scale:</div>
+    <div>
+        <select name="ScaleSetting" id="timescale-setting" class="form-control">
+            @foreach (var e in Enum<TimeScale>.Get())
+            {
+                var selected = e.Value == (int)TimeScale.Days ? "selected" : string.Empty;
+                <option value="@e.Value" @selected>@e.Text</option>
+            }
+        </select>
+    </div>
+    <div>
+        <input type="text" id="timeFrom" />
+        <i class="icon-time"></i>
+    </div>
+    <div>
+        to
+    </div>
+    <div>
+        <input type="text" id="timeTo" />
+        <i class="icon-time"></i>
+    </div>
+    <div><a href="javascript:" class="btn btn-primary">redraw</a></div>
+    <div>Idle Timeout (min):</div>
+    <div><input class="form-control" type="text" id="timeout" name="Timeout" placeholder="3" /></div>
+    <div>Grayscale:</div><input type="checkbox" id="grayscale" />
+</div>

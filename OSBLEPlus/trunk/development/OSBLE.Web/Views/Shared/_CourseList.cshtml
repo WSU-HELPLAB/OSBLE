@@ -6,10 +6,10 @@
     <li class="dropdown" id="course_select">
         @if (ViewBag.ActiveCourseUser != null)
         {
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                @DBHelper.GetCourseShortNameFromID(ViewBag.ActiveCourseUser.AbstractCourseID, connection)
-                <span class="caret"></span>
-            </a>
+    <a data-course-id="@ViewBag.ActiveCourseUser.AbstractCourseID" class="dropdown-toggle" data-toggle="dropdown" href="#">
+        @DBHelper.GetCourseShortNameFromID(ViewBag.ActiveCourseUser.AbstractCourseID, connection)
+        <span class="caret"></span>
+    </a>
         }
         else
         {

@@ -60,9 +60,15 @@
     <Compile Include="DataAccess\Activities\Posts.cs" />
     <Compile Include="DataAccess\Activities\Feeds.cs" />
     <Compile Include="DataAccess\Analytics\Calendar.cs" />
+    <Compile Include="DataAccess\Analytics\TimelineStateDictionaries.cs" />
+    <Compile Include="DataAccess\Analytics\TimelineVisualization.cs" />
     <Compile Include="DataAccess\Lookups\Courses.cs" />
     <Compile Include="DataAccess\Profiles\CourseDataAccess.cs" />
     <Compile Include="DomainObjects\ActivityFeeds\SubmisionAssignment.cs" />
+    <Compile Include="DomainObjects\Analytics\StateMachineEvent.cs" />
+    <Compile Include="DomainObjects\Analytics\TimelineChartData.cs" />
+    <Compile Include="DomainObjects\Analytics\TimelineCriteria.cs" />
+    <Compile Include="DomainObjects\Analytics\VisualizationParams.cs" />
     <Compile Include="DomainObjects\Helpers\LocalErrorLog.cs" />
     <Compile Include="DomainObjects\Interface\IActivityEvent.cs" />
     <Compile Include="DomainObjects\Interface\IEventLog.cs" />

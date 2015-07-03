@@ -102,6 +102,9 @@
     <Compile Include="Controllers\EventCollectionController.Helper.cs" />
     <Compile Include="Controllers\EventCollectionController.cs" />
     <Compile Include="Controllers\FeedController.cs" />
+    <Compile Include="Controllers\TimelineController.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Controllers\UserProfilesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
