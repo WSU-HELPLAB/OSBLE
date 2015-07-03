@@ -767,6 +767,7 @@
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\moment.min.js" />
     <Content Include="Scripts\multifile.js" />
+    <Content Include="Scripts\navbar.js" />
     <Content Include="Scripts\npm.js" />
     <Content Include="Scripts\osble.assignments.js" />
     <Content Include="Scripts\osble.assignment_list.js" />
