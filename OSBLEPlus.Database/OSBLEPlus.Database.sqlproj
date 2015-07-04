@@ -213,12 +213,18 @@
     <Build Include="Schema\Stored Procedures\Profiles\GetAssignmentsForCourse.sql" />
     <Build Include="Schema\Stored Procedures\Activiities\GetMostRecentSocialActivityForUser.sql" />
     <Build Include="Schema\Tables\LocalErrorLogs.sql" />
+    <Build Include="Schema\Tables\PassiveSocialEvents.sql" />
+    <Build Include="Schema\Stored Procedures\Analytics\GetStateMachineEvents.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Post-Deployment\Script.PostDeployment.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Schema\Tables\FeedPostUserTags.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Docs\AutoDeploy.txt" />
+    <None Include="OSBLEPlus.Database.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Docs\AutoDeploy.txt" />

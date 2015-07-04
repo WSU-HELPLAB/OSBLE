@@ -341,10 +341,14 @@
     <Content Include="Areas\Analytics\Content\AnalyticsIndex.css" />
     <Content Include="Areas\Analytics\Content\Calendar.css" />
     <Content Include="Areas\Analytics\Content\loading.gif" />
+    <Content Include="Areas\Analytics\Content\Timeline.css" />
     <Content Include="Areas\Analytics\Scripts\AnalyticsIndex.js" />
+    <Content Include="Areas\Analytics\Scripts\bullet.js" />
     <Content Include="Areas\Analytics\Scripts\Calendar.js" />
     <Content Include="Areas\Analytics\Scripts\d3-tip.min.js" />
     <Content Include="Areas\Analytics\Scripts\d3.min.js" />
+    <Content Include="Areas\Analytics\Scripts\data-visualization.js" />
+    <Content Include="Areas\Analytics\Scripts\jquery.datetimepicker.js" />
     <Content Include="Areas\Analytics\Scripts\TrendingCalendar.js" />
     <Content Include="Areas\AssignmentDetails\Content\css\Home.css" />
     <Content Include="Areas\AssignmentDetails\Content\js\Home.js" />
@@ -732,6 +736,13 @@
     <Content Include="Areas\Analytics\Views\Analytics\_AnalyticsMenu.cshtml" />
     <Content Include="Areas\Analytics\Views\Analytics\_Default.cshtml" />
     <Content Include="Areas\Analytics\Views\Timeline\_TimelineOptions.cshtml" />
+    <Content Include="Areas\Analytics\Views\Timeline\DataVisualizationLegend.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Areas\Analytics\Views\Timeline\DataVisualizationLegendDetails.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Areas\Analytics\Content\jquery.datetimepicker.css" />
     <None Include="Properties\PublishProfiles\filesystem.pubxml" />
     <None Include="Scripts\jquery-2.0.1.intellisense.js" />
     <Content Include="Scripts\jquery-2.0.1.js" />

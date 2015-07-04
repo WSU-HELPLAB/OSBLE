@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using OSBLEPlus.Logic.Utility;
 
-namespace OSBIDE.Data.SQLDatabase
+namespace OSBLEPlus.Logic.DataAccess.Analytics
 {
     public class TimelineStateDictionaries
     {
