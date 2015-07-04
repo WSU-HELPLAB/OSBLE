@@ -4,7 +4,6 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using Dapper;
-using OSBIDE.Data.SQLDatabase;
 using OSBLEPlus.Logic.DomainObjects.Analytics;
 using OSBLEPlus.Logic.Utility;
 
