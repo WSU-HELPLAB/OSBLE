@@ -7,19 +7,19 @@
         @if (ViewBag.ActiveCourseUser != null)
         {
     <a data-course-id="@ViewBag.ActiveCourseUser.AbstractCourseID" class="dropdown-toggle" data-toggle="dropdown" href="#">
-        @DBHelper.GetCourseShortNameFromID(ViewBag.ActiveCourseUser.AbstractCourseID, connection)
-        <span class="caret"></span>
-    </a>
+                @DBHelper.GetCourseShortNameFromID(ViewBag.ActiveCourseUser.AbstractCourseID, connection)
+                <span class="caret"></span>
+            </a>
         }
         else
         {
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                No Courses
+                No Courses 
                 <span class="caret"></span>
             </a>
         }
-            <ul class="dropdown-menu">
-    
+        <ul class="dropdown-menu">
+
             @if(ViewBag.ActiveCourseUser != null)
             {
                 IEnumerable<CourseUser> courses = DBHelper.GetCoursesFromUserProfileID(OsbleAuthentication.CurrentUser.ID, connection);
@@ -31,7 +31,7 @@
                     <li class="dropdown-header">Courses</li>
                     foreach (CourseUser cu in courses)
                     {
-                    <li class="course-item @(ViewBag.ActiveCourseUser.AbstractCourseID == cu.AbstractCourseID ? "active" : "")" data-courseid="@cu.AbstractCourseID">
+                        <li class="course-item @(ViewBag.ActiveCourseUser.AbstractCourseID == cu.AbstractCourseID ? "active" : "")" data-courseid="@cu.AbstractCourseID">
                         @Html.ActionLink(DBHelper.GetCourseFullNameFromCourseUser(cu, connection), "SetCourse", "Home", new { area = "", courseID = cu.AbstractCourseID}, null)
                         </li>
                     }
@@ -42,13 +42,16 @@
                     <li class="dropdown-header">Communities</li>
                     foreach (CourseUser cu in communities)
                     {
-                    <li class="@(ViewBag.ActiveCourseUser.AbstractCourseID == cu.AbstractCourseID ? "active" : "")" data-courseid="@cu.AbstractCourseID">
-                        @Html.ActionLink(DBHelper.GetCourseFullNameFromCourseUser(cu, connection), "SetCourse", "Home", new {courseID = cu.AbstractCourseID}, null)
+                        <li class="course-item @(ViewBag.ActiveCourseUser.AbstractCourseID == cu.AbstractCourseID ? "active" : "")" data-courseid="@cu.AbstractCourseID">
+                            @Html.ActionLink(DBHelper.GetCourseFullNameFromCourseUser(cu, connection), "SetCourse", "Home", new { area = "", courseID = cu.AbstractCourseID }, null)
                         </li>
                     }
-                <li class="divider"></li>            
                 }
             }
+
+
+            @* Set up our course actions *@
+            <li class="divider"></li>
 
             @if (ViewBag.CurrentUser != null && ViewBag.CurrentUser.CanCreateCourses)
             {
@@ -87,23 +90,25 @@
     </li>
 }
 
+@* The following are javascript methods that open dialogs for the various course buttons *@
 @if (ViewBag.CurrentUser != null)
 {
+    // ************* CREATE COURSE ***************
     if (ViewBag.CurrentUser.CanCreateCourses)
-    {
+    { 
         <script type="text/javascript">
             function create_and_open_course_create_dialog()
             {
                 //create the div that we will then make into a dialog
                 $('body').append(
                     '<div id="course_create_dialog" title="Create"> \
-                            <p>Would you like to create a course, community or an assessment committee?</p> \
-                            <ul> \
-                                <li>@Html.ActionLink("Create Course", "Create", "Course", new { area = "" }, null) </li> \
-                                <li>@Html.ActionLink("Create Community", "Create", "Community", new { area = "" }, null) </li> \
-                                <li>@Html.ActionLink("Create Assessment Committee", "Create", "Committee", new { area = "" }, null) </li> \
-                            </ul> \
-                        </div>');
+                        <p>Would you like to create a course, community or an assessment committee?</p> \
+                        <ul> \
+                            <li>@Html.ActionLink("Create Course", "Create", "Course", new { area = "" }, null) </li> \
+                            <li>@Html.ActionLink("Create Community", "Create", "Community", new { area = "" }, null) </li> \
+                            <li>@Html.ActionLink("Create Assessment Committee", "Create", "Committee", new { area = "" }, null) </li> \
+                        </ul> \
+                    </div>');
 
                 //make the div we just created into a dialog box
                 $('#course_create_dialog').dialog({
@@ -130,66 +135,69 @@
             }
         </script>
     }
-    else
+
+    // ************* WITHDRAW COURSE ***************
+    if (ViewBag.ActiveCourse != null && !(ViewBag.ActiveCourse.AbstractRole.CanModify))
     {
-    <script type="text/javascript">
+        <script type="text/javascript">
 
-        function withdraw_course_dialog() {
+            function withdraw_course_dialog() {
 
-            //create the div that we will then make into a dialog
+                //create the div that we will then make into a dialog
 
-            $('body').append(
-           '<div id="withdraw_course_dialog" title="Withdraw"> \
+                $('body').append(
+               '<div id="withdraw_course_dialog" title="Withdraw"> \
                 <p>Are you sure you want to withdraw from the current course? This action is irreversible and you \
                 must contact the course instructor to be reenrolled</p>\
                 <button onclick="withdraw_user()">Withdraw</button>\
                 <button onclick="remove_withdraw_course_dialog()">Cancel</button>\
                 </div>');
 
-            //make the div we just created into a dialog box
+                //make the div we just created into a dialog box
 
-            $('#withdraw_course_dialog').dialog({
-                modal: true,
-                autoOpen: true,
-                resizable: false,
-                width: 350,
-                height: 220,
-                closeOnEscape: true,
-                close: remove_withdraw_course_dialog
-            });
+                $('#withdraw_course_dialog').dialog({
+                    modal: true,
+                    autoOpen: true,
+                    resizable: false,
+                    width: 350,
+                    height: 220,
+                    closeOnEscape: true,
+                    close: remove_withdraw_course_dialog
+                });
 
 
 
-            $('#course_create_dialog').dialog('open');
+                $('#course_create_dialog').dialog('open');
 
-            return false;
-
-        }
-
-        function remove_withdraw_course_dialog() {
-
-            //change the dialog back into a normal div (that is what destroy does although it does not destroy the div)
-            $('#withdraw_course_dialog').dialog("destroy");
-
-            //then remove the div
-            $('#withdraw_course_dialog').remove();
-        }
-
-        function withdraw_user() {
-
-            remove_withdraw_course_dialog();
-            var url = "/Account/WithdrawFromCourse";
-            $.get(url, function (data) {
-                location.reload();
                 return false;
-            });
-        }
 
-    </script>
+            }
+
+            function remove_withdraw_course_dialog() {
+
+                //change the dialog back into a normal div (that is what destroy does although it does not destroy the div)
+                $('#withdraw_course_dialog').dialog("destroy");
+
+                //then remove the div
+                $('#withdraw_course_dialog').remove();
+            }
+
+            function withdraw_user() {
+
+                remove_withdraw_course_dialog();
+                var url = "/Account/WithdrawFromCourse";
+                $.get(url, function (data) {
+                    location.reload();
+                    return false;
+                });
+            }
+
+        </script>
     }
 }
 
-    <script type="text/javascript">
+@* ************* COURSE SEARCH *************** *@
+<script type="text/javascript">
     function create_and_open_course_search_dialog() {
 
         //create the div that we will then make into a dialog
@@ -216,7 +224,7 @@
         $('#course_search_dialog').dialog('open');
 
         return false;
-}
+    }
 
     function remove_course_search_dialog() {
 
@@ -225,7 +233,7 @@
 
         //then remove the div
         $('#course_search_dialog').remove();
-}
+    }
 </script>
 
 
@@ -233,137 +241,44 @@
 
 
 @*
-@if (ViewBag.CurrentUser != null && ViewBag.CurrentUser.CanCreateCourses)
-{
-    <a href="#" onclick="create_and_open_course_create_dialog()" title="Create Course or Community" id="course_create_button" class="course_modify_buttons">@Helpers.AddButton()</a>
-    <a href="#" onclick="search_and_open_course_search_dialog()" title="Search for Course" id="course_create_button" class="course_modify_buttons">@Helpers.SearchButton()</a>  
-    if (ViewBag.ActiveCourse != null && ViewBag.ActiveCourse.AbstractRole.CanModify)
+    @if (ViewBag.CurrentUser != null && ViewBag.CurrentUser.CanCreateCourses)
     {
-    <a href="/Course/Delete" title="Delete current course / community" class="course_modify_buttons">@Helpers.DeleteButton()</a>
-    }
-    
-  
-    <script type="text/javascript">
-
-    function create_and_open_course_create_dialog() {
-
-        //create the div that we will then make into a dialog
-
-        $('body').append(
-       '<div id="course_create_dialog" title="Create"> \
-        <p>Would you like to create a course, community or an assessment committee?</p><ul> \
-        <li>@Html.ActionLink("Create Course", "Create", "Course", new { area = "" }, null) </li> \*@
-
-    @*<li>@Html.ActionLink("Clone Course", "CloneCourse", "Course", new { area = "" }, null) </li>*@
-
- @*                                                                                                   
-<li>@Html.ActionLink("Create Community", "Create", "Community", new { area = "" }, null) </li> \
-<li>@Html.ActionLink("Create Assessment Committee", "Create", "Committee", new { area = "" }, null) </li> \
-    </ul></div>');
-
-        //make the div we just created into a dialog box
-
-        $('#course_create_dialog').dialog({
-            modal: true,
-            autoOpen: true,
-            resizable: false,
-            width: 350,
-            height: 220,
-            closeOnEscape: true,
-            close: remove_course_create_dialog
-        });
+        <a href="#" onclick="create_and_open_course_create_dialog()" title="Create Course or Community" id="course_create_button" class="course_modify_buttons">@Helpers.AddButton()</a>
+        <a href="#" onclick="search_and_open_course_search_dialog()" title="Search for Course" id="course_create_button" class="course_modify_buttons">@Helpers.SearchButton()</a>
+        if (ViewBag.ActiveCourse != null && ViewBag.ActiveCourse.AbstractRole.CanModify)
+        {
+        <a href="/Course/Delete" title="Delete current course / community" class="course_modify_buttons">@Helpers.DeleteButton()</a>
+        }
 
 
+        <script type="text/javascript">
 
-        $('#course_create_dialog').dialog('open');
-
-        return false;
-
-    }
-
-    function remove_course_create_dialog() {
-
-        //change the dialog back into a normal div (that is what destroy does although it does not destroy the div)
-        $('#course_create_dialog').dialog("destroy");
-
-        //then remove the div
-        $('#course_create_dialog').remove();
-    }
-    </script>
-
-    <script type="text/javascript">
-
-            function search_and_open_course_search_dialog() {
-
-                //create the div that we will then make into a dialog
-
-                $('body').append(
-               '<div id="course_search_dialog" title="Search For A Course/Community"> \
-        <ul> \
-        <li>@Html.ActionLink("Courses", "CourseSearch", "Course", new { area = "" }, null) </li> \
-        <li>@Html.ActionLink("Communities", "CommunitySearch", "Course", new { area = "" }, null) </li> \
-    </ul></div>');
-
-                //make the div we just created into a dialog box
-
-                $('#course_search_dialog').dialog({
-                    modal: true,
-                    autoOpen: true,
-                    resizable: false,
-                    width: 350,
-                    height: 220,
-                    closeOnEscape: true,
-                    close: remove_course_search_dialog
-                });
-
-
-
-                $('#course_search_dialog').dialog('open');
-
-                return false;
-
-            }
-
-            function remove_course_search_dialog() {
-
-                //change the dialog back into a normal div (that is what destroy does although it does not destroy the div)
-                $('#course_search_dialog').dialog("destroy");
-
-                //then remove the div
-                $('#course_search_dialog').remove();
-            }
-        </script>
-    
-    
-    
-}
-else if (ViewBag.CurrentUser != null)    //yc adding a withdraw button this user cannot create courses so they can probably removethemselves from a course
-{
-    <a href="#" onclick="withdraw_course_dialog()" title="Withdraw From Course" id="course_withdraw_button" class="course_modify_buttons">@Helpers.DeleteButton()</a>
-    <script type="text/javascript">
-
-        function withdraw_course_dialog() {
+        function create_and_open_course_create_dialog() {
 
             //create the div that we will then make into a dialog
 
             $('body').append(
-           '<div id="withdraw_course_dialog" title="Withdraw"> \
-            <p>Are you sure you want to withdraw from the current course? This action is irreversible and you \
-            must contact the course instructor to be reenrolled</p>\
-            <button onclick="withdraw_user()">Withdraw</button>\
-            <button onclick="remove_withdraw_course_dialog()">Cancel</button>\
-            </div>');
+           '<div id="course_create_dialog" title="Create"> \
+            <p>Would you like to create a course, community or an assessment committee?</p><ul> \
+            <li>@Html.ActionLink("Create Course", "Create", "Course", new { area = "" }, null) </li> \*@
+
+        @*<li>@Html.ActionLink("Clone Course", "CloneCourse", "Course", new { area = "" }, null) </li>*@
+
+@*
+    <li>@Html.ActionLink("Create Community", "Create", "Community", new { area = "" }, null) </li> \
+    <li>@Html.ActionLink("Create Assessment Committee", "Create", "Committee", new { area = "" }, null) </li> \
+        </ul></div>');
 
             //make the div we just created into a dialog box
 
-            $('#withdraw_course_dialog').dialog({
+            $('#course_create_dialog').dialog({
                 modal: true,
                 autoOpen: true,
                 resizable: false,
                 width: 350,
                 height: 220,
                 closeOnEscape: true,
-                close: remove_withdraw_course_dialog
+                close: remove_course_create_dialog
             });
 
 
@@ -374,71 +289,164 @@ else if (ViewBag.CurrentUser != null)    //yc adding a withdraw button this user
 
         }
 
-        function remove_withdraw_course_dialog() {
+        function remove_course_create_dialog() {
 
             //change the dialog back into a normal div (that is what destroy does although it does not destroy the div)
-            $('#withdraw_course_dialog').dialog("destroy");
+            $('#course_create_dialog').dialog("destroy");
 
             //then remove the div
-            $('#withdraw_course_dialog').remove();
+            $('#course_create_dialog').remove();
         }
-
-       function withdraw_user() {
-            
-            remove_withdraw_course_dialog();
-            var url = "/Account/WithdrawFromCourse";
-            $.get(url, function (data) {
-                location.reload();
-                return false;
-            });
-       }
-        
-    </script>
-    if(ViewBag.CurrentUser != null && !(ViewBag.CurrentUser.CanCreateCourses)) //fw: crease a button so users may search communities and courses
-    {
-        <a href="#" onclick="search_and_open_course_search_dialog()" title="Search for Course" id="course_create_button" class="course_modify_buttons">@Helpers.SearchButton()</a>
+        </script>
 
         <script type="text/javascript">
 
-            function search_and_open_course_search_dialog() {
+                function search_and_open_course_search_dialog() {
+
+                    //create the div that we will then make into a dialog
+
+                    $('body').append(
+                   '<div id="course_search_dialog" title="Search For A Course/Community"> \
+            <ul> \
+            <li>@Html.ActionLink("Courses", "CourseSearch", "Course", new { area = "" }, null) </li> \
+            <li>@Html.ActionLink("Communities", "CommunitySearch", "Course", new { area = "" }, null) </li> \
+        </ul></div>');
+
+                    //make the div we just created into a dialog box
+
+                    $('#course_search_dialog').dialog({
+                        modal: true,
+                        autoOpen: true,
+                        resizable: false,
+                        width: 350,
+                        height: 220,
+                        closeOnEscape: true,
+                        close: remove_course_search_dialog
+                    });
+
+
+
+                    $('#course_search_dialog').dialog('open');
+
+                    return false;
+
+                }
+
+                function remove_course_search_dialog() {
+
+                    //change the dialog back into a normal div (that is what destroy does although it does not destroy the div)
+                    $('#course_search_dialog').dialog("destroy");
+
+                    //then remove the div
+                    $('#course_search_dialog').remove();
+                }
+            </script>
+
+
+
+    }
+    else if (ViewBag.CurrentUser != null)    //yc adding a withdraw button this user cannot create courses so they can probably removethemselves from a course
+    {
+        <a href="#" onclick="withdraw_course_dialog()" title="Withdraw From Course" id="course_withdraw_button" class="course_modify_buttons">@Helpers.DeleteButton()</a>
+        <script type="text/javascript">
+
+            function withdraw_course_dialog() {
 
                 //create the div that we will then make into a dialog
 
                 $('body').append(
-               '<div id="course_search_dialog" title="Search For A Course/Community"> \
-        <ul> \
-        <li>@Html.ActionLink("Courses", "CourseSearch", "Course", new { area = "" }, null) </li> \
-        <li>@Html.ActionLink("Communities", "CommunitySearch", "Course", new { area = "" }, null) </li> \
-    </ul></div>');
+               '<div id="withdraw_course_dialog" title="Withdraw"> \
+                <p>Are you sure you want to withdraw from the current course? This action is irreversible and you \
+                must contact the course instructor to be reenrolled</p>\
+                <button onclick="withdraw_user()">Withdraw</button>\
+                <button onclick="remove_withdraw_course_dialog()">Cancel</button>\
+                </div>');
 
                 //make the div we just created into a dialog box
 
-                $('#course_search_dialog').dialog({
+                $('#withdraw_course_dialog').dialog({
                     modal: true,
                     autoOpen: true,
                     resizable: false,
                     width: 350,
                     height: 220,
                     closeOnEscape: true,
-                    close: remove_course_search_dialog
+                    close: remove_withdraw_course_dialog
                 });
 
 
 
-                $('#course_search_dialog').dialog('open');
+                $('#course_create_dialog').dialog('open');
 
                 return false;
 
             }
 
-            function remove_course_search_dialog() {
+            function remove_withdraw_course_dialog() {
 
                 //change the dialog back into a normal div (that is what destroy does although it does not destroy the div)
-                $('#course_search_dialog').dialog("destroy");
+                $('#withdraw_course_dialog').dialog("destroy");
 
                 //then remove the div
-                $('#course_search_dialog').remove();
+                $('#withdraw_course_dialog').remove();
             }
+
+           function withdraw_user() {
+
+                remove_withdraw_course_dialog();
+                var url = "/Account/WithdrawFromCourse";
+                $.get(url, function (data) {
+                    location.reload();
+                    return false;
+                });
+           }
+
+        </script>
+        if(ViewBag.CurrentUser != null && !(ViewBag.CurrentUser.CanCreateCourses)) //fw: crease a button so users may search communities and courses
+        {
+            <a href="#" onclick="search_and_open_course_search_dialog()" title="Search for Course" id="course_create_button" class="course_modify_buttons">@Helpers.SearchButton()</a>
+
+            <script type="text/javascript">
+
+                function search_and_open_course_search_dialog() {
+
+                    //create the div that we will then make into a dialog
+
+                    $('body').append(
+                   '<div id="course_search_dialog" title="Search For A Course/Community"> \
+            <ul> \
+            <li>@Html.ActionLink("Courses", "CourseSearch", "Course", new { area = "" }, null) </li> \
+            <li>@Html.ActionLink("Communities", "CommunitySearch", "Course", new { area = "" }, null) </li> \
+        </ul></div>');
+
+                    //make the div we just created into a dialog box
+
+                    $('#course_search_dialog').dialog({
+                        modal: true,
+                        autoOpen: true,
+                        resizable: false,
+                        width: 350,
+                        height: 220,
+                        closeOnEscape: true,
+                        close: remove_course_search_dialog
+                    });
+
+
+
+                    $('#course_search_dialog').dialog('open');
+
+                    return false;
+
+                }
+
+                function remove_course_search_dialog() {
+
+                    //change the dialog back into a normal div (that is what destroy does although it does not destroy the div)
+                    $('#course_search_dialog').dialog("destroy");
+
+                    //then remove the div
+                    $('#course_search_dialog').remove();
+                }
 
             </script>
         }
