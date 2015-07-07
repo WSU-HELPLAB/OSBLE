@@ -46,6 +46,9 @@
 .navbar-default .navbar-link:hover {
   color: #ffffff;
 }
+.navbar .nav > li {
+    z-index: 10000;
+}
 
 #course_label {
     display: none;
