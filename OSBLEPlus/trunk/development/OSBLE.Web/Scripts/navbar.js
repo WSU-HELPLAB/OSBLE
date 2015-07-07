@@ -1,7 +1,7 @@
 ﻿
 // Makes tabs go under "more" dropdown to save space on the navbar
 function ResizeTabs() {
-    var w = $(window).width();
+    var w = $('body').width();
 
     if ($(".navbar-toggle").css("display") != "none") {
         if ($(".MoreTab").length > 0) {
@@ -15,13 +15,13 @@ function ResizeTabs() {
             // Shrink
             var tab = $(".NavTab").last();
 
-            tabWidthAffordance -= tab.width();
             tab.data("twidth", tab.width());
 
             tab.prependTo($("#MoreList"));
             tab.removeClass("NavTab").addClass("MoreTab");
 
             $("#MoreDrop").css("display", "block");
+            tabWidthAffordance = 35 + $(".navbar-header").width() + $("#NavList").width() + $(".navbar-right").width();
         }
         if ($(".MoreTab").length > 0) {
             var tab = $(".MoreTab").first();
@@ -31,6 +31,7 @@ function ResizeTabs() {
                 tabWidthAffordance += tab.data("twidth");
                 tab.insertAfter($(".NavTab").last());
                 tab.removeClass("MoreTab").addClass("NavTab");
+                tab = $(".MoreTab").first();
             }
 
             if($(".MoreTab").length == 0)
@@ -44,5 +45,4 @@ function ResizeTabs() {
 $(document).ready(function () {            
     $(window).resize(function () { ResizeTabs(); });
     ResizeTabs();
-    ResizeTabs(); // For some reason, running this only once will still result in stacking. But running it twice seems to fix that.
 });
