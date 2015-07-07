@@ -199,6 +199,12 @@ input {
     margin-top: 0.5em;
     margin-bottom: 0.5em;
 }
+
+.dashboard_mode .radio-inline {
+    margin-left: 0px;
+    margin-right: 10px;
+}
+
 /* End Dashboard Posts */
 
 /* Common layout elements */
