@@ -9,6 +9,18 @@
     function RemainingChars() {
         var remaining =  $('#MaxContentChars').val() - $('#ActivityFeed').val().length;
         $('#remChars').val("(" + remaining + ") Characters left");
+
+        // disable posting if no characters have been typed
+        if ($('#ActivityFeed').val().length == 0)
+        {
+            $('#btn_post_active').prop("disabled", true);
+            $('#btn_post_all').prop("disabled", true);
+        }
+        else
+        {
+            $('#btn_post_active').prop("disabled", false);
+            $('#btn_post_all').prop("disabled", false);
+        }
     }
 
     //we need to update the activity feed timestamps when it's done loading
@@ -25,6 +37,7 @@
             }
         });*@
         parseDates();
+        RemainingChars();
     });
 
     function completed() {
@@ -54,34 +67,40 @@
 
                 }))
             {
-                <input id="remChars" name="remainingChars" readonly="true" type="text" value="(@ViewBag.MaxActivityFeedLength) Characters left" /><br />
-                <textarea id="ActivityFeed" name="Content" rows="5" cols="40" placeholder="Enter new feed post here..."
-                          onkeyup="RemainingChars();" onkeydown="RemainingChars();" ></textarea><br />
+                <div class="form-group">
+                    <input id="remChars" name="remainingChars" readonly="readonly" type="text" value="(@ViewBag.MaxActivityFeedLength) Characters left" /><br />
+                    <textarea id="ActivityFeed" class="form-control" name="Content" rows="4" placeholder="Enter new feed post here..."
+                              onkeyup="RemainingChars();" onkeydown="RemainingChars();"></textarea>
+                </div>
 
-                <input type="submit" name="post_active" value="Post to @Helpers.CourseTag(ViewBag.ActiveCourse.AbstractCourse)" />
+                <input type="submit" id="btn_post_active" class="btn btn-default" name="post_active" value="Post to @Helpers.CourseTag(ViewBag.ActiveCourse.AbstractCourse)" />
 
                 if (ViewBag.IsInstructor)
                 {
-                    <input type="submit" name="post_all" value="Post to All Courses I Teach" onclick="return confirm('Post this message to all your taught courses?');" />
-                    <input type="checkbox" value="True" name="send_email" /> <text>Email to Class</text>
+                    <input type="submit" id="btn_post_all" class="btn btn-default" name="post_all" value="Post to All Courses I Teach" onclick="return confirm('Post this message to all your taught courses?');" />
+                    <label class="checkbox-inline"><input type="checkbox" value="True" name="send_email" /> Email to Class</label>
                 }
 
                 if (ViewBag.IsLeader)
                 {
-                    <input type="checkbox" value="True" name="send_email" /> <text>Email to Community</text>
+                    <label class="checkbox-inline"><input type="checkbox" value="True" name="send_email" /> Email to Community</label>
                 }
-
             }
         }
     }
 </div>
+
 <div class="dashboard_mode">
     @using (Html.BeginForm("SetDashboardMode", "Home", FormMethod.Post, new { id = "set_dashboard" }))
     {
-        <input type="radio" name="mode" value="false" @if (!ViewBag.DashboardSingleCourseMode) {<text>checked="checked"</text>}/>
-        <text>Show all courses/communities</text>
-        <input type="radio" name="mode" value="true" @if (ViewBag.DashboardSingleCourseMode) {<text>checked="checked"</text>}/>
-        <text>Show only <em>@Helpers.CourseTag(ViewBag.ActiveCourse.AbstractCourse)</em></text>
+        <label class="radio-inline">
+            <input type="radio" name="mode" value="false" @if (!ViewBag.DashboardSingleCourseMode) { <text> checked="checked" </text> } /> 
+            Show all courses/communities
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="mode" value="true" @if (ViewBag.DashboardSingleCourseMode) { <text> checked="checked" </text> } />
+            Show only <em>@Helpers.CourseTag(ViewBag.ActiveCourse.AbstractCourse)</em>
+        </label>
     }
 </div>
 <script type="text/javascript">
@@ -89,7 +108,9 @@
         $('#set_dashboard').submit();
     });
 </script>
-<div id="dp_posts">
+
+
+<div id="dp_posts" class="panel-group">
     @foreach (DashboardPost dp in ViewBag.DashboardPosts)
     {
         @Html.Partial("_DashboardPost", dp);
