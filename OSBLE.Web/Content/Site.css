@@ -34,6 +34,11 @@ input {
     display: none;
 }
 
+ #dashboard_pills .btn:not(.btn-primary) > .badge {
+     color: #f2f2f2;
+ }
+
+
 @media (max-width: 850px)
 {
     #dashboard_pills {

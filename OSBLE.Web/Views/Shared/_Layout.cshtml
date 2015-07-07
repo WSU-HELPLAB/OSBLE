@@ -14,7 +14,7 @@
     <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery-ui-1.8.13.custom.css")" />
     <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery-ui-timepicker.css")" />
     <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/bootstrap-3.3.5/css/bootstrap.min.css")" />
-    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/Site.css")?version=1.1.52" /> @* Update version to cause browsers to reload css file *@
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/Site.css")?version=1.1.70" /> @* Update version to cause browsers to reload css file *@
     <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/navbar.css")?version=1.10" />
     <link rel="shortcut icon" type="text/css" href="/Content/favicon.ico" />
 
@@ -72,7 +72,7 @@
 
                         <li class="dropdown">
                             <a id="profile_selector" class="dropdown-toggle" data-toggle="dropdown" href="#">
-                                <img id="profile_pic" class="hidden-xs" src="@Url.Action("Picture", "User", new { id = OsbleAuthentication.CurrentUser.ID, size = 30 })" />
+                                <img id="profile_pic" class="hidden-xs" src="@Url.Action("Picture", "User", new { id = OsbleAuthentication.CurrentUser.ID, size = 30, area = "" })" />
                                 @ViewBag.CurrentUser.FirstName 
                                 @ViewBag.CurrentUser.LastName
                                 @if (ViewBag.UnreadMessageCount > 0)
