@@ -54,53 +54,55 @@
 
 @using (Html.BeginForm()) {
     <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
-    <div>
+    <div class="row" id="login_form">
+        <div class="col-xs-10 col-xs-offset-1 col-sm-6 col-sm-offset-3 col-md-8 col-md-offset-2">
             <div class="editor-label">
                 @Html.LabelFor(m => m.UserName, "Email Address")
             </div>
             <div class="editor-field">
-                @Html.TextBoxFor(m => m.UserName, new { tabindex = "1" })<br />
+                @Html.TextBoxFor(m => m.UserName, new { tabindex = "1", @class = "form-control" })<br />
                 @Html.ValidationMessageFor(m => m.UserName)
             </div>
             <div class="editor-label">
                 @Html.LabelFor(m => m.Password)
             </div>
             <div class="editor-field">
-                @Html.PasswordFor(m => m.Password, new { tabindex = "2" })<br />
+                @Html.PasswordFor(m => m.Password, new { tabindex = "2", @class = "form-control" })<br />
                 @Html.ValidationMessageFor(m => m.Password)
             </div>
             <div class="editor-label">
                 @Html.CheckBoxFor(m => m.RememberMe, new { tabindex = "3" })
                 @Html.LabelFor(m => m.RememberMe)
-                @Helpers.CreateToolTip(ToolTips.AccountLogOnRemember) 
+                @Helpers.CreateToolTip(ToolTips.AccountLogOnRemember)
             </div>
 
             <!-- AC: Turn of captcha for now -->
             @if (false)
-            { 
-            <div>
-            Are you are robot trying to brute force someone's password? Prove it!<br />
-            Forgot your password? @Html.ActionLink("Click Here", "ResetPassword").
-            <br />Forgot your username? @Html.ActionLink("Click Here", "SendUsername").
-            <br />
-            @Html.Partial("_ReCaptcha")
-            </div>
+            {
+                <div>
+                    Are you are robot trying to brute force someone's password? Prove it!<br />
+                    Forgot your password? @Html.ActionLink("Click Here", "ResetPassword").
+                    <br />Forgot your username? @Html.ActionLink("Click Here", "SendUsername").
+                    <br />
+                    @Html.Partial("_ReCaptcha")
+                </div>
             }
 
             <p>
-                <input type="submit" value="Log On" />
+                <input type="submit" value="Log On" class="btn btn-default" />
             </p>
+        </div>
     </div>
-    
-    
+
+
     <p>
-        Don't have an account? @Html.ActionLink("Sign Up", "Register", null, new {id= "sign_up_link", tabindex = "4" }).
+        Don't have an account? @Html.ActionLink("Sign Up", "Register", null, new {id= "sign_up_link", tabindex = "4" })
     </p>
     <p>
-        Forgot your password? @Html.ActionLink("Click Here", "ResetPassword").
+        Forgot your password? @Html.ActionLink("Click Here", "ResetPassword", null, new { tabindex = "5"})
     </p>
     <p>
-        Forgot your username? @Html.ActionLink("Click Here", "FindUsername").
+        Forgot your username? @Html.ActionLink("Click Here", "FindUsername", null, new { tabindex = "6"})
     </p>
     <p>
         <!--Need help? <a href="#" tabindex="5">Click Here</a>.-->
