@@ -55,6 +55,14 @@ input {
     }
 }
 
+/* keeps things from being on the very bottom edge of the screen on tablets and phones*/
+@media(max-width: 992px)
+{
+    body {
+        padding-bottom: 20px;
+    }
+}
+
 #dashboard_left h4, #dashboard_middle h4, #dashboard_right h4 {
     margin-top: 0.5em;
     margin-bottom: 0.25em;
@@ -98,6 +106,10 @@ input {
 #activity_new_post .btn {
     margin-right: 5px;
     margin-bottom: 4px;
+}
+
+#activity_new_post .checkbox-inline {
+    margin-left: 10px;
 }
 
 /* Dashboard Posts */
@@ -450,16 +462,34 @@ li.wt_no_email {
 }
 /* LogOn/Register Screens */
 
+#logon_logo {
+    margin-left: -25px;
+    margin-right: -10px;
+}
+
 body#layoutLogOn {
     background-color: #074974;
     color: #eee;
     background-image: url('./images/logon_bg.jpg');
     background-repeat: no-repeat;
     background-position: center top;
+    padding-bottom: 20px;
 }
 
 #layoutLogOn h1, #layoutLogOn h2, #layoutLogOn h3, #layoutLogOn h4, #layoutLogOn h5, #layoutLogOn h6 {
     color: #eee;
+}
+
+@media (min-width: 992px) {
+    #login_form {
+        margin-bottom: 10px;
+    }
+}
+
+@media (max-width: 992px) {
+    #layoutLogOn p {
+        margin: 20px;
+    }
 }
 
 #layoutLogOn a {
@@ -475,11 +505,15 @@ body#layoutLogOn {
 }
 
 #contentLogOn {
-    margin-left: auto;
-    margin-right: auto;
     margin-top: 50px;
     text-align: center;
-    width: 615px;
+}
+
+@media (max-width: 992px)
+{
+    #contentLogOn {
+        margin-top: 10px;
+    }
 }
 
 #contentLogOn .input-validation-error {
