@@ -19,8 +19,7 @@ function assignmentfilemanager_update(assignmentID)
     // Get the current course ID
     var courseID = GetSelectedCourseID();
 
-    globlCourseID = selectCourseObj.value;
-
+    globlCourseID = courseID;
     globlAssignmentID = assignmentID;
 
     // Do the service request to get the file list for this assignment
