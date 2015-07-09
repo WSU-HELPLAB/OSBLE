@@ -718,12 +718,10 @@
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\AnchoredDiscussionSubmissionDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\AnchoredDiscussionSubmitDecorator.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\AnchoredDiscussionDocuments\Index.cshtml" />
-    <Content Include="Areas\Analytics\Views\Calendar\Calendar.cshtml" />
     <Content Include="Areas\Analytics\Views\Web.config" />
     <Content Include="Areas\Analytics\Views\Analytics\Index.cshtml" />
     <Content Include="Areas\Analytics\Views\Calendar\_Calendar.cshtml" />
     <Content Include="Areas\Analytics\Views\Timeline\_Timeline.cshtml" />
-    <Content Include="Areas\Analytics\Views\_Default.cshtml" />
     <Content Include="Content\bootstrap-3.3.5\css\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap-3.3.5\css\bootstrap.css.map" />
     <Content Include="Content\bootstrap-3.3.5\fonts\glyphicons-halflings-regular.eot" />

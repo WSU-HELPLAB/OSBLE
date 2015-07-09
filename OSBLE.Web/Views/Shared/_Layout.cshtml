@@ -42,14 +42,13 @@
     <script type="text/javascript" src="@Url.Content("~/Content/bootstrap-3.3.5/js/bootstrap.min.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/navbar.js")?version=1.8"></script>
 
-
     @RenderSection("Header", required: false)
     @RenderSection("SubHeader", required: false)
 
     </head>
     <body>
 
-        <nav class="navbar navbar-default">
+        <nav class="navbar navbar-default" id="NavigationBar">
             <div class="container-fluid">
 
                 <div class="navbar-header">

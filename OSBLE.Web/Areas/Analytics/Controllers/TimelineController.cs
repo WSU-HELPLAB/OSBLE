@@ -10,10 +10,17 @@ namespace OSBLE.Areas.Analytics.Controllers
     {
         //
         // GET: /Analytics/Calendar/
+        [ChildActionOnly]
         public ActionResult Index()
         {
             //return View("Calendar", new CalendarAttributes { ReferenceDate = DateTime.Today });
             return PartialView("_Timeline");
+        }
+
+        [ChildActionOnly]
+        public ActionResult Options()
+        {
+            return PartialView("_TimelineOptions");
         }
     }
 }

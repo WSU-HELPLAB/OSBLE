@@ -1,4 +1,5 @@
 ﻿@using OSBLE.Areas.Analytics.Controllers
+@Styles.Render("~/Areas/Analytics/Content/AnalyticsIndex.css?version=1.7")
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -14,9 +15,24 @@
     @Html.Partial("~/Areas/Analytics/Views/Default/_DefaultOptions.cshtml")
     @Html.Partial("~/Areas/Analytics/Views/Calendar/_CalendarOptions.cshtml")
 </div>*@
+@if (ViewBag.CurrentView != null)
+{ 
+    <div id="analytics_content" class="row">
+        <div id="analytics_right" class="col-sm-8 col-sm-push-4">
+            <h2 class="sr-only">@ViewBag.CurrentView View</h2>
+            <a id="options_link" class="visible-xs-block" href="#analytics_left">options <span class="glyphicon glyphicon-cog"></span></a>
 
-<div id="analytics_content">
-    @Html.Partial("_Default")
-</div>
+            @{ Html.RenderAction("Index", (string)ViewBag.CurrentView); }
+
+        </div>
+        <div id="analytics_left" class="col-sm-4 col-sm-pull-8">
+            <h2 class="sr-only">@ViewBag.CurrentView Options</h2>
+            <a id="view_link" class="visible-xs-block" href="#NavigationBar">show view <span class="glyphicon glyphicon-calendar"></span></a>
+
+            @{ Html.RenderAction("Options", (string)ViewBag.CurrentView); }
+
+        </div>
+    </div>
+}
 
 <script type="text/javascript" src="@Url.Content("~/Areas/Analytics/Scripts/AnalyticsIndex.js")"></script>
