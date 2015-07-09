@@ -14,18 +14,14 @@ namespace OSBLE.Areas.Analytics.Controllers
         public ActionResult Index()
         {
             ViewBag.CurrentTab = "Analytics";
-            return View("Index");
+            return RedirectToAction("Load", new { viewName = "Default" });
             //return RedirectToAction("Index", "Calendar");
         }
 
-        public ActionResult GetDefaultView()
+        public ActionResult Load(string viewName)
         {
-            return PartialView("~/Areas/Analytics/Views/Analytics/_Default.cshtml");
-        }
-
-        public ActionResult GetOptions()
-        {
-            return PartialView("~/Areas/Analytics/Views/Analytics/_DefaultOptions.cshtml");
+            ViewBag.CurrentView = viewName;
+            return View("Index");
         }
     }
 }

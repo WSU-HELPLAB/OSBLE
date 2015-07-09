@@ -1,18 +1,25 @@
 ﻿
-@Styles.Render("~/Areas/Analytics/Content/AnalyticsIndex.css?version=1.1")
 
-<div class="nav nav-analytics">
-    <ul>
-        <li class="">
-            @Ajax.ActionLink("Default", "Index", "Default", null, new AjaxOptions { UpdateTargetId = "analytics_content" }, new { @class = "menu_item current" })           
-        </li>
-        <li class="">
-            @Ajax.ActionLink("Calendar", "GetCalendar", "Calendar", null, new AjaxOptions { UpdateTargetId = "analytics_content" }, new { @class = "menu_item" })
-        </li>
-        <li class="">
-            @Ajax.ActionLink("Timeline", "Index", "Timeline", null, new AjaxOptions { UpdateTargetId = "analytics_content" }, new { @class = "menu_item" })
-        </li>
-        <li class="menu_item"><a href="#">[Other]</a></li>
-    </ul>
+<div class="btn-group btn-group-justified" id="analytics_pills">
+    @Html.ActionLink("Default", "Load", "Analytics", new { viewName = "Default" }, new { @class = ViewBag.CurrentView == "Default" ? "btn btn-primary" : "btn" })
+    @Html.ActionLink("Calendar", "Load", "Analytics", new { viewName = "Calendar" }, new { @class = ViewBag.CurrentView == "Calendar" ? "btn btn-primary" : "btn" })
+    @Html.ActionLink("Timeline", "Load", "Analytics", new { viewName = "Timeline" }, new { @class = ViewBag.CurrentView == "Timeline" ? "btn btn-primary" : "btn" })
+    <a href="#" class="btn" >[Other]</a>
 </div>
 
+@*
+    <div class="nav nav-analytics">
+        <ul>
+            <li class="">
+                @Ajax.ActionLink("Default", "Index", "Default", null, new AjaxOptions { UpdateTargetId = "analytics_content" }, new { @class = "menu_item current" })
+            </li>
+            <li class="">
+                @Ajax.ActionLink("Calendar", "GetCalendar", "Calendar", null, new AjaxOptions { UpdateTargetId = "analytics_content" }, new { @class = "menu_item" })
+            </li>
+            <li class="">
+                @Ajax.ActionLink("Timeline", "Index", "Timeline", null, new AjaxOptions { UpdateTargetId = "analytics_content" }, new { @class = "menu_item" })
+            </li>
+            <li class="menu_item"><a href="#">[Other]</a></li>
+        </ul>
+    </div>
+*@

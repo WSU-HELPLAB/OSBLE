@@ -12,16 +12,18 @@ namespace OSBLE.Areas.Analytics.Controllers
     {
         //
         // GET: /Analytics/Calendar/
+        [ChildActionOnly]
         public ActionResult Index()
         {
-            return View("_Calendar", new CalendarAttributes { ReferenceDate = DateTime.Today });
+            return PartialView("_Calendar", new CalendarAttributes { ReferenceDate = DateTime.Today });
             //return PartialView("_Calendar");
             //return PartialView("_Calendar", new CalendarAttributes {ReferenceDate = DateTime.Today});
         }
 
-        public ActionResult GetCalendar()
+        [ChildActionOnly]
+        public ActionResult Options()
         {
-            return PartialView("_Calendar", new CalendarAttributes { ReferenceDate = DateTime.Today });
+            return PartialView("_CalendarOptions", new CalendarAttributes { ReferenceDate = DateTime.Today });
         }
     }
 }

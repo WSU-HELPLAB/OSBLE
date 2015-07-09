@@ -10,9 +10,16 @@ namespace OSBLE.Areas.Analytics.Controllers
     {
         //
         // GET: /Analytics/Calendar/
+        [ChildActionOnly]
         public ActionResult Index()
         {
             return PartialView("_Default");
+        }
+
+        [ChildActionOnly]
+        public ActionResult Options()
+        {
+            return PartialView("_DefaultOptions");
         }
     }
 }
