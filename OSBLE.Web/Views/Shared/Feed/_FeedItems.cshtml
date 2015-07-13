@@ -1,0 +1,123 @@
+﻿@using OSBLE.Models.Users
+@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+@model List<AggregateFeedItem>
+@{
+    string additionalStyle = "";
+    if (ViewBag.FeedItemStyle != null)
+    {
+        additionalStyle = ViewBag.FeedItemStyle;
+    }
+    UserProfile currentUser = ViewBag.CurrentUser;
+    Dictionary<int, int> subscriptions = new Dictionary<int, int>();
+    //foreach (EventLogSubscription log in currentUser.LogSubscriptions)
+    //{
+    //    subscriptions[log.LogId] = log.LogId;
+    //}
+}
+@foreach (AggregateFeedItem item in Model)
+{
+    int lastLogId = item.Items.Select(m => m.Event.EventLogId).Max();
+    List<int> eventLogIds = item.Items.Select(i => i.Event.EventLogId).ToList();
+    bool isSubscribed = false;
+    foreach (int logId in eventLogIds)
+    {
+        if (subscriptions.ContainsKey(logId) == true)
+        {
+            isSubscribed = true;
+            break;
+        }
+    }
+    
+    //do we need to anonymize?
+    if(item.IsAnonymous == true && currentUser.ID != item.Creator.ID)
+    {
+        item.Creator.FirstName = "A student";
+        item.Creator.LastName = "";
+        item.Creator.ID = -1;
+    }
+    
+    <section id="feed-item-@lastLogId" data-id="@lastLogId" class="feed-item-single @additionalStyle">
+
+        <div class="feed-item-single-left">
+            <img src="@Url.Action("Picture", "Profile", new { id = item.Creator.ID, size = 64 })" height="64" width="64" title="profile image" alt="profile image" />
+            @*@if (item.HelpfulMarks > 0)
+            {
+                @:<span class="helpful-marks">+@item.HelpfulMarks</span>
+            }*@
+            @if (isSubscribed)
+            {
+                <img src="~/Content/icons/follow.png" alt="you are following this post" title="you are following this post" />
+            }
+        </div>
+        <div class="feed-item-single-right">
+            <h1>
+                <a href="@Url.Action("Index", "Profile", new { id = item.Creator.Id, component = OsbideVsComponent.UserProfile })">@item.Creator.FirstAndLastName</a>
+                <span class="feed-item-date">(@item.Creator.DefaultCourse.Name)</span>
+                <time class="utc-time feed-item-date"
+                      datetime="@Helpers.DateAsUnixTime(item.MostRecentOccurance)"
+                      data-original-date="@Helpers.RawDate(item.MostRecentOccurance)"
+                      data-date-format="MM/DD/YYYY hh:mm A">
+                    @item.MostRecentOccurance.ToString("MM/dd @ hh:mmtt") (UTC)
+                </time>
+            </h1>
+            <div>
+                @{
+    string partialName = string.Format("Feed/_{0}", item.Items.First().Event.EventName);
+                }
+                @Html.Partial(partialName, item)
+            </div>
+            <div class="feed-item-footer">
+                <ul>
+                    <li>
+                        <a id="expand-comments-@lastLogId"
+                           class="anchor-pointer"
+                           onclick="expandComments('@lastLogId')">
+                            <span id="expand-comments-text-@lastLogId">View</span> Conversation(<span data-bind="text: NumberOfComments">@item.Comments.Count</span>)
+                        </a>
+                    </li>
+                    @{
+    int[] ids = item.Items.Select(i => i.Event.EventLogId).ToArray();
+    string idString = string.Join(",", ids);
+                    }
+                    <li><a href="@Url.Action("Details", "Feed", new { id = idString, component = OsbideVsComponent.FeedDetails })">Details</a></li>
+                </ul>
+            </div>
+            <div class="feed-item-comments"
+                 id="feed-item-comments-@lastLogId"
+                 style="display:none;"
+                 data-bind="foreach: Comments">
+                <section class="log-comment-single">
+                    <div class="log-comment-profile-picture">
+                        <img src="@Url.Action("Picture", "Profile", new { id = -1, size = 48 })" title="profile image" alt="profile image" style="float:left;" data-bind="attr: { src: ProfileUrl }">
+                    </div>
+                    <div class="log-comment-content">
+                        <h1 data-bind="text: FirstAndLastName"></h1>
+                        <h2>
+                            (<span data-bind="text: CourseName" ></span>)
+                            <time data-bind="text: LocalDate, attr: { datetime: UtcUnixDate }"
+                                  data-date-format="MM/DD/YYYY hh:mm A">
+                            </time>
+                        </h2>
+                        <p>
+                            <pre class="normal-font" data-bind="text: Content"></pre>
+                        </p>
+                    </div>
+                    <div data-bind="if: DisplayHelpfulMarkLink">
+                        <a data-bind="attr: { href: MarkHelpfulUrl }">mark as helpful</a>
+                    </div>
+                    <div class="helpful-marks" style="clear: both;" data-bind="if: MarkHelpfulCount > 0">
+                        <span data-bind="text: HelpfulMarkCount"></span>
+                    </div>
+                </section>
+            </div>
+            <div class="feed-item-respond">
+                <textarea name="response" id="feed-item-respond-@lastLogId" placeholder="Say something..." style="width:250px;"></textarea>
+                <br />
+                <input name="response-submit" type="button" value="Send" onclick="sendResponse(@lastLogId)" />
+            </div>
+        </div>
+        <div style="clear: both;">
+            &nbsp;
+        </div>
+    </section>
+}

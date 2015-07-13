@@ -1,0 +1,38 @@
+﻿@using OSBLE.Models.Users
+@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+@model LogCommentEvent
+@{
+    LogCommentEvent comment = Model;
+    UserProfile CurrentUser = ViewBag.CurrentUser;
+    //HelpfulMarkGivenEvent helpful = comment.HelpfulMarks.Where(m => m.EventLog.SenderId == CurrentUser.Id).FirstOrDefault();
+    //int helpfulCount = comment.HelpfulMarks.Count();
+}
+<section class="log-comment-single" data-id="@Model.EventLogId" data-logid="@Model.SourceEventLogId">
+    <div class="log-comment-profile-picture">
+        <img src="@Url.Action("Picture", "User", new { id = comment.SenderId, size = 48 })" title="profile image" alt="profile image" style="float:left;" />
+    </div>
+    <div class="log-comment-content">
+        <h1>@comment.Sender.FullName</h1>
+        <h2>
+            <time class="utc-time"
+                  datetime="@Helpers.DateAsUnixTime(comment.EventDate)"
+                  data-original-date="@Helpers.RawDate(comment.EventDate)"
+                  data-date-format="MM/DD/YYYY hh:mm A">
+                @comment.EventDate.ToString("MM/dd @ hh:mmtt") (UTC)
+            </time>
+        </h2>
+        <p>
+            <pre class="normal-font">@comment.Content</pre>
+        </p>
+    </div>
+    @*@if (helpful == null && comment.SenderId != CurrentUser.ID)
+    {
+        <div>@Html.ActionLink("mark as helpful", "MarkCommentHelpful", "Feed", new { commentId = comment.ID, returnUrl = Request.Url.AbsoluteUri }, new { })</div>
+    }
+    <div class="helpful-marks" style="clear: both;">
+        @if (helpfulCount > 0)
+        {
+            @:+@helpfulCount
+                }
+    </div>*@
+</section>

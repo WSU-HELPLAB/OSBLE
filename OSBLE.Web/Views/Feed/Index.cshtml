@@ -1,0 +1,142 @@
+﻿@using OSBLE.Models.Courses
+@using OSBLEPlus.Logic.Utility
+@using OSBLEPlus.Logic.Utility.Lookups
+@model OSBLEPlus.Logic.DomainObjects.ActivityFeeds.FeedViewModel
+
+@{
+    ViewBag.Title = "Activity Feed";
+}
+
+<section data-tab="ActivityFeed" class="row">
+
+    <article class="col-xs-2">
+        <div class="activity-feed-dashboard">
+            <div class="trends-container">
+                <h3>Trends</h3>
+                <ul></ul>
+            </div>
+            <div class="notifications-container">
+                <h3>Notifications</h3>
+                <ul></ul>
+            </div>
+        </div>
+    </article>
+
+    <article class="col-xs-10">
+        <!--
+        <article style="max-width:500px;">
+            <h1>Notice</h1>
+            <p>In preparation for a higher than normal server load, automatic loading of new feed posts has been temporarily disabled.
+            In order to view the most recent feed items, you will need to manually Html.ActionLink("refresh", "Index", new { component = OsbideVsComponent.FeedOverview }, new {}) this page.</p>
+        </article>
+            -->
+        @using (Html.BeginForm("PostFeedComment", "Feed", FormMethod.Post, new { id = "post-comment-form", @class = "spinner" }))
+        {
+            <article id="add-feed-comment">
+                <h1>Post a comment:</h1>
+                <div>
+                    <textarea class="typeahead" name="comment"></textarea>
+                </div>
+                <input type="submit" name="submit" id="post-comment-button" value="Post Comment" />
+                <img class="submit-loading" src="~/Areas/Analytics/Content/loading.gif" title="loading" alt="loading" />
+                <input id="filter-options-button" type="button" value="Filter Options" />
+            </article>
+        }
+
+        @using (Html.BeginForm("Index", "Feed", FormMethod.Post))
+        {
+            <article id="keywordSection">
+                <h2>Filter by keywords</h2>
+                <div><input type="text" class="typeahead" name="keyword" autocomplete="off" value="@Model.Keyword" /></div>
+            </article>
+        }
+
+        @using (Html.BeginForm("ApplyFeedFilter", "Feed"))
+        {
+            <article id="filter-options" style="display: none;">
+                <article>
+                    <h2>Filter by Activity Type:</h2>
+                    <ul>
+                        @foreach (var e in Enum<EventType>.Get())
+                        {
+                            if (Model.EventFilterOptions.Contains((EventType)e.Value))
+                            {
+                                var evt = Model.EventFilterOptions.Single(o => (int)o == e.Value);
+
+                                string checkbox = "";
+                                if (Model.UserEventFilterOptions.Where(o => o == evt).Count() > 0)
+                                {
+                                    checkbox = @"checked=""checked""";
+                                }
+                                <li>
+                                    <input @Html.Raw(checkbox) type="checkbox" id="event_@evt.ToString()" name="event_@evt.ToString()" />
+                                    <label for="event_@evt.ToString()">@e.Text</label>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </article>
+                @*<article>
+                    <h2>Filter by Error Type:</h2>
+                    <select name="error-type">
+                        <option value="-1">No Filter</option>
+                        @foreach (ErrorType error in Model.ErrorTypes)
+                        {
+                            string selectedText = "";
+                            if (error.Name.CompareTo(Model.SelectedErrorType.Name) == 0)
+                            {
+                                selectedText = @"selected=""selected""";
+                            }
+                            <option @Html.Raw(selectedText) value="@error.Id">@error.Name</option>
+                        }
+                    </select>
+                </article>*@
+                <article>
+                    <h2>Filter by Course</h2>
+                    <select name="course-filter">
+                        <option value="-1">No Filter</option>
+                        @foreach (Course course in Model.Courses)
+                        {
+                            string selectedText = "";
+                            if (course.ID.CompareTo(Model.SelectedCourseId) == 0)
+                            {
+                                selectedText = @"selected=""selected""";
+                            }
+                            <option @Html.Raw(selectedText) value="@course.ID">@course.Name</option>
+                        }
+                    </select>
+                </article>
+                <article>
+                    <h2>Filter by User Type</h2>
+                    <select name="user-type-filter">
+                        <option value="-1">No Filter</option>
+                        @foreach (CourseRole.CourseRoles role in Model.CourseRoles)
+                        {
+                            string selectedText = "";
+                            int roleValue = (int)role;
+                            string roleName = Enum.GetName(typeof(CourseRole), role);
+                            if (role == Model.SelectedCourseRole)
+                            {
+                                selectedText = @"selected=""selected""";
+                            }
+                            <option @Html.Raw(selectedText) value="@roleValue">@roleName</option>
+                        }
+                    </select>
+                </article>
+                <input type="submit" name="ApplyFeedFilter" value="Apply Filter" />
+                <img class="submit-loading" src="~/Areas/Analytics/Content/loading.gif" title="loading" alt="loading" />
+            </article>
+        }
+        @Html.Partial("Feed/_Feed", Model)
+
+    </article>
+
+</section>
+
+@*@section Scripts
+{
+    <script type="text/javascript" src="~/Scripts/Typeahead/typeahead-0.10.4.js"></script>
+    <script type="text/javascript" src="~/Scripts/Typeahead/osbide-posts.js"></script>
+    <script type="text/javascript" src="~/Scripts/Typeahead/jquery.textcomplete.js"></script>
+    <script type="text/javascript" src="~/Scripts/Typeahead/jquery.overlay.js"></script>
+}*@

@@ -39,6 +39,12 @@ namespace OSBLE
                         "~/Content/themes/base/jquery.ui.datepicker.css",
                         "~/Content/themes/base/jquery.ui.progressbar.css",
                         "~/Content/themes/base/jquery.ui.theme.css"));
+
+            //// for ActivityFeed
+            //bundles.Add(new StyleBundle("~/Content/css").Include(
+            //    "~/Content/Calendar.css",
+            //    "~/Content/AnalyticsIndex.css?version=1.1"
+            //    ));
         }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
+using System.IO;
 using System.Linq;
 using System.Net.Mail;
+using System.Reflection;
 using System.Web.Mvc;
 using System.Threading.Tasks;
 using DotNetOpenAuth.Messaging;
@@ -14,6 +16,8 @@ using OSBLE.Utility;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
 using OSBLEPlus.Logic.Utility.Lookups;
 using OSBLEPlus.Services.Controllers;
+using OSBLEPlus.Logic.DataAccess.Activities;
+using OSBLEPlus.Logic.DomainObjects.Interface;
 
 namespace OSBLE.Controllers
 {
@@ -58,7 +62,6 @@ namespace OSBLE.Controllers
             }
 
             SetupPostDisplay(dp);
-
             ViewBag.DashboardPost = dp;
 
             ViewBag.DashboardSingleCourseMode = false; // Force course/community prefixes to show when viewing thread.
@@ -66,6 +69,8 @@ namespace OSBLE.Controllers
             return View(dp);
         }
 
+        // For new ActivityFeed need to return
+        // Task<ActionResult>
         public ActionResult ActivityFeed()
         {
             SetupActivityFeed();
@@ -83,6 +88,8 @@ namespace OSBLE.Controllers
             ViewBag.DashboardPostCount = dashboardPosts.Count();
         }
 
+        // for new activity feed
+        // need to connect to the feed controller
         private void SetupActivityFeed(int startPost = 0, bool showAll = false)
         {
             // Pagination defaults
@@ -242,6 +249,73 @@ namespace OSBLE.Controllers
             }
         }
 
+        // for new activity feed
+        // private void SetupPostDisplay(FeedItem post)
+        //{
+        //    List<CourseUser> courseList = new List<CourseUser>();
+
+        //    courseList = db.CourseUsers.Where(c => c.AbstractCourseID == post.Event.CourseId).ToList();
+
+        //    // Get Course/User link for current user.
+        //    CourseUser currentCu = courseList.FirstOrDefault(c => c.UserProfileID == CurrentUser.ID);
+
+        //    // " " for poster of post/reply.
+        //    CourseUser posterCu = courseList.FirstOrDefault(c => c.UserProfileID == post.Event.SenderId);
+
+
+        //    /*** Setup Display Name/Display Title/Profile Picture/Mail Button/Delete Button ***/
+
+        //    // If user is not anonymous, this post was written by current user, or the poster is an Instructor/TA, display name and picture.
+        //    if (currentCu != null && ((posterCu == null) || !currentCu.AbstractRole.Anonymized || (currentCu.UserProfileID == posterCu.UserProfileID) || posterCu.AbstractRole.CanGrade))
+        //    {
+        //        // Display Name (may be anonymous depending on currentCu's AbstractRoleID)
+        //        ///post.Event.SenderId = posterCu.UserProfileID != null ? posterCu.DisplayName(currentCu.AbstractRoleID, true) : "Deleted User";
+
+        //        // cannot reply to non-FeedPostEvent
+        //        if (post.Event is FeedPostEvent)
+        //        {
+        //            post.Event.CanReply = true;
+        //        }
+
+        //        // Allow deletion if current user is poster or is an instructor
+        //        if (currentCu.AbstractRole.CanModify || ((posterCu != null) && (posterCu.UserProfileID == currentCu.UserProfileID)))
+        //        {
+        //            post.Event.CanDelete = true;
+        //        }
+        //        else
+        //        {
+        //            post.Event.CanDelete = false;
+        //        }
+
+        //        // If current user is not the poster, allow mailing
+        //        if (posterCu != null && posterCu.UserProfileID != currentCu.UserProfileID)
+        //        {
+        //            post.Event.CanMail = true;
+        //        }
+        //        else
+        //        {
+        //            post.Event.CanMail = false;
+        //        }
+
+        //        if (posterCu != null)
+        //        {
+        //            // Display Titles for Instructors/TAs for Courses, or Leader of Communities.
+        //            post.Event.DisplayTitle = GetRoleTitle(posterCu.AbstractRoleID);
+        //            post.Event.ShowProfilePicture = true;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        // Display Anonymous name (or "Deleted User")
+        //        post.Event.DisplayTitle = posterCu != null ? posterCu.DisplayName((int)CourseRole.CourseRoles.Observer, true) : "Deleted User";
+
+        //        // Profile picture will display default picture.
+        //        post.Event.ShowProfilePicture = false;
+        //        post.Event.CanMail = false;
+        //        post.Event.CanDelete = false;
+        //        post.Event.CanReply = false;
+        //    }
+        //}
         /// <summary>
         /// Sets up display settings for dashboard posts and replies.
         /// </summary>
@@ -272,13 +346,18 @@ namespace OSBLE.Controllers
             /*** Setup Display Name/Display Title/Profile Picture/Mail Button/Delete Button ***/
 
             // If user is not anonymous, this post was written by current user, or the poster is an Instructor/TA, display name and picture.
-            if (currentCu != null && ((posterCu == null) || !currentCu.AbstractRole.Anonymized || (currentCu.UserProfileID == posterCu.UserProfileID) || posterCu.AbstractRole.CanGrade))
+            if (currentCu != null &&
+                ((posterCu == null) || !currentCu.AbstractRole.Anonymized ||
+                 (currentCu.UserProfileID == posterCu.UserProfileID) || posterCu.AbstractRole.CanGrade))
             {
                 // Display Name (may be anonymous depending on currentCu's AbstractRoleID)
-                post.DisplayName = posterCu != null ? posterCu.DisplayName(currentCu.AbstractRoleID, true) : "Deleted User";
+                post.DisplayName = posterCu != null
+                    ? posterCu.DisplayName(currentCu.AbstractRoleID, true)
+                    : "Deleted User";
 
                 // Allow deletion if current user is poster or is an instructor
-                if (currentCu.AbstractRole.CanModify || ((posterCu != null) && (posterCu.UserProfileID == currentCu.UserProfileID)))
+                if (currentCu.AbstractRole.CanModify ||
+                    ((posterCu != null) && (posterCu.UserProfileID == currentCu.UserProfileID)))
                 {
                     post.CanDelete = true;
                 }
@@ -299,7 +378,9 @@ namespace OSBLE.Controllers
             else
             {
                 // Display Anonymous name (or "Deleted User")
-                post.DisplayName = posterCu != null ? posterCu.DisplayName((int)CourseRole.CourseRoles.Observer, true) : "Deleted User";
+                post.DisplayName = posterCu != null
+                    ? posterCu.DisplayName((int) CourseRole.CourseRoles.Observer, true)
+                    : "Deleted User";
 
                 // Profile picture will display default picture.
                 post.ShowProfilePicture = false;
@@ -310,7 +391,7 @@ namespace OSBLE.Controllers
             // For root posts only
             if (post is DashboardPost)
             {
-                DashboardPost thisDp = (DashboardPost)post;
+                DashboardPost thisDp = (DashboardPost) post;
 
                 // For posts, set reply box display if the course allows replies or if Instructor/TA/Observer.
                 if (currentCu != null && ((currentCu.AbstractCourse is Course &&
@@ -331,6 +412,7 @@ namespace OSBLE.Controllers
                 }
             }
         }
+
 
         /// <summary>
         /// Gets optional role title for certain roles in a course/community
@@ -446,20 +528,123 @@ namespace OSBLE.Controllers
             ViewBag.MaxActivityFeedLength = 4000;
         }
 
+        // for new activity feed
+        //public ActionResult NewPost(FeedPostEvent f)
+        //{
+        //    List<CourseUser> coursesToPost = new List<CourseUser>();
+
+        //    bool sendEmail = Convert.ToBoolean(Request.Form["send_email"]);
+
+        //    if (Request.Form["post_active"] != null)
+        //    { // Post to active course only.
+        //        coursesToPost.Add(ActiveCourseUser);
+        //    }
+        //    else if (Request.Form["post_all"] != null)
+        //    { // Post to all courses.
+        //        coursesToPost = currentCourses.Where(cu => cu.AbstractCourse is Course && cu.AbstractRole.CanModify && !cu.Hidden).ToList();
+        //    }
+
+        //    foreach (CourseUser cu in coursesToPost)
+        //    {
+        //        AbstractCourse c = cu.AbstractCourse;
+        //        if (cu.AbstractRole.CanGrade || ((c != null) && (c.AllowDashboardPosts)))
+        //        {
+        //            List<IActivityEvent> itemToPost = new List<IActivityEvent>();
+
+        //            // update the FeedPostEvent information
+        //            f.EventDate = DateTime.Now;
+        //            f.EventTypeId = (int)EventType.FeedPostEvent;
+        //            f.SenderId = cu.UserProfileID;
+        //            f.SolutionName = new Uri(Path.GetDirectoryName(Assembly.GetExecutingAssembly().GetName().CodeBase)).LocalPath;
+        //            f.CourseId = ActiveCourseUser.AbstractCourseID;
+
+        //            // AJ: to post an Item we need to add it to a list, so we can associate multiple events in the future
+        //            itemToPost.Add(f);
+
+        //            Posts.Post(itemToPost);
+
+        //            if (ModelState.IsValid)
+        //            {
+        //                //db.DashboardPosts.Add(newDp);
+        //                //db.SaveChanges();
+
+        //                ////construct the subject & body
+        //                string subject = "";
+        //                string body = "";
+        //                List<MailAddress> addresses = new List<MailAddress>();
+        //                DateTime postedTime = DateTime.Now;
+
+
+        //                ////slightly different messages depending on course type
+        //                if (c is Course)
+        //                {
+        //                    Course course = c as Course;
+        //                    subject = "[" + course.Prefix + " " + course.Number + "] New Activity Post from " + CurrentUser.FirstName + " " + CurrentUser.LastName;
+        //                    body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message to the class at " + postedTime + ":";
+        //                }
+        //                else if (c is Community)
+        //                {
+        //                    Community community = c as Community;
+        //                    subject = "[" + community.Nickname + "] New Activity Post from " + CurrentUser.FirstName + " " + CurrentUser.LastName;
+        //                    body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message to the community at " + postedTime + ":";
+        //                }
+        //                else
+        //                {
+        //                    //this should never execute, but just in case...
+        //                    subject = "OSBLE Activity Post";
+        //                    body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message at " + postedTime + ":";
+        //                }
+        //                body += "<br /><br />";
+        //                body += f.Comment.Replace("\n", "<br />");
+        //                body += string.Format("<br /><br /><a href=\"http://osble.org/Home/Course?courseId={0}&postId={0}\">View and reply to post in OSBLE</a>",
+        //                    ActiveCourseUser.AbstractCourseID
+        //                    /////////////////////
+        //                    /// Need to find the ID of the EventLog, change last {0} back to {1} when fixed
+        //                    /// /////////////////
+        //                    //newDp.ID
+        //                    );
+
+        //                List<CourseUser> courseUser = db.CourseUsers.Where(couseuser => couseuser.AbstractCourseID == c.ID).ToList();
+
+        //                ////Who gets this email?  If the instructor desires, we send to everyone
+        //                if (c != null && sendEmail && cu.AbstractRole.CanModify)
+        //                {
+        //                    foreach (CourseUser member in courseUser)
+        //                    {
+        //                        if (member.UserProfile.UserName != null) // Ignore pending users
+        //                        {
+        //                            addresses.Add(new MailAddress(member.UserProfile.UserName, member.UserProfile.FirstName + " " + member.UserProfile.LastName));
+        //                        }
+        //                    }
+        //                }
+        //                //If the instructor didn't want to send to everyone, only send to those
+        //                //that want to receive everything
+        //                else
+        //                {
+        //                    foreach (CourseUser member in courseUser)
+        //                    {
+        //                        if (member.UserProfile.UserName != null && member.UserProfile.EmailAllActivityPosts) // Ignore pending users
+        //                        {
+        //                            addresses.Add(new MailAddress(member.UserProfile.UserName, member.UserProfile.FirstName + " " + member.UserProfile.LastName));
+        //                        }
+        //                    }
+        //                }
+
+        //                //Send the message
+        //                Email.Send(subject, body, addresses);
+        //            }
+        //        }
+        //    }
+
+        //    // using this for mail within OSBLE still
+        //    db.SaveChanges();
+        //    return RedirectToAction("Index");
+        //}
         [HttpPost]
         public ActionResult NewPost(DashboardPost dp)
         {
             dp.CourseUser = ActiveCourseUser;
             dp.Posted = DateTime.UtcNow;
-
-            //AJ: Start of what we will need for a new post on the activity feed
-            //FeedItem f = new FeedItem();
-
-            //f.Comments = null;
-            //f.Event = new FeedPostEvent()
-            //{
-            //    Comment = Convert.ToString(Request.Form["Content"]),
-            //};
 
             List<CourseUser> coursesToPost = new List<CourseUser>();
 

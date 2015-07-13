@@ -11,6 +11,7 @@ using OSBLE.Models.Courses;
 using OSBLE.Areas.AssignmentDetails.Models.TableBuilder;
 using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models;
+using OSBLE.Models.AbstractCourses.Course;
 
 namespace OSBLE.Areas.AssignmentDetails.ViewModels
 {

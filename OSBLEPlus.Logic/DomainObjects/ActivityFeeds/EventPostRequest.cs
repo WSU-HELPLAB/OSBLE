@@ -1,4 +1,5 @@
-﻿namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+﻿using OSBLEPlus.Logic.Utility;
+namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
     public class EventPostRequest
     {

@@ -19,7 +19,7 @@
         var pastCourses = ViewBag.pastCourses;
         int courseAssignmentCount = 0;
 
-        foreach (OSBLE.Models.Courses.CourseUser cu in ViewBag.pastCourses)
+        foreach (CourseUser cu in ViewBag.pastCourses)
         {
             //get the semester/year info for the course
             string semester = "";

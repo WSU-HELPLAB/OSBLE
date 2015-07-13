@@ -1,0 +1,10 @@
+﻿@using OSBLE.Models.Users
+@model OSBLEPlus.Logic.DomainObjects.ActivityFeeds.AggregateFeedItem
+@{
+    UserProfile currentUser = ViewBag.CurrentUser;
+}
+@*@if(Model.Creator.ID == currentUser.ID)
+{
+    //allow students to download their submissions
+    @Html.ActionLink("Download assignment", "DownloadStudentAssignment", "Assignment", new { id = Model.Items.FirstOrDefault().Event.EventLogId }, new { })
+}*@

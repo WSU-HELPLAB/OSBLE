@@ -12,6 +12,7 @@ using OSBLEPlus.Logic.DomainObjects.Profiles;
 using OSBLEPlus.Logic.Utility;
 using OSBLEPlus.Logic.Utility.Lookups;
 using OSBLE.Interfaces;
+using OSBLE.Models.Users;
 
 namespace OSBLEPlus.Logic.DataAccess.Activities
 {
@@ -38,7 +39,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                                             DateReceivedMax = dateReceivedMax,
                                             EventLogIds = l,
                                             EventTypes = t,
-                                            CourseId =courseId ?? 0,
+                                            CourseId = courseId ?? 0,
                                             RoleId = roleId ?? 99,
                                             CommentFilter = c,
                                             SenderIds = s,
@@ -46,7 +47,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                                         }, commandType: CommandType.StoredProcedure);
 
                 var eventLogs = multiResults.Read<ActivityEvent>().ToList();
-                var users = multiResults.Read<User>().ToList();
+                var users = multiResults.Read<UserProfile>().ToList();
                 var askHelps = multiResults.Read<AskForHelpEvent>().ToList();
                 var builds = multiResults.Read<BuildEvent>().ToList();
                 var exceptions = multiResults.Read<ExceptionEvent>().ToList();
@@ -67,7 +68,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
             }
         }
 
-        private static IEnumerable<FeedItem> NormalizeDataObjects(IList<ActivityEvent> eventLogs, IList<User> users,
+        private static IEnumerable<FeedItem> NormalizeDataObjects(IList<ActivityEvent> eventLogs, IList<UserProfile> users,
             IList<AskForHelpEvent> askHelps, IList<BuildEvent> builds, IList<ExceptionEvent> exceptions,
             IList<FeedPostEvent> feedPosts, IList<LogCommentEvent> logComments,
             IList<HelpfulMarkGivenEvent> helpMarks, IList<SubmitEvent> submits)
@@ -217,7 +218,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
 
         private static List<LogCommentEvent> ComposeComments(IActivityEvent subjectEvent,
             IList<ActivityEvent> eventLogs,
-            IList<User> users,
+            IList<UserProfile> users,
             IEnumerable<LogCommentEvent> logComments,
             IList<HelpfulMarkGivenEvent> helpMarks,
             Dictionary<int, IUser> userDictionary)
@@ -246,7 +247,9 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
         private static IUser GetUser(Dictionary<int, IUser> userDictionary, IEnumerable<IUser> users, int userId)
         {
             if (!userDictionary.Keys.Contains(userId))
-                userDictionary.Add(userId, users.Single(y => y.UserId == userId));
+                // change to firstordefault from single to prevent errors, may cause errors in the future?
+                userDictionary.Add(userId, users.FirstOrDefault(y => y.UserId == userId));
+                
 
             return userDictionary[userId];
         }

@@ -82,7 +82,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             var solutionData = temp==null?"Null":string.Format("0x{0}", BitConverter.ToString(temp));
             solutionData = solutionData.Replace("-", string.Empty);
             return string.Format(@"
-INSERT INTO dbo.EventLogs (EventTypeID, EventDate, SenderId, BatchId) VALUES ({0}, '{1}', {2})
+INSERT INTO dbo.EventLogs (EventTypeID, EventDate, SenderId, BatchId) VALUES ({0}, '{1}', {2}, '{6}')
 INSERT INTO dbo.SubmitEvents (EventLogId, EventDate, SolutionName, AssignmentId, SolutionData)
 VALUES (SCOPE_IDENTITY(), '{1}', '{3}', {4}, {5})", EventTypeId, EventDate, SenderId, SolutionName, AssignmentId, solutionData);
         }

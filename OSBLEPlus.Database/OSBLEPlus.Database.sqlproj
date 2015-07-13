@@ -231,4 +231,11 @@
   <ItemGroup>
     <None Include="Docs\AutoDeploy.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="OSBLEPlus.Database.publish.xml" />
+    <None Include="OSBLEPlus_1.Database.publish.xml" />
+  </ItemGroup>
+  <PropertyGroup>
+    <PostBuildEvent>sqlpackage /Action:Publish /SourceFile:"OSBLEPlus.Database.dacpac" /pr:..\..\OSBLEPlus.Database.publish.xml</PostBuildEvent>
+  </PropertyGroup>
 </Project>

@@ -266,6 +266,7 @@
     <Compile Include="Controllers\DepartmentsController.cs" />
     <Compile Include="Controllers\DiscussionAssignmentController.cs" />
     <Compile Include="Controllers\EventController.cs" />
+    <Compile Include="Controllers\FeedController.cs" />
     <Compile Include="Controllers\FileHandlerController.cs" />
     <Compile Include="Controllers\GradebookController.cs" />
     <Compile Include="Controllers\HelpController.cs" />
@@ -286,6 +287,8 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\Queries\ActivityFeedQuery.cs" />
+    <Compile Include="Models\Queries\IOSBLEQuery.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\CsvParser.cs" />
     <Compile Include="Resources\CSVReader\CSVDriver.cs" />
@@ -880,7 +883,7 @@
     <Content Include="Views\Home\ViewThread.cshtml" />
     <Content Include="Views\Home\_ActivityFeed.cshtml" />
     <Content Include="Views\Home\_AjaxEmpty.cshtml" />
-    <Content Include="Views\Home\_DashboardPost.cshtml" />
+    <Content Include="Views\Home\_FeedItem.cshtml" />
     <Content Include="Views\Home\_ImportantDates.cshtml" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />
     <Content Include="Views\Mail\Create.cshtml" />
@@ -951,12 +954,37 @@
     <Content Include="Views\Clone\CourseSetup.cshtml" />
     <Content Include="Views\Clone\CloneAssignment.cshtml" />
     <Content Include="Views\Course\CloneCourse.cshtml" />
+    <Content Include="Views\Home\_Replies.cshtml" />
+    <Content Include="Views\Home\_Post.cshtml" />
+    <Content Include="Views\Shared\Feed\_AskForHelpEvent.cshtml" />
+    <Content Include="Views\Shared\Feed\_BuildEvent.cshtml" />
+    <Content Include="Views\Shared\Feed\_DebugEvent.cshtml" />
+    <Content Include="Views\Shared\Feed\_ExceptionEvent.cshtml" />
+    <Content Include="Views\Shared\Feed\_Feed.cshtml" />
+    <Content Include="Views\Shared\Feed\_FeedFooter.cshtml" />
+    <Content Include="Views\Shared\Feed\_FeedItems.cshtml" />
+    <Content Include="Views\Shared\Feed\_FeedPostEvent.cshtml" />
+    <Content Include="Views\Shared\Feed\_HelpfulMarkGivenEvent.cshtml" />
+    <Content Include="Views\Shared\Feed\_LogCommentEvent.cshtml" />
+    <Content Include="Views\Shared\Feed\_SubmitEvent.cshtml" />
+    <Content Include="Views\Feed\AjaxFeed.cshtml" />
+    <Content Include="Views\Feed\Details.cshtml" />
+    <Content Include="Views\Feed\GetItemUpdates.cshtml" />
+    <Content Include="Views\Feed\Index.cshtml" />
+    <Content Include="Views\Feed\Details\_AskForHelpEvent.cshtml" />
+    <Content Include="Views\Feed\Details\_BuildEvent.cshtml" />
+    <Content Include="Views\Feed\Details\_DebugEvent.cshtml" />
+    <Content Include="Views\Feed\Details\_ExceptionEvent.cshtml" />
+    <Content Include="Views\Feed\Details\_FeedPostEvent.cshtml" />
+    <Content Include="Views\Feed\Details\_SubmitEvent.cshtml" />
+    <Content Include="Views\Shared\_CommentSingle.cshtml" />
+    <Content Include="Views\Home\_NEWActivityFeedCode_Temp.cshtml" />
+    <Content Include="Views\Home\_DashboardPost.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Areas\AssignmentWizard\Views\Deliverables\Deliverables\" />
     <Folder Include="Areas\AssignmentWizard\Views\Rubric\Rubric\" />
-    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
