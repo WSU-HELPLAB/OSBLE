@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text.RegularExpressions;
-
+using Dapper;
+using OSBLE.Models.Courses;
+using OSBLE.Models.Users;
 using OSBLEPlus.Logic.Utility;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
@@ -24,7 +28,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             var sql = string.Format(@"
 INSERT INTO dbo.EventLogs (EventTypeID, EventDate, CreatedDate, SenderId, BatchId) VALUES ({0}, '{1}', '{2}', {3}, {6})
 INSERT INTO dbo.FeedPostEvents (EventLogId, EventDate, SolutionName, Comment)
-VALUES (SCOPE_IDENTITY(), '{1}', '{4}', '{5}')", EventTypeId, EventDate, DateTime.Now, SenderId, SolutionName, Comment, BatchId);
+VALUES (SCOPE_IDENTITY(), '{1}', '{3}', '{4}')", EventTypeId, EventDate, SenderId, SolutionName, Comment, BatchId, CourseId);
 
             var hashTags = GetMentionTags();
             var userTags = GetMentionTags();

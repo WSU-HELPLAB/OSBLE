@@ -82,6 +82,7 @@ AS
            EventTypeId    INT NOT NULL,
            EventDate      DATETIME NOT NULL,
            SenderId       INT NOT NULL,
+		   CourseId		  INT NOT NULL,
            IsPrimaryEvent BIT NOT NULL
         )
 
@@ -94,6 +95,7 @@ AS
                               s.EventTypeId,
                               s.EventDate,
                               s.SenderId,
+							  s.CourseId,
                               1
             FROM   [dbo].[EventLogs] s WITH (NOLOCK)
                    INNER JOIN #eventTypesFilter ef
@@ -146,6 +148,7 @@ AS
                               s.EventTypeId,
                               s.EventDate,
                               s.SenderId,
+							  s.CourseId,
                               1
             FROM   [dbo].[EventLogs] s WITH (NOLOCK)
                    INNER JOIN #eventTypesFilter ef
@@ -184,6 +187,7 @@ AS
                    LEFT JOIN #eventLogIdFilter eif2
                           ON Len(@EventLogIds) = 0
             WHERE  s.[DateReceived] BETWEEN @DateReceivedMin AND @DateReceivedMax
+				   AND s.CourseId IS NOT NULL
             ORDER  BY s.[DateReceived] DESC
         END
 
@@ -193,6 +197,7 @@ AS
              s.EventTypeId,
              s.EventDate,
              s.SenderId,
+			 s.CourseId,
              0
       FROM   #events e
              INNER JOIN [dbo].[LogCommentEvents] cs WITH (NOLOCK)
@@ -208,6 +213,7 @@ AS
              s.EventTypeId,
              s.EventDate,
              s.SenderId,
+			 s.CourseId,
              0
       FROM   #events e
              INNER JOIN [dbo].[LogCommentEvents] cs WITH (NOLOCK)
@@ -232,6 +238,7 @@ AS
              EventTypeId,
              EventDate,
              SenderId,
+			 CourseId,
              IsPrimaryEvent
       FROM   #events
 
@@ -244,13 +251,13 @@ AS
                       a.Identification,
                       a.EmailAllActivityPosts,
                       a.EmailAllNotifications,
-                      a.EmailNewDiscussionPosts,
-                      DefaultCourseId = a.DefaultCourse,
-                      DefaultCourseNumber=c.Number,
-                      DefaultCourseNamePrefix=c.Prefix
+                      a.EmailNewDiscussionPosts
+                      --a.DefaultCourseId, = a.DefaultCourse,
+                      --a.DefaultCourseNumber,=c.Number,
+                      --a.DefaultCourseNamePrefix=,c.Prefix
       FROM   [dbo].[UserProfiles] a WITH (NOLOCK)
-             INNER JOIN [dbo].[AbstractCourses] c WITH (NOLOCK)
-                     ON c.ID = a.DefaultCourse
+             --INNER JOIN [dbo].[AbstractCourses] c WITH (NOLOCK)
+             --        ON c.ID = a.DefaultCourse
              INNER JOIN #events b
                      ON b.SenderId = a.ID
 

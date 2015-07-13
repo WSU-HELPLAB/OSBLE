@@ -1,0 +1,186 @@
+﻿@using OSBLE.Models.Users
+@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+@model FeedDetailsViewModel
+@{
+    string detailsIds = Model.Ids;
+    int firstLogId = Model.FeedItem.Items.Select(m => m.Event.EventLogId).Min();
+    ViewBag.Title = string.Format("Details - {0}", firstLogId);
+    UserProfile currentUser = ViewBag.CurrentUser;
+    if(Model.FeedItem.IsAnonymous == true && currentUser.Id != Model.FeedItem.Creator.Id)
+    {
+        Model.FeedItem.Creator.FirstName = "A Student";
+        Model.FeedItem.Creator.LastName = "";
+        Model.FeedItem.Creator.ID = -1;
+    }
+}
+@if (Model == null)
+{
+    <text><h2>Post not found.</h2></text>
+    return;
+}
+<section>
+    <div class="feed-item-single-left">
+        <img @*src="@Url.Action("Picture", "Profile", new { id = Model.FeedItem.Creator.ID, size = 64 })"*@ title="profile image" alt="profile image" />
+    </div>
+    <div class="feed-item-single-right">
+        <h1><a @*href="@Url.Action("Index", "Profile", new { id = Model.FeedItem.Creator.ID, component = OsbideVsComponent.UserProfile })"*@>@Model.FeedItem.Creator.DisplayName()</a></h1>
+        <div class="feed-item-date">
+            <time class="utc-time"
+                  datetime="@Helpers.DateAsUnixTime(Model.FeedItem.MostRecentOccurance)"
+                  data-original-date="@Helpers.RawDate(Model.FeedItem.MostRecentOccurance)"
+                  data-date-format="MM/DD/YYYY hh:mm A">
+                @Model.FeedItem.MostRecentOccurance.ToString("MM/dd @ hh:mmtt") (UTC)
+            </time>
+        </div>
+        @{string partialName = string.Format("Feed/_{0}", Model.FeedItem.FeedItemType); }
+        <div>@Html.Partial(partialName, Model.FeedItem)</div>
+        <div>
+            @if (Model.IsSubscribed == true)
+            {
+                @:You are following this post.  @Html.ActionLink("Unfollow.", "UnfollowPost", new { id = firstLogId, returnUrl = Request.Url.AbsoluteUri })
+        }
+            else
+            {
+                @Html.ActionLink("Follow this post.", "FollowPost", new { id = firstLogId, returnUrl = Request.Url.AbsoluteUri })
+            }
+        </div>
+    </div>
+</section>
+<section style="clear: both; padding-top:15px;">
+    @{partialName = string.Format("Details/_{0}", Model.FeedItem.FeedItemType); }
+    @Html.Partial(partialName, Model.FeedItem)
+</section>
+<section class="log-comments" id="feed-item-@firstLogId" style="display:none">
+    <div data-bind="foreach: Comments">
+        <section class="log-comment-single">
+            <div class="log-comment-profile-picture">
+                @*<img @*src="@Url.Action("Picture", "Profile", new { id = -1, size = 48 })" title="profile image" alt="profile image" style="float:left;" data-bind="attr { src: ProfileUrl }">*@
+            </div>
+            <div class="log-comment-content">
+                <h1 data-bind="text: FirstAndLastName"></h1>
+                <h2>
+                    (<span data-bind="text: CourseName"></span>)
+                    <time data-bind="text: LocalDate, attr: { datetime: UtcUnixDate }"
+                          data-date-format="MM/DD/YYYY hh:mm A">
+                    </time>
+                </h2>
+                <p>
+                    <pre class="normal-font" data-bind="text: Content"></pre>
+                </p>
+            </div>
+            <div data-bind="if: DisplayHelpfulMarkLink">
+                @*<a href="" data-bind="attr { url: MarkHelpfulUrl }">mark as helpful</a>*@
+            </div>
+            <div class="helpful-marks" style="clear: both;" data-bind="if: MarkHelpfulCount > 0">
+                <span data-bind="text: HelpfulMarkCount"></span>
+            </div>
+        </section>
+    </div>
+
+    <h2>Post a Comment</h2>
+    @*@using (Html.BeginForm("PostComment", "Home"))
+    {
+
+        <div>
+            <textarea style="width: 100%; height: 200px" name="comment"></textarea>
+        </div>
+    <input type="hidden" name="logId" value="@Model.FeedItem.Items.Where(m => m.Event.EventLogId == firstLogId).FirstOrDefault().Event.EventLogId" />
+        <input type="hidden" name="returnUrl" value="@Request.Url.AbsoluteUri" />
+        <input type="submit" name="submit" value="Post" />
+        <img class="submit-loading" src="~/Content/icons/loading.gif" title="loading" alt="loading" />
+    }*@
+</section>
+
+@section Scripts {
+    @*@Scripts.Render("~/bundles/highlight")
+    @Styles.Render("~/Content/css/highlight")*@
+
+    <script type="text/javascript">
+
+        var AllComments = {};
+
+        $(document).ready(function () {
+
+            //get comment updates
+            getCommentUpdates();
+
+        });
+
+        //Periodically updates view models for feed items.  Useful for displaying an updated count
+        //of comments for a given feed item.
+        function getCommentUpdates() {
+
+            var log_id = '@firstLogId';
+
+            //make the ajax call
+            $.ajax(
+                {
+                    url: "@Url.Action("GetComments", "Feed")",
+                    data: { singleLogId: log_id },
+                    dataType: "json",
+                    type: "GET",
+                    success: updateFeedItemViewModel
+                });
+
+            //call ourselves again in 60 seconds
+            setTimeout(getCommentUpdates, 60000)
+        }
+
+        //Updates a KO view model using the supplied JS object
+        function updateFeedItemViewModel(jsObject) {
+
+            $.each(jsObject.Data, function (index, value) {
+
+                //bind to new view model
+                var model = {
+                    Comments: value.Comments,
+                    NumberOfComments: ko.observable(value.Comments.length),
+                    LastUpdated: ko.observable(new Date())
+                };
+
+                //model mapping
+                var mapping =
+                    {
+                        'Comments': {
+                            key: function (item) {
+                                return ko.utils.unwrapObservable(item.CommentId);
+                            }
+                        }
+                    };
+
+                //compute local time
+                $(model.Comments).each(function (index) {
+
+                    var milliseconds = model.Comments[index].UtcUnixDate + "";
+                    var formatString = "MM/DD/YYYY hh:mm A";
+                    var currentDate = moment.utc(milliseconds, 'X');
+                    var localDate = new Date();
+                    var localOffset = localDate.getTimezoneOffset();
+                    currentDate = currentDate.subtract('minutes', localOffset);
+                    model.Comments[index]['LocalDate'] = currentDate.format(formatString);
+                });
+
+                var toBind = "feed-item-" + value.OriginalLogId;
+
+                //view model doesn't exist, create one
+                if (!AllComments[value.ActualLogId]) {
+
+                    AllComments[value.ActualLogId] = ko.mapping.fromJS(model, mapping);
+                }
+
+                //update view model with server data
+                ko.mapping.fromJS(model, AllComments[value.ActualLogId]);
+
+                //apply binding if one doesn't already exist
+                if (!ko.dataFor(document.getElementById(toBind))) {
+                    ko.applyBindings(AllComments[value.ActualLogId], document.getElementById(toBind));
+                }
+
+                //unhide comments
+                $('#' + toBind).css("display", "block");
+            });
+        }
+
+    </script>
+}
+<script>hljs.initHighlightingOnLoad();</script>

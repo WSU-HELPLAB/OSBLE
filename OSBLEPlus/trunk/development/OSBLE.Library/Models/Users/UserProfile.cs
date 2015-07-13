@@ -76,14 +76,16 @@ namespace OSBLE.Models.Users
         [DataMember]
         public bool EmailNewDiscussionPosts { get; set; }
 
-        // extra items need by Dapper, and OSBLEPlus.Services, these are implemented as wrapper items
-
-        // Used by IModelBuilderExtender
+        // needed by IModelBuilderExtender
         public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
         {
         }
 
-        // IUser interface
+        // extra items need by Dapper, and OSBLEPlus.Services, these are implemented as wrapper items
+
+        /// <summary>
+        /// Use ID, this is for the IUser interface
+        /// </summary>
         [NotMapped]
         public int UserId
         {
@@ -91,7 +93,9 @@ namespace OSBLE.Models.Users
             set { ID = value; }
         }
 
-        // IUser interface
+        /// <summary>
+        /// Use UserName, this is for the IUser interface
+        /// </summary>
         [NotMapped]
         public string Email
         {
@@ -99,14 +103,18 @@ namespace OSBLE.Models.Users
             set { UserName = value; }
         }
 
-        // IUser interface
+        /// <summary>
+        /// The returns the FirstName and the LastName of the user with a space between
+        /// </summary>
         [NotMapped]
         public string FullName
         {
             get { return FirstName + " " + LastName; }
         }
 
-        // IUser interface
+        /// <summary>
+        /// Use SchoolID, this is for the IUser interface
+        /// </summary>
         [NotMapped]
         public int SchoolId
         {
@@ -114,7 +122,9 @@ namespace OSBLE.Models.Users
             set { SchoolID = value; }
         }
 
-        // IUser interface
+        /// <summary>
+        /// Use DefaultCourse, this is for the IUser interface
+        /// </summary>
         [NotMapped]
         public int DefaultCourseId
         {
@@ -122,7 +132,9 @@ namespace OSBLE.Models.Users
             set { DefaultCourse = value; }
         }
 
-        // IUser interface
+        /// <summary>
+        /// This is for the IUser interface
+        /// </summary>
         [NotMapped]
         public IProfileCourse DefalutCourse { get; set; }   // Mis-spelled but leaving it for all the references in Services
 
@@ -152,21 +164,21 @@ namespace OSBLE.Models.Users
         public UserProfile(UserProfile up)
             : base()
         {
-            this.CanCreateCourses = up.CanCreateCourses;
-            this.DefaultCourse = up.DefaultCourse;
-            this.EmailAllNotifications = up.EmailAllNotifications;
-            this.EmailAllActivityPosts = up.EmailAllActivityPosts;
-            this.EmailNewDiscussionPosts = up.EmailNewDiscussionPosts;
-            this.FirstName = up.FirstName;
-            this.ID = up.ID;
-            this.Identification = up.Identification;
-            this.IsAdmin = up.IsAdmin;
-            this.IsApproved = up.IsApproved;
-            this.LastName = up.LastName;
-            this.Password = up.Password;
-            this.School = up.School;
-            this.SchoolID = up.SchoolID;
-            this.UserName = up.UserName;
+            CanCreateCourses = up.CanCreateCourses;
+            DefaultCourse = up.DefaultCourse;
+            EmailAllNotifications = up.EmailAllNotifications;
+            EmailAllActivityPosts = up.EmailAllActivityPosts;
+            EmailNewDiscussionPosts = up.EmailNewDiscussionPosts;
+            FirstName = up.FirstName;
+            ID = up.ID;
+            Identification = up.Identification;
+            IsAdmin = up.IsAdmin;
+            IsApproved = up.IsApproved;
+            LastName = up.LastName;
+            Password = up.Password;
+            School = up.School;
+            SchoolID = up.SchoolID;
+            UserName = up.UserName;
         }
 
         public override string ToString()

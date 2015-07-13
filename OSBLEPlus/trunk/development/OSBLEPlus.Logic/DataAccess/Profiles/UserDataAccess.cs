@@ -20,7 +20,7 @@ namespace OSBLEPlus.Logic.DataAccess.Profiles
             using (
                 var connection = new SqlConnection(StringConstants.ConnectionString))
             {
-                return connection.Query<User>(UserQuery.SelectByUserId,
+                return connection.Query<UserProfile>(UserQuery.SelectByUserId,
                                                             new { Id = id }).FirstOrDefault();
             }
         }
@@ -29,7 +29,7 @@ namespace OSBLEPlus.Logic.DataAccess.Profiles
             using (
                 var connection = new SqlConnection(StringConstants.ConnectionString))
             {
-                return connection.Query<User>(UserQuery.SelectByUserName,
+                return connection.Query<UserProfile>(UserQuery.SelectByUserName,
                                                             new { UserName = userName }).FirstOrDefault();
             }
         }

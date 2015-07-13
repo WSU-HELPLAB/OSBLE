@@ -79,6 +79,9 @@
     <Compile Include="DomainObjects\ActivityFeeds\SaveEvent.cs" />
     <Compile Include="DomainObjects\ActivityFeeds\StackFrame.cs" />
     <Compile Include="DomainObjects\ActivityFeeds\StackFrameVariable.cs" />
+    <Compile Include="DomainObjects\ActivityFeeds\AggregateFeedItem.cs" />
+    <Compile Include="DomainObjects\ActivityFeeds\FeedDetailsViewModel.cs" />
+    <Compile Include="DomainObjects\ActivityFeeds\FeedViewModel.cs" />
     <Compile Include="DomainObjects\ActivityFeeds\SubmisionAssignment.cs" />
     <Compile Include="DomainObjects\ActivityFeeds\WhatsNewItem.cs" />
     <Compile Include="DomainObjects\Analytics\StateMachineEvent.cs" />

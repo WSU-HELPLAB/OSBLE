@@ -65,7 +65,8 @@ namespace OSBLEPlus.Logic.Tests.Activities
                         {
                             SenderId = 1,
                             SolutionName = solutionName,
-                            Comment = "fp comment"
+                            Comment = "fp comment",
+                            CourseId = 1
                         },
                         // below events need to set up data dependencies
                         //new HelpfulMarkGivenEvent

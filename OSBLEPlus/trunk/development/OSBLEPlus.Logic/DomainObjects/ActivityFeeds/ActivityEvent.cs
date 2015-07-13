@@ -38,6 +38,13 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             return string.Empty;
         }
 
+        // for posting
+        public bool CanMail { get; set; }
+        public bool CanDelete { get; set; }
+        public bool CanReply { get; set; }
+        public bool ShowProfilePicture { get; set; }
+        public string DisplayTitle { get; set; }
+
         public ActivityEvent() // NOTE!! This is required by Dapper ORM
         {
             EventDate = DateTime.UtcNow;

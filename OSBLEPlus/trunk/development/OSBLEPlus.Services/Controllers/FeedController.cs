@@ -17,7 +17,7 @@ namespace OSBLEPlus.Services.Controllers
             int? c, int? r, string cf, IEnumerable<int> us)
         {
             return await Task.FromResult(Feeds.Get(dmin, dmax,
-                ls, ets, c, r, cf, us, 20));
+                ls, ets, c, r, cf, us, 999));
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Web;
 using OSBLE.Models.Assignments;
 using OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder;
 using OSBLE.Areas.AssignmentDetails.Models.TableBuilder;
+using OSBLE.Models.AbstractCourses.Course;
 using OSBLE.Models.Courses;
 
 namespace OSBLE.Areas.AssignmentDetails.ViewModels

@@ -1,0 +1,17 @@
+﻿@model OSBLEPlus.Logic.DomainObjects.ActivityFeeds.FeedViewModel
+@{
+    ViewBag.RecentUserErrors = Model.RecentUserErrors;
+    //ViewBag.RecentClassErrors = Model.RecentClassErrors;
+    //ViewBag.ErrorTypes = Model.ErrorTypes;
+}
+<style type="text/css">
+    .feed-item-ajax {
+        display: none;
+    }
+</style>
+<section id="feed-items">
+@Html.Partial("Feed/_FeedItems", Model.Feed)
+</section>
+<section id="feed-footer">
+@Html.Partial("Feed/_FeedFooter", Model)
+</section>
