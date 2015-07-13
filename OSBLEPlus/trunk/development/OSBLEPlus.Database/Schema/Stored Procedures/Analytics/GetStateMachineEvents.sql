@@ -7,8 +7,8 @@ create procedure [dbo].[GetStateMachineEvents]
 
 	 @dateFrom DateTime
 	,@dateTo DateTime
-	,@courseId int
-
+	,@courseId int=null
+	,@userIds varchar(max)
 as
 begin
 
@@ -16,8 +16,17 @@ begin
 
 	declare @minDate datetime='1-2-2012'
 
-	declare @users table(UserId int)
-	insert into @users select UserId=id from CourseUsers where AbstractCourseID=@courseId
+	declare @selectedUsers table(UserId int)
+	insert into @selectedusers select UserId=cast(items as int) from dbo.Split(@userIds, ',')
+
+	declare @users table(UserId int) 
+	if @courseId <> null 
+	insert into @users select UserId=cu.UserProfileID from CourseUsers cu 
+	inner join @selectedUsers ur on ur.UserId = cu.UserProfileID
+	where AbstractCourseID=@courseId
+	else
+	insert into @users select * from @selectedUsers
+
 
 	select distinct l.SenderId, l.EventDate, l.SolutionName, LogType=et.EventTypeName, BuildErrorLogId=be.LogId, ExecutionActionId=d.ExecutionAction, eu.FirstName, eu.LastName, eu.Identification
 	, MarkerType=case when l.EventTypeId=1 or p.Comment like '%?%' then 'QP'

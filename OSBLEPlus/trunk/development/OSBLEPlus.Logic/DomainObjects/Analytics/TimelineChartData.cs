@@ -73,4 +73,11 @@ namespace OSBLEPlus.Logic.DomainObjects.Analytics
         public List<Point> markers { get; set; }
         public bool showTicks { get; set; }
     }
+
+    public class StudentData
+    {
+        public int ID { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+    }
 }

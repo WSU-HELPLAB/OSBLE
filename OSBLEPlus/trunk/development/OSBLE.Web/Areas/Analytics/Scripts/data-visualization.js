@@ -3,8 +3,14 @@
 
         Init: function () {
 
-            this.TimeFromElm().datetimepicker({ value: this.TimeFromElm().val() });
-            this.TimeToElm().datetimepicker({ value: this.TimeToElm().val() });
+            this.TimeFromElm().datetimepicker();
+            this.TimeFromElm().on("dp.change", function(e) {
+                this.TimeFromElm().data("DateTimePicker").minDate(e.date);
+            });
+            this.TimeToElm().datetimepicker();
+            this.TimeToElm().on("dp.change", function (e) {
+                this.TimeToElm().data("DateTimePicker").maxDate(e.date);
+            });
 
             this.SpinnerElm().height($(window).height() * .5).css("margin-top", $(window).height() * .25);
             this.WireupEventHandlers();
@@ -39,6 +45,12 @@
 
             self.SetChartVisibility(false);
             Chart.Draw();
+        });
+
+        $("#download").click(function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            $(this).closest("form").submit();
         });
     },
 
@@ -179,20 +191,24 @@ if (typeof (Chart) == "undefined") {
                     
                 var dataservice = $("#main").attr("data-service-path");
                 //dataservice = "http://localhost:1271";
-
- $.ajax({
-     url: dataservice + "/api/timeline/",
-     //xhrFields: { withCredentials: true },
-     type: "GET",
-     headers: { "Access-Control-Allow-Origin": dataservice + ".*" },
-     data: {
-         timeScale: $("#timescale-setting").val(),
-         timeFrom: $("#timeFrom").val(),
-         timeTo: $("#timeTo").val(),
-         timeout: $("#timeout").val(),
-         grayscale: $("#grayscale").is(":checked"),
-         courseId: parseInt($("[data-course-id]").first().attr("data-course-id"))
-     }
+                var checkedValues = $("input[name='userId']:checked").map(function () {
+                    return this.value;
+                }).get().join(",");
+                alert(checkedValues);
+                $.ajax({
+                    url: dataservice + "/api/timeline",
+                    //xhrFields: { withCredentials: true },
+                    type: "GET",
+                    headers: { "Access-Control-Allow-Origin": dataservice + ".*" },
+                    data: {
+                        timeScale: $("#timescale-setting").val(),
+                        timeFrom: $("#timeFrom").val(),
+                        timeTo: $("#timeTo").val(),
+                        timeout: $("#timeout").val(),
+                        grayscale: $("#grayscale").is(":checked"),
+                        courseId: parseInt($("[data-course-id]").first().attr("data-course-id")),
+                        userIds: checkedValues
+            }
  }).done(function (data) {
 
                     // no chart data available show message
