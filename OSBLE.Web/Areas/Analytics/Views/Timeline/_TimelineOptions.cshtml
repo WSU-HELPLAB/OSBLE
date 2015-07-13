@@ -1,39 +1,43 @@
 ﻿@using OSBLEPlus.Logic.Utility
 @model List<OSBLEPlus.Logic.DomainObjects.Analytics.StudentData>
-
-<div id="timeline-options">
-    <div>Time Scale:</div>
-    <div>
-        <select name="ScaleSetting" id="timescale-setting" class="form-control">
-            @foreach (var e in Enum<TimeScale>.Get())
+@using (Html.BeginForm("GetCSVData", "Timeline", FormMethod.Post, new {@class = "form-horizontal", role = "form"}))
+{
+    <div id="timeline-options">
+        <div>Time Scale:</div>
+        <div>
+            <select name="ScaleSetting" id="timescale-setting" class="form-control">
+                @foreach (var e in Enum<TimeScale>.Get())
+                {
+                    var selected = e.Value == (int) TimeScale.Days ? "selected" : string.Empty;
+                    <option value="@e.Value" @selected>@e.Text</option>
+                }
+            </select>
+        </div>
+        <div>
+            <input type="text" id="timeFrom"/>
+            <i class="icon-time"></i>
+        </div>
+        <div>
+            to
+        </div>
+        <div>
+            <input type="text" id="timeTo"/>
+            <i class="icon-time"></i>
+        </div>
+        <div><a href="javascript:" class="btn btn-primary">update</a>
+        </div>
+        <div>Idle Timeout (min):</div>
+        <div><input class="form-control" type="text" id="timeout" name="Timeout" placeholder="3"/>
+        </div>
+        <div>Grayscale:</div><input type="checkbox" id="grayscale"/>
+        <input type="hidden" name="courseId" id="courseId" value="@ViewBag.ActiveCourseUser.AbstractCourseID">
+        <ul id="studentList">
+            @foreach (var student in Model)
             {
-                var selected = e.Value == (int) TimeScale.Days ? "selected" : string.Empty;
-                <option value="@e.Value" @selected>@e.Text</option>
+                <li><input value="@student.ID" type="checkbox" name="userId" checked="checked"/>@student.FirstName @student.LastName (@student.ID)</li>
             }
-        </select>
+        </ul>
     </div>
-    <div>
-        <input type="text" id="timeFrom"/>
-        <i class="icon-time"></i>
-    </div>
-    <div>
-        to
-    </div>
-    <div>
-        <input type="text" id="timeTo"/>
-        <i class="icon-time"></i>
-    </div>
-    <div><a href="javascript:" class="btn btn-primary">update</a>
-    </div>
-    <div>Idle Timeout (min):</div>
-    <div><input class="form-control" type="text" id="timeout" name="Timeout" placeholder="3"/>
-    </div>
-    <div>Grayscale:</div><input type="checkbox" id="grayscale"/>
-    <input type="hidden" name="courseId" id="courseId" value="@ViewBag.ActiveCourseUser.AbstractCourseID">
-    <ul id="studentList">
-        @foreach (var student in Model)
-        {
-            <li><input value="@student.ID" type="checkbox" name="userId" checked="checked"/>@student.FirstName @student.LastName (@student.ID)</li>
-        }
-    </ul>
-</div>
+
+    <a id="download">Export current visualization to CSV</a>
+}

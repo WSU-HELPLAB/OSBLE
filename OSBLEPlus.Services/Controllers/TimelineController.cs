@@ -10,7 +10,7 @@ namespace OSBLEPlus.Services.Controllers
     public class TimelineController : ApiController
     {
         [AllowAdmin]
-        public List<TimelineChartData> GetTimeline([FromUri] TimelineCriteria criteria)
+        public List<TimelineChartData> Get([FromUri] TimelineCriteria criteria)
         {
             return TimelineVisualization.Get
                 (

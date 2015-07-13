@@ -4,13 +4,9 @@
 @model List<OSBLEPlus.Logic.DomainObjects.Analytics.StudentData>
 
 <section data-tab="Analytics" id="analytics" class="container-fluid">
-    @using (Html.BeginForm("GetCSVData", "Timeline", FormMethod.Post, new {@class = "form-horizontal", role = "form"}))
-    {
         <div class="row">
             <div class="col-xs-2">
-                @Html.Partial("~/Areas/Analytics/Views/Timeline/_TimelineOptions.cshtml")
             </div>
-            <a id="download">Export current visualization to CSV</a>
             <div class="col-xs-10">
                 <div data-type="chart-area">
                     <div class="row" id="chartBody">
@@ -27,7 +23,6 @@
                 </div>
             </div>
         </div>
-    }
 </section>
 
 <script type="text/javascript" src="@Url.Content("~/Areas/Analytics/Scripts/d3.min.js")"></script>
@@ -37,7 +32,6 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
-        debugger;
         DataVisualization.Init();
         Chart.Draw();
     });
