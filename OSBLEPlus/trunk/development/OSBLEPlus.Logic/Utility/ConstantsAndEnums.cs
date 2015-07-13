@@ -28,6 +28,13 @@ namespace OSBLEPlus.Logic.Utility
         StartWithoutDebugging = 5,
     };
 
+    public enum CutCopyPasteActions
+    {
+        Cut,
+        Copy,
+        Paste
+    };
+
     public enum ErrorsConsidered
     {
         One = 1,

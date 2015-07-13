@@ -5,6 +5,7 @@
     [SolutionName] VARCHAR (MAX) NOT NULL,
     [DocumentId]   INT           NOT NULL,
     CONSTRAINT [PK_SaveEvents] PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT [FK_SaveEvents_EventLogs] FOREIGN KEY ([EventLogId]) REFERENCES [dbo].[EventLogs] ([Id]),
     CONSTRAINT [FK_SaveEvents_CodeDocuments] FOREIGN KEY ([DocumentId]) REFERENCES [dbo].[CodeDocuments] ([Id])
 );
 

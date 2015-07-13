@@ -259,12 +259,12 @@ namespace OSBLE.Models.Users
         /// <param name="userName"></param>
         /// <param name="password"></param>
         /// <returns>True if the combo is valid, false otherwise</returns>
-        public static bool ValidateUser(string userName, string password)
+        public static bool ValidateUser(string userName, string password, bool encrypted = false)
         {
             int count = 0;
             using (OSBLEContext db = new OSBLEContext())
             {
-                string hashedPassword = UserProfile.GetPasswordHash(password);
+                string hashedPassword = !encrypted ? UserProfile.GetPasswordHash(password) : password;
                 count = (from user in db.UserProfiles
                          where
                          user.UserName.CompareTo(userName) == 0

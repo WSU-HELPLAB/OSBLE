@@ -6,7 +6,7 @@ namespace OSBLEPlus.Services.Controllers
 {
     public class EventCollectionControllerHelper
     {
-        public static IEnumerable<IActivityEvent> GetActivityEvents(EventPostRequest requestObject)
+        public static List<IActivityEvent> GetActivityEvents(EventPostRequest requestObject)
         {
             var events = new List<IActivityEvent>();
 
@@ -15,6 +15,15 @@ namespace OSBLEPlus.Services.Controllers
 
             if (requestObject.BuildEvents != null && requestObject.BuildEvents.Length > 0)
                 events.AddRange(requestObject.BuildEvents);
+
+            if (requestObject.CutCopyPasteEvents != null && requestObject.CutCopyPasteEvents.Length > 0)
+                events.AddRange(requestObject.CutCopyPasteEvents);
+
+            if (requestObject.DebugEvents != null && requestObject.DebugEvents.Length > 0)
+                events.AddRange(requestObject.DebugEvents);
+
+            if (requestObject.EditorActivityEvents != null && requestObject.EditorActivityEvents.Length > 0)
+                events.AddRange(requestObject.EditorActivityEvents);
 
             if (requestObject.ExceptionEvents != null && requestObject.ExceptionEvents.Length > 0)
                 events.AddRange(requestObject.ExceptionEvents);
@@ -30,6 +39,9 @@ namespace OSBLEPlus.Services.Controllers
 
             if (requestObject.SubmitEvents != null && requestObject.SubmitEvents.Length > 0)
                 events.AddRange(requestObject.SubmitEvents);
+
+            if (requestObject.SaveEvents != null && requestObject.SaveEvents.Length > 0)
+                events.AddRange(requestObject.SaveEvents);
 
             return events;
         }

@@ -43,24 +43,17 @@ namespace OSBLEPlus.Logic.Tests.Activities
                     {
                         new AskForHelpEvent
                         {
-                            EventDate = eventDate,
-                            EventTypeId = (int) EventType.AskForHelpEvent,
                             SenderId = 1,
                             SolutionName = solutionName,
                             Code = "c#"
                         },
                         new BuildEvent
                         {
-                            EventDate = eventDate,
-                            EventTypeId = (int) EventType.BuildEvent,
                             SenderId = 1,
                             SolutionName = solutionName,
-                            CriticalErrorName = "critical error"
                         },
                         new ExceptionEvent
                         {
-                            EventDate = eventDate,
-                            EventTypeId = (int) EventType.ExceptionEvent,
                             SenderId = 1,
                             SolutionName = solutionName,
                             ExceptionCode = 1,
@@ -70,8 +63,6 @@ namespace OSBLEPlus.Logic.Tests.Activities
                         },
                         new FeedPostEvent
                         {
-                            EventDate = eventDate,
-                            EventTypeId = (int) EventType.FeedPostEvent,
                             SenderId = 1,
                             SolutionName = solutionName,
                             Comment = "fp comment"
@@ -79,24 +70,18 @@ namespace OSBLEPlus.Logic.Tests.Activities
                         // below events need to set up data dependencies
                         //new HelpfulMarkGivenEvent
                         //{
-                        //    EventDate = eventDate,
-                        //    EventTypeId = (int) EventType.HelpfulMarkGivenEvent,
                         //    SenderId = 1,
                         //    SolutionName = solutionName,
                         //    LogCommentEventId = 1
                         //},
                         //new LogCommentEvent
                         //{
-                        //    EventDate = eventDate,
-                        //    EventTypeId = (int) EventType.LogCommentEvent,
                         //    SenderId = 1,
                         //    SolutionName = solutionName,
                         //    Content = "log comment"
                         //},
                         //new SubmitEvent
                         //{
-                        //    EventDate = eventDate,
-                        //    EventTypeId = (int) EventType.SubmitEvent,
                         //    SenderId = 1,
                         //    SolutionName = solutionName,
                         //    AssignmentId = 1

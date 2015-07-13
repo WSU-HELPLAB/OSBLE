@@ -1,11 +1,14 @@
 ﻿namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
-    public class AskForHelpEvent : ActivityEvent
+    public sealed class AskForHelpEvent : ActivityEvent
     {
         public string Code { get; set; }
         public string UserComment { get; set; }
 
-        public AskForHelpEvent() { } // NOTE!! This is required by Dapper ORM
+        public AskForHelpEvent() // NOTE!! This is required by Dapper ORM
+        {
+            EventTypeId = (int)Utility.Lookups.EventType.AskForHelpEvent;
+        }
 
         public override string GetInsertScripts()
         {

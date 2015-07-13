@@ -29,7 +29,10 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                 for (var b = 0; b < batches + 1; b++)
                 {
                     sql.Clear();
-                    sql.AppendFormat("DECLARE {0} INT{1}", StringConstants.SqlHelperScopeIdentityName, Environment.NewLine);
+                    sql.AppendFormat("DECLARE {0} INT{1}", StringConstants.SqlHelperLogIdVar, Environment.NewLine);
+                    sql.AppendFormat("DECLARE {0} INT{1}", StringConstants.SqlHelperEventIdVar, Environment.NewLine);
+                    sql.AppendFormat("DECLARE {0} INT{1}", StringConstants.SqlHelperDocIdVar, Environment.NewLine);
+                    sql.AppendFormat("DECLARE {0} INT{1}", StringConstants.SqlHelperIdVar, Environment.NewLine);
 
                     var from = b * BatchSize;
                     var to = (b + 1) * BatchSize > activityEvents.Length ? activityEvents.Length : (b + 1) * BatchSize;
@@ -62,7 +65,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
             try
             {
                 var sql = new StringBuilder();
-                sql.AppendFormat("DECLARE {0} INT{1}", StringConstants.SqlHelperScopeIdentityName, Environment.NewLine);
+                sql.AppendFormat("DECLARE {0} INT{1}", StringConstants.SqlHelperLogIdVar, Environment.NewLine);
                 sql.AppendFormat("{0}{1}", submit.GetInsertScripts(), Environment.NewLine);
 
                 //execute sql batch insert statements

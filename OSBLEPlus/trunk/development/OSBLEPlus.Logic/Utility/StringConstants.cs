@@ -17,11 +17,26 @@ namespace OSBLEPlus.Logic.Utility
 
         public static string WebClientRoot
         {
-            get { return ConfigurationManager.AppSettings["OSBLEWeb"]; }
+            get
+            {
+#if DEBUG
+                return "http://localhost:8088";
+#else
+                return "http://osble.com";
+#endif
+             }
         }
+
         public static string DataServiceRoot
         {
-            get { return ConfigurationManager.AppSettings["OSBLEDataService"]; }
+            get
+            {
+#if DEBUG
+                return "http://localhost:8087";
+#else
+                return "http://osble.com:8087";
+#endif
+            }
         }
 
         public static string ActivityFeedUrl
@@ -47,6 +62,11 @@ namespace OSBLEPlus.Logic.Utility
         public static string ProfileUrl
         {
             get { return string.Format("{0}/Profile", WebClientRoot); }
+        }
+
+        public static string WhatsNewUrl
+        {
+            get { return string.Format("{0}/WhatsNew", WebClientRoot); }
         }
 
         public static string UpdateUrl
@@ -76,7 +96,11 @@ namespace OSBLEPlus.Logic.Utility
         {
             get
             {
-                var path = Path.Combine(DataRoot, ConfigurationManager.AppSettings["LocalCacheDirectory"]);
+#if DEBUG
+                string path = Path.Combine(DataRoot, "cache_debug");
+#else
+                string path = Path.Combine(DataRoot, "cache_release");
+#endif
                 if (!Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);
@@ -162,6 +186,10 @@ namespace OSBLEPlus.Logic.Utility
             }
         }
 
-        public const string SqlHelperScopeIdentityName = "@scope_id";
+        public const string SqlHelperLogIdVar = "@logId";
+
+        public const string SqlHelperEventIdVar = "@eventId";
+        public const string SqlHelperDocIdVar = "@docId";
+        public const string SqlHelperIdVar = "@tempId";
     }
 }

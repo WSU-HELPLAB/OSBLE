@@ -15,12 +15,16 @@ namespace OSBLEPlus.Services.Controllers
 {
     public class CourseController : ApiController
     {
-        public List<SubmisionAssignment> GetAssignmentsForCourse(int id, string a, IAuthentication auth = null)
+        [HttpGet]
+        public DateTime MostRecentWhatsNewItem()
         {
-            if (auth == null)
-                auth = new Authentication();
+            var recentWhatsNew = CourseDataAccess.GetMostRecentWhatsNewItem();
+            return recentWhatsNew == null ? DateTime.MinValue : recentWhatsNew.DatePosted;
+        }
 
-            if (auth.IsValidKey(a))
+        public List<SubmisionAssignment> GetAssignmentsForCourse(int id, string a)
+        {
+            if ((new Authentication()).IsValidKey(a))
             {
                 return CourseDataAccess.GetAssignmentsForCourse(id, DateTime.Today);
             }
@@ -28,12 +32,9 @@ namespace OSBLEPlus.Services.Controllers
             return null;
         }
 
-        public DateTime? GetLastSubmitDateForAssignment(int id, string a, IAuthentication auth = null)
+        public DateTime? GetLastSubmitDateForAssignment(int id, string a)
         {
-            if (auth == null)
-                auth = new Authentication();
-
-            if (auth.IsValidKey(a))
+            if ((new Authentication()).IsValidKey(a))
             {
                 return CourseDataAccess.GetLastSubmitDateForAssignment(id);
             }
@@ -42,14 +43,11 @@ namespace OSBLEPlus.Services.Controllers
         }
 
         [HttpPost]
-        public HttpResponseMessage Post(HttpRequestMessage request, IAuthentication auth = null)
+        public HttpResponseMessage Post(HttpRequestMessage request)
         {
             var requestObject = JsonConvert.DeserializeObject<SubmissionRequest>(request.Content.ReadAsStringAsync().Result);
 
-            if (auth == null)
-                auth = new Authentication();
-
-            if (!auth.IsValidKey(requestObject.AuthToken))
+            if (!(new Authentication()).IsValidKey(requestObject.AuthToken))
                 return new HttpResponseMessage { StatusCode = HttpStatusCode.Forbidden };
 
             return new HttpResponseMessage

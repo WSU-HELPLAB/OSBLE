@@ -81,8 +81,6 @@ namespace OSBLE.Controllers
                 var sub = new SubmitEvent
                 {
                     AssignmentId = id.Value,
-                    EventDate = DateTime.UtcNow,
-                    EventTypeId = (int)EventType.SubmitEvent,
                     SenderId = CurrentUser.ID
                 };
                 Posts.SubmitAssignment(sub);

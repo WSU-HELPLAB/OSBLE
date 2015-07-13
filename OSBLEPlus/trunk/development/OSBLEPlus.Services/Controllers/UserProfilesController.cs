@@ -4,7 +4,6 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 
-using Newtonsoft.Json;
 using OSBLE.Interfaces;
 using OSBLEPlus.Logic.DataAccess.Activities;
 using OSBLEPlus.Logic.DataAccess.Profiles;
@@ -16,7 +15,8 @@ namespace OSBLEPlus.Services.Controllers
 {
     public class UserProfilesController : ApiController
     {
-        public HttpResponseMessage Login(string e, string hp, IAuthentication auth = null)
+        [HttpGet]
+        public HttpResponseMessage Login(string e, string hp)
         {
             if (!UserDataAccess.ValidateUser(e, hp))
                 return new HttpResponseMessage { StatusCode = HttpStatusCode.Unauthorized };
@@ -25,9 +25,7 @@ namespace OSBLEPlus.Services.Controllers
             if (user == null)
                 return new HttpResponseMessage { StatusCode = HttpStatusCode.Unauthorized };
 
-            if (auth == null)
-                auth = new Authentication();
-
+            var auth = new Authentication();
             var hash = auth.LogIn(user);
             UserDataAccess.LogUserTransaction(user.UserId, DateTime.Now);
 
@@ -38,19 +36,15 @@ namespace OSBLEPlus.Services.Controllers
             };
         }
 
-        public IUser GetActiveUser(string a, IAuthentication auth = null)
+        public IUser GetActiveUser(string a)
         {
-            if (auth == null)
-                auth = new Authentication();
-
-            return auth.GetActiveUser(a);
+            return (new Authentication()).GetActiveUser(a);
         }
 
-        public bool IsValidKey(string a, IAuthentication auth = null)
+        [HttpGet]
+        public bool IsValidKey(string a)
         {
-            if (auth == null)
-                auth = new Authentication();
-
+            var auth = new Authentication();
             if (auth.IsValidKey(a))
             {
                 UserDataAccess.LogUserTransaction(auth.GetActiveUserId(a), DateTime.Now);
@@ -60,10 +54,9 @@ namespace OSBLEPlus.Services.Controllers
             return false;
         }
 
-        public List<ProfileCourse> GetCoursesForUser(string a, IAuthentication auth = null)
+        public List<ProfileCourse> GetCoursesForUser(string a)
         {
-            if (auth == null)
-                auth = new Authentication();
+            var auth = new Authentication();
 
             if (auth.IsValidKey(a))
             {
@@ -73,12 +66,12 @@ namespace OSBLEPlus.Services.Controllers
             return null;
         }
 
-        public DateTime MostRecentSocialActivity(string a, IAuthentication auth = null)
+        [HttpGet]
+        public DateTime MostRecentSocialActivity(string a)
         {
             var lastSocialActivity = DateTime.MinValue;
 
-            if (auth == null)
-                auth = new Authentication();
+            var auth = new Authentication();
 
             if (auth.IsValidKey(a))
             {
@@ -89,20 +82,18 @@ namespace OSBLEPlus.Services.Controllers
         }
 
         [HttpPost]
-        public HttpResponseMessage SubmitLocalErrorLog(HttpRequestMessage request, IAuthentication auth = null)
+        public HttpResponseMessage SubmitLocalErrorLog(LocalErrorLogRequest request)
         {
-            var requestObject = JsonConvert.DeserializeObject<LocalErrorLogRequest>(request.Content.ReadAsStringAsync().Result);
-            if (auth == null)
-                auth = new Authentication();
+            var auth = new Authentication();
 
-            if (!auth.IsValidKey(requestObject.AuthToken))
+            if (!auth.IsValidKey(request.AuthToken))
                 return new HttpResponseMessage { StatusCode = HttpStatusCode.Forbidden };
 
-            requestObject.Log.SenderId = auth.GetActiveUserId(requestObject.AuthToken);
+            request.Log.SenderId = auth.GetActiveUserId(request.AuthToken);
 
             return new HttpResponseMessage
             {
-                StatusCode = Posts.SubmitLocalErrorLog(requestObject.Log) == 0
+                StatusCode = Posts.SubmitLocalErrorLog(request.Log) > 0
                            ? HttpStatusCode.OK
                            : HttpStatusCode.InternalServerError
             };

@@ -74,6 +74,7 @@
     <Compile Include="Activities\EventCollectorTests.cs" />
     <Compile Include="Analytics\CalendarDay.cs" />
     <Compile Include="Analytics\Calendar.cs" />
+    <Compile Include="Profiles\UserProfileTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
