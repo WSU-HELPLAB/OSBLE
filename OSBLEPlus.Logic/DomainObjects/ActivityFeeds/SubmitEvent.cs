@@ -7,11 +7,14 @@ using Ionic.Zip;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
-    public class SubmitEvent:ActivityEvent
+    public sealed class SubmitEvent : ActivityEvent
     {
         public int AssignmentId { get; set; }
         public byte[] SolutionData { get; private set; }
-        public SubmitEvent() { } // NOTE!! This is required by Dapper ORM
+        public SubmitEvent() // NOTE!! This is required by Dapper ORM
+        {
+            EventTypeId = (int)Utility.Lookups.EventType.SubmitEvent;
+        }
 
         public byte[] GetSolutionBinary()
         {
@@ -79,7 +82,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             var solutionData = temp==null?"Null":string.Format("0x{0}", BitConverter.ToString(temp));
             solutionData = solutionData.Replace("-", string.Empty);
             return string.Format(@"
-INSERT INTO dbo.EventLogs (EventTypeID, EventDate, SenderId) VALUES ({0}, '{1}', {2})
+INSERT INTO dbo.EventLogs (EventTypeID, EventDate, SenderId, BatchId) VALUES ({0}, '{1}', {2})
 INSERT INTO dbo.SubmitEvents (EventLogId, EventDate, SolutionName, AssignmentId, SolutionData)
 VALUES (SCOPE_IDENTITY(), '{1}', '{3}', {4}, {5})", EventTypeId, EventDate, SenderId, SolutionName, AssignmentId, solutionData);
         }

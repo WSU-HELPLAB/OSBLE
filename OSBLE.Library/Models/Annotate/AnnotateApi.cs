@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Net;
 using System.Security.Cryptography;
-using OSBLE.Models.Assignments;
-using OSBLE.Models.Users;
+using System.Text;
+using System.Web;
 using System.Web.Helpers;
 using System.Web.Script.Serialization;
-
+using OSBLE.Models.Assignments;
+using OSBLE.Models.Users;
 
 namespace OSBLE.Models.Annotate
 {
@@ -25,7 +26,7 @@ namespace OSBLE.Models.Annotate
         {
             ApiKey = apiKey;
             ApiUser = apiUser;
-            AnnotateURL = ConfigurationManager.AppSettings["AnnotateURL"];            
+            AnnotateURL = ConfigurationManager.AppSettings["AnnotateURL"];
         }
 
         public AnnotateResult ToggleCommentVisibility(int criticalReviewAssignmentID, int authorTeamID, bool makeVisible)
@@ -81,14 +82,14 @@ namespace OSBLE.Models.Annotate
                                                );
                     try
                     {
-                        webResult = client.DownloadString(noteUrl);                        
+                        webResult = client.DownloadString(noteUrl);
                         dynamic jsonResult = Json.Decode(webResult);
                     }
                     catch (Exception)
                     {
                         throw;
                     }
-                    
+
                 }
 
             }
@@ -164,12 +165,12 @@ namespace OSBLE.Models.Annotate
                                             epoch,
                                             ApiUser,
                                             apiKey,
-                                            System.Web.HttpUtility.UrlEncode(documentUrl)
+                                            HttpUtility.UrlEncode(documentUrl)
                                              );
                 try
                 {
                     sendResult = client.DownloadString(uploadString);
-                    WriteLog("UploadDocument: "+sendResult);
+                    WriteLog("UploadDocument: " + sendResult);
                 }
                 catch (Exception ex)
                 {
@@ -205,7 +206,7 @@ namespace OSBLE.Models.Annotate
                         }
                         else
                         {
-                            db.Entry(code).State = System.Data.EntityState.Modified;
+                            db.Entry(code).State = EntityState.Modified;
                         }
                         code.AnnotateDocumentCode = result.DocumentCode;
                         code.AnnotateDocumentDate = result.DocumentDate;
@@ -277,15 +278,15 @@ namespace OSBLE.Models.Annotate
                 try
                 {
                     webResult = client.DownloadString(updateString);
-                    WriteLog("CreateAccount2: " + webResult); 
+                    WriteLog("CreateAccount2: " + webResult);
                     result.RawMessage = webResult;
                 }
                 catch (Exception)
                 {
-                    
+
                     throw;
                 }
-                
+
             }
             result.RawMessage = webResult;
             if (webResult.Substring(0, 2) == "OK")
@@ -337,15 +338,15 @@ namespace OSBLE.Models.Annotate
             try
             {
                 webResult = client.DownloadString(authorizeString);
-                WriteLog("GiveAccessToDocument: " + webResult); 
+                WriteLog("GiveAccessToDocument: " + webResult);
                 result.RawMessage = webResult;
             }
             catch (Exception)
             {
-                
+
                 throw;
             }
-            
+
             if (webResult.Substring(0, 2) == "OK")
             {
                 result.Result = ResultCode.OK;
@@ -380,7 +381,7 @@ namespace OSBLE.Models.Annotate
             loginString = string.Format(loginString,
                                         ApiUser,
                                         epoch,
-                                        System.Web.HttpUtility.UrlEncode(string.Format("d={0}&c={1}&nobanner=1", docDate, docCode)),
+                                        HttpUtility.UrlEncode(string.Format("d={0}&c={1}&nobanner=1", docDate, docCode)),
                                         osbleUser.UserName,
                                         apiKey
                                         );
@@ -440,7 +441,7 @@ namespace OSBLE.Models.Annotate
                                   where rt.AssignmentID == assignment.ID
                                         &&
                                         rt.AuthorTeamID == authorTeamID
-                                        select rt
+                                  select rt
                                                 ).FirstOrDefault();
 
                     fileName = string.Format(
@@ -530,15 +531,15 @@ namespace OSBLE.Models.Annotate
             try
             {
                 webResult = client.DownloadString(anonString);
-                WriteLog("SetDocumentAnnonymity: " + webResult); 
+                WriteLog("SetDocumentAnnonymity: " + webResult);
                 result.RawMessage = webResult;
             }
             catch (Exception)
             {
-                
+
                 throw;
             }
-            
+
             if (webResult.Substring(0, 2) == "OK")
             {
                 result.Result = ResultCode.OK;

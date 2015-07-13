@@ -64,7 +64,23 @@
     <Compile Include="DataAccess\Analytics\TimelineVisualization.cs" />
     <Compile Include="DataAccess\Lookups\Courses.cs" />
     <Compile Include="DataAccess\Profiles\CourseDataAccess.cs" />
+    <Compile Include="DomainObjects\ActivityFeeds\BreakPoint.cs" />
+    <Compile Include="DomainObjects\ActivityFeeds\BuildDocument.cs" />
+    <Compile Include="DomainObjects\ActivityFeeds\BuildError.cs" />
+    <Compile Include="DomainObjects\ActivityFeeds\BuildEventBreakPoint.cs" />
+    <Compile Include="DomainObjects\ActivityFeeds\BuildEventErrorListItem.cs" />
+    <Compile Include="DomainObjects\ActivityFeeds\CodeDocument.cs" />
+    <Compile Include="DomainObjects\ActivityFeeds\CodeDocumentBreakPoint.cs" />
+    <Compile Include="DomainObjects\ActivityFeeds\CodeDocumentErrorListItem.cs" />
+    <Compile Include="DomainObjects\ActivityFeeds\CutCopyPasteEvent.cs" />
+    <Compile Include="DomainObjects\ActivityFeeds\DebugEvent.cs" />
+    <Compile Include="DomainObjects\ActivityFeeds\EditorActivityEvent.cs" />
+    <Compile Include="DomainObjects\ActivityFeeds\ErrorType.cs" />
+    <Compile Include="DomainObjects\ActivityFeeds\SaveEvent.cs" />
+    <Compile Include="DomainObjects\ActivityFeeds\StackFrame.cs" />
+    <Compile Include="DomainObjects\ActivityFeeds\StackFrameVariable.cs" />
     <Compile Include="DomainObjects\ActivityFeeds\SubmisionAssignment.cs" />
+    <Compile Include="DomainObjects\ActivityFeeds\WhatsNewItem.cs" />
     <Compile Include="DomainObjects\Analytics\StateMachineEvent.cs" />
     <Compile Include="DomainObjects\Analytics\TimelineChartData.cs" />
     <Compile Include="DomainObjects\Analytics\TimelineCriteria.cs" />
@@ -105,7 +121,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\FileCacheHelper.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OSBLE.Library\OSBLE.Library.csproj">
       <Project>{6873caf7-4914-4b62-af7e-bfffa0a9ffd4}</Project>

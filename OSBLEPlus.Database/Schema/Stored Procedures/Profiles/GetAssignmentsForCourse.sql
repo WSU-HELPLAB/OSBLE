@@ -6,7 +6,7 @@ AS
 
       -- course assignments
       SELECT Id=a.ID,
-             CourseId=a.CourseId,
+             CourseId=a.CourseID,
              AssignmentType = a.AssignmentTypeID,
              NAME = a.AssignmentName,
              [Description]=a.AssignmentDescription,

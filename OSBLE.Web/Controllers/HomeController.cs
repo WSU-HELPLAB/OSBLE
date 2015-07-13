@@ -459,8 +459,6 @@ namespace OSBLE.Controllers
             //f.Event = new FeedPostEvent()
             //{
             //    Comment = Convert.ToString(Request.Form["Content"]),
-            //    EventDate = DateTime.Now,
-
             //};
 
             List<CourseUser> coursesToPost = new List<CourseUser>();

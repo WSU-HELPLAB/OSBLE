@@ -130,8 +130,6 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
             {
                 EventId = evt.EventId,
                 EventLogId = eventLog.EventLogId,
-                EventTypeId = (int)EventType.AskForHelpEvent,
-                EventDate = eventLog.EventDate,
                 SenderId = eventLog.SenderId,
                 Sender = GetUser(userDictionary, users, eventLog.SenderId),
                 Code = evt.Code,
@@ -151,12 +149,9 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
             {
                 EventId = evt.EventId,
                 EventLogId = eventLog.EventLogId,
-                EventTypeId = (int)EventType.BuildEvent,
-                EventDate = eventLog.EventDate,
                 SenderId = eventLog.SenderId,
                 Sender = GetUser(userDictionary, users, eventLog.SenderId),
                 SolutionName = evt.SolutionName,
-                CriticalErrorName = evt.CriticalErrorName
             };
         }
 
@@ -171,8 +166,6 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
             {
                 EventId = evt.EventId,
                 EventLogId = eventLog.EventLogId,
-                EventTypeId = (int)EventType.ExceptionEvent,
-                EventDate = eventLog.EventDate,
                 SenderId = eventLog.SenderId,
                 Sender = GetUser(userDictionary, users, eventLog.SenderId),
                 SolutionName = evt.SolutionName,
@@ -197,8 +190,6 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
             {
                 EventId = evt.EventId,
                 EventLogId = eventLog.EventLogId,
-                EventTypeId = (int)EventType.FeedPostEvent,
-                EventDate = eventLog.EventDate,
                 SenderId = eventLog.SenderId,
                 Sender = GetUser(userDictionary, users, eventLog.SenderId),
                 SolutionName = evt.SolutionName,
@@ -217,8 +208,6 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
             {
                 EventId = evt.EventId,
                 EventLogId = eventLog.EventLogId,
-                EventTypeId = (int)EventType.SubmitEvent,
-                EventDate = eventLog.EventDate,
                 SenderId = eventLog.SenderId,
                 Sender = GetUser(userDictionary, users, eventLog.SenderId),
                 SolutionName = evt.SolutionName,
@@ -238,7 +227,6 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
             foreach (var c in comments)
             {
                 // fill up each comment event properties not returned by query
-                c.EventTypeId = (int)EventType.LogCommentEvent;
                 c.Sender = GetUser(userDictionary, users, c.SenderId);
                 c.SourceEvent = subjectEvent;
                 c.NumberHelpfulMarks = helpMarks.Count(y => y.LogCommentEventId == c.EventId);
@@ -248,7 +236,6 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                 foreach (var h in commentMarks)
                 {
                     var helpMarkEventLog = eventLogs.Single(z => z.EventLogId == h.EventLogId);
-                    h.EventTypeId = (int)EventType.HelpfulMarkGivenEvent;
                     h.Sender = GetUser(userDictionary, users, helpMarkEventLog.SenderId);
                     h.LogComment = c;
                 }

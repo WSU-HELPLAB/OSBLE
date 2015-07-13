@@ -37,7 +37,7 @@ namespace OSBLEPlus.Logic.DomainObjects.Helpers
         {
             return string.Format(@"
 INSERT INTO [dbo].[LocalErrorLogs] ([SenderId],[LogDate],[Content])
-VALUES ({0},'{1}','{2}',){3}", SenderId, LogDate, Content, Environment.NewLine);
+VALUES ({0},'{1}','{2}'){3}", SenderId, LogDate, Content.Replace("'", "''"), Environment.NewLine);
         }
     }
 

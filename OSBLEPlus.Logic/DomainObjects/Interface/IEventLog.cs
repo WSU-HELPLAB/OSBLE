@@ -7,9 +7,8 @@ namespace OSBLEPlus.Logic.DomainObjects.Interface
     public interface IEventLog
     {
         int EventLogId { get; set; }
-        int EventTypeId { get; set; }
         EventType EventType { get; }
-        DateTime EventDate { get; set; }
+        DateTime EventDate { get; }
         int SenderId { get; set; }
         IUser Sender { get; set; }
         int? CourseId { get; set; }

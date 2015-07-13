@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Runtime.Caching;
+using System.Security.Cryptography;
+using System.Text;
 using System.Web;
 using OSBLE.Interfaces;
 using OSBLE.Models.Users;
@@ -103,7 +105,7 @@ namespace OSBLEPlus.Logic.Utility.Auth
             var cookie = new HttpCookie(ProfileCookieKey);
 
             //compute hash for this login attempt
-            var hash = GetPasswordHash(profile.Email);
+            var hash = GetAuthKey(profile.Email);
 
             //store profile in the authentication hash
             _cache[hash] = profile.UserId;
@@ -136,9 +138,26 @@ namespace OSBLEPlus.Logic.Utility.Auth
                 httpCookie.Expires = DateTime.UtcNow.AddDays(-1d);
         }
 
-        public static string GetPasswordHash(string text)
+        public static string GetOsblePasswordHash(string text)
         {
             return UserProfile.GetPasswordHash(text);
+        }
+
+        public static string GetAuthKey(string text)
+        {
+            var date = DateTime.UtcNow.ToLongTimeString();
+            var hashString = text + date;
+
+            //compute the hash
+            using (var sha1 = new SHA1Managed())
+            {
+                var textBytes = Encoding.ASCII.GetBytes(hashString);
+                var hashBytes = sha1.ComputeHash(textBytes);
+                var hashText = BitConverter.ToString(hashBytes);
+
+                //return the hash to the caller
+                return hashText;
+            }
         }
     }
 }

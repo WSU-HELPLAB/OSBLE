@@ -10,12 +10,13 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
     {
         // EventLogs table contents
         public int EventLogId { get; set; }
-        public int EventTypeId { get; set; }
+        protected virtual int EventTypeId { get; set; }
+
         public EventType EventType
         {
             get { return (EventType) EventTypeId; }
         }
-        public DateTime EventDate { get; set; }
+        public DateTime EventDate { get; private set; }
         public int SenderId { get; set; }
         public IUser Sender { get; set; }
 
@@ -37,6 +38,9 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             return string.Empty;
         }
 
-        public ActivityEvent() { } // NOTE!! This is required by Dapper ORM
+        public ActivityEvent() // NOTE!! This is required by Dapper ORM
+        {
+            EventDate = DateTime.UtcNow;
+        }
     }
 }

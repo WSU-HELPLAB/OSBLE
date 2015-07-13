@@ -215,6 +215,8 @@
     <Build Include="Schema\Tables\LocalErrorLogs.sql" />
     <Build Include="Schema\Tables\PassiveSocialEvents.sql" />
     <Build Include="Schema\Stored Procedures\Analytics\GetStateMachineEvents.sql" />
+    <Build Include="Schema\Tables\WhatsNewItems.sql" />
+    <Build Include="Schema\Stored Procedures\Activiities\GetMostRecentWhatsNewItem.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Post-Deployment\Script.PostDeployment.sql" />

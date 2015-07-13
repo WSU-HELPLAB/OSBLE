@@ -1,0 +1,37 @@
+﻿<UserControl x:Class="OSBIDE.Controls.Views.SubmissionEntry"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             Height="102" Width="250"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25" />
+            <RowDefinition Height="25" />
+            <RowDefinition Height="25" />
+            <RowDefinition Height="25" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100*" />
+            <ColumnDefinition Width="150*" />
+        </Grid.ColumnDefinitions>
+        
+        <!--Row #1-->
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Student:" />
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Path=SubmissionLog.Sender.FullName, Mode=OneWay}" />
+
+        <!--Row #2-->
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Assignment:" />
+        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Path=Submission.AssignmentName, Mode=OneWay}" />
+        
+        <!--Row #3-->
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Date Submitted:" />
+        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Path=Submission.EventDate, Mode=OneWay}" />
+
+        <!--Row #4-->
+        <Button Grid.Row="3" Grid.ColumnSpan="2" Content="Download" Command="{Binding DownloadCommand}" Width="100" HorizontalAlignment="Center" />
+
+    </Grid>
+</UserControl>

@@ -36,7 +36,7 @@ namespace OSBLEPlus.Logic.DataAccess.Profiles
 
         public static bool ValidateUser(string userName, string password)
         {
-            return UserProfile.ValidateUser(userName, password);
+            return UserProfile.ValidateUser(userName, password, true);
         }
 
         public static int LogUserTransaction(int userId, DateTime activityTime)
@@ -49,14 +49,14 @@ namespace OSBLEPlus.Logic.DataAccess.Profiles
             }
         }
 
-        public static List<ProfileCourse> GetProfileCoursesForUser(int userId, DateTime currenTime)
+        public static List<ProfileCourse> GetProfileCoursesForUser(int userId, DateTime currentTime)
         {
             using (
                 var connection = new SqlConnection(StringConstants.ConnectionString))
             {
                 return
                     connection.Query<ProfileCourse>("dbo.GetCoursesForUser",
-                        new {UserId = userId, CurrentDate = currenTime.Date.AddDays(1).AddSeconds(-1)},
+                        new {UserId = userId, CurrentDate = currentTime.Date.AddDays(1).AddSeconds(-1)},
                         commandType: CommandType.StoredProcedure).ToList();
             }
         }
@@ -66,12 +66,12 @@ namespace OSBLEPlus.Logic.DataAccess.Profiles
             using (
                 var connection = new SqlConnection(StringConstants.ConnectionString))
             {
-                var activity =
-                    connection.Query<ActivityEvent>("dbo.GetMostRecentSocialActivityForUser",
+                var activityTime =
+                    connection.Query<DateTime?>("dbo.GetMostRecentSocialActivityForUser",
                         new { UserId = userId },
                         commandType: CommandType.StoredProcedure).SingleOrDefault();
 
-                return activity == null ? DateTime.MinValue : activity.EventDate;
+                return activityTime ?? DateTime.MinValue;
             }
         }
     }
