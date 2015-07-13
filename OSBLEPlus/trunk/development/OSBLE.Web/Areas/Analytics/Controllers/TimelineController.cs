@@ -22,14 +22,16 @@ namespace OSBLE.Areas.Analytics.Controllers
         [ChildActionOnly]
         public ActionResult Index()
         {
-                return PartialView("_Timeline", CourseDataAccess.GetStudentList(ActiveCourseUser.AbstractCourseID));       
+
+                
+            return PartialView("_Timeline");
         }
 
-        public ActionResult GetCSVData(int scaleSetting, DateTime? timeFrom, DateTime? timeTo, int? timeout, bool? grayscale, bool? realtime, int courseId)
+        public ActionResult GetCSVData(int scaleSetting, DateTime? timeFrom, DateTime? timeTo, int? timeout, bool? grayscale, bool? realtime, int courseId, string[] userId)
         {
             bool gray = grayscale ?? false;
             TimelineCriteria var = new TimelineCriteria {timeScale = (TimeScale) scaleSetting, timeFrom = timeFrom,
-                timeTo = timeTo, timeout = timeout, grayscale = gray, courseId = courseId};
+                timeTo = timeTo, timeout = timeout, grayscale = gray, courseId = courseId, userIds = string.Join(",", userId)};
 
             var chartCsvData = TimelineVisualization.GetCSV(var, realtime);
             return File(new System.Text.UTF8Encoding().GetBytes(chartCsvData), "text/csv", "timeline.csv");
@@ -38,7 +40,8 @@ namespace OSBLE.Areas.Analytics.Controllers
         [ChildActionOnly]
         public ActionResult Options()
         {
-            return PartialView("_TimelineOptions");
+            var list = CourseDataAccess.GetStudentList(ActiveCourseUser.AbstractCourseID);
+            return PartialView("_TimelineOptions", list);
         }
     }
 }

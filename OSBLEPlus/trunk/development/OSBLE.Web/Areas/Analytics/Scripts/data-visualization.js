@@ -194,7 +194,6 @@ if (typeof (Chart) == "undefined") {
                 var checkedValues = $("input[name='userId']:checked").map(function () {
                     return this.value;
                 }).get().join(",");
-                alert(checkedValues);
                 $.ajax({
                     url: dataservice + "/api/timeline",
                     //xhrFields: { withCredentials: true },
