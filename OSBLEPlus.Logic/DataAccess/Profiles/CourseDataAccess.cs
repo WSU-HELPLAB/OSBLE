@@ -7,6 +7,7 @@ using System.Linq;
 using Dapper;
 using OSBLE.Interfaces;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
+using OSBLEPlus.Logic.DomainObjects.Analytics;
 using OSBLEPlus.Logic.DomainObjects.Profiles;
 using OSBLEPlus.Logic.Utility;
 
@@ -54,5 +55,19 @@ namespace OSBLEPlus.Logic.DataAccess.Profiles
                         commandType: CommandType.StoredProcedure).FirstOrDefault();
             }
         }
+
+        public static List<StudentData> GetStudentList(int courseId)
+        {
+            using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+
+                return sqlConnection.Query<StudentData>(@"GetStudentList",
+                    new
+                    {
+                        courseId
+                    }, commandType: CommandType.StoredProcedure)
+                    .ToList();
+            }
+        } 
     }
 }

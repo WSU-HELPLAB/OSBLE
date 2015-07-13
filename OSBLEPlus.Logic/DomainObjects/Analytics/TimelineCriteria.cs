@@ -12,6 +12,7 @@ namespace OSBLEPlus.Logic.DomainObjects.Analytics
         public int? timeout { get; set; }
         public bool grayscale { get; set; }
 
-        public int courseId { get; set; }        
+        public int courseId { get; set; }
+        public string userIds { get; set; }
     }
 }

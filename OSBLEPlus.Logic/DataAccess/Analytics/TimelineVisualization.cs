@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Text;
 using Dapper;
 using OSBLEPlus.Logic.DomainObjects.Analytics;
 using OSBLEPlus.Logic.Utility;
@@ -11,15 +12,19 @@ namespace OSBLEPlus.Logic.DataAccess.Analytics
 {
     public class TimelineVisualization
     {
+        private const string EVENT_FORMAT = ",{0};{1}";
+        private const string ACTIVITY_FORMAT = ",{0};{1};{2}";
+        private const string TIME_FORMAT = "MM/dd/yy HH:mm:ss";
         public static List<TimelineChartData> Get(TimelineCriteria criteria, bool? realtime)
         {
             using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
             {
                 sqlConnection.Open();
+                var defaultMin = new DateTime(2000, 1, 1);
+                var defaultMax = DateTime.Today.AddDays(1);
 
-                var unspecifiedDate = new DateTime(2000, 1, 1);
-                var timeFrom = criteria.timeFrom ?? unspecifiedDate;
-                var timeTo = criteria.timeTo ?? unspecifiedDate;
+                var timeFrom = criteria.timeFrom ?? defaultMin; ;
+                var timeTo = criteria.timeTo ?? defaultMax;
 
                 var timeoutVal = criteria.timeout ?? VisualizationParams.DEFAULT_TIMEOUT;
 
@@ -29,14 +34,15 @@ namespace OSBLEPlus.Logic.DataAccess.Analytics
                     {
                         dateFrom = timeFrom,
                         dateTo = timeTo,
-                        courseId = criteria.courseId
+                        courseId = criteria.courseId,
+                        userIds = criteria.userIds
                     }, commandType: CommandType.StoredProcedure)
                     .ToList();
 
                 sqlConnection.Close();
-
-                if (timeFrom == unspecifiedDate) timeFrom = rawR.Min(x => x.EventDate);
-                if (timeTo == unspecifiedDate) timeTo = rawR.Max(x => x.EventDate);
+                if (rawR.Count == 0) return null;
+                if (timeFrom == defaultMin) timeFrom = rawR.Min(x => x.EventDate);
+                if (timeTo == defaultMax) timeTo = rawR.Max(x => x.EventDate);
 
                 var totalMinutes = (int)(timeTo - timeFrom).TotalMinutes;
 
@@ -346,5 +352,50 @@ namespace OSBLEPlus.Logic.DataAccess.Analytics
 
             return nextStateName;
         }
+
+        public static string GetCSV(TimelineCriteria criteria, bool? realtime)
+        {
+            var csvText = new StringBuilder();
+            var chartData = Get(criteria, realtime);
+
+            chartData.ForEach(x =>
+            {
+                csvText.Append(x.UserId);
+
+                var i = 0;
+                var j = 0;
+                while (i < x.measures.Count || j < x.markers.Count)
+                {
+                    if (i >= x.measures.Count)
+                    {
+                        csvText.AppendFormat(EVENT_FORMAT, x.markers[j].Name, x.markers[j].EventTime.ToString(TIME_FORMAT));
+                        j++;
+                    }
+                    else if (j >= x.markers.Count)
+                    {
+                        csvText.AppendFormat(ACTIVITY_FORMAT, x.measures[i].Name, x.measures[i].StartTime.ToString(TIME_FORMAT), x.measures[i].EndTime.ToString(TIME_FORMAT));
+                        i++;
+                    }
+                    else
+                    {
+                        if (x.markers[j].Position < x.measures[i].StartPoint)
+                        {
+                            csvText.AppendFormat(EVENT_FORMAT, x.markers[j].Name, x.markers[j].EventTime.ToString(TIME_FORMAT));
+                            j++;
+                        }
+                        else
+                        {
+                            csvText.AppendFormat(ACTIVITY_FORMAT, x.measures[i].Name, x.measures[i].StartTime.ToString(TIME_FORMAT), x.measures[i].EndTime.ToString(TIME_FORMAT));
+                            i++;
+                        }
+                    }
+                }
+                csvText.AppendFormat("{0}", Environment.NewLine);
+            });
+
+            return csvText.ToString();
+        }
+
+
     }
 }

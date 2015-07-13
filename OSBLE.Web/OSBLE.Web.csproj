@@ -342,10 +342,14 @@
   <ItemGroup>
     <Content Include="App_Code\Libraries\LumenWorks.Framework.IO.dll" />
     <Content Include="Areas\Analytics\Content\AnalyticsIndex.css" />
+    <Content Include="Areas\Analytics\Content\bootstrap-datetimepicker.css" />
+    <Content Include="Areas\Analytics\Content\bootstrap-datetimepicker.min.css" />
     <Content Include="Areas\Analytics\Content\Calendar.css" />
     <Content Include="Areas\Analytics\Content\loading.gif" />
     <Content Include="Areas\Analytics\Content\Timeline.css" />
     <Content Include="Areas\Analytics\Scripts\AnalyticsIndex.js" />
+    <Content Include="Areas\Analytics\Scripts\bootstrap-datetimepicker.js" />
+    <Content Include="Areas\Analytics\Scripts\bootstrap-datetimepicker.min.js" />
     <Content Include="Areas\Analytics\Scripts\bullet.js" />
     <Content Include="Areas\Analytics\Scripts\Calendar.js" />
     <Content Include="Areas\Analytics\Scripts\d3-tip.min.js" />
