@@ -237,6 +237,7 @@
     <None Include="OSBLEPlus_1.Database.publish.xml" />
   </ItemGroup>
   <PropertyGroup>
-    <PostBuildEvent>sqlpackage /Action:Publish /SourceFile:"OSBLEPlus.Database.dacpac" /pr:..\..\OSBLEPlus.Database.publish.xml</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>
