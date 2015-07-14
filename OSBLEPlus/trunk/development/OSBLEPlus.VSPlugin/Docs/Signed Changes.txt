@@ -1,0 +1,5 @@
+Each time either the library or the logic project file is modified to include or exclude new files, 
+the signed project files should to be updated, too. We can only share the cs files between the signed 
+and unsigned projects, but the project files themselves have to be maintained individually.
+
+See changeset 39520
