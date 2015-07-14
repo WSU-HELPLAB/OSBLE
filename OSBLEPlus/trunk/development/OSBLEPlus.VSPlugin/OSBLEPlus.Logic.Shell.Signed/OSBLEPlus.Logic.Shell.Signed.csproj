@@ -97,6 +97,10 @@
     <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\Analytics\DailyAggregations.cs" />
     <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\Analytics\HourlyAggregations.cs" />
     <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\Analytics\MeasureDefinitions.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\Analytics\StateMachineEvent.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\Analytics\TimelineChartData.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\Analytics\TimelineCriteria.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\Analytics\VisualizationParams.cs" />
     <Compile Include="..\..\OSBLEPlus.Logic\Utility\Auth\IAuthentication.cs" />
     <Compile Include="..\..\OSBLEPlus.Logic\Utility\ConstantsAndEnums.cs" />
     <Compile Include="..\..\OSBLEPlus.Logic\Utility\Logging\ILogger.cs" />
