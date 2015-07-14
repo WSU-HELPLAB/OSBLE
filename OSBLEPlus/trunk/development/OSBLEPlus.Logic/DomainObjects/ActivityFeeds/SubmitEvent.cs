@@ -84,7 +84,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             return string.Format(@"
 INSERT INTO dbo.EventLogs (EventTypeID, EventDate, SenderId, BatchId) VALUES ({0}, '{1}', {2}, '{6}')
 INSERT INTO dbo.SubmitEvents (EventLogId, EventDate, SolutionName, AssignmentId, SolutionData)
-VALUES (SCOPE_IDENTITY(), '{1}', '{3}', {4}, {5})", EventTypeId, EventDate, SenderId, SolutionName, AssignmentId, solutionData);
+VALUES (SCOPE_IDENTITY(), '{1}', '{3}', {4}, {5})", EventTypeId, EventDate, SenderId, SolutionName, AssignmentId, solutionData, BatchId);
         }
     }
 }
