@@ -325,9 +325,47 @@ Also runs content through nl2br to convert newlines to <br /> tags. *@
 
 }
 
+@helper GetIconImgPath(string ext)
+{
+    if (".aac" == ext || ".ai" == ext || ".aiff" == ext || ".avi" == ext ||
+            ".bmp" == ext || ".c" == ext || ".cpp" == ext || ".css" == ext ||
+            ".dat" == ext || ".dmg" == ext || ".doc" == ext || ".dotx" == ext ||
+            ".dwg" == ext || ".dxf" == ext || ".eps" == ext || ".exe" == ext ||
+            ".flv" == ext || ".gif" == ext || ".h" == ext || ".hpp" == ext ||
+            ".html" == ext || ".ics" == ext || ".iso" == ext || ".java" == ext ||
+            ".jpg" == ext || ".key" == ext || ".mid" == ext || ".mp3" == ext ||
+            ".mp4" == ext || ".mpg" == ext || ".odf" == ext || ".ods" == ext ||
+            ".odt" == ext || ".otp" == ext || ".ots" == ext || ".ott" == ext ||
+            ".pdf" == ext || ".php" == ext || ".png" == ext || ".ppt" == ext ||
+            ".psd" == ext || ".py" == ext || ".qt" == ext || ".rar" == ext ||
+            ".rb" == ext || ".rtf" == ext || ".sql" == ext || ".tga" == ext ||
+            ".tgz" == ext || ".tiff" == ext || ".txt" == ext || ".wav" == ext ||
+            ".xls" == ext || ".xlsx" == ext || ".xml" == ext || ".yml" == ext ||
+            ".zip" == ext)
+    {
+        <text>/Content/images/fileextimages/</text>@ext.Substring(1)<text>.png</text>
+    }
+    else
+    { 
+        <text>/Content/images/fileextimages/_blank.png</text>
+    }
+}
+
 @functions{
     #region C# functions
 
+    int CountFolderChildern(System.Xml.XmlElement folder, int count)
+    {
+        count++; //Count self
+        foreach(System.Xml.XmlElement e in folder.ChildNodes)
+        {
+            if (e.Name == "folder")
+                count += CountFolderChildern(e, count);
+            else
+                count++;
+        }
+        return count;
+    }
 
 #endregion
     }
