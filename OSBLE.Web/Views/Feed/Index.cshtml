@@ -114,7 +114,7 @@
                         {
                             string selectedText = "";
                             int roleValue = (int)role;
-                            string roleName = Enum.GetName(typeof(CourseRole), role);
+                            string roleName = Enum.GetName(typeof(CourseRole.CourseRoles), roleValue);
                             if (role == Model.SelectedCourseRole)
                             {
                                 selectedText = @"selected=""selected""";

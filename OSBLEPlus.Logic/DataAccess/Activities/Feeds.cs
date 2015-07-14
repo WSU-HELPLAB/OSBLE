@@ -45,7 +45,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                                             SenderIds = s,
                                             TopN = topN ?? 20
                                         }, commandType: CommandType.StoredProcedure);
-
+                
                 var eventLogs = multiResults.Read<ActivityEvent>().ToList();
                 var users = multiResults.Read<UserProfile>().ToList();
                 var askHelps = multiResults.Read<AskForHelpEvent>().ToList();
@@ -76,44 +76,60 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
             var feedItems = new List<FeedItem>();
             var userDictionary = new Dictionary<int, IUser>();
 
-            IActivityEvent xActivityEvent = null;
-            foreach (var x in eventLogs)
+            try
             {
-                #region compose the event log's activity event
-
-                switch (x.EventType)
+                IActivityEvent xActivityEvent = null;
+                foreach (var x in eventLogs)
                 {
-                    case EventType.AskForHelpEvent:
-                        xActivityEvent = ComposeAskForHelpEvent(x, userDictionary, users, askHelps);
-                        break;
+                    #region compose the event log's activity event
 
-                    case EventType.BuildEvent:
-                        xActivityEvent = ComposeBuildEvent(x, userDictionary, users, builds);
-                        break;
+                    switch (x.EventType)
+                    {
+                        case EventType.AskForHelpEvent:
+                            xActivityEvent = ComposeAskForHelpEvent(x, userDictionary, users, askHelps);
+                            break;
 
-                    case EventType.ExceptionEvent:
-                        xActivityEvent = ComposeExceptionEvent(x, userDictionary, users, exceptions);
-                        break;
+                        case EventType.BuildEvent:
+                            xActivityEvent = ComposeBuildEvent(x, userDictionary, users, builds);
+                            break;
 
-                    case EventType.FeedPostEvent:
-                        xActivityEvent = ComposeFeedPostEvent(x, userDictionary, users, feedPosts);
-                        break;
+                        case EventType.ExceptionEvent:
+                            xActivityEvent = ComposeExceptionEvent(x, userDictionary, users, exceptions);
+                            break;
 
-                    case EventType.SubmitEvent:
-                        xActivityEvent = ComposeSubmitEvent(x, userDictionary, users, submits);
-                        break;
+                        case EventType.FeedPostEvent:
+                            xActivityEvent = ComposeFeedPostEvent(x, userDictionary, users, feedPosts);
+                            break;
+
+                        case EventType.SubmitEvent:
+                            xActivityEvent = ComposeSubmitEvent(x, userDictionary, users, submits);
+                            break;
+                    }
+
+                    #endregion
+
+                    if (xActivityEvent == null) continue;
+                    FeedItem f = new FeedItem()
+                    {
+                        Event = xActivityEvent,
+                        Comments = ComposeComments(xActivityEvent, eventLogs, users, logComments, helpMarks, userDictionary)
+                    };
+
+                    if (!feedItems.Contains(f))
+                        feedItems.Add(f);
+                    //feedItems.Add(new FeedItem
+                    //{
+                    //    Event = xActivityEvent,
+                    //    Comments =
+                    //        ComposeComments(xActivityEvent, eventLogs, users, logComments, helpMarks, userDictionary)
+                    //});
                 }
-
-                #endregion
-
-                if (xActivityEvent == null) continue;
-
-                feedItems.Add(new FeedItem
-                {
-                    Event = xActivityEvent,
-                    Comments = ComposeComments(xActivityEvent, eventLogs, users, logComments, helpMarks, userDictionary)
-                });
             }
+            catch (Exception)
+            {
+                // do nothing
+            }
+            
 
             return feedItems;
         }

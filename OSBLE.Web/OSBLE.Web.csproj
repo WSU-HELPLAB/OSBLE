@@ -277,6 +277,7 @@
     <Compile Include="Controllers\OpenIdController.cs" />
     <Compile Include="Controllers\OSBLEController.cs" />
     <Compile Include="Controllers\PdfCriticalReviewController.cs" />
+    <Compile Include="Controllers\ProfileController.cs" />
     <Compile Include="Controllers\RosterController.cs" />
     <Compile Include="Controllers\RubricController.cs" />
     <Compile Include="Controllers\SchoolController.cs" />
@@ -289,6 +290,7 @@
     </Compile>
     <Compile Include="Models\Queries\ActivityFeedQuery.cs" />
     <Compile Include="Models\Queries\IOSBLEQuery.cs" />
+    <Compile Include="Models\UserFeedSetting.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\CsvParser.cs" />
     <Compile Include="Resources\CSVReader\CSVDriver.cs" />
@@ -984,6 +986,7 @@
     <Content Include="Views\Shared\_CommentSingle.cshtml" />
     <Content Include="Views\Home\_NEWActivityFeedCode_Temp.cshtml" />
     <Content Include="Views\Home\_DashboardPost.cshtml" />
+    <Content Include="Views\Profile\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

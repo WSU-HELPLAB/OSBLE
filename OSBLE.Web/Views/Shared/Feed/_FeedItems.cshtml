@@ -1,4 +1,5 @@
-﻿@using OSBLE.Models.Users
+﻿@using OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
+@using OSBLE.Models.Users
 @using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 @model List<AggregateFeedItem>
 @{
@@ -51,8 +52,8 @@
         </div>
         <div class="feed-item-single-right">
             <h1>
-                <a href="@Url.Action("Index", "Profile", new { id = item.Creator.Id, component = OsbideVsComponent.UserProfile })">@item.Creator.FirstAndLastName</a>
-                <span class="feed-item-date">(@item.Creator.DefaultCourse.Name)</span>
+                <a href="@Url.Action("Index", "Profile", new { id = item.Creator.ID })">@item.Creator.FullName</a>
+                <span class="feed-item-date">(@item.Creator.DefaultCourse.ToString())</span>
                 <time class="utc-time feed-item-date"
                       datetime="@Helpers.DateAsUnixTime(item.MostRecentOccurance)"
                       data-original-date="@Helpers.RawDate(item.MostRecentOccurance)"
@@ -62,7 +63,7 @@
             </h1>
             <div>
                 @{
-    string partialName = string.Format("Feed/_{0}", item.Items.First().Event.EventName);
+    string partialName = string.Format("Feed/_{0}", item.Items.First().Event.EventName.Replace(" ", String.Empty));
                 }
                 @Html.Partial(partialName, item)
             </div>
@@ -79,7 +80,7 @@
     int[] ids = item.Items.Select(i => i.Event.EventLogId).ToArray();
     string idString = string.Join(",", ids);
                     }
-                    <li><a href="@Url.Action("Details", "Feed", new { id = idString, component = OsbideVsComponent.FeedDetails })">Details</a></li>
+                    <li><a href="@Url.Action("Details", "Feed", new { id = idString })">Details</a></li>
                 </ul>
             </div>
             <div class="feed-item-comments"

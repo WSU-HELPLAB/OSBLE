@@ -12,6 +12,7 @@
         HelpfulMarkGivenEvent = 8,
         LogCommentEvent = 9,
         SaveEvent = 10,
-        SubmitEvent = 11
+        SubmitEvent = 11,
+        Null = 12
     }
 }
