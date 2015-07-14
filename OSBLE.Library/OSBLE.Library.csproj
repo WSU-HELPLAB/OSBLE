@@ -119,6 +119,7 @@
     <Compile Include="Models\Assignments\AbetAssignmentOutcome.cs" />
     <Compile Include="Models\Assignments\AbetSubmissionTag.cs" />
     <Compile Include="Models\Assignments\Assignment.cs" />
+    <Compile Include="Models\Assignments\AssignmentSubmissionHelper.cs" />
     <Compile Include="Models\Assignments\AssignmentTeam.cs" />
     <Compile Include="Models\Assignments\AssignmentTypes.cs" />
     <Compile Include="Models\Assignments\CommentCategory.cs" />

@@ -561,21 +561,7 @@ namespace OSBLE.Controllers
 
         public static string[] GetFileExtensions(DeliverableType deliverableType)
         {
-            var type = deliverableType.GetType();
-
-            var fi = type.GetField(deliverableType.ToString());
-
-            //we get the attributes of the selected language
-            var attrs = (fi.GetCustomAttributes(typeof(FileExtensions), false) as FileExtensions[]);
-
-            //make sure we have more than (should be exactly 1)
-            if (attrs != null && (attrs.Length > 0 && attrs[0] != null))
-            {
-                return attrs[0].Extensions;
-            }
-
-            //throw and exception if not decorated with any attrs because it is a requirement
-            throw new Exception("Languages must have be decorated with a FileExtensionAttribute");
+            return AssignmentSubmissionHelper.GetFileExtensions(deliverableType);
         }
 
         protected List<SelectListItem> GetListOfDeliverableTypes()
@@ -702,7 +688,7 @@ namespace OSBLE.Controllers
         //                            , null
         //                            , null
         //                            );
-                    
+
         //        //if (checkEvent != null)
         //        //{
         //        //    id = (checkEvent as LogCommentEvent).SourceEventLogId;
