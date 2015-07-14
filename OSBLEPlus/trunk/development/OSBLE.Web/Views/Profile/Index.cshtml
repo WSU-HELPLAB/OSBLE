@@ -1,0 +1,199 @@
+﻿@using System.Diagnostics
+@using OSBIDE.Library.Models
+@using OSBIDE.Web.Models.ViewModels
+@using OSBIDE.Web.Models
+@using OSBIDE.Library.Events
+@using OSBIDE.Library
+@using System.Text
+@using OSBLE.Models.Users
+@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+@using OSBLEPlus.Services.Models
+@using OSBLE.Models.ViewModels
+@model ProfileViewModel
+@{
+    ViewBag.Title = Model.User.FullName;
+    UserProfile currentUser = ViewBag.CurrentUser;
+}
+
+<section data-tab="Profile">
+    <div class="feed-item-single-left">
+        <img src="@Url.Action("Picture", "Profile", new { id = Model.User.ID })" title="profile image" alt="profile image" />
+    </div>
+    <div class="feed-item-single-right">
+        <h1 style="display: inline;">@Model.User.DisplayName()</h1>
+        @if (ViewBag.CurrentUser.Id == Model.User.ID)
+        {
+            <span>@Html.ActionLink("(Edit your profile)", "Edit")</span>
+        }
+        <table>
+            @*<tr>
+                <td><strong>@Model.Score.Score</strong> points</td>
+            </tr>*@
+            <tr>
+                <td><strong>@Model.NumberOfPosts</strong> post(s)</td>
+            </tr>
+            <tr>
+                <td><strong>@Model.NumberOfComments</strong> comment(s)</td>
+            </tr>
+        </table>
+    </div>
+</section>
+@if (Model.User.Id == currentUser.Id)
+{
+    int rowCounter = 0;
+    <section id="subscriptions">
+        <h1>My Subscriptions</h1>
+        @if (Model.EventLogSubscriptions.Count() == 0)
+        {
+            @:You don't have any subscriptions.
+        }
+        else
+        {
+            <table id="subscriptions-table">
+                <thead>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th>Author</th>
+                        <th>Event Type</th>
+                        <th>Last Activity Date</th>
+                        <th># Comments</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (AggregateFeedItem item in Model.EventLogSubscriptions)
+                    {
+                        rowCounter++;
+                        string rowClass = "normal-row";
+                        if (rowCounter % 2 == 0)
+                        {
+                            rowClass = "alt-row";
+                        }
+                        var lastComment = (from comment in item.Comments
+                                           orderby comment.EventDate descending
+                                           select comment).FirstOrDefault();
+                        string lastCommentText = "not available";
+                        if (lastComment != null)
+                        {
+                            lastCommentText = lastComment.EventDate.ToString("MM/dd @ hh:mmtt");
+                        }
+
+                        <tr class="@rowClass">
+                            <td>
+                                <img src="@Url.Action("Picture", "Profile", new { id = item.Creator.Id, size = 24 })" height="24" width="24" title="profile image" alt="profile image" />
+                            </td>
+                            <td>
+                                @Html.ActionLink(item.Creator.FirstAndLastName, "Index", "Profile", new { id = item.Creator.Id, component = OsbideVsComponent.UserProfile }, new { })
+                            </td>
+                            <td>@item.PrettyName</td>
+                            <td>@lastCommentText</td>
+                            <td>@item.Comments.Count</td>
+                            <td>
+                                @Html.ActionLink("View", "Details", "Feed", new { id = item.Items.FirstOrDefault().LogId, component = OsbideVsComponent.FeedDetails }, new { })
+                                <a style="padding-left:10px;" href="@Url.Action("UnfollowPost", "Feed", new { id = item.Items.FirstOrDefault().LogId, returnUrl = Request.Url.AbsoluteUri })">
+                                    <img src="~/Content/icons/unfollow.png" title="unfollow" alt="unfollow" />
+                                </a>
+
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </section>
+}
+<section id="recent-comments">
+    <h1>Recent Social Activity</h1>
+    @if (Model.SocialActivity.TopLevelLogCount == 0)
+    {
+        @:No recent activity.
+    }
+    else
+    {
+        foreach (DateTime date in Model.SocialActivity.ActivityDates)
+        {
+            List<int> eventIds = Model.SocialActivity.GetEventIds(date);
+
+            <div>
+                <h2>@Helpers.RelativeDate(date)</h2>
+                <ul>
+                    @foreach (int logId in eventIds)
+                    {
+                        List<CommentActivityLog> socialLogs = Model.SocialActivity.GetLogs(date, logId);
+                        DateTime maxDate = socialLogs.Select(s => s.LogCommentEvent.EventDate).Max();
+                        string content = "";
+
+                        //is the user commenting on an anymous event?
+                        var ideEvents = OSBIDE.Web.Models.Queries.ActivityFeedQuery.GetIdeEvents();
+                        EventLog sourceEvent = socialLogs[0].LogCommentEvent.SourceEventLog;
+                        if (ideEvents.Where(e => (int)e == sourceEvent.EventTypeId).FirstOrDefault() != null)
+                        {
+                            //Is the user the target of an IDE event?  For example, did someone comment on this user's build event?
+                            //If so, we don't want to show this as it would ruin the anonymity
+                            if (sourceEvent.SenderId == Model.User.Id)
+                            {
+                                //skip this record
+                                continue;
+                            }
+
+                            //otherwise, anonymize the source
+                            sourceEvent.Sender.FirstName = "A student";
+                            sourceEvent.Sender.LastName = "";
+                        }
+
+
+                        switch (socialLogs.Count)
+                        {
+                            case 1:
+                                content = string.Format("{0} commented on a post by {1}",
+                                socialLogs[0].LogCommentEvent.EventLog.Sender.FirstAndLastName,
+                                Html.ActionLink(sourceEvent.Sender.FirstAndLastName, "Details", "Feed", new { id = logId }, new { }));
+                                break;
+
+                            case 2:
+                                content = string.Format("{0} and {1} commented on a post by {2}",
+                                socialLogs[0].LogCommentEvent.EventLog.Sender.FirstAndLastName,
+                                socialLogs[1].LogCommentEvent.EventLog.Sender.FirstAndLastName,
+                                Html.ActionLink(sourceEvent.Sender.FirstAndLastName, "Details", "Feed", new { id = logId }, new { }));
+                                break;
+
+                            case 3:
+                                content = string.Format("{0}, {1}, and {2} commented on a post by {3}",
+                                socialLogs[0].LogCommentEvent.EventLog.Sender.FirstAndLastName,
+                                socialLogs[1].LogCommentEvent.EventLog.Sender.FirstAndLastName,
+                                socialLogs[2].LogCommentEvent.EventLog.Sender.FirstAndLastName,
+                                Html.ActionLink(sourceEvent.Sender.FirstAndLastName, "Details", "Feed", new { id = logId }, new { }));
+                                break;
+
+                            default:
+                                content = string.Format("{0}, {1}, and {2} other(s) commented on a post by {3}",
+                                socialLogs[0].LogCommentEvent.EventLog.Sender.FirstAndLastName,
+                                socialLogs[1].LogCommentEvent.EventLog.Sender.FirstAndLastName,
+                                socialLogs.Count - 2,
+                                Html.ActionLink(sourceEvent.Sender.FirstAndLastName, "Details", "Feed", new { id = logId }, new { }));
+                                break;
+                        }
+
+                        <li>
+                            @Html.Raw(content)
+                        <span class="comments-table-date">
+                            (
+                            <time class="utc-time"
+                                  datetime="@Helpers.DateAsUnixTime(maxDate)"
+                                  data-original-date="@Helpers.RawDate(maxDate)"
+                                  data-date-format="hh:mm A">
+                                @maxDate.ToString("hh:mmtt") (UTC)
+                            </time>
+                            )
+                        </span>.
+                    </li>
+                    }
+                </ul>
+            </div>
+        }
+    }
+</section>
+<section>
+    <h1>All Activity</h1>
+    @Html.Partial("Feed/_Feed", Model.Feed)
+</section>

@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Data.SqlTypes;
 using System.Linq;
 using System.Threading.Tasks;
+using Dapper;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
+using OSBLE.Utility;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
 using OSBLEPlus.Logic.Utility.Lookups;
 using OSBLEPlus.Services.Controllers;
@@ -25,7 +28,15 @@ namespace OSBLE.Models.Queries
             MinLogId = -1;
             MaxLogId = -1;
             MaxQuerySize = 20;
-            CourseRoleFilter = CourseRole.CourseRoles.Student;
+            using (SqlConnection conn = DBHelper.GetNewConnection())
+            {
+                string query = "SELECT * " +
+                               "FROM AbstractRoles a " +
+                               "WHERE " +
+                               "a.Name = 'Student'";
+
+                CourseRoleFilter = new CourseRole(conn.Query<CourseRole>(query).First());
+            }
             CourseFilter = new Course() { ID = -1 };
         }
 
@@ -63,7 +74,7 @@ namespace OSBLE.Models.Queries
         /// the supplied threshold.  E.g. CourseRole.Student will select everyone whereas 
         /// CourseRole.Coordinator will only select course coordinators.
         /// </summary>
-        public CourseRole.CourseRoles CourseRoleFilter { private get; set; }
+        public CourseRole CourseRoleFilter { private get; set; }
 
         /// <summary>
         /// Used to select only posts made by students in a given course.  Default value is all
@@ -187,7 +198,7 @@ namespace OSBLE.Models.Queries
                                     , EventIds.Select(eid => (int)eid).ToList() // 3
                                     , _eventSelectors.Select(e => (int)e) // 4
                                     , CourseFilter != null && CourseFilter.ID > 0 ? CourseFilter.ID : 0
-                                    , (int)CourseRoleFilter
+                                    , CourseRoleFilter.ID
                                     , CommentFilter
                                     , SubscriptionSubjects.Select(s => s.ID).ToList()
                                     );

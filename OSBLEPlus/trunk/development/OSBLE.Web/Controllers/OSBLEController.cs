@@ -670,6 +670,22 @@ namespace OSBLE.Controllers
             db.SaveChanges();
         }
 
+        protected List<int> ParseIdString(string idStr)
+        {
+            //get out list of ID numbers
+            string[] rawIds = idStr.Split(',');
+            List<int> ids = new List<int>(rawIds.Length);
+            for (int i = 0; i < rawIds.Length; i++)
+            {
+                int tempId = -1;
+                if (Int32.TryParse(rawIds[i], out tempId) == true)
+                {
+                    ids.Add(tempId);
+                }
+            }
+            return ids;
+        }
+
         //protected async Task<bool> PostComment(string logId, string comment)
         //{
         //    int id = -1;

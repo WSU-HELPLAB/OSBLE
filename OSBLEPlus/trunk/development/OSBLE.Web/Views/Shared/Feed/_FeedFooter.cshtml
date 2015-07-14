@@ -1,6 +1,7 @@
-﻿@model OSBLE.Models.ViewModels.FeedViewModel
+﻿@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+@model FeedViewModel
 <section>
-    @Html.ActionLink("Load earlier posts...", "Index", new { timestamp = Model.LastPollDate.AddHours(-10).Ticks, errorType = Model.SelectedErrorType.Id }, new { id = "load-old-posts" })
+    @*@Html.ActionLink("Load earlier posts...", "Index", new { timestamp = Model.LastPollDate.AddHours(-10).Ticks, errorType = Model.SelectedErrorType.Id }, new { id = "load-old-posts" })*@
 </section>
 <div id="hidden-workspace">
 </div>
@@ -30,7 +31,7 @@
             $.ajax(
             {
                 url: "@Url.Action("OldFeedItems", "Feed")",
-                data: { id: feedId, count: 30, userId: "@Model.SingleUserId", errorType: "@Model.SelectedErrorType.Id", keyword: "@Model.Keyword", hash: hashVal },
+                @*data: { id: feedId, count: 30, userId: "@Model.SingleUserId", errorType: "@Model.SelectedErrorType.Id", keyword: "@Model.Keyword", hash: hashVal },*@
                 dataType: "html",
                 type: "GET",
                 success: getOldPostsSuccess,
@@ -83,7 +84,7 @@
                 //ask server for comments
                 $.ajax(
                     {
-                        url: "@Url.Action("GetComments", "Feed")",
+                        @*url: "@Url.Action("GetComments", "Feed")",*@
                         data: { singleLogId: element },
                         dataType: "json",
                         type: "GET",
@@ -172,7 +173,7 @@
         //make the ajax call
         $.ajax(
             {
-                url: "@Url.Action("GetComments", "Feed")",
+                @*url: "@Url.Action("GetComments", "Feed")",*@
                 data: { logIds: JSON.stringify(ModelIds) },
                 dataType: "json",
                 type: "POST",
@@ -256,7 +257,7 @@
         $.ajax(
             {
                 url: "@Url.Action("RecentFeedItems", "Feed")",
-                data: { id: lastId, userId: "@Model.SingleUserId", errorType: "@Model.SelectedErrorType.Id", keyword:"@Model.Keyword", hash:hashVal},
+                @*data: { id: lastId, userId: "@Model.SingleUserId", errorType: "@Model.SelectedErrorType.Id", keyword:"@Model.Keyword", hash:hashVal},*@
                 dataType: "html",
                 type: "GET",
                 success: getRecentFeedItemsSuccess,

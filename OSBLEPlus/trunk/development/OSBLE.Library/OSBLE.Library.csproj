@@ -167,10 +167,12 @@
     <Compile Include="Models\Triggers\DiscussionTeamDeleteTrigger.cs" />
     <Compile Include="Models\Triggers\ModelTrigger.cs" />
     <Compile Include="Models\Triggers\TeamDeleteTrigger.cs" />
+    <Compile Include="Models\UserFeedSetting.cs" />
     <Compile Include="Models\Users\Mail.cs" />
     <Compile Include="Models\Users\ProfileImage.cs" />
     <Compile Include="Models\Users\UserProfile.cs" />
     <Compile Include="Models\ViewModels\DiscussionViewModel.cs" />
+    <Compile Include="Models\ViewModels\ProfileViewModel.cs" />
     <Compile Include="Models\ViewModels\ReviewInterfaceModels.cs" />
     <Compile Include="Models\ViewModels\RubricViewModel.cs" />
     <Compile Include="Models\ViewModels\SerializableTeamMembers.cs" />
