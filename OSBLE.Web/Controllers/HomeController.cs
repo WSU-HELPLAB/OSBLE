@@ -7,6 +7,7 @@ using System.Net.Mail;
 using System.Reflection;
 using System.Web.Mvc;
 using System.Threading.Tasks;
+using System.Xml;
 using DotNetOpenAuth.Messaging;
 using OSBLE.Attributes;
 using OSBLE.Models.Courses;
@@ -316,6 +317,17 @@ namespace OSBLE.Controllers
         //        post.Event.CanReply = false;
         //    }
         //}
+        
+        public ActionResult FilesAndLinks(string xmlString)
+        {
+            xmlString = Uri.UnescapeDataString(xmlString);
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(xmlString);
+            XmlElement root = (XmlElement)doc.DocumentElement.FirstChild;
+            ViewBag.ActiveCourseID = ActiveCourseUser.AbstractCourseID;
+            return PartialView("_FilesAndLinks", root);
+        }
+
         /// <summary>
         /// Sets up display settings for dashboard posts and replies.
         /// </summary>

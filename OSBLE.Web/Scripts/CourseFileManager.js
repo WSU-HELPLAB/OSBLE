@@ -83,25 +83,24 @@ function cfm_listcompletion(args, targetDIVID) {
         }
 
         var listNode = lists[0];
-        theDIV.innerHTML = cfm_MakeDIV(listNode, "", "padding: 0px;", -1, targetDIVID);
+        //theDIV.innerHTML = cfm_MakeDIV(listNode, "", "padding: 0px;", -1, targetDIVID);
 
         var cookieExists = $.cookie('fileSystemCookie');
         if (cookieExists == null) {
             $.cookie('fileSystemCookie', "root");
         }
 
-        //// Expand the root by default
-        cfm_expand_collapseRoot();
+        // using a partial view makes things much easier to understand
+        var xml = encodeURIComponent(new XMLSerializer().serializeToString(listNode));
+        $("#" + targetDIVID).load('/Home/FilesAndLinks', { xmlString: xml }, cfm_retrieveListingStatus);
 
         //Retrieve the file listings for the current user.
         //Checks the user's cookies to see what directories they had expanded and expands them.
-        cfm_retrieveListingStatus();
+        //cfm_retrieveListingStatus();
     }
 }
 
 function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targetDIVID) {
-    var rArrowImg = "<img src=\"/Content/images/arrow_right.png\" />";
-    //var rArrowImg = "<img src=\"/Content/images/arrow_down.png\" />";
 
     var result = "<div id=\"content_of_" + parentStateIndex.toString() +
         "\" style=\"" + styleString + "\">";
@@ -171,12 +170,13 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
             //If the user has control over files and links add controls to the folder div.
             //Controls are added to the div by making the div part of the context-menu class.
             //There are three types of context menus one for root, one for a file, and one for a directory
-            if (canUploadTo == true) {
+            /*if (canUploadTo == true) {
                 result += "<div class=\"context-menu-three box menu-1\" state-obj=\"" + stateObjIndex.toString() + "\" id=\"folder_div_" + ss + "\" style=\"" + theStyle + "\" name=\"Files and Links\">";
             }
             else {
                 result += "<div state-obj=\"" + stateObjIndex.toString() + "\" id=\"folder_div_" + ss + "\" style=\"" + theStyle + "\" name=\"Files and Links\">";
-            }
+            }*/
+            result += '<div state-obj="' + stateObjIndex.toString() + '" id="folder_div_' + ss + '" style="' + theStyle + '" name="Files and Links">';
         }
         else {
             //If user has control over files and links add controls to the div
@@ -189,31 +189,33 @@ function cfm_MakeDIV(listNode, relativeDir, styleString, parentStateIndex, targe
                 result += "<div id=\"stateSelectID_" + stateObjIndex.toString() + "\" class=\"itemSelection\" state-obj-select=\"" + stateObjIndex.toString() + "\" file-or-folder=\"folder\" folder-name=\"" + folderName + "\">";
             }
         }
-        result += "<table width=100%; id=\"folder_text_" + ss + "\" style=\"" + " table-layout: fixed; " + "\">";
-        result += "<tr>";
-        result += "<td style=\"" + " width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; " + "\">";
-        if (stateObj.allowsCollapsing) {
-            if (folderName == "Files and Links") {
-                result += "<h3 class=\"files_links_header\" style=\"-webkit-margin-before: .60em; -webkit-margin-after: .5em;\">Files and Links </h3>"
-                            + "<span><a  class=\"root_context_menu\" href=\"#\" > <img width=\"19\" height=\"19\" class=\"files_links_tooltip\" alt=\"(?)\" src=\"../../Content/images/folder_plus.png\"></a></span>"
-                            + "<span><a  class=\"files_links\" href=\"#\" > <img width=\"19\" height=\"19\" class=\"files_links_tooltip\" alt=\"(?)\" src=\"../../Content/images/tooltip/109_AllAnnotations_Help_19x19_72.png\">"
-                            + "<span id=\"files_links_tooltip\"><p class=\"files_links_p\">Right clicking \"Files and Links\" or on uploaded Files/Folders will bring up a dialog for the current course file manager</p></span></a> </span>";
-            } else {
-                result += "<a style=\"cursor: pointer;\" title=\"" + folderName + "\" onclick=\"cfm_expand_collapse(" + ss + ");\">";
-                result += "<img id=\"expander_img_" + ss + "\" src=\"" + stateObj.getExpanderImgSrc() + "\" />&nbsp;" + folderName;
-                            // commented line is to put a folder+ icon to allow left click menu like the one next to files and links, not working currently due to undefined opt.$trigger when implementing this feature
-                            //+ "<span><a  class=\"root_context_subfolder\" href=\"#\" > <img width=\"19\" height=\"19\" class=\"files_links_tooltip\" alt=\"(?)\" src=\"../../Content/images/folder_plus.png\"></a>";
-                result += "</a>";
+        if (folderPath != "/") {
+            result += "<table width=100%; id=\"folder_text_" + ss + "\" style=\"" + " table-layout: fixed; " + "\">";
+            result += "<tr>";
+            result += "<td style=\"" + " width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; " + "\">";
+            if (stateObj.allowsCollapsing) {
+                if (folderName == "Files and Links") {
+                    result += "<h3 class=\"files_links_header\" style=\"-webkit-margin-before: .60em; -webkit-margin-after: .5em;\">Files and Links </h3>"
+                                + "<span><a  class=\"root_context_menu\" href=\"#\" > <img width=\"19\" height=\"19\" class=\"files_links_tooltip\" alt=\"(?)\" src=\"../../Content/images/folder_plus.png\"></a></span>"
+                                + "<span><a  class=\"files_links\" href=\"#\" > <img width=\"19\" height=\"19\" class=\"files_links_tooltip\" alt=\"(?)\" src=\"../../Content/images/tooltip/109_AllAnnotations_Help_19x19_72.png\">"
+                                + "<span id=\"files_links_tooltip\"><p class=\"files_links_p\">Right clicking \"Files and Links\" or on uploaded Files/Folders will bring up a dialog for the current course file manager</p></span></a> </span>";
+                } else {
+                    result += "<a style=\"cursor: pointer;\" title=\"" + folderName + "\" onclick=\"cfm_expand_collapse(" + ss + ");\">";
+                    result += "<img id=\"expander_img_" + ss + "\" src=\"" + stateObj.getExpanderImgSrc() + "\" />&nbsp;" + folderName;
+                    // commented line is to put a folder+ icon to allow left click menu like the one next to files and links, not working currently due to undefined opt.$trigger when implementing this feature
+                    //+ "<span><a  class=\"root_context_subfolder\" href=\"#\" > <img width=\"19\" height=\"19\" class=\"files_links_tooltip\" alt=\"(?)\" src=\"../../Content/images/folder_plus.png\"></a>";
+                    result += "</a>";
+                }
             }
-        }
-        else { result += folderName; }
-        result += "</td>";
-        result += "</tr>";
-        result += "</table>";
-        result += "</div>";
-
-        if (folderName != "Files and Links") {
+            else { result += folderName; }
+            result += "</td>";
+            result += "</tr>";
+            result += "</table>";
             result += "</div>";
+
+            if (folderName != "Files and Links") {
+                result += "</div>";
+            }
         }
 
         // Then the recursive call makes another DIV for the files (provided there are some)
@@ -414,6 +416,7 @@ function cfm_CountChildrenWithName(listNode, node_name) {
 
 function cfm_CreateFolder(stateObjectIndex) {
     
+
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
 
@@ -462,7 +465,7 @@ function cfm_CreateFolder(stateObjectIndex) {
     //Remove pop up dialog box
     removePopUp();
 
-    cfm_expand_collapseRoot();
+    //cfm_expand_collapseRoot();
 
     //Expand any previously expanded directories after the file listing is complete.
     cfm_retrieveListingStatus();
@@ -541,8 +544,8 @@ function cfm_DeleteFolder(stateObjectIndex) {
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
 
-    var element = document.getElementById("stateSelectID_" + stateObjectIndex);
-    var elementTitle = $(element).attr("folder-name");
+    //var element = document.getElementById("stateSelectID_" + stateObjectIndex);
+    //var elementTitle = $(element).attr("folder-name");
 
     // Get the current course ID
     var courseID = GetSelectedCourseID();
@@ -564,10 +567,10 @@ function cfm_DeleteFolder(stateObjectIndex) {
     //Remove pop up dialog box
     removePopUp();
 
-    cfm_expand_collapseRoot();
+    //cfm_expand_collapseRoot();
 
     //If the directory was expanded remove it from the cookie string
-    cfm_removeCookie(elementTitle);
+    cfm_removeCookie(stateObjectIndex);
 
     //Expand any previously expanded directories after the file listing is complete.
     cfm_retrieveListingStatus();
@@ -638,13 +641,8 @@ function cfm_retrieveListingStatus() {
         $.cookie('fileSystemCookie');
     }
     else {
-        //Get all divs elements that are named folders
-        var elements = document.getElementsByName("Folders");
-
         //Get the cookie
-        var tmpString = $.cookie('fileSystemCookie');
-        tmpString = tmpString.toString();
-        var boolFound = false;
+        tmpString = cookieExists.toString();
 
         //Split the string retrieved from the cookie into parts seperated by a comma
         //Directories are seperated by commas, any expanded directory will be listed in the cookie
@@ -653,9 +651,9 @@ function cfm_retrieveListingStatus() {
         //For each entry in the cookie check to see if there is a corresponding element
         //in the currently open document
         for (var j = 0; j < tmpArray.length; j++) {
-            boolFound = false;
             if (tmpArray[j] != "" && tmpArray[j] != "root") {
                 var cookieElement = tmpArray[j];
+                /*
                 //Check each element
                 for (var i = 0; i < elements.length; i++) {
                     var tmpElement = elements[i];
@@ -666,10 +664,14 @@ function cfm_retrieveListingStatus() {
                         cfm_expand_collapse(foundElementId, true);
                         boolFound = true;
                     }
+                }*/
+                var folder = $('#folder_' + cookieElement);
+                if (folder.length > 0) {
+                    cfm_expand_collapse(Number(cookieElement), true);
                 }
-                //If there is no corresponding element to the cookie entry
-                //Remove that entry from the cookie
-                if (boolFound != true) {
+                else {
+                    //If there is no corresponding element to the cookie entry
+                    //Remove that entry from the cookie
                     cfm_removeCookie(cookieElement);
                 }
 
@@ -742,6 +744,45 @@ function cfm_removeCookie(cookieName) {
 }
 
 function cfm_expand_collapse(stateObjectIndex, cookies) {
+    
+    if (stateObjectIndex <= 0)
+        return;
+
+    var id = '#folder_' + stateObjectIndex;
+    var folder = $(id);
+    if (folder.length == 0)
+        return;
+
+    var arrow = folder.find('.expArrow').first();
+    var state = cfm_states[stateObjectIndex];
+
+    if (folder.hasClass("folder-collapsed")) {
+        // open the folder
+        folder.removeClass("folder-collapsed").addClass("folder-open");
+        // point arrow down
+        arrow.removeClass("glyphicon-triangle-right").addClass("glyphicon-triangle-bottom");
+        //update state
+        state.expanded = true;
+    }
+    else {
+        // close the folder
+        folder.removeClass("folder-open").addClass("folder-collapsed");
+        // point arrow down
+        arrow.removeClass("glyphicon-triangle-bottom").addClass("glyphicon-triangle-right");
+        //update state
+        state.expanded = false;
+    }
+    
+    var cookieTitle = stateObjectIndex.toString();
+    if (cookies == null && cookieTitle != null) {
+        if (state.expanded) {
+            cfm_addCookie(cookieTitle);
+        } else {
+            cfm_removeCookie(cookieTitle);
+        }
+    }
+
+    /*
     // Get the state object at the specified index
     var state = cfm_states[stateObjectIndex];
     var ss = stateObjectIndex.toString();
@@ -774,6 +815,7 @@ function cfm_expand_collapse(stateObjectIndex, cookies) {
 
     // Update the source of the image now that the new state is set
     if (null != theIMG) { theIMG.src = state.getExpanderImgSrc(); }
+    */
 }
 
 function cfm_FileDeleteIconClicked(stateObjectIndex) {
@@ -926,8 +968,8 @@ function cfm_RenameFolder(stateObjectIndex) {
     var state = cfm_states[stateObjectIndex];
 
     //Get the old file name to remove cookies
-    var element = document.getElementById("stateSelectID_" + stateObjectIndex);
-    var elementTitle = $(element).attr("folder-name");
+    //var element = $("stateSelectID_" + stateObjectIndex);
+    //var elementTitle = $(element).attr("folder-name");
 
     // Get the current course ID
     var courseID = GetSelectedCourseID();
@@ -966,15 +1008,16 @@ function cfm_RenameFolder(stateObjectIndex) {
     cfm_expand_collapseRoot();
 
     //If the current div being renamed is expanded
-    if (state.expanded == true) {
+    /*if (state.expanded == true) {
         //Remove the div's old name in the cookie and replace it with the new name
-        cfm_removeCookie(elementTitle);
+        cfm_removeCookie(stateObjectIndex.toString());
         cfm_addCookie(tb.value.toString());
     }
     else {
         //Relist the previously expanded divs
         cfm_retrieveListingStatus();
-    }
+    }*/
+    cfm_retrieveListingStatus();
 }
 
 function cfm_RenameFolderIconClicked(stateObjectIndex) {
@@ -985,7 +1028,7 @@ function cfm_RenameFolderIconClicked(stateObjectIndex) {
     ContextMenu = true;
 
     // Find the appropriate DIV
-    var targetDIV = document.getElementById("folder_controls_" + stateObjectIndex.toString());
+    //var targetDIV = $("#folder_" + stateObjectIndex.toString());
 
     //// Add the rename controls into the DIV
     //targetDIV.innerHTML = "<br /><div><input type=\"text\" id=\"tbRenameFolder_" +
@@ -1068,9 +1111,9 @@ function cfm_CopyLinkClicked(stateObjectIndex) {
     ContextMenu = true;
 
     // Find the appropriate DIV
-    var targetDIV = document.getElementById("stateSelectID_" + stateObjectIndex.toString());
+    var targetDIV = $("#file_" + stateObjectIndex.toString());
     var copyLink = "https://osble.org";
-    copyLink += $(targetDIV).attr("copy-link");
+    copyLink += $(targetDIV).data("path");
 
 
     //// Add the controls into the DIV

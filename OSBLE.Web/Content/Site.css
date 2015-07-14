@@ -22,8 +22,13 @@ a img {
     border: none;
 }
 
+/*
 input {
     z-index: 2000;
+}*/
+
+h3 span.glyphicon {
+    font-size: 12pt;
 }
 
 /* Dashboard */
@@ -66,11 +71,6 @@ input {
 #dashboard_left h4, #dashboard_middle h4, #dashboard_right h4 {
     margin-top: 0.5em;
     margin-bottom: 0.25em;
-}
-
-/* this should be temporary, files and links is wierd and needs to be stuctured better... */
-#divFileManager {
-    margin-top: 20px;
 }
 
 .roster_table tr td {
@@ -223,6 +223,88 @@ input {
 }
 
 /* End Dashboard Posts */
+
+/* Files And Links*/
+#divFileManager {
+    margin-right: 5px;
+}
+
+.folder-content {
+    background-color: #eee;
+    padding: 3px 0px 3px 15px;
+    /*
+    border: 1px solid #ddd;
+    border-top-width: 0;
+    border-right-width: 0;*/
+}
+
+.folder-root>.folder-content {
+    padding: 0;
+    background-color: white;
+}
+
+.folder-root > .folder-content > .folder > .folder-content {
+    border-left-width: 0;
+}
+
+.folder-collapsed>.folder-content {
+    display: none;
+}
+
+.folder-open>.folder-content {
+    display: block;
+}
+
+.folder-root a {
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.folder-header {
+    background-color: #f5f5f5;
+}
+
+.file {
+    background-color: white;
+}
+
+.folder, .file {
+    margin-bottom: 3px;
+    border: 1px solid #ddd;
+}
+
+.folder-root {
+    border: none;   
+}
+
+.file:last-child {
+    margin-bottom: 0px;
+}
+
+.folder-header, .file {
+    padding: 6px;
+}
+
+.file-header, .folder-name-link {
+    display: block;
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow: ellipsis;
+    margin-right: 20px;
+}
+
+.file-controls {
+    float: right;
+    margin-top: -20px;
+}
+
+@media (max-width: 850px)
+{
+    .folder-header, .file {
+        font-size: 12pt;
+        padding: 10px;
+    }
+}
 
 /* Common layout elements */
 #header {
