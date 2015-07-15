@@ -944,7 +944,7 @@ body#layoutLogOn {
 
 .inbox_table {
     border-collapse: collapse;
-    width: 950px;
+    width: 87%;
 }
 
     .inbox_table td, .inbox_table th {
@@ -1032,9 +1032,45 @@ body#layoutLogOn {
     width: 750px;
 }
 
+
 #mail_menu {
     float: left;
     margin-right: 10px;
+}
+
+#mail_page {
+    width: 100%;
+}
+
+@media(max-width: 850px)
+{
+    #mail_menu {
+        float: none;
+        margin-right: auto;
+        margin-left: auto;
+        width: 100%;
+        border-radius: 0;
+    }
+
+    #mail_menu .btn {
+        float:left;
+        width: 48%;
+        margin-left: 1%;
+        margin-right: 1%;
+        margin-bottom: 10px;
+        margin-top: 0px;
+        border-radius: 0;
+    }
+
+    .inbox_table {
+        width: 98%;
+        margin: 1%;
+    }
+
+    /*
+    #mail_menu_lg { display: none; }
+    #mail_menu_sm { display: block; }
+    */
 }
 
 #add_update_users {
