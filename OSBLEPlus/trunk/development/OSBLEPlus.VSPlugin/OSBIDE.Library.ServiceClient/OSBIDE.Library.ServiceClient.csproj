@@ -89,7 +89,7 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="FileCache.Signed">
-      <HintPath>..\..\..\..\..\..\OSBIDE\packages\FileCache.Signed.1.4.0\lib\FileCache.Signed.dll</HintPath>
+      <HintPath>..\..\packages\FileCache.Signed.1.4.0\lib\FileCache.Signed.dll</HintPath>
     </Reference>
     <Reference Include="Ionic.Zip">
       <HintPath>..\..\packages\DotNetZip.1.9.1.8\lib\net20\Ionic.Zip.dll</HintPath>
