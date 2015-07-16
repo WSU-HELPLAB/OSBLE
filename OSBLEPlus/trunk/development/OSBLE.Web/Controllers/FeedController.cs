@@ -6,11 +6,13 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Mail;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 using Dapper;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Queries;
 using OSBLE.Models;
+using OSBLE.Models.ViewModels;
 using OSBLE.Utility;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
 using OSBLEPlus.Logic.Utility;
@@ -22,6 +24,7 @@ namespace OSBLE.Controllers
     public class FeedController : OSBLEController
     {
         private UserFeedSetting _userSettings = new UserFeedSetting();
+
         public FeedController()
         {
             //_userSettings = (from setting in Db.UserFeedSettings
@@ -162,7 +165,9 @@ namespace OSBLE.Controllers
             // 1. Find all errors being sent out
             // 2. Find students who have recently had these errors
             // 3. Add this info to our VM
+
             #region class build errors
+
             //step 1
             //List<BuildEvent> feedBuildEvents = feedItems
             //    .Where(i => i.LogType.CompareTo(BuildEvent.Name) == 0)
@@ -216,7 +221,8 @@ namespace OSBLE.Controllers
         /// </summary>
         /// <param name="id">The ID of the last feed item received by the client</param>
         /// <returns></returns>
-        public ActionResult RecentFeedItems(int id, int userId = -1, int errorType = -1, string keyword = "", int hash = 0)
+        public ActionResult RecentFeedItems(int id, int userId = -1, int errorType = -1, string keyword = "",
+            int hash = 0)
         {
             //return View("AjaxFeed", new List<AggregateFeedItem>()); 
 
@@ -253,98 +259,133 @@ namespace OSBLE.Controllers
 
         [System.Web.Http.HttpPost]
         [ValidateInput(false)]
-        public JsonResult PostCommentAsync(string logId, string comment)
+        public async Task<JsonResult> PostCommentAsync(string logId, string comment)
         {
             int id = -1;
             if (Int32.TryParse(logId, out id))
             {
-                //bool result = base.PostComment(logId, comment);
-                //return GetComments(id);
+                bool result = await PostComment(logId, comment);
+                return GetComments(id);
             }
-            return this.Json(new { });
+            return this.Json(new {});
         }
 
-        //public JsonResult GetComments(int? singleLogId)
-        //{
-        //    //turned off for now
-        //    //return this.Json(new { Data = new{} }, JsonRequestBehavior.AllowGet);
+        public JsonResult GetComments(int? singleLogId)
+        {
+            //turned off for now
+            //return this.Json(new { Data = new{} }, JsonRequestBehavior.AllowGet);
 
-        //    try
-        //    {
-        //        List<int> logIds = new List<int>();
+            try
+            {
+                List<int> logIds = new List<int>();
 
-        //        if (!string.IsNullOrWhiteSpace(Request["logIds"]))
-        //        {
-        //            logIds = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(Request.Form["logIds"]);
-        //        }
-        //        else
-        //        {
-        //            logIds = new List<int>();
-        //        }
+                if (!string.IsNullOrWhiteSpace(Request["logIds"]))
+                {
+                    logIds = Newtonsoft.Json.JsonConvert.DeserializeObject<List<int>>(Request.Form["logIds"]);
+                }
+                else
+                {
+                    logIds = new List<int>();
+                }
 
-        //        //legacy code will send a single log Id.  In that case, add it to the list of log ids
-        //        if (singleLogId != null)
-        //        {
-        //            logIds.Add((int)singleLogId);
-        //        }
+                //legacy code will send a single log Id.  In that case, add it to the list of log ids
+                if (singleLogId != null)
+                {
+                    logIds.Add((int) singleLogId);
+                }
 
-        //        var allcomments = CommentsProc.Get(string.Join(",", logIds), CurrentUser.Id).OrderBy(c => c.EventDate);
+                // needs to use FeedController.Get()
+                //var allcomments = CommentsProc.Get(string.Join(",", logIds), CurrentUser.ID).OrderBy(c => c.EventDate);
+                string logs = string.Join(",", logIds);
 
-        //        //for each log Id, build the appropriate comments view model
-        //        Dictionary<int, List<CommentsViewModel>> viewModels = new Dictionary<int, List<CommentsViewModel>>();
-        //        List<object> jsonVm = new List<object>();
+                List<LogCommentEvent> comments;
+                using (SqlConnection conn = DBHelper.GetNewConnection())
+                {
+                    // need to get source user id, should all be the same user, use first item in logIds
+                    int uid = conn.Query<int>("FROM EventLogs e " +
+                                              "WHERE e.Id = @logId " +
+                                              "SELECT e.SenderId", new {logId = logIds[0]}).FirstOrDefault();
 
-        //        foreach (int logId in logIds)
-        //        {
-        //            var actualLogId = logId;
+                    // get all feed items
+                    EventType e = conn.Query<EventType>("FROM EventTypes e " +
+                                                        "WHERE e.EventTypeName = 'LogCommentEvent' " +
+                                                        "SELECT e").SingleOrDefault();
+                    var query = new OSBLEPlus.Services.Controllers.FeedController().Get(
+                        new DateTime(2010, 01, 01),
+                        DateTime.Now,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        10000
+                        );
 
-        //            if (allcomments.Any(c => c.OriginalId == logId && c.ActualId != logId))
-        //            {
-        //                // original log is either a comment or a helpful mark
-        //                actualLogId = allcomments.First(c => c.OriginalId == logId && c.ActualId != logId).ActualId;
-        //            }
+                    List<FeedItem> items = query.GetAwaiter().GetResult().ToList();
+                    //comments = conn.Query<LogCommentEvent>();
+                    //return new JsonResult();
+                }
 
-        //            if (!viewModels.Keys.Contains(actualLogId))
-        //            {
-        //                viewModels.Add(actualLogId, new List<CommentsViewModel>());
-        //            }
+                //for each log Id, build the appropriate comments view model
+                Dictionary<int, List<CommentsViewModel>> viewModels = new Dictionary<int, List<CommentsViewModel>>();
+                List<object> jsonVm = new List<object>();
 
-        //            var logComments = allcomments.Where(c => c.ActualId == actualLogId);
-        //            //convert LogCommentEvents into JSON
-        //            foreach (var comment in logComments)
-        //            {
-        //                if (!viewModels[actualLogId].Any(c => c.CommentId == comment.CommentId))
-        //                {
-        //                    var commentVM = new CommentsViewModel()
-        //                    {
-        //                        CommentId = comment.CommentId,
-        //                        CourseName = comment.CourseName,
-        //                        Content = comment.Content,
-        //                        FirstAndLastName = comment.FirstAndLastName,
-        //                        ProfileUrl = Url.Action("Picture", "Profile", new { id = comment.SenderId, size = 48 }),
-        //                        UtcEventDate = comment.EventDate,
-        //                        MarkHelpfulCount = comment.HelpfulMarkCounts,
-        //                        MarkHelpfulUrl = Url.Action("MarkCommentHelpful", "Feed", new { commentId = comment.CommentId, returnUrl = Url.Action("Index", "Feed") }),
-        //                        DisplayHelpfulMarkLink = !comment.IsHelpfulMarkSender,
-        //                    };
+                //foreach (int logId in logIds)
+                //{
+                //    var actualLogId = logId;
 
-        //                    //add to VM
-        //                    viewModels[actualLogId].Add(commentVM);
-        //                }
-        //            }
+                //    if (allcomments.Any(c => c.OriginalId == logId && c.ActualId != logId))
+                //    {
+                //        // original log is either a comment or a helpful mark
+                //        actualLogId = allcomments.First(c => c.OriginalId == logId && c.ActualId != logId).ActualId;
+                //    }
 
-        //            //convert to json view model
-        //            jsonVm.Add(new { Comments = viewModels[actualLogId], ActualLogId = actualLogId, OriginalLogId = logId });
-        //        }
+                //    if (!viewModels.Keys.Contains(actualLogId))
+                //    {
+                //        viewModels.Add(actualLogId, new List<CommentsViewModel>());
+                //    }
 
-        //        return this.Json(new { Data = jsonVm }, JsonRequestBehavior.AllowGet);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        LogErrorMessage(ex);
-        //        return this.Json(new { Data = "An error occurred duing data processing." }, JsonRequestBehavior.AllowGet);
-        //    }
-        //}
+                //    var logComments = allcomments.Where(c => c.ActualId == actualLogId);
+                //    //convert LogCommentEvents into JSON
+                //    foreach (var comment in logComments)
+                //    {
+                //        if (!viewModels[actualLogId].Any(c => c.EventLogId == comment.CommentId))
+                //        {
+                //            var commentVM = new CommentsViewModel()
+                //            {
+                //                EventLogId = comment.CommentId,
+                //                CourseName = comment.CourseName,
+                //                Content = comment.Content,
+                //                FirstAndLastName = comment.FirstAndLastName,
+                //                ProfileUrl = Url.Action("Picture", "Profile", new {id = comment.SenderId, size = 48}),
+                //                UtcEventDate = comment.EventDate,
+                //                MarkHelpfulCount = comment.HelpfulMarkCounts,
+                //                MarkHelpfulUrl =
+                //                    Url.Action("MarkCommentHelpful", "Feed",
+                //                        new {commentId = comment.CommentId, returnUrl = Url.Action("Index", "Feed")}),
+                //                DisplayHelpfulMarkLink = !comment.IsHelpfulMarkSender,
+                //            };
+
+                //            //add to VM
+                //            viewModels[actualLogId].Add(commentVM);
+                    //    }
+                    //}
+
+                    //convert to json view model
+                    //jsonVm.Add(
+                    //    new {Comments = viewModels[actualLogId], ActualLogId = actualLogId, OriginalLogId = logId});
+                return Json(new { Data = jsonVm }, JsonRequestBehavior.AllowGet);
+            }
+
+            
+            //}
+            catch (Exception ex)
+            {
+                //LogErrorMessage(ex);
+                return Json(new {Data = "An error occurred duing data processing."}, JsonRequestBehavior.AllowGet);
+            }
+        }
 
         //[System.Web.Http.HttpPost]
         //public ActionResult GetItemUpdates(List<GetItemUpdatesViewModel> items)
@@ -380,54 +421,54 @@ namespace OSBLE.Controllers
         //    return View(new List<LogCommentEvent>());
         //}
 
-        /// <summary>
+    /// <summary>
         /// Returns a raw feed of past feed items without any extra HTML chrome.  Used for AJAX updates to an existing feed.
         /// </summary>
         /// <param name="id">The ID of the first feed item received by the client.</param>
         /// <returns></returns>
-        public ActionResult OldFeedItems(int id, int count, int userId, int errorType = -1, string keyword = "", int hash = 0)
-        {
-            try
-            {
-                var query = new ActivityFeedQuery();
-                query.CommentFilter = hash == 0 ? keyword : "#" + keyword;
-                if (errorType > 0)
-                {
-                    //query = new BuildErrorQuery(Db);
-                    //(query as BuildErrorQuery).BuildErrorTypeId = errorType;
-                }
-                BuildBasicQuery(query);
-                query.MaxLogId = id;
-                query.MaxQuerySize = count;
+        //public ActionResult OldFeedItems(int id, int count, int userId, int errorType = -1, string keyword = "", int hash = 0)
+        //{
+        //    try
+        //    {
+        //        var query = new ActivityFeedQuery();
+        //        query.CommentFilter = hash == 0 ? keyword : "#" + keyword;
+        //        if (errorType > 0)
+        //        {
+        //            //query = new BuildErrorQuery(Db);
+        //            //(query as BuildErrorQuery).BuildErrorTypeId = errorType;
+        //        }
+        //        BuildBasicQuery(query);
+        //        query.MaxLogId = id;
+        //        query.MaxQuerySize = count;
 
-                //used to build a feed for a single person.  Useful for building profile-based feeds
-                if (userId > 0)
-                {
-                    query.ClearSubscriptionSubjects();
-                    //query.AddSubscriptionSubject(Db.Users.Where(u => u.Id == userId).FirstOrDefault());
-                }
+        //        //used to build a feed for a single person.  Useful for building profile-based feeds
+        //        if (userId > 0)
+        //        {
+        //            query.ClearSubscriptionSubjects();
+        //            //query.AddSubscriptionSubject(Db.Users.Where(u => u.Id == userId).FirstOrDefault());
+        //        }
 
-                List<FeedItem> feedItems = query.Execute().ToList();
-                List<AggregateFeedItem> aggregateFeed = AggregateFeedItem.FromFeedItems(feedItems);
+        //        List<FeedItem> feedItems = query.Execute().ToList();
+        //        List<AggregateFeedItem> aggregateFeed = AggregateFeedItem.FromFeedItems(feedItems);
 
 
-                //build the "you and 5 others got this error"-type messages
-                FeedViewModel vm = new FeedViewModel();
-                BuildEventRelations(vm, feedItems);
+        //        //build the "you and 5 others got this error"-type messages
+        //        FeedViewModel vm = new FeedViewModel();
+        //        BuildEventRelations(vm, feedItems);
 
-                ViewBag.RecentUserErrors = vm.RecentUserErrors;
-                //ViewBag.RecentClassErrors = vm.RecentClassErrors;
-                //ViewBag.ErrorTypes = vm.ErrorTypes;
+        //        ViewBag.RecentUserErrors = vm.RecentUserErrors;
+        //        //ViewBag.RecentClassErrors = vm.RecentClassErrors;
+        //        //ViewBag.ErrorTypes = vm.ErrorTypes;
 
-                return View("AjaxFeed", aggregateFeed);
-            }
-            catch (Exception ex)
-            {
-                //LogErrorMessage(ex);
-                //return RedirectToAction("FeedDown", "Error");
-            }
-            return View("Index");
-        }
+        //        return View("AjaxFeed", aggregateFeed);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        //LogErrorMessage(ex);
+        //        //return RedirectToAction("FeedDown", "Error");
+        //    }
+        //    return View("Index");
+        //}
 
         /// <summary>
         /// Provides a details view for the provided Log IDs

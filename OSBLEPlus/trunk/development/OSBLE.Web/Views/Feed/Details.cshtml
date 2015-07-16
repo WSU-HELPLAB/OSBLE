@@ -6,13 +6,14 @@
     int firstLogId = Model.FeedItem.Items.Select(m => m.Event.EventLogId).Min();
     ViewBag.Title = string.Format("Details - {0}", firstLogId);
     UserProfile currentUser = ViewBag.CurrentUser;
-    if(Model.FeedItem.IsAnonymous == true && currentUser.Id != Model.FeedItem.Creator.Id)
+    if(Model.FeedItem.IsAnonymous == true && currentUser.ID != Model.FeedItem.Creator.ID)
     {
         Model.FeedItem.Creator.FirstName = "A Student";
         Model.FeedItem.Creator.LastName = "";
         Model.FeedItem.Creator.ID = -1;
     }
 }
+
 @if (Model == null)
 {
     <text><h2>Post not found.</h2></text>
@@ -23,7 +24,7 @@
         <img @*src="@Url.Action("Picture", "Profile", new { id = Model.FeedItem.Creator.ID, size = 64 })"*@ title="profile image" alt="profile image" />
     </div>
     <div class="feed-item-single-right">
-        <h1><a @*href="@Url.Action("Index", "Profile", new { id = Model.FeedItem.Creator.ID, component = OsbideVsComponent.UserProfile })"*@>@Model.FeedItem.Creator.DisplayName()</a></h1>
+        <h1><a @*href="@Url.Action("Index", "Profile", new { id = Model.FeedItem.Creator.ID, component = OsbideVsComponent.UserProfile })"*@>@Model.FeedItem.Creator.FullName</a></h1>
         <div class="feed-item-date">
             <time class="utc-time"
                   datetime="@Helpers.DateAsUnixTime(Model.FeedItem.MostRecentOccurance)"
@@ -32,7 +33,7 @@
                 @Model.FeedItem.MostRecentOccurance.ToString("MM/dd @ hh:mmtt") (UTC)
             </time>
         </div>
-        @{string partialName = string.Format("Feed/_{0}", Model.FeedItem.FeedItemType); }
+        @{string partialName = string.Format("Feed/_{0}", Model.FeedItem.FeedItemType.Replace(" ", String.Empty)); }
         <div>@Html.Partial(partialName, Model.FeedItem)</div>
         <div>
             @if (Model.IsSubscribed == true)
@@ -47,14 +48,14 @@
     </div>
 </section>
 <section style="clear: both; padding-top:15px;">
-    @{partialName = string.Format("Details/_{0}", Model.FeedItem.FeedItemType); }
+    @{partialName = string.Format("Details/_{0}", Model.FeedItem.FeedItemType.Replace(" ", String.Empty)); }
     @Html.Partial(partialName, Model.FeedItem)
 </section>
 <section class="log-comments" id="feed-item-@firstLogId" style="display:none">
     <div data-bind="foreach: Comments">
         <section class="log-comment-single">
             <div class="log-comment-profile-picture">
-                @*<img @*src="@Url.Action("Picture", "Profile", new { id = -1, size = 48 })" title="profile image" alt="profile image" style="float:left;" data-bind="attr { src: ProfileUrl }">*@
+                <img src="@Url.Action("Picture", "Profile", new { id = -1, size = 48 })" title="profile image" alt="profile image" style="float:left;" data-bind="attr { src: ProfileUrl }">
             </div>
             <div class="log-comment-content">
                 <h1 data-bind="text: FirstAndLastName"></h1>
@@ -78,7 +79,7 @@
     </div>
 
     <h2>Post a Comment</h2>
-    @*@using (Html.BeginForm("PostComment", "Home"))
+    @using (Html.BeginForm("PostComment", "Home"))
     {
 
         <div>
@@ -88,7 +89,7 @@
         <input type="hidden" name="returnUrl" value="@Request.Url.AbsoluteUri" />
         <input type="submit" name="submit" value="Post" />
         <img class="submit-loading" src="~/Content/icons/loading.gif" title="loading" alt="loading" />
-    }*@
+    }
 </section>
 
 @section Scripts {

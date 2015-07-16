@@ -22,10 +22,13 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 
         public override string GetInsertScripts()
         {
-            return string.Format(@"
+            string batchString = BatchId == null ? "NULL" : BatchId.ToString();
+
+            string s = string.Format(@"
 INSERT INTO dbo.EventLogs (EventTypeID, EventDate, SenderId, BatchId) VALUES ({0}, '{1}', {2}, {6})
 INSERT INTO dbo.LogCommentEvents (EventLogId,SourceEventLogId,EventDate,SolutionName,Content)
-VALUES (SCOPE_IDENTITY(),{3}, '{1}', '{4}', '{5}')", EventTypeId, EventDate, SenderId, SourceEventLogId, SolutionName, Content.Replace("'", "''"), BatchId);
+VALUES (SCOPE_IDENTITY(),{3}, '{1}', '{4}', '{5}')", EventTypeId, EventDate, SenderId, SourceEventLogId, SolutionName, Content.Replace("'", "''"), batchString);
+            return s;
         }
 
         public CourseUser GetCourseUser()

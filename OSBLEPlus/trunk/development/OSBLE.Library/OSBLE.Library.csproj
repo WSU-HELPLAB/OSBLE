@@ -172,7 +172,9 @@
     <Compile Include="Models\Users\Mail.cs" />
     <Compile Include="Models\Users\ProfileImage.cs" />
     <Compile Include="Models\Users\UserProfile.cs" />
+    <Compile Include="Models\ViewModels\CommentsViewModel.cs" />
     <Compile Include="Models\ViewModels\DiscussionViewModel.cs" />
+    <Compile Include="Models\ViewModels\GetItemUpdatesViewModel.cs" />
     <Compile Include="Models\ViewModels\ProfileViewModel.cs" />
     <Compile Include="Models\ViewModels\ReviewInterfaceModels.cs" />
     <Compile Include="Models\ViewModels\RubricViewModel.cs" />
