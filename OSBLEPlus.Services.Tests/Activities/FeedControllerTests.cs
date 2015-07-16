@@ -22,7 +22,8 @@ namespace OSBLEPlus.Services.Tests.Activities
                                     null,
                                     null,
                                     null,
-                                    null);
+                                    null,
+                                    20);
 
             Assert.IsTrue(results != null);
         }

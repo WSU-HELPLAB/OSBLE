@@ -201,6 +201,7 @@ namespace OSBLE.Models.Queries
                                     , CourseRoleFilter.ID
                                     , CommentFilter
                                     , SubscriptionSubjects.Select(s => s.ID).ToList()
+                                    , 20
                                     );
 
             return query.GetAwaiter().GetResult();

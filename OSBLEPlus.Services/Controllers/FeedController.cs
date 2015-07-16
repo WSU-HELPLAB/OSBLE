@@ -14,10 +14,10 @@ namespace OSBLEPlus.Services.Controllers
         [AllowAdmin]
         public async Task<IEnumerable<FeedItem>> Get([FromUri]DateTime dmin,
             DateTime dmax, IEnumerable<int> ls, IEnumerable<int> ets,
-            int? c, int? r, string cf, IEnumerable<int> us)
+            int? c, int? r, string cf, IEnumerable<int> us, int topN)
         {
             return await Task.FromResult(Feeds.Get(dmin, dmax,
-                ls, ets, c, r, cf, us, 999));
+                ls, ets, c, r, cf, us, topN));
         }
     }
 }
