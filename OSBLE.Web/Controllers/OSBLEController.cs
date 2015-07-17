@@ -719,7 +719,15 @@ namespace OSBLE.Controllers
                     // insert logComment
                     if (logComment != null)
                     {
-                        conn.Execute(logComment.GetInsertScripts());
+                        try
+                        {
+                            conn.Execute(logComment.GetInsertScripts());
+                        }
+                        catch (Exception ex)
+                        {
+                            //
+                        }
+                        
                     }
                 }
 

@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Data.SqlTypes;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web.WebPages.Scope;
 using Dapper;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
@@ -116,6 +117,15 @@ namespace OSBLE.Models.Queries
             };
         }
 
+        public static IEnumerable<int> GetNecessaryEvents()
+        {
+            return new List<int>
+            {
+                (int)EventType.AskForHelpEvent,
+                (int)EventType.FeedPostEvent
+            };
+        }
+
         /// <summary>
         /// returns a list of all possible events that a user can subscribe to
         /// </summary>
@@ -196,7 +206,7 @@ namespace OSBLE.Models.Queries
                                     StartDate // 1
                                     , EndDate // 2
                                     , EventIds.Select(eid => (int)eid).ToList() // 3
-                                    , _eventSelectors.Select(e => (int)e) // 4
+                                    , GetNecessaryEvents()//_eventSelectors.Select(e => (int)e) // 4
                                     , CourseFilter != null && CourseFilter.ID > 0 ? CourseFilter.ID : 0
                                     , CourseRoleFilter.ID
                                     , CommentFilter
