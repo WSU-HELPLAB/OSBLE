@@ -48,7 +48,6 @@ namespace OSBLE.Models.Assignments
                     assignment.Deliverables.Clear();
                     db.SaveChanges();
                     deliverables = new List<Deliverable>((assignment).Deliverables);
-                    List<string> deliverableNames = new List<string>();
 
                     deliverables.AddRange(files.Select(file => new Deliverable
                     {
@@ -72,6 +71,7 @@ namespace OSBLE.Models.Assignments
             }
             return deliverables;
         }
+
 
         public static bool SubmitAssignments(NameValueCollection request, CourseUser user, string firstName,
             string lastName, int? id, IEnumerable<HttpPostedFileBase> files, int? authorTeamID,
@@ -113,15 +113,21 @@ namespace OSBLE.Models.Assignments
 
                             if (allowFileExtensions.Contains(extension))
                             {
+
+                                #region Allowed Extension
+
                                 if (assignment.Type == AssignmentTypes.CriticalReview ||
                                     assignment.Type == AssignmentTypes.AnchoredDiscussion)
                                 {
+
+                                    #region Assignment Type Critical Review/Anchored Discussion
                                     //TODO: clean this up
                                     AssignmentTeam authorTeam = new AssignmentTeam();
                                     ReviewTeam reviewTeam = new ReviewTeam();
 
                                     if (assignment.Type == AssignmentTypes.AnchoredDiscussion)
                                     {
+                                        #region Anchored Discussion, Create teams for assignment, save review teams for assignment
                                         authorTeam = new AssignmentTeam
                                         {
                                             Assignment = assignment,
@@ -142,9 +148,11 @@ namespace OSBLE.Models.Assignments
                                         assignment.ReviewTeams.Add(reviewTeam);
                                         //db.Entry(assignment).State = System.Data.EntityState.Modified;
                                         db.SaveChanges();
+                                        #endregion
                                     }
                                     else
                                     {
+                                        #region Critical Review, pull the first author team and review team from database
                                         authorTeam = (from at in db.AssignmentTeams
                                                       where at.TeamID == authorTeamID &&
                                                             at.AssignmentID == assignment.PrecededingAssignmentID
@@ -156,15 +164,18 @@ namespace OSBLE.Models.Assignments
                                                       where tm.CourseUserID == user.ID
                                                             && rt.AssignmentID == assignment.ID
                                                       select rt).FirstOrDefault();
+                                        #endregion
                                     }
 
                                     //MG&MK: file system for critical review assignments is laid out a bit differently, so 
                                     //critical review assignments must use different file system functions
 
+                                    #region Remove Prior Files
                                     //remove all prior files
                                     OSBLE.Models.FileSystem.AssignmentFilePath fs =
                                         Models.FileSystem.Directories.GetAssignment(
                                             user.AbstractCourseID, assignment.ID);
+
                                     fs.Review(authorTeam.TeamID, reviewTeam.ReviewTeamID)
                                         .File(deliverableName)
                                         .Delete();
@@ -172,6 +183,7 @@ namespace OSBLE.Models.Assignments
                                     if (assignment.Type != AssignmentTypes.AnchoredDiscussion)
                                     // handle assignments that are not anchored discussion
                                     {
+                                        #region Not Anchored Discussion(Critical Review)
                                         //We need to remove the zipfile corresponding to the authorTeamId being sent in as well as the regularly cached zip. 
                                         AssignmentTeam precedingAuthorAssignmentTeam =
                                             (from at in assignment.PreceedingAssignment.AssignmentTeams
@@ -181,9 +193,11 @@ namespace OSBLE.Models.Assignments
                                             precedingAuthorAssignmentTeam);
                                         OSBLE.FileSystem.RemoveZipFile(user.AbstractCourse as Course, assignment,
                                             assignmentTeam);
+                                        #endregion
                                     }
                                     else //anchored discussion type TODO: this does nothing right now, fix!
                                     {
+                                        #region Anchored Discussion
                                         //We need to remove the zipfile corresponding to the authorTeamId being sent in as well as the regularly cached zip. 
                                         AssignmentTeam precedingAuthorAssignmentTeam =
                                             (from at in assignment.AssignmentTeams
@@ -193,7 +207,11 @@ namespace OSBLE.Models.Assignments
                                             precedingAuthorAssignmentTeam);
                                         OSBLE.FileSystem.RemoveZipFile(user.AbstractCourse as Course, assignment,
                                             assignmentTeam);
+                                        #endregion
                                     }
+                                    #endregion
+
+
                                     //add in the new file
                                     //authorTeamID is the deliverable file counter, and reviewTeamID is the courseID
                                     fs.Review(authorTeam.TeamID, reviewTeam.ReviewTeamID)
@@ -202,6 +220,7 @@ namespace OSBLE.Models.Assignments
                                     //unzip and rezip xps files because some XPS generators don't do it right
                                     if (extension.ToLower().CompareTo(".xps") == 0)
                                     {
+                                        #region xps extensions
                                         //XPS documents require the actual file path, so get that.
                                         OSBLE.Models.FileSystem.FileCollection fileCollection =
                                             OSBLE.Models.FileSystem.Directories.GetAssignment(
@@ -224,13 +243,19 @@ namespace OSBLE.Models.Assignments
                                             newZip.AddDirectory(extractPath);
                                             newZip.Save(path);
                                         }
+                                        #endregion
                                     }
+                                    #endregion
                                 }
                                 else
                                 {
+                                    #region For Non Critical Review/Anchored Discussion
+
+                                    #region Remove Old Submission
                                     //If a submission of any extension exists delete it.  This is needed because they could submit a .c file and then a .cs file and the teacher would not know which one is the real one.
                                     string submission = OSBLE.FileSystem.GetDeliverable(user.AbstractCourse as Course,
                                         assignment.ID, assignmentTeam, deliverables[i].Name, allowFileExtensions);
+
                                     if (submission != null)
                                     {
                                         FileInfo oldSubmission = new FileInfo(submission);
@@ -240,15 +265,21 @@ namespace OSBLE.Models.Assignments
                                             oldSubmission.Delete();
                                         }
                                     }
-                                    OSBLE.FileSystem.RemoveZipFile(user.AbstractCourse as Course, assignment,
-                                        assignmentTeam);
+                                    OSBLE.FileSystem.RemoveZipFile(user.AbstractCourse as Course, assignment, assignmentTeam);
+                                    #endregion
+
+                                    #region Save New File
+
+
                                     string path =
                                         Path.Combine(
                                             OSBLE.FileSystem.GetTeamUserSubmissionFolder(true,
                                                 user.AbstractCourse as Course,
                                                 (int)id, assignmentTeam), deliverables[i].Name + extension);
                                     file.SaveAs(path);
+                                    #endregion
 
+                                    #region XPS File
                                     //unzip and rezip xps files because some XPS generators don't do it right
                                     if (extension.ToLower().CompareTo(".xps") == 0)
                                     {
@@ -266,9 +297,13 @@ namespace OSBLE.Models.Assignments
                                             newZip.Save(path);
                                         }
                                     }
+                                    #endregion
+                                    #endregion
                                 }
+                                //names are for sending notifications in the controller
+                                deliverableNames.Add(deliverables[i].Name);
+                                #endregion
                             }
-                            deliverableNames.Add(deliverables[i].Name);
                         }
                         else
                         {
@@ -279,6 +314,7 @@ namespace OSBLE.Models.Assignments
                 }
             }
 
+            #region Create files for Browser Text submissions
             // Creates the text files from text boxes
             int j = 0;
             string delName;
@@ -309,7 +345,9 @@ namespace OSBLE.Models.Assignments
                 }
                 j++;
             } while (delName != null);
+            #endregion
 
+            //false to not redirect
             return false;
         }
     }

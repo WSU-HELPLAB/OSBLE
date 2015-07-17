@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
+using Ionic.Zip;
+using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 
 namespace OSBLE.Models.FileSystem
@@ -100,6 +102,12 @@ namespace OSBLE.Models.FileSystem
             sys.Add("created", DateTime.Now.ToString());
 
             return AddFile(fileName, data, sys, null);
+        }
+
+        public void AddZip(string fileName, ZipFile zip, int teamid)
+        {
+            string partPath = Path.Combine(m_path, teamid.ToString());
+            zip.ExtractAll(Path.Combine(partPath, fileName));
         }
 
         /// <summary>

@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
-
+using System.Web.Http.ModelBinding;
 using Newtonsoft.Json;
 
 using OSBLEPlus.Logic.DataAccess.Activities;
@@ -43,16 +45,20 @@ namespace OSBLEPlus.Services.Controllers
         }
 
         [HttpPost]
-        public HttpResponseMessage Post(HttpRequestMessage request)
+        public HttpResponseMessage Post([ModelBinder]SubmissionRequest request)
         {
-            var requestObject = JsonConvert.DeserializeObject<SubmissionRequest>(request.Content.ReadAsStringAsync().Result);
+            //var requestObject = JsonConvert.DeserializeObject<SubmissionRequest>(request.Content.ReadAsStringAsync().Result);
 
-            if (!(new Authentication()).IsValidKey(requestObject.AuthToken))
+            if (!(new Authentication()).IsValidKey(request.AuthToken))
                 return new HttpResponseMessage { StatusCode = HttpStatusCode.Forbidden };
+
+            Posts.SubmitAssignment(request.SubmitEvent);
+
+            Posts.SaveToFileSystem(request.SubmitEvent, request.TeamId);
 
             return new HttpResponseMessage
             {
-                Content = new StringContent(Posts.SubmitAssignment(requestObject.SubmitEvent).ToString())
+                StatusCode = HttpStatusCode.OK
             };
         }
     }
