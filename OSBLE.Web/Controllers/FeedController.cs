@@ -12,6 +12,7 @@ using Dapper;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Queries;
 using OSBLE.Models;
+using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
 using OSBLE.Utility;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
@@ -650,49 +651,65 @@ namespace OSBLE.Controllers
 
                 comment = comment.TrimStart(',');
                 //OsbideWebService client = new OsbideWebService();
-                Authentication auth = new Authentication();
-                string key = auth.GetAuthenticationKey();
-                //    if (string.IsNullOrEmpty(comment) == false)
-                //    {
-                //        EventLog log = new EventLog();
-                //        log.Sender = CurrentUser.Id;
-                //        log.LogType = FeedPostEvent.Name;
-                //        FeedPostEvent commentEvent = new FeedPostEvent();
-                //        commentEvent.Comment = comment;
-                //        log.Data.BinaryData = EventFactory.ToZippedBinary(commentEvent);
-                //        log = client.SubmitLog(log, CurrentUser);
-
-                //        //find all of this user's subscribers and send them an email
-                //        List<OsbideUser> observers = new List<OsbideUser>();
-
-                //        observers = (from subscription in Db.UserSubscriptions
-                //                     join user in Db.Users on
-                //                                     new { InstitutionId = subscription.ObserverInstitutionId, SchoolId = subscription.ObserverSchoolId }
-                //                                     equals new { InstitutionId = user.InstitutionId, SchoolId = user.SchoolId }
-                //                     where subscription.SubjectSchoolId == CurrentUser.SchoolId
-                //                     && subscription.SubjectInstitutionId == CurrentUser.InstitutionId
-                //                     && user.ReceiveEmailOnNewFeedPost == true
-                //                     select user).ToList();
-                //        if (observers.Count > 0)
-                //        {
-                //            string url = StringConstants.GetActivityFeedDetailsUrl(log.Id);
-                //            string body = "Greetings,<br />{0} posted a new item to the activity feed:<br />\"{1}\"<br />To view this "
-                //            + "conversation online, please visit {2} or visit your OSBIDE user profile.<br /><br />Thanks,\nOSBIDE<br /><br />"
-                //            + "These automated messages can be turned off by editing your user profile.";
-                //            body = string.Format(body, CurrentUser.FirstAndLastName, comment, url);
-                //            List<MailAddress> to = new List<MailAddress>();
-                //            foreach (OsbideUser user in observers)
-                //            {
-                //                to.Add(new MailAddress(user.Email));
-                //            }
-                //            Email.Send("[OSBIDE] New Activity Post", body, to);
-                //        }
-                //    }
-                }
-                catch (Exception ex)
+                //Authentication auth = new Authentication();
+                //string key = auth.GetAuthenticationKey();
+                if (string.IsNullOrEmpty(comment) == false)
                 {
-                //    LogErrorMessage(ex);
+                    FeedPostEvent log = new FeedPostEvent()
+                    {
+                        SenderId = CurrentUser.ID,
+                        Comment = comment,
+                        CourseId = ActiveCourseUser.AbstractCourseID,
+                        SolutionName = "OSBLEPlus"
+                    };
+
+                    using (SqlConnection conn = DBHelper.GetNewConnection())
+                    {
+                        try
+                        {
+                            conn.Execute(log.GetInsertScripts());
+                        }
+                        catch (Exception ex)
+                        {
+                            //
+                        }
+                    }
+                    //FeedPostEvent commentEvent = new FeedPostEvent();
+                    //commentEvent.Comment = comment;
+                    //log.Data.BinaryData = EventFactory.ToZippedBinary(commentEvent);
+                    //log = client.SubmitLog(log, CurrentUser);
+
+                    //find all of this user's subscribers and send them an email
+                    //List<UserProfile> observers = new List<UserProfile>();
+
+                    //observers = (from subscription in Db.UserSubscriptions
+                    //             join user in Db.Users on
+                    //                             new { InstitutionId = subscription.ObserverInstitutionId, SchoolId = subscription.ObserverSchoolId }
+                    //                             equals new { InstitutionId = user.InstitutionId, SchoolId = user.SchoolId }
+                    //             where subscription.SubjectSchoolId == CurrentUser.SchoolId
+                    //             && subscription.SubjectInstitutionId == CurrentUser.InstitutionId
+                    //             && user.ReceiveEmailOnNewFeedPost == true
+                    //             select user).ToList();
+                    //if (observers.Count > 0)
+                    //{
+                    //    string url = StringConstants.GetActivityFeedDetailsUrl(log.Id);
+                    //    string body = "Greetings,<br />{0} posted a new item to the activity feed:<br />\"{1}\"<br />To view this "
+                    //    + "conversation online, please visit {2} or visit your OSBIDE user profile.<br /><br />Thanks,\nOSBIDE<br /><br />"
+                    //    + "These automated messages can be turned off by editing your user profile.";
+                    //    body = string.Format(body, CurrentUser.FirstAndLastName, comment, url);
+                    //    List<MailAddress> to = new List<MailAddress>();
+                    //    foreach (OsbideUser user in observers)
+                    //    {
+                    //        to.Add(new MailAddress(user.Email));
+                    //    }
+                    //    Email.Send("[OSBIDE] New Activity Post", body, to);
+                    //}
                 }
+            }
+            catch (Exception ex)
+            {
+               // LogErrorMessage(ex);
+            }
             return RedirectToAction("Index");
         }
 
