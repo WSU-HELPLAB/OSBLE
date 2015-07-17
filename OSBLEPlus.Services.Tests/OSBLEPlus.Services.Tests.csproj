@@ -38,6 +38,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Ionic.Zip, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DotNetZip.1.9.1.8\lib\net20\Ionic.Zip.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -72,6 +76,7 @@
   <ItemGroup>
     <Compile Include="Activities\FeedControllerTests.cs" />
     <Compile Include="Activities\EventCollectorTests.cs" />
+    <Compile Include="Activities\CourseControllerTests.cs" />
     <Compile Include="Analytics\CalendarDay.cs" />
     <Compile Include="Analytics\Calendar.cs" />
     <Compile Include="Profiles\UserProfileTest.cs" />
@@ -93,7 +98,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Activities\EventCollectorTests.Mocks.cs" />
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

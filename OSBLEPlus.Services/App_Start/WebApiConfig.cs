@@ -1,9 +1,12 @@
 ﻿using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web.Http;
-
+using System.Web.Http.ModelBinding;
+using System.Web.Http.ModelBinding.Binders;
 using Newtonsoft.Json.Serialization;
+using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
 using OSBLEPlus.Services.Attributes;
+using OSBLEPlus.Services.Models;
 
 namespace OSBLEPlus.Services
 {
@@ -25,6 +28,9 @@ namespace OSBLEPlus.Services
                 routeTemplate: "api/{controller}/{action}/{id}",
                 defaults: new { action="get", id = RouteParameter.Optional }
             );
+
+            var provider = new SimpleModelBinderProvider(typeof(SubmissionRequest), new SubmitEventModelBinder());
+            config.Services.Insert(typeof(ModelBinderProvider), 0, provider);
         }
     }
 }

@@ -8,7 +8,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OSBLEPlus.Logic.DataAccess.Activities;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
 using OSBLEPlus.Logic.DomainObjects.Interface;
-using OSBLEPlus.Logic.Utility.Lookups;
+using OSBLEPlus.Logic.DomainObjects.Profiles;
+using Ionic.Zip;
 
 namespace OSBLEPlus.Logic.Tests.Activities
 {
@@ -28,6 +29,22 @@ namespace OSBLEPlus.Logic.Tests.Activities
             Assert.IsTrue(result > 0);
         }
 
+
+        [TestMethod]
+        public void TestSubmission()
+        {
+            var submit = CreateSubmitEvent();
+            string path = Directory.GetCurrentDirectory();
+            Posts.SaveToFileSystem(submit, 1, path);
+            var fullpath = path + "\\Courses\\4\\Assignments\\3\\1\\Test User\\testfile.txt";
+            File.SetAttributes(fullpath, FileAttributes.Normal);
+            bool success = File.Exists(fullpath);
+            File.Delete(fullpath);
+            Directory.Delete(path+"\\Courses", true);
+            Assert.IsTrue(success);
+        }
+
+        #region setup helpers
         private static IEnumerable<IActivityEvent> Events
         {
             get
@@ -93,5 +110,41 @@ namespace OSBLEPlus.Logic.Tests.Activities
                 return events;
             }
         }
+
+        private static SubmitEvent CreateSubmitEvent()
+        {
+            var submit = new SubmitEvent
+            {
+                //SolutionName = "C:/SubmissionTest/Source/TestSolution.sln",
+                CourseId = 4,
+                AssignmentId = 3,
+                SenderId = 1,
+                Sender = new User
+                {
+                    FirstName = "Test",
+                    LastName = "User"
+                }
+            };
+            //submit.GetSolutionBinary();
+            string path = "testfile.txt";
+            using (StreamWriter sw = File.CreateText(path))
+            {
+                sw.WriteLine("CourseId = 4");
+                sw.WriteLine("AssignmentId = 3");
+                sw.WriteLine("SenderId = 1");
+                sw.WriteLine("Name = Test User");
+            }
+            var stream = new MemoryStream();
+            using (var zip = new ZipFile()){
+                zip.AddFile(path);
+                zip.Save(stream);
+                stream.Position = 0;
+
+                submit.CreateSolutionBinary(stream.ToArray());
+            }
+            File.Delete(path);
+            return submit;
+        }
+        #endregion
     }
 }

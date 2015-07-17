@@ -112,6 +112,7 @@
     <Compile Include="Models\CalendarSettings.cs" />
     <Compile Include="Models\CommentActivityLog.cs" />
     <Compile Include="Models\ProfileViewModel.cs" />
+    <Compile Include="Models\SubmitEventModelBinder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
