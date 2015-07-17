@@ -22,7 +22,7 @@ namespace OSBLEPlus.Logic.Utility
 #if DEBUG
                 return "http://localhost:8088";
 #else
-                return "http://osble.com";
+                return "http://osble.org";
 #endif
              }
         }
@@ -34,7 +34,7 @@ namespace OSBLEPlus.Logic.Utility
 #if DEBUG
                 return "http://localhost:8087";
 #else
-                return "http://osble.com:8087";
+                return "http://osble.org:8087";
 #endif
             }
         }
