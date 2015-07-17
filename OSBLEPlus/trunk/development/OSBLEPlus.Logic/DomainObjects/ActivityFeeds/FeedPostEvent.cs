@@ -25,10 +25,12 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 
         public override string GetInsertScripts()
         {
+            string batchString = BatchId == null ? "NULL" : BatchId.ToString();
+
             var sql = string.Format(@"
-INSERT INTO dbo.EventLogs (EventTypeID, EventDate, CreatedDate, SenderId, BatchId) VALUES ({0}, '{1}', '{2}', {3}, {5}, {6})
+INSERT INTO dbo.EventLogs (EventTypeID, EventDate, DateReceived, SolutionName, SenderId, BatchId, CourseId) VALUES ({0}, '{1}', '{7}', '{3}', '{2}', {5}, {6})
 INSERT INTO dbo.FeedPostEvents (EventLogId, EventDate, SolutionName, Comment)
-VALUES (SCOPE_IDENTITY(), '{1}', '{3}', '{4}')", EventTypeId, EventDate, SenderId, SolutionName, Comment, BatchId, CourseId);
+VALUES (SCOPE_IDENTITY(), '{1}', '{3}', '{4}')", EventTypeId, EventDate, SenderId, SolutionName, Comment, batchString, CourseId, DateTime.UtcNow);
 
             var hashTags = GetMentionTags();
             var userTags = GetMentionTags();
