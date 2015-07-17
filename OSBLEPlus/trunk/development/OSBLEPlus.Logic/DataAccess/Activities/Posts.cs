@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
 using Dapper;
-
+using Ionic.Zip;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
 using OSBLEPlus.Logic.DomainObjects.Helpers;
 using OSBLEPlus.Logic.DomainObjects.Interface;
@@ -74,12 +77,37 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                     connection.Execute(sql.ToString());
                 }
 
+
                 return submit.EventLogId;
             }
             catch (Exception)
             {
                 //TODO: inject Log4Net to log error details into files
                 return -1;
+            }
+        }
+
+        public static void SaveToFileSystem(SubmitEvent submit, int teamid, string path=null)
+        {
+            using (var zipStream = new MemoryStream())
+            {
+                zipStream.Write(submit.SolutionData, 0, submit.SolutionData.Length);
+                zipStream.Position = 0;
+                try
+                {
+                    using (var zip = ZipFile.Read(zipStream))
+                    {
+                        OSBLE.Models.FileSystem.Directories.GetAssignment(submit.CourseId ?? 1
+                            , submit.AssignmentId, path).AddZip(submit.Sender.FullName, zip, teamid);
+                    }
+                }
+                catch (ZipException)
+                {
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
             }
         }
 
