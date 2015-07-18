@@ -81,7 +81,6 @@
     <Compile Include="..\..\OSBLE.Library\IdenticonRenderer.cs" />
     <Compile Include="..\..\OSBLE.Library\Interfaces\IAssignment.cs" />
     <Compile Include="..\..\OSBLE.Library\Interfaces\ICourse.cs" />
-    <Compile Include="..\..\OSBLE.Library\Interfaces\IProfileCourse.cs" />
     <Compile Include="..\..\OSBLE.Library\Interfaces\IUser.cs" />
     <Compile Include="..\..\OSBLE.Library\Models\AbstractCourses\AbstractCourse.cs" />
     <Compile Include="..\..\OSBLE.Library\Models\AbstractCourses\AbstractRole.cs" />

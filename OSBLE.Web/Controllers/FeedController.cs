@@ -797,7 +797,7 @@ namespace OSBLE.Controllers
         /// Constructs a basic query to be further manipulated by other functions in this class
         /// </summary>
         /// <returns></returns>
-        private void BuildBasicQuery(ref ActivityFeedQuery query)
+        private ActivityFeedQuery BuildBasicQuery(ActivityFeedQuery query = null)
         {
             //check for null query
             if (query == null)
@@ -823,11 +823,11 @@ namespace OSBLE.Controllers
                 }
 
                 //load in course and user type filtering
-                query.CourseRoleFilter = feedSettings.CourseRoleFilter;
+                query.CourseRoleFilter = (CourseRole)feedSettings.CourseRoleFilter;
                 query.CourseFilter = new Course() { ID = feedSettings.CourseFilter };
             }
 
-            //return query;
+            return query;
         }
     }
 }
