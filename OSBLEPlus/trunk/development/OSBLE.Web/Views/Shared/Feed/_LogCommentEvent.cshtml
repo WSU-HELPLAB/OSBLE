@@ -1,39 +1,40 @@
 ﻿@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+@using OSBLE.Models.Courses
+@using OSBLE.Utility
 @model AggregateFeedItem
 @{
     LogCommentEvent comment = Model.Items.First().Event as LogCommentEvent;
-    Model.Items.First().Event.EventLogId = comment.SourceEventLogId;
-} 
-@Model.Creator.FirstName commented on their own
-@if (Model.Creator.ID == comment.SourceEvent.SenderId)
-{
-    @*switch(Model.Creator.Gender)
-    {
-        case OSBIDE.Library.Models.Gender.Female:
-            @:her own
-            break;
-            
-        case OSBIDE.Library.Models.Gender.Male:
-            @:his own
-            break;
-            
-        case OSBIDE.Library.Models.Gender.Unknown:
-            @:their own
-            break;
-    }*@
 }
-else
-{
-    //anonymize IDE events
-    @*if (ActivityFeedQuery.GetIdeEvents().Any(e => (int)e == comment.SourceEventLog.EventTypeId))
-    {
-        <text>a student's</text>
-    }
-    else
-    {
-        <text>@string.Format("{0}'s", comment.SourceEventLog.Sender.FirstName)</text>   
-    }*@
-}
-@string.Format("{0}:", comment.SourceEvent.EventName)@*.LogType.ToDisplayText().ToLower())*@
-<br />
-@comment.Content
+
+            @*@if (Model.Creator.ID == comment.SourceEvent.SenderId)
+                {
+                    @*switch(Model.Creator.Gender)
+                    {
+                        case OSBIDE.Library.Models.Gender.Female:
+                            @:her own
+                            break;
+
+                        case OSBIDE.Library.Models.Gender.Male:
+                            @:his own
+                            break;
+
+                        case OSBIDE.Library.Models.Gender.Unknown:
+                            @:their own
+                            break;
+                    }*@@*
+                }
+                else
+                {
+                    //anonymize IDE events
+                    @*if (ActivityFeedQuery.GetIdeEvents().Any(e => (int)e == comment.SourceEventLog.EventTypeId))
+                    {
+                        <text>a student's</text>
+                    }
+                    else
+                    {
+                        <text>@string.Format("{0}'s", comment.SourceEventLog.Sender.FirstName)</text>
+                    }*@@*
+                        }
+                        @string.Format("{0}:", comment.SourceEvent.EventName)@*.LogType.ToDisplayText().ToLower())*@
+
+                    @comment.Content;

@@ -60,7 +60,7 @@ namespace OSBLE.Controllers
             try
             {
                 FeedViewModel vm = GetFeedViewModel(timestamp, errorType, errorTypeStr, keyword, hash);
-                return View(vm);
+                return PartialView(vm);
             }
             catch (Exception ex)
             {

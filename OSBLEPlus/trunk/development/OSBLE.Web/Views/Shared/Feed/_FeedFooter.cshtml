@@ -72,7 +72,9 @@
             $(commentsTextSpan).text("View");
         }
 
-        //if the user clicked hide, hide the comments now
+        ToggleShowReplies(element);
+
+        @*//if the user clicked hide, hide the comments now
         //display comments
         var commentsDiv = "#feed-item-comments-" + element;
         if ($(commentsDiv).find('.log-comment-single').length > 0) {
@@ -84,7 +86,7 @@
                 //ask server for comments
                 $.ajax(
                     {
-                        @*url: "@Url.Action("GetComments", "Feed")",*@
+                        @*url: "@Url.Action("GetComments", "Feed")",*@@*
                         data: { singleLogId: element },
                         dataType: "json",
                         type: "GET",
@@ -92,7 +94,7 @@
                     }
             );
             }
-        }
+        }*@
     }
 
     //Called after successful AJAX call to get feed item comments

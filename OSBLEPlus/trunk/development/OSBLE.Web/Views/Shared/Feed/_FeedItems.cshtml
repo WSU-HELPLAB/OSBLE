@@ -1,6 +1,8 @@
 ﻿@using OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
 @using OSBLE.Models.Users
 @using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+@using OSBLE.Models.Courses;
+@using OSBLE.Models;
 @model List<AggregateFeedItem>
 @{
     string additionalStyle = "";
@@ -37,7 +39,7 @@
         item.Creator.ID = -1;
     }
     
-    <section id="feed-item-@lastLogId" data-id="@lastLogId" class="feed-item-single @additionalStyle">
+    <article id="feed-item-@lastLogId" data-id="@lastLogId" class="feed-item-single @additionalStyle">
         
         <div class="dp_post panel panel-default" >
             <div class="dp_post_header panel-heading">
@@ -52,7 +54,6 @@
                 } 
 
                 <a class="display_name" href="@Url.Action("Index", "Profile", new { id = item.Creator.ID })">@item.Creator.FullName</a>
-                <span class="feed-item-date">(@item.Creator.DefaultCourse.ToString())</span>
                 <time class="utc-time feed-item-date"
                         datetime="@Helpers.DateAsUnixTime(item.MostRecentOccurance)"
                         data-original-date="@Helpers.RawDate(item.MostRecentOccurance)"
@@ -62,11 +63,14 @@
 
                 @* Mail and Delete Buttons *@
                 <div class="dp_tools">
-                    @if (!item.IsAnonymous)
+                    @if (ViewBag.CurrentUser.ID != item.Creator.ID && !item.IsAnonymous)
                     {
                         <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { id = item.Creator.ID })"><span class="glyphicon glyphicon-envelope"></span></a>
                     }
-                   @* TODO: Add delete functionality *@
+                    @if (ViewBag.CurrentUser.ID == item.Creator.ID || ViewBag.ActiveCourseUser.AbstractRole.CanModify)
+                    {
+                        @* TODO: Add delete functionality *@
+                    }
                 </div>
             </div>
 
@@ -78,50 +82,41 @@ string partialName = string.Format("Feed/_{0}", item.Items.First().Event.EventNa
                 @Html.Partial(partialName, item)    
             </div>
             
-            <div class="feed-item-comments"
-                    id="feed-item-comments-@lastLogId"
-                    style="display:none;"
-                    data-bind="foreach: Comments">
-                <section class="log-comment-single">
-                    <div class="log-comment-profile-picture">
-                        <img src="@Url.Action("Picture", "Profile", new { id = -1, size = 48 })" title="profile image" alt="profile image" style="float:left;" data-bind="attr: { src: ProfileUrl }">
-                    </div>
-                    <div class="log-comment-content">
-                        <h1 data-bind="text: FirstAndLastName"></h1>
-                        <h2>
-                            (<span data-bind="text: CourseName"></span>)
-                            <time data-bind="text: LocalDate, attr: { datetime: UtcUnixDate }"
-                                    data-date-format="MM/DD/YYYY hh:mm A">
-                            </time>
-                        </h2>
-                        <p>
-                            <pre class="normal-font" data-bind="text: Content"></pre>
-                        </p>
-                    </div>
-                    @*<div data-bind="if: DisplayHelpfulMarkLink">
-                        <a data-bind="attr: { href: MarkHelpfulUrl }">mark as helpful</a>
-                    </div>
-                    <div class="helpful-marks" style="clear: both;" data-bind="if: MarkHelpfulCount > 0">
-                        <span data-bind="text: HelpfulMarkCount"></span>
-                    </div>*@
-                </section>
+            <div class="feed-item-comments panel-group" id="feed-item-comments-@lastLogId">
+                @{
+                    List<FeedItem> commentItems = new List<FeedItem>();
+                    foreach (LogCommentEvent comment in item.Comments)
+                    {
+                        FeedItem fi = new FeedItem();
+                        fi.Event = comment;
+                        fi.Comments = new List<LogCommentEvent>();
+                        commentItems.Add(fi);
+                    }
+                    if (commentItems.Count > 0)
+                    {
+                        @Html.Partial("Feed/_FeedItems", AggregateFeedItem.FromFeedItems(commentItems))
+                    }
+                }
+
             </div>
 
-            <div class="feed-item-footer">
-
-                @* Note: Hidden by default. Only shows when user clicks reply *@
-                <form class="feed-reply-form" id="feed-reply-@lastLogId"
-                      data-ajax="true"
-                      data-ajax-update="#feed-item-comments-@lastLogId"
-                      data-ajax-failure="alert('There was an error sending your reply.')"
-                      data-ajax-complete="$('#btn-reply-@lastLogId').removeAttr('disabled'); $('body').css('cursor', 'default');"
-                      data-ajax-mode="after"
-                      method="post">
-                    <textarea name="response" id="feed-item-respond-@lastLogId" placeholder="Say something..." class="form-control"></textarea>
-                    <input name="response-submit" class="btn btn-default btn-sm" type="button" value="Send" onclick="sendResponse(@lastLogId)" />
-                    <input name="response-cancel" class="btn btn-default btn-sm" type="button" value="Cancel" onclick="HideReplyBox(@lastLogId)" />
-                </form>
-
+        @if(item.FeedItemType.Replace(" ", "") != "LogCommentEvent")
+        {
+            <div class="feed-item-footer">               
+                    @* Note: Hidden by default. Only shows when user clicks reply *@
+                    <form class="feed-reply-form" id="feed-reply-@lastLogId"
+                          data-ajax="true"
+                          data-ajax-update="#feed-item-comments-@lastLogId"
+                          data-ajax-failure="alert('There was an error sending your reply.')"
+                          data-ajax-complete="$('#btn-reply-@lastLogId').removeAttr('disabled'); $('body').css('cursor', 'default');"
+                          data-ajax-mode="after"
+                          method="post">
+                        <textarea name="response" id="feed-item-respond-@lastLogId" placeholder="Say something..." class="form-control"></textarea>
+                        <input name="response-submit" class="btn btn-default btn-sm" type="button" value="Send" onclick="sendResponse(@lastLogId)" />
+                        <input name="response-cancel" class="btn btn-default btn-sm" type="button" value="Cancel" onclick="HideReplyBox(@lastLogId)" />
+                    </form>
+                
+                
                 <ul class="feed-item-links">
                     <li>
                         <a id="expand-comments-@lastLogId"
@@ -131,18 +126,20 @@ string partialName = string.Format("Feed/_{0}", item.Items.First().Event.EventNa
                         </a>
                     </li>
                     @{
-int[] ids = item.Items.Select(i => i.Event.EventLogId).ToArray();
-string idString = string.Join(",", ids);
+                        int[] ids = item.Items.Select(i => i.Event.EventLogId).ToArray();
+                        string idString = string.Join(",", ids);
                     }
                     <li><a href="@Url.Action("Details", "Feed", new { id = idString })">Details</a></li>
 
                     <li><a id="btn-reply-@lastLogId" onclick="ShowReplyBox(@lastLogId)" >Reply</a></li>
+
                 </ul>
 
                 @*<textarea name="response" id="feed-item-respond-@lastLogId" placeholder="Say something..." style="width:250px;"></textarea>
                 <br />
                 <input name="response-submit" type="button" value="Send" onclick="sendResponse(@lastLogId)" />*@
             </div>
+            }
         </div>
-</section>
+</article>
 }

@@ -175,4 +175,14 @@
         $("#ActivityFeed").val(''); // Clear the input
         getRecentFeedItems();
     }
+
+    function ToggleShowReplies(lastLogID) {
+        var replies = $("#feed-item-comments-" + lastLogID);
+        if (replies.css('display') == 'none') {
+            replies.css('display', 'block');
+        }
+        else {
+            replies.css('display', 'none');
+        }
+    }
 </script>
