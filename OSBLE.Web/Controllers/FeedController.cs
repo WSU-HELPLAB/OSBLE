@@ -55,95 +55,11 @@ namespace OSBLE.Controllers
         public ActionResult Index(long timestamp = -1, int errorType = -1, string errorTypeStr = "", string keyword = "",
             int hash = 0)
         {
-            //turned off for now.
+             //turned off for now.
             //return RedirectToAction("FeedDown", "Error");
             try
             {
-                var query = new ActivityFeedQuery();
-
-                //query.CommentFilter = hash == 0 ? keyword : "#" + keyword;
-
-                //Two ways that we can receive an error type: by name (errorTypeStr) or by ID (errorType).
-                //First, we check the string and see if we can match it to an ID number.  Then, we check
-                //to see if we have a valid ID number.  If it doesn't work out, just work as normal.
-                //if (string.IsNullOrEmpty(errorTypeStr) == false)
-                //{
-                //    errorTypeStr = errorTypeStr.ToLower().Trim();
-                //    ErrorType type = Db.ErrorTypes.Where(e => e.Name.CompareTo(errorTypeStr) == 0).FirstOrDefault();
-                //    if (type != null)
-                //    {
-                //        errorType = type.Id;
-                //    }
-                //}
-                //if (errorType > 0)
-                //{
-                //    query = new BuildErrorQuery(Db);
-                //    (query as BuildErrorQuery).BuildErrorTypeId = errorType;
-                //}
-                //BuildBasicQuery(query);
-                FeedViewModel vm = new FeedViewModel();
-
-                if (timestamp > 0)
-                {
-                    DateTime pullDate = new DateTime(timestamp);
-                    query.StartDate = pullDate;
-                }
-                else
-                {
-                    query.MaxQuerySize = 40;
-                }
-
-                //and finally, retrieve our list of feed items
-                //var maxIdQuery = Db.EventLogs.Select(l => l.Id);
-                //if (maxIdQuery.Count() > 0)
-                //{
-                //    vm.LastLogId = maxIdQuery.Max();
-                //}
-                //else
-                //{
-                //    vm.LastLogId = 0;
-                //}
-
-                List<FeedItem> feedItems = query.Execute().ToList();
-                List<AggregateFeedItem> aggregateFeed = AggregateFeedItem.FromFeedItems(feedItems);
-                //this.UpdateLogSubscriptions(CurrentUser);
-                try
-                {
-                    vm.LastPollDate = aggregateFeed.Select(a => a.MostRecentOccurance).Max();
-                }
-                catch (Exception)
-                {
-                    vm.LastPollDate = DateTime.MinValue.AddDays(2);
-                }
-                vm.Feed = aggregateFeed;
-                vm.EventFilterOptions = ActivityFeedQuery.GetAllEvents().OrderBy(e => e.ToString()).ToList();
-                vm.UserEventFilterOptions = query.ActiveEvents;
-                //vm.ErrorTypes = Db.ErrorTypes.Distinct().ToList();
-                //vm.SelectedErrorType = new ErrorType();
-                //if (errorType > 0)
-                //{
-                //    vm.SelectedErrorType = Db.ErrorTypes.Where(e => e.Id == errorType).FirstOrDefault();
-                //    if (vm.SelectedErrorType == null)
-                //    {
-                //        vm.SelectedErrorType = new ErrorType();
-                //    }
-                //}
-
-                ////build possible courses and user types
-                //vm.Courses = Db.Courses.ToList();
-                vm.CourseRoles.Add(CourseRole.CourseRoles.Student);
-                vm.CourseRoles.Add(CourseRole.CourseRoles.TA);
-                vm.CourseRoles.Add(CourseRole.CourseRoles.Instructor);
-                //if (_userSettings != null)
-                //{
-                //    vm.SelectedCourseId = _userSettings.CourseFilter;
-                //    vm.SelectedCourseRole = _userSettings.CourseRole;
-                //}
-
-                //build the "you and 5 others got this error"-type messages
-                //BuildEventRelations(vm, feedItems);
-                vm.Keyword = keyword;
-
+                FeedViewModel vm = GetFeedViewModel(timestamp, errorType, errorTypeStr, keyword, hash);
                 return View(vm);
             }
             catch (Exception ex)
@@ -155,6 +71,96 @@ namespace OSBLE.Controllers
 
             // error go back to home page
             return RedirectToAction("Index", "Home");
+            
+        }
+
+        private FeedViewModel GetFeedViewModel(long timestamp = -1, int errorType = -1, string errorTypeStr = "", string keyword = "", int hash = 0)
+        {
+            var query = new ActivityFeedQuery();
+
+            //query.CommentFilter = hash == 0 ? keyword : "#" + keyword;
+
+            //Two ways that we can receive an error type: by name (errorTypeStr) or by ID (errorType).
+            //First, we check the string and see if we can match it to an ID number.  Then, we check
+            //to see if we have a valid ID number.  If it doesn't work out, just work as normal.
+            //if (string.IsNullOrEmpty(errorTypeStr) == false)
+            //{
+            //    errorTypeStr = errorTypeStr.ToLower().Trim();
+            //    ErrorType type = Db.ErrorTypes.Where(e => e.Name.CompareTo(errorTypeStr) == 0).FirstOrDefault();
+            //    if (type != null)
+            //    {
+            //        errorType = type.Id;
+            //    }
+            //}
+            //if (errorType > 0)
+            //{
+            //    query = new BuildErrorQuery(Db);
+            //    (query as BuildErrorQuery).BuildErrorTypeId = errorType;
+            //}
+            //BuildBasicQuery(query);
+            FeedViewModel vm = new FeedViewModel();
+
+            if (timestamp > 0)
+            {
+                DateTime pullDate = new DateTime(timestamp);
+                query.StartDate = pullDate;
+            }
+            else
+            {
+                query.MaxQuerySize = 40;
+            }
+
+            //and finally, retrieve our list of feed items
+            //var maxIdQuery = Db.EventLogs.Select(l => l.Id);
+            //if (maxIdQuery.Count() > 0)
+            //{
+            //    vm.LastLogId = maxIdQuery.Max();
+            //}
+            //else
+            //{
+            //    vm.LastLogId = 0;
+            //}
+
+            List<FeedItem> feedItems = query.Execute().ToList();
+            List<AggregateFeedItem> aggregateFeed = AggregateFeedItem.FromFeedItems(feedItems);
+            //this.UpdateLogSubscriptions(CurrentUser);
+            try
+            {
+                vm.LastPollDate = aggregateFeed.Select(a => a.MostRecentOccurance).Max();
+            }
+            catch (Exception)
+            {
+                vm.LastPollDate = DateTime.MinValue.AddDays(2);
+            }
+            vm.Feed = aggregateFeed;
+            vm.EventFilterOptions = ActivityFeedQuery.GetAllEvents().OrderBy(e => e.ToString()).ToList();
+            vm.UserEventFilterOptions = query.ActiveEvents;
+            //vm.ErrorTypes = Db.ErrorTypes.Distinct().ToList();
+            //vm.SelectedErrorType = new ErrorType();
+            //if (errorType > 0)
+            //{
+            //    vm.SelectedErrorType = Db.ErrorTypes.Where(e => e.Id == errorType).FirstOrDefault();
+            //    if (vm.SelectedErrorType == null)
+            //    {
+            //        vm.SelectedErrorType = new ErrorType();
+            //    }
+            //}
+
+            ////build possible courses and user types
+            //vm.Courses = Db.Courses.ToList();
+            vm.CourseRoles.Add(CourseRole.CourseRoles.Student);
+            vm.CourseRoles.Add(CourseRole.CourseRoles.TA);
+            vm.CourseRoles.Add(CourseRole.CourseRoles.Instructor);
+            //if (_userSettings != null)
+            //{
+            //    vm.SelectedCourseId = _userSettings.CourseFilter;
+            //    vm.SelectedCourseRole = _userSettings.CourseRole;
+            //}
+
+            //build the "you and 5 others got this error"-type messages
+            //BuildEventRelations(vm, feedItems);
+            vm.Keyword = keyword;
+            return vm;
         }
 
         private void BuildEventRelations(FeedViewModel vm, List<FeedItem> feedItems)
@@ -234,7 +240,7 @@ namespace OSBLE.Controllers
                 //query = new BuildErrorQuery(Db);
                 //(query as BuildErrorQuery).BuildErrorTypeId = errorType;
             }
-            BuildBasicQuery(query);
+            BuildBasicQuery(ref query);
             query.MinLogId = id;
             query.MaxQuerySize = 10;
 
@@ -642,69 +648,73 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         [System.Web.Http.HttpPost]
         [ValidateInput(false)]
-        public ActionResult PostFeedComment(FormCollection formCollection)
+        public ActionResult PostFeedItem(FormCollection formCollection)
         {
             try
             {
                 var comment = formCollection["comment"];
-                if (string.IsNullOrWhiteSpace(comment)) return RedirectToAction("Index");
+                if (!string.IsNullOrWhiteSpace(comment)) { 
 
-                comment = comment.TrimStart(',');
-                //OsbideWebService client = new OsbideWebService();
-                //Authentication auth = new Authentication();
-                //string key = auth.GetAuthenticationKey();
-                if (string.IsNullOrEmpty(comment) == false)
-                {
-                    FeedPostEvent log = new FeedPostEvent()
+                    comment = comment.TrimStart(',');
+                    //OsbideWebService client = new OsbideWebService();
+                    //Authentication auth = new Authentication();
+                    //string key = auth.GetAuthenticationKey();
+                    if (string.IsNullOrEmpty(comment) == false)
                     {
-                        SenderId = CurrentUser.ID,
-                        Comment = comment,
-                        CourseId = ActiveCourseUser.AbstractCourseID,
-                        SolutionName = "OSBLEPlus"
-                    };
-
-                    using (SqlConnection conn = DBHelper.GetNewConnection())
-                    {
-                        try
+                        FeedPostEvent log = new FeedPostEvent()
                         {
-                            conn.Execute(log.GetInsertScripts());
-                        }
-                        catch (Exception ex)
+                            SenderId = CurrentUser.ID,
+                            Comment = comment,
+                            CourseId = ActiveCourseUser.AbstractCourseID,
+                            SolutionName = "OSBLEPlus"
+                        };
+
+                        using (SqlConnection conn = DBHelper.GetNewConnection())
                         {
-                            //
+                            try
+                            {
+                                string sql = log.GetInsertScripts();
+                                conn.Execute(sql);
+                            }
+                            catch (Exception ex)
+                            {
+                                //
+                            }
                         }
-                    }
-                    //FeedPostEvent commentEvent = new FeedPostEvent();
-                    //commentEvent.Comment = comment;
-                    //log.Data.BinaryData = EventFactory.ToZippedBinary(commentEvent);
-                    //log = client.SubmitLog(log, CurrentUser);
+                        //FeedPostEvent commentEvent = new FeedPostEvent();
+                        //commentEvent.Comment = comment;
+                        //log.Data.BinaryData = EventFactory.ToZippedBinary(commentEvent);
+                        //log = client.SubmitLog(log, CurrentUser);
 
-                    //find all of this user's subscribers and send them an email
-                    //List<UserProfile> observers = new List<UserProfile>();
+                        //find all of this user's subscribers and send them an email
+                        //List<UserProfile> observers = new List<UserProfile>();
 
-                    //observers = (from subscription in Db.UserSubscriptions
-                    //             join user in Db.Users on
-                    //                             new { InstitutionId = subscription.ObserverInstitutionId, SchoolId = subscription.ObserverSchoolId }
-                    //                             equals new { InstitutionId = user.InstitutionId, SchoolId = user.SchoolId }
-                    //             where subscription.SubjectSchoolId == CurrentUser.SchoolId
-                    //             && subscription.SubjectInstitutionId == CurrentUser.InstitutionId
-                    //             && user.ReceiveEmailOnNewFeedPost == true
-                    //             select user).ToList();
-                    //if (observers.Count > 0)
-                    //{
-                    //    string url = StringConstants.GetActivityFeedDetailsUrl(log.Id);
-                    //    string body = "Greetings,<br />{0} posted a new item to the activity feed:<br />\"{1}\"<br />To view this "
-                    //    + "conversation online, please visit {2} or visit your OSBIDE user profile.<br /><br />Thanks,\nOSBIDE<br /><br />"
-                    //    + "These automated messages can be turned off by editing your user profile.";
-                    //    body = string.Format(body, CurrentUser.FirstAndLastName, comment, url);
-                    //    List<MailAddress> to = new List<MailAddress>();
-                    //    foreach (OsbideUser user in observers)
-                    //    {
-                    //        to.Add(new MailAddress(user.Email));
-                    //    }
-                    //    Email.Send("[OSBIDE] New Activity Post", body, to);
-                    //}
+                        //observers = (from subscription in Db.UserSubscriptions
+                        //             join user in Db.Users on
+                        //                             new { InstitutionId = subscription.ObserverInstitutionId, SchoolId = subscription.ObserverSchoolId }
+                        //                             equals new { InstitutionId = user.InstitutionId, SchoolId = user.SchoolId }
+                        //             where subscription.SubjectSchoolId == CurrentUser.SchoolId
+                        //             && subscription.SubjectInstitutionId == CurrentUser.InstitutionId
+                        //             && user.ReceiveEmailOnNewFeedPost == true
+                        //             select user).ToList();
+                        //if (observers.Count > 0)
+                        //{
+                        //    string url = StringConstants.GetActivityFeedDetailsUrl(log.Id);
+                        //    string body = "Greetings,<br />{0} posted a new item to the activity feed:<br />\"{1}\"<br />To view this "
+                        //    + "conversation online, please visit {2} or visit your OSBIDE user profile.<br /><br />Thanks,\nOSBIDE<br /><br />"
+                        //    + "These automated messages can be turned off by editing your user profile.";
+                        //    body = string.Format(body, CurrentUser.FirstAndLastName, comment, url);
+                        //    List<MailAddress> to = new List<MailAddress>();
+                        //    foreach (OsbideUser user in observers)
+                        //    {
+                        //        to.Add(new MailAddress(user.Email));
+                        //    }
+                        //    Email.Send("[OSBIDE] New Activity Post", body, to);
+                        //}
+                        }
                 }
+
+                //return PartialView("_Feed", GetFeedViewModel());
             }
             catch (Exception ex)
             {

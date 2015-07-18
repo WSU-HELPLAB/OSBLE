@@ -7,22 +7,8 @@
     ViewBag.Title = "Activity Feed";
 }
 
-<section data-tab="ActivityFeed" class="row">
+<section data-tab="ActivityFeed">
 
-    <article class="col-xs-2">
-        <div class="activity-feed-dashboard">
-            <div class="trends-container">
-                <h3>Trends</h3>
-                <ul></ul>
-            </div>
-            <div class="notifications-container">
-                <h3>Notifications</h3>
-                <ul></ul>
-            </div>
-        </div>
-    </article>
-
-    <article class="col-xs-10">
         <!--
         <article style="max-width:500px;">
             <h1>Notice</h1>
@@ -30,27 +16,57 @@
             In order to view the most recent feed items, you will need to manually Html.ActionLink("refresh", "Index", new { component = OsbideVsComponent.FeedOverview }, new {}) this page.</p>
         </article>
             -->
-        @using (Html.BeginForm("PostFeedComment", "Feed", FormMethod.Post, new { id = "post-comment-form", @class = "spinner" }))
+    <div id="activity_new_post">
+        @if (ViewBag.ActiveCourse.AbstractRole != null)
         {
-            <article id="add-feed-comment">
-                <h1>Post a comment:</h1>
-                <div>
-                    <textarea class="typeahead" name="comment"></textarea>
-                </div>
-                <input type="submit" name="submit" id="post-comment-button" value="Post Comment" />
-                <img class="submit-loading" src="~/Areas/Analytics/Content/loading.gif" title="loading" alt="loading" />
-                <input id="filter-options-button" type="button" value="Filter Options" />
-            </article>
+            if ((ViewBag.ActiveCourse.AbstractRole.CanGrade == true) || (ViewBag.ActiveCourse.AbstractRole.Anonymized) || ((ViewBag.ActiveCourse.AbstractCourse is Course) && (ViewBag.ActiveCourse.AbstractCourse.AllowDashboardPosts) == true))
+            {
+                if (ViewBag.Error != null)
+                {
+                    <h3 class="error">@ViewBag.Error</h3>
+                }
+                using (Html.BeginForm("PostFeedItem", "Feed", FormMethod.Post, new { id = "post-comment-form", @class = "spinner"}))
+                /*using (Ajax.BeginForm("PostFeedItem", "Feed",
+                    new AjaxOptions
+                    {
+                        HttpMethod = "POST",
+                        OnComplete = "FeedPostComplete",
+                    },
+                    new { 
+                        id = "post-comment-form", 
+                        @class = "spinner" 
+                    }))*/
+                {
+                    <div class="form-group">
+                        <textarea id="ActivityFeed" class="form-control" name="comment" rows="4" placeholder="Enter new feed post here..."></textarea>
+                    </div>
+
+                    <input type="submit" id="btn_post_active" class="btn btn-default" name="post_active" value="Post to @Helpers.CourseTag(ViewBag.ActiveCourse.AbstractCourse)" />
+
+                    /*if (ViewBag.IsInstructor)
+                    {
+                        <input type="submit" id="btn_post_all" class="btn btn-default" name="post_all" value="Post to All Courses I Teach" onclick="return confirm('Post this message to all your taught courses?');" />
+                        <label class="checkbox-inline"><input type="checkbox" value="True" name="send_email" /> Email to Class</label>
+                    }
+
+                    if (ViewBag.IsLeader)
+                    {
+                        <label class="checkbox-inline"><input type="checkbox" value="True" name="send_email" /> Email to Community</label>
+                    }*/
+                }
+            }
         }
+    </div>
 
         @using (Html.BeginForm("Index", "Feed", FormMethod.Post))
         {
-            <article id="keywordSection">
-                <h2>Filter by keywords</h2>
-                <div><input type="text" class="typeahead" name="keyword" autocomplete="off" value="@Model.Keyword" /></div>
-            </article>
+            <div id="keywordSection" class="form-group">
+                <label id="feedSearchIcon" for="feedSearchInput"><span class="glyphicon glyphicon-search"></span></label>
+                <input id="feedSearchInput" type="text" class="typeahead form-control" name="keyword" autocomplete="off" value="@Model.Keyword" placeholder="Search by keyword..." />
+            </div>
         }
 
+        @*
         @using (Html.BeginForm("ApplyFeedFilter", "Feed"))
         {
             <article id="filter-options" style="display: none;">
@@ -90,7 +106,7 @@
                             <option @Html.Raw(selectedText) value="@error.Id">@error.Name</option>
                         }
                     </select>
-                </article>*@
+                </article>*@@*
                 <article>
                     <h2>Filter by Course</h2>
                     <select name="course-filter">
@@ -127,9 +143,10 @@
                 <img class="submit-loading" src="~/Areas/Analytics/Content/loading.gif" title="loading" alt="loading" />
             </article>
         }
+        *@
+    <div id="dp_posts" class="panel-group">
         @Html.Partial("Feed/_Feed", Model)
-
-    </article>
+    </div>
 
 </section>
 
@@ -140,3 +157,22 @@
     <script type="text/javascript" src="~/Scripts/Typeahead/jquery.textcomplete.js"></script>
     <script type="text/javascript" src="~/Scripts/Typeahead/jquery.overlay.js"></script>
 }*@
+
+<script type="text/javascript">
+    function ShowReplyBox(lastLogID) {
+        $("#btn-reply-" + lastLogID).hide();
+        $("#feed-reply-" + lastLogID).show('blind');
+        return false;
+    }
+
+    function HideReplyBox(lastLogID) {
+        $("#btn-reply-" + lastLogID).show('highlight');
+        $("#feed-reply-" + lastLogID).hide('blind');
+        return false;
+    }
+
+    function FeedPostComplete() {
+        $("#ActivityFeed").val(''); // Clear the input
+        getRecentFeedItems();
+    }
+</script>
