@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-
+using System.Xml.Schema;
 using Dapper;
 
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
@@ -19,7 +19,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
     public class Feeds
     {
         public static IEnumerable<FeedItem> Get(DateTime dateReceivedMin, DateTime dateReceivedMax,
-            IEnumerable<int> logIds, IEnumerable<int> eventTypes,
+            int? minEventLogId, int? maxEventLogId, IEnumerable<int> logIds, IEnumerable<int> eventTypes,
             int? courseId, int? roleId, string commentFilter,
             IEnumerable<int> senderIds, int? topN)
         {
@@ -37,6 +37,8 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                                         {
                                             DateReceivedMin = dateReceivedMin,
                                             DateReceivedMax = dateReceivedMax,
+                                            MinEventLogId = minEventLogId ?? -1,
+                                            MaxEventLogId = maxEventLogId ?? 2000000000,
                                             EventLogIds = l,
                                             EventTypes = t,
                                             CourseId = courseId ?? 0,
@@ -117,6 +119,8 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
 
                     if (!feedItems.Contains(f))
                         feedItems.Add(f);
+
+                    xActivityEvent = null;
                     //feedItems.Add(new FeedItem
                     //{
                     //    Event = xActivityEvent,
@@ -143,7 +147,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
             var evt = askHelps.SingleOrDefault(y => y.EventLogId == eventLog.EventLogId);
             if (evt == null) return null;
 
-            return new AskForHelpEvent
+            return new AskForHelpEvent(evt.EventDate)
             {
                 EventId = evt.EventId,
                 EventLogId = eventLog.EventLogId,
@@ -162,7 +166,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
             var evt = builds.SingleOrDefault(y => y.EventLogId == eventLog.EventLogId);
             if (evt == null) return null;
 
-            return new BuildEvent
+            return new BuildEvent(evt.EventDate)
             {
                 EventId = evt.EventId,
                 EventLogId = eventLog.EventLogId,
@@ -179,7 +183,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
             var evt = exceptions.SingleOrDefault(y => y.EventLogId == eventLog.EventLogId);
             if (evt == null) return null;
 
-            return new ExceptionEvent
+            return new ExceptionEvent(evt.EventDate)
             {
                 EventId = evt.EventId,
                 EventLogId = eventLog.EventLogId,
@@ -203,14 +207,14 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
             var evt = exceptions.SingleOrDefault(y => y.EventLogId == eventLog.EventLogId);
             if (evt == null) return null;
 
-            return new FeedPostEvent
+            return new FeedPostEvent(evt.EventDate)
             {
                 EventId = evt.EventId,
                 EventLogId = eventLog.EventLogId,
                 SenderId = eventLog.SenderId,
                 Sender = GetUser(userDictionary, users, eventLog.SenderId),
                 SolutionName = evt.SolutionName,
-                Comment = evt.Comment
+                Comment = evt.Comment,
             };
         }
 
@@ -221,7 +225,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
             var evt = exceptions.SingleOrDefault(y => y.EventLogId == eventLog.EventLogId);
             if (evt == null) return null;
 
-            return new SubmitEvent
+            return new SubmitEvent(evt.EventDate)
             {
                 EventId = evt.EventId,
                 EventLogId = eventLog.EventLogId,

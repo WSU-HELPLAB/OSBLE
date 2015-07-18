@@ -20,6 +20,12 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             EventTypeId = (int)Utility.Lookups.EventType.LogCommentEvent;
         }
 
+        public LogCommentEvent(DateTime dateTimeValue)
+            : this()
+        {
+            EventDate = dateTimeValue;
+        }
+
         public override string GetInsertScripts()
         {
             string batchString = BatchId == null ? "NULL" : BatchId.ToString();

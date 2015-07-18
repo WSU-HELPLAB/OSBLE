@@ -23,6 +23,11 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             EventTypeId = (int) Utility.Lookups.EventType.FeedPostEvent;
         }
 
+        public FeedPostEvent(DateTime dateTimeValue) : this()
+        {
+            EventDate = dateTimeValue;
+        }
+
         public override string GetInsertScripts()
         {
             string batchString = BatchId == null ? "NULL" : BatchId.ToString();

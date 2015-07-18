@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
@@ -18,6 +19,12 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
         {
             StackFrames = new List<StackFrame>();
             EventTypeId = (int)Utility.Lookups.EventType.ExceptionEvent;
+        }
+
+        public ExceptionEvent(DateTime dateTimeValue)
+            : this()
+        {
+            EventDate = dateTimeValue;
         }
 
         public override string GetInsertScripts()

@@ -1,4 +1,5 @@
-﻿using OSBLEPlus.Logic.Utility;
+﻿using System;
+using OSBLEPlus.Logic.Utility;
 using OSBLEPlus.Logic.Utility.Lookups;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
@@ -21,6 +22,12 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             DocumentName = string.Empty;
             Content = string.Empty;
             EventTypeId = (int)EventType.CutCopyPasteEvent;
+        }
+
+        public CutCopyPasteEvent(DateTime dateTimeValue)
+            : this()
+        {
+            EventDate = dateTimeValue;
         }
 
         public override string GetInsertScripts()
