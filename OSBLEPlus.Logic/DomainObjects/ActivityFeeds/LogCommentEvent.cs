@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using Dapper;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
@@ -36,16 +37,6 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
                 VALUES (SCOPE_IDENTITY(),{3}, '{1}', '{4}', '{5}')", EventTypeId, EventDate, SenderId, SourceEventLogId, SolutionName, Content.Replace("'", "''"), batchString, CourseId);
 
             return s;
-        }
-
-        public CourseUser GetCourseUser()
-        {
-            using (var connection = new SqlConnection(StringConstants.ConnectionString))
-            {
-                var results = connection.Query("dbo.GetCourseUser", new { UserId = this.SenderId }, commandType: CommandType.StoredProcedure);
-            }
-
-            return new CourseUser();
         }
 
         public static string Name { get { return "LogCommentEvent"; } }
