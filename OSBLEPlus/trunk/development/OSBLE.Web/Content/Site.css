@@ -2097,3 +2097,55 @@ div.pagedocname {
     background: #ffffff url("images/info_circle.png") no-repeat 10px 50%;
     padding-left: 50px;
 }
+
+
+/* NEW ACTIVITY FEED */
+
+#feedSearchIcon {
+    color: #aaa;
+    display: block;
+    float: left;
+    padding: 7px 9px 0px 9px;
+    height: 34px;
+    border: 1px solid #ccc;
+    border-right-width: 0;
+    border-bottom-left-radius: 4px;
+    border-top-left-radius: 4px;
+    cursor: default;
+}
+
+#feedSearchInput {
+    width: 200px;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+}
+
+.feed-item-links li {
+    display: inline;
+    margin: 8px 7px 0px 7px;
+}
+
+.feed-item-links a {
+    cursor: pointer;
+}
+
+.feed-item-links {
+    padding: 0;
+}
+
+.feed-item-footer {
+    margin: 15px 20px -10px 30px;
+}
+
+.feed-reply-form {
+    display: none;
+    margin-bottom: 10px;
+}
+
+.feed-reply-form textarea {
+    display: block;
+    margin-bottom: 4px;
+    overflow:visible;
+    height: 100px;
+}
+
