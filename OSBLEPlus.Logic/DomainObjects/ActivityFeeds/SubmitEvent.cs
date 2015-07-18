@@ -19,6 +19,12 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             EventTypeId = (int)Utility.Lookups.EventType.SubmitEvent;
         }
 
+        public SubmitEvent(DateTime dateTimeValue)
+            : this()
+        {
+            EventDate = dateTimeValue;
+        }
+
         public byte[] GetSolutionBinary()
         {
             if (string.IsNullOrWhiteSpace(SolutionName))

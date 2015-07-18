@@ -1,4 +1,6 @@
-﻿namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+﻿using System;
+
+namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
     public sealed class DebugEvent : ActivityEvent
     {
@@ -14,6 +16,12 @@
             DebugOutput = string.Empty;
             LineNumber = -1;
             EventTypeId = (int)Utility.Lookups.EventType.DebugEvent;
+        }
+
+        public DebugEvent(DateTime dateTimeValue)
+            : this()
+        {
+            EventDate = dateTimeValue;
         }
 
         public override string GetInsertScripts()

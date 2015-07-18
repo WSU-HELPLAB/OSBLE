@@ -1,4 +1,6 @@
-﻿namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+﻿using System;
+
+namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
     public sealed class HelpfulMarkGivenEvent : ActivityEvent
     {
@@ -8,6 +10,12 @@
         public HelpfulMarkGivenEvent() // NOTE!! This is required by Dapper ORM
         {
             EventTypeId = (int)Utility.Lookups.EventType.HelpfulMarkGivenEvent;
+        }
+
+        public HelpfulMarkGivenEvent(DateTime dateTimeValue)
+            : this()
+        {
+            EventDate = dateTimeValue;
         }
 
         public override string GetInsertScripts()

@@ -1,8 +1,7 @@
 ﻿@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 @model FeedViewModel
 <section>
-    @*@Html.ActionLink("Load earlier posts...", "Index", new { timestamp = Model.LastPollDate.AddHours(-10).Ticks, errorType = Model.SelectedErrorType.Id }, new { id = "load-old-posts" })*@
-    
+    @Html.ActionLink("Load earlier posts...", "", new { timestamp = Model.LastPollDate.AddHours(-10).Ticks }, new { id = "load-old-posts" })
 </section>
 <div id="hidden-workspace">
 </div>
@@ -32,7 +31,7 @@
             $.ajax(
             {
                 url: "@Url.Action("OldFeedItems", "Feed")",
-                @*data: { id: feedId, count: 30, userId: "@Model.SingleUserId", errorType: "@Model.SelectedErrorType.Id", keyword: "@Model.Keyword", hash: hashVal },*@
+                data: { id: feedId, count: 30, userId: "@Model.SingleUserId", keyword: "@Model.Keyword", hash: hashVal },
                 dataType: "html",
                 type: "GET",
                 success: getOldPostsSuccess,

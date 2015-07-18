@@ -5,6 +5,8 @@
 -------------------------------------------------------------------------------------------------
 CREATE PROCEDURE [dbo].[GetActivityFeeds] @DateReceivedMin DATETIME='01-01-2010',
                                           @DateReceivedMax DATETIME,
+										  @MinEventLogId   INT=-1,
+										  @MaxEventLogId   INT=2147483647,
                                           @EventLogIds     NVARCHAR(max)='',
                                           @EventTypes      NVARCHAR(max)='',
                                           @CourseId        INT=-1,
@@ -139,6 +141,8 @@ AS
                              AND ef.EventTypeId = 7
                              AND fp.Id > 0
             WHERE  s.[DateReceived] BETWEEN @DateReceivedMin AND @DateReceivedMax
+			AND
+				   s.[Id] BETWEEN @MinEventLogId AND @MaxEventLogId
             ORDER  BY s.[DateReceived] DESC
         END
       ELSE
@@ -188,6 +192,7 @@ AS
                           ON Len(@EventLogIds) = 0
             WHERE  s.[DateReceived] BETWEEN @DateReceivedMin AND @DateReceivedMax
 				   AND s.CourseId IS NOT NULL
+				   AND s.[Id] BETWEEN @MinEventLogId AND @MaxEventLogId
             ORDER  BY s.[DateReceived] DESC
         END
 

@@ -15,6 +15,12 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             EventTypeId = (int)EventType.SaveEvent;
         }
 
+        public SaveEvent(DateTime dateTimeValue)
+            : this()
+        {
+            EventDate = dateTimeValue;
+        }
+
         public override string GetInsertScripts()
         {
             var sql =

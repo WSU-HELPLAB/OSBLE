@@ -18,6 +18,8 @@ namespace OSBLEPlus.Services.Tests.Activities
                                     new DateTime(2014, 1, 1),
                                     new DateTime(2014, 2, 1),
                                     null,
+                                    null,
+                                    null,
                                     new List<int> { 1, 2 },
                                     null,
                                     null,

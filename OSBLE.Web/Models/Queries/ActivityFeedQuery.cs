@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Data.SqlTypes;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.WebPages.Scope;
@@ -26,8 +27,8 @@ namespace OSBLE.Models.Queries
             StartDate = new DateTime(2010, 1, 1);
             EndDate = DateTime.Today.AddDays(3);
             CommentFilter = string.Empty;
-            MinLogId = -1;
-            MaxLogId = -1;
+            MinLogId = null;
+            MaxLogId = null;
             MaxQuerySize = 20;
             using (SqlConnection conn = DBHelper.GetNewConnection())
             {
@@ -57,13 +58,13 @@ namespace OSBLE.Models.Queries
         /// Used to set a floor on the logs to retrieve.  Example: if <see cref="MinLogId"/> is set to 5,
         /// no posts with an Id less than 6 will be retrieved.
         /// </summary>
-        public int MinLogId { protected get; set; }
+        public int? MinLogId { protected get; set; }
 
         /// <summary>
         /// Used to set a ceiling on the logs to retrieve.  Example: if <see cref="MaxLogId"/> is set to 5,
         /// no posts with an Id greater than 4 will be retrieved.
         /// </summary>
-        public int MaxLogId { protected get; set; }
+        public int? MaxLogId { protected get; set; }
 
         /// <summary>
         /// Used to limit the number of query results.  Default of -1 means to return all results.
@@ -196,6 +197,11 @@ namespace OSBLE.Models.Queries
             EventIds.Add(id);
         }
 
+        private void ClearEventIds()
+        {
+            EventIds.Clear();
+        }
+
         /// <summary>
         /// execute the query
         /// </summary>
@@ -203,16 +209,20 @@ namespace OSBLE.Models.Queries
         public virtual IEnumerable<FeedItem> Execute()
         {
             var query = new OSBLEPlus.Services.Controllers.FeedController().Get(
-                                    StartDate // 1
-                                    , EndDate // 2
-                                    , EventIds.Select(eid => (int)eid).ToList() // 3
-                                    , GetNecessaryEvents()//_eventSelectors.Select(e => (int)e) // 4
-                                    , CourseFilter != null && CourseFilter.ID > 0 ? CourseFilter.ID : 0
-                                    , CourseRoleFilter.ID
-                                    , CommentFilter
-                                    , SubscriptionSubjects.Select(s => s.ID).ToList()
-                                    , 20
-                                    );
+                                StartDate // 1
+                                , EndDate // 2
+                                , MinLogId
+                                , MaxLogId
+                                , EventIds//.Select(eid => (int)eid).ToList() // 3
+                                , GetNecessaryEvents()//_eventSelectors.Select(e => (int)e) // 4
+                                , CourseFilter != null && CourseFilter.ID > 0 ? CourseFilter.ID : 0
+                                , CourseRoleFilter.ID
+                                , CommentFilter
+                                , SubscriptionSubjects.Select(s => s.ID).ToList()
+                                , 20
+                                );
+
+            MinLogId = MaxLogId = null;
 
             return query.GetAwaiter().GetResult();
         }

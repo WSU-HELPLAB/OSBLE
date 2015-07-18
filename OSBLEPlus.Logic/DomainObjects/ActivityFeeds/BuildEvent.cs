@@ -60,6 +60,12 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             EventTypeId = (int)Utility.Lookups.EventType.BuildEvent;
         }
 
+        public BuildEvent(DateTime dateTimeValue)
+            : this()
+        {
+            EventDate = dateTimeValue;
+        }
+
         public override string GetInsertScripts()
         {
             var sql = new StringBuilder(string.Format(@"

@@ -1,4 +1,5 @@
-﻿using OSBLEPlus.Logic.Utility.Lookups;
+﻿using System;
+using OSBLEPlus.Logic.Utility.Lookups;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
@@ -7,6 +8,12 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
         public EditorActivityEvent()
         {
             EventTypeId = (int)EventType.EditorActivityEvent;
+        }
+
+        public EditorActivityEvent(DateTime dateTimeValue)
+            : this()
+        {
+            EventDate = dateTimeValue;
         }
 
         public override string GetInsertScripts()

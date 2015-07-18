@@ -16,7 +16,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
         {
             get { return (EventType) EventTypeId; }
         }
-        public DateTime EventDate { get; private set; }
+        public DateTime EventDate { get; protected set; }
         public int SenderId { get; set; }
         public IUser Sender { get; set; }
 
