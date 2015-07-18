@@ -22,6 +22,7 @@ AS
              AND a.Inactive = 0
              AND a.StartDate <= @currentDate
              AND @currentDate <= a.EndDate
+			 AND UserProfileID = @userId
   END
 
 GO 
