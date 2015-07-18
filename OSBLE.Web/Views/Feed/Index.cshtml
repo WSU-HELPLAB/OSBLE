@@ -25,17 +25,17 @@
                 {
                     <h3 class="error">@ViewBag.Error</h3>
                 }
-                using (Html.BeginForm("PostFeedItem", "Feed", FormMethod.Post, new { id = "post-comment-form", @class = "spinner"}))
-                /*using (Ajax.BeginForm("PostFeedItem", "Feed",
+                //using (Html.BeginForm("PostFeedItem", "Feed", FormMethod.Post, new { id = "post-comment-form", @class = "spinner"}))
+                using (Ajax.BeginForm("PostFeedItem", "Feed",
                     new AjaxOptions
                     {
                         HttpMethod = "POST",
-                        OnComplete = "FeedPostComplete",
+                        UpdateTargetId = "activity_feed_content",
                     },
                     new { 
                         id = "post-comment-form", 
                         @class = "spinner" 
-                    }))*/
+                    }))
                 {
                     <div class="form-group">
                         <textarea id="ActivityFeed" class="form-control" name="comment" rows="4" placeholder="Enter new feed post here..."></textarea>
