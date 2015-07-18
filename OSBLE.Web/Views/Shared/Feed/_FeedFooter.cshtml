@@ -195,19 +195,19 @@
 
         //submit response using AJAX
         $.ajax(
-                        {
-                            url: "@Url.Action("PostCommentAsync", "Feed")",
-                            data: { logId: elementId, comment: userResponse },
-                            dataType: "json",
-                            type: "POST",
-                            success: function (data) {
-                                if (!$.isEmptyObject(data)) {
-                                    var commentsTextSpan = "#expand-comments-text-" + data.OriginalLogId;
-                                    $(commentsTextSpan).text("Hide");
-                                    expandCommentsSuccess(data);
-                                }
-                            }
-                        });
+            {
+                url: "@Url.Action("PostCommentAsync", "Feed")",
+                data: { logId: elementId, comment: userResponse },
+                dataType: "json",
+                type: "POST",
+                success: function (data) {
+                    if (!$.isEmptyObject(data)) {
+                        var commentsTextSpan = "#expand-comments-text-" + data.OriginalLogId;
+                        $(commentsTextSpan).text("Hide");
+                        expandCommentsSuccess(data);
+                    }
+                }
+            });
     }
 
     function showLastHidden() {
