@@ -163,11 +163,12 @@ h3 span.glyphicon {
     display: none;
 }
 
-.dp_replies {
+.feed-item-comments {
     margin: 10px 20px 5px 60px;
+    display: none;
 }
 
-.dp_replies .panel-group{
+.feed-item-comments .panel-group{
     margin-bottom: 10px;
 }
 
@@ -2122,7 +2123,7 @@ div.pagedocname {
 
 .feed-item-links li {
     display: inline;
-    margin: 8px 7px 0px 7px;
+    margin: 8px 14px 0px 0px;
 }
 
 .feed-item-links a {
@@ -2134,7 +2135,7 @@ div.pagedocname {
 }
 
 .feed-item-footer {
-    margin: 15px 20px -10px 30px;
+    margin: 15px 20px -10px 65px;
 }
 
 .feed-reply-form {
@@ -2149,3 +2150,6 @@ div.pagedocname {
     height: 100px;
 }
 
+.dp_post {
+    min-height: 65px;
+}
