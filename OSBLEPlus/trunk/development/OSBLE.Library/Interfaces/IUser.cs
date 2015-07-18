@@ -14,6 +14,6 @@
         bool EmailAllNotifications { get; set; }
         bool EmailNewDiscussionPosts { get; set; }
         int DefaultCourseId { get; set; }
-        IProfileCourse DefalutCourse { get; set; }
+        ICourse DefalutCourse { get; set; }
     }
 }

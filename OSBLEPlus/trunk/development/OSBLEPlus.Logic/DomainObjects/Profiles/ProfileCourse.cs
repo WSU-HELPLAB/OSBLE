@@ -3,7 +3,7 @@ using OSBLE.Interfaces;
 
 namespace OSBLEPlus.Logic.DomainObjects.Profiles
 {
-    public class ProfileCourse : IProfileCourse
+    public class ProfileCourse : ICourse
     {
         public int CourseId { get; set; }
         public int Number { get; set; }

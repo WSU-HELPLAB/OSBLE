@@ -18,7 +18,7 @@ namespace OSBLEPlus.Logic.DomainObjects.Profiles
         public bool EmailAllNotifications { get; set; }
         public bool EmailNewDiscussionPosts { get; set; }
         public int DefaultCourseId { get; set; }
-        public IProfileCourse DefalutCourse { get; set; }
+        public ICourse DefalutCourse { get; set; }
 
         public User() { } // NOTE!! This is required by Dapper ORM
     }

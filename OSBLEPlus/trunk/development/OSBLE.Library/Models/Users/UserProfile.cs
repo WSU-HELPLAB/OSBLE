@@ -136,7 +136,7 @@ namespace OSBLE.Models.Users
         /// This is for the IUser interface
         /// </summary>
         [NotMapped]
-        public IProfileCourse DefalutCourse { get; set; }   // Mis-spelled but leaving it for all the references in Services
+        public ICourse DefalutCourse { get; set; }   // Mis-spelled but leaving it for all the references in Services
 
         public enum sortEmailBy
         {

@@ -43,11 +43,6 @@ namespace OSBIDE.Controls.ViewModels
             {
                 Courses.Add(course);
             }
-            Courses.Clear();
-            foreach (var course in courses.OfType<ICourse>())
-            {
-                Courses.Add(course);
-            }
 
             IsLoading = false;
         }
