@@ -121,7 +121,7 @@ namespace OSBLE.Controllers
                         maxIdQuery = f.Event.EventId;
                 }
 
-                vm.LastLogId = maxIdQuery;
+                vm.LastLogId = maxIdQuery - 1;
 
                 //if (maxIdQuery.Count() > 0)
                 //{
