@@ -71,24 +71,35 @@
                 <span class="dp_tools">
         @if (Model.Event.CanMail)
                 {
-            <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { id = (Model.Event as FeedPostEvent).GetCourseUser().UserProfileID })">@Helpers.MailButton()</a>
+            <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { id = Model.Event.SenderId })">@Helpers.MailButton()</a>
                 }
         @if (Model.Event.CanDelete)
-                {
-                    string deleteAction = "";
-                    string deleteConfirm = "";
+        {
+            string deleteAction = "";
+            string deleteConfirm = "";
             if (Model.Event is FeedPostEvent)
-                    {
-                        deleteAction = "DeletePost";
-                        deleteConfirm = "Are you sure you want to delete this post and all its replies?";
-                    }
+            {
+                deleteAction = "DeleteFeedPost";
+                deleteConfirm = "Are you sure you want to delete this post and all its replies?";
+            }
             else if (Model.Event is LogCommentEvent)
-                    {
-                        deleteAction = "DeleteReply";
-                        deleteConfirm = "Are you sure you want to delete this reply?";
-                    }
-                        
-                    <form action="@Url.Action(deleteAction)"
+            {
+                deleteAction = "DeleteLogComment";
+                deleteConfirm = "Are you sure you want to delete this reply?";
+            }
+
+                <form action="@Url.Action(deleteAction)"
+                      style="display: inline;"
+                      data-ajax="true"
+                      data-ajax-success="$('#dp_post_@(Model.Event.EventId)').hide('blind',{},'slow',function(){$(this).remove();})"
+                      data-ajax-confirm="@deleteConfirm"
+                      method="post">
+                    <input type="hidden" name="id" value="@Model.Event.EventId" />
+                    @*@Helpers.DeleteSubmit("Delete This Dashboard Post")*@
+                    <a title="Delete This Dashboard Post" onclick="$(this).parents('form:first').submit();"><span class="glyphicon glyphicon-remove"></span></a>
+                </form>
+            
+                    @*<form action="@Url.Action(deleteAction)"
                         style="display: inline;"
                         data-ajax="true"
                 data-ajax-success="$('#dp_post_@(Model.Event.EventId)').hide('blind',{},'slow',function(){$(this).remove();})"
@@ -96,7 +107,7 @@
                         method="post">
                 <input type="hidden" name="ID" value="@Model.Event.SenderId" />
                 @Helpers.DeleteSubmit("Delete This Dashboard Post")
-                    </form>
+                    </form>*@
                 }
         </div>
                 <br />
