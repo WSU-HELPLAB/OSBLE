@@ -675,7 +675,7 @@ namespace OSBLE.Controllers
             return ids;
         }
 
-        protected async Task<bool> PostComment(string logId, string comment)
+        /*protected async Task<bool> PostComment(string logId, string comment)
         {
             int id = -1;
             if (Int32.TryParse(logId, out id) == true)
@@ -887,6 +887,6 @@ namespace OSBLE.Controllers
         //    }
             }
             return true;
-        }
+        }*/
     }
 }

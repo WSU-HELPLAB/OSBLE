@@ -278,17 +278,30 @@ namespace OSBLE.Controllers
             return View("AjaxFeed", aggregateFeed);
         }
 
-        [System.Web.Http.HttpPost]
-        [ValidateInput(false)]
-        public async Task<JsonResult> PostCommentAsync(string logId, string comment)
+        //[System.Web.Http.HttpPost]
+        //[ValidateInput(false)]
+        //public async Task<JsonResult> PostCommentAsync(string logId, string comment)
+        //{
+        //    int id = -1;
+        //    if (Int32.TryParse(logId, out id))
+        //    {
+        //        bool result = await PostComment(logId, comment);
+        //        return GetComments(id);
+        //    }
+        //    return this.Json(new {});
+        //}
+
+        [HttpPost]
+        public ActionResult PostComment(FormCollection formCollection)
         {
-            int id = -1;
-            if (Int32.TryParse(logId, out id))
+            string content = formCollection["response"];
+            string logIDstr = formCollection["logID"];
+            int logID = 0;
+            if (!String.IsNullOrWhiteSpace(content) && !String.IsNullOrWhiteSpace(logIDstr) && int.TryParse(logIDstr, out logID))
             {
-                bool result = await PostComment(logId, comment);
-                return GetComments(id);
+                DBHelper.InsertActivityFeedComment(logID, CurrentUser.ID, content);
             }
-            return this.Json(new {});
+            return RedirectToAction("Index");
         }
 
         public JsonResult GetComments(int? singleLogId)
@@ -671,65 +684,36 @@ namespace OSBLE.Controllers
             try
             {
                 var comment = formCollection["comment"];
-                if (!string.IsNullOrWhiteSpace(comment)) { 
-
-                comment = comment.TrimStart(',');
-                //OsbideWebService client = new OsbideWebService();
-                //Authentication auth = new Authentication();
-                //string key = auth.GetAuthenticationKey();
-                if (string.IsNullOrEmpty(comment) == false)
-                {
-                    FeedPostEvent log = new FeedPostEvent()
+                if (!string.IsNullOrWhiteSpace(comment)) 
+                { 
+                    comment = comment.TrimStart(',');
+                    //OsbideWebService client = new OsbideWebService();
+                    //Authentication auth = new Authentication();
+                    //string key = auth.GetAuthenticationKey();
+                    if (string.IsNullOrEmpty(comment) == false)
                     {
-                        SenderId = CurrentUser.ID,
-                        Comment = comment,
-                        CourseId = ActiveCourseUser.AbstractCourseID,
-                        SolutionName = "OSBLEPlus"
-                    };
-
-                    using (SqlConnection conn = DBHelper.GetNewConnection())
-                    {
-                        try
+                        FeedPostEvent log = new FeedPostEvent()
                         {
+                            SenderId = CurrentUser.ID,
+                            Comment = comment,
+                            CourseId = ActiveCourseUser.AbstractCourseID,
+                            SolutionName = "OSBLEPlus"
+                        };
+
+                        using (SqlConnection conn = DBHelper.GetNewConnection())
+                        {
+                            try
+                            {
                                 string sql = log.GetInsertScripts();
                                 conn.Execute(sql);
+                            }
+                            catch (Exception ex)
+                            {
+                                //
+                            }
                         }
-                        catch (Exception ex)
-                        {
-                            //
-                        }
+
                     }
-                    //FeedPostEvent commentEvent = new FeedPostEvent();
-                    //commentEvent.Comment = comment;
-                    //log.Data.BinaryData = EventFactory.ToZippedBinary(commentEvent);
-                    //log = client.SubmitLog(log, CurrentUser);
-
-                    //find all of this user's subscribers and send them an email
-                    //List<UserProfile> observers = new List<UserProfile>();
-
-                    //observers = (from subscription in Db.UserSubscriptions
-                    //             join user in Db.Users on
-                    //                             new { InstitutionId = subscription.ObserverInstitutionId, SchoolId = subscription.ObserverSchoolId }
-                    //                             equals new { InstitutionId = user.InstitutionId, SchoolId = user.SchoolId }
-                    //             where subscription.SubjectSchoolId == CurrentUser.SchoolId
-                    //             && subscription.SubjectInstitutionId == CurrentUser.InstitutionId
-                    //             && user.ReceiveEmailOnNewFeedPost == true
-                    //             select user).ToList();
-                    //if (observers.Count > 0)
-                    //{
-                    //    string url = StringConstants.GetActivityFeedDetailsUrl(log.Id);
-                    //    string body = "Greetings,<br />{0} posted a new item to the activity feed:<br />\"{1}\"<br />To view this "
-                    //    + "conversation online, please visit {2} or visit your OSBIDE user profile.<br /><br />Thanks,\nOSBIDE<br /><br />"
-                    //    + "These automated messages can be turned off by editing your user profile.";
-                    //    body = string.Format(body, CurrentUser.FirstAndLastName, comment, url);
-                    //    List<MailAddress> to = new List<MailAddress>();
-                    //    foreach (OsbideUser user in observers)
-                    //    {
-                    //        to.Add(new MailAddress(user.Email));
-                    //    }
-                    //    Email.Send("[OSBIDE] New Activity Post", body, to);
-                    //}
-                }
                 }
 
                 //return PartialView("_Feed", GetFeedViewModel());

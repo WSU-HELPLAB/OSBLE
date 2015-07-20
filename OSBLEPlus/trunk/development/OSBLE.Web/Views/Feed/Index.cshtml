@@ -25,7 +25,6 @@
                 {
                     <h3 class="error">@ViewBag.Error</h3>
                 }
-                //using (Html.BeginForm("PostFeedItem", "Feed", FormMethod.Post, new { id = "post-comment-form", @class = "spinner"}))
                 using (Ajax.BeginForm("PostFeedItem", "Feed",
                     new AjaxOptions
                     {
@@ -171,18 +170,41 @@
         return false;
     }
 
-    function FeedPostComplete() {
-        $("#ActivityFeed").val(''); // Clear the input
-        getRecentFeedItems();
-    }
-
     function ToggleShowReplies(lastLogID) {
         var replies = $("#feed-item-comments-" + lastLogID);
         if (replies.css('display') == 'none') {
-            replies.css('display', 'block');
+            replies.show('blind');
         }
         else {
-            replies.css('display', 'none');
+            var height = (window.innerHeight > 0) ? window.innerHeight : screen.height;
+            var post = $("#feed-item-" + lastLogID);
+
+            // scroll helps if reply box was really big
+            if (post.height() > height) {
+                $('html, body').animate({
+                    scrollTop: post.offset().top
+                }, 200);
+            }
+            replies.hide('blind');
         }
+    }
+
+    function PostReplyComplete(logID)
+    {
+        var replies = $("#feed-item-comments-" + logID);
+
+        // make sure reply block is visible
+        replies.css('display', 'block');
+        $("#expand-comments-text-" + logID).text("Hide");
+
+        // highlight the new reply
+        replies.children().last().addClass('just-posted-reply');
+        
+        // scroll to new reply
+        var post = $("#feed-item-" + logID);
+        var height = (window.innerHeight > 0) ? window.innerHeight : screen.height;
+        $('html, body').animate({
+            scrollTop: post.offset().top + post.height() - height + 5
+        }, 500);
     }
 </script>
