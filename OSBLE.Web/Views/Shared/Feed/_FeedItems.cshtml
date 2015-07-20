@@ -100,15 +100,28 @@ string partialName = string.Format("Feed/_{0}", item.Items.First().Event.EventNa
 
             </div>
 
+        @* Don't display footer for replies *@
         @if(item.FeedItemType.Replace(" ", "") != "LogCommentEvent")
         {
             <div class="feed-item-footer">               
-                    @* Note: Hidden by default. Only shows when user clicks reply *@
-                    <form class="feed-reply-form" id="feed-reply-@lastLogId">
-                        <textarea name="response" id="feed-item-respond-@lastLogId" placeholder="Say something..." class="form-control"></textarea>
-                        <input name="response-submit" class="btn btn-default btn-sm" type="button" value="Send" onclick="sendResponse(@lastLogId)" />
-                        <input name="response-cancel" class="btn btn-default btn-sm" type="button" value="Cancel" onclick="HideReplyBox(@lastLogId)" />
-                    </form>
+                @* Note: Hidden by default. Only shows when user clicks reply *@
+                @using (Ajax.BeginForm("PostComment", "Feed",
+                    new AjaxOptions
+                    {
+                        HttpMethod = "POST",
+                        UpdateTargetId = "activity_feed_content",
+                        OnSuccess = "PostReplyComplete(" + lastLogId + ")",
+                    },
+                    new {
+                        @class = "feed-reply-form",
+                        id = "feed-reply-" + lastLogId,
+                    }))
+                {
+                    <textarea name="response" id="feed-item-respond-@lastLogId" placeholder="Say something..." class="form-control"></textarea>
+                    <input name="response-submit" class="btn btn-default btn-sm" type="submit" value="Send" />
+                    <input name="response-cancel" class="btn btn-default btn-sm" type="reset" value="Cancel" onclick="HideReplyBox(@lastLogId)" />
+                    <input name="logID" type="hidden" value="@lastLogId" />
+                }
                 
                 
                 <ul class="feed-item-links">

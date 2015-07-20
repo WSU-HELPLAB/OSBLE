@@ -9,6 +9,7 @@ using OSBLE.Models.Courses;
 using OSBLE.Models.DiscussionAssignment;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;
+using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
 
 namespace OSBLE.Utility
 {
@@ -272,6 +273,44 @@ namespace OSBLE.Utility
             return events;
         }
 
+        #endregion
+
+
+        /*** Activity Feed *************************************************************************************************/
+        #region ActivityFeed
+        public static bool InsertActivityFeedComment(int logID, int senderID, string text, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                bool result = false;
+                using (SqlConnection sqlc = GetNewConnection()) { result = InsertActivityFeedComment(logID, senderID, text, sqlc); }
+                return result;
+            }
+
+            try
+            {
+                // Get the course id of the original post
+                int? courseID = connection.Query<int>("SELECT [CourseId] FROM EventLogs WHERE Id = @id",
+                    new { id = logID }).SingleOrDefault();
+
+                LogCommentEvent e = new LogCommentEvent(DateTime.UtcNow)
+                {
+                    Content = text,
+                    SourceEventLogId = logID,
+                    SolutionName = null,
+                    SenderId = senderID,
+                    CourseId = courseID
+                };
+
+                connection.Execute(e.GetInsertScripts());
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
         #endregion
     }
 }

@@ -2153,3 +2153,10 @@ div.pagedocname {
 .dp_post {
     min-height: 65px;
 }
+
+/* highlight the new reply to draw users attention */
+
+
+.just-posted-reply .dp_post_header {
+    background-color: #fafae0;
+}
