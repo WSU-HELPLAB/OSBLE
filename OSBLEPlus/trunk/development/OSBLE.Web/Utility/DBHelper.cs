@@ -273,6 +273,179 @@ namespace OSBLE.Utility
             return events;
         }
 
+        /// <summary>
+        /// Returns event log from DB
+        /// </summary>
+        /// <param name="userProfileId"></param>
+        /// <param name="courseId"></param>
+        /// <param name="eventId"></param>
+        /// <param name="connection"></param>
+        /// <returns></returns>
+        public static ActivityEvent GetActivityEvent(int eventId, SqlConnection connection = null)
+        {
+            ActivityEvent evt = null;
+
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    evt = GetActivityEvent(eventId, sqlc);
+                }
+ 
+                return evt;
+            }
+
+            evt = connection.Query<ActivityEvent>("SELECT * " +
+                                                  "FROM EventLogs e " +
+                                                  "WHERE e.Id = @EventId ",
+                new {EventId = eventId}
+                ).FirstOrDefault();
+
+            return evt;
+        }
+
+        public static FeedPostEvent GetFeedPostEvent(int eventId, SqlConnection connection = null)
+        {
+            FeedPostEvent evt = null;
+
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    evt = GetFeedPostEvent(eventId, sqlc);
+                }
+
+                return evt;
+            }
+
+            evt = connection.Query<FeedPostEvent>("SELECT * " +
+                                      "FROM FeedPostEvents e " +
+                                      "WHERE e.EventLogId = @EventId ",
+                    new { EventId = eventId }
+                    ).FirstOrDefault();
+
+            return evt;
+        }
+
+        public static List<LogCommentEvent> GetLogCommentEvents(int eventId, SqlConnection connection = null)
+        {
+            List<LogCommentEvent> comments = null;
+
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    comments = GetLogCommentEvents(eventId, sqlc);
+                }
+
+                return comments;
+            }
+
+            comments = connection.Query<LogCommentEvent>("SELECT * " +
+                                "FROM LogCommentEvents l " +
+                                "WHERE l.SourceEventLogId = @EventId",
+                                new { EventId = eventId }).ToList();
+
+            return comments;
+        }
+
+        public static LogCommentEvent GetSingularLogComment(int eventId, SqlConnection connection = null)
+        {
+            LogCommentEvent comment = null;
+
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    comment = GetSingularLogComment(eventId, sqlc);
+                }
+
+                return comment;
+            }
+
+            comment = connection.Query<LogCommentEvent>("SELECT * " +
+                                "FROM LogCommentEvents l " +
+                                "WHERE l.EventLogId = @EventId",
+                                new { EventId = eventId }).FirstOrDefault();
+
+            return comment;
+        }
+
+        /// <summary>
+        /// Deletes the feed post event, associated eventlog, and asociated LogComments/EventLogs for LogComments
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <param name="connection"></param>
+        public static void DeleteFeedPostEvent(int eventId, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    DeleteFeedPostEvent(eventId, sqlc);
+                }
+
+                return;
+            }
+
+            List<LogCommentEvent> comments = GetLogCommentEvents(eventId, connection);
+
+            //FeedPostEvent fpe = GetFeedPostEvent(eventId, connection);
+
+            
+            if (comments.Count > 0)
+            {
+                // delete associated LogComments
+                connection.Execute("DELETE " +
+                                   "FROM LogCommentEvents " +
+                                   "WHERE SourceEventLogId = @SourceEventLogId ", comments);
+
+                // delete eventlogs associated with LogComments
+                connection.Execute("DELETE " +
+                                   "FROM EventLogs " +
+                                   "WHERE Id = @EventLogId", comments);
+            }
+
+
+            // delete feed post
+            connection.Execute("DELETE " +
+                             "FROM FeedPostEvents " +
+                             "WHERE EventLogId = @FeedPostId",
+                new {FeedPostId = eventId});
+            
+            // delete eventlog for feedpost
+            connection.Execute("DELETE " +
+                               "FROM EventLogs " +
+                               "WHERE Id = @EventLogId", new {EventLogId = eventId});
+        }
+
+        public static void DeleteLogComment(int eventId, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    DeleteLogComment(eventId, sqlc);
+                }
+
+                return;
+            }
+
+            LogCommentEvent l = GetSingularLogComment(eventId, connection);
+
+            // delete logcomment
+            connection.Execute("DELETE " +
+                               "FROM LogCommentEvents " +
+                               "WHERE EventLogId = @EventLogId", l);
+
+            // delete eventlog
+            connection.Execute("DELETE " +
+                               "FROM EventLogs " +
+                               "WHERE Id = @EventLogId", l);
+
+
+        }
+
         #endregion
 
 

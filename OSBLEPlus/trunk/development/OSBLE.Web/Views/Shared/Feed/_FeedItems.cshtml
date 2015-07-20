@@ -70,6 +70,30 @@
                     @if (ViewBag.CurrentUser.ID == item.Creator.ID || ViewBag.ActiveCourseUser.AbstractRole.CanModify)
                     {
                         @* TODO: Add delete functionality *@
+                        string deleteAction = "";
+                        string deleteConfirm = "";
+                        if (item.FeedItemType.Replace(" ", String.Empty) == "FeedPostEvent")
+                        {
+                            deleteAction = "DeleteFeedPost";
+                            deleteConfirm = "Are you sure you want to delete this post and all its replies?";
+                        }
+                        else if (item.FeedItemType.Replace(" ", String.Empty) == "LogCommentEvent")
+                        {
+                            deleteAction = "DeleteLogComment";
+                            deleteConfirm = "Are you sure you want to delete this reply?";
+                        }
+
+                        <form action="@Url.Action(deleteAction)"
+                              style="display: inline;"
+                              data-ajax="true"
+                              data-ajax-success="$('#feed-item-@(item.Items[0].Event.EventLogId)').hide('blind',{},'slow',function(){$(this).remove();})"
+                              data-ajax-confirm="@deleteConfirm"
+                              method="post">
+                            <input type="hidden" name="id" value="@item.Items[0].Event.EventLogId" />
+                            @*@Helpers.DeleteSubmit("Delete This Dashboard Post")*@
+                            <a title="Delete This Dashboard Post" onclick="$(this).parents('form:first').submit(); increaseConversationsNumber(@ViewBag.ParentId);"><span class="glyphicon glyphicon-remove"></span></a>
+                        </form>
+
                     }
                 </div>
             </div>
@@ -94,6 +118,8 @@ string partialName = string.Format("Feed/_{0}", item.Items.First().Event.EventNa
                     }
                     if (commentItems.Count > 0)
                     {
+                        ViewBag.ParentId = item.Items[0].Event.EventLogId;
+                        
                         @Html.Partial("Feed/_FeedItems", AggregateFeedItem.FromFeedItems(commentItems))
                     }
                 }
@@ -129,7 +155,7 @@ string partialName = string.Format("Feed/_{0}", item.Items.First().Event.EventNa
                         <a id="expand-comments-@lastLogId"
                            class="anchor-pointer"
                            onclick="expandComments('@lastLogId')">
-                            <span id="expand-comments-text-@lastLogId">View</span> Conversation(<span data-bind="text: NumberOfComments">@item.Comments.Count</span>)
+                            <span id="expand-comments-text-@lastLogId">View</span> Conversation(<span data-bind="text: NumberOfComments" id="number-of-comments-for-@item.Items[0].Event.EventLogId">@item.Comments.Count</span>)
                         </a>
                     </li>
                     @{
@@ -150,3 +176,17 @@ string partialName = string.Format("Feed/_{0}", item.Items.First().Event.EventNa
         </div>
 </article>
 }
+
+<script>
+    function decreaseConversationsNumber(id) {
+        if (id === null) return;
+        var elem = document.getElementById("number-of-comments-for-" + id);
+        elem.innerHTML = parseInt(elem.innerHTML) - 1;
+    }
+
+    function increaseConversationsNumber(id) {
+        if (id === null) return;
+        var elem = document.getElementById("number-of-comments-for-" + id);
+        elem.innerHTML = parseInt(elem.innerHTML) + 1;
+    }
+</script>

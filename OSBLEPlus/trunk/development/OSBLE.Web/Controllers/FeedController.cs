@@ -304,6 +304,52 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index");
         }
 
+        /// <summary>
+        /// Removes a FeedPostEvent, AJAX-style!
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult DeleteFeedPost(int id)
+        {
+            UserProfile current = DBHelper.GetUserProfile(ActiveCourseUser.UserProfileID);// dp = db.DashboardPosts.Find(id);
+
+            if ((current.UserId == ActiveCourseUser.UserProfileID) || (ActiveCourseUser.AbstractRole.CanGrade))
+            {
+                DBHelper.DeleteFeedPostEvent(id);
+            }
+            else
+            {
+                Response.StatusCode = 403;
+            }
+
+            return View("_AjaxEmpty");
+        }
+
+        /// <summary>
+        /// Removes a Reply, AJAX-style!
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult DeleteLogComment(int id)
+        {
+            UserProfile current = DBHelper.GetUserProfile(ActiveCourseUser.UserProfileID);// dp = db.DashboardPosts.Find(id);
+
+            if ((current.UserId == ActiveCourseUser.UserProfileID) || (ActiveCourseUser.AbstractRole.CanGrade))
+            {
+                DBHelper.DeleteLogComment(id);
+            }
+            else
+            {
+                Response.StatusCode = 403;
+            }
+
+            return View("_AjaxEmpty");
+        }
+
+
+
         public JsonResult GetComments(int? singleLogId)
         {
             //turned off for now
@@ -346,7 +392,7 @@ namespace OSBLE.Controllers
                                                         "SELECT e").SingleOrDefault();
                     var query = new OSBLEPlus.Services.Controllers.FeedController().Get(
                         new DateTime(2010, 01, 01),
-                        DateTime.Now,
+                        DateTime.UtcNow,
                         null,
                         null,
                         null,
