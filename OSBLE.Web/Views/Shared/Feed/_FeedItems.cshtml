@@ -16,6 +16,9 @@
     //{
     //    subscriptions[log.LogId] = log.LogId;
     //}
+    
+    bool showFooter = ViewData["ShowFooter"] == null? true : (bool)ViewData["ShowFooter"];
+    bool showDetails = ViewData["ShowDetails"] == null? false : (bool)ViewData["ShowDetails"];
 }
 @foreach (AggregateFeedItem item in Model)
 {
@@ -101,7 +104,8 @@
 
             <div class="dp_content" >
                 @{
-string partialName = string.Format("Feed/_{0}", item.Items.First().Event.EventName.Replace(" ", String.Empty));
+                    string partialName = showDetails? "Details/_" : "Feed/_";
+                    partialName += item.Items.First().Event.EventName.Replace(" ", String.Empty);
                 }
                 @Html.Partial(partialName, item)    
             </div>
@@ -118,16 +122,16 @@ string partialName = string.Format("Feed/_{0}", item.Items.First().Event.EventNa
                     }
                     if (commentItems.Count > 0)
                     {
+                        ViewData["ShowFooter"] = false;
                         ViewBag.ParentId = item.Items[0].Event.EventLogId;
-                        
-                        @Html.Partial("Feed/_FeedItems", AggregateFeedItem.FromFeedItems(commentItems))
+                        @Html.Partial("Feed/_FeedItems", AggregateFeedItem.FromFeedItems(commentItems), ViewData)
+                        ViewData["ShowFooter"] = true;
                     }
                 }
 
             </div>
 
-        @* Don't display footer for replies *@
-        @if(item.FeedItemType.Replace(" ", "") != "LogCommentEvent")
+        @if(showFooter)
         {
             <div class="feed-item-footer">               
                 @* Note: Hidden by default. Only shows when user clicks reply *@
@@ -151,6 +155,12 @@ string partialName = string.Format("Feed/_{0}", item.Items.First().Event.EventNa
                 
                 
                 <ul class="feed-item-links">
+                    @* No need to have a "details" link if we're already there *@
+                    @if (!showDetails)
+                    {
+                        int[] ids = item.Items.Select(i => i.Event.EventLogId).ToArray();
+                        string idString = string.Join(",", ids);
+                        
                     <li>
                         <a id="expand-comments-@lastLogId"
                            class="anchor-pointer"
@@ -158,19 +168,16 @@ string partialName = string.Format("Feed/_{0}", item.Items.First().Event.EventNa
                             <span id="expand-comments-text-@lastLogId">View</span> Conversation(<span data-bind="text: NumberOfComments" id="number-of-comments-for-@item.Items[0].Event.EventLogId">@item.Comments.Count</span>)
                         </a>
                     </li>
-                    @{
-                        int[] ids = item.Items.Select(i => i.Event.EventLogId).ToArray();
-                        string idString = string.Join(",", ids);
+                        
+                        <li><a href="@Url.Action("Details", "Feed", new { id = idString })">Details</a></li>
                     }
-                    <li><a href="@Url.Action("Details", "Feed", new { id = idString })">Details</a></li>
 
+                    @* Prevent replying to replies *@
+                    @if (item.FeedItemType.Replace(" ", "") != "LogCommentEvent") { 
                     <li><a id="btn-reply-@lastLogId" onclick="ShowReplyBox(@lastLogId)" >Reply</a></li>
+                    }
 
                 </ul>
-
-                @*<textarea name="response" id="feed-item-respond-@lastLogId" placeholder="Say something..." style="width:250px;"></textarea>
-                <br />
-                <input name="response-submit" type="button" value="Send" onclick="sendResponse(@lastLogId)" />*@
             </div>
             }
         </div>

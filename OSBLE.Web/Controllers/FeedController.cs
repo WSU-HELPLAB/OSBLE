@@ -69,9 +69,7 @@ namespace OSBLE.Controllers
                 //return RedirectToAction("FeedDown", "Error");
             }
 
-            // error go back to home page
-            return RedirectToAction("Index", "Home");
-            
+            return PartialView("_Error");            
         }
 
         private FeedViewModel GetFeedViewModel(long timestamp = -1, int errorType = -1, string errorTypeStr = "", string keyword = "", int hash = 0)
@@ -568,12 +566,12 @@ namespace OSBLE.Controllers
                 //make sure that we've gotten a valid ID
                 if (string.IsNullOrEmpty(id))
                 {
-                    return RedirectToAction("Index");
+                    return RedirectToAction("Index", "Home");
                 }
 
                 //check to receive if we've gotten a single ID back
                 int idAsInt = -1;
-                if (Int32.TryParse(id, out idAsInt) == true)
+                if (Int32.TryParse(id, out idAsInt))
                 {
                     //if we've received a log comment event or a helpful mark event, we have to reroute to the original event
                     //EventLog log = Db.EventLogs.Where(e => e.Id == idAsInt).FirstOrDefault();
