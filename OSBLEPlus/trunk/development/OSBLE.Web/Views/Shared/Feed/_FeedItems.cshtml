@@ -96,7 +96,30 @@
                             @*@Helpers.DeleteSubmit("Delete This Dashboard Post")*@
                             <a title="Delete This Dashboard Post" onclick="$(this).parents('form:first').submit(); decreaseConversationsNumber(@ViewBag.ParentId);"><span class="glyphicon glyphicon-trash"></span></a>
                         </form>
+                    }
+                    @if (ViewBag.CurrentUser.ID == item.Creator.ID || ViewBag.ActiveCourseUser.AbstractRole.CanModify)
+                    {
+                        string editAction = "";
+                        string editConfirm = "";
 
+                        if (item.FeedItemType.Replace(" ", String.Empty) == "FeedPostEvent")
+                        {
+                            editAction = "EditFeedPost";
+                        }
+                        else if (item.FeedItemType.Replace(" ", String.Empty) == "LogCommentEvent")
+                        {
+                            editAction = "EditLogComment";
+                        }
+
+                        <form action="@Url.Action(editAction)"
+                              style="display: inline;"
+                              data-ajax="true"
+                              data-ajax-sucess="$('#feed-item-@(item.Items[0].Event.EventLogId)').hide('blind',{},'slow',function(){$(this).remove();})"
+                              data-ajax-confirm="@editConfirm"
+                              method="POST">
+                            <input type="hidden", name="id", value="@item.Items[0].Event.EventLogId" />
+                            <a title="Edit This Post" onclick="$(this).parents('form:first').submit();"><span class="glyphicon glyphicon-pencil"></span></a>
+                        </form>
                     }
                 </div>
             </div>

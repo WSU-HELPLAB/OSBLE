@@ -6,7 +6,12 @@
     LogCommentEvent comment = Model.Items.First().Event as LogCommentEvent;
 }
 
-            @*@if (Model.Creator.ID == comment.SourceEvent.SenderId)
+<div id="comment-content-@comment.EventLogId">
+    @comment.Content
+</div>
+
+
+@*@if (Model.Creator.ID == comment.SourceEvent.SenderId)
                 {
                     @*switch(Model.Creator.Gender)
                     {
@@ -37,4 +42,4 @@
                         }
                         @string.Format("{0}:", comment.SourceEvent.EventName)@*.LogType.ToDisplayText().ToLower())*@
 
-                    @comment.Content
+                    
