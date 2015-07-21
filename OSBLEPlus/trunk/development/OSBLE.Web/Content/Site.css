@@ -168,6 +168,10 @@ h3 span.glyphicon {
     display: none;
 }
 
+#Details .feed-item-comments {
+    display: block;
+}
+
 .feed-item-comments .panel-group{
     margin-bottom: 10px;
 }

@@ -10,6 +10,7 @@ using OSBLE.Models.DiscussionAssignment;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
+using OSBLEPlus.Logic.DomainObjects.Interface;
 
 namespace OSBLE.Utility
 {

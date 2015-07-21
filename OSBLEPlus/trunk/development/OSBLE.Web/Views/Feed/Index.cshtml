@@ -3,10 +3,6 @@
 @using OSBLEPlus.Logic.Utility.Lookups
 @model OSBLEPlus.Logic.DomainObjects.ActivityFeeds.FeedViewModel
 
-@{
-    ViewBag.Title = "Activity Feed";
-}
-
 <section data-tab="ActivityFeed">
 
         <!--
@@ -182,7 +178,7 @@
             // scroll helps if reply box was really big
             if (post.height() > height) {
                 $('html, body').animate({
-                    scrollTop: post.offset().top
+                    scrollTop: post.offset().top - 5
                 }, 200);
             }
             replies.hide('blind');
