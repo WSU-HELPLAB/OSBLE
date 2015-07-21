@@ -110,6 +110,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnnotateApiTest.cs" />
+    <Compile Include="DBHelperTests.cs" />
     <Compile Include="OsbleServiceTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -127,6 +128,14 @@
     <ProjectReference Include="..\OSBLE.Web\OSBLE.Web.csproj">
       <Project>{A88C37D7-0144-490F-8101-BD30B14A48ED}</Project>
       <Name>OSBLE.Web</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OSBLEPlus.Logic\OSBLEPlus.Logic.csproj">
+      <Project>{cd97e12a-c4c1-4319-8809-9a3a0eb9d302}</Project>
+      <Name>OSBLEPlus.Logic</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OSBLEPlus.Services\OSBLEPlus.Services.csproj">
+      <Project>{32428e0a-501c-4532-96f8-9a4755714797}</Project>
+      <Name>OSBLEPlus.Services</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

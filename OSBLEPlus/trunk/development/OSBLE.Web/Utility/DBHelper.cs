@@ -485,6 +485,43 @@ namespace OSBLE.Utility
                 return false;
             }
         }
+
+        public static List<FeedItem> GetActivityFeedItems(IEnumerable<int> IDs, SqlConnection connection = null)
+        {
+            List<FeedItem> items = new List<FeedItem>();
+
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection()) { items = GetActivityFeedItems(IDs, sqlc); }
+                return items;
+            }
+
+            var logs = connection.Query("SELECT * FROM EventLogs WHERE Id in @ids",
+                new { ids = IDs });
+
+            foreach (var row in logs)
+            {
+                ActivityEvent e = null;
+                /*switch(row.EventTypeId)
+                {
+                    case: 
+                }
+                ActivityEvent e = new ActivityEvent(row.EventTypeId, row.EventDate)
+                {
+                    EventLogId = row.Id,
+                    SenderId = row.SenderId,
+                    CourseId = row.CourseId,
+                    BatchId = row.BatchId,
+                    SolutionName = row.SolutionName,
+                };*/
+                e.Sender = connection.Query<UserProfile>("SELECT * FROM UserProfiles WHERE ID = @id", new { id = row.SenderId }).SingleOrDefault();
+                
+                IEnumerable<LogCommentEvent> comments = connection.Query<LogCommentEvent>("SELECT * FROM LogCommentEvents WHERE SourceEventLogId = @id", new { id = row.Id });
+                items.Add(new FeedItem { Event = e, Comments = comments.ToList() });
+            }
+
+            return items;
+        }
         #endregion
     }
 }

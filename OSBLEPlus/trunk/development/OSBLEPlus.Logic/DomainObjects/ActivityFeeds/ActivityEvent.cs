@@ -49,5 +49,6 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
         {
             EventDate = DateTime.UtcNow;
         }
+
     }
 }
