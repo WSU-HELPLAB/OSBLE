@@ -2,5 +2,24 @@
 @model AggregateFeedItem
 @{
     FeedPostEvent comment = Model.Items.First().Event as FeedPostEvent;
-} 
-@comment.Comment
+}
+
+<div id="feedpost-content-@comment.EventLogId">
+    @comment.Comment
+    <textarea style="display: none;" form="feedpost-edit-form-@comment.EventLogId">
+        
+    </textarea>
+</div>
+
+<script>
+    function UpdateText(id) {
+        // get the div we're working with
+        var newInputBox = $("#feedpost-content-" + id);
+
+        // save text
+        var oldText = newInputBox.innerHTML;
+
+        // clear text
+        newInputBox.innerHTML = '';
+    }
+</script>

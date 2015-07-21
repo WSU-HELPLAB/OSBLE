@@ -346,6 +346,18 @@ namespace OSBLE.Controllers
             return View("_AjaxEmpty");
         }
 
+        public ActionResult EditFeedPost(int id)
+        {
+
+            return View("_AjaxEmpty");
+        }
+
+        public ActionResult EditLogComment(int id)
+        {
+
+            return View("_AjaxEmpty");
+        }
+
 
 
         public JsonResult GetComments(int? singleLogId)

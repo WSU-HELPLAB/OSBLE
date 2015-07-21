@@ -203,7 +203,7 @@ namespace OSBLE.Models.Queries
         }
 
         /// <summary>
-        /// execute the query
+        /// execute the query, returns 20 items by default
         /// </summary>
         /// <returns></returns>
         public virtual IEnumerable<FeedItem> Execute()
@@ -221,6 +221,31 @@ namespace OSBLE.Models.Queries
                                 , SubscriptionSubjects.Select(s => s.ID).ToList()
                                 , 20
                                 );
+
+            MinLogId = MaxLogId = null;
+
+            return query.GetAwaiter().GetResult();
+        }
+        /// <summary>
+        /// Another query execution, able to designate the number of items you want
+        /// </summary>
+        /// <param name="numberOfItemsToReturn"></param>
+        /// <returns></returns>
+        public IEnumerable<FeedItem> Execute(int? numberOfItemsToReturn)
+        {
+            var query = new OSBLEPlus.Services.Controllers.FeedController().Get(
+                    StartDate // 1
+                    , EndDate // 2
+                    , MinLogId
+                    , MaxLogId
+                    , EventIds//.Select(eid => (int)eid).ToList() // 3
+                    , GetNecessaryEvents()//_eventSelectors.Select(e => (int)e) // 4
+                    , CourseFilter != null && CourseFilter.ID > 0 ? CourseFilter.ID : 0
+                    , CourseRoleFilter.ID
+                    , CommentFilter
+                    , SubscriptionSubjects.Select(s => s.ID).ToList()
+                    , numberOfItemsToReturn
+                    );
 
             MinLogId = MaxLogId = null;
 
