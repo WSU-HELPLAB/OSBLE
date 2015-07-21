@@ -91,7 +91,7 @@
                               method="post">
                             <input type="hidden" name="id" value="@item.Items[0].Event.EventLogId" />
                             @*@Helpers.DeleteSubmit("Delete This Dashboard Post")*@
-                            <a title="Delete This Dashboard Post" onclick="$(this).parents('form:first').submit(); increaseConversationsNumber(@ViewBag.ParentId);"><span class="glyphicon glyphicon-trash"></span></a>
+                            <a title="Delete This Dashboard Post" onclick="$(this).parents('form:first').submit(); decreaseConversationsNumber(@ViewBag.ParentId);"><span class="glyphicon glyphicon-trash"></span></a>
                         </form>
 
                     }
