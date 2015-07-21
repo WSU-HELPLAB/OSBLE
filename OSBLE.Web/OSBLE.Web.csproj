@@ -988,12 +988,12 @@
     <Content Include="Views\Home\_DashboardPost.cshtml" />
     <Content Include="Views\Profile\Index.cshtml" />
     <Content Include="Views\Home\_FilesAndLinks.cshtml" />
+    <Content Include="Views\Feed\Details\_LogCommentEvent.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Areas\AssignmentWizard\Views\Deliverables\Deliverables\" />
     <Folder Include="Areas\AssignmentWizard\Views\Rubric\Rubric\" />
-    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

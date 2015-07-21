@@ -610,7 +610,12 @@ namespace OSBLE.Controllers
                 {
                     query.AddEventId(logId);
                 }
-                List<FeedItem> feedItems = query.Execute().ToList();
+                // query.MaxQuerySize = ids.Count;
+                // This is a work arround, and should be fixed soon - 7/21/15
+                // this is because the GetActivityFeeds.sql stored proc does
+                // not work correctly with IDs as of right now.
+                List<FeedItem> feedItems = query.Execute().Where(i => ids.Contains(i.Event.EventLogId)).ToList();
+
                 List<AggregateFeedItem> aggregateItems = AggregateFeedItem.FromFeedItems(feedItems);
 
                 //build the "you and 5 others got this error"-type messages
