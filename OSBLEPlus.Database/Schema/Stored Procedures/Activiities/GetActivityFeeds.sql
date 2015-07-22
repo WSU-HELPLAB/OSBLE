@@ -23,6 +23,9 @@ AS
       -- Subject Eventlogs
       -------------------------------------------------------------------------------------
       -------------------------------------------------------------------------------------
+	  IF Object_id('tempdb..#events') IS NOT NULL
+	  DROP TABLE #events
+
       IF Object_id('tempdb..#eventTypesFilter') IS NOT NULL
         DROP TABLE #eventTypesFilter
 
@@ -84,7 +87,7 @@ AS
            EventTypeId    INT NOT NULL,
            EventDate      DATETIME NOT NULL,
            SenderId       INT NOT NULL,
-		   CourseId		  INT NOT NULL,
+		   CourseId		  INT,
            IsPrimaryEvent BIT NOT NULL
         )
 
@@ -92,111 +95,122 @@ AS
 
       IF Len(@CommentFilter) > 0
         BEGIN
-            INSERT INTO #events
-            SELECT TOP(@TopN) EventLogId = s.Id,
-                              s.EventTypeId,
-                              s.EventDate,
-                              s.SenderId,
-							  s.CourseId,
-                              1
-            FROM   [dbo].[EventLogs] s WITH (NOLOCK)
-                   INNER JOIN #eventTypesFilter ef
-                           ON ef.EventTypeId = s.EventTypeId
-                   INNER JOIN [dbo].[UserProfiles] u WITH (NOLOCK)
-                           ON u.ID = s.SenderId
-                   LEFT JOIN [dbo].[CourseUsers] cr1 WITH (NOLOCK)
-                          ON cr1.UserProfileID = s.SenderId
-                             AND cr1.AbstractCourseID = @CourseId
-                             AND cr1.AbstractRoleID = @RoleId
-                   LEFT JOIN [dbo].[CourseUsers] cr2 WITH (NOLOCK)
-                          ON cr2.UserProfileID = s.SenderId
-                             AND @CourseId = @anyCourse
-                             AND cr2.AbstractRoleID = @RoleId
-                   LEFT JOIN [dbo].[CourseUsers] cr3 WITH (NOLOCK)
-                          ON cr3.UserProfileID = s.SenderId
-                             AND cr3.AbstractCourseID = @CourseId
-                             AND @RoleId = 99
-                   LEFT JOIN [dbo].[CourseUsers] cr WITH (NOLOCK)
-                          ON cr.UserProfileID = s.SenderId
-                             AND @CourseId = @anyCourse
-                             AND @RoleId = 99
-                   LEFT JOIN (SELECT buildErrors=Count(BuildErrorTypeId),
-                                     LogId
-                              FROM   [dbo].[BuildErrors] WITH (NOLOCK)
-                              GROUP  BY LogId) be
-                          ON s.Id = be.LogId
-                             AND ef.EventTypeId = 2
-                             AND be.buildErrors > 0
-                   LEFT JOIN #senderIdFilter sf1
-                          ON sf1.Id = s.SenderId
-                   LEFT JOIN #senderIdFilter sf2
-                          ON Len(@SenderIds) = 0
-                   LEFT JOIN #eventLogIdFilter eif1
-                          ON eif1.Id = s.Id
-                   LEFT JOIN #eventLogIdFilter eif2
-                          ON Len(@EventLogIds) = 0
-                   LEFT JOIN [dbo].[FeedPostEvents] fp
-                          ON fp.EventLogId = s.Id
-                             AND fp.Comment LIKE @CommentFilter
-                             AND ef.EventTypeId = 7
-                             AND fp.Id > 0
-            WHERE  s.[DateReceived] BETWEEN @DateReceivedMin AND @DateReceivedMax
-			AND
-				   s.[Id] BETWEEN @MinEventLogId AND @MaxEventLogId
-			AND	   (s.[IsDeleted] IS NULL OR s.[IsDeleted] = 0)
-            ORDER  BY s.[DateReceived] DESC
-        END
-      ELSE
-        BEGIN
-            INSERT INTO #events
-            SELECT TOP(@TopN) EventLogId = s.Id,
-                              s.EventTypeId,
-                              s.EventDate,
-                              s.SenderId,
-							  s.CourseId,
-                              1
-            FROM   [dbo].[EventLogs] s WITH (NOLOCK)
-                   INNER JOIN #eventTypesFilter ef
-                           ON ef.EventTypeId = s.EventTypeId
-                   INNER JOIN [dbo].[UserProfiles] u WITH (NOLOCK)
-                           ON u.ID = s.SenderId
-                   LEFT JOIN [dbo].[CourseUsers] cr1 WITH (NOLOCK)
-                          ON cr1.UserProfileID = s.SenderId
-                             AND cr1.AbstractCourseID = @CourseId
-                             AND cr1.AbstractRoleID = @RoleId
-                   LEFT JOIN [dbo].[CourseUsers] cr2 WITH (NOLOCK)
-                          ON cr2.UserProfileID = s.SenderId
-                             AND @CourseId = 0
-                             AND cr2.AbstractRoleID = @RoleId
-                   LEFT JOIN [dbo].[CourseUsers] cr3 WITH (NOLOCK)
-                          ON cr3.UserProfileID = s.SenderId
-                             AND cr3.AbstractCourseID = @CourseId
-                             AND @RoleId = 99
-                   LEFT JOIN [dbo].[CourseUsers] cr WITH (NOLOCK)
-                          ON cr.UserProfileID = s.SenderId
-                             AND @CourseId = 0
-                             AND @RoleId = 99
-                   LEFT JOIN (SELECT buildErrors=Count(BuildErrorTypeId),
-                                     LogId
-                              FROM   [dbo].[BuildErrors] WITH (NOLOCK)
-                              GROUP  BY LogId) be
-                          ON s.Id = be.LogId
-                             AND ef.EventTypeId = 2
-                             AND be.buildErrors > 0
-                   LEFT JOIN #senderIdFilter sf1
-                          ON sf1.Id = s.SenderId
-                   LEFT JOIN #senderIdFilter sf2
-                          ON Len(@SenderIds) = 0
-                   LEFT JOIN #eventLogIdFilter eif1
-                          ON eif1.Id = s.Id
-                   LEFT JOIN #eventLogIdFilter eif2
-                          ON Len(@EventLogIds) = 0
-            WHERE  s.[DateReceived] BETWEEN @DateReceivedMin AND @DateReceivedMax
-				   AND s.CourseId IS NOT NULL
-				   AND s.[Id] BETWEEN @MinEventLogId AND @MaxEventLogId
-				   AND (s.[IsDeleted] IS NULL OR s.[IsDeleted] = 0)
-            ORDER  BY s.[DateReceived] DESC
-        END
+			IF Len(@SenderIds) > 0 AND Len(@EventLogIds) > 0
+				BEGIN
+
+				INSERT INTO #events
+				EXEC [dbo].[GetActivityFeedsWithCommentSenderLogFilters] @DateReceivedMin,
+                                                                     @DateReceivedMax,
+                                                                     @MinEventLogId,
+                                                                     @MaxEventLogId,
+                                                                     @CourseId,
+                                                                     @RoleId,
+                                                                     @CommentFilter,
+                                                                     @TopN,
+                                                                     @anyCourse
+				END
+			ELSE
+			IF Len(@SenderIds) > 0
+				BEGIN
+
+				INSERT INTO #events
+				EXEC [dbo].[GetActivityFeedsWithCommentSenderFilters] @DateReceivedMin,
+                                                                     @DateReceivedMax,
+                                                                     @MinEventLogId,
+                                                                     @MaxEventLogId,
+                                                                     @CourseId,
+                                                                     @RoleId,
+                                                                     @CommentFilter,
+                                                                     @TopN,
+                                                                     @anyCourse
+				END
+			ELSE
+			IF Len(@EventLogIds) > 0
+				BEGIN
+
+				INSERT INTO #events
+				EXEC [dbo].[GetActivityFeedsWithCommentLogFilters] @DateReceivedMin,
+                                                                     @DateReceivedMax,
+                                                                     @MinEventLogId,
+                                                                     @MaxEventLogId,
+                                                                     @CourseId,
+                                                                     @RoleId,
+                                                                     @CommentFilter,
+                                                                     @TopN,
+                                                                     @anyCourse
+				END
+			ELSE
+				BEGIN
+
+				INSERT INTO #events
+				EXEC [dbo].[GetActivityFeedsWithCommentFilters] @DateReceivedMin,
+                                                                @DateReceivedMax,
+                                                                @MinEventLogId,
+                                                                @MaxEventLogId,
+                                                                @CourseId,
+                                                                @RoleId,
+                                                                @CommentFilter,
+                                                                @TopN,
+                                                                @anyCourse
+				END
+		END
+	  ELSE
+		BEGIN
+			IF Len(@SenderIds) > 0 AND Len(@EventLogIds) > 0
+				BEGIN
+
+				INSERT INTO #events
+				EXEC [dbo].[GetActivityFeedsWithSenderLogFilters] @DateReceivedMin,
+                                                                     @DateReceivedMax,
+                                                                     @MinEventLogId,
+                                                                     @MaxEventLogId,
+                                                                     @CourseId,
+                                                                     @RoleId,
+                                                                     @TopN,
+                                                                     @anyCourse
+				END
+			ELSE
+			IF Len(@SenderIds) > 0
+				BEGIN
+
+				INSERT INTO #events
+				EXEC [dbo].[GetActivityFeedsWithSenderFilters] @DateReceivedMin,
+                                                                @DateReceivedMax,
+                                                                @MinEventLogId,
+                                                                @MaxEventLogId,
+                                                                @CourseId,
+                                                                @RoleId,
+                                                                @TopN,
+                                                                @anyCourse
+				END
+			ELSE
+			IF Len(@EventLogIds) > 0
+				BEGIN
+
+				INSERT INTO #events
+				EXEC [dbo].[GetActivityFeedsWithLogFilters] @DateReceivedMin,
+                                                            @DateReceivedMax,
+                                                            @MinEventLogId,
+                                                            @MaxEventLogId,
+                                                            @CourseId,
+                                                            @RoleId,
+                                                            @TopN,
+                                                            @anyCourse
+				END
+			ELSE
+				BEGIN
+
+				INSERT INTO #events
+				EXEC [dbo].[GetActivityFeedsBasic] @DateReceivedMin,
+                                                    @DateReceivedMax,
+                                                    @MinEventLogId,
+                                                    @MaxEventLogId,
+                                                    @CourseId,
+                                                    @RoleId,
+                                                    @TopN,
+                                                    @anyCourse
+				END
+		END
 
       -- event logs' comments
       INSERT INTO #events
