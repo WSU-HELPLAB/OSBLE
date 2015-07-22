@@ -219,6 +219,14 @@
     <Build Include="Schema\Stored Procedures\Activiities\GetMostRecentWhatsNewItem.sql" />
     <Build Include="Schema\Stored Procedures\Analytics\GetStudentList.sql" />
     <Build Include="Schema\Stored Procedures\Profiles\GetLastSubmitDateForAssignment.sql" />
+    <Build Include="Schema\Stored Procedures\Activiities\GetActivityFeedsWithCommentSenderLogFilters.sql" />
+    <Build Include="Schema\Stored Procedures\Activiities\GetActivityFeedsWithCommentSenderFilters.sql" />
+    <Build Include="Schema\Stored Procedures\Activiities\GetActivityFeedsWithCommentLogFilters.sql" />
+    <Build Include="Schema\Stored Procedures\Activiities\GetActivityFeedsWithLogFilters.sql" />
+    <Build Include="Schema\Stored Procedures\Activiities\GetActivityFeedsWithSenderFilters.sql" />
+    <Build Include="Schema\Stored Procedures\Activiities\GetActivityFeedsWithSenderLogFilters.sql" />
+    <Build Include="Schema\Stored Procedures\Activiities\GetActivityFeedsWithCommentFilters.sql" />
+    <Build Include="Schema\Stored Procedures\Activiities\GetActivityFeedsBasic.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Post-Deployment\Script.PostDeployment.sql" />
