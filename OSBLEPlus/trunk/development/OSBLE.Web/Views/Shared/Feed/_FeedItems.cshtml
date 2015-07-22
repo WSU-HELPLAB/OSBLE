@@ -74,7 +74,6 @@
                     }
                     @if (ViewBag.CurrentUser.ID == item.Creator.ID || ViewBag.ActiveCourseUser.AbstractRole.CanModify)
                     {
-                        @* TODO: Add delete functionality *@
                         string deleteAction = "";
                         string deleteConfirm = "";
                         if (item.FeedItemType.Replace(" ", String.Empty) == "FeedPostEvent")
@@ -114,13 +113,14 @@
                         }
 
                         <form action="@Url.Action(editAction)"
+                              id="edit-form-@item.Items[0].Event.EventLogId"
                               style="display: inline;"
                               data-ajax="true"
                               data-ajax-sucess="$('#feed-item-@(item.Items[0].Event.EventLogId)').hide('blind',{},'slow',function(){$(this).remove();})"
                               data-ajax-confirm="@editConfirm"
                               method="POST">
-                            <input type="hidden", name="id", value="@item.Items[0].Event.EventLogId" />
-                            <a title="Edit This Post" onclick="$(this).parents('form:first').submit();"><span class="glyphicon glyphicon-pencil"></span></a>
+                            <input type="hidden" , name="id" , value="@item.Items[0].Event.EventLogId"/>
+                            <a title="Edit This Post" onclick="updateText(@item.Items[0].Event.EventLogId);"><span class="glyphicon glyphicon-pencil"></span></a>
                         </form>
                     }
                 </div>

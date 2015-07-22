@@ -794,6 +794,7 @@
     <Content Include="Scripts\osble.js" />
     <Content Include="Scripts\osble.teacher_activity.js" />
     <Content Include="Scripts\Silverlight.js" />
+    <Content Include="Scripts\edit_form.js" />
     <Content Include="Scripts\time.js" />
     <Content Include="Scripts\_references.js" />
     <Content Include="Services\AssignmentSubmissionService.svc" />

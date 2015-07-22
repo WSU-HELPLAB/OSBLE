@@ -396,28 +396,16 @@ namespace OSBLE.Utility
             
             if (comments.Count > 0)
             {
-                // delete associated LogComments
-                connection.Execute("DELETE " +
-                                   "FROM LogCommentEvents " +
-                                   "WHERE SourceEventLogId = @SourceEventLogId ", comments);
-
-                // delete eventlogs associated with LogComments
-                connection.Execute("DELETE " +
-                                   "FROM EventLogs " +
+                // soft delete eventlogs associated with LogComments
+                connection.Execute("UPDATE EventLogs " +
+                                   "SET IsDeleted = 1" +
                                    "WHERE Id = @EventLogId", comments);
             }
-
-
-            // delete feed post
-            connection.Execute("DELETE " +
-                             "FROM FeedPostEvents " +
-                             "WHERE EventLogId = @FeedPostId",
-                new {FeedPostId = eventId});
             
-            // delete eventlog for feedpost
-            connection.Execute("DELETE " +
-                               "FROM EventLogs " +
-                               "WHERE Id = @EventLogId", new {EventLogId = eventId});
+            // soft delete eventlog for feedpost
+            connection.Execute("UPDATE EventLogs " +
+                   "SET IsDeleted = 1" +
+                   "WHERE Id = @EventLogId", new { EventLogId = eventId });
         }
 
         public static void DeleteLogComment(int eventId, SqlConnection connection = null)
@@ -434,17 +422,62 @@ namespace OSBLE.Utility
 
             LogCommentEvent l = GetSingularLogComment(eventId, connection);
 
-            // delete logcomment
-            connection.Execute("DELETE " +
-                               "FROM LogCommentEvents " +
-                               "WHERE EventLogId = @EventLogId", l);
+            // soft delete eventlog
+            if (l != null)
+            {
+                connection.Execute("UPDATE EventLogs " +
+                                   "SET IsDeleted = 1" +
+                                   "WHERE Id = @EventLogId", l);
+            }
 
-            // delete eventlog
-            connection.Execute("DELETE " +
-                               "FROM EventLogs " +
-                               "WHERE Id = @EventLogId", l);
+        }
+
+        public static void EditFeedPost(int eventId, string newText, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    EditFeedPost(eventId, newText, sqlc);
+                }
+
+                return;
+            }
+
+            FeedPostEvent fpe = GetFeedPostEvent(eventId);
+
+            // make sure the event exists and the text was changed
+            if (fpe != null && fpe.Comment != newText) 
+            {
+                connection.Execute("UPDATE FeedPostEvents " +
+                                   "SET Comment = @Comment " +
+                                   "WHERE EventLogId = @EventLogId ", new { Comment = newText, EventLogId = eventId });
+            }
 
 
+        }
+
+        public static void EditLogComment(int eventId, string newText, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    EditLogComment(eventId, newText, sqlc);
+                }
+
+                return;
+            }
+
+            LogCommentEvent lce = GetSingularLogComment(eventId);
+
+            // make sure the event exists and the text was changed
+            if (lce != null && lce.Content != newText)
+            {
+                connection.Execute("UPDATE LogCommentEvents " +
+                                   "SET Content = @Content " +
+                                   "WHERE EventLogId = @EventLogId ", new {Content = newText, EventLogId = eventId});
+            }
         }
 
         #endregion
