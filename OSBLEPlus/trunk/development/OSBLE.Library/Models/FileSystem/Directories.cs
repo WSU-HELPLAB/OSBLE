@@ -69,9 +69,25 @@ namespace OSBLE.Models.FileSystem
         public static AssignmentFilePath GetAssignment(int courseID, int assignmentID, string r = null)
         {
             string path = r ?? HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
-            
+
             path = System.IO.Path.Combine(path, "Courses", courseID.ToString(),
                 "Assignments", assignmentID.ToString());
+
+            // Make sure the directory exists
+            if (!System.IO.Directory.Exists(path))
+            {
+                System.IO.Directory.CreateDirectory(path);
+            }
+
+            return new AssignmentFilePath(path, assignmentID);
+        }
+
+        public static AssignmentFilePath GetAssignmentWithId(int courseID, int assignmentID, int teamid, string r = null)
+        {
+            string path = r ?? HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
+
+            path = System.IO.Path.Combine(path, "Courses", courseID.ToString(),
+                "Assignments", assignmentID.ToString(), "Submissions", teamid.ToString());
 
             // Make sure the directory exists
             if (!System.IO.Directory.Exists(path))

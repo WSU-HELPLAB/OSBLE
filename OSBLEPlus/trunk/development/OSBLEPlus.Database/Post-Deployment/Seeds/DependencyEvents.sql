@@ -216,9 +216,8 @@ BEGIN
 			   ([EventLogId]
 			   ,[EventDate]
 			   ,[SolutionName]
-			   ,[AssignmentId]
-			   ,[SolutionData])
-	SELECT l.Id, l.EventDate, '', @fakeAssignment, 0x111100001111
+			   ,[AssignmentId])
+	SELECT l.Id, l.EventDate, '', @fakeAssignment
 	FROM [dbo].[EventLogs] l
 	WHERE l.EventTypeId=11
 END

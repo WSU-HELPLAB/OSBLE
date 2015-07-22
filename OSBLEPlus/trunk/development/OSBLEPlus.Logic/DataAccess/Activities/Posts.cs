@@ -6,7 +6,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-
+using System.Web;
 using Dapper;
 using Ionic.Zip;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
@@ -74,11 +74,8 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                 //execute sql batch insert statements
                 using (var connection = new SqlConnection(StringConstants.ConnectionString))
                 {
-                    connection.Execute(sql.ToString());
+                    return connection.Query<int>(sql.ToString()).Single();
                 }
-
-
-                return submit.EventLogId;
             }
             catch (Exception)
             {
@@ -95,18 +92,16 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                 zipStream.Position = 0;
                 try
                 {
-                    using (var zip = ZipFile.Read(zipStream))
+                    if (path == null)
                     {
-                        OSBLE.Models.FileSystem.Directories.GetAssignment(submit.CourseId ?? 1
-                            , submit.AssignmentId, path).AddZip(submit.Sender.FullName, zip, teamid);
+                        var a = HttpContext.Current.Server.MapPath("~").TrimEnd('\\');
+                        path = string.Format("{0}\\OSBLE.Web\\App_Data\\FileSystem\\", Directory.GetParent(a).FullName);
                     }
+                    OSBLE.Models.FileSystem.Directories.GetAssignmentWithId(submit.CourseId ?? 1
+                        , submit.AssignmentId, submit.SenderId, path).AddFile(string.Format("{0}.zip", submit.Sender.FullName), zipStream);
                 }
                 catch (ZipException)
                 {
-                }
-                catch (Exception)
-                {
-                    // ignored
                 }
             }
         }

@@ -6,6 +6,11 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
     public class SubmisionAssignment : IAssignment
     {
+        public SubmisionAssignment()
+        {
+            //This constructor is for DapperORM
+        }
+
         public int Id { get; set; }
         public AssignmentTypes AssignmentType { get; set; }
         public int CourseId { get; set; }

@@ -15,11 +15,11 @@ AS
       FROM   [dbo].[Assignments] a
       WHERE  a.CourseID = @courseId
              AND a.IsDraft = 0
-             AND a.ReleaseDate <= @currentDate
+            -- AND a.ReleaseDate <= @currentDate
              AND @currentDate <= a.DueDate
 
       -- course details
-      SELECT CourseId=a.ID,
+      SELECT Id=a.ID,
              NAME=a.Prefix + ' ' + a.Number + ', ' + a.Semester + ' '
                   + Cast(a.[Year] AS VARCHAR(4)),
              Number = Cast(a.Number AS VARCHAR(32)),

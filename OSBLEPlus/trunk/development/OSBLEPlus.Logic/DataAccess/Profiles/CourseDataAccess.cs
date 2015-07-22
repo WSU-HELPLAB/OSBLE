@@ -44,14 +44,14 @@ namespace OSBLEPlus.Logic.DataAccess.Profiles
             }
         }
 
-        public static DateTime? GetLastSubmitDateForAssignment(int assignmentId)
+        public static DateTime? GetLastSubmitDateForAssignment(int assignmentId, int userId)
         {
             using (
                 var connection = new SqlConnection(StringConstants.ConnectionString))
             {
                 return
                     connection.Query<DateTime?>("dbo.GetLastSubmitDateForAssignment",
-                        new { AssignmentId = assignmentId },
+                        new { AssignmentId = assignmentId, UserId = userId},
                         commandType: CommandType.StoredProcedure).FirstOrDefault();
             }
         }

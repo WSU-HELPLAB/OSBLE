@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using Ionic.Zip;
-using OSBLE.Models;
-using OSBLE.Models.Assignments;
+using OSBLEPlus.Logic.Utility;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
@@ -85,17 +82,14 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 
         public override string GetInsertScripts()
         {
-            var temp = SolutionData ?? GetSolutionBinary();
-
             var modifiedCourse = CourseId.ToString();
             modifiedCourse = modifiedCourse == string.Empty ? "NULL" : modifiedCourse;
 
-            var solutionData = temp==null?"Null":string.Format("0x{0}", BitConverter.ToString(temp));
-            solutionData = solutionData.Replace("-", string.Empty);
             return string.Format(@"
-INSERT INTO dbo.EventLogs (EventTypeID, EventDate, SenderId, BatchId, CourseId) VALUES ({0}, '{1}', {2}, '{6}', {7})
-INSERT INTO dbo.SubmitEvents (EventLogId, EventDate, SolutionName, AssignmentId, SolutionData)
-VALUES (SCOPE_IDENTITY(), '{1}', '{3}', {4}, {5})", EventTypeId, EventDate, SenderId, SolutionName, AssignmentId, solutionData, BatchId, modifiedCourse);
+INSERT INTO dbo.EventLogs (EventTypeID, EventDate, SenderId, BatchId, CourseId) VALUES ({0}, '{1}', {2}, '{5}', {6})
+SELECT {7}=SCOPE_IDENTITY()
+INSERT INTO dbo.SubmitEvents (EventLogId, EventDate, SolutionName, AssignmentId)
+VALUES (SCOPE_IDENTITY(), '{1}', '{3}', {4}) SELECT {7}", EventTypeId, EventDate, SenderId, SolutionName, AssignmentId, BatchId, modifiedCourse, StringConstants.SqlHelperLogIdVar);
         }
     }
 }

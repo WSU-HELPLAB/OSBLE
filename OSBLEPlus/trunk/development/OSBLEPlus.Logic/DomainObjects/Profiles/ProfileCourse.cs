@@ -5,7 +5,7 @@ namespace OSBLEPlus.Logic.DomainObjects.Profiles
 {
     public class ProfileCourse : ICourse
     {
-        public int CourseId { get; set; }
+        public int Id { get; set; }
         public int Number { get; set; }
         public string NamePrefix { get; set; }
         public string Description { get; set; }

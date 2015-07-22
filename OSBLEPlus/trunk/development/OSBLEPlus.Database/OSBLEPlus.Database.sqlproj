@@ -218,6 +218,7 @@
     <Build Include="Schema\Tables\WhatsNewItems.sql" />
     <Build Include="Schema\Stored Procedures\Activiities\GetMostRecentWhatsNewItem.sql" />
     <Build Include="Schema\Stored Procedures\Analytics\GetStudentList.sql" />
+    <Build Include="Schema\Stored Procedures\Profiles\GetLastSubmitDateForAssignment.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Post-Deployment\Script.PostDeployment.sql" />
