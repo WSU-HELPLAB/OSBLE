@@ -1,6 +1,12 @@
 ﻿@using OSBLE.Models.Users
 @using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 @model FeedDetailsViewModel
+
+@if (Model == null)
+{
+    <text><h2>Post not found.</h2></text>
+    return;
+}
 @{
     string detailsIds = Model.Ids;
     int firstLogId = Model.FeedItem.Items.Select(m => m.Event.EventLogId).Min();
@@ -15,11 +21,6 @@
     ViewData["ShowDetails"] = true;
 }
 
-@if (Model == null)
-{
-    <text><h2>Post not found.</h2></text>
-    return;
-}
 @*<section>
     <div class="feed-item-single-left">
         <img @*src="@Url.Action("Picture", "Profile", new { id = Model.FeedItem.Creator.ID, size = 64 })"* title="profile image" alt="profile image" />
@@ -92,7 +93,8 @@
         <img class="submit-loading" src="~/Content/icons/loading.gif" title="loading" alt="loading" />
     }
 </section>*@
-    
+
+<script type="text/javascript" src="@Url.Content("~/Scripts/ActivityFeed.js")"></script>
 <section id="Details">
     @Html.Partial("Feed/_FeedItems", new List<AggregateFeedItem> { Model.FeedItem }, ViewData);
 </section>

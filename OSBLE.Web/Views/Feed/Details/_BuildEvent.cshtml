@@ -1,16 +1,16 @@
 ﻿@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 @model AggregateFeedItem
 @{
-    //int marginOfError = 3;    
+    int marginOfError = 3;    
 }
-@*@foreach (FeedItem item in Model.Items)
+@foreach (FeedItem item in Model.Items)
 {
     BuildEvent build = item.Event as BuildEvent;
     if (build == null)
     {
         continue;
     }
-    //List<BuildEventErrorListItem> errorItems = build.CriticalErrorItems;
+    List<BuildEventErrorListItem> errorItems = build.CriticalErrorItems;
     
     <section>
         <h1>Build Errors</h1>
@@ -48,4 +48,4 @@
                 }
             </ul>
     </section>
-}*@
+}

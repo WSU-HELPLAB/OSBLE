@@ -25,6 +25,8 @@
     int lastLogId = item.Items.Select(m => m.Event.EventLogId).Max();
     List<int> eventLogIds = item.Items.Select(i => i.Event.EventLogId).ToList();
     bool isSubscribed = false;
+    bool isComment = item.FeedItemType.Replace(" ", "") == "LogCommentEvent";
+    
     foreach (int logId in eventLogIds)
     {
         if (subscriptions.ContainsKey(logId) == true)
@@ -145,10 +147,13 @@
                     }
                     if (commentItems.Count > 0)
                     {
-                        ViewData["ShowFooter"] = false;
+                        // Set these to make the comments display properly
+                        ViewDataDictionary vdd = new ViewDataDictionary(ViewData);
+                        vdd["ShowFooter"] = false;
+                        vdd["ShowDetails"] = true;
+                        
                         ViewBag.ParentId = item.Items[0].Event.EventLogId;
-                        @Html.Partial("Feed/_FeedItems", AggregateFeedItem.FromFeedItems(commentItems), ViewData)
-                        ViewData["ShowFooter"] = true;
+                        @Html.Partial("Feed/_FeedItems", AggregateFeedItem.FromFeedItems(commentItems), vdd)
                     }
                 }
 
@@ -157,25 +162,27 @@
         @if(showFooter)
         {
             <div class="feed-item-footer">               
-                @* Note: Hidden by default. Only shows when user clicks reply *@
-                @using (Ajax.BeginForm("PostComment", "Feed",
-                    new AjaxOptions
+                @if (!isComment) { 
+                    @* Note: Hidden by default. Only shows when user clicks reply *@
+                    using (Ajax.BeginForm("PostComment", "Feed",
+                        new AjaxOptions
+                        {
+                            HttpMethod = "POST",
+                            UpdateTargetId = showDetails? "Details" : "activity_feed_content",
+                            OnSuccess = "PostReplyComplete(" + lastLogId + ")",
+                        },
+                        new {
+                            @class = "feed-reply-form",
+                            id = "feed-reply-" + lastLogId,
+                        }))
                     {
-                        HttpMethod = "POST",
-                        UpdateTargetId = "activity_feed_content",
-                        OnSuccess = "PostReplyComplete(" + lastLogId + ")",
-                    },
-                    new {
-                        @class = "feed-reply-form",
-                        id = "feed-reply-" + lastLogId,
-                    }))
-                {
-                    <textarea name="response" id="feed-item-respond-@lastLogId" placeholder="Say something..." class="form-control"></textarea>
-                    <input name="response-submit" class="btn btn-default btn-sm" type="submit" value="Send" />
-                    <input name="response-cancel" class="btn btn-default btn-sm" type="reset" value="Cancel" onclick="HideReplyBox(@lastLogId)" />
-                    <input name="logID" type="hidden" value="@lastLogId" />
+                        <textarea name="response" id="feed-item-respond-@lastLogId" placeholder="Say something..." class="form-control"></textarea>
+                        <input name="response-submit" class="btn btn-default btn-sm" type="submit" value="Send" />
+                        <input name="response-cancel" class="btn btn-default btn-sm" type="reset" value="Cancel" onclick="HideReplyBox(@lastLogId)" />
+                        <input name="logID" type="hidden" value="@lastLogId" />
+                        <input name="showDetails" type="hidden" value="@showDetails.ToString()" />
+                    }
                 }
-                
                 
                 <ul class="feed-item-links">
                     @* No need to have a "details" link if we're already there *@
@@ -183,20 +190,24 @@
                     {
                         int[] ids = item.Items.Select(i => i.Event.EventLogId).ToArray();
                         string idString = string.Join(",", ids);
-                        
-                    <li>
-                        <a id="expand-comments-@lastLogId"
-                           class="anchor-pointer"
-                           onclick="expandComments('@lastLogId')">
-                            <span id="expand-comments-text-@lastLogId">View</span> Conversation(<span data-bind="text: NumberOfComments" id="number-of-comments-for-@item.Items[0].Event.EventLogId">@item.Comments.Count</span>)
-                        </a>
-                    </li>
-                        
+                        <li>
+                            @if (isComment)
+                            {
+                                <a href="@Url.Action("Details", "Feed", new { id = idString })">View Full Conversation</a>
+                            }
+                            else
+                            {
+                                <a id="expand-comments-@lastLogId" class="anchor-pointer" onclick="expandComments('@lastLogId')">
+                                    <span id="expand-comments-text-@lastLogId">View</span> Conversation(<span data-bind="text: NumberOfComments" id="number-of-comments-for-@item.Items[0].Event.EventLogId">@item.Comments.Count</span>)
+                                </a>
+                            }
+
+                        </li>
                         <li><a href="@Url.Action("Details", "Feed", new { id = idString })">Details</a></li>
                     }
 
                     @* Prevent replying to replies *@
-                    @if (item.FeedItemType.Replace(" ", "") != "LogCommentEvent") { 
+                    @if (!isComment) { 
                     <li><a id="btn-reply-@lastLogId" onclick="ShowReplyBox(@lastLogId)" >Reply</a></li>
                     }
 
@@ -206,17 +217,3 @@
         </div>
 </article>
 }
-
-<script>
-    function decreaseConversationsNumber(id) {
-        if (id === null) return;
-        var elem = document.getElementById("number-of-comments-for-" + id);
-        elem.innerHTML = parseInt(elem.innerHTML) - 1;
-    }
-
-    function increaseConversationsNumber(id) {
-        if (id === null) return;
-        var elem = document.getElementById("number-of-comments-for-" + id);
-        elem.innerHTML = parseInt(elem.innerHTML) + 1;
-    }
-</script>

@@ -15,13 +15,13 @@ namespace OSBLE.Web.Tests
     {
         SqlConnection con = new SqlConnection(@"data source=localhost\SQLEXPRESS;Database=OSBLEPlus;Trusted_Connection=yes;Persist Security Info=True;");
 
-        [TestMethod]
+        /*[TestMethod]
         public void GetActivityFeedItemsTest()
         {
             int[] ids = {1,2};
             List<FeedItem> items = DBHelper.GetActivityFeedItems(ids, con);
             Assert.AreEqual(ids.Length, items.Count);
-        }
+        }*/
 
     }
 }

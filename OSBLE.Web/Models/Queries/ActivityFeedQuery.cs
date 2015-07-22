@@ -123,7 +123,11 @@ namespace OSBLE.Models.Queries
             return new List<int>
             {
                 (int)EventType.AskForHelpEvent,
-                (int)EventType.FeedPostEvent
+                (int)EventType.BuildEvent,
+                (int)EventType.DebugEvent,
+                (int)EventType.ExceptionEvent,
+                (int)EventType.FeedPostEvent,
+                (int)EventType.SubmitEvent
             };
         }
 

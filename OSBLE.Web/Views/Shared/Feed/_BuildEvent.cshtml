@@ -22,7 +22,9 @@
     }
 
     //building the basic output message
-    string outputString = "{0} attempted to compile \"{1}\" {2} and encountered errors{3}";
+    string outputString = build.CriticalErrorCount > 0?
+        "{0} attempted to compile \"{1}\"{2} and encountered errors{3}" :
+        "{0} compiled \"{1}\" successfully{2}.";
     string param0 = Model.Creator.FirstName;
     string param1 = Path.GetFileNameWithoutExtension(Model.Items.First().Event.SolutionName);
     string param2 = "";
@@ -30,7 +32,7 @@
     string param4 = ".";
     if (buildCount > 1)
     {
-        param2 = string.Format("{0} times", buildCount);
+        param2 = string.Format(" {0} times", buildCount);
     }
     //if (errorCount > 0)
     //{
