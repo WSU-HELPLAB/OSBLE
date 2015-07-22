@@ -203,8 +203,6 @@ namespace OSBLE.Controllers
             // 2. Find students who have recently had these errors
             // 3. Add this info to our VM
 
-            #region class build errors
-
             //step 1
             //List<BuildEvent> feedBuildEvents = feedItems
             //    .Where(i => i.LogType.CompareTo(BuildEvent.Name) == 0)
@@ -319,33 +317,21 @@ namespace OSBLE.Controllers
                 return new EmptyResult();
             }
 
-            List<FeedItem> model = null;
-            using (SqlConnection conn = DBHelper.GetNewConnection())
-            {
-                // Insert the comment
-                bool success = DBHelper.InsertActivityFeedComment(logID, CurrentUser.ID, content, conn);
-                if (!success)
-                    return new EmptyResult();
+            // Insert the comment
+            bool success = DBHelper.InsertActivityFeedComment(logID, CurrentUser.ID, content);
+            if (!success)
+                return new EmptyResult();
 
-                // Get the new comment list, and put it into a Model
-                ActivityFeedQuery q = new ActivityFeedQuery();
-                q.AddEventId(logID);
+            // Get the new comment list, and put it into a model
+            FeedItem post = GetFeedItemFromID(logID);
+            // Add a new FeedItem for each comment whose event is the logCommentEvent and whose comments are an empty list
+            List<FeedItem> model = post.Comments.Select(c => new FeedItem { Event = c, Comments = new List<LogCommentEvent>() }).ToList();
 
-                IEnumerable<LogCommentEvent> commentItems = q.Execute().Where(i => i.Event.EventLogId == logID).SingleOrDefault().Comments; //DBHelper.GetCommentsFromSourceEventID(logID, conn);
-                model = commentItems.Select(c => new FeedItem { Event = c, Comments = new List<LogCommentEvent>() }).ToList();
-            }
-            // return the newly created partial view for the list of comments
+            // return the newly created partial view for the list of comments 
             ViewData["ShowFooter"] = false;
             ViewData["ShowDetails"] = true;            
             ViewBag.ParentId = logID;
             return PartialView("Feed/_FeedItems", AggregateFeedItem.FromFeedItems(model));
-
-            //string showDetails = formCollection["showDetails"].ToString();
-            //bool returnToDetails = formCollection["showDetails"] == null ? false : bool.Parse(formCollection["showDetails"]);
-            //if (returnToDetails)
-            //    return DetailsPartial(logID.ToString());
-
-            //return RedirectToAction("Index");
         }
 
         /// <summary>
@@ -658,8 +644,6 @@ namespace OSBLE.Controllers
             }
             catch (Exception ex)
             {
-                //LogErrorMessage(ex);
-                //return RedirectToAction("FeedDown", "Error");
                 ViewBag.ErrorMessage = ex.Message;
                 return View("Error");
             }
@@ -681,40 +665,13 @@ namespace OSBLE.Controllers
 
         private FeedDetailsViewModel GetDetailsViewModel(string id)
         {
-            //check to receive if we've gotten a single ID back
-            int idAsInt = -1;
-            if (Int32.TryParse(id, out idAsInt))
-            {
-                //if we've received a log comment event or a helpful mark event, we have to reroute to the original event
-                //EventLog log = Db.EventLogs.Where(e => e.Id == idAsInt).FirstOrDefault();
-                //MarkReadProc.Update(idAsInt, CurrentUser.Id, true);
-                //if (log != null)
-                //{
-                //    if (log.LogType == LogCommentEvent.Name)
-                //    {
-                //        LogCommentEvent commentEvent = Db.LogCommentEvents.Where(c => c.EventLogId == log.Id).FirstOrDefault();
-                //        return RedirectToAction("Details", "Feed", new { id = commentEvent.SourceEventLogId });
-                //    }
-                //    else if (log.LogType == HelpfulMarkGivenEvent.Name)
-                //    {
-                //        HelpfulMarkGivenEvent helpfulEvent = Db.HelpfulMarkGivenEvents.Where(e => e.EventLogId == log.Id).FirstOrDefault();
-                //        return RedirectToAction("Details", "Feed", new { id = helpfulEvent.LogCommentEvent.SourceEventLogId });
-                //    }
-                //}
-            }
-
-            var query = new ActivityFeedQuery();
-
+            // Get the list of ids
             List<int> ids = ParseIdString(id);
-            foreach (int logId in ids)
-            {
-                query.AddEventId(logId);
-            }
-            // query.MaxQuerySize = ids.Count;
-            // This is a work arround, and should be fixed soon - 7/21/15
-            // this is because the GetActivityFeeds.sql stored proc does
-            // not work correctly with IDs as of right now.
-            List<FeedItem> feedItems = query.Execute().Where(i => ids.Contains(i.Event.EventLogId)).ToList();
+
+            // Get the list of feed items (EventLogs) with that id
+            List<FeedItem> feedItems = GetFeedItemsFromIDs(ids);
+
+            // Check if we were able to get the feed items
             if (feedItems.Count == 0)
             {
                 ViewBag.ErrorName = "Query Error";
@@ -995,6 +952,26 @@ namespace OSBLE.Controllers
                 query.CourseFilter = new Course() { ID = feedSettings.CourseFilter };
             }
         }
+
+        private FeedItem GetFeedItemFromID(int id)
+        {
+            ActivityFeedQuery query = new ActivityFeedQuery();
+            query.MinLogId = id;
+            query.MaxLogId = id;
+            IEnumerable<FeedItem> result = query.Execute();
+            return result.SingleOrDefault();
+        }
+
+        private List<FeedItem> GetFeedItemsFromIDs(IEnumerable<int> ids)
+        {
+            List<FeedItem> items = new List<FeedItem>();
+
+            foreach(int id in ids)
+            {
+                items.Add(GetFeedItemFromID(id));
+            }
+
+            return items;
+        }
     }
 }
-            #endregion
