@@ -37,12 +37,12 @@
     }
     
     //do we need to anonymize?
-    if(item.IsAnonymous == true && currentUser.ID != item.Creator.ID)
+    /*if(item.IsAnonymous && item.Creator != null && currentUser.ID != item.Creator.ID)
     {
         item.Creator.FirstName = "A student";
         item.Creator.LastName = "";
         item.Creator.ID = -1;
-    }
+    }*/
     
     <article id="feed-item-@lastLogId" data-id="@lastLogId" class="feed-item-single @additionalStyle">
         
@@ -168,7 +168,7 @@
                         new AjaxOptions
                         {
                             HttpMethod = "POST",
-                            UpdateTargetId = showDetails? "Details" : "activity_feed_content",
+                            UpdateTargetId = "feed-item-comments-" + lastLogId,
                             OnSuccess = "PostReplyComplete(" + lastLogId + ")",
                         },
                         new {

@@ -2158,11 +2158,25 @@ div.pagedocname {
     min-height: 65px;
 }
 
-/* highlight the new reply to draw users attention */
+/* Activity Feed Filters */
 
+.filter-type-option {
+    float: left;
+    margin: 8px 25px 0px 0px !important;
+}
 
-.just-posted-reply .dp_post_header {
-    background-color: #fafae0;
+#filter-type {
+    margin: 0px;
+    margin-top: -10px;
+    padding: 0px;
+}
+
+#filters {
+    padding: 8px;
+    background-color: #f3f3f3;
+    border-radius: 5px;
+    border: 1px solid #eee;
+    margin-bottom: 15px;
 }
 
 .feed-edit {

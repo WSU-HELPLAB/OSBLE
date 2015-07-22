@@ -518,7 +518,6 @@ namespace OSBLE.Utility
                 return false;
             }
         }
-
         #endregion
     }
 }

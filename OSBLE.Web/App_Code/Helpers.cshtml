@@ -5,6 +5,7 @@
 @using System.Text.RegularExpressions
 @using System.Collections
 @using System.Web.Mvc
+@using OSBLEPlus.Logic.Utility.Lookups
 @* Section headers for user tabs. *@
 @helper DisplaySection(string sectionNum)
     {
@@ -349,6 +350,13 @@ Also runs content through nl2br to convert newlines to <br /> tags. *@
     { 
         <text>/Content/images/fileextimages/_blank.png</text>
     }
+}
+
+@helper GetOptionNameOfEventType(EventType e)
+{
+    // in the future this will be more in depth
+    // and give prettier names
+    @e.ToString()
 }
 
 @functions{
