@@ -15,7 +15,6 @@ BEGIN
 		 EventDate		DATETIME NOT NULL,
 		 SolutionName	VARCHAR(MAX) NOT NULL,
 		 AssignmentId	INT NOT NULL,
-		 SolutionData	IMAGE NOT NULL,
 		 CONSTRAINT PK_SubmitEvents PRIMARY KEY CLUSTERED (Id),
 		 CONSTRAINT FK_SubmitEvents_EventLogs FOREIGN KEY (EventLogId) REFERENCES EventLogs(Id),
 		 CONSTRAINT FK_SubmitEvents_Assignments FOREIGN KEY (AssignmentId) REFERENCES Assignments(Id),
@@ -30,8 +29,7 @@ SELECT	a.Id,
 		a.EventLogId,
 		a.EventDate,
 		a.SolutionName,
-		AssignmentId = d.ID,
-		a.SolutionData
+		AssignmentId = d.ID
 INTO #SubmitEvents
 FROM [OSBIDE.Helplab].dbo.SubmitEvents a
 INNER JOIN dbo.EventLogs b ON b.Id = a.EventLogId
@@ -49,14 +47,13 @@ MERGE [dbo].[SubmitEvents] AS Target
 USING [#SubmitEvents] AS Source ON (Target.Id = Source.Id)
 	WHEN NOT MATCHED BY Target
 	THEN
-	INSERT (Id, EventLogId, EventDate, SolutionName, AssignmentId, SolutionData)
+	INSERT (Id, EventLogId, EventDate, SolutionName, AssignmentId)
 	VALUES
 	(
 		Source.Id,
 		Source.EventLogId,
 		Source.EventDate,
 		Source.SolutionName,
-		Source.AssignmentId,
-		Source.SolutionData
+		Source.AssignmentId
 	);
 SET IDENTITY_INSERT [dbo].[SubmitEvents] OFF

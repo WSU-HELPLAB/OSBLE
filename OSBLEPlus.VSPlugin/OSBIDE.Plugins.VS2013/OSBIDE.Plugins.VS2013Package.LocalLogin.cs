@@ -85,7 +85,7 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
             InitStepThree_CheckServiceVersionComplete(result);
         }
 
-        private void InitStepThree_CheckServiceVersionComplete(string version)
+        private async void InitStepThree_CheckServiceVersionComplete(string version)
         {
             var isOsbideUpToDate = true;
 
@@ -132,7 +132,8 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
                 _client.StartSending();
                 ShowActivityFeedTool(this, EventArgs.Empty);
 
-                var recentNews = AsyncServiceClient.GetMostRecentWhatsNewItem().Result;
+                var task = AsyncServiceClient.GetMostRecentWhatsNewItem();
+                var recentNews = await task;
                 GetRecentNewsItemDateComplete(recentNews);
             }
         }

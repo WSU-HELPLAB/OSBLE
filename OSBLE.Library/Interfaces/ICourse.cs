@@ -4,7 +4,7 @@ namespace OSBLE.Interfaces
 {
     public interface ICourse
     {
-        int CourseId { get; set; }
+        int Id { get; set; }
         int Number { get; set; }
         string NamePrefix { get; set; }
         string Description { get; set; }

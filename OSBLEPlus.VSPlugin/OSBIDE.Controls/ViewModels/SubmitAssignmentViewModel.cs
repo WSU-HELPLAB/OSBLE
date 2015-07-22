@@ -7,7 +7,9 @@ using System.Windows.Input;
 
 using OSBIDE.Library.ServiceClient.ServiceHelpers;
 using OSBLE.Interfaces;
+using OSBLE.Models.Assignments;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
+using OSBLEPlus.Logic.Utility;
 
 namespace OSBIDE.Controls.ViewModels
 {
@@ -34,9 +36,10 @@ namespace OSBIDE.Controls.ViewModels
             GetCoursesForUserAsync(authToken);
         }
 
-        private void GetCoursesForUserAsync(string authToken)
+        private async void GetCoursesForUserAsync(string authToken)
         {
-            var courses = AsyncServiceClient.GetCoursesForUser(authToken).Result;
+            var task = AsyncServiceClient.GetCoursesForUser(authToken);
+            var courses = await task;
 
             Courses.Clear();
             foreach (var course in courses.OfType<ICourse>())
@@ -47,9 +50,12 @@ namespace OSBIDE.Controls.ViewModels
             IsLoading = false;
         }
 
-        private void GetAssignmentsForCourseAsync(int courseId, string authToken)
+        private async void GetAssignmentsForCourseAsync(int courseId, string authToken)
         {
-            var assignments = AsyncServiceClient.GetAssignmentsForCourse(courseId, authToken).Result;
+            var task = AsyncServiceClient.GetAssignmentsForCourse(courseId, authToken);
+            await task;
+            var assignments = task.Result;
+
             Assignments.Clear();
             foreach (var assignment in assignments)
             {
@@ -59,9 +65,11 @@ namespace OSBIDE.Controls.ViewModels
             IsLoading = false;
         }
 
-        private void GetLastAssignmentSubmitDateAsync(int assignmentId, string authToken)
+        private async void GetLastAssignmentSubmitDateAsync(int assignmentId, string authToken)
         {
-            var submissionDate = AsyncServiceClient.GetLastAssignmentSubmitDate(assignmentId, authToken).Result;
+            var task = AsyncServiceClient.GetLastAssignmentSubmitDate(assignmentId, authToken);
+            var submissionDate = await task;
+
             if (!submissionDate.HasValue || submissionDate.Value == DateTime.MinValue)
             {
                 LastSubmitted = "N/A";
@@ -74,12 +82,15 @@ namespace OSBIDE.Controls.ViewModels
             }
         }
 
-        private void SubmitAssignmentAsync()
+        private async void SubmitAssignmentAsync()
         {
             _submitEvent.CreateSolutionBinary(_submitEvent.GetSolutionBinary());
             _submitEvent.AssignmentId = SelectedAssignment;
+            _submitEvent.CourseId = SelectedCourse;
 
-            var confirmation = AsyncServiceClient.SubmitAssignment(_submitEvent, _authToken).Result;
+            var task = AsyncServiceClient.SubmitAssignment(_submitEvent, _authToken);
+            var confirmation = await task;
+
             SubmitAssignmentCompleted(confirmation);
         }
 

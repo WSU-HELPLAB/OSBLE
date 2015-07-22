@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-
+using System.Web;
 using Newtonsoft.Json;
 
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
@@ -40,11 +40,10 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
         {
             using (var client = GetClient())
             {
-                var task = client.GetAsync("api/course/mostrecentwhatsnewitem")
-                                 .Result.Content.ReadAsStringAsync();
+                var task = client.GetAsync("api/course/mostrecentwhatsnewitem");
                 await task;
 
-                return JsonConvert.DeserializeObject<DateTime>(task.Result);
+                return JsonConvert.DeserializeObject<DateTime>(task.Result.Content.ReadAsStringAsync().Result);
             }
         }
 
@@ -67,11 +66,10 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
         {
             using (var client = GetClient())
             {
-                var task = client.GetAsync(string.Format("api/userprofiles/isvalidkey?a={0}", authToken))
-                                 .Result.Content.ReadAsStringAsync();
+                var task = client.GetAsync(string.Format("api/userprofiles/isvalidkey?a={0}", authToken));
                 await task;
 
-                return JsonConvert.DeserializeObject<bool>(task.Result);
+                return JsonConvert.DeserializeObject<bool>(task.Result.Content.ReadAsStringAsync().Result);
             }
         }
 
@@ -79,11 +77,10 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
         {
             using (var client = GetClient())
             {
-                var task = client.GetAsync(string.Format("api/userprofiles/getcoursesforuser?a={0}", authToken))
-                                 .Result.Content.ReadAsStringAsync();
+                var task = client.GetAsync(string.Format("api/userprofiles/getcoursesforuser?a={0}", authToken));
                 await task;
 
-                return JsonConvert.DeserializeObject<List<ProfileCourse>>(task.Result);
+                return JsonConvert.DeserializeObject<List<ProfileCourse>>(task.Result.Content.ReadAsStringAsync().Result);
             }
         }
 
@@ -91,11 +88,13 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
         {
             using (var client = GetClient())
             {
-                var task = client.GetAsync(string.Format("api/course/getassignmentsforcourse?{0}&a={1}", courseId, authToken))
-                                 .Result.Content.ReadAsStringAsync();
+                var task = client.GetAsync(string.Format("api/course/getassignmentsforcourse?id={0}&a={1}", courseId, authToken));
                 await task;
-
-                return JsonConvert.DeserializeObject<List<SubmisionAssignment>>(task.Result);
+                JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+                {
+                    Converters = new List<JsonConverter> { new AssignmentJsonConverter() }
+                };
+                return JsonConvert.DeserializeObject<List<SubmisionAssignment>>(task.Result.Content.ReadAsStringAsync().Result);
             }
         }
 
@@ -103,13 +102,10 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
         {
             using (var client = GetClient())
             {
-                var task =
-                    client.GetAsync(string.Format("api/course/getlastsubmitdateforassignment?{0}&a={1}", assignmentId,
-                        authToken))
-                        .Result.Content.ReadAsStringAsync();
+                var task = client.GetAsync(string.Format("api/course/getlastsubmitdateforassignment?id={0}&a={1}", assignmentId, authToken));
                 await task;
 
-                return JsonConvert.DeserializeObject<DateTime?>(task.Result);
+                return JsonConvert.DeserializeObject<DateTime?>(task.Result.Content.ReadAsStringAsync().Result);
             }
         }
 
@@ -117,11 +113,10 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
         {
             using (var client = GetClient())
             {
-                var task = client.GetAsync(string.Format("api/userprofiles/mostrecentsocialactivity?a={0}", authToken))
-                    .Result.Content.ReadAsStringAsync();
+                var task = client.GetAsync(string.Format("api/userprofiles/mostrecentsocialactivity?a={0}", authToken));
                 await task;
 
-                return JsonConvert.DeserializeObject<DateTime>(task.Result);
+                return JsonConvert.DeserializeObject<DateTime>(task.Result.Content.ReadAsStringAsync().Result);
             }
         }
 
@@ -132,11 +127,17 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
                 var request = new SubmissionRequest
                 {
                     AuthToken = authToken,
-                    SubmitEvent = submitEvent
+                    SubmitEvent = submitEvent,
+                    TeamId = 1,
+                    RequestData = HttpServerUtility.UrlTokenEncode(submitEvent.SolutionData)
                 };
+                // to remove the redundant payload from acrossing http wire
+                request.SubmitEvent.CreateSolutionBinary(null);
+                var response = await client.PostAsJsonAsync("api/course/post", request);
 
-                var response = await client.PostAsJsonAsync("api/eventcollection", request);
-                return JsonConvert.DeserializeObject<int>(response.Content.ReadAsStringAsync().Result);
+                return response.IsSuccessStatusCode
+                        ? JsonConvert.DeserializeObject<int>(response.Content.ReadAsStringAsync().Result)
+                        : 0;
             }
         }
 

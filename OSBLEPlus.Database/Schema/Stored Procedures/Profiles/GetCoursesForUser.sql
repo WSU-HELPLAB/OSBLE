@@ -4,7 +4,7 @@ AS
   BEGIN
       SET nocount ON;
 
-      SELECT CourseId=a.ID,
+      SELECT Id=a.ID,
              Name=a.Prefix + ' ' + a.Number + ', ' + a.Semester + ' '
                   + Cast(a.[Year] AS VARCHAR(4)),
              Number = Cast(a.Number AS VARCHAR(32)),

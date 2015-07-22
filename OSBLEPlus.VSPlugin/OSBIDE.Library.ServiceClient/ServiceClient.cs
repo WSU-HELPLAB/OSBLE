@@ -203,7 +203,8 @@ namespace OSBIDE.Library.ServiceClient
                     var result = false;
                     try
                     {
-                        result = AsyncServiceClient.IsValidKey(webServiceKey).Result;
+                        var task = AsyncServiceClient.IsValidKey(webServiceKey);
+                        result = task.Result;
                     }
                     catch (Exception)
                     {
@@ -228,7 +229,8 @@ namespace OSBIDE.Library.ServiceClient
                         }
                         if (userName != null && password != null)
                         {
-                            webServiceKey = AsyncServiceClient.Login(userName, password).Result;
+                            var task = AsyncServiceClient.Login(userName, password);
+                            webServiceKey = task.Result;
                             _cache[StringConstants.AuthenticationCacheKey] = webServiceKey;
                         }
                         else
@@ -266,7 +268,8 @@ namespace OSBIDE.Library.ServiceClient
                     DateTime lastServerProfileUpdate;
                     try
                     {
-                        lastServerProfileUpdate = AsyncServiceClient.GetMostRecentSocialActivity(webServiceKey).Result;
+                        var task = AsyncServiceClient.GetMostRecentSocialActivity(webServiceKey);
+                        lastServerProfileUpdate = task.Result;
                     }
                     catch (Exception)
                     {
@@ -311,7 +314,9 @@ namespace OSBIDE.Library.ServiceClient
                 lock (_cache)
                 {
                     var webServiceKey = _cache[StringConstants.AuthenticationCacheKey] as string;
-                    result = AsyncServiceClient.SubmitLocalErrorLog(new LocalErrorLogRequest { Log = log, AuthToken = webServiceKey }).Result;
+
+                    var task = AsyncServiceClient.SubmitLocalErrorLog(new LocalErrorLogRequest { Log = log, AuthToken = webServiceKey });
+                    result = task.Result;
                 }
 
                 //remove if file successfully sent
@@ -333,7 +338,7 @@ namespace OSBIDE.Library.ServiceClient
             IsSendingData = false;
         }
 
-        private void SendLogToServer(IActivityEvent data)
+        private async void SendLogToServer(IActivityEvent data)
         {
             SendStatus.IsActive = true;
 
@@ -377,7 +382,8 @@ namespace OSBIDE.Library.ServiceClient
 
                     //compose web request and send to the server
                     var eventPostRequest = GetEventPostWebRequest(currentBatch, webServiceKey);
-                    var result = AsyncServiceClient.SubmitLog(eventPostRequest).Result;
+                    var task = AsyncServiceClient.SubmitLog(eventPostRequest);
+                    var result = await task;
                     currentBatch.ForEach(x =>
                     {
                         x.BatchId = result;

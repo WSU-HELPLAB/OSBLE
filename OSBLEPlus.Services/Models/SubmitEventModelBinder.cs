@@ -4,7 +4,6 @@ using System.Web;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
-using OSBLEPlus.Logic.DomainObjects.Profiles;
 
 namespace OSBLEPlus.Services.Models
 {
@@ -23,27 +22,17 @@ namespace OSBLEPlus.Services.Models
                         AuthToken = jsonTokens.First(x => x.Contains("AuthToken:")).Split(':').Last(),
                         SubmitEvent = new SubmitEvent
                         {
-                            CourseId =
-                                Convert.ToInt32(jsonTokens.First(x => x.Contains("CourseId:")).Split(':').Last()),
+                            CourseId = Convert.ToInt32(jsonTokens.First(x => x.Contains("CourseId:")).Split(':').Last()),
                             AssignmentId =
                                 Convert.ToInt32(jsonTokens.First(x => x.Contains("AssignmentId:")).Split(':').Last()),
-                                Sender = new User
-                                {
-                                    UserId =
-                                        Convert.ToInt32(jsonTokens.First(x => x.Contains("SenderId:")).Split(':').Last()),
-                                    FirstName = jsonTokens.First(x => x.Contains("FirstName:")).Split(':').Last(),
-                                    LastName = jsonTokens.First(x => x.Contains("LastName:")).Split(':').Last()
-                                },
-
-                            SolutionName = jsonTokens.First(x => x.Contains("SolutionName:")).Split(':').Last()
-                        },
-                        TeamId = Convert.ToInt32(jsonTokens.First(x => x.Contains("TeamId:")).Split(':').Last())
+                            SolutionName = jsonTokens.First(x => x.Contains("SolutionName:")).Split(':').Last(),
+                            },
+                        TeamId =
+                            Convert.ToInt32(jsonTokens.First(x => x.Contains("TeamId:")).Split(':').Last())
                     };
-                    
-                    var encodedSolution = jsonTokens.First(x => x.Contains("RequestData:")).Split(':').Last();
 
+                    var encodedSolution = jsonTokens.First(x => x.Contains("RequestData:")).Split(':').Last();
                     submitRequest.SubmitEvent.CreateSolutionBinary(HttpServerUtility.UrlTokenDecode(encodedSolution));
-                   
 
                     bindingContext.Model = submitRequest;
                     return true;
