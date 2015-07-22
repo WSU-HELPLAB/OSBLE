@@ -708,6 +708,7 @@
     <Content Include="Areas\AssessmentWizard\Views\ReviewOfStudentWork\Index.cshtml" />
     <Content Include="Areas\AssessmentWizard\Views\CommitteeReview\Index.cshtml" />
     <Content Include="Resources\CSVReader\CSVCellReaderStateMachine.png" />
+    <Content Include="Scripts\ActivityFeed.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\contextMenu.js" />

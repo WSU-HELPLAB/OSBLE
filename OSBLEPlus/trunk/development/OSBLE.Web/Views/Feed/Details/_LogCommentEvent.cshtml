@@ -4,4 +4,6 @@
     LogCommentEvent comment = Model.Items.First().Event as LogCommentEvent;
 }
 
-@comment.Content
+<div id="comment-content-@comment.EventLogId">
+    @comment.Content
+</div>

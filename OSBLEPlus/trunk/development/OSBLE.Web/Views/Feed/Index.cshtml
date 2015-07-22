@@ -3,15 +3,9 @@
 @using OSBLEPlus.Logic.Utility.Lookups
 @model OSBLEPlus.Logic.DomainObjects.ActivityFeeds.FeedViewModel
 
-<section data-tab="ActivityFeed">
+<script type="text/javascript" src="@Url.Content("~/Scripts/ActivityFeed.js")"></script>
 
-        <!--
-        <article style="max-width:500px;">
-            <h1>Notice</h1>
-            <p>In preparation for a higher than normal server load, automatic loading of new feed posts has been temporarily disabled.
-            In order to view the most recent feed items, you will need to manually Html.ActionLink("refresh", "Index", new { component = OsbideVsComponent.FeedOverview }, new {}) this page.</p>
-        </article>
-            -->
+<section data-tab="ActivityFeed">
     <div id="activity_new_post">
         @if (ViewBag.ActiveCourse.AbstractRole != null)
         {
@@ -153,54 +147,3 @@
     <script type="text/javascript" src="~/Scripts/Typeahead/jquery.overlay.js"></script>
 }*@
 
-<script type="text/javascript">
-    function ShowReplyBox(lastLogID) {
-        $("#btn-reply-" + lastLogID).hide();
-        $("#feed-reply-" + lastLogID).show('blind');
-        return false;
-    }
-
-    function HideReplyBox(lastLogID) {
-        $("#btn-reply-" + lastLogID).show('highlight');
-        $("#feed-reply-" + lastLogID).hide('blind');
-        return false;
-    }
-
-    function ToggleShowReplies(lastLogID) {
-        var replies = $("#feed-item-comments-" + lastLogID);
-        if (replies.css('display') == 'none') {
-            replies.show('blind');
-        }
-        else {
-            var height = (window.innerHeight > 0) ? window.innerHeight : screen.height;
-            var post = $("#feed-item-" + lastLogID);
-
-            // scroll helps if reply box was really big
-            if (post.height() > height) {
-                $('html, body').animate({
-                    scrollTop: post.offset().top - 5
-                }, 200);
-            }
-            replies.hide('blind');
-        }
-    }
-
-    function PostReplyComplete(logID)
-    {
-        var replies = $("#feed-item-comments-" + logID);
-
-        // make sure reply block is visible
-        replies.css('display', 'block');
-        $("#expand-comments-text-" + logID).text("Hide");
-
-        // highlight the new reply
-        replies.children().last().addClass('just-posted-reply');
-        
-        // scroll to new reply
-        var post = $("#feed-item-" + logID);
-        var height = (window.innerHeight > 0) ? window.innerHeight : screen.height;
-        $('html, body').animate({
-            scrollTop: post.offset().top + post.height() - height + 5
-        }, 500);
-    }
-</script>

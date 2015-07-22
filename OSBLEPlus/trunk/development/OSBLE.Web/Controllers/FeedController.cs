@@ -294,11 +294,17 @@ namespace OSBLE.Controllers
         {
             string content = formCollection["response"];
             string logIDstr = formCollection["logID"];
-            int logID = 0;
+            int logID = -1;
             if (!String.IsNullOrWhiteSpace(content) && !String.IsNullOrWhiteSpace(logIDstr) && int.TryParse(logIDstr, out logID))
             {
                 DBHelper.InsertActivityFeedComment(logID, CurrentUser.ID, content);
             }
+
+            string showDetails = formCollection["showDetails"].ToString();
+            bool returnToDetails = formCollection["showDetails"] == null ? false : bool.Parse(formCollection["showDetails"]);
+            if (returnToDetails)
+                return DetailsPartial(logID.ToString());
+
             return RedirectToAction("Index");
         }
 
@@ -573,74 +579,97 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         public ActionResult Details(string id)
         {
+            //make sure that we've gotten a valid ID
+            if (string.IsNullOrEmpty(id))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             try
             {
-                //make sure that we've gotten a valid ID
-                if (string.IsNullOrEmpty(id))
-                {
-                    return RedirectToAction("Index", "Home");
-                }
-
-                //check to receive if we've gotten a single ID back
-                int idAsInt = -1;
-                if (Int32.TryParse(id, out idAsInt))
-                {
-                    //if we've received a log comment event or a helpful mark event, we have to reroute to the original event
-                    //EventLog log = Db.EventLogs.Where(e => e.Id == idAsInt).FirstOrDefault();
-                    //MarkReadProc.Update(idAsInt, CurrentUser.Id, true);
-                    //if (log != null)
-                    //{
-                    //    if (log.LogType == LogCommentEvent.Name)
-                    //    {
-                    //        LogCommentEvent commentEvent = Db.LogCommentEvents.Where(c => c.EventLogId == log.Id).FirstOrDefault();
-                    //        return RedirectToAction("Details", "Feed", new { id = commentEvent.SourceEventLogId });
-                    //    }
-                    //    else if (log.LogType == HelpfulMarkGivenEvent.Name)
-                    //    {
-                    //        HelpfulMarkGivenEvent helpfulEvent = Db.HelpfulMarkGivenEvents.Where(e => e.EventLogId == log.Id).FirstOrDefault();
-                    //        return RedirectToAction("Details", "Feed", new { id = helpfulEvent.LogCommentEvent.SourceEventLogId });
-                    //    }
-                    //}
-                }
-
-                var query = new ActivityFeedQuery();
-
-                List<int> ids = ParseIdString(id);
-                foreach (int logId in ids)
-                {
-                    query.AddEventId(logId);
-                }
-                // query.MaxQuerySize = ids.Count;
-                // This is a work arround, and should be fixed soon - 7/21/15
-                // this is because the GetActivityFeeds.sql stored proc does
-                // not work correctly with IDs as of right now.
-                List<FeedItem> feedItems = query.Execute().Where(i => ids.Contains(i.Event.EventLogId)).ToList();
-
-                List<AggregateFeedItem> aggregateItems = AggregateFeedItem.FromFeedItems(feedItems);
-
-                //build the "you and 5 others got this error"-type messages
-                FeedViewModel fvm = new FeedViewModel();
-                BuildEventRelations(fvm, feedItems);
-
-                ViewBag.RecentUserErrors = fvm.RecentUserErrors;
-                //ViewBag.RecentClassErrors = fvm.RecentClassErrors;
-                //ViewBag.ErrorTypes = fvm.ErrorTypes;
-
-                FeedDetailsViewModel vm = new FeedDetailsViewModel();
-                vm.Ids = id;
-                vm.FeedItem = aggregateItems.FirstOrDefault();
-                //if (Db.EventLogSubscriptions.Where(e => e.UserId == CurrentUser.Id).Where(e => e.LogId == ids.Min()).Count() > 0)
-                //{
-                //    vm.IsSubscribed = true;
-                //}
+                FeedDetailsViewModel vm = GetDetailsViewModel(id);
                 return View(vm);
             }
             catch (Exception ex)
             {
                 //LogErrorMessage(ex);
                 //return RedirectToAction("FeedDown", "Error");
-                return View();
+                ViewBag.ErrorMessage = ex.Message;
+                return View("Error");
             }
+        }
+
+        private ActionResult DetailsPartial(string id)
+        {
+            try
+            {
+                FeedDetailsViewModel vm = GetDetailsViewModel(id);
+                return PartialView("Details", vm);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = ex.Message;
+                return PartialView("Error");
+            }
+        }
+
+        private FeedDetailsViewModel GetDetailsViewModel(string id)
+        {
+            //check to receive if we've gotten a single ID back
+            int idAsInt = -1;
+            if (Int32.TryParse(id, out idAsInt))
+            {
+                //if we've received a log comment event or a helpful mark event, we have to reroute to the original event
+                //EventLog log = Db.EventLogs.Where(e => e.Id == idAsInt).FirstOrDefault();
+                //MarkReadProc.Update(idAsInt, CurrentUser.Id, true);
+                //if (log != null)
+                //{
+                //    if (log.LogType == LogCommentEvent.Name)
+                //    {
+                //        LogCommentEvent commentEvent = Db.LogCommentEvents.Where(c => c.EventLogId == log.Id).FirstOrDefault();
+                //        return RedirectToAction("Details", "Feed", new { id = commentEvent.SourceEventLogId });
+                //    }
+                //    else if (log.LogType == HelpfulMarkGivenEvent.Name)
+                //    {
+                //        HelpfulMarkGivenEvent helpfulEvent = Db.HelpfulMarkGivenEvents.Where(e => e.EventLogId == log.Id).FirstOrDefault();
+                //        return RedirectToAction("Details", "Feed", new { id = helpfulEvent.LogCommentEvent.SourceEventLogId });
+                //    }
+                //}
+            }
+
+            var query = new ActivityFeedQuery();
+
+            List<int> ids = ParseIdString(id);
+            foreach (int logId in ids)
+            {
+                query.AddEventId(logId);
+            }
+            // query.MaxQuerySize = ids.Count;
+            // This is a work arround, and should be fixed soon - 7/21/15
+            // this is because the GetActivityFeeds.sql stored proc does
+            // not work correctly with IDs as of right now.
+            List<FeedItem> feedItems = query.Execute().Where(i => ids.Contains(i.Event.EventLogId)).ToList();
+            if (feedItems.Count == 0)
+            {
+                ViewBag.ErrorName = "Query Error";
+                throw new Exception("The query for event log details has returned no usable results.");
+            }
+
+
+            List<AggregateFeedItem> aggregateItems = AggregateFeedItem.FromFeedItems(feedItems);
+
+            //build the "you and 5 others got this error"-type messages
+            FeedViewModel fvm = new FeedViewModel();
+            BuildEventRelations(fvm, feedItems);
+
+            ViewBag.RecentUserErrors = fvm.RecentUserErrors;
+            //ViewBag.RecentClassErrors = fvm.RecentClassErrors;
+            //ViewBag.ErrorTypes = fvm.ErrorTypes;
+
+            FeedDetailsViewModel vm = new FeedDetailsViewModel();
+            vm.Ids = id;
+            vm.FeedItem = aggregateItems.FirstOrDefault();
+            return vm;
         }
 
         /// <summary>
