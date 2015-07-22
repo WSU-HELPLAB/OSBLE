@@ -35,7 +35,7 @@ namespace OSBLEPlus.Logic.Tests.Activities
         {
             var submit = CreateSubmitEvent();
             string path = Directory.GetCurrentDirectory();
-            Posts.SaveToFileSystem(submit, 1, path);
+            Posts.SaveToFileSystem(submit, path);
             var fullpath = path + "\\Courses\\4\\Assignments\\3\\1\\Test User\\testfile.txt";
             File.SetAttributes(fullpath, FileAttributes.Normal);
             bool success = File.Exists(fullpath);

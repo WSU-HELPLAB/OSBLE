@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
@@ -84,12 +85,21 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
             }
         }
 
-        public static void SaveToFileSystem(SubmitEvent submit, int teamid, string path=null)
+        public static void SaveToFileSystem(SubmitEvent submit, string path=null)
         {
             using (var zipStream = new MemoryStream())
             {
                 zipStream.Write(submit.SolutionData, 0, submit.SolutionData.Length);
                 zipStream.Position = 0;
+
+                using (
+                    var connection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    int teamId =  connection.Query<int>("dbo.GetAssignmentTeam",
+                        new { assignmentId = submit.AssignmentId, userId = submit.SenderId },
+                        commandType: CommandType.StoredProcedure).SingleOrDefault();
+
+
                 try
                 {
                     if (path == null)
@@ -98,10 +108,11 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                         path = string.Format("{0}\\OSBLE.Web\\App_Data\\FileSystem\\", Directory.GetParent(a).FullName);
                     }
                     OSBLE.Models.FileSystem.Directories.GetAssignmentWithId(submit.CourseId ?? 1
-                        , submit.AssignmentId, submit.SenderId, path).AddFile(string.Format("{0}.zip", submit.Sender.FullName), zipStream);
+                        , submit.AssignmentId, teamId, path).AddFile(string.Format("{0}.zip", submit.Sender.FullName), zipStream);
                 }
                 catch (ZipException)
                 {
+                }
                 }
             }
         }
