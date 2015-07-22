@@ -173,7 +173,25 @@ namespace OSBLE.Controllers
                 //BuildEventRelations(vm, feedItems);
                 vm.Keyword = keyword;
             return vm;
+        }
+
+        /// <summary>
+        /// Returns just the feed part of the activity feed, without the forms at the top for posting/filtering.
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult GetFeed(long timestamp = -1, int errorType = -1, string errorTypeStr = "", string keyword = "", int hash = 0)
+        {
+            try
+            {
+                FeedViewModel vm = GetFeedViewModel(timestamp, errorType, errorTypeStr, keyword, hash);
+                return PartialView("Feed/_Feed", vm);
             }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = ex.Message;
+                return PartialView("Error");
+            }
+        }
 
         private void BuildEventRelations(FeedViewModel vm, List<FeedItem> feedItems)
         {
@@ -293,19 +311,41 @@ namespace OSBLE.Controllers
         public ActionResult PostComment(FormCollection formCollection)
         {
             string content = formCollection["response"];
-            string logIDstr = formCollection["logID"];
+            string logIDstr = formCollection["logID"]; // the id of the parent event log
             int logID = -1;
-            if (!String.IsNullOrWhiteSpace(content) && !String.IsNullOrWhiteSpace(logIDstr) && int.TryParse(logIDstr, out logID))
+            
+            if (String.IsNullOrWhiteSpace(content) || String.IsNullOrWhiteSpace(logIDstr) || !int.TryParse(logIDstr, out logID))
             {
-                DBHelper.InsertActivityFeedComment(logID, CurrentUser.ID, content);
+                return new EmptyResult();
             }
 
-            string showDetails = formCollection["showDetails"].ToString();
-            bool returnToDetails = formCollection["showDetails"] == null ? false : bool.Parse(formCollection["showDetails"]);
-            if (returnToDetails)
-                return DetailsPartial(logID.ToString());
+            List<FeedItem> model = null;
+            using (SqlConnection conn = DBHelper.GetNewConnection())
+            {
+                // Insert the comment
+                bool success = DBHelper.InsertActivityFeedComment(logID, CurrentUser.ID, content, conn);
+                if (!success)
+                    return new EmptyResult();
 
-            return RedirectToAction("Index");
+                // Get the new comment list, and put it into a Model
+                ActivityFeedQuery q = new ActivityFeedQuery();
+                q.AddEventId(logID);
+
+                IEnumerable<LogCommentEvent> commentItems = q.Execute().Where(i => i.Event.EventLogId == logID).SingleOrDefault().Comments; //DBHelper.GetCommentsFromSourceEventID(logID, conn);
+                model = commentItems.Select(c => new FeedItem { Event = c, Comments = new List<LogCommentEvent>() }).ToList();
+            }
+            // return the newly created partial view for the list of comments
+            ViewData["ShowFooter"] = false;
+            ViewData["ShowDetails"] = true;            
+            ViewBag.ParentId = logID;
+            return PartialView("Feed/_FeedItems", AggregateFeedItem.FromFeedItems(model));
+
+            //string showDetails = formCollection["showDetails"].ToString();
+            //bool returnToDetails = formCollection["showDetails"] == null ? false : bool.Parse(formCollection["showDetails"]);
+            //if (returnToDetails)
+            //    return DetailsPartial(logID.ToString());
+
+            //return RedirectToAction("Index");
         }
 
         /// <summary>
@@ -838,7 +878,7 @@ namespace OSBLE.Controllers
             {
                // LogErrorMessage(ex);
             }
-            return RedirectToAction("Index");
+            return GetFeed();
         }
 
         [System.Web.Http.HttpPost]

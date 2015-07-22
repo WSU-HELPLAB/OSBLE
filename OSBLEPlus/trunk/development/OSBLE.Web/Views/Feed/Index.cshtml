@@ -1,6 +1,7 @@
 ﻿@using OSBLE.Models.Courses
 @using OSBLEPlus.Logic.Utility
 @using OSBLEPlus.Logic.Utility.Lookups
+@using OSBLE.Models.Queries
 @model OSBLEPlus.Logic.DomainObjects.ActivityFeeds.FeedViewModel
 
 <script type="text/javascript" src="@Url.Content("~/Scripts/ActivityFeed.js")"></script>
@@ -19,7 +20,8 @@
                     new AjaxOptions
                     {
                         HttpMethod = "POST",
-                        UpdateTargetId = "activity_feed_content",
+                        UpdateTargetId = "dp_posts",
+                        OnComplete = "PostFeedItemComplete()"
                     },
                     new { 
                         id = "post-comment-form", 
@@ -27,7 +29,7 @@
                     }))
                 {
                     <div class="form-group">
-                        <textarea id="ActivityFeed" class="form-control" name="comment" rows="4" placeholder="Enter new feed post here..."></textarea>
+                        <textarea id="feed-post-textbox" class="form-control" name="comment" rows="4" placeholder="Enter new feed post here..."></textarea>
                     </div>
 
                     <input type="submit" id="btn_post_active" class="btn btn-default" name="post_active" value="Post to @Helpers.CourseTag(ViewBag.ActiveCourse.AbstractCourse)" />
@@ -47,6 +49,7 @@
         }
     </div>
 
+    <div id="filters">
         @using (Html.BeginForm("Index", "Feed", FormMethod.Post))
         {
             <div id="keywordSection" class="form-group">
@@ -55,33 +58,26 @@
             </div>
         }
 
-        @*
-        @using (Html.BeginForm("ApplyFeedFilter", "Feed"))
+        @using (Ajax.BeginForm("ApplyFeedFilter", "Feed", new AjaxOptions
         {
-            <article id="filter-options" style="display: none;">
-                <article>
-                    <h2>Filter by Activity Type:</h2>
-                    <ul>
-                        @foreach (var e in Enum<EventType>.Get())
-                        {
-                            if (Model.EventFilterOptions.Contains((EventType)e.Value))
-                            {
-                                var evt = Model.EventFilterOptions.Single(o => (int)o == e.Value);
-
-                                string checkbox = "";
-                                if (Model.UserEventFilterOptions.Where(o => o == evt).Count() > 0)
-                                {
-                                    checkbox = @"checked=""checked""";
-                                }
-                                <li>
-                                    <input @Html.Raw(checkbox) type="checkbox" id="event_@evt.ToString()" name="event_@evt.ToString()" />
-                                    <label for="event_@evt.ToString()">@e.Text</label>
-                                </li>
-                            }
-                        }
-                    </ul>
-                </article>
-                @*<article>
+            HttpMethod = "Get",
+            UpdateTargetId = "dp_posts"
+        }))
+        {
+            <div id="filter-type" class="form-group">
+                @foreach (EventType e in ActivityFeedQuery.GetNecessaryEvents())
+                {
+                    <div class="checkbox filter-type-option">
+                        <label>
+                            <input type="checkbox" id="event_@e.ToString()" name="event_@e.ToString()" />
+                            @Helpers.GetOptionNameOfEventType(e)
+                        </label>
+                    </div>
+                }
+                @* This allows the parent div to properly "contain" all the checkboxes *@
+                <div style="clear: both"></div>
+            </div>
+            @*<article>
                     <h2>Filter by Error Type:</h2>
                     <select name="error-type">
                         <option value="-1">No Filter</option>
@@ -95,7 +91,7 @@
                             <option @Html.Raw(selectedText) value="@error.Id">@error.Name</option>
                         }
                     </select>
-                </article>*@@*
+                </article>
                 <article>
                     <h2>Filter by Course</h2>
                     <select name="course-filter">
@@ -127,12 +123,10 @@
                             <option @Html.Raw(selectedText) value="@roleValue">@roleName</option>
                         }
                     </select>
-                </article>
-                <input type="submit" name="ApplyFeedFilter" value="Apply Filter" />
-                <img class="submit-loading" src="~/Areas/Analytics/Content/loading.gif" title="loading" alt="loading" />
-            </article>
+                </article>*@
         }
-        *@
+    </div>
+
     <div id="dp_posts" class="panel-group">
         @Html.Partial("Feed/_Feed", Model)
     </div>

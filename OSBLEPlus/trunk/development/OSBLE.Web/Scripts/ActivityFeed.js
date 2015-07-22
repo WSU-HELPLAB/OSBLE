@@ -51,22 +51,32 @@ function expandComments(lastLogID) {
     }
 }
 
+function PostFeedItemComplete()
+{
+    $('#feed-post-textbox').val('');
+    $('.feed-item-single').first().hide().show('easeInBounce');
+}
+
 function PostReplyComplete(logID) {
     var replies = $("#feed-item-comments-" + logID);
 
-    // make sure reply block is visible
-    replies.css('display', 'block');
-    $("#expand-comments-text-" + logID).text("Hide");
+    // clear textbox
+    $("#feed-item-respond-" + logID).text('');
+
+    // hide the reply form
+    $("#btn-reply-" + logID).show();
+    $("#feed-reply-" + logID).hide();
+
+    // update "View Conversation" link
+    increaseConversationsNumber(logID);
+
+    // make sure comments block is visible
+    if (replies.css('display') == 'none') {
+        expandComments(logID);
+    }
 
     // highlight the new reply
-    replies.children().last().addClass('just-posted-reply');
-
-    // scroll to new reply
-    var post = $("#feed-item-" + logID);
-    var height = (window.innerHeight > 0) ? window.innerHeight : screen.height;
-    $('html, body').animate({
-        scrollTop: post.offset().top + post.height() - height + 5
-    }, 500);
+    replies.children().last().hide().show('easeInBounce');
 }
 
 //called when the user clicks on the "Load Earlier Posts..." link at the bottom of the page
