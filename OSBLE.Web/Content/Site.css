@@ -2164,3 +2164,8 @@ div.pagedocname {
 .just-posted-reply .dp_post_header {
     background-color: #fafae0;
 }
+
+.feed-edit {
+    margin-bottom: 5px;
+    display: block;
+}

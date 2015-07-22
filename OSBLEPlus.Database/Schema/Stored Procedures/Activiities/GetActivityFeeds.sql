@@ -143,6 +143,7 @@ AS
             WHERE  s.[DateReceived] BETWEEN @DateReceivedMin AND @DateReceivedMax
 			AND
 				   s.[Id] BETWEEN @MinEventLogId AND @MaxEventLogId
+			AND	   (s.[IsDeleted] IS NULL OR s.[IsDeleted] = 0)
             ORDER  BY s.[DateReceived] DESC
         END
       ELSE
@@ -193,6 +194,7 @@ AS
             WHERE  s.[DateReceived] BETWEEN @DateReceivedMin AND @DateReceivedMax
 				   AND s.CourseId IS NOT NULL
 				   AND s.[Id] BETWEEN @MinEventLogId AND @MaxEventLogId
+				   AND (s.[IsDeleted] IS NULL OR s.[IsDeleted] = 0)
             ORDER  BY s.[DateReceived] DESC
         END
 

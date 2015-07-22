@@ -352,14 +352,40 @@ namespace OSBLE.Controllers
             return View("_AjaxEmpty");
         }
 
-        public ActionResult EditFeedPost(int id)
+        [HttpPost]
+        public ActionResult EditFeedPost(int id, string newText)
         {
+            // do checking, make sure non-authorized users cannot edit posts
+
+            UserProfile current = DBHelper.GetUserProfile(ActiveCourseUser.UserProfileID);
+            if ((current.UserId == ActiveCourseUser.UserProfileID) || (ActiveCourseUser.AbstractRole.CanGrade))
+            {
+                DBHelper.EditFeedPost(id, newText);
+            }
+            else
+            {
+                Response.StatusCode = 403;
+            }
+
 
             return View("_AjaxEmpty");
         }
 
-        public ActionResult EditLogComment(int id)
+        [HttpPost]
+        public ActionResult EditLogComment(int id, string newText)
         {
+            // do checking, make sure non-authorized users cannot edit posts
+
+            UserProfile current = DBHelper.GetUserProfile(ActiveCourseUser.UserProfileID);
+            if ((current.UserId == ActiveCourseUser.UserProfileID) || (ActiveCourseUser.AbstractRole.CanGrade))
+            {
+                DBHelper.EditLogComment(id, newText);
+            }
+            else
+            {
+                Response.StatusCode = 403;
+            }
+
 
             return View("_AjaxEmpty");
         }
