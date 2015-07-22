@@ -71,7 +71,7 @@ namespace OSBLEPlus.Services.Tests.Activities
                 {
                     AuthToken = "83-B6-77-B8-54-83-30-7D-0F-EE-68-38-6D-E7-42-5E-2A-D1-3A-72",
                     SubmitEvent = temp,
-                    TeamId = 1,
+                    //TeamId = 1,
                     RequestData = HttpServerUtility.UrlTokenEncode(temp.SolutionData)
                 };
                 request.SubmitEvent.CreateSolutionBinary(null);
