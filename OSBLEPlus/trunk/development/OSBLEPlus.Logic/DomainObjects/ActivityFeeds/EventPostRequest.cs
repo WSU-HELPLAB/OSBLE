@@ -21,9 +21,6 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
     {
         public string AuthToken { get; set; }
         public SubmitEvent SubmitEvent { get; set; }
-
-        public int TeamId { get; set; }
-
         public string RequestData { get; set; }
     }
 }

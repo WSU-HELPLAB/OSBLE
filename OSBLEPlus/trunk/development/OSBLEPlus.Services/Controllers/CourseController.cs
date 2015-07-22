@@ -62,7 +62,7 @@ namespace OSBLEPlus.Services.Controllers
             }
 
             string content = Posts.SubmitAssignment(request.SubmitEvent).ToString();
-            Posts.SaveToFileSystem(request.SubmitEvent, request.SubmitEvent.SenderId);
+            Posts.SaveToFileSystem(request.SubmitEvent);
 
             return new HttpResponseMessage
             {

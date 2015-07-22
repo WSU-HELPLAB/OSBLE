@@ -128,7 +128,6 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
                 {
                     AuthToken = authToken,
                     SubmitEvent = submitEvent,
-                    TeamId = 1,
                     RequestData = HttpServerUtility.UrlTokenEncode(submitEvent.SolutionData)
                 };
                 // to remove the redundant payload from acrossing http wire

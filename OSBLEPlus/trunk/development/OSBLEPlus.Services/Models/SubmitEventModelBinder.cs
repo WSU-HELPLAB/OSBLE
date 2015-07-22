@@ -26,9 +26,7 @@ namespace OSBLEPlus.Services.Models
                             AssignmentId =
                                 Convert.ToInt32(jsonTokens.First(x => x.Contains("AssignmentId:")).Split(':').Last()),
                             SolutionName = jsonTokens.First(x => x.Contains("SolutionName:")).Split(':').Last(),
-                            },
-                        TeamId =
-                            Convert.ToInt32(jsonTokens.First(x => x.Contains("TeamId:")).Split(':').Last())
+                            }
                     };
 
                     var encodedSolution = jsonTokens.First(x => x.Contains("RequestData:")).Split(':').Last();
