@@ -33,8 +33,8 @@ namespace OSBLE.Controllers
         {
             try
             {
-                var query = new ActivityFeedQuery();
-                var subscriptionsQuery = new ActivityFeedQuery();
+                var query = new ActivityFeedQuery(ActiveCourseUser.AbstractCourseID);
+                var subscriptionsQuery = new ActivityFeedQuery(ActiveCourseUser.AbstractCourseID);
                 ProfileViewModel vm = new ProfileViewModel();
                 vm.User = CurrentUser;
                 if (id != null)

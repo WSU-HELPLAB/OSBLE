@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web.WebPages.Scope;
 using Dapper;
+using DDay.Collections;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Utility;
@@ -18,11 +19,11 @@ namespace OSBLE.Models.Queries
 {
     public class ActivityFeedQuery : IOSBLEQuery<FeedItem>
     {
-        private readonly List<EventType> _eventSelectors = new List<EventType>();
+        private List<EventType> _eventSelectors = new List<EventType>();
         protected List<UserProfile> SubscriptionSubjects = new List<UserProfile>();
         protected readonly List<int> EventIds = new List<int>();
 
-        public ActivityFeedQuery()
+        public ActivityFeedQuery(int activeCourseUserCourseId)
         {
             StartDate = new DateTime(2010, 1, 1);
             EndDate = DateTime.Today.AddDays(3);
@@ -39,7 +40,7 @@ namespace OSBLE.Models.Queries
 
                 CourseRoleFilter = new CourseRole(conn.Query<CourseRole>(query).First());
             }
-            CourseFilter = new Course() { ID = -1 };
+            CourseFilter = new Course() { ID = activeCourseUserCourseId };
         }
 
         /// <summary>
@@ -68,7 +69,7 @@ namespace OSBLE.Models.Queries
 
         /// <summary>
         /// Used to limit the number of query results.  Default of -1 means to return all results.
-        /// </summary>B
+        /// </summary>
         public int MaxQuerySize { protected get; set; }
 
         /// <summary>
@@ -76,13 +77,13 @@ namespace OSBLE.Models.Queries
         /// the supplied threshold.  E.g. CourseRole.Student will select everyone whereas 
         /// CourseRole.Coordinator will only select course coordinators.
         /// </summary>
-        public CourseRole CourseRoleFilter { private get; set; }
+        public CourseRole CourseRoleFilter { get; set; }
 
         /// <summary>
         /// Used to select only posts made by students in a given course.  Default value is all
         /// courses.
         /// </summary>
-        public Course CourseFilter { private get; set; }
+        public Course CourseFilter { get; set; }
 
         /// <summary>
         /// Comment search token entered by the user
@@ -99,8 +100,8 @@ namespace OSBLE.Models.Queries
             {
                 EventType.FeedPostEvent,
                 EventType.AskForHelpEvent,
-                EventType.LogCommentEvent,
-                EventType.HelpfulMarkGivenEvent,
+                //EventType.LogCommentEvent,
+                //EventType.HelpfulMarkGivenEvent,
                 EventType.SubmitEvent,
             };
         }
@@ -118,17 +119,26 @@ namespace OSBLE.Models.Queries
             };
         }
 
-        public static IEnumerable<int> GetNecessaryEvents()
+        public static IEnumerable<EventType> GetNecessaryEvents()
         {
-            return new List<int>
+            return new List<EventType>
             {
-                (int)EventType.AskForHelpEvent,
-                (int)EventType.BuildEvent,
-                (int)EventType.DebugEvent,
-                (int)EventType.ExceptionEvent,
-                (int)EventType.FeedPostEvent,
-                (int)EventType.SubmitEvent
+                EventType.AskForHelpEvent,
+                EventType.BuildEvent,
+                EventType.DebugEvent,
+                EventType.ExceptionEvent,
+                EventType.FeedPostEvent,
+                EventType.SubmitEvent
             };
+        } 
+
+        private IEnumerable<int> GetEventFilter()
+        {
+            List<int> l = new List<int>();
+
+            l = _eventSelectors.Select(i => (int) i).ToList();
+
+            return l;
         }
 
         /// <summary>
@@ -206,19 +216,33 @@ namespace OSBLE.Models.Queries
             EventIds.Clear();
         }
 
+        private void ClearEventSelectors()
+        {
+            _eventSelectors.Clear();
+        }
+
+        public void UpdateEventSelectors(IEnumerable<EventType> eList)
+        {
+            ClearEventSelectors();
+
+            _eventSelectors = eList.Select(e => e).Distinct().ToList();
+        }
+
         /// <summary>
         /// execute the query, returns 20 items by default
         /// </summary>
         /// <returns></returns>
         public virtual IEnumerable<FeedItem> Execute()
         {
+            UpdateEventSelectors(GetSocialEvents());
+
             var query = new OSBLEPlus.Services.Controllers.FeedController().Get(
                                 StartDate // 1
                                 , EndDate // 2
                                 , MinLogId
                                 , MaxLogId
                                 , EventIds//.Select(eid => (int)eid).ToList() // 3
-                                , GetNecessaryEvents()//_eventSelectors.Select(e => (int)e) // 4
+                                , GetEventFilter()//_eventSelectors.Select(e => (int)e) // 4
                                 , CourseFilter != null && CourseFilter.ID > 0 ? CourseFilter.ID : 0
                                 , CourseRoleFilter.ID
                                 , CommentFilter
@@ -243,7 +267,7 @@ namespace OSBLE.Models.Queries
                     , MinLogId
                     , MaxLogId
                     , EventIds//.Select(eid => (int)eid).ToList() // 3
-                    , GetNecessaryEvents()//_eventSelectors.Select(e => (int)e) // 4
+                    , GetEventFilter()//_eventSelectors.Select(e => (int)e) // 4
                     , CourseFilter != null && CourseFilter.ID > 0 ? CourseFilter.ID : 0
                     , CourseRoleFilter.ID
                     , CommentFilter

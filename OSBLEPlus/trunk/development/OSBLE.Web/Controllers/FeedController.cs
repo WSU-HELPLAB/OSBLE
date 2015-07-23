@@ -24,10 +24,11 @@ namespace OSBLE.Controllers
 {
     public class FeedController : OSBLEController
     {
-        private UserFeedSetting _userSettings = new UserFeedSetting();
-
+        //private UserFeedSetting _userSettings = ;
+        private ActivityFeedQuery _activityFeedQuery;
         public FeedController()
         {
+            _activityFeedQuery = new ActivityFeedQuery(ActiveCourseUser.AbstractCourseID);
             //_userSettings = (from setting in Db.UserFeedSettings
             //                    where setting.UserId == CurrentUser.Id
             //                    orderby setting.Id descending
@@ -64,38 +65,18 @@ namespace OSBLE.Controllers
             }
             catch (Exception ex)
             {
-                //LogErrorMessage(ex);
-
-                //return RedirectToAction("FeedDown", "Error");
+                ViewBag.ErrorMessage = ex.Message;
+                return PartialView("Error");
             }
 
-            return PartialView("_Error");            
         }
 
         private FeedViewModel GetFeedViewModel(long timestamp = -1, int errorType = -1, string errorTypeStr = "", string keyword = "", int hash = 0)
         {
-                var query = new ActivityFeedQuery();
+            var query = _activityFeedQuery;
 
                 //query.CommentFilter = hash == 0 ? keyword : "#" + keyword;
 
-                //Two ways that we can receive an error type: by name (errorTypeStr) or by ID (errorType).
-                //First, we check the string and see if we can match it to an ID number.  Then, we check
-                //to see if we have a valid ID number.  If it doesn't work out, just work as normal.
-                //if (string.IsNullOrEmpty(errorTypeStr) == false)
-                //{
-                //    errorTypeStr = errorTypeStr.ToLower().Trim();
-                //    ErrorType type = Db.ErrorTypes.Where(e => e.Name.CompareTo(errorTypeStr) == 0).FirstOrDefault();
-                //    if (type != null)
-                //    {
-                //        errorType = type.Id;
-                //    }
-                //}
-                //if (errorType > 0)
-                //{
-                //    query = new BuildErrorQuery(Db);
-                //    (query as BuildErrorQuery).BuildErrorTypeId = errorType;
-                //}
-                //BuildBasicQuery(query);
                 FeedViewModel vm = new FeedViewModel();
 
                 if (timestamp > 0)
@@ -121,15 +102,6 @@ namespace OSBLE.Controllers
 
                 vm.LastLogId = maxIdQuery - 1;
 
-                //if (maxIdQuery.Count() > 0)
-                //{
-                //    vm.LastLogId = maxIdQuery.Max();
-                //}
-                //else
-                //{
-                //    vm.LastLogId = 0;
-                //}
-
                 // order items correctly, currently the Stored Procedure returns items in reverse order even though it orders dates by DESC
                 // see GetActivityFeeds.sql or run the Stored Procedure in Sql Server Managment Studio to see output.
                 List<FeedItem> feedItems = returnItems.OrderByDescending(i => i.Event.EventDate).ToList();
@@ -147,30 +119,11 @@ namespace OSBLE.Controllers
                 vm.Feed = aggregateFeed;
                 vm.EventFilterOptions = ActivityFeedQuery.GetAllEvents().OrderBy(e => e.ToString()).ToList();
                 vm.UserEventFilterOptions = query.ActiveEvents;
-                //vm.ErrorTypes = Db.ErrorTypes.Distinct().ToList();
-                //vm.SelectedErrorType = new ErrorType();
-                //if (errorType > 0)
-                //{
-                //    vm.SelectedErrorType = Db.ErrorTypes.Where(e => e.Id == errorType).FirstOrDefault();
-                //    if (vm.SelectedErrorType == null)
-                //    {
-                //        vm.SelectedErrorType = new ErrorType();
-                //    }
-                //}
 
                 ////build possible courses and user types
-                //vm.Courses = Db.Courses.ToList();
                 vm.CourseRoles.Add(CourseRole.CourseRoles.Student);
                 vm.CourseRoles.Add(CourseRole.CourseRoles.TA);
                 vm.CourseRoles.Add(CourseRole.CourseRoles.Instructor);
-                //if (_userSettings != null)
-                //{
-                //    vm.SelectedCourseId = _userSettings.CourseFilter;
-                //    vm.SelectedCourseRole = _userSettings.CourseRole;
-                //}
-
-                //build the "you and 5 others got this error"-type messages
-                //BuildEventRelations(vm, feedItems);
                 vm.Keyword = keyword;
             return vm;
         }
@@ -261,7 +214,7 @@ namespace OSBLE.Controllers
         {
             //return View("AjaxFeed", new List<AggregateFeedItem>()); 
 
-            var query = new ActivityFeedQuery();
+            var query = _activityFeedQuery;
             query.CommentFilter = hash == 0 ? keyword : "#" + keyword;
             if (errorType > 0)
             {
@@ -317,17 +270,20 @@ namespace OSBLE.Controllers
                 return new EmptyResult();
             }
 
-            // Insert the comment
+                // Insert the comment
             bool success = DBHelper.InsertActivityFeedComment(logID, CurrentUser.ID, content);
-            if (!success)
-                return new EmptyResult();
+                if (!success)
+                    return new EmptyResult();
 
             // Get the new comment list, and put it into a model
             FeedItem post = GetFeedItemFromID(logID);
             // Add a new FeedItem for each comment whose event is the logCommentEvent and whose comments are an empty list
             List<FeedItem> model = post.Comments.Select(c => new FeedItem { Event = c, Comments = new List<LogCommentEvent>() }).ToList();
+                // Get the new comment list, and put it into a Model
+                ActivityFeedQuery q = _activityFeedQuery;
+                q.AddEventId(logID);
 
-            // return the newly created partial view for the list of comments 
+            // return the newly created partial view for the list of comments
             ViewData["ShowFooter"] = false;
             ViewData["ShowDetails"] = true;            
             ViewBag.ParentId = logID;
@@ -481,55 +437,8 @@ namespace OSBLE.Controllers
                 Dictionary<int, List<CommentsViewModel>> viewModels = new Dictionary<int, List<CommentsViewModel>>();
                 List<object> jsonVm = new List<object>();
 
-                //foreach (int logId in logIds)
-                //{
-                //    var actualLogId = logId;
-
-                //    if (allcomments.Any(c => c.OriginalId == logId && c.ActualId != logId))
-                //    {
-                //        // original log is either a comment or a helpful mark
-                //        actualLogId = allcomments.First(c => c.OriginalId == logId && c.ActualId != logId).ActualId;
-                //    }
-
-                //    if (!viewModels.Keys.Contains(actualLogId))
-                //    {
-                //        viewModels.Add(actualLogId, new List<CommentsViewModel>());
-                //    }
-
-                //    var logComments = allcomments.Where(c => c.ActualId == actualLogId);
-                //    //convert LogCommentEvents into JSON
-                //    foreach (var comment in logComments)
-                //    {
-                //        if (!viewModels[actualLogId].Any(c => c.EventLogId == comment.CommentId))
-                //        {
-                //            var commentVM = new CommentsViewModel()
-                //            {
-                //                EventLogId = comment.CommentId,
-                //                CourseName = comment.CourseName,
-                //                Content = comment.Content,
-                //                FirstAndLastName = comment.FirstAndLastName,
-                //                ProfileUrl = Url.Action("Picture", "Profile", new {id = comment.SenderId, size = 48}),
-                //                UtcEventDate = comment.EventDate,
-                //                MarkHelpfulCount = comment.HelpfulMarkCounts,
-                //                MarkHelpfulUrl =
-                //                    Url.Action("MarkCommentHelpful", "Feed",
-                //                        new {commentId = comment.CommentId, returnUrl = Url.Action("Index", "Feed")}),
-                //                DisplayHelpfulMarkLink = !comment.IsHelpfulMarkSender,
-                //            };
-
-                //            //add to VM
-                //            viewModels[actualLogId].Add(commentVM);
-                    //    }
-                    //}
-
-                    //convert to json view model
-                    //jsonVm.Add(
-                    //    new {Comments = viewModels[actualLogId], ActualLogId = actualLogId, OriginalLogId = logId});
                 return Json(new { Data = jsonVm }, JsonRequestBehavior.AllowGet);
             }
-
-            
-            //}
             catch (Exception ex)
             {
                 //LogErrorMessage(ex);
@@ -580,7 +489,7 @@ namespace OSBLE.Controllers
         {
             try
             {
-                var query = new ActivityFeedQuery();
+                var query = _activityFeedQuery;
                 query.CommentFilter = hash == 0 ? keyword : "#" + keyword;
                 if (errorType > 0)
                 {
@@ -670,6 +579,7 @@ namespace OSBLE.Controllers
 
             // Get the list of feed items (EventLogs) with that id
             List<FeedItem> feedItems = GetFeedItemsFromIDs(ids);
+            var query = _activityFeedQuery;
 
             // Check if we were able to get the feed items
             if (feedItems.Count == 0)
@@ -838,85 +748,103 @@ namespace OSBLE.Controllers
             return GetFeed();
         }
 
-        [System.Web.Http.HttpPost]
-        public ActionResult ApplyFeedFilter(FormCollection formCollection)
+        [HttpPost]
+        public ActionResult ApplyFeedfilter(IEnumerable<EventType> eventFilter = null, string commentFilter = null )
         {
-            try
+            if (eventFilter != null)
             {
-                // update user settings in database
-                UserFeedSetting feedSetting = _userSettings;
-                if (feedSetting == null)
-                {
-                    feedSetting = new UserFeedSetting();
-                    feedSetting.UserId = CurrentUser.ID;
-                }
-                else
-                {
-                    feedSetting = new UserFeedSetting(feedSetting);
-                    feedSetting.Id = 0;
-                    feedSetting.SettingsDate = DateTime.UtcNow;
-                }
-                //Db.UserFeedSettings.Add(feedSetting);
-
-                //clear out existing settings
-                feedSetting.EventFilterSettings = 0;
-
-                //load in new settings
-                foreach (string key in Request.Form.Keys)
-                {
-                    if (key.StartsWith("event_") == true)
-                    {
-                        string[] pieces = key.Split('_');
-                        if (pieces.Length == 2)
-                        {
-                            EventType evt;
-                            if (Enum.TryParse<EventType>(pieces[1], true, out evt))
-                            {
-                                feedSetting.SetSetting(evt, true);
-                            }
-                        }
-                    }
+                _activityFeedQuery.UpdateEventSelectors(eventFilter.ToList());
                 }
 
-                //check for course filter
-                if (Request.Form.AllKeys.Contains("course-filter"))
+            if (commentFilter != null)
                 {
-                    int courseId = -1;
-                    Int32.TryParse(Request.Form["course-filter"], out courseId);
-                    feedSetting.CourseFilter = courseId;
+                _activityFeedQuery.CommentFilter = commentFilter;
                 }
 
-                //check for user filter
-                if (Request.Form.AllKeys.Contains("user-type-filter"))
-                {
-                    int userRoleId = (int) CourseRole.CourseRoles.Student;
-                    Int32.TryParse(Request.Form["user-type-filter"], out userRoleId);
-                    using (SqlConnection conn = DBHelper.GetNewConnection())
-                    {
-                        string query = "SELECT * " +
-                                       "FROM AbstractRoles a " +
-                                       "WHERE " +
-                                       "a.Name = 'Student'";
-                        feedSetting.CourseRoleFilter = new CourseRole(conn.Query<CourseRole>(query).First());
-                    }
+            _activityFeedQuery.CourseFilter = new Course() { ID = _activityFeedQuery.CourseFilter.ID };
+
+            return View("Index");
                 }
-                //save changes
-                //Db.SaveChanges();
 
-                //apply filter reload page
-                var errorType = Request.Form.AllKeys.Contains("error-type") ? Request.Form["error-type"] : string.Empty;
-                var keyword = ((EventFilterSetting)feedSetting.EventFilterSettings & EventFilterSetting.FeedPostEvent) == EventFilterSetting.FeedPostEvent
-                                && Request.Form.AllKeys.Contains("keyword") ? Request.Form["keyword"] : string.Empty;
+        //[System.Web.Http.HttpPost]
+        //public ActionResult ApplyFeedFilter(FormCollection formCollection)
+        //{
+        //    try
+        //    {
+        //        // update user settings in database
+        //        //UserFeedSetting feedSetting = _userSettings;
+        //        //if (feedSetting == null)
+        //        //{
+        //        //    feedSetting = new UserFeedSetting();
+        //        //    feedSetting.UserId = CurrentUser.ID;
+        //        //}
+        //        //else
+        //        //{
+        //        //    feedSetting = new UserFeedSetting(feedSetting);
+        //        //    feedSetting.Id = 0;
+        //        //    feedSetting.SettingsDate = DateTime.UtcNow;
+        //        //}
+        //        ////Db.UserFeedSettings.Add(feedSetting);
 
-                return RedirectToAction("Index", new { errorType = errorType, keyword = keyword });
-            }
-            catch (Exception ex)
-            {
-                return RedirectToAction("Index");
-                //LogErrorMessage(ex);
-                //return RedirectToAction("FeedDown", "Error");
-            }
-        }
+        //        ////clear out existing settings
+        //        //feedSetting.EventFilterSettings = 0;
+
+        //        //load in new settings
+        //        foreach (string key in Request.Form.Keys)
+        //        {
+        //            if (key.StartsWith("event_") == true)
+        //            {
+        //                string[] pieces = key.Split('_');
+        //                if (pieces.Length == 2)
+        //                {
+        //                    EventType evt;
+        //                    if (Enum.TryParse<EventType>(pieces[1], true, out evt))
+        //                    {
+        //                        feedSetting.SetSetting(evt, true);
+        //                    }
+        //                }
+        //            }
+        //        }
+
+        //        //check for course filter
+        //        if (Request.Form.AllKeys.Contains("course-filter"))
+        //        {
+        //            int courseId = -1;
+        //            Int32.TryParse(Request.Form["course-filter"], out courseId);
+        //            feedSetting.CourseFilter = courseId;
+        //        }
+
+        //        //check for user filter
+        //        if (Request.Form.AllKeys.Contains("user-type-filter"))
+        //        {
+        //            int userRoleId = (int) CourseRole.CourseRoles.Student;
+        //            Int32.TryParse(Request.Form["user-type-filter"], out userRoleId);
+        //            using (SqlConnection conn = DBHelper.GetNewConnection())
+        //            {
+        //                string query = "SELECT * " +
+        //                               "FROM AbstractRoles a " +
+        //                               "WHERE " +
+        //                               "a.Name = 'Student'";
+        //                feedSetting.CourseRoleFilter = new CourseRole(conn.Query<CourseRole>(query).First());
+        //            }
+        //        }
+        //        //save changes
+        //        //Db.SaveChanges();
+
+        //        //apply filter reload page
+        //        var errorType = Request.Form.AllKeys.Contains("error-type") ? Request.Form["error-type"] : string.Empty;
+        //        var keyword = ((EventFilterSetting)feedSetting.EventFilterSettings & EventFilterSetting.FeedPostEvent) == EventFilterSetting.FeedPostEvent
+        //                        && Request.Form.AllKeys.Contains("keyword") ? Request.Form["keyword"] : string.Empty;
+
+        //        return RedirectToAction("Index", new { errorType = errorType, keyword = keyword });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return RedirectToAction("Index");
+        //        //LogErrorMessage(ex);
+        //        //return RedirectToAction("FeedDown", "Error");
+        //    }
+        //}
 
         /// <summary>
         /// Constructs a basic query to be further manipulated by other functions in this class
@@ -927,24 +855,12 @@ namespace OSBLE.Controllers
             //check for null query
             if (query == null)
             {
-                query = new ActivityFeedQuery();
+                query = _activityFeedQuery;
             }
 
-            //add the event types that the user wants to see
-            UserFeedSetting feedSettings = _userSettings;
-            if (feedSettings == null || feedSettings.ActiveSettings.Count == 0)
-            {
                 foreach (var evt in ActivityFeedQuery.GetAllEvents())
                 {
                     query.AddEventType(evt);
-                }
-            }
-            else
-            {
-                //load in event filter settings
-                foreach (EventFilterSetting setting in feedSettings.ActiveSettings)
-                {
-                    query.AddEventType(UserFeedSetting.FeedOptionToOsbideEvent(setting));
                 }
 
                 //load in course and user type filtering
