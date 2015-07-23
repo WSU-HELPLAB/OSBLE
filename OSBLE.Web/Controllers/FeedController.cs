@@ -754,17 +754,17 @@ namespace OSBLE.Controllers
             if (eventFilter != null)
             {
                 _activityFeedQuery.UpdateEventSelectors(eventFilter.ToList());
-                }
+            }
 
             if (commentFilter != null)
-                {
+            {
                 _activityFeedQuery.CommentFilter = commentFilter;
-                }
+            }
 
             _activityFeedQuery.CourseFilter = new Course() { ID = _activityFeedQuery.CourseFilter.ID };
 
             return View("Index");
-                }
+        }
 
         //[System.Web.Http.HttpPost]
         //public ActionResult ApplyFeedFilter(FormCollection formCollection)
@@ -858,20 +858,19 @@ namespace OSBLE.Controllers
                 query = _activityFeedQuery;
             }
 
-                foreach (var evt in ActivityFeedQuery.GetAllEvents())
-                {
-                    query.AddEventType(evt);
-                }
-
-                //load in course and user type filtering
-                query.CourseRoleFilter = (CourseRole)feedSettings.CourseRoleFilter;
-                query.CourseFilter = new Course() { ID = feedSettings.CourseFilter };
+            foreach (var evt in ActivityFeedQuery.GetAllEvents())
+            {
+                query.AddEventType(evt);
             }
+
+            //load in course and user type filtering
+            query.CourseRoleFilter = (CourseRole)query.CourseRoleFilter;
+            query.CourseFilter = new Course() { ID = query.CourseFilter.ID };
         }
 
         private FeedItem GetFeedItemFromID(int id)
         {
-            ActivityFeedQuery query = new ActivityFeedQuery();
+            ActivityFeedQuery query = new ActivityFeedQuery(ActiveCourseUser.AbstractCourseID);
             query.MinLogId = id;
             query.MaxLogId = id;
             IEnumerable<FeedItem> result = query.Execute();
