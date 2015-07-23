@@ -85,9 +85,9 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             textEditorEvents = Dte.Events.TextEditorEvents;
 
             //attach osbide requests
-            var osbideEventGenerator = osbideEvents;
-            osbideEventGenerator.SolutionSubmitRequest += SolutionSubmitted;
-            osbideEventGenerator.SubmitEventRequested += SubmitEventRequested;
+            //var osbideEventGenerator = osbideEvents;
+            //osbideEventGenerator.SolutionSubmitRequest += SolutionSubmitted;
+            //osbideEventGenerator.SubmitEventRequested += SubmitEventRequested;
 
             //attach listeners for dte events
             //build events
