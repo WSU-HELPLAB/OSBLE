@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="Activities\FeedsTests.cs" />
     <Compile Include="Activities\PostsTests.cs" />
+    <Compile Include="Activities\UnitTest1.cs" />
     <Compile Include="Analytics\CalendarTests.cs" />
     <Compile Include="Profiles\UserDataAccessTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
