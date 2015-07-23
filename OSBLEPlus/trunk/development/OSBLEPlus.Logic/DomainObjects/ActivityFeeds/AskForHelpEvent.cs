@@ -21,9 +21,9 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
         public override string GetInsertScripts()
         {
             return string.Format(@"
-INSERT INTO dbo.EventLogs (EventTypeId, EventDate, SenderId, BatchId) VALUES ({0}, '{1}', {2}, '{6}')
+INSERT INTO dbo.EventLogs (EventTypeId, EventDate, SenderId, BatchId, CourseId) VALUES ({0}, '{1}', {2}, '{6}', {7})
 INSERT INTO dbo.AskForHelpEvents (EventLogId, EventDate, SolutionName, Code, UserComment)
-VALUES (SCOPE_IDENTITY(), '{1}', '{3}', '{4}', '{5}')", EventTypeId, EventDate, SenderId, SolutionName, Code, UserComment, BatchId);
+VALUES (SCOPE_IDENTITY(), '{1}', '{3}', '{4}', '{5}')", EventTypeId, EventDate, SenderId, SolutionName, Code, UserComment, BatchId, CourseId);
         }
     }
 }
