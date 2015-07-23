@@ -322,6 +322,7 @@
     <Compile Include="Services\UploaderWebService.svc.cs">
       <DependentUpon>UploaderWebService.svc</DependentUpon>
     </Compile>
+    <Compile Include="TempCode\FeedControllerUnusedCode.cs" />
     <Compile Include="Utility\ActionResultExtensions.cs" />
     <Compile Include="Utility\DBHelper.cs" />
     <Compile Include="Utility\Constants.cs" />
