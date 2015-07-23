@@ -497,8 +497,19 @@ namespace OSBLE.Utility
             try
             {
                 // Get the course id of the original post
-                int? courseID = connection.Query<int>("SELECT [CourseId] FROM EventLogs WHERE Id = @id",
-                    new { id = logID }).SingleOrDefault();
+                int? courseID;
+
+                // nested try catch for when commenting on a post that has a NULL courseID
+                try
+                {
+                    courseID = connection.Query<int>("SELECT CourseId FROM EventLogs WHERE Id = @id",
+                        new {id = logID}).SingleOrDefault();
+                }
+                catch
+                {
+                    courseID = null;
+                }
+                    
 
                 LogCommentEvent e = new LogCommentEvent(DateTime.UtcNow)
                 {
