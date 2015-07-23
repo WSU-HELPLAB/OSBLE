@@ -31,16 +31,21 @@ namespace OSBLE.Models.Queries
             MinLogId = null;
             MaxLogId = null;
             MaxQuerySize = 20;
-            using (SqlConnection conn = DBHelper.GetNewConnection())
-            {
-                string query = "SELECT * " +
-                               "FROM AbstractRoles a " +
-                               "WHERE " +
-                               "a.Name = 'Student'";
+            //using (SqlConnection conn = DBHelper.GetNewConnection())
+            //{
+            //    string query = "SELECT * " +
+            //                   "FROM AbstractRoles a " +
+            //                   "WHERE " +
+            //                   "a.Name = 'Student'";
 
-                CourseRoleFilter = new CourseRole(conn.Query<CourseRole>(query).First());
-            }
+            //    CourseRoleFilter = new CourseRole(conn.Query<CourseRole>(query).First());
+            //}
+
+            CourseRoleFilter = null;
+
             CourseFilter = new Course() { ID = activeCourseUserCourseId };
+            // default events
+            _eventSelectors = GetSocialEvents().ToList();
         }
 
         /// <summary>
@@ -244,7 +249,7 @@ namespace OSBLE.Models.Queries
                                 , EventIds//.Select(eid => (int)eid).ToList() // 3
                                 , GetEventFilter()//_eventSelectors.Select(e => (int)e) // 4
                                 , CourseFilter != null && CourseFilter.ID > 0 ? CourseFilter.ID : 0
-                                , CourseRoleFilter.ID
+                                , CourseRoleFilter == null ? (int?) null : CourseRoleFilter.ID
                                 , CommentFilter
                                 , SubscriptionSubjects.Select(s => s.ID).ToList()
                                 , MaxQuerySize
@@ -269,7 +274,7 @@ namespace OSBLE.Models.Queries
                     , EventIds//.Select(eid => (int)eid).ToList() // 3
                     , GetEventFilter()//_eventSelectors.Select(e => (int)e) // 4
                     , CourseFilter != null && CourseFilter.ID > 0 ? CourseFilter.ID : 0
-                    , CourseRoleFilter.ID
+                    , CourseRoleFilter == null ? (int?) null : CourseRoleFilter.ID
                     , CommentFilter
                     , SubscriptionSubjects.Select(s => s.ID).ToList()
                     , numberOfItemsToReturn
