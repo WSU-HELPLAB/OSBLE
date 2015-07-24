@@ -2,6 +2,7 @@
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
+    [Serializable]
     public sealed class HelpfulMarkGivenEvent : ActivityEvent
     {
         public int LogCommentEventId { get; set; }

@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
+    [Serializable]
     public class CodeDocument
     {
         public int Id { get; set; }

@@ -4,6 +4,7 @@ using OSBLEPlus.Logic.Utility.Lookups;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
+    [Serializable]
     public sealed class CutCopyPasteEvent : ActivityEvent
     {
         public int EventActionId { get; set; }

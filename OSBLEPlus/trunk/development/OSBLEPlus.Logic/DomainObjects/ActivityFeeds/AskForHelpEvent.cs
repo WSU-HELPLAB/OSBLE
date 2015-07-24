@@ -2,6 +2,7 @@
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
+    [Serializable]
     public sealed class AskForHelpEvent : ActivityEvent
     {
         public string Code { get; set; }

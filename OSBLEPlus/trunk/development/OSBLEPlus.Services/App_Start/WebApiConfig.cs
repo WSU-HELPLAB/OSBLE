@@ -15,7 +15,10 @@ namespace OSBLEPlus.Services
         public static void Register(HttpConfiguration config)
         {
             var jsonFormatter = config.Formatters.OfType<JsonMediaTypeFormatter>().First();
-            jsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            jsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver
+            {
+                IgnoreSerializableAttribute = true
+            };
 
             // Web API configuration and services
             config.EnableCors(new AllowWebClientsAttribute());

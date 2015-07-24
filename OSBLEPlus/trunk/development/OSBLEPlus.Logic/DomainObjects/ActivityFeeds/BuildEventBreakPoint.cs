@@ -1,5 +1,8 @@
-﻿namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+﻿using System;
+
+namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
+    [Serializable]
     public class BuildEventBreakPoint
     {
         public int BuildEventId { get; set; }

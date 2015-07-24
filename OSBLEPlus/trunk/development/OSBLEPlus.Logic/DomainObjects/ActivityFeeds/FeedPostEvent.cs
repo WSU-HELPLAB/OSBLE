@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Dapper;
-using OSBLE.Models.Courses;
-using OSBLE.Models.Users;
 using OSBLEPlus.Logic.Utility;
+using OSBLEPlus.Logic.Utility.Lookups;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
+    [Serializable]
     public sealed class FeedPostEvent : ActivityEvent
     {
         private const string HashRegex = "#[A-Za-z][A-Za-z0-9]+";
@@ -20,7 +17,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 
         public FeedPostEvent() // NOTE!! This is required by Dapper ORM
         {
-            EventTypeId = (int) Utility.Lookups.EventType.FeedPostEvent;
+            EventTypeId = (int) EventType.FeedPostEvent;
         }
 
         public FeedPostEvent(DateTime dateTimeValue) : this()
@@ -30,7 +27,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 
         public override string GetInsertScripts()
         {
-            string batchString = BatchId == null ? "NULL" : BatchId.ToString();
+            var batchString = BatchId == null ? "NULL" : BatchId.ToString();
 
             var sql = string.Format(@"
 INSERT INTO dbo.EventLogs (EventTypeID, EventDate, DateReceived, SolutionName, SenderId, BatchId, CourseId) VALUES ({0}, '{1}', '{7}', '{3}', '{2}', {5}, {6})

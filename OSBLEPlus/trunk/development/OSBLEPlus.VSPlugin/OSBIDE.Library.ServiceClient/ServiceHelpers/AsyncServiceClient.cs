@@ -128,11 +128,8 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
                 {
                     AuthToken = authToken,
                     SubmitEvent = submitEvent,
-                    RequestData = HttpServerUtility.UrlTokenEncode(submitEvent.SolutionData)
                 };
-                // to remove the redundant payload from acrossing http wire
-                request.SubmitEvent.CreateSolutionBinary(null);
-                var response = await client.PostAsJsonAsync("api/course/post", request);
+                var response = await client.PostAsXmlAsync("api/course/post", request);
 
                 return response.IsSuccessStatusCode
                         ? JsonConvert.DeserializeObject<int>(response.Content.ReadAsStringAsync().Result)
@@ -144,7 +141,7 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
         {
             using (var client = GetClient())
             {
-                var task = client.PostAsJsonAsync("api/eventcollection/post", request);
+                var task = client.PostAsXmlAsync("api/eventcollection/post", request);
                 await task;
 
                 return task.Result.StatusCode == HttpStatusCode.OK

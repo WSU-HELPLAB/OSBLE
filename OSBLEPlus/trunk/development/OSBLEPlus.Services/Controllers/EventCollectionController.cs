@@ -2,8 +2,6 @@
 using System.Net.Http;
 using System.Web.Http;
 
-using Newtonsoft.Json;
-
 using OSBLEPlus.Logic.DataAccess.Activities;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
 using OSBLEPlus.Logic.Utility.Auth;

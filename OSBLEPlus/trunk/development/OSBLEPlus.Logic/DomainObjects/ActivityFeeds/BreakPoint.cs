@@ -2,6 +2,7 @@
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
+    [Serializable]
     public class BreakPoint : IComparable, IEquatable<BreakPoint>
     {
         public int Id { get; set; }

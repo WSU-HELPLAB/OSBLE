@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
+    [Serializable]
     public sealed class ExceptionEvent : ActivityEvent
     {
         public string DocumentName { get; set; }

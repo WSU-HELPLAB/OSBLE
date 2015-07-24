@@ -1,5 +1,4 @@
-﻿using OSBLEPlus.Logic.Utility;
-namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+﻿namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
     public class EventPostRequest
     {
@@ -21,6 +20,5 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
     {
         public string AuthToken { get; set; }
         public SubmitEvent SubmitEvent { get; set; }
-        public string RequestData { get; set; }
     }
 }
