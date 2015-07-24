@@ -44,6 +44,25 @@ namespace OSBLE.Utility
 
             return profile;
         }
+
+        public static UserProfile GetUserProfile(string userName, SqlConnection connection = null)
+        {
+            UserProfile profile = null;
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    profile = GetUserProfile(userName, sqlc);
+                }
+                return profile;
+            }
+
+            profile = connection.Query<UserProfile>("SELECT * FROM UserProfiles WHERE UserName = @UserName",
+                new {UserName = userName}).SingleOrDefault();
+
+            return profile;
+        }
+
         #endregion
 
 
