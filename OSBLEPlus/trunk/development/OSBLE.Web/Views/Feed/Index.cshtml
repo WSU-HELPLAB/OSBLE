@@ -52,7 +52,7 @@
             @* Search by Keyword *@
             <div id="keywordSection" class="form-group">
                 <label id="feedSearchIcon" for="feedSearchInput"><span class="glyphicon glyphicon-search"></span></label>
-                <input id="feedSearchInput" type="text" class="typeahead form-control" name="keyword" autocomplete="off" placeholder="Search by keyword..." />
+                <input id="feedSearchInput" type="text" data-bind="textInput: filter.keywords" class="typeahead form-control" name="keyword" autocomplete="off" placeholder="Search by keyword..." />
             </div>
 
             @* Event Type Checkboxes *@

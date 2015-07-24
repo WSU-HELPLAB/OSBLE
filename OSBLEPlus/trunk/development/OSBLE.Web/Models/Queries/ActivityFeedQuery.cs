@@ -93,7 +93,7 @@ namespace OSBLE.Models.Queries
         /// <summary>
         /// Comment search token entered by the user
         /// </summary>
-        public string CommentFilter { private get; set; }
+        public string CommentFilter { get; set; }
 
         /// <summary>
         /// returns a lits of all social events in OSBLE
