@@ -45,6 +45,21 @@ namespace OSBLE.Utility
             return profile;
         }
 
+        public static CourseUser GetCourseUserFromProfileAndCourse(int userProfileID, int courseID, SqlConnection connection = null)
+        {
+            CourseUser cu = null;
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection()) { cu = GetCourseUserFromProfileAndCourse(userProfileID, courseID, sqlc); }
+                return cu;
+            }
+
+            cu = connection.Query<CourseUser>("SELECT * FROM CourseUsers WHERE UserProfileID = @uid AND AbstractCourseID = @courseID",
+                new { uid = userProfileID, cid = courseID }).FirstOrDefault();
+
+            return cu;
+        }
+
         public static UserProfile GetUserProfile(string userName, SqlConnection connection = null)
         {
             UserProfile profile = null;

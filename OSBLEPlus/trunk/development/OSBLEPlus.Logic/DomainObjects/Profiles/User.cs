@@ -1,4 +1,5 @@
 ﻿using OSBLE.Interfaces;
+using OSBLE.Models.Courses;
 
 namespace OSBLEPlus.Logic.DomainObjects.Profiles
 {
@@ -21,5 +22,10 @@ namespace OSBLEPlus.Logic.DomainObjects.Profiles
         public ICourse DefalutCourse { get; set; }
 
         public User() { } // NOTE!! This is required by Dapper ORM
+
+        public string DisplayName(CourseUser viewingUser)
+        {
+            return FullName;
+        }
     }
 }

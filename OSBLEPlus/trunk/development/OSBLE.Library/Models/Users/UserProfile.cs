@@ -217,6 +217,11 @@ namespace OSBLE.Models.Users
             return returnValue;
         }
 
+        public string DisplayName(CourseUser viewingUser)
+        {
+            return DisplayName(viewingUser.AbstractRoleID, true);
+        }
+
         public void SetProfileImage(System.Drawing.Bitmap bmp)
         {
             if (null == bmp)

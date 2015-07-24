@@ -1,4 +1,5 @@
-﻿namespace OSBLE.Interfaces
+﻿using OSBLE.Models.Courses;
+namespace OSBLE.Interfaces
 {
     public interface IUser
     {
@@ -15,5 +16,6 @@
         bool EmailNewDiscussionPosts { get; set; }
         int DefaultCourseId { get; set; }
         ICourse DefalutCourse { get; set; }
+        string DisplayName(CourseUser viewingUser);
     }
 }

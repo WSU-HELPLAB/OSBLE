@@ -2,9 +2,21 @@
 @using OSBLEPlus.Logic.Utility
 @using OSBLEPlus.Logic.Utility.Lookups
 @using OSBLE.Models.Queries
+@using OSBLE.Models.Users
 @model OSBLEPlus.Logic.DomainObjects.ActivityFeeds.FeedViewModel
+@{
+    UserProfile currentUser = ViewBag.CurrentUser;
+}
 
+
+<script type="text/javascript" src="@Url.Content("~/Scripts/knockout-2.2.1.js")"></script>
 <script type="text/javascript" src="@Url.Content("~/Scripts/ActivityFeed.js")"></script>
+<script type="text/javascript">
+    var vm = new FeedViewModel("@currentUser.FullName", @currentUser.ID);;
+    $(document).ready(function () {
+        ko.applyBindings(vm);
+    });
+</script>
 
 <section data-tab="ActivityFeed">
     <div id="activity_new_post">

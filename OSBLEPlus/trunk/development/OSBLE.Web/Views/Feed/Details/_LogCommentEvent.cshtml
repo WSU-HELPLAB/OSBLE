@@ -1,9 +1,6 @@
 ﻿@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
-@model AggregateFeedItem
-@{
-    LogCommentEvent comment = Model.Items.First().Event as LogCommentEvent;
-}
+@model LogCommentEvent
 
-<div id="comment-content-@comment.EventLogId">
-    @comment.Content
+<div id="comment-content-@Model.EventLogId">
+    @Model.Content
 </div>

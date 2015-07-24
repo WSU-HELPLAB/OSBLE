@@ -12,8 +12,8 @@
         display: none;
     }
 </style>
-<section id="feed-items">
-@Html.Partial("Feed/_FeedItems", Model.Feed)
+<section id="feed-items" data-bind="foreach: items">
+@Html.Partial("Feed/_FeedItems")
 </section>
 <section id="feed-footer">
 @Html.Partial("Feed/_FeedFooter", Model)
