@@ -73,7 +73,7 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             //save references to dte events
             buildEvents = Dte.Events.BuildEvents;
             genericCommandEvents = Dte.Events.CommandEvents;
-            menuCommandEvents = Dte.Events.get_CommandEvents(MenuEventGuid);
+            menuCommandEvents = Dte.Events.CommandEvents[MenuEventGuid];
             debuggerEvents = Dte.Events.DebuggerEvents;
             documentEvents = Dte.Events.DocumentEvents;
             findEvents = Dte.Events.FindEvents;

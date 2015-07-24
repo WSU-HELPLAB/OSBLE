@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
+using System.Web.UI;
 using System.Xml.Schema;
 using Dapper;
 
@@ -58,11 +59,14 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                 var logComments = multiResults.Read<LogCommentEvent>().ToList();
 
                 // associate logComments with senderId
+
+                List<LogCommentEvent> nonDeletedLogComments = new List<LogCommentEvent>();
                 foreach (LogCommentEvent log in logComments)
                 {
                     ActivityEvent e = eventLogs.SingleOrDefault(x => x.EventLogId == log.EventLogId);
                     if (e == null) continue;
                     log.SenderId = e.SenderId;
+                    nonDeletedLogComments.Add(log);
                 }
                 var helpMark = multiResults.Read<HelpfulMarkGivenEvent>().ToList();
                 var submits = multiResults.Read<SubmitEvent>().ToList();
@@ -73,7 +77,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                                             builds,
                                             exceptions,
                                             feedPosts,
-                                            logComments,
+                                            nonDeletedLogComments,
                                             helpMark,
                                             submits);
             }
