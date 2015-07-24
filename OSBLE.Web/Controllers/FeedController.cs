@@ -30,6 +30,7 @@ namespace OSBLE.Controllers
         public FeedController()
         {
             _activityFeedQuery = new ActivityFeedQuery(ActiveCourseUser.AbstractCourseID);
+            _activityFeedQuery.MaxQuerySize = 20;
         }
 
         /// <summary>
@@ -55,60 +56,60 @@ namespace OSBLE.Controllers
 
         }
 
-        private FeedViewModel GetFeedViewModel(long timestamp = -1, int errorType = -1, string errorTypeStr = "", string keyword = "", int hash = 0)
+        private FeedViewModel GetFeedViewModel()
         {
             var query = _activityFeedQuery;
 
-                //query.CommentFilter = hash == 0 ? keyword : "#" + keyword;
+            //query.CommentFilter = hash == 0 ? keyword : "#" + keyword;
 
-                FeedViewModel vm = new FeedViewModel();
+            FeedViewModel vm = new FeedViewModel();
 
-                if (timestamp > 0)
-                {
-                    DateTime pullDate = new DateTime(timestamp);
-                    query.StartDate = pullDate;
-                }
-                else
-                {
-                    query.MaxQuerySize = 20;
-                }
+            //if (timestamp > 0)
+            //{
+            //    DateTime pullDate = new DateTime(timestamp);
+            //    query.StartDate = pullDate;
+            //}
+            //else
+            //{
+            //    query.MaxQuerySize = 20;
+            //}
 
-                List<FeedItem> returnItems = query.Execute().ToList();
+            List<FeedItem> returnItems = _activityFeedQuery.Execute().ToList();
 
-                //and finally, retrieve our list of feed items
-                int maxIdQuery = int.MaxValue;
+            //and finally, retrieve our list of feed items
+            int maxIdQuery = int.MaxValue;
 
-                foreach (FeedItem f in returnItems)
-                {
-                    if (f.Event.EventId < maxIdQuery)
-                        maxIdQuery = f.Event.EventId;
-                }
+            foreach (FeedItem f in returnItems)
+            {
+                if (f.Event.EventId < maxIdQuery)
+                    maxIdQuery = f.Event.EventId;
+            }
 
-                vm.LastLogId = maxIdQuery - 1;
+            vm.LastLogId = maxIdQuery - 1;
 
-                // order items correctly, currently the Stored Procedure returns items in reverse order even though it orders dates by DESC
-                // see GetActivityFeeds.sql or run the Stored Procedure in Sql Server Managment Studio to see output.
-                List<FeedItem> feedItems = returnItems.OrderByDescending(i => i.Event.EventDate).ToList();
+            // order items correctly, currently the Stored Procedure returns items in reverse order even though it orders dates by DESC
+            // see GetActivityFeeds.sql or run the Stored Procedure in Sql Server Managment Studio to see output.
+            List<FeedItem> feedItems = returnItems.OrderByDescending(i => i.Event.EventDate).ToList();
+            List<AggregateFeedItem> aggregateFeed = AggregateFeedItem.FromFeedItems(feedItems);
 
-                List<AggregateFeedItem> aggregateFeed = AggregateFeedItem.FromFeedItems(feedItems);
-                //this.UpdateLogSubscriptions(CurrentUser);
-                try
-                {
-                    vm.LastPollDate = aggregateFeed.Select(a => a.MostRecentOccurance).Max();
-                }
-                catch (Exception)
-                {
-                    vm.LastPollDate = DateTime.MinValue.AddDays(2);
-                }
-                vm.Feed = aggregateFeed;
-                vm.EventFilterOptions = ActivityFeedQuery.GetAllEvents().OrderBy(e => e.ToString()).ToList();
-                vm.UserEventFilterOptions = query.ActiveEvents;
+            try
+            {
+                vm.LastPollDate = aggregateFeed.Select(a => a.MostRecentOccurance).Max();
+            }
+            catch (Exception)
+            {
+                vm.LastPollDate = DateTime.MinValue.AddDays(2);
+            }
 
-                ////build possible courses and user types
-                vm.CourseRoles.Add(CourseRole.CourseRoles.Student);
-                vm.CourseRoles.Add(CourseRole.CourseRoles.TA);
-                vm.CourseRoles.Add(CourseRole.CourseRoles.Instructor);
-                vm.Keyword = keyword;
+            vm.Feed = aggregateFeed;
+            vm.EventFilterOptions = ActivityFeedQuery.GetNecessaryEvents().OrderBy(e => e.ToString()).ToList();
+            vm.UserEventFilterOptions = query.ActiveEvents;
+
+            ////build possible courses and user types
+            vm.CourseRoles.Add(CourseRole.CourseRoles.Student);
+            vm.CourseRoles.Add(CourseRole.CourseRoles.TA);
+            vm.CourseRoles.Add(CourseRole.CourseRoles.Instructor);
+            vm.Keyword = query.CommentFilter;
             return vm;
         }
 
@@ -117,9 +118,13 @@ namespace OSBLE.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public JsonResult GetFeed(long timestamp = -1, int errorType = -1, string errorTypeStr = "", string keyword = "", int hash = 0)
+        public JsonResult GetFeed(string keywords = null)
         {
-            FeedViewModel vm = GetFeedViewModel(timestamp, errorType, errorTypeStr, keyword, hash);
+            // Set filters
+            if (!string.IsNullOrWhiteSpace(keywords))
+                _activityFeedQuery.CommentFilter = keywords;
+
+            FeedViewModel vm = GetFeedViewModel();
             return GetJsonFromViewModel(vm);
         }   
 

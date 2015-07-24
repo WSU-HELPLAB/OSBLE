@@ -97,12 +97,10 @@ function FeedItem(data) {
     // Edit: called when the user clicks the send button after clicking the pencil symbol on a post to reveal
     // the edit form. (Note: not called if the user cancels their edit)
     self.Edit = function () {
-        // Get text from the textarea
-        var text = $('#feed-edit-textbox-' + self.eventId).text();
 
         $.ajax({
             url: self.isComment? "/Feed/EditLogComment" : "/Feed/EditFeedPost",
-            data: { id: self.eventId, newText: text },
+            data: { id: self.eventId, newText: self.content() },
             dataType: "json",
             method: "POST",
             success: function (dataObj) {
@@ -118,7 +116,7 @@ function FeedItem(data) {
 
     self.AddComment = function () {
         // Get text from the textarea
-        var text = $('#feed-reply-textbox-' + self.eventId).text();
+        var text = $('#feed-reply-textbox-' + self.eventId).val();
 
         // Make sure the user submited something
         if (text == "") {
@@ -150,11 +148,20 @@ function FeedItemOptions(canMail, canDelete, canEdit)
     self.canEdit = canEdit;
 }
 
+function FeedViewFilter(keywords)
+{
+    var self = this;
+    self.keywords = ko.observable(keywords);
+
+
+}
+
 function FeedViewModel(userName, userId) {
     var self = this;
     self.userName = userName;
     self.userId = userId;
     self.items = ko.observableArray([]);
+    self.filter = new FeedViewFilter("");
 
     self.MakePost = function () {
         var text = $("#feed-post-textbox").val();
@@ -191,6 +198,7 @@ function FeedViewModel(userName, userId) {
             type: "POST",
             url: "/Feed/GetFeed",
             dataType: "json",
+            data: self.filter,
             async: false,
             cache: false,
             success: function (data, textStatus, jqXHR) {
