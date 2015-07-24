@@ -156,6 +156,8 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
             var evt = askHelps.SingleOrDefault(y => y.EventLogId == eventLog.EventLogId);
             if (evt == null) return null;
 
+            evt.Code = evt.Code.Replace("'", "''");
+
             return new AskForHelpEvent(evt.EventDate)
             {
                 EventId = evt.EventId,
