@@ -16,6 +16,7 @@ using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
 using OSBLE.Utility;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
+using OSBLEPlus.Logic.DomainObjects.Interface;
 using OSBLEPlus.Logic.Utility;
 using OSBLEPlus.Logic.Utility.Auth;
 using OSBLEPlus.Logic.Utility.Lookups;
@@ -43,8 +44,8 @@ namespace OSBLE.Controllers
             //return RedirectToAction("FeedDown", "Error");
             try
             {
-                FeedViewModel vm = GetFeedViewModel(timestamp, errorType, errorTypeStr, keyword, hash);
-                return PartialView(vm);
+                //FeedViewModel vm = GetFeedViewModel(timestamp, errorType, errorTypeStr, keyword, hash);
+                return PartialView();
             }
             catch (Exception ex)
             {
@@ -122,6 +123,11 @@ namespace OSBLE.Controllers
             return GetJsonFromViewModel(vm);
         }   
 
+        private string GetDisplayTimeString(DateTime time)
+        {
+            return time.ToLocalTime().ToShortDateString() + " " + time.ToLocalTime().ToShortTimeString();
+        }
+
         private object MakeLogCommentJsonObject(LogCommentEvent comment)
         {
             comment.SetPrivileges(ActiveCourseUser);
@@ -131,7 +137,7 @@ namespace OSBLE.Controllers
                 ParentEventId = comment.SourceEventLogId,
                 SenderName = comment.DisplayTitle,
                 SenderId = comment.SenderId,
-                TimeString = "time", //e.EventDate.UTCToCourse(e.CourseId).ToLongDateString(),
+                TimeString = GetDisplayTimeString(comment.EventDate),
                 CanMail = comment.CanMail,
                 CanEdit = comment.CanEdit,
                 CanDelete = comment.CanDelete,
@@ -141,6 +147,33 @@ namespace OSBLE.Controllers
                 HTMLContent = PartialView("Details/_LogCommentEvent", comment).Capture(this.ControllerContext),
                 Content = comment.Content,
                 IdString = comment.EventId.ToString()
+            };
+        }
+
+        private object MakeAggregateFeedItemJsonObject(AggregateFeedItem item, bool details)
+        {
+            var eventLog = item.Items[0].Event;
+            eventLog.SetPrivileges(ActiveCourseUser);
+
+            var comments = MakeCommentListJsonObject(item.Comments, eventLog.EventLogId);
+            string viewFolder = details? "Details/_" : "Feed/_";
+
+            return new
+            {
+                EventId = eventLog.EventLogId,
+                ParentEventId = -1,
+                SenderName = eventLog.DisplayTitle,
+                SenderId = item.Creator.ID,
+                TimeString = GetDisplayTimeString(item.MostRecentOccurance),
+                CanMail = eventLog.CanMail,
+                CanEdit = eventLog.CanEdit,
+                CanDelete = eventLog.CanDelete,
+                CanReply = eventLog.CanReply,
+                ShowPicture = eventLog.ShowProfilePicture,
+                Comments = comments,
+                HTMLContent = PartialView(viewFolder + eventLog.EventType.ToString().Replace(" ", ""), item).Capture(this.ControllerContext),
+                Content = eventLog.EventType == EventType.FeedPostEvent ? (eventLog as FeedPostEvent).Comment : "",
+                IdString = string.Join(",", item.Items.Select(i => i.Event.EventLogId))
             };
         }
 
@@ -159,32 +192,16 @@ namespace OSBLE.Controllers
             var obj = new { Feed = new List<dynamic>() };
             foreach(AggregateFeedItem item in vm.Feed)
             {
-                var eventLog = item.Items[0].Event;
-                eventLog.SetPrivileges(ActiveCourseUser);
-
-                var comments = MakeCommentListJsonObject(item.Comments, eventLog.EventLogId);
-
-                obj.Feed.Add(new {
-                    EventId = eventLog.EventLogId,
-                    ParentEventId = -1,
-                    SenderName = eventLog.DisplayTitle,
-                    SenderId = item.Creator.ID,
-                    TimeString = "time",//item.MostRecentOccurance.UTCToCourse(eventLog.CourseId).ToLongDateString(),
-                    CanMail = eventLog.CanMail,
-                    CanEdit = eventLog.CanEdit,
-                    CanDelete = eventLog.CanDelete,
-                    CanReply = eventLog.CanReply,
-                    ShowPicture = eventLog.ShowProfilePicture,
-                    Comments = comments,
-                    HTMLContent = PartialView("Feed/_" + eventLog.EventType.ToString().Replace(" ", ""), item).Capture(this.ControllerContext),
-                    Content = eventLog.EventType == EventType.FeedPostEvent? (eventLog as FeedPostEvent).Comment : "",
-                    IdString = string.Join(",", item.Items.Select(i => i.Event.EventLogId))
-                });
+                obj.Feed.Add(MakeAggregateFeedItemJsonObject(item, false));
             }
             return Json(obj);
         }
 
-
+        private JsonResult GetJsonFromViewModel(FeedDetailsViewModel vm)
+        {
+            var obj = new { Item = MakeAggregateFeedItemJsonObject(vm.FeedItem, true) };
+            return Json(obj);
+        }
 
         /// <summary>
         /// Returns a raw feed without any extra HTML chrome.  Used for AJAX updates to an existing feed.
@@ -303,7 +320,10 @@ namespace OSBLE.Controllers
                         html = PartialView("Details/_FeedPostEvent", item).Capture(this.ControllerContext);
                     else
                         html = PartialView("Feed/_FeedPostEvent", item).Capture(this.ControllerContext);
-                    return Json(new { HTMLContent = html });
+                    return Json(new { 
+                        HTMLContent = html, 
+                        TimeString = GetDisplayTimeString(item.MostRecentOccurance) 
+                    });
                 }
             }
             else
@@ -325,7 +345,10 @@ namespace OSBLE.Controllers
                 {
                     DBHelper.EditLogComment(id, newText, conn);
                     LogCommentEvent c = DBHelper.GetSingularLogComment(id, conn);
-                    return Json(new { HTMLContent = PartialView("Details/_LogCommentEvent", c).Capture(this.ControllerContext)});
+                    return Json(new { 
+                        HTMLContent = PartialView("Details/_LogCommentEvent", c).Capture(this.ControllerContext),
+                        TimeString = GetDisplayTimeString(c.EventDate)
+                    });
                 }
 
             }
@@ -475,30 +498,15 @@ namespace OSBLE.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            try
-            {
-                FeedDetailsViewModel vm = GetDetailsViewModel(id);
-                return View(vm);
-            }
-            catch (Exception ex)
-            {
-                ViewBag.ErrorMessage = ex.Message;
-                return View("Error");
-            }
+            ViewBag.RootId = id;
+            return View();
         }
 
-        private ActionResult DetailsPartial(string id)
+        [HttpPost]
+        public JsonResult GetDetails(string id)
         {
-            try
-            {
-                FeedDetailsViewModel vm = GetDetailsViewModel(id);
-                return PartialView("Details", vm);
-            }
-            catch (Exception ex)
-            {
-                ViewBag.ErrorMessage = ex.Message;
-                return PartialView("Error");
-            }
+            FeedDetailsViewModel vm = GetDetailsViewModel(id);
+            return GetJsonFromViewModel(vm);
         }
 
         private FeedDetailsViewModel GetDetailsViewModel(string id)
@@ -538,47 +546,26 @@ namespace OSBLE.Controllers
         /// </summary>
         /// <param name="comment"></param>
         /// <returns></returns>
-        [System.Web.Http.HttpPost]
-        [ValidateInput(false)]
-        public ActionResult PostFeedItem(FormCollection formCollection)
+        [HttpPost]
+        public JsonResult PostFeedItem(string text)
         {
-            try
-            {
-                var comment = formCollection["comment"];
-                if (!string.IsNullOrWhiteSpace(comment)) 
-                { 
-                    comment = comment.TrimStart(',');
+            // We purposefully are not catching exceptions that could be thrown
+            // here, because we want this response to fail if there is an error
+            if (!string.IsNullOrWhiteSpace(text)) 
+            { 
+                FeedPostEvent log = new FeedPostEvent()
+                {
+                    SenderId = CurrentUser.ID,
+                    Comment = text,
+                    CourseId = ActiveCourseUser.AbstractCourseID,
+                    SolutionName = null
+                };
 
-                    if (string.IsNullOrEmpty(comment) == false)
-                    {
-                        FeedPostEvent log = new FeedPostEvent()
-                        {
-                            SenderId = CurrentUser.ID,
-                            Comment = comment,
-                            CourseId = ActiveCourseUser.AbstractCourseID,
-                            SolutionName = "OSBLEPlus"
-                        };
-
-                        using (SqlConnection conn = DBHelper.GetNewConnection())
-                        {
-                            try
-                            {
-                                string sql = log.GetInsertScripts();
-                                conn.Execute(sql);
-                            }
-                            catch (Exception ex)
-                            {
-                                //
-                            }
-                        }
-
-                    }
+                using (SqlConnection conn = DBHelper.GetNewConnection())
+                {
+                    string sql = log.GetInsertScripts();
+                    conn.Execute(sql);
                 }
-
-            }
-            catch (Exception ex)
-            {
-               // Ignore
             }
             return GetFeed();
         }

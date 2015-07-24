@@ -16,7 +16,7 @@
             @* Name, Picture, and Time *@
             <img data-bind="attr: {src: '/user/' + senderId + '/Picture?size=52'}" class="profile_picture" title="profile image" alt="profile image" />
             <a class="display_name" data-bind="text: senderName, attr: {href: '/Profile/Index/' + senderId}"></a>
-            <span class="utc-time feed-item-date" data-bind="text: time, attr: {datetime: time}"></span>
+            <span class="utc-time feed-item-date" data-bind="text: time(), attr: {datetime: time}"></span>
 
             @* Button Controls *@
             <div class="dp_tools">
@@ -46,7 +46,6 @@
         @* Edit Content Form *@
         <div data-bind="if: options.canEdit">
             <form class="feed-edit-form" data-bind="attr: {id: 'feed-edit-' + eventId}">
-                <div class="panel panel-danger errMsgPanel" data-bind="attr: {id: 'feed-edit-error-' + eventId}"><div class="panel-heading">@* This is an error message box *@</div></div>
                 <textarea class="form-control" data-bind="value: content, attr: {id: 'feed-edit-textbox-' + eventId}"></textarea>
                 <input name="response-submit" class="btn btn-default btn-sm" type="button" value="Send" data-bind="click: Edit" />
                 <input name="response-cancel" class="btn btn-default btn-sm" type="reset" value="Cancel" data-bind="click: HideEditBox" />
