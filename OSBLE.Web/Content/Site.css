@@ -2159,9 +2159,8 @@ div.pagedocname {
     height: 100px;
 }
 
-.errMsgPanel {
+#errMsgPanel {
     display: none;
-    height: 20px;
 }
 
 .dp_post {

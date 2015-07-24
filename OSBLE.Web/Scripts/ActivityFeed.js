@@ -58,7 +58,7 @@ function FeedItem(data) {
     self.parentEventId = data.ParentEventId;
     self.senderName = data.SenderName;
     self.senderId = data.SenderId;
-    self.time = data.TimeString;
+    self.time = ko.observable(data.TimeString);
     self.options = new FeedItemOptions(data.CanMail, data.CanDelete, data.CanEdit);
     self.show = true;
     self.isComment = self.parentEventId != -1;
@@ -107,6 +107,7 @@ function FeedItem(data) {
             method: "POST",
             success: function (dataObj) {
                 self.htmlContent(dataObj.HTMLContent);
+                self.time(dataObj.TimeString);
                 EditSucceeded(self);
             },
             error: function () {
@@ -153,11 +154,39 @@ function FeedViewModel(userName, userId) {
     var self = this;
     self.userName = userName;
     self.userId = userId;
-
     self.items = ko.observableArray([]);
 
-    // load initial state from server
-    $(document).ready(function () {
+    self.MakePost = function () {
+        var text = $("#feed-post-textbox").val();
+
+        if (text == "")
+            return;
+
+        // Disable buttons while waiting for server response
+        $('#feed-post-textbox').attr('disabled', 'disabled');
+        $('#btn_post_active').attr('disabled', 'disabled');
+
+        $.ajax({
+            type: "POST",
+            url: "/Feed/PostFeedItem",
+            dataType: "json",
+            data: { text: text },
+            success: function (data) {
+                var mappedItems = $.map(data.Feed, function (item) { return new FeedItem(item) });
+                self.items(mappedItems);
+                MakePostSucceeded();
+            },
+            error: function() {
+                MakePostFailed();
+            },
+            complete: function () {
+                $('#feed-post-textbox').removeAttr('disabled');
+                $('#btn_post_active').removeAttr('disabled');
+            }
+        })
+    }
+
+    self.RequestUpdate = function () {
         $.ajax({
             type: "POST",
             url: "/Feed/GetFeed",
@@ -169,7 +198,36 @@ function FeedViewModel(userName, userId) {
                 self.items(mappedItems);
             }
         });
-    });
+    };
+
+    // load initial state from server
+    self.RequestUpdate();
+}
+
+function DetailsViewModel(userName, userId, rootId)
+{
+    var self = this;
+    self.userName = userName;
+    self.userId = userId;
+    self.rootId = rootId;
+    self.items = ko.observableArray([]);
+
+    self.RequestUpdate = function () {
+        $.ajax({
+            type: "POST",
+            url: "/Feed/GetDetails",
+            data: { id: self.rootId },
+            dataType: "json",
+            async: false,
+            cache: false,
+            success: function (data, textStatus, jqXHR) {
+                var itemAsList = [new FeedItem(data.Item)];
+                self.items(itemAsList);
+            }
+        });
+    };
+
+    self.RequestUpdate();
 }
 
 
@@ -228,10 +286,18 @@ function expandComments(item) {
     }
 }
 
-function PostFeedItemComplete()
+function MakePostSucceeded()
 {
+    // Clear the textbox
     $('#feed-post-textbox').val('');
+
+    // Show a nifty animation for the new post
     $('.feed-item-single').first().hide().show('easeInBounce');
+}
+
+function MakePostFailed()
+{
+    ShowError('#feed-post-form', 'Unable to create post, check internet connection.', false);
 }
 
 function PostReplySucceeded(item) {
@@ -256,9 +322,7 @@ function PostReplySucceeded(item) {
 function PostReplyFailed(item)
 {
     // Set the error message text and display it for 4 seconds
-    $('#feed-reply-error-' + item.eventId).children().text('Unable to submit reply. Check internet connection.');
-    $('#feed-reply-error-' + item.eventId).show('fade');
-    setTimeout(function () { $('#feed-reply-error-' + item.eventId).hide('fade'); }, 4000);
+    ShowError('#feed-reply-' + item.eventId, 'Unable to submit reply. Check internet connection.', true);
 }
 
 function EditSucceeded(item)
@@ -273,9 +337,12 @@ function EditSucceeded(item)
 function EditFailed(item)
 {
     // Set the error message text and display it for 4 seconds
-    $('#feed-edit-error-' + item.eventId).children().text('Unable to edit post. Check internet connection.');
-    $('#feed-edit-error-' + item.eventId).show('fade');
-    setTimeout(function () { $('#feed-edit-error-' + item.eventId).hide('fade'); }, 4000);
+    ShowError('#feed-edit-' + item.eventId, 'Unable to edit post. Check internet connection.', true);    
+}
+
+function LoadOldPosts()
+{
+
 }
 
 //called when the user clicks on the "Load Earlier Posts..." link at the bottom of the page
@@ -321,19 +388,22 @@ function updateText(id) {
     }
 }
 
-function editText(id, bool) {
-    var editForm = $("#edit-form-items-" + id);
-    var originalText = $('#content-comment-' + id);
-    var textFromInput = $('#edit-form-textarea-' + id);
+function ShowError(containerID, text, insertAbove)
+{
+    var errBox = $("#errMsgPanel");
 
-    if (bool === true) {
-        originalText.html(textFromInput.val());
-    }
-    else {
-        originalText.html(text);
-    }
+    // Set the text
+    $("#errText").text(text);
 
-    editForm.hide("blind");
+    // Put into container
+    if (insertAbove)
+        $(containerID).prepend(errBox);
+    else
+        $(containerID).append(errBox);
+
+    // Show the errBox
+    errBox.show('fade');
+    setTimeout(function () { errBox.hide('fade'); }, 4000);
 }
 
 /*

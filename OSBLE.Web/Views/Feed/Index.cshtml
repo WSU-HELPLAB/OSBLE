@@ -3,7 +3,6 @@
 @using OSBLEPlus.Logic.Utility.Lookups
 @using OSBLE.Models.Queries
 @using OSBLE.Models.Users
-@model OSBLEPlus.Logic.DomainObjects.ActivityFeeds.FeedViewModel
 @{
     UserProfile currentUser = ViewBag.CurrentUser;
 }
@@ -24,58 +23,39 @@
         {
             if ((ViewBag.ActiveCourse.AbstractRole.CanGrade == true) || (ViewBag.ActiveCourse.AbstractRole.Anonymized) || ((ViewBag.ActiveCourse.AbstractCourse is Course) && (ViewBag.ActiveCourse.AbstractCourse.AllowDashboardPosts) == true))
             {
-                if (ViewBag.Error != null)
-                {
-                    <h3 class="error">@ViewBag.Error</h3>
-                }
-                using (Ajax.BeginForm("PostFeedItem", "Feed",
-                    new AjaxOptions
-                    {
-                        HttpMethod = "POST",
-                        UpdateTargetId = "dp_posts",
-                        OnComplete = "PostFeedItemComplete()"
-                    },
-                    new { 
-                        id = "post-comment-form", 
-                        @class = "spinner" 
-                    }))
-                {
+                @* Make new post form *@
+                <form id="feed-post-form" role="form">
                     <div class="form-group">
-                        <textarea id="feed-post-textbox" class="form-control" name="comment" rows="4" placeholder="Enter new feed post here..."></textarea>
+                        <textarea id="feed-post-textbox" class="form-control" rows="4" placeholder="Enter new feed post here..."></textarea>
                     </div>
+                    <input type="submit" data-bind="click: MakePost" id="btn_post_active" class="btn btn-default" name="post_active" value="Post to @Helpers.CourseTag(ViewBag.ActiveCourse.AbstractCourse)" />
 
-                    <input type="submit" id="btn_post_active" class="btn btn-default" name="post_active" value="Post to @Helpers.CourseTag(ViewBag.ActiveCourse.AbstractCourse)" />
-
-                    /*if (ViewBag.IsInstructor)
+                    @*if (ViewBag.IsInstructor)
                     {
-                        <input type="submit" id="btn_post_all" class="btn btn-default" name="post_all" value="Post to All Courses I Teach" onclick="return confirm('Post this message to all your taught courses?');" />
-                        <label class="checkbox-inline"><input type="checkbox" value="True" name="send_email" /> Email to Class</label>
+                    <input type="submit" id="btn_post_all" class="btn btn-default" name="post_all" value="Post to All Courses I Teach" onclick="return confirm('Post this message to all your taught courses?');" />
+                    <label class="checkbox-inline"><input type="checkbox" value="True" name="send_email" /> Email to Class</label>
                     }
 
                     if (ViewBag.IsLeader)
                     {
-                        <label class="checkbox-inline"><input type="checkbox" value="True" name="send_email" /> Email to Community</label>
-                    }*/
-                }
+                    <label class="checkbox-inline"><input type="checkbox" value="True" name="send_email" /> Email to Community</label>
+                    }*@
+
+                </form>
             }
         }
     </div>
 
     <div id="filters">
-        @using (Html.BeginForm("Index", "Feed", FormMethod.Post))
-        {
+        <form role="form">
+            
+            @* Search by Keyword *@
             <div id="keywordSection" class="form-group">
                 <label id="feedSearchIcon" for="feedSearchInput"><span class="glyphicon glyphicon-search"></span></label>
-                <input id="feedSearchInput" type="text" class="typeahead form-control" name="keyword" autocomplete="off" value="@Model.Keyword" placeholder="Search by keyword..." />
+                <input id="feedSearchInput" type="text" class="typeahead form-control" name="keyword" autocomplete="off" placeholder="Search by keyword..." />
             </div>
-        }
 
-        @using (Ajax.BeginForm("ApplyFeedFilter", "Feed", new AjaxOptions
-        {
-            HttpMethod = "Get",
-            UpdateTargetId = "dp_posts"
-        }))
-        {
+            @* Event Type Checkboxes *@
             <div id="filter-type" class="form-group">
                 @foreach (EventType e in ActivityFeedQuery.GetNecessaryEvents())
                 {
@@ -89,67 +69,12 @@
                 @* This allows the parent div to properly "contain" all the checkboxes *@
                 <div style="clear: both"></div>
             </div>
-            @*<article>
-                    <h2>Filter by Error Type:</h2>
-                    <select name="error-type">
-                        <option value="-1">No Filter</option>
-                        @foreach (ErrorType error in Model.ErrorTypes)
-                        {
-                            string selectedText = "";
-                            if (error.Name.CompareTo(Model.SelectedErrorType.Name) == 0)
-                            {
-                                selectedText = @"selected=""selected""";
-                            }
-                            <option @Html.Raw(selectedText) value="@error.Id">@error.Name</option>
-                        }
-                    </select>
-                </article>
-                <article>
-                    <h2>Filter by Course</h2>
-                    <select name="course-filter">
-                        <option value="-1">No Filter</option>
-                        @foreach (Course course in Model.Courses)
-                        {
-                            string selectedText = "";
-                            if (course.ID.CompareTo(Model.SelectedCourseId) == 0)
-                            {
-                                selectedText = @"selected=""selected""";
-                            }
-                            <option @Html.Raw(selectedText) value="@course.ID">@course.Name</option>
-                        }
-                    </select>
-                </article>
-                <article>
-                    <h2>Filter by User Type</h2>
-                    <select name="user-type-filter">
-                        <option value="-1">No Filter</option>
-                        @foreach (CourseRole.CourseRoles role in Model.CourseRoles)
-                        {
-                            string selectedText = "";
-                            int roleValue = (int)role;
-                            string roleName = Enum.GetName(typeof(CourseRole.CourseRoles), roleValue);
-                            if (role == Model.SelectedCourseRole)
-                            {
-                                selectedText = @"selected=""selected""";
-                            }
-                            <option @Html.Raw(selectedText) value="@roleValue">@roleName</option>
-                        }
-                    </select>
-                </article>*@
-        }
+
+        </form>
     </div>
 
     <div id="dp_posts" class="panel-group">
-        @Html.Partial("Feed/_Feed", Model)
+        @Html.Partial("Feed/_Feed")
     </div>
 
 </section>
-
-@*@section Scripts
-{
-    <script type="text/javascript" src="~/Scripts/Typeahead/typeahead-0.10.4.js"></script>
-    <script type="text/javascript" src="~/Scripts/Typeahead/osbide-posts.js"></script>
-    <script type="text/javascript" src="~/Scripts/Typeahead/jquery.textcomplete.js"></script>
-    <script type="text/javascript" src="~/Scripts/Typeahead/jquery.overlay.js"></script>
-}*@
-

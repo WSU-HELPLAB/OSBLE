@@ -1,44 +1,10 @@
 ﻿@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
-@model FeedViewModel
 <section>
-    @Html.ActionLink("Load earlier posts...", "", new { timestamp = Model.LastPollDate.AddHours(-10).Ticks }, new { id = "load-old-posts" })
+    <a id="load-old-posts" data-bind="click: LoadOldPosts">Load earlier posts...</a>
 </section>
 <div id="hidden-workspace">
 </div>
 <div id="hidden-updates-workspace" style="display: none;"></div>
-<script type="text/javascript">
-    //var AllComments = {};
 
-    $(document).ready(function () {
-
-        //get recent feed items
-        //getRecentFeedItems();
-
-        //display hidden
-        //showLastHidden();
-
-        //get comment updates
-        //getCommentUpdates();
-
-        //listen for clicks to load older messages
-        @*$("#load-old-posts").click(function (e) {
-            e.preventDefault();
-            $("#load-old-posts").text("Loading...");
-            var feedId = getOldestFeedId();
-            var urlParamTokens = window.location.search.substring(1).split('&');
-            var hashVal = urlParamTokens.length > 1 && urlParamTokens[1].substring(0, 4) == "hash" ? 1 : 0;
-            $.ajax(
-            {
-                url: "@Url.Action("OldFeedItems", "Feed")",
-                data: { id: feedId, count: 30, userId: "@Model.SingleUserId", keyword: "@Model.Keyword", hash: hashVal },
-            dataType: "html",
-            type: "GET",
-            success: getOldPostsSuccess,
-            }
-            );
-        });*@
-
-        //disable footer selection
-        $('.feed-item-footer').disableSelection();
-    });
-</script>
+@* This is the error message box, it's hidden normally, and only displays when something goes wrong *@
+<div class="panel panel-danger" id="errMsgPanel"><div class="panel-heading" id="errText"></div></div>
