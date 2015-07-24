@@ -115,18 +115,73 @@ namespace OSBLE.Controllers
         /// Returns just the feed part of the activity feed, without the forms at the top for posting/filtering.
         /// </summary>
         /// <returns></returns>
-        public ActionResult GetFeed(long timestamp = -1, int errorType = -1, string errorTypeStr = "", string keyword = "", int hash = 0)
+        [HttpPost]
+        public JsonResult GetFeed(long timestamp = -1, int errorType = -1, string errorTypeStr = "", string keyword = "", int hash = 0)
         {
-            try
+            FeedViewModel vm = GetFeedViewModel(timestamp, errorType, errorTypeStr, keyword, hash);
+            return GetJsonFromViewModel(vm);
+        }   
+
+        private object MakeLogCommentJsonObject(LogCommentEvent comment)
+        {
+            comment.SetPrivileges(ActiveCourseUser);
+            return new
             {
-                FeedViewModel vm = GetFeedViewModel(timestamp, errorType, errorTypeStr, keyword, hash);
-                return PartialView("Feed/_Feed", vm);
-            }
-            catch (Exception ex)
+                EventId = comment.EventLogId,
+                ParentEventId = comment.SourceEventLogId,
+                SenderName = comment.DisplayTitle,
+                SenderId = comment.SenderId,
+                TimeString = "time", //e.EventDate.UTCToCourse(e.CourseId).ToLongDateString(),
+                CanMail = comment.CanMail,
+                CanEdit = comment.CanEdit,
+                CanDelete = comment.CanDelete,
+                CanReply = false,
+                ShowPicture = comment.ShowProfilePicture,
+                Comments = new List<dynamic>(),
+                HTMLContent = PartialView("Details/_LogCommentEvent", comment).Capture(this.ControllerContext),
+                Content = comment.Content,
+                IdString = comment.EventId.ToString()
+            };
+        }
+
+        private object MakeCommentListJsonObject(IEnumerable<LogCommentEvent> comments, int parentLogID)
+        {
+            var obj = new List<dynamic>();
+            foreach(LogCommentEvent e in comments)
             {
-                ViewBag.ErrorMessage = ex.Message;
-                return PartialView("Error");
+                obj.Add(MakeLogCommentJsonObject(e));
             }
+            return obj;
+        }
+
+        private JsonResult GetJsonFromViewModel(FeedViewModel vm)
+        {
+            var obj = new { Feed = new List<dynamic>() };
+            foreach(AggregateFeedItem item in vm.Feed)
+            {
+                var eventLog = item.Items[0].Event;
+                eventLog.SetPrivileges(ActiveCourseUser);
+
+                var comments = MakeCommentListJsonObject(item.Comments, eventLog.EventLogId);
+
+                obj.Feed.Add(new {
+                    EventId = eventLog.EventLogId,
+                    ParentEventId = -1,
+                    SenderName = eventLog.DisplayTitle,
+                    SenderId = item.Creator.ID,
+                    TimeString = "time",//item.MostRecentOccurance.UTCToCourse(eventLog.CourseId).ToLongDateString(),
+                    CanMail = eventLog.CanMail,
+                    CanEdit = eventLog.CanEdit,
+                    CanDelete = eventLog.CanDelete,
+                    CanReply = eventLog.CanReply,
+                    ShowPicture = eventLog.ShowProfilePicture,
+                    Comments = comments,
+                    HTMLContent = PartialView("Feed/_" + eventLog.EventType.ToString().Replace(" ", ""), item).Capture(this.ControllerContext),
+                    Content = eventLog.EventType == EventType.FeedPostEvent? (eventLog as FeedPostEvent).Comment : "",
+                    IdString = string.Join(",", item.Items.Select(i => i.Event.EventLogId))
+                });
+            }
+            return Json(obj);
         }
 
 
@@ -167,35 +222,24 @@ namespace OSBLE.Controllers
         }
 
         [HttpPost]
-        public ActionResult PostComment(FormCollection formCollection)
-        {
-            string content = formCollection["response"];
-            string logIDstr = formCollection["logID"]; // the id of the parent event log
-            int logID = -1;
-            
-            if (String.IsNullOrWhiteSpace(content) || String.IsNullOrWhiteSpace(logIDstr) || !int.TryParse(logIDstr, out logID))
-            {
-                return new EmptyResult();
+        public JsonResult PostComment(int id, string content)
+        {            
+            // Check for blank comment
+            if (String.IsNullOrWhiteSpace(content)) {
+                throw new Exception();
             }
 
-                // Insert the comment
-            bool success = DBHelper.InsertActivityFeedComment(logID, CurrentUser.ID, content);
-                if (!success)
-                    return new EmptyResult();
+            // Insert the comment
+            bool success = DBHelper.InsertActivityFeedComment(id, CurrentUser.ID, content);
+            if (!success) {
+                throw new Exception();
+            }
 
-            // Get the new comment list, and put it into a model
-            FeedItem post = GetFeedItemFromID(logID);
-            // Add a new FeedItem for each comment whose event is the logCommentEvent and whose comments are an empty list
-            List<FeedItem> model = post.Comments.Select(c => new FeedItem { Event = c, Comments = new List<LogCommentEvent>() }).ToList();
-                // Get the new comment list, and put it into a Model
-                ActivityFeedQuery q = _activityFeedQuery;
-                q.AddEventId(logID);
+            // Get the new comment list by getting the parent feed item
+            FeedItem post = GetFeedItemFromID(id);
 
-            // return the newly created partial view for the list of comments
-            ViewData["ShowFooter"] = false;
-            ViewData["ShowDetails"] = true;            
-            ViewBag.ParentId = logID;
-            return PartialView("Feed/_FeedItems", AggregateFeedItem.FromFeedItems(model));
+            // return the new list of comments in a Json object
+            return Json(MakeCommentListJsonObject(post.Comments, id));
         }
 
         /// <summary>
@@ -243,41 +287,53 @@ namespace OSBLE.Controllers
         }
 
         [HttpPost]
-        public ActionResult EditFeedPost(int id, string newText)
+        public JsonResult EditFeedPost(int id, string newText, bool details = false)
         {
             // do checking, make sure non-authorized users cannot edit posts
 
-            UserProfile current = DBHelper.GetUserProfile(ActiveCourseUser.UserProfileID);
+            UserProfile current = CurrentUser; //DBHelper.GetUserProfile(ActiveCourseUser.UserProfileID);
             if ((current.UserId == ActiveCourseUser.UserProfileID) || (ActiveCourseUser.AbstractRole.CanGrade))
             {
-                DBHelper.EditFeedPost(id, newText);
+                using (SqlConnection conn = DBHelper.GetNewConnection())
+                {
+                    DBHelper.EditFeedPost(id, newText, conn);
+                    AggregateFeedItem item = new AggregateFeedItem(GetFeedItemFromID(id));
+                    string html;
+                    if (details)
+                        html = PartialView("Details/_FeedPostEvent", item).Capture(this.ControllerContext);
+                    else
+                        html = PartialView("Feed/_FeedPostEvent", item).Capture(this.ControllerContext);
+                    return Json(new { HTMLContent = html });
+                }
             }
             else
             {
                 Response.StatusCode = 403;
+                throw new Exception();
             }
-
-
-            return View("_AjaxEmpty");
         }
 
         [HttpPost]
-        public ActionResult EditLogComment(int id, string newText)
+        public JsonResult EditLogComment(int id, string newText)
         {
             // do checking, make sure non-authorized users cannot edit posts
 
-            UserProfile current = DBHelper.GetUserProfile(ActiveCourseUser.UserProfileID);
+            UserProfile current = CurrentUser; //DBHelper.GetUserProfile(ActiveCourseUser.UserProfileID);
             if ((current.UserId == ActiveCourseUser.UserProfileID) || (ActiveCourseUser.AbstractRole.CanGrade))
             {
-                DBHelper.EditLogComment(id, newText);
+                using (SqlConnection conn = DBHelper.GetNewConnection()) 
+                {
+                    DBHelper.EditLogComment(id, newText, conn);
+                    LogCommentEvent c = DBHelper.GetSingularLogComment(id, conn);
+                    return Json(new { HTMLContent = PartialView("Details/_LogCommentEvent", c).Capture(this.ControllerContext)});
+                }
+
             }
             else
             {
                 Response.StatusCode = 403;
+                throw new Exception();
             }
-
-
-            return View("_AjaxEmpty");
         }
 
 

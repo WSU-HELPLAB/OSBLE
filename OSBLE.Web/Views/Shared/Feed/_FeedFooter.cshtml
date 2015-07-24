@@ -7,7 +7,7 @@
 </div>
 <div id="hidden-updates-workspace" style="display: none;"></div>
 <script type="text/javascript">
-    var AllComments = {};
+    //var AllComments = {};
 
     $(document).ready(function () {
 
@@ -21,7 +21,7 @@
         //getCommentUpdates();
 
         //listen for clicks to load older messages
-        $("#load-old-posts").click(function (e) {
+        @*$("#load-old-posts").click(function (e) {
             e.preventDefault();
             $("#load-old-posts").text("Loading...");
             var feedId = getOldestFeedId();
@@ -36,7 +36,7 @@
             success: getOldPostsSuccess,
             }
             );
-        });
+        });*@
 
         //disable footer selection
         $('.feed-item-footer').disableSelection();

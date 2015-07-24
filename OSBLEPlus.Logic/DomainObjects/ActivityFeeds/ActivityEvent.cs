@@ -3,6 +3,7 @@ using OSBLE.Interfaces;
 using OSBLEPlus.Logic.DomainObjects.Interface;
 using OSBLEPlus.Logic.Utility;
 using OSBLEPlus.Logic.Utility.Lookups;
+using OSBLE.Models.Courses;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
@@ -43,6 +44,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
         public bool CanMail { get; set; }
         public bool CanDelete { get; set; }
         public bool CanReply { get; set; }
+        public bool CanEdit { get; set; }
         public bool ShowProfilePicture { get; set; }
         public string DisplayTitle { get; set; }
 
@@ -51,5 +53,25 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             EventDate = DateTime.UtcNow;
         }
 
+        public void SetPrivileges(CourseUser currentUser)
+        {
+            bool anonymous = currentUser.AbstractRole.Anonymized;
+
+            // Anyone can mail anyone but themselves (provided they're not anonimous)
+            CanMail = !anonymous && SenderId != currentUser.UserProfileID;
+            
+            // Graders can delete posts, anyone can delete their own posts
+            CanDelete = currentUser.AbstractRole.CanGrade || SenderId == currentUser.UserProfileID;
+
+            // Anyone can edit their own posts
+            CanEdit = SenderId == currentUser.UserProfileID;
+
+            // Verify that user can make new posts (No one can reply to a reply)
+            CanReply = currentUser.AbstractRole.CanSubmit && EventType != EventType.LogCommentEvent;
+
+            ShowProfilePicture = !anonymous;
+
+            DisplayTitle = Sender.DisplayName(currentUser);
+        }
     }
 }

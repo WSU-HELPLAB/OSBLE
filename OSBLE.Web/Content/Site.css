@@ -212,6 +212,10 @@ h3 span.glyphicon {
     cursor: pointer;
 }
 
+.dp_tools * {
+    display: inline;
+}
+
 .dp_tools {
     display: inline;
     float: right;
@@ -2138,24 +2142,34 @@ div.pagedocname {
     padding: 0;
 }
 
-.feed-item-footer {
-    margin: 15px 20px -10px 65px;
+.feed-item-footer, .feed-edit-form {
+    margin: 10px 20px -10px 65px;
 }
 
-.feed-reply-form {
+.feed-reply-form, .feed-edit-form {
     display: none;
     margin-bottom: 10px;
 }
 
-.feed-reply-form textarea {
+.feed-reply-form textarea, .feed-edit-form textarea {
     display: block;
     margin-bottom: 4px;
+    margin-top: 4px;
     overflow:visible;
     height: 100px;
 }
 
+.errMsgPanel {
+    display: none;
+    height: 20px;
+}
+
 .dp_post {
     min-height: 65px;
+}
+
+.feed-item-date {
+    font-size: 8pt;
 }
 
 /* Activity Feed Filters */

@@ -1,36 +1,213 @@
-﻿
+﻿//Updates a KO view model using the supplied JS object
+//function updateFeedItemViewModel(jsObject) {
 
-function decreaseConversationsNumber(id) {
-    if (id === null) return;
-    var elem = document.getElementById("number-of-comments-for-" + id);
-    if (elem != null) {
-        elem.innerHTML = parseInt(elem.innerHTML) - 1;
+//    $.each(jsObject.Data, function (index, value) {
+
+//        //bind to new view model
+//        var model = {
+//            Comments: value.Comments,
+//            NumberOfComments: ko.observable(value.Comments.length),
+//            LastUpdated: ko.observable(new Date())
+//        };
+
+//        //model mapping
+//        var mapping =
+//            {
+//                'Comments': {
+//                    key: function (item) {
+//                        return ko.utils.unwrapObservable(item.CommentId);
+//                    }
+//                }
+//            };
+
+//        //compute local time
+//        $(model.Comments).each(function (index) {
+
+//            var milliseconds = model.Comments[index].UtcUnixDate + "";
+//            var formatString = "MM/DD/YYYY hh:mm A";
+//            var currentDate = moment.utc(milliseconds, 'X');
+//            var localDate = new Date();
+//            var localOffset = localDate.getTimezoneOffset();
+//            currentDate = currentDate.subtract('minutes', localOffset);
+//            model.Comments[index]['LocalDate'] = currentDate.format(formatString);
+//        });
+
+//        var toBind = "feed-item-" + value.OriginalLogId;
+
+//        //view model doesn't exist, create one
+//        if (!AllComments[value.ActualLogId]) {
+
+//            AllComments[value.ActualLogId] = ko.mapping.fromJS(model, mapping);
+//        }
+
+//        //update view model with server data
+//        ko.mapping.fromJS(model, AllComments[value.ActualLogId]);
+
+//        //apply binding if one doesn't already exist
+//        if (!ko.dataFor(document.getElementById(toBind))) {
+//            ko.applyBindings(AllComments[value.ActualLogId], document.getElementById(toBind));
+//        }
+//    });
+//}
+
+//KnockoutJS Objects
+function FeedItem(data) {
+    // Fields
+    var self = this;
+    self.eventId = data.EventId;
+    self.parentEventId = data.ParentEventId;
+    self.senderName = data.SenderName;
+    self.senderId = data.SenderId;
+    self.time = data.TimeString;
+    self.options = new FeedItemOptions(data.CanMail, data.CanDelete, data.CanEdit);
+    self.show = true;
+    self.isComment = self.parentEventId != -1;
+    self.content = ko.observable(data.Content); // used for editing posts
+    self.htmlContent = ko.observable(data.HTMLContent);
+    self.idString = data.IdString; // used for items with multiple ids
+
+    // load Comments
+    self.comments = ko.observableArray([]);
+    if (!self.isComment && data.Comments != null && data.Comments.length > 0) {
+        var commentList = $.map(data.Comments, function (item) { return new FeedItem(item) });
+        self.comments(commentList);
+    }
+    
+    /**** Methods ****/
+    // Delete: called when user clicks the trashcan icon on a post or comment, uses an ajax call to the 
+    // server for delete, after prompting the user to confirm.
+    self.Delete = function () {
+        $.ajax({
+            url: self.isComment ? "/Feed/DeleteLogComment" : "/Feed/DeleteFeedPost",
+            data: {id: self.eventId},
+            method: "POST",
+            beforeSend: function (jqXHR, settings) {
+                // will cancel the request if the user does not ok
+                return confirm(self.isComment ? 
+                    "Are you sure you want to delete this reply?" : 
+                    "Are you sure you want to delete this post and all its replies?");
+            },
+            success: function () {
+                self.show = false;
+                onDeleteSuccess(self);
+            }
+        });
+    };
+
+    // Edit: called when the user clicks the send button after clicking the pencil symbol on a post to reveal
+    // the edit form. (Note: not called if the user cancels their edit)
+    self.Edit = function () {
+        // Get text from the textarea
+        var text = $('#feed-edit-textbox-' + self.eventId).text();
+
+        $.ajax({
+            url: self.isComment? "/Feed/EditLogComment" : "/Feed/EditFeedPost",
+            data: { id: self.eventId, newText: text },
+            dataType: "json",
+            method: "POST",
+            success: function (dataObj) {
+                self.htmlContent(dataObj.HTMLContent);
+                EditSucceeded(self);
+            },
+            error: function () {
+                EditFailed(self);
+            }
+        });
+    };
+
+    self.AddComment = function () {
+        // Get text from the textarea
+        var text = $('#feed-reply-textbox-' + self.eventId).text();
+
+        // Make sure the user submited something
+        if (text == "") {
+            return;
+        }
+
+        $.ajax({
+            url: "/Feed/PostComment",
+            data: { id: self.eventId, content: text},
+            dataType: "json",
+            method: "POST",
+            success: function (dataList) {
+                var commentList = $.map(dataList, function (item) { return new FeedItem(item) });
+                self.comments(commentList);
+                PostReplySucceeded(self);
+            },
+            error: function () {
+                PostReplyFailed(self);
+            }
+        });
     }
 }
 
-function increaseConversationsNumber(id) {
-    if (id === null) return;
-    var elem = document.getElementById("number-of-comments-for-" + id);
-    if (elem != null) {
-        elem.innerHTML = parseInt(elem.innerHTML) + 1;
-    }
+function FeedItemOptions(canMail, canDelete, canEdit)
+{
+    var self = this;
+    self.canMail = canMail;
+    self.canDelete = canDelete;
+    self.canEdit = canEdit;
 }
 
-function ShowReplyBox(lastLogID) {
-    $("#btn-reply-" + lastLogID).hide();
-    $("#feed-reply-" + lastLogID).show('blind');
-    return false;
+function FeedViewModel(userName, userId) {
+    var self = this;
+    self.userName = userName;
+    self.userId = userId;
+
+    self.items = ko.observableArray([]);
+
+    // load initial state from server
+    $(document).ready(function () {
+        $.ajax({
+            type: "POST",
+            url: "/Feed/GetFeed",
+            dataType: "json",
+            async: false,
+            cache: false,
+            success: function (data, textStatus, jqXHR) {
+                var mappedItems = $.map(data.Feed, function (item) { return new FeedItem(item) });
+                self.items(mappedItems);
+            }
+        });
+    });
 }
 
-function HideReplyBox(lastLogID) {
-    $("#btn-reply-" + lastLogID).show('highlight');
-    $("#feed-reply-" + lastLogID).hide('blind');
-    return false;
+
+/* Regular JS Functions */
+
+function onDeleteSuccess(item)
+{
+    $('#feed-item-' + item.eventId).hide('blind', {}, 'slow', function () { $(this).remove(); });
 }
 
-function expandComments(lastLogID) {
-    var commentsTextSpan = "#expand-comments-text-" + lastLogID;
-    var replies = "#feed-item-comments-" + lastLogID;
+function ShowEditBox(item)
+{
+    $('#feed-edit-' + item.eventId).show('fade');
+    $('#feed-item-content-' + item.eventId).hide();
+    $('#btn-edit-' + item.eventId).hide('highlight');
+}
+
+function HideEditBox(item)
+{
+    $('#feed-edit-' + item.eventId).hide();
+    $('#feed-item-content-' + item.eventId).show('fade');
+    $('#btn-edit-' + item.eventId).show('highlight');
+}
+
+function ShowReplyBox(item) {
+    $("#btn-reply-" + item.eventId).hide();
+    $("#feed-reply-" + item.eventId).show('blind');
+    $("#feed-reply-textbox-" + item.eventId).val('');
+}
+
+function HideReplyBox(item) {
+    $("#btn-reply-" + item.eventId).show('highlight');
+    $("#feed-reply-" + item.eventId).hide('blind');
+}
+
+function expandComments(item) {
+    var commentsTextSpan = "#expand-comments-text-" + item.eventId;
+    var replies = "#feed-item-comments-" + item.eventId;
 
     if ($(replies).css('display') == 'none') {
         $(replies).show('blind');
@@ -38,7 +215,7 @@ function expandComments(lastLogID) {
     }
     else {
         var height = (window.innerHeight > 0) ? window.innerHeight : screen.height;
-        var post = "#feed-item-" + lastLogID;
+        var post = "#feed-item-" + item.eventId;
 
         // scroll helps if reply box was really big
         if ($(post).height() > height) {
@@ -57,26 +234,48 @@ function PostFeedItemComplete()
     $('.feed-item-single').first().hide().show('easeInBounce');
 }
 
-function PostReplyComplete(logID) {
-    var replies = $("#feed-item-comments-" + logID);
-
-    // clear textbox
-    $("#feed-item-respond-" + logID).text('');
-
-    // hide the reply form
-    $("#btn-reply-" + logID).show();
-    $("#feed-reply-" + logID).hide();
-
-    // update "View Conversation" link
-    increaseConversationsNumber(logID);
+function PostReplySucceeded(item) {
+    var replies = $("#feed-item-comments-" + item.eventId);
 
     // make sure comments block is visible
     if (replies.css('display') == 'none') {
-        expandComments(logID);
+        expandComments(item);
     }
+
+    // clear textbox
+    $("#feed-reply-textbox-" + item.eventId).val('');
+
+    // hide the reply form
+    $("#btn-reply-" + item.eventId).show();
+    $("#feed-reply-" + item.eventId).hide();
 
     // highlight the new reply
     replies.children().last().hide().show('easeInBounce');
+}
+
+function PostReplyFailed(item)
+{
+    // Set the error message text and display it for 4 seconds
+    $('#feed-reply-error-' + item.eventId).children().text('Unable to submit reply. Check internet connection.');
+    $('#feed-reply-error-' + item.eventId).show('fade');
+    setTimeout(function () { $('#feed-reply-error-' + item.eventId).hide('fade'); }, 4000);
+}
+
+function EditSucceeded(item)
+{
+    // clear textbox
+    $("#feed-edit-textbox-" + item.eventId).val('');
+
+    // hide the edit form & display regular text
+    HideEditBox(item);
+}
+
+function EditFailed(item)
+{
+    // Set the error message text and display it for 4 seconds
+    $('#feed-edit-error-' + item.eventId).children().text('Unable to edit post. Check internet connection.');
+    $('#feed-edit-error-' + item.eventId).show('fade');
+    setTimeout(function () { $('#feed-edit-error-' + item.eventId).hide('fade'); }, 4000);
 }
 
 //called when the user clicks on the "Load Earlier Posts..." link at the bottom of the page
@@ -104,58 +303,6 @@ function expandCommentsSuccess(result) {
     //display comments
     var commentsDiv = "#feed-item-comments-" + result.Data[0].OriginalLogId;
     $(commentsDiv).css('display', 'block');
-}
-
-//Updates a KO view model using the supplied JS object
-function updateFeedItemViewModel(jsObject) {
-
-    $.each(jsObject.Data, function (index, value) {
-
-        //bind to new view model
-        var model = {
-            Comments: value.Comments,
-            NumberOfComments: ko.observable(value.Comments.length),
-            LastUpdated: ko.observable(new Date())
-        };
-
-        //model mapping
-        var mapping =
-            {
-                'Comments': {
-                    key: function (item) {
-                        return ko.utils.unwrapObservable(item.CommentId);
-                    }
-                }
-            };
-
-        //compute local time
-        $(model.Comments).each(function (index) {
-
-            var milliseconds = model.Comments[index].UtcUnixDate + "";
-            var formatString = "MM/DD/YYYY hh:mm A";
-            var currentDate = moment.utc(milliseconds, 'X');
-            var localDate = new Date();
-            var localOffset = localDate.getTimezoneOffset();
-            currentDate = currentDate.subtract('minutes', localOffset);
-            model.Comments[index]['LocalDate'] = currentDate.format(formatString);
-        });
-
-        var toBind = "feed-item-" + value.OriginalLogId;
-
-        //view model doesn't exist, create one
-        if (!AllComments[value.ActualLogId]) {
-
-            AllComments[value.ActualLogId] = ko.mapping.fromJS(model, mapping);
-        }
-
-        //update view model with server data
-        ko.mapping.fromJS(model, AllComments[value.ActualLogId]);
-
-        //apply binding if one doesn't already exist
-        if (!ko.dataFor(document.getElementById(toBind))) {
-            ko.applyBindings(AllComments[value.ActualLogId], document.getElementById(toBind));
-        }
-    });
 }
 
 // global for updating text back to the correct text if canceled/changed when editing
