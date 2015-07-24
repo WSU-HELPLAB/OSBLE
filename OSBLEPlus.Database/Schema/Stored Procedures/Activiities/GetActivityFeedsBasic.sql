@@ -42,6 +42,7 @@ AS
                        AND be.buildErrors > 0
       WHERE  s.[DateReceived] BETWEEN @DateReceivedMin AND @DateReceivedMax
              AND s.[Id] BETWEEN @MinEventLogId AND @MaxEventLogId
+			 AND (s.[IsDeleted] IS NULL OR s.[IsDeleted] = 0)
 	  GROUP BY s.Id, s.EventTypeId, s.EventDate, s.SenderId, s.CourseId
       ORDER  BY s.EventDate DESC
 
