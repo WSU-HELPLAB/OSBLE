@@ -168,28 +168,25 @@ namespace OSBLE.Utility
                 UserProfile profile = null;
                 if (HttpContext.Current != null)
                 {
-                    using (OSBLEContext db = new OSBLEContext())
+                    try
                     {
-                        try
+                        HttpCookie cookie = HttpContext.Current.Request.Cookies.Get(ProfileCookieKey);
+                        string userName = Decrypt(cookie.Values[userNameKey]);
+                        return DBHelper.GetUserProfile(userName);
+                    }
+                    catch (Exception ex)
+                    {
+                        string message = string.Format("Error parsing current user for IP {0}: {1}", HttpContext.Current.Request.UserHostAddress, ex.Message);
+                        ActivityLog log = new ActivityLog()
                         {
-                            HttpCookie cookie = HttpContext.Current.Request.Cookies.Get(ProfileCookieKey);
-                            string userName = Decrypt(cookie.Values[userNameKey]);
-                            return db.UserProfiles.Where(u => u.UserName == userName).FirstOrDefault();
-                        }
-                        catch (Exception ex)
-                        {
-                            string message = string.Format("Error parsing current user for IP {0}: {1}", HttpContext.Current.Request.UserHostAddress, ex.Message);
-                            ActivityLog log = new ActivityLog()
-                            {
-                                Sender = typeof(OsbleAuthentication).ToString(),
-                                Message = message
-                            };
-                            //AC: turned off to save space / improve performance
-                            /*
-                                    db.ActivityLogs.Add(log);
-                                    db.SaveChanges();
-                             * */
-                        }
+                            Sender = typeof(OsbleAuthentication).ToString(),
+                            Message = message
+                        };
+                        //AC: turned off to save space / improve performance
+                        /*
+                                db.ActivityLogs.Add(log);
+                                db.SaveChanges();
+                            * */
                     }
                 }
                 return profile;
