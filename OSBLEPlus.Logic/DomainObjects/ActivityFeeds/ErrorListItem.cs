@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
+    [Serializable]
     public class ErrorListItem
     {
         public int Id { get; set; }

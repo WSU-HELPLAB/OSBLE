@@ -6,6 +6,7 @@ using OSBLEPlus.Logic.Utility.Lookups;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
+    [Serializable]
     public class ActivityEvent : IActivityEvent
     {
         // EventLogs table contents

@@ -3,6 +3,7 @@ using OSBLEPlus.Logic.Utility.Lookups;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
+    [Serializable]
     public sealed class EditorActivityEvent : ActivityEvent
     {
         public EditorActivityEvent()

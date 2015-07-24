@@ -2,6 +2,7 @@
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
+    [Serializable]
     public sealed class DebugEvent : ActivityEvent
     {
         public int ExecutionAction { get; set; }

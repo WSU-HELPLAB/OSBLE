@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Data;
-using System.Data.SqlClient;
-using System.Linq;
-using Dapper;
-using OSBLE.Models.Courses;
-using OSBLE.Models.Users;
 using OSBLEPlus.Logic.DomainObjects.Interface;
-using OSBLEPlus.Logic.Utility;
+using OSBLEPlus.Logic.Utility.Lookups;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
+    [Serializable]
     public sealed class LogCommentEvent : ActivityEvent
     {
         public int SourceEventLogId { get; set; }
@@ -18,7 +13,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
         public int NumberHelpfulMarks { get; set; }
         public LogCommentEvent() // NOTE!! This is required by Dapper ORM
         {
-            EventTypeId = (int)Utility.Lookups.EventType.LogCommentEvent;
+            EventTypeId = (int)EventType.LogCommentEvent;
         }
 
         public LogCommentEvent(DateTime dateTimeValue)

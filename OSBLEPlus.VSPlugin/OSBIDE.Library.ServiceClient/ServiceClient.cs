@@ -35,7 +35,7 @@ namespace OSBIDE.Library.ServiceClient
 
         private readonly ILogger _logger;
 
-        private readonly ObjectCache _cache = new FileCache(StringConstants.LocalCacheDirectory);
+        private readonly ObjectCache _cache = new FileCache(StringConstants.LocalCacheDirectory, new ObjectBinder());
         private readonly TransmissionStatus _sendStatus = new TransmissionStatus();
 
         private bool _isSendingData;

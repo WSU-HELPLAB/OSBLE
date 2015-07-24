@@ -7,6 +7,7 @@ using OSBLEPlus.Logic.Utility;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
+    [Serializable]
     public sealed class SubmitEvent : ActivityEvent
     {
         public int AssignmentId { get; set; }

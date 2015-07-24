@@ -1,5 +1,8 @@
-﻿namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+﻿using System;
+
+namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
+    [Serializable]
     public class CodeDocumentBreakPoint
     {
         public int CodeFileId { get; set; }
