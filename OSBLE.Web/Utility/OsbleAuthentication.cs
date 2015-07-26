@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using OSBLE.Models.Users;
-using System.Web.Security;
-using System.IO;
-using OSBLE.Models;
-using System.Security.Cryptography;
 using System.Configuration;
+using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
+using System.Web;
+using OSBLE.Models;
+using OSBLE.Models.Users;
+using OSBLEPlus.Logic.Utility.Auth;
 
 namespace OSBLE.Utility
 {
@@ -59,7 +58,7 @@ namespace OSBLE.Utility
         {
             string hash = ConfigurationManager.AppSettings["EncryptionHash"];
             byte[] Results;
-            System.Text.UTF8Encoding UTF8 = new System.Text.UTF8Encoding();
+            UTF8Encoding UTF8 = new UTF8Encoding();
 
             // Step 1. We hash the passphrase using MD5
             // We use the MD5 hash generator as the result is a 128 bit byte array
@@ -100,7 +99,7 @@ namespace OSBLE.Utility
         {
             byte[] Results;
             string hash = ConfigurationManager.AppSettings["EncryptionHash"];
-            System.Text.UTF8Encoding UTF8 = new System.Text.UTF8Encoding();
+            UTF8Encoding UTF8 = new UTF8Encoding();
 
             // Step 1. We hash the passphrase using MD5
             // We use the MD5 hash generator as the result is a 128 bit byte array
@@ -166,7 +165,7 @@ namespace OSBLE.Utility
             get
             {
                 UserProfile profile = null;
-                if (HttpContext.Current != null)
+                if (HttpContext.Current != null && HttpContext.Current.Request.Cookies.Get(ProfileCookieKey) != null)
                 {
                     try
                     {
@@ -189,6 +188,21 @@ namespace OSBLE.Utility
                             * */
                     }
                 }
+                else
+                {
+                    if (HttpContext.Current != null)
+                    {
+                        var authToken = HttpContext.Current.Request.QueryString["auth"];
+
+                        var a = HttpContext.Current.Server.MapPath("~").TrimEnd('\\');
+                        var path = string.Format("{0}\\OSBLEPlus.Services\\App_Data\\", Directory.GetParent(a).FullName);
+
+                        var auth = new Authentication(path);
+                        var temp = auth.GetActiveUser(authToken);
+                        return auth.GetActiveUser(authToken);
+                    }
+                }
+
                 return profile;
             }
         }

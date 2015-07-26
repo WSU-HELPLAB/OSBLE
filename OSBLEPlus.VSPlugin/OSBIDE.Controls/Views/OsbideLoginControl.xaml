@@ -27,13 +27,13 @@
 
         <!--1,0 and 1,1-->
         <TextBlock Grid.Row="1" Grid.Column="0" FontWeight="Bold" Margin="0,5,0,0">Email Address:
-            <Hyperlink x:Name="ForgotEmailLink" NavigateUri="http://osbide.com/account/ForgotEmail">(Help)</Hyperlink>
+            <Hyperlink x:Name="ForgotEmailLink" NavigateUri="https://osble.org/Account/FindUsername">(Help)</Hyperlink>
         </TextBlock>
         <TextBox Grid.Row="1" Grid.Column="1" x:Name="EmailTextBox" Text="{Binding Path=Email, Mode=TwoWay}" Margin="0,5,0,0" TabIndex="0" />
 
         <!--2,0 and 2,1-->
         <TextBlock Grid.Row="2" Grid.Column="0" FontWeight="Bold" Margin="0,5,0,0">Password:
-                <Hyperlink x:Name="ForgotPasswordLink" NavigateUri="http://osbide.com/account/ForgotPassword">(Help)</Hyperlink>
+                <Hyperlink x:Name="ForgotPasswordLink" NavigateUri="https://osble.org/Account/ResetPassword">(Help)</Hyperlink>
         </TextBlock>
         <PasswordBox Grid.Row="2" Grid.Column="1" x:Name="PasswordTextBox" Margin="0,5,0,0" TabIndex="1" />
 

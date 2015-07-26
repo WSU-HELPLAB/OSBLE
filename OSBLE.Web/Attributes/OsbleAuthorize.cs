@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.IO;
 using System.Web;
 using System.Web.Mvc;
-using OSBLE.Controllers;
 using System.Web.Routing;
-using System.Web.Security;
 using OSBLE.Utility;
-using System.Configuration;
-using OSBLE.Models.Users;
-using OSBLE.Models;
+using OSBLEPlus.Logic.Utility.Auth;
 
 namespace OSBLE.Attributes
 {
@@ -20,7 +14,13 @@ namespace OSBLE.Attributes
     {
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            if (OsbleAuthentication.CurrentUser == null)
+            var a = HttpContext.Current.Server.MapPath("~").TrimEnd('\\');
+            var path = string.Format("{0}\\OSBLEPlus.Services\\App_Data\\", Directory.GetParent(a).FullName);
+
+            var auth =
+                new Authentication(path);
+
+            if (OsbleAuthentication.CurrentUser == null && auth.GetActiveUser(filterContext.HttpContext.Request.QueryString["auth"]) == null)
             {
                 filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Account", action = "LogOn", returnUrl = filterContext.HttpContext.Request.Url }));
             }

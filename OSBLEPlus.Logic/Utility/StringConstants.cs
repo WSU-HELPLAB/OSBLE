@@ -51,7 +51,7 @@ namespace OSBLEPlus.Logic.Utility
 
         public static string CreateAccountUrl
         {
-            get { return string.Format("{0}/Account/Create", WebClientRoot); }
+            get { return string.Format("{0}/Account/AcademiaRegister", WebClientRoot); }
         }
 
         public static string ChatUrl
@@ -61,7 +61,7 @@ namespace OSBLEPlus.Logic.Utility
 
         public static string ProfileUrl
         {
-            get { return string.Format("{0}/Profile", WebClientRoot); }
+            get { return string.Format("{0}/Account/Profile", WebClientRoot); }
         }
 
         public static string WhatsNewUrl

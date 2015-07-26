@@ -23,6 +23,7 @@ using OSBLE.Attributes;
 using OSBLE.Services;
 using System.Net;
 using System.ComponentModel.DataAnnotations;
+using OSBLEPlus.Logic.Utility.Auth;
 
 namespace OSBLE.Controllers
 {
@@ -135,9 +136,9 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         public ActionResult TokenLogin(string authToken, string destinationUrl = "/")
         {
-            AuthenticationService auth = new AuthenticationService();
-            UserProfile profile = auth.GetActiveUser(authToken);
-            if (profile == null || profile.UserName == null)
+            var auth = new Authentication();
+            var profile = auth.GetActiveUser(authToken);
+            if (profile == null || string.IsNullOrWhiteSpace(profile.UserName))
             {
                 return RedirectToAction("LogOn", "Account");
             }
@@ -211,7 +212,7 @@ namespace OSBLE.Controllers
                             db.Entry(currentUser).State = EntityState.Modified;
                             db.SaveChanges();
                             changeIdentificationSucceeded = true;
-                        }    
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -629,10 +630,10 @@ namespace OSBLE.Controllers
                                 CourseUser newUser = new CourseUser();
                                 newUser.UserProfile = profile;
                                 //make pending so we can approve pending to workaround issue of whitelisted user not being added to assignments
-                                newUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending; 
+                                newUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending;
                                 newUser.AbstractCourseID = wtu.CourseID;
                                 newUser.AbstractCourse = (from c in db.AbstractCourses
-                                                          where c.ID == newUser.AbstractCourseID 
+                                                          where c.ID == newUser.AbstractCourseID
                                                           select c).FirstOrDefault();
                                 newUser.UserProfileID = profile.ID;
                                 db.CourseUsers.Add(newUser);

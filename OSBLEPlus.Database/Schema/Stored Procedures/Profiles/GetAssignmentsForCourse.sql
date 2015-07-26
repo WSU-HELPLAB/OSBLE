@@ -13,10 +13,13 @@ AS
              a.ReleaseDate,
              a.DueDate
       FROM   [dbo].[Assignments] a
+	  INNER JOIN [dbo].[Deliverables] d on a.ID = d.AssignmentID
       WHERE  a.CourseID = @courseId
              AND a.IsDraft = 0
             -- AND a.ReleaseDate <= @currentDate
              AND @currentDate <= a.DueDate
+			 AND a.AssignmentTypeID = 1 --Basic assignment
+
 
       -- course details
       SELECT Id=a.ID,

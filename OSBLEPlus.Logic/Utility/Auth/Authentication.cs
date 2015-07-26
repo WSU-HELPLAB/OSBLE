@@ -3,7 +3,7 @@ using System.Runtime.Caching;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
-using OSBLE.Interfaces;
+
 using OSBLE.Models.Users;
 using OSBLEPlus.Logic.DataAccess.Profiles;
 
@@ -17,7 +17,7 @@ namespace OSBLEPlus.Logic.Utility.Auth
 
         public Authentication()
             : this(HttpContext.Current.Server.MapPath("~\\App_Data\\"))
-        {            
+        {
         }
 
         public Authentication(string path)
@@ -68,7 +68,7 @@ namespace OSBLEPlus.Logic.Utility.Auth
         /// </summary>
         /// <param name="authToken"></param>
         /// <returns></returns>
-        public IUser GetActiveUser(string authToken)
+        public UserProfile GetActiveUser(string authToken)
         {
             try
             {
@@ -100,7 +100,7 @@ namespace OSBLEPlus.Logic.Utility.Auth
         /// Logs the user into the system
         /// </summary>
         /// <param name="profile"></param>
-        public string LogIn(IUser profile)
+        public string LogIn(UserProfile profile)
         {
             var cookie = new HttpCookie(ProfileCookieKey);
 
