@@ -1,4 +1,4 @@
-﻿using OSBLE.Interfaces;
+﻿using OSBLE.Models.Users;
 
 namespace OSBLEPlus.Logic.Utility.Auth
 {
@@ -6,9 +6,9 @@ namespace OSBLEPlus.Logic.Utility.Auth
     {
         bool IsValidKey(string authToken);
         string GetAuthenticationKey();
-        IUser GetActiveUser(string authToken);
+        UserProfile GetActiveUser(string authToken);
         int GetActiveUserId(string authToken);
-        string LogIn(IUser profile);
+        string LogIn(UserProfile profile);
         void LogOut();
     }
 }

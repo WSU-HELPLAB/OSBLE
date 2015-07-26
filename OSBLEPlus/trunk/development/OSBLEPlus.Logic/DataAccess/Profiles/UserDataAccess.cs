@@ -5,9 +5,7 @@ using System.Data.SqlClient;
 using System.Linq;
 
 using Dapper;
-using OSBLE.Interfaces;
 using OSBLE.Models.Users;
-using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
 using OSBLEPlus.Logic.DomainObjects.Profiles;
 using OSBLEPlus.Logic.Utility;
 
@@ -15,7 +13,7 @@ namespace OSBLEPlus.Logic.DataAccess.Profiles
 {
     public static class UserDataAccess
     {
-        public static IUser GetById(int id)
+        public static UserProfile GetById(int id)
         {
             using (
                 var connection = new SqlConnection(StringConstants.ConnectionString))
@@ -24,7 +22,7 @@ namespace OSBLEPlus.Logic.DataAccess.Profiles
                                                             new { Id = id }).FirstOrDefault();
             }
         }
-        public static IUser GetByName(string userName)
+        public static UserProfile GetByName(string userName)
         {
             using (
                 var connection = new SqlConnection(StringConstants.ConnectionString))
@@ -44,7 +42,7 @@ namespace OSBLEPlus.Logic.DataAccess.Profiles
             using (
                 var connection = new SqlConnection(StringConstants.ConnectionString))
             {
-                return connection.Execute("dbo.LogUserTransaction", new {UserId = userId, ActivityTime = activityTime},
+                return connection.Execute("dbo.LogUserTransaction", new { UserId = userId, ActivityTime = activityTime },
                     commandType: CommandType.StoredProcedure);
             }
         }
@@ -56,7 +54,7 @@ namespace OSBLEPlus.Logic.DataAccess.Profiles
             {
                 return
                     connection.Query<ProfileCourse>("dbo.GetCoursesForUser",
-                        new {UserId = userId, CurrentDate = currentTime.Date.AddDays(1).AddSeconds(-1)},
+                        new { UserId = userId, CurrentDate = currentTime.Date.AddDays(1).AddSeconds(-1) },
                         commandType: CommandType.StoredProcedure).ToList();
             }
         }
