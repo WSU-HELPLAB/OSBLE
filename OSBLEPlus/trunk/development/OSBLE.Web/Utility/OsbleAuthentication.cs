@@ -198,7 +198,6 @@ namespace OSBLE.Utility
                         var path = string.Format("{0}\\OSBLEPlus.Services\\App_Data\\", Directory.GetParent(a).FullName);
 
                         var auth = new Authentication(path);
-                        var temp = auth.GetActiveUser(authToken);
                         return auth.GetActiveUser(authToken);
                     }
                 }
