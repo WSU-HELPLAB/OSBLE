@@ -148,20 +148,17 @@ function FeedItemOptions(canMail, canDelete, canEdit)
     self.canEdit = canEdit;
 }
 
-function FeedViewFilter(keywords)
-{
-    var self = this;
-    self.keywords = ko.observable(keywords);
-
-
-}
-
 function FeedViewModel(userName, userId) {
     var self = this;
     self.userName = userName;
     self.userId = userId;
     self.items = ko.observableArray([]);
-    self.filter = new FeedViewFilter("");
+
+    self.keywords = ko.observable("");
+    self.keywords.subscribe(function (newValue) {
+        self.keywords(newValue);
+        self.RequestUpdate();
+    });
 
     self.MakePost = function () {
         var text = $("#feed-post-textbox").val();
@@ -198,8 +195,7 @@ function FeedViewModel(userName, userId) {
             type: "POST",
             url: "/Feed/GetFeed",
             dataType: "json",
-            data: self.filter,
-            async: false,
+            data: { keywords: self.keywords(), events: GetCheckedEvents() },
             cache: false,
             success: function (data, textStatus, jqXHR) {
                 var mappedItems = $.map(data.Feed, function (item) { return new FeedItem(item) });
@@ -240,6 +236,25 @@ function DetailsViewModel(userName, userId, rootId)
 
 
 /* Regular JS Functions */
+
+function CheckEvents(events)
+{
+    var elist = events.split(',');
+    $.each(elist, function (index, value) {
+        $("#event_" + value).prop("checked", true);
+    });
+}
+
+function GetCheckedEvents()
+{
+    var str = "";
+    $('.event_checkbox').each(function (index, value) {
+        if (value.checked == true) {
+            str += $(this).data('type') + ',';
+        }
+    });
+    return str;
+}
 
 function onDeleteSuccess(item)
 {

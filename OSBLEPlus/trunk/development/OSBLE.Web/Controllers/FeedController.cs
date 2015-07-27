@@ -31,6 +31,7 @@ namespace OSBLE.Controllers
         {
             _activityFeedQuery = new ActivityFeedQuery(ActiveCourseUser.AbstractCourseID);
             _activityFeedQuery.MaxQuerySize = 20;
+            _activityFeedQuery.UpdateEventSelectors(ActivityFeedQuery.GetSocialEvents());
         }
 
         /// <summary>
@@ -118,11 +119,16 @@ namespace OSBLE.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public JsonResult GetFeed(string keywords = null)
+        public JsonResult GetFeed(string keywords = null, string events = null)
         {
             // Set filters
             if (!string.IsNullOrWhiteSpace(keywords))
-                _activityFeedQuery.CommentFilter = keywords;
+                _activityFeedQuery.CommentFilter = "%" + keywords + "%";
+            if (!string.IsNullOrWhiteSpace(events))
+            {
+                var eventList = events.Split(',').Where(s => s != "");
+                _activityFeedQuery.UpdateEventSelectors(eventList.Select(s => (EventType)int.Parse(s)));
+            }
 
             FeedViewModel vm = GetFeedViewModel();
             return GetJsonFromViewModel(vm);

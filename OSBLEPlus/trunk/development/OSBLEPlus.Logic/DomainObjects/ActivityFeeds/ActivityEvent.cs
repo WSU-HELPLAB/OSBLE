@@ -64,14 +64,15 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             CanDelete = currentUser.AbstractRole.CanGrade || SenderId == currentUser.UserProfileID;
 
             // Anyone can edit their own posts
-            CanEdit = SenderId == currentUser.UserProfileID;
+            CanEdit = (EventType == EventType.FeedPostEvent || EventType == EventType.LogCommentEvent) && SenderId == currentUser.UserProfileID;
 
             // Verify that user can make new posts (No one can reply to a reply)
             CanReply = currentUser.AbstractRole.CanSubmit && EventType != EventType.LogCommentEvent;
 
             ShowProfilePicture = !anonymous;
 
-            DisplayTitle = Sender.DisplayName(currentUser);
+            if (Sender != null)
+                DisplayTitle = Sender.DisplayName(currentUser);
         }
     }
 }
