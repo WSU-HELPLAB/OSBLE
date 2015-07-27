@@ -97,7 +97,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Activities\EventCollectorTests.Mocks.cs" />
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
