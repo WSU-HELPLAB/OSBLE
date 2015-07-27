@@ -30,16 +30,16 @@ INSERT INTO [#EventTypes]
 VALUES
  (1,	'AskForHelpEvent',		1,	0,	1,	0,	1)
 ,(2,	'BuildEvent',			0,	1,	1,	0,	NULL)
-,(3,	'CutCopyPasteEvent',	0,	0,	0,	1,	2)
-,(4,	'DebugEvent',			0,	0,	0,	0,	3)
-,(5,	'EditorActivityEvent',	0,	0,	0,	1,	2)
+,(3,	'CutCopyPasteEvent',	0,	0,	1,	1,	2)
+,(4,	'DebugEvent',			0,	0,	1,	0,	3)
+,(5,	'EditorActivityEvent',	0,	0,	1,	1,	2)
 ,(6,	'ExceptionEvent',		0,	1,	1,	1,	2)
 ,(7,	'FeedPostEvent',		1,	0,	1,	0,	1)
 /* helpful mark and log comment shouldn't be listed as activity feeds, they belong to user profiles */
 ,(8,	'HelpfulMarkGivenEvent',1,	0,	0,	0,	1)
 ,(9,	'LogCommentEvent',		1,	0,	0,	0,	1)
 /* */
-,(10,	'SaveEvent',			0,	0,	0,	1,	2)
+,(10,	'SaveEvent',			0,	0,	1,	1,	2)
 ,(11,	'SubmitEvent',			1,	0,	1,	1,	2)
 
 SET IDENTITY_INSERT [#EventTypes] OFF
