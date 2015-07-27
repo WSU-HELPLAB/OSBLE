@@ -255,9 +255,10 @@ AS
       -------------------------------------------------------------------------------------
       -------------------------------------------------------------------------------------
       -- Top level results
+	  -- number next to header to table is the number read from Dapper QueryMultiple
       -------------------------------------------------------------------------------------
       -------------------------------------------------------------------------------------
-      -- EventLogs 
+      -- EventLogs (1)
       SELECT EventLogId,
              EventTypeId,
              EventDate,
@@ -266,7 +267,7 @@ AS
              IsPrimaryEvent
       FROM   #events
 
-      -- Event and Comment Users 
+      -- Event and Comment Users (2)
       SELECT DISTINCT UserId = a.ID,
                       Email=a.UserName,
                       a.FirstName,
@@ -298,6 +299,7 @@ AS
       -- Detailed event types
       -------------------------------------------------------------------------------------
       -------------------------------------------------------------------------------------
+	  -- Ask For Help (3)
       SELECT EventId = a.Id,
              a.EventLogId,
              a.EventDate,
@@ -308,6 +310,7 @@ AS
              INNER JOIN #events b
                      ON b.EventLogId = a.EventLogId
 
+	  -- Build (4)
       SELECT EventId = a.Id,
              a.EventLogId,
              a.EventDate,
@@ -316,6 +319,41 @@ AS
              INNER JOIN #events b
                      ON b.EventLogId = a.EventLogId
 
+	  -- Cut Copy Paste (5)
+      SELECT EventId = a.Id,
+             a.EventLogId,
+			 a.DocumentName,
+			 a.EventAction,
+			 a.Content,
+             a.EventDate,
+             a.SolutionName
+      FROM   [dbo].[CutCopyPasteEvents] a WITH (NOLOCK)
+             INNER JOIN #events b
+                     ON b.EventLogId = a.EventLogId
+
+	  -- Debug (6)
+      SELECT EventId = a.Id,
+             a.EventLogId,
+			 a.DocumentName,
+			 a.ExecutionAction,
+			 a.DebugOutput,
+			 a.LineNumber,
+             a.EventDate,
+             a.SolutionName
+      FROM   [dbo].[DebugEvents] a WITH (NOLOCK)
+             INNER JOIN #events b
+                     ON b.EventLogId = a.EventLogId
+
+      -- Editor Activity (7)
+	  SELECT EventId = a.Id,
+			 a.EventLogId,
+			 a.EventDate,
+			 a.SolutionName
+	  FROM   [dbo].[EditorActivityEvents] a WITH (NOLOCK)
+		     INNER JOIN #events b
+			         ON b.EventLogId = a.EventLogId
+
+	  -- Exception (8)
       SELECT EventId = a.Id,
              a.EventLogId,
              a.EventDate,
@@ -332,6 +370,7 @@ AS
              INNER JOIN #events b
                      ON b.EventLogId = a.EventLogId
 
+	  -- Feed Posts (9)
       SELECT EventId = a.Id,
              a.EventLogId,
              a.EventDate,
@@ -343,6 +382,16 @@ AS
       WHERE  a.Comment LIKE @CommentFilter
               OR Len(@CommentFilter) = 0
 
+	  -- Helpful Marks (10)
+	  SELECT EventId = a.Id,
+             a.EventLogId,
+             a.LogCommentEventId,
+             a.SolutionName
+      FROM   [dbo].[HelpfulMarkGivenEvents] a WITH (NOLOCK)
+             INNER JOIN #events b
+                     ON b.EventLogId = a.EventLogId
+
+	  -- Log Comments (11)
       SELECT EventId = a.Id,
              a.EventLogId,
              a.SourceEventLogId,
@@ -352,14 +401,16 @@ AS
              INNER JOIN #events b
                      ON b.EventLogId = a.SourceEventLogId
 
+	  -- Save (12)
       SELECT EventId = a.Id,
              a.EventLogId,
-             a.LogCommentEventId,
-             a.SolutionName
-      FROM   [dbo].[HelpfulMarkGivenEvents] a WITH (NOLOCK)
+			 a.DocumentId,
+			 a.SolutionName
+      FROM   [dbo].[SaveEvents] a WITH (NOLOCK)
              INNER JOIN #events b
                      ON b.EventLogId = a.EventLogId
 
+	  -- Submit (13)
       SELECT EventId = a.Id,
              a.EventLogId,
              a.AssignmentId,

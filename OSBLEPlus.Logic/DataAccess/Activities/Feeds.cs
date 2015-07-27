@@ -50,13 +50,22 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                                             TopN = topN ?? 20
                                         }, commandType: CommandType.StoredProcedure);
                 
-                var eventLogs = multiResults.Read<ActivityEvent>().ToList();
-                var users = multiResults.Read<UserProfile>().ToList();
-                var askHelps = multiResults.Read<AskForHelpEvent>().ToList();
-                var builds = multiResults.Read<BuildEvent>().ToList();
-                var exceptions = multiResults.Read<ExceptionEvent>().ToList();
-                var feedPosts = multiResults.Read<FeedPostEvent>().ToList();
-                var logComments = multiResults.Read<LogCommentEvent>().ToList();
+                // multiResults reads in order of the tables declared in dbo.GetActivityEvents
+                // if you need to change these make sure that the table is read in the right order
+
+                var eventLogs = multiResults.Read<ActivityEvent>().ToList();            //1
+                var users = multiResults.Read<UserProfile>().ToList();                  //2
+                var askHelps = multiResults.Read<AskForHelpEvent>().ToList();           //3
+                var builds = multiResults.Read<BuildEvent>().ToList();                  //4
+                var cutcopypastes = multiResults.Read<CutCopyPasteEvent>().ToList();    //5
+                var debugs = multiResults.Read<DebugEvent>().ToList();                  //6
+                var editoractivites = multiResults.Read<EditorActivityEvent>().ToList();//7
+                var exceptions = multiResults.Read<ExceptionEvent>().ToList();          //8
+                var feedPosts = multiResults.Read<FeedPostEvent>().ToList();            //9
+                var helpMark = multiResults.Read<HelpfulMarkGivenEvent>().ToList();     //10
+                var logComments = multiResults.Read<LogCommentEvent>().ToList();        //11
+                var saves = multiResults.Read<SaveEvent>().ToList();                    //12
+                var submits = multiResults.Read<SubmitEvent>().ToList();                //13
 
                 // associate logComments with senderId
 
@@ -68,8 +77,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                     log.SenderId = e.SenderId;
                     nonDeletedLogComments.Add(log);
                 }
-                var helpMark = multiResults.Read<HelpfulMarkGivenEvent>().ToList();
-                var submits = multiResults.Read<SubmitEvent>().ToList();
+
 
                 return NormalizeDataObjects(eventLogs,
                                             users,
@@ -79,14 +87,20 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                                             feedPosts,
                                             nonDeletedLogComments,
                                             helpMark,
-                                            submits);
+                                            submits,
+                                            cutcopypastes,
+                                            debugs,
+                                            editoractivites,
+                                            saves);
             }
         }
 
         private static IEnumerable<FeedItem> NormalizeDataObjects(IList<ActivityEvent> eventLogs, IList<UserProfile> users,
             IList<AskForHelpEvent> askHelps, IList<BuildEvent> builds, IList<ExceptionEvent> exceptions,
             IList<FeedPostEvent> feedPosts, IList<LogCommentEvent> logComments,
-            IList<HelpfulMarkGivenEvent> helpMarks, IList<SubmitEvent> submits)
+            IList<HelpfulMarkGivenEvent> helpMarks, IList<SubmitEvent> submits, 
+            IList<CutCopyPasteEvent> cutCopyPastes, IList<DebugEvent> debugs, 
+            IList<EditorActivityEvent> editorActivities, IList<SaveEvent> saves )
         {
             var feedItems = new List<FeedItem>();
             var userDictionary = new Dictionary<int, IUser>();
@@ -119,6 +133,18 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                         case EventType.SubmitEvent:
                             xActivityEvent = ComposeSubmitEvent(x, userDictionary, users, submits);
                             break;
+                        case EventType.SaveEvent:
+                            xActivityEvent = ComposeSaveEvent(x, userDictionary, users, saves);
+                            break;
+                        case EventType.EditorActivityEvent:
+                            xActivityEvent = ComposeEditorActivityEvent(x, userDictionary, users, editorActivities);
+                            break;
+                        case EventType.DebugEvent:
+                            xActivityEvent = ComposeDebugEvent(x, userDictionary, users, debugs);
+                            break;
+                        case EventType.CutCopyPasteEvent:
+                            xActivityEvent = ComposeCutCopyPasteEvent(x, userDictionary, users, cutCopyPastes);
+                            break;
                     }
 
                     #endregion
@@ -149,6 +175,83 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
             
 
             return feedItems;
+        }
+
+        private static IActivityEvent ComposeCutCopyPasteEvent(IEventLog eventLog, 
+            Dictionary<int, IUser> userDictionary, 
+            IList<UserProfile> users, IList<CutCopyPasteEvent> cutCopyPastes)
+        {
+            var evt = cutCopyPastes.SingleOrDefault(y => y.EventLogId == eventLog.EventLogId);
+            if (evt == null) return null;
+
+            return new CutCopyPasteEvent()
+            {
+                EventId = evt.EventId,
+                EventLogId = evt.EventLogId,
+                Content = evt.Content,
+                CourseId = evt.CourseId,
+                DocumentName = evt.DocumentName,
+                SenderId = eventLog.SenderId,
+                Sender = GetUser(userDictionary, users, eventLog.SenderId),
+                SolutionName = evt.SolutionName
+            };
+        }
+
+        private static IActivityEvent ComposeDebugEvent(IEventLog eventLog, 
+            Dictionary<int, IUser> userDictionary, 
+            IList<UserProfile> users, IList<DebugEvent> debugs)
+        {
+            var evt = debugs.SingleOrDefault(y => y.EventLogId == eventLog.EventLogId);
+            if (evt == null) return null;
+
+            return new DebugEvent()
+            {
+                EventId = evt.EventId,
+                EventLogId = evt.EventLogId,
+                CourseId = evt.CourseId,
+                DebugOutput = evt.DebugOutput,
+                LineNumber = evt.LineNumber,
+                ExecutionAction = evt.ExecutionAction,
+                DocumentName = evt.DocumentName,
+                SenderId = eventLog.SenderId,
+                Sender = GetUser(userDictionary, users, eventLog.SenderId)
+            };
+        }
+
+        private static IActivityEvent ComposeEditorActivityEvent(IEventLog eventLog, 
+            Dictionary<int, IUser> userDictionary, 
+            IList<UserProfile> users, IList<EditorActivityEvent> editorActivities)
+        {
+            var evt = editorActivities.SingleOrDefault(y => y.EventLogId == eventLog.EventLogId);
+            if (evt == null) return null;
+
+            return new EditorActivityEvent()
+            {
+                EventId = evt.EventId,
+                EventLogId = evt.EventLogId,
+                CourseId = evt.CourseId,
+                SolutionName = evt.SolutionName,
+                SenderId = eventLog.SenderId,
+                Sender = GetUser(userDictionary, users, eventLog.SenderId)
+            };
+        }
+
+        private static IActivityEvent ComposeSaveEvent(IEventLog eventLog, 
+            Dictionary<int, IUser> userDictionary, 
+            IList<UserProfile> users, IList<SaveEvent> saves)
+        {
+            var evt = saves.SingleOrDefault(y => y.EventLogId == eventLog.EventLogId);
+            if (evt == null) return null;
+
+            return new SaveEvent()
+            {
+                EventId = evt.EventId,
+                EventLogId = evt.EventLogId,
+                DocumentId = evt.DocumentId,
+                SolutionName = evt.SolutionName,
+                SenderId = eventLog.SenderId,
+                Sender = GetUser(userDictionary, users, eventLog.SenderId)
+            };
         }
 
         #region static helpers
@@ -235,9 +338,9 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
 
         private static IActivityEvent ComposeSubmitEvent(IEventLog eventLog,
             Dictionary<int, IUser> userDictionary,
-            IEnumerable<IUser> users, IEnumerable<SubmitEvent> exceptions)
+            IEnumerable<IUser> users, IEnumerable<SubmitEvent> submits)
         {
-            var evt = exceptions.SingleOrDefault(y => y.EventLogId == eventLog.EventLogId);
+            var evt = submits.SingleOrDefault(y => y.EventLogId == eventLog.EventLogId);
             if (evt == null) return null;
 
             return new SubmitEvent(evt.EventDate)
