@@ -8,10 +8,10 @@
 }
 
 
-<script type="text/javascript" src="@Url.Content("~/Scripts/knockout-2.2.1.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/knockout-3.3.0.js")"></script>
 <script type="text/javascript" src="@Url.Content("~/Scripts/ActivityFeed.js")"></script>
 <script type="text/javascript">
-    var vm = new FeedViewModel("@currentUser.FullName", @currentUser.ID);;
+    var vm = new FeedViewModel("@currentUser.FullName", @currentUser.ID);
     $(document).ready(function () {
         ko.applyBindings(vm);
     });
@@ -52,7 +52,7 @@
             @* Search by Keyword *@
             <div id="keywordSection" class="form-group">
                 <label id="feedSearchIcon" for="feedSearchInput"><span class="glyphicon glyphicon-search"></span></label>
-                <input id="feedSearchInput" type="text" data-bind="textInput: filter.keywords" class="typeahead form-control" name="keyword" autocomplete="off" placeholder="Search by keyword..." />
+                <input id="feedSearchInput" type="text" data-bind="textInput: keywords" onkeypress="vm.RequestUpdate()" class="form-control" autocomplete="off" placeholder="Search by keyword..." />
             </div>
 
             @* Event Type Checkboxes *@
@@ -61,7 +61,7 @@
                 {
                     <div class="checkbox filter-type-option">
                         <label>
-                            <input type="checkbox" id="event_@e.ToString()" name="event_@e.ToString()" />
+                            <input type="checkbox" id="event_@((int)e)" class="event_checkbox" name="event_@e.ToString()" data-type="@((int)e)" onchange="vm.RequestUpdate()" data-bind="@(ActivityFeedQuery.GetSocialEvents().Contains(e)? "checked: 'checked'" : "" )" />
                             @Helpers.GetOptionNameOfEventType(e)
                         </label>
                     </div>

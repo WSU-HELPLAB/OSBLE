@@ -239,7 +239,7 @@ namespace OSBLE.Models.Queries
         /// <returns></returns>
         public virtual IEnumerable<FeedItem> Execute()
         {
-            UpdateEventSelectors(GetSocialEvents());
+            //UpdateEventSelectors(GetSocialEvents());
 
             var query = new OSBLEPlus.Services.Controllers.FeedController().Get(
                                 StartDate // 1
