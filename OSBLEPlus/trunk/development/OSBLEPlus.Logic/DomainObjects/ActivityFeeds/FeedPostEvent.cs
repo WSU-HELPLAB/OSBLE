@@ -30,9 +30,11 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             var batchString = BatchId == null ? "NULL" : BatchId.ToString();
 
             var sql = string.Format(@"
+DECLARE {8} INT
 INSERT INTO dbo.EventLogs (EventTypeID, EventDate, DateReceived, SolutionName, SenderId, BatchId, CourseId) VALUES ({0}, '{1}', '{7}', '{3}', '{2}', {5}, {6})
+SELECT {8}=SCOPE_IDENTITY()
 INSERT INTO dbo.FeedPostEvents (EventLogId, EventDate, SolutionName, Comment)
-VALUES (SCOPE_IDENTITY(), '{1}', '{3}', '{4}')", EventTypeId, EventDate, SenderId, SolutionName, Comment, batchString, CourseId, DateTime.UtcNow);
+VALUES (SCOPE_IDENTITY(), '{1}', '{3}', '{4}') SELECT {8}", EventTypeId, EventDate, SenderId, SolutionName, Comment, batchString, CourseId, DateTime.UtcNow, StringConstants.SqlHelperLogIdVar);
 
             var hashTags = GetMentionTags();
             var userTags = GetMentionTags();

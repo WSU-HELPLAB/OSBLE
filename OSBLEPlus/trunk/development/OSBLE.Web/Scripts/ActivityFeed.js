@@ -152,7 +152,7 @@ function FeedViewModel(userName, userId) {
     var self = this;
     self.userName = userName;
     self.userId = userId;
-    self.items = ko.observableArray([]);
+    self.items = ko.observableArray();
 
     self.keywords = ko.observable("");
     self.keywords.subscribe(function (newValue) {
@@ -176,9 +176,8 @@ function FeedViewModel(userName, userId) {
             dataType: "json",
             data: { text: text },
             success: function (data) {
-                var mappedItems = $.map(data.Feed, function (item) { return new FeedItem(item) });
-                self.items(mappedItems);
-                MakePostSucceeded();
+                self.items.unshift(new FeedItem(data)); // unshift puts object at beginning of array
+                MakePostSucceeded(data.EventId);
             },
             error: function() {
                 MakePostFailed();
@@ -309,13 +308,13 @@ function expandComments(item) {
     }
 }
 
-function MakePostSucceeded()
+function MakePostSucceeded(newPostId)
 {
     // Clear the textbox
     $('#feed-post-textbox').val('');
 
     // Show a nifty animation for the new post
-    $('.feed-item-single').first().hide().show('easeInBounce');
+    $('#feed-item-' + newPostId).hide().show('easeInBounce');
 }
 
 function MakePostFailed()

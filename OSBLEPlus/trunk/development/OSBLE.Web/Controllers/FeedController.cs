@@ -127,12 +127,11 @@ namespace OSBLE.Controllers
             // Set filters
             if (!string.IsNullOrWhiteSpace(keywords))
                 _activityFeedQuery.CommentFilter = "%" + keywords + "%";
-            if (!string.IsNullOrWhiteSpace(events))
-            {
-                var eventList = events.Split(',').Where(s => s != "");
-                _activityFeedQuery.UpdateEventSelectors(eventList.Select(s => (EventType)int.Parse(s)));
-            }
 
+            var eventList = events.Replace(" ", "").Split(',').Where(s => s != "");
+            _activityFeedQuery.UpdateEventSelectors(eventList.Select(s => (EventType)int.Parse(s)));
+
+            // Build the model and convert it to JSON to send to the view
             FeedViewModel vm = GetFeedViewModel();
             return GetJsonFromViewModel(vm);
         }   
@@ -565,23 +564,27 @@ namespace OSBLE.Controllers
         {
             // We purposefully are not catching exceptions that could be thrown
             // here, because we want this response to fail if there is an error
-            if (!string.IsNullOrWhiteSpace(text)) 
-            { 
-                FeedPostEvent log = new FeedPostEvent()
-                {
-                    SenderId = CurrentUser.ID,
-                    Comment = text,
-                    CourseId = ActiveCourseUser.AbstractCourseID,
-                    SolutionName = null
-                };
-
-                using (SqlConnection conn = DBHelper.GetNewConnection())
-                {
-                    string sql = log.GetInsertScripts();
-                    conn.Execute(sql);
-                }
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                throw new ArgumentException();
             }
-            return GetFeed();
+             
+            FeedPostEvent log = new FeedPostEvent()
+            {
+                SenderId = CurrentUser.ID,
+                Comment = text,
+                CourseId = ActiveCourseUser.AbstractCourseID,
+                SolutionName = null
+            };
+            int newPostId = 0;
+            using (SqlConnection conn = DBHelper.GetNewConnection())
+            {
+                string sql = log.GetInsertScripts();
+                newPostId = conn.Query<int>(sql).Single();
+            }
+                
+            AggregateFeedItem newPost = new AggregateFeedItem(GetFeedItemFromID(newPostId));
+            return Json(MakeAggregateFeedItemJsonObject(newPost, false));
         }
 
         [HttpPost]
