@@ -7,7 +7,10 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
     {
         public int BuildEventId { get; set; }
 
-        public virtual BuildEvent BuildEvent { get; set; }
+        public virtual BuildEvent BuildEvent { get { return _build; } set { _build = value; } }
+
+        [NonSerialized]
+        private BuildEvent _build;
 
         public int BreakPointId { get; set; }
 
