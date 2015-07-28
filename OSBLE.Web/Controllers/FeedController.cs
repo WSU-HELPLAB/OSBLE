@@ -9,6 +9,7 @@ using System.Net.Mail;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Dapper;
+using OSBLE.Attributes;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Queries;
 using OSBLE.Models;
@@ -23,6 +24,8 @@ using OSBLEPlus.Logic.Utility.Lookups;
 
 namespace OSBLE.Controllers
 {
+
+    [OsbleAuthorize]
     public class FeedController : OSBLEController
     {
         //private UserFeedSetting _userSettings = ;

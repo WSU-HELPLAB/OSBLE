@@ -136,7 +136,9 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         public ActionResult TokenLogin(string authToken, string destinationUrl = "/")
         {
-            var auth = new Authentication();
+            var tempPath = System.Web.HttpContext.Current.Server.MapPath("~").TrimEnd('\\');
+            var path = string.Format("{0}\\OSBLEPlus.Services\\App_Data\\", Directory.GetParent(tempPath).FullName);
+            var auth = new Authentication(path);
             var profile = auth.GetActiveUser(authToken);
             if (profile == null || string.IsNullOrWhiteSpace(profile.UserName))
             {

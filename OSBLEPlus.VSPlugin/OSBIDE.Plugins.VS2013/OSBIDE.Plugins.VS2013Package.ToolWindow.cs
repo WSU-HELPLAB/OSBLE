@@ -31,7 +31,8 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
         private void OpenOsbideWebLink(object sender, EventArgs e)
         {
             var authKey = _cache[StringConstants.AuthenticationCacheKey] as string;
-            var url = string.Format("{0}?auth={1}", StringConstants.ActivityFeedUrl, authKey);
+            var url = string.Format("{0}/Account/TokenLogin?authToken={1}", StringConstants.WebClientRoot, authKey);
+
             Process.Start(new ProcessStartInfo(url));
         }
 
