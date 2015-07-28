@@ -10,11 +10,25 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
     [Serializable]
     public sealed class BuildEvent : ActivityEvent
     {
+        
         public IList<BuildEventErrorListItem> ErrorItems { get; set; }
 
         public IList<BuildEventBreakPoint> Breakpoints { get; set; }
 
-        public List<BuildDocument> Documents { get; set; }
+        
+        public List<BuildDocument> Documents {
+            get
+            {
+                return _privateBuildDocuments;
+            } 
+            set
+            {
+                _privateBuildDocuments = value;
+            } 
+        }
+
+        [NonSerialized]
+        private List<BuildDocument> _privateBuildDocuments;
 
         public int CriticalErrorCount
         {
@@ -25,6 +39,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
         }
 
         private List<string> _criticalErrorNames;
+
         public List<string> CriticalErrorNames
         {
             get
