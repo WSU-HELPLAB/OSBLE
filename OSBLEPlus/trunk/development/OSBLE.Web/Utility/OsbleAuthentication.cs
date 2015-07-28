@@ -198,7 +198,18 @@ namespace OSBLE.Utility
                         var path = string.Format("{0}\\OSBLEPlus.Services\\App_Data\\", Directory.GetParent(a).FullName);
 
                         var auth = new Authentication(path);
-                        return auth.GetActiveUser(authToken);
+
+                        HttpCookie cookie = new HttpCookie(ProfileCookieKey);
+                        UserProfile user = auth.GetActiveUser(authToken);
+
+                        if (user != null)
+                        {
+                            cookie.Values[userNameKey] = Encrypt(user.UserName);
+                            cookie.Expires = DateTime.UtcNow.AddDays(300);
+                            HttpContext.Current.Response.Cookies.Set(cookie);
+                        }
+
+                        return user;
                     }
                 }
 
