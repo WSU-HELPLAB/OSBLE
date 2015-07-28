@@ -189,6 +189,7 @@ function FeedViewModel(userName, userId) {
     }
 
     self.RequestUpdate = function () {
+        ShowLoading();
         $.ajax({
             type: "POST",
             url: "/Feed/GetFeed",
@@ -198,6 +199,9 @@ function FeedViewModel(userName, userId) {
             success: function (data, textStatus, jqXHR) {
                 var mappedItems = $.map(data.Feed, function (item) { return new FeedItem(item) });
                 self.items(mappedItems);
+            },
+            complete: function() {
+                HideLoading();
             }
         });
     };
@@ -425,6 +429,16 @@ function ShowError(containerID, text, insertAbove)
     // Show the errBox
     errBox.show('fade');
     setTimeout(function () { errBox.hide('fade'); }, 4000);
+}
+
+function ShowLoading()
+{
+    $('#loadingMsg').show('fade');
+}
+
+function HideLoading()
+{
+    $('#loadingMsg').hide('fade');
 }
 
 /*
