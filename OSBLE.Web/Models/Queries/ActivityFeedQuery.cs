@@ -285,7 +285,7 @@ namespace OSBLE.Models.Queries
                     , GetEventFilter()//_eventSelectors.Select(e => (int)e) // 4
                     , CourseFilter != null && CourseFilter.ID > 0 ? CourseFilter.ID : 0
                     , CourseRoleFilter == null ? (int?) null : CourseRoleFilter.ID
-                    , CommentFilter
+                    , CommentFilter == String.Empty ? String.Empty : "%" + CommentFilter + "%"
                     , SubscriptionSubjects.Select(s => s.ID).ToList()
                     , numberOfItemsToReturn
                     );

@@ -309,6 +309,8 @@ AS
       FROM   [dbo].[AskForHelpEvents] a WITH (NOLOCK)
              INNER JOIN #events b
                      ON b.EventLogId = a.EventLogId
+      WHERE  a.UserComment LIKE @CommentFilter
+              OR Len(@CommentFilter) = 0
 
 	  -- Build (4)
       SELECT EventId = a.Id,
@@ -318,7 +320,6 @@ AS
       FROM   [dbo].[BuildEvents] a WITH (NOLOCK)
              INNER JOIN #events b
                      ON b.EventLogId = a.EventLogId
-	  WHERE b.CourseId = @CourseId
 
 	  -- Cut Copy Paste (5)
       SELECT EventId = a.Id,
@@ -331,7 +332,6 @@ AS
       FROM   [dbo].[CutCopyPasteEvents] a WITH (NOLOCK)
              INNER JOIN #events b
                      ON b.EventLogId = a.EventLogId
-	  WHERE b.CourseId = @CourseId
 
 	  -- Debug (6)
       SELECT EventId = a.Id,
@@ -345,7 +345,6 @@ AS
       FROM   [dbo].[DebugEvents] a WITH (NOLOCK)
              INNER JOIN #events b
                      ON b.EventLogId = a.EventLogId
-	  WHERE b.CourseId = @CourseId
 
       -- Editor Activity (7)
 	  SELECT EventId = a.Id,
@@ -355,7 +354,6 @@ AS
 	  FROM   [dbo].[EditorActivityEvents] a WITH (NOLOCK)
 		     INNER JOIN #events b
 			         ON b.EventLogId = a.EventLogId
-	  WHERE b.CourseId = @CourseId
 
 	  -- Exception (8)
       SELECT EventId = a.Id,
@@ -373,7 +371,6 @@ AS
       FROM   [dbo].[ExceptionEvents] a WITH (NOLOCK)
              INNER JOIN #events b
                      ON b.EventLogId = a.EventLogId
-	  WHERE b.CourseId = @CourseId
 
 	  -- Feed Posts (9)
       SELECT EventId = a.Id,
@@ -386,7 +383,6 @@ AS
                      ON b.EventLogId = a.EventLogId
       WHERE  a.Comment LIKE @CommentFilter
               OR Len(@CommentFilter) = 0
-			  AND b.CourseId = @CourseId
 
 	  -- Helpful Marks (10)
 	  SELECT EventId = a.Id,
@@ -396,7 +392,6 @@ AS
       FROM   [dbo].[HelpfulMarkGivenEvents] a WITH (NOLOCK)
              INNER JOIN #events b
                      ON b.EventLogId = a.EventLogId
-	  WHERE b.CourseId = @CourseId
 
 	  -- Log Comments (11)
       SELECT EventId = a.Id,
@@ -407,7 +402,6 @@ AS
       FROM   [dbo].[LogCommentEvents] a WITH (NOLOCK)
              INNER JOIN #events b
                      ON b.EventLogId = a.SourceEventLogId
-	  WHERE b.CourseId = @CourseId
 
 	  -- Save (12)
       SELECT EventId = a.Id,
@@ -417,7 +411,6 @@ AS
       FROM   [dbo].[SaveEvents] a WITH (NOLOCK)
              INNER JOIN #events b
                      ON b.EventLogId = a.EventLogId
-	  WHERE b.CourseId = @CourseId
 
 	  -- Submit (13)
       SELECT EventId = a.Id,
@@ -427,7 +420,6 @@ AS
       FROM   [dbo].[SubmitEvents] a WITH (NOLOCK)
              INNER JOIN #events b
                      ON b.EventLogId = a.EventLogId
-      WHERE b.CourseId = @CourseId
 
   END
 /*

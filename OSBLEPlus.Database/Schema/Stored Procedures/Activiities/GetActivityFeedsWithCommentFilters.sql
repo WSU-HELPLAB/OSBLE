@@ -41,16 +41,22 @@ AS
                     ON s.Id = be.LogId
                        AND ef.EventTypeId = 2
                        AND be.buildErrors > 0
-             INNER JOIN #eventLogIdFilter eif
-                     ON eif.Id = s.Id
              LEFT JOIN [dbo].[FeedPostEvents] fp
                     ON fp.EventLogId = s.Id
                        AND fp.Comment LIKE @CommentFilter
                        AND ef.EventTypeId = 7
                        AND fp.Id > 0
+			 LEFT JOIN [dbo].[AskForHelpEvents] afh
+				    ON afh.EventLogId = s.Id
+					   AND afh.UserComment LIKE @CommentFilter
+					   AND ef.EventTypeId = 1
+					   AND fp.Id > 0
       WHERE  s.[DateReceived] BETWEEN @DateReceivedMin AND @DateReceivedMax
              AND s.[Id] BETWEEN @MinEventLogId AND @MaxEventLogId
 			 AND (s.[IsDeleted] IS NULL OR s.[IsDeleted] = 0)
+			 AND (s.[CourseId] = @CourseId
+				 OR s.[CourseId] IS NULL
+				 OR @CourseId = @anyCourse)
 	  GROUP BY s.Id, s.EventTypeId, s.EventDate, s.SenderId, s.CourseId
       ORDER  BY s.EventDate DESC
 

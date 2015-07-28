@@ -47,6 +47,9 @@ AS
       WHERE  s.[DateReceived] BETWEEN @DateReceivedMin AND @DateReceivedMax
              AND s.[Id] BETWEEN @MinEventLogId AND @MaxEventLogId
 			 AND s.[IsDeleted] IS NULL OR s.[IsDeleted] = 0
+			 AND (s.[CourseId] = @CourseId
+			     OR s.[CourseId] IS NULL
+				 OR @CourseId = @anyCourse)
 	  GROUP BY s.Id, s.EventTypeId, s.EventDate, s.SenderId, s.CourseId
       ORDER  BY s.EventDate DESC
 
