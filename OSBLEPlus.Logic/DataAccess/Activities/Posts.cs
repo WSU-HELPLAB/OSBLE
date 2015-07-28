@@ -51,7 +51,15 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                     //execute sql batch insert statements
                     using (var connection = new SqlConnection(StringConstants.ConnectionString))
                     {
-                        connection.Execute(sql.ToString());
+                        try
+                        {
+                            connection.Execute(sql.ToString());
+                        }
+                        catch
+                        {
+                            //
+                        }
+                        
                     }
                 }
 

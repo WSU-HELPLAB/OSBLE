@@ -3,7 +3,7 @@ using OSBLE.Interfaces;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
-    [Serializable]
+    
     public class BuildDocument
     {
         public int BuildId { get; set; }
