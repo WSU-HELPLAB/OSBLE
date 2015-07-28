@@ -10,7 +10,10 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
     public sealed class SaveEvent : ActivityEvent
     {
         public int DocumentId { get; set; }
-        public CodeDocument Document { get; set; }
+        public CodeDocument Document { get { return _document; } set { _document = value; } }
+
+        [NonSerialized]
+        private CodeDocument _document;
         public SaveEvent()
         {
             EventTypeId = (int)EventType.SaveEvent;
