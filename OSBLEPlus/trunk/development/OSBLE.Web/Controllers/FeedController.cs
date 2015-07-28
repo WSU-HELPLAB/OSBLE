@@ -624,6 +624,7 @@ namespace OSBLE.Controllers
         private FeedItem GetFeedItemFromID(int id)
         {
             ActivityFeedQuery query = new ActivityFeedQuery(ActiveCourseUser.AbstractCourseID);
+            query.UpdateEventSelectors(ActivityFeedQuery.GetNecessaryEvents());
             query.MinLogId = id;
             query.MaxLogId = id;
             IEnumerable<FeedItem> result = query.Execute();

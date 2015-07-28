@@ -152,7 +152,19 @@ namespace OSBLE.Models.Queries
         /// <returns></returns>
         public static IEnumerable<EventType> GetAllEvents()
         {
-            return GetIdeEvents().Concat(GetSocialEvents());
+            return new List<EventType>
+            {
+                EventType.AskForHelpEvent,
+                EventType.BuildEvent,
+                EventType.CutCopyPasteEvent,
+                EventType.DebugEvent,
+                EventType.EditorActivityEvent,
+                EventType.ExceptionEvent,
+                EventType.FeedPostEvent,
+                EventType.HelpfulMarkGivenEvent,
+                EventType.SaveEvent,
+                EventType.SubmitEvent
+            };
         }
 
         /// <summary>
@@ -239,8 +251,6 @@ namespace OSBLE.Models.Queries
         /// <returns></returns>
         public virtual IEnumerable<FeedItem> Execute()
         {
-            //UpdateEventSelectors(GetSocialEvents());
-
             var query = new OSBLEPlus.Services.Controllers.FeedController().Get(
                                 StartDate // 1
                                 , EndDate // 2
