@@ -126,7 +126,7 @@ namespace OSBLE.Controllers
         {
             // Set filters
             if (!string.IsNullOrWhiteSpace(keywords))
-                _activityFeedQuery.CommentFilter = "%" + keywords + "%";
+                _activityFeedQuery.CommentFilter = keywords;
 
             if (events != null)
             {

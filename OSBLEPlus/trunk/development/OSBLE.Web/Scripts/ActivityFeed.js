@@ -156,7 +156,6 @@ function FeedViewModel(userName, userId) {
 
     self.keywords = ko.observable("");
     self.keywords.subscribe(function (newValue) {
-        self.keywords(newValue);
         self.RequestUpdate();
     });
 
