@@ -79,6 +79,12 @@
         </form>
     </div>
 
+    @* This is a message displayed while the feed is loading posts *@
+    <div id="loadingMsg">
+        Loading Posts...
+    </div>
+
+    @* Feed is inserted here *@
     <div id="dp_posts" class="panel-group">
         @Html.Partial("Feed/_Feed")
     </div>
