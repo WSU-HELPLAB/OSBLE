@@ -5,6 +5,7 @@
 @using OSBLE.Models.Users
 @{
     UserProfile currentUser = ViewBag.CurrentUser;
+    string defaultEvents = string.Join(",", ActivityFeedQuery.GetSocialEvents().Select(e => (int)e));
 }
 
 
@@ -61,7 +62,12 @@
                 {
                     <div class="checkbox filter-type-option">
                         <label>
-                            <input type="checkbox" id="event_@((int)e)" class="event_checkbox" name="event_@e.ToString()" data-type="@((int)e)" onchange="vm.RequestUpdate()" data-bind="@(ActivityFeedQuery.GetSocialEvents().Contains(e)? "checked: 'checked'" : "" )" />
+                            @Html.CheckBox("event_" + e.ToString(), ActivityFeedQuery.GetSocialEvents().Contains(e), new {
+                                id = "event_" + ((int)e).ToString(),
+                                @class = "event_checkbox",
+                                data_type = ((int)e),
+                                onchange = "vm.RequestUpdate()"
+                            })
                             @Helpers.GetOptionNameOfEventType(e)
                         </label>
                     </div>

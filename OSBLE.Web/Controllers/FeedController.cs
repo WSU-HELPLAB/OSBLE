@@ -128,8 +128,11 @@ namespace OSBLE.Controllers
             if (!string.IsNullOrWhiteSpace(keywords))
                 _activityFeedQuery.CommentFilter = "%" + keywords + "%";
 
-            var eventList = events.Replace(" ", "").Split(',').Where(s => s != "");
-            _activityFeedQuery.UpdateEventSelectors(eventList.Select(s => (EventType)int.Parse(s)));
+            if (events != null)
+            {
+                var eventList = events.Replace(" ", "").Split(',').Where(s => s != "");
+                _activityFeedQuery.UpdateEventSelectors(eventList.Select(s => (EventType)int.Parse(s)));
+            }
 
             // Build the model and convert it to JSON to send to the view
             FeedViewModel vm = GetFeedViewModel();
