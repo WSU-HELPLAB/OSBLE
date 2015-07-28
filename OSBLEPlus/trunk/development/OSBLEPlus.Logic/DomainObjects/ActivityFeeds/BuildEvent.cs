@@ -15,20 +15,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 
         public IList<BuildEventBreakPoint> Breakpoints { get; set; }
 
-        
-        public List<BuildDocument> Documents {
-            get
-            {
-                return _privateBuildDocuments;
-            } 
-            set
-            {
-                _privateBuildDocuments = value;
-            } 
-        }
-
-        [NonSerialized]
-        private List<BuildDocument> _privateBuildDocuments;
+        public List<BuildDocument> Documents { get; set; }
 
         public int CriticalErrorCount
         {
@@ -94,7 +81,7 @@ SELECT {5}=SCOPE_IDENTITY()", EventTypeId, EventDate, SenderId, SolutionName, Ba
             {
                 sql.AppendFormat(@"{0}INSERT INTO dbo.CodeDocuments([FileName],[Content]) VALUES ('{1}','{2}')", Environment.NewLine, doc.FileName, doc.Content);
                 sql.AppendFormat(@"{0}SELECT {1}=SCOPE_IDENTITY()", Environment.NewLine, StringConstants.SqlHelperDocIdVar);
-                sql.AppendFormat(@"{0}INSERT INTO [dbo].[BuildDocuments] ([BuildEventId],[DocumentId]) VALUES ({1},{2})", Environment.NewLine, StringConstants.SqlHelperEventIdVar, StringConstants.SqlHelperDocIdVar);
+                sql.AppendFormat(@"{0}INSERT INTO [dbo].[BuildDocuments] ([BuildId],[DocumentId]) VALUES ({1},{2})", Environment.NewLine, StringConstants.SqlHelperEventIdVar, StringConstants.SqlHelperDocIdVar);
 
                 foreach (var item in from errorItem in ErrorItems where errorItem.ErrorListItem != null select errorItem.ErrorListItem)
                 {

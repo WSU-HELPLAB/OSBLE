@@ -3,12 +3,15 @@ using OSBLE.Interfaces;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
-    
+    [Serializable]
     public class BuildDocument
     {
         public int BuildId { get; set; }
         
-        public virtual BuildEvent Build { get; set; }
+        public virtual BuildEvent Build { get { return _build; } set { _build = value; } }
+
+        [NonSerialized]
+        private BuildEvent _build;
 
         public int DocumentId { get; set; }
 

@@ -7,7 +7,10 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
     {
         public int CodeFileId { get; set; }
 
-        public virtual CodeDocument CodeDocument { get; set; }
+        public virtual CodeDocument CodeDocument { get { return _code; } set { _code = value; } }
+
+        [NonSerialized]
+        private CodeDocument _code;
 
         public int ErrorListItemId { get; set; }
 
