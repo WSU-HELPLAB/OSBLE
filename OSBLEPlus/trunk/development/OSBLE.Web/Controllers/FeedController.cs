@@ -569,6 +569,7 @@ namespace OSBLE.Controllers
             }
 
             ViewBag.RootId = id;
+            ViewBag.BackURL = "/Feed/OSBIDE";
             return View("Details", "_OSBIDELayout");
         }
 
