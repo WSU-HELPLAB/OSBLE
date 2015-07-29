@@ -992,6 +992,7 @@
     <Content Include="Views\Profile\Index.cshtml" />
     <Content Include="Views\Home\_FilesAndLinks.cshtml" />
     <Content Include="Views\Feed\Details\_LogCommentEvent.cshtml" />
+    <Content Include="Views\Shared\_OSBIDELayout.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -6,6 +6,7 @@
 @{
     bool isComment = ViewBag.IsComment ?? false;
     bool showDetails = ViewBag.ShowDetails ?? false;
+    string detailsLink = ViewBag.DetailsLink ?? "'/Feed/Details/' + idString";
 }
 
 <div data-bind="if: show"> @* prevents deleted items from displaying *@
@@ -84,7 +85,7 @@
                         </li>
                         
                         @* Details Link *@
-                        <li><a data-bind="attr: {href: '/Feed/Details/' + idString}">Details</a></li>
+                        <li><a data-bind="attr: {href: @detailsLink}">Details</a></li>
                     }
 
                     @* Reply Link *@
