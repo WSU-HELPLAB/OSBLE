@@ -167,6 +167,7 @@ namespace OSBLE.Controllers
                 SenderName = comment.DisplayTitle,
                 SenderId = comment.SenderId,
                 TimeString = GetDisplayTimeString(comment.EventDate),
+                EventDate = comment.EventDate.Ticks,
                 CanMail = comment.CanMail,
                 CanEdit = comment.CanEdit,
                 CanDelete = comment.CanDelete,
@@ -194,6 +195,7 @@ namespace OSBLE.Controllers
                 SenderName = eventLog.DisplayTitle,
                 SenderId = item.Creator.ID,
                 TimeString = GetDisplayTimeString(item.MostRecentOccurance),
+                EventDate = item.MostRecentOccurance.Ticks,
                 CanMail = eventLog.CanMail,
                 CanEdit = eventLog.CanEdit,
                 CanDelete = eventLog.CanDelete,
@@ -461,6 +463,29 @@ namespace OSBLE.Controllers
                 return Json(new {Data = "An error occurred duing data processing."}, JsonRequestBehavior.AllowGet);
             }
         }*/
+
+        [HttpPost]
+        public JsonResult GetMorePosts(long endDate)
+        {
+            // store the current End date so we can restore it later
+            DateTime temp = _activityFeedQuery.EndDate;
+
+            // Get the items we can that match the query and are older 
+            // than the ones currently loaded
+            DateTime end = new DateTime(endDate);
+            _activityFeedQuery.EndDate = end;
+            
+            FeedViewModel vm = GetFeedViewModel();
+
+            // restore the original end date
+            _activityFeedQuery.EndDate = temp;
+
+            // remove the first item, since it's already in the feed
+            if (vm.Feed.Count > 0)
+                vm.Feed.RemoveAt(0);
+
+            return GetJsonFromViewModel(vm);
+        }
 
         /// <summary>
         /// Returns a raw feed of past feed items without any extra HTML chrome.  Used for AJAX updates to an existing feed.

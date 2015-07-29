@@ -215,9 +215,12 @@ h3 span.glyphicon {
     display: inline;
 }
 
+
+
 .dp_tools {
     display: inline;
     float: right;
+    margin-left: 8px;
 }
 
 .dashboard_mode {
@@ -2115,6 +2118,8 @@ div.pagedocname {
     float: left;
     padding: 7px 9px 0px 9px;
     height: 34px;
+    width: 36px;
+    margin-left: -36px;
     border: 1px solid #ccc;
     border-right-width: 0;
     border-bottom-left-radius: 4px;
@@ -2123,9 +2128,14 @@ div.pagedocname {
 }
 
 #feedSearchInput {
-    width: 200px;
+
     border-bottom-left-radius: 0;
     border-top-left-radius: 0;
+}
+
+#keywordSection {
+    padding-left: 36px;
+    
 }
 
 .feed-item-links li {
@@ -2197,19 +2207,31 @@ div.pagedocname {
 }
 
 #loadingMsg {
+    margin-top: -12px;
+}
+
+.message {
     display: none;
     float: left;
     color: #444;
     position: absolute;
     left: 50%;
     margin-left: -100px;
-    margin-top: -12px;
     width: 200px;
     text-align: center;
 }
 
 #dp_posts {
     margin-top: 25px;
+}
+
+#feed-footer {
+    margin-top: 7px;
+    height: 25px;
+}
+
+#load-old-posts {
+    cursor: pointer;
 }
 
 /* OSBIDE Layout */

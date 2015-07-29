@@ -25,7 +25,14 @@
 
 }
 
+
 @* Dashboard Pills (used when width < 850px) *@
+<div class="btn-group btn-group-justified" id="dashboard_pills">
+    <div class="btn-group">  <button type="button" id="btn_notifications" class="btn">Notifications <span id="notifications_badge" class="badge">@ViewBag.Notifications.Count</span></button>               </div>
+    <div class="btn-group">  <button type="button" id="btn_activity_feed" class="btn btn-primary">Activity Feed</button>   </div>
+    <div class="btn-group">  <button type="button" id="btn_files" class="btn">Files &amp; Links</button>                      </div>
+</div>
+
 <script type="text/javascript">
     function setContent(btnID, divID) {
         $(".activeContent").removeClass("activeContent").addClass("unactiveContent");
@@ -42,17 +49,13 @@
     });
 </script>
 
-<div class="btn-group btn-group-justified" id="dashboard_pills">
-    <div class="btn-group">  <button type="button" id="btn_notifications" class="btn">Notifications <span id="notifications_badge" class="badge">@ViewBag.Notifications.Count</span></button>               </div>
-    <div class="btn-group">  <button type="button" id="btn_activity_feed" class="btn btn-primary">Activity Feed</button>   </div>
-    <div class="btn-group">  <button type="button" id="btn_files" class="btn">Files &amp; Links</button>                      </div>
-</div>
 
+@* Dashboard Content *@
 <div id="dashboard_outer">
     <div class="row" id="dashboard_inner">
 
         <!---------------- NOTIFICATIONS --------------------->
-        <div class="col-sm-4 col-md-3 unactiveContent" id="dashboard_left">
+        <div class="col-sm-3 unactiveContent" id="dashboard_left">
             <h3>Notifications</h3>
 
             <div id="notifications">
@@ -107,7 +110,7 @@
         </div>
 
         <!--------------------- ACTIVITY FEED --------------------->
-        <div class="col-sm-5 col-md-6 activeContent" id="dashboard_middle">
+        <div class="col-sm-6 activeContent" id="dashboard_middle">
             <h3>
                 Activity Feed
                 <a href="@Url.Action("DownloadDashboardPosts", "Course")" title="Download Activity Feed as csv">@Helpers.UnPublishButton()</a>
