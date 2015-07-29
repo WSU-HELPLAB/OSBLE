@@ -14,10 +14,10 @@
 
         @* Header Content *@
         <div class="dp_post_header panel-heading">
-            @* Name, Picture, and Time *@
-            <img data-bind="attr: {src: '/user/' + senderId + '/Picture?size=52'}" class="profile_picture" title="profile image" alt="profile image" />
-            <a class="display_name" data-bind="text: senderName, attr: {href: '/Profile/Index/' + senderId}"></a>
-            <span class="utc-time feed-item-date" data-bind="text: time(), attr: {datetime: time}"></span>
+            @* Display Picture *@
+            <div data-bind="if: options.showPicture">
+                <img data-bind="attr: {src: '/user/' + senderId + '/Picture?size=52'}" class="profile_picture" title="profile image" alt="profile image" />
+            </div>
 
             @* Button Controls *@
             <div class="dp_tools">
@@ -36,8 +36,11 @@
                     <a title="Edit this post" data-bind="click: ShowEditBox, attr: {id: 'btn-edit-' + eventId}"><span class="glyphicon glyphicon-pencil"></span></a>
                 </div>
             </div>
-        </div>
 
+            @* Display Name & Date/Time*@
+            <a class="display_name" data-bind="text: senderName, attr: {href: '/Profile/Index/' + senderId}"></a>
+            <span class="utc-time feed-item-date" data-bind="text: timeString(), attr: {datetime: time()}"></span>
+        </div>
 
         @* Body Content *@
         <div class="dp_content" data-bind="html: htmlContent(), attr: {id: 'feed-item-content-' + eventId}">

@@ -58,8 +58,9 @@ function FeedItem(data) {
     self.parentEventId = data.ParentEventId;
     self.senderName = data.SenderName;
     self.senderId = data.SenderId;
-    self.time = ko.observable(data.TimeString);
-    self.options = new FeedItemOptions(data.CanMail, data.CanDelete, data.CanEdit);
+    self.timeString = ko.observable(data.TimeString);
+    self.eventDate = data.EventDate;
+    self.options = new FeedItemOptions(data.CanMail, data.CanDelete, data.CanEdit, data.ShowPicture);
     self.show = true;
     self.isComment = self.parentEventId != -1;
     self.content = ko.observable(data.Content); // used for editing posts
@@ -105,7 +106,7 @@ function FeedItem(data) {
             method: "POST",
             success: function (dataObj) {
                 self.htmlContent(dataObj.HTMLContent);
-                self.time(dataObj.TimeString);
+                self.timeString(dataObj.TimeString);
                 EditSucceeded(self);
             },
             error: function () {
@@ -140,12 +141,13 @@ function FeedItem(data) {
     }
 }
 
-function FeedItemOptions(canMail, canDelete, canEdit)
+function FeedItemOptions(canMail, canDelete, canEdit, showPicture)
 {
     var self = this;
     self.canMail = canMail;
     self.canDelete = canDelete;
     self.canEdit = canEdit;
+    self.showPicture = showPicture;
 }
 
 function FeedViewModel(userName, userId) {
@@ -178,15 +180,41 @@ function FeedViewModel(userName, userId) {
                 self.items.unshift(new FeedItem(data)); // unshift puts object at beginning of array
                 MakePostSucceeded(data.EventId);
             },
-            error: function() {
+            error: function () {
                 MakePostFailed();
             },
             complete: function () {
                 $('#feed-post-textbox').removeAttr('disabled');
                 $('#btn_post_active').removeAttr('disabled');
             }
-        })
-    }
+        });
+    };
+
+    self.LoadMorePosts = function () {
+        if (self.items().length == 0)
+            return self.RequestUpdate();
+
+        // set the end date to the current oldest item
+        var lastDate = self.items()[self.items().length - 1].eventDate;
+        ShowMoreLoading();
+        $.ajax({
+            type: "POST",
+            url: "/Feed/GetMorePosts",
+            dataType: "json",
+            data: { endDate: lastDate },
+            success: function (data) {
+                $.each(data.Feed, function (index, value) {
+                    self.items.push(new FeedItem(value));
+                });
+            },
+            error: function () {
+                ShowError("#feed-footer", "Cannot load posts. Check internet connection.", false);
+            },
+            complete: function() {
+                HideMoreLoading();
+            }
+        });
+    };
 
     self.RequestUpdate = function () {
         ShowLoading();
@@ -437,6 +465,7 @@ function ShowLoading()
         return;
 
     $('#loadingMsg').show('fade');
+    $('#load-old-posts').hide();
 }
 
 function HideLoading()
@@ -445,6 +474,19 @@ function HideLoading()
         return;
 
     $('#loadingMsg').hide('fade');
+    $('#load-old-posts').show();
+}
+
+function ShowMoreLoading()
+{
+    $('#loadingMoreMsg').show('fade');
+    $('#load-old-posts').hide();
+}
+
+function HideMoreLoading()
+{
+    $('#loadingMoreMsg').hide();
+    $('#load-old-posts').show();
 }
 
 /*
@@ -472,88 +514,6 @@ function getCommentUpdates() {
 
     //call ourselves again in 20 seconds
     setTimeout(getCommentUpdates, 20000)
-}
-
-//called when the user clicks the "Send" button
-function sendResponse(elementId) {
-    var textAreaId = '#feed-item-respond-' + elementId;
-    var textArea = $(textAreaId);
-
-    //get and clear user response
-    var userResponse = textArea.val();
-    textArea.val("");
-
-    //submit response using AJAX
-    $.ajax(
-        {
-            url: "@Url.Action("PostCommentAsync", "Feed")",
-            data: { logId: elementId, comment: userResponse },
-            dataType: "json",
-            type: "POST",
-            success: function (data) {
-                if (!$.isEmptyObject(data)) {
-                    var commentsTextSpan = "#expand-comments-text-" + data.OriginalLogId;
-                    $(commentsTextSpan).text("Hide");
-                    expandCommentsSuccess(data);
-                }
-            }
-        });
-}*@
-
-function showLastHidden() {
-    var initialScrollHeight = $(document).scrollTop();
-    var item = $(".feed-item-ajax:hidden").last();
-
-    //if we're loading old items,
-    if (item.hasClass("OldFeedItems")) {
-        item = $(".feed-item-ajax:hidden.OldFeedItems").first();
-    }
-    item.slideDown(
-            {
-                duration: 600,
-                easing: "linear",
-                progress: function (animation, progress, remainingMs) {
-                    if (initialScrollHeight > 50) {
-                        $(document).scrollTop($(this).height() + initialScrollHeight);
-                    }
-                }
-            });
-    parseDates();
-    setTimeout(showLastHidden, 4000);
-}
-
-function getOldestFeedId() {
-    var lastId = $(".feed-item-single").last().attr("data-id");
-    if (lastId == undefined) {
-        lastId = "@(Model.LastLogId + 1)";
-    }
-    return lastId;
-}
-
-function getMostRecentFeedId() {
-    var lastId = $(".feed-item-single").first().attr("data-id");
-    if (lastId == undefined) {
-        lastId = "@Model.LastLogId";
-    }
-    return lastId;
-}
-
-function getRecentFeedItems() {
-
-    //find most recent log id
-    var lastId = getMostRecentFeedId();
-    var urlParamTokens = window.location.search.substring(1).split('&');
-    var hashVal = urlParamTokens.length > 1 && urlParamTokens[1].substring(0, 4) == "hash" ? 1 : 0;
-    $.ajax(
-        {
-            url: "@Url.Action("RecentFeedItems", "Feed")",
-            @*data: { id: lastId, userId: "@Model.SingleUserId", errorType: "@Model.SelectedErrorType.Id", keyword:"@Model.Keyword", hash:hashVal},*@
-            dataType: "html",
-            type: "GET",
-            success: getRecentFeedItemsSuccess,
-            complete: function () { setTimeout(getRecentFeedItems, 30000); }
-        }
-        );
 }
 
 function getRecentFeedItemsSuccess(html) {

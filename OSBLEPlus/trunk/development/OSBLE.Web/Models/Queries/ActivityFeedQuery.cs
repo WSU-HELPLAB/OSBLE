@@ -52,7 +52,7 @@ namespace OSBLE.Models.Queries
         /// Sets a limit on the newest post to be retrieved.  Example: if <see cref="EndDate"/> is set to
         /// 2010-01-01, no posts after 2010-01-01 will be retrieved.
         /// </summary>
-        public DateTime EndDate { get; private set; }
+        public DateTime EndDate { get; set; }
 
         /// <summary>
         /// Sets a limit on the oldest post to be retrieved.  Example: if <see cref="StartDate"/> is set to
