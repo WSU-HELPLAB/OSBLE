@@ -206,6 +206,12 @@ function FeedViewModel(userName, userId) {
                 $.each(data.Feed, function (index, value) {
                     self.items.push(new FeedItem(value));
                 });
+                if (data.HasLastPost) {
+                    $('#load-old-posts').addClass('disabled');;
+                }
+                else {
+                    $('#load-old-posts').removeClass('disabled');
+                }
             },
             error: function () {
                 ShowError("#feed-footer", "Cannot load posts. Check internet connection.", false);
@@ -227,6 +233,10 @@ function FeedViewModel(userName, userId) {
             success: function (data, textStatus, jqXHR) {
                 var mappedItems = $.map(data.Feed, function (item) { return new FeedItem(item) });
                 self.items(mappedItems);
+
+                if ($('#load-old-posts').hasClass('disabled')) {
+                    $('#load-old-posts').removeClass('disabled');
+                }
             },
             complete: function() {
                 HideLoading();

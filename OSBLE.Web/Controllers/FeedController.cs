@@ -220,7 +220,7 @@ namespace OSBLE.Controllers
 
         private JsonResult GetJsonFromViewModel(FeedViewModel vm)
         {
-            var obj = new { Feed = new List<dynamic>() };
+            var obj = new { Feed = new List<dynamic>(), HasLastPost = vm.Feed.Count < _activityFeedQuery.MaxQuerySize };
             foreach(AggregateFeedItem item in vm.Feed)
             {
                 obj.Feed.Add(MakeAggregateFeedItemJsonObject(item, false));
@@ -474,11 +474,16 @@ namespace OSBLE.Controllers
             // than the ones currently loaded
             DateTime end = new DateTime(endDate);
             _activityFeedQuery.EndDate = end;
+
+            // Get one more post since the first one will already be
+            // in the feed.
+            _activityFeedQuery.MaxQuerySize++;
             
             FeedViewModel vm = GetFeedViewModel();
 
-            // restore the original end date
+            // restore the original end date and query size
             _activityFeedQuery.EndDate = temp;
+            _activityFeedQuery.MaxQuerySize--;
 
             // remove the first item, since it's already in the feed
             if (vm.Feed.Count > 0)
