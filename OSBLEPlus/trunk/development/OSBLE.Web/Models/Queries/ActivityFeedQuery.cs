@@ -75,7 +75,7 @@ namespace OSBLE.Models.Queries
         /// <summary>
         /// Used to limit the number of query results.  Default of -1 means to return all results.
         /// </summary>
-        public int MaxQuerySize { protected get; set; }
+        public int MaxQuerySize { get; set; }
 
         /// <summary>
         /// Used to select posts made by only certain users.  This works by restricting posts below 

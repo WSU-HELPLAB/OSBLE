@@ -2234,6 +2234,10 @@ div.pagedocname {
     cursor: pointer;
 }
 
+a.disabled{
+    display: none !important;
+}
+
 /* OSBIDE Layout */
 #osbide_header {
     font-size: 14pt;
