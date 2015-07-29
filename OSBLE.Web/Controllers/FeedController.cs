@@ -38,12 +38,11 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-        /// Index, returns feed items
+        /// Index, returns a view with the Activity Feed and the inputs for 
+        /// creating new posts and filtering.
         /// </summary>
-        /// <param name="id">The ID of the last event received by the user.  Used for AJAX updates</param>
         /// <returns></returns>
-        public ActionResult Index(long timestamp = -1, int errorType = -1, string errorTypeStr = "", string keyword = "",
-            int hash = 0)
+        public ActionResult Index()
         {
             //turned off for now.
             //return RedirectToAction("FeedDown", "Error");
@@ -58,6 +57,20 @@ namespace OSBLE.Controllers
                 return PartialView("Error");
             }
 
+        }
+
+        /// <summary>
+        /// This action returns the same view as Index, but inside a wrapper view
+        /// that makes sure all componenets such as jquery and bootstrap are included.
+        /// This is so the OSBIDE viewer does not include the _layout.cshtml layout,
+        /// which normally includes these things.
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult OSBIDE()
+        {
+            // This is used to tell the feed view where the details page is
+            ViewBag.DetailsLink = "'/Feed/OSBIDEDetails/' + idString";
+            return View("Index", "_OSBIDELayout");
         }
 
         private FeedViewModel GetFeedViewModel()
@@ -377,7 +390,7 @@ namespace OSBLE.Controllers
 
 
 
-        public JsonResult GetComments(int? singleLogId)
+        /*public JsonResult GetComments(int? singleLogId)
         {
             //turned off for now
             //return this.Json(new { Data = new{} }, JsonRequestBehavior.AllowGet);
@@ -447,7 +460,7 @@ namespace OSBLE.Controllers
                 //LogErrorMessage(ex);
                 return Json(new {Data = "An error occurred duing data processing."}, JsonRequestBehavior.AllowGet);
             }
-        }
+        }*/
 
         /// <summary>
         /// Returns a raw feed of past feed items without any extra HTML chrome.  Used for AJAX updates to an existing feed.
@@ -509,13 +522,24 @@ namespace OSBLE.Controllers
         public ActionResult Details(string id)
         {
             //make sure that we've gotten a valid ID
-            if (string.IsNullOrEmpty(id))
+            if (string.IsNullOrWhiteSpace(id))
             {
                 return RedirectToAction("Index", "Home");
             }
 
             ViewBag.RootId = id;
             return View();
+        }
+
+        public ActionResult OSBIDEDetails(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return RedirectToAction("OSBIDE");
+            }
+
+            ViewBag.RootId = id;
+            return View("Details", "_OSBIDELayout");
         }
 
         [HttpPost]

@@ -6,6 +6,9 @@
 @{
     UserProfile currentUser = ViewBag.CurrentUser;
     string defaultEvents = string.Join(",", ActivityFeedQuery.GetSocialEvents().Select(e => (int)e));
+    if (string.IsNullOrEmpty(ViewBag.Title)) {
+        ViewBag.Title = "Activity Feed";
+    }
 }
 
 

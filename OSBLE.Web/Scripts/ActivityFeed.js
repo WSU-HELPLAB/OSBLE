@@ -433,11 +433,17 @@ function ShowError(containerID, text, insertAbove)
 
 function ShowLoading()
 {
+    if ($('#loadingMsg').css('display') != 'none')
+        return;
+
     $('#loadingMsg').show('fade');
 }
 
 function HideLoading()
 {
+    if ($('#loadingMsg').css('display') == 'none')
+        return;
+
     $('#loadingMsg').hide('fade');
 }
 

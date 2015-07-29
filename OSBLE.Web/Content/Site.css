@@ -2202,10 +2202,18 @@ div.pagedocname {
     color: #444;
     position: absolute;
     left: 50%;
-    margin-left: -40px;
+    margin-left: -100px;
     margin-top: -12px;
+    width: 200px;
+    text-align: center;
 }
 
 #dp_posts {
     margin-top: 25px;
+}
+
+/* OSBIDE Layout */
+#osbide_header {
+    font-size: 14pt;
+    margin: 15px;
 }
