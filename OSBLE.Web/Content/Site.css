@@ -2243,3 +2243,21 @@ a.disabled{
     font-size: 14pt;
     margin: 15px;
 }
+
+.osbide_nav_btn {
+    padding-top: 3px !important;
+    padding-left: 6px !important;
+    border-radius: 15px !important;
+    background-color: #ddd !important;
+    color: white !important;
+    display: block !important;
+    float: left !important;
+    margin-right: 5px;
+    margin-top: -3px;
+    height: 26px;
+    width: 26px;
+}
+
+.osbide_nav_btn:first-child {
+    margin-left: 15px;
+}

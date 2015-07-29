@@ -18,6 +18,15 @@
     <title>@ViewBag.Title</title>
 </head>
 <body>
+
+    @* Forward/Back buttons if desired *@
+    @if (!string.IsNullOrEmpty(ViewBag.ForwardURL)) {
+        <a href="@ViewBag.ForwardURL" id="osbide_forward" class="osbide_nav_btn"><span class="glyphicon glyphicon-arrow-right"></span></a>
+    }
+    @if (!string.IsNullOrEmpty(ViewBag.BackURL)) {
+        <a href="@ViewBag.BackURL" id="osbide_forward" class="osbide_nav_btn"><span class="glyphicon glyphicon-arrow-left"></span></a>
+    }
+
     <h1 id="osbide_header">OSBIDE - @ViewBag.Title</h1>
     <div class="container-fluid" id="main_container">
         @RenderBody()
