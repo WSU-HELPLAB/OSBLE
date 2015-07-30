@@ -1,6 +1,8 @@
-﻿using System.Web.Mvc;
+﻿using System;
+using System.Web.Mvc;
 using OSBLE.Attributes;
 using OSBLE.Controllers;
+using OSBLEPlus.Logic.DomainObjects.Analytics;
 
 
 namespace OSBLE.Areas.Analytics.Controllers
@@ -12,15 +14,13 @@ namespace OSBLE.Areas.Analytics.Controllers
         //
         // GET: /Analytics/Calendar/
         public ActionResult Index()
-        {            
-            return RedirectToAction("Load", new { viewName = "Default" });
-            //return RedirectToAction("Index", "Calendar");
+        {
+            return RedirectToAction("Load", new { view = "Default" });
         }
 
-        public ActionResult Load(string viewName)
+        public ActionResult Load(string view)
         {
-            ViewBag.CurrentTab = "Analytics";
-            ViewBag.CurrentView = viewName;
+            ViewBag.CurrentView = view;
             return View("Index");
         }
     }

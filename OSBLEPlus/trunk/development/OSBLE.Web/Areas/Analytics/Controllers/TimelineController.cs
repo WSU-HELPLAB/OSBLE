@@ -3,6 +3,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web.Mvc;
+using System.Collections.Generic;
 using Dapper;
 using OSBLE.Attributes;
 using OSBLE.Controllers;
@@ -22,9 +23,8 @@ namespace OSBLE.Areas.Analytics.Controllers
         [ChildActionOnly]
         public ActionResult Index()
         {
-
-                
-            return PartialView("_Timeline");
+            var model = new List<OSBLEPlus.Logic.DomainObjects.Analytics.StudentData>();
+            return PartialView("_Timeline", model);
         }
 
         public ActionResult GetCSVData(int scaleSetting, DateTime? timeFrom, DateTime? timeTo, int? timeout, bool? grayscale, bool? realtime, int courseId, string[] userId)

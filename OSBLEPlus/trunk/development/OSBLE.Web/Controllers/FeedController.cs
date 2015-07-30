@@ -68,8 +68,6 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         public ActionResult OSBIDE()
         {
-            // This is used to tell the feed view where the details page is
-            ViewBag.DetailsLink = "'/Feed/OSBIDEDetails/' + idString";
             return View("Index", "_OSBIDELayout");
         }
 

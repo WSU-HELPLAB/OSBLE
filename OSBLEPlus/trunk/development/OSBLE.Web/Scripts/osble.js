@@ -107,69 +107,87 @@ function parseDates() {
 
 }
 
-    // Ready function for date/time pickers
-    function setupDateTime() {
-        setupDate('.date_picker');
-        setupTime('.time_picker');
-    }
+// Ready function for date/time pickers
+function setupDateTime() {
+    setupDate('.date_picker');
+    setupTime('.time_picker');
+}
 
-    // Used to set up dynamically created time pickers.
-    function setupTime(element) {
-        $(element).timepicker({
-            showPeriod: true,
-            showLeadingZero: false
-        });
-    }
-
-    // Used to set up dynamically created date pickers.
-    function setupDate(element) {
-        $(element).datepicker();
-    }
-
-    $(function () {
-        setupDateTime();
+// Used to set up dynamically created time pickers.
+function setupTime(element) {
+    $(element).timepicker({
+        showPeriod: true,
+        showLeadingZero: false
     });
+}
 
-    function onSilverlightError(sender, args) {
-        var appSource = "";
-        if (sender != null && sender != 0) {
-            appSource = sender.getHost().Source;
-        }
+// Used to set up dynamically created date pickers.
+function setupDate(element) {
+    $(element).datepicker();
+}
 
-        var errorType = args.ErrorType;
-        var iErrorCode = args.ErrorCode;
+$(function () {
+    setupDateTime();
+});
 
-        if (errorType == "ImageError" || errorType == "MediaError") {
-            return;
-        }
+function onSilverlightError(sender, args) {
+    var appSource = "";
+    if (sender != null && sender != 0) {
+        appSource = sender.getHost().Source;
+    }
 
-        var errMsg = "Unhandled Error in Silverlight Application " + appSource + "\n";
+    var errorType = args.ErrorType;
+    var iErrorCode = args.ErrorCode;
 
-        errMsg += "Code: " + iErrorCode + "    \n";
-        errMsg += "Category: " + errorType + "       \n";
-        errMsg += "Message: " + args.ErrorMessage + "     \n";
+    if (errorType == "ImageError" || errorType == "MediaError") {
+        return;
+    }
 
-        if (errorType == "ParserError") {
-            errMsg += "File: " + args.xamlFile + "     \n";
+    var errMsg = "Unhandled Error in Silverlight Application " + appSource + "\n";
+
+    errMsg += "Code: " + iErrorCode + "    \n";
+    errMsg += "Category: " + errorType + "       \n";
+    errMsg += "Message: " + args.ErrorMessage + "     \n";
+
+    if (errorType == "ParserError") {
+        errMsg += "File: " + args.xamlFile + "     \n";
+        errMsg += "Line: " + args.lineNumber + "     \n";
+        errMsg += "Position: " + args.charPosition + "     \n";
+    }
+    else if (errorType == "RuntimeError") {
+        if (args.lineNumber != 0) {
             errMsg += "Line: " + args.lineNumber + "     \n";
             errMsg += "Position: " + args.charPosition + "     \n";
         }
-        else if (errorType == "RuntimeError") {
-            if (args.lineNumber != 0) {
-                errMsg += "Line: " + args.lineNumber + "     \n";
-                errMsg += "Position: " + args.charPosition + "     \n";
-            }
-            errMsg += "MethodName: " + args.methodName + "     \n";
+        errMsg += "MethodName: " + args.methodName + "     \n";
+    }
+    //alert(errMsg);
+    //omthrow new Error(errMsg);
+}
+
+function GetSelectedCourseID()
+{
+    var selectCourseObj = $(".course-item.active");
+    var courseID = selectCourseObj != null ? selectCourseObj.data("courseid") : 0;
+    return courseID;
+}
+
+$(document).ready(function () {
+    $(".show-hide-toggle").addClass("shown");
+    $(".show-hide-toggle").click(function (event) {
+        var btn = $(event.target);
+        if (!btn.hasClass("show-hide-toggle")) {
+            btn = btn.parents(".show-hide-toggle").first();
         }
-        //alert(errMsg);
-        //omthrow new Error(errMsg);
-    }
 
-    function GetSelectedCourseID()
-    {
-        var selectCourseObj = $(".course-item.active");
-        var courseID = selectCourseObj != null ? selectCourseObj.data("courseid") : 0;
-        return courseID;
-    }
-
+        if (btn.hasClass("shown")) {
+            btn.removeClass("shown").addClass("not-shown");
+            $(btn.data('target')).hide('blind');
+        }
+        else {
+            btn.removeClass("not-shown").addClass("shown");
+            $(btn.data('target')).show('blind');
+        }
+    });
+});
 

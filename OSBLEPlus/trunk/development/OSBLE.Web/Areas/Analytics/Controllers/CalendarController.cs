@@ -16,14 +16,6 @@ namespace OSBLE.Areas.Analytics.Controllers
         public ActionResult Index()
         {
             return PartialView("_Calendar", new CalendarAttributes { ReferenceDate = DateTime.Today });
-            //return PartialView("_Calendar");
-            //return PartialView("_Calendar", new CalendarAttributes {ReferenceDate = DateTime.Today});
-        }
-
-        [ChildActionOnly]
-        public ActionResult Options()
-        {
-            return PartialView("_CalendarOptions", new CalendarAttributes { ReferenceDate = DateTime.Today });
         }
     }
 }
