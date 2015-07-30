@@ -6,6 +6,7 @@ using System.Linq;
 
 using Dapper;
 using OSBLE.Interfaces;
+using OSBLE.Models.Assignments;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
 using OSBLEPlus.Logic.DomainObjects.Analytics;
 using OSBLEPlus.Logic.DomainObjects.Profiles;
@@ -32,7 +33,9 @@ namespace OSBLEPlus.Logic.DataAccess.Profiles
                 var connection = new SqlConnection(StringConstants.ConnectionString))
             {
                 using (var multi = connection.QueryMultiple("dbo.GetAssignmentsForCourse",
-                        new { CourseId = courseId, CurrentDate = currentTime.Date.AddDays(1).AddSeconds(-1) },
+                        new { CourseId = courseId, CurrentDate = currentTime.Date.AddDays(1).AddSeconds(-1),
+                            AssignType = AssignmentTypes.Basic,
+                            FileType=DeliverableType.Zip },
                         commandType: CommandType.StoredProcedure))
                 {
                     var assignments = multi.Read<SubmisionAssignment>().ToList();

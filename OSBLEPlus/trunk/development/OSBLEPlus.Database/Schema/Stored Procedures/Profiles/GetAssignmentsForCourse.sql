@@ -1,5 +1,7 @@
 ﻿CREATE PROCEDURE [dbo].[GetAssignmentsForCourse] @courseId    INT,
-                                                 @currentDate DATETIME
+                                                 @currentDate DATETIME,
+												 @assignType INT,
+												 @fileType INT
 AS
   BEGIN
       SET nocount ON;
@@ -18,7 +20,8 @@ AS
              AND a.IsDraft = 0
             -- AND a.ReleaseDate <= @currentDate
              AND @currentDate <= a.DueDate
-			 AND a.AssignmentTypeID = 1 --Basic assignment
+			 AND a.AssignmentTypeID = @assignType
+			 AND d.Type = @fileType
 
 
       -- course details

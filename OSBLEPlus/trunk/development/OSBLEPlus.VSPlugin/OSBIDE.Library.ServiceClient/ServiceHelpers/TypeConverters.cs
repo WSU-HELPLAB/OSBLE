@@ -51,6 +51,12 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
         public static StackFrame VsStackFrameToStackFrame(EnvDTE.StackFrame frame)
         {
             var frame2 = (StackFrame2) frame;
+
+            if (string.IsNullOrWhiteSpace(frame2.FileName))
+            {
+                return new StackFrame();
+            }
+
             var stackFrame = new StackFrame
             {
                 LineNumber = (int)frame2.LineNumber,

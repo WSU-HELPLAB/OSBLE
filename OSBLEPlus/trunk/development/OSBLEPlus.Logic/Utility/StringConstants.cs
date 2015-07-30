@@ -41,7 +41,7 @@ namespace OSBLEPlus.Logic.Utility
 
         public static string ActivityFeedUrl
         {
-            get { return string.Format("{0}/Feed", WebClientRoot); }
+            get { return string.Format("{0}/Feed/OSBIDE", WebClientRoot); }
         }
 
         public static string AskTheProfessorUrl
