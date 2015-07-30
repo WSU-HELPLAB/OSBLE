@@ -65,7 +65,6 @@ div[data-wzstep="DataVisualization"] div[data-type="spinner"] img {
 
 .calendar-section {
     margin-top: 15px;
-    float: right;
 }
 
 .calendar-section h4 {
@@ -79,3 +78,11 @@ div[data-wzstep="DataVisualization"] div[data-type="spinner"] img {
     top: 10px;
 }
 
+#currentMonth {
+    display: inline;
+    margin: 12px;
+}
+
+.calendar-header {
+    text-align: center;
+}

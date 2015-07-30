@@ -2261,3 +2261,14 @@ a.disabled{
 .osbide_nav_btn:first-child {
     margin-left: 15px;
 }
+
+/* Generic show/hide buttons */
+.show-hide-toggle, .show-hide-toggle * {
+    cursor: pointer;
+}
+.show-hide-toggle > .show-only, .show-hide-toggle > .hide-only {
+    display: none;
+}
+.show-hide-toggle.shown > .show-only, .show-hide-toggle.not-shown > .hide-only  {
+    display: inline !important;
+}
