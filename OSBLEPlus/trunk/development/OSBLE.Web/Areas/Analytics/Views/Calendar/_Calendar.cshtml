@@ -5,12 +5,9 @@
 @model CalendarAttributes
 @Styles.Render("~/Areas/Analytics/Content/Calendar.css")
 
+
 <div id="calendar-options" class="col-sm-4 options_view">
-    <a class="show-hide-toggle" data-target="#options_content"> 
-        <span class="show-only glyphicon glyphicon-chevron-up"></span>
-        <span class="hide-only glyphicon glyphicon-chevron-down"></span>
-    </a>
-    <h4 class="options_header">Options</h4>
+    @Helpers.ToggleButtonHeader("Options", "#options_content")
     <div id="options_content">
         @Html.DropDownListFor(m => m.CourseId, new SelectList(Courses.GetCourses(), "Value", "Name"))
 

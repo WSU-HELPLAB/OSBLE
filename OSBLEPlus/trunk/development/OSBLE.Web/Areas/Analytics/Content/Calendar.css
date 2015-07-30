@@ -1,5 +1,8 @@
 ﻿/* calendar */
 
+#chart {
+    width: 100%;
+}
 
  div[data-wzstep="DataVisualization"] h2
 ,div[data-wzstep="DataVisualization"] select {
