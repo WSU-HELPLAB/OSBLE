@@ -3,10 +3,13 @@
 @using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 @using OSBLE.Models.Courses;
 @using OSBLE.Models;
+@using OSBLEPlus.Logic.Utility
 @{
     bool isComment = ViewBag.IsComment ?? false;
     bool showDetails = ViewBag.ShowDetails ?? false;
+    int genericComponent = (int)VsComponent.GenericComponent;
     string detailsLink = ViewBag.DetailsLink ?? "'/Feed/Details/' + idString";
+    detailsLink += "+'?component='+" + genericComponent;
 }
 
 <div data-bind="if: show"> @* prevents deleted items from displaying *@
@@ -23,7 +26,7 @@
             <div class="dp_tools">
                 @* Mail Button *@
                 <div data-bind="if: options.canMail">
-                    <a title="Mail This User" data-bind="attr: {href: '/Mail/CreateUser/' + senderId}"><span class="glyphicon glyphicon-envelope"></span></a>
+                    <a title="Mail This User" data-bind="attr: {href: '/Mail/CreateUser/' + senderId + '?component=' + @genericComponent}"><span class="glyphicon glyphicon-envelope"></span></a>
                 </div>
 
                 @* Delete Button *@
