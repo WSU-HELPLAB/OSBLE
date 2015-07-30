@@ -62,8 +62,7 @@ function updateCalendar(monthOffset) {
                 ReferenceDate: "2014/01/01",
                 AggregateFunctionId: $("input[name = 'AggregationFunction']").val(),
                 CourseId: $("select[name = 'CourseId']").val(),
-                SelectedMeasures: measures,
-                SelectedUsers: "17,18,19"
+                SelectedMeasures: measures
             }
         }).done(function (data) {
 
@@ -75,7 +74,7 @@ function updateCalendar(monthOffset) {
                 // calendar
                 var chart = d3.trendingCalendar().height(700).onDayClick(onDayClick);
                 d3.select("#chart").selectAll("svg").data([data]).enter().append("svg")
-                    .attr("width", 850)
+                    .attr("width", "100%")
                     .attr("height", 850)
                     .append("g")
                     .call(chart);
