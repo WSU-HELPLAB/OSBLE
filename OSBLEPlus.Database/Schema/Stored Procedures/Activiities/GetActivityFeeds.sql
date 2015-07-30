@@ -387,6 +387,7 @@ AS
 	  -- Helpful Marks (10)
 	  SELECT EventId = a.Id,
              a.EventLogId,
+			 a.EventDate,
              a.LogCommentEventId,
              a.SolutionName
       FROM   [dbo].[HelpfulMarkGivenEvents] a WITH (NOLOCK)
@@ -396,6 +397,7 @@ AS
 	  -- Log Comments (11)
       SELECT EventId = a.Id,
              a.EventLogId,
+			 a.EventDate,
              a.SourceEventLogId,
              a.SolutionName,
              a.Content
@@ -407,6 +409,7 @@ AS
       SELECT EventId = a.Id,
              a.EventLogId,
 			 a.DocumentId,
+			 a.EventDate,
 			 a.SolutionName
       FROM   [dbo].[SaveEvents] a WITH (NOLOCK)
              INNER JOIN #events b
@@ -416,7 +419,8 @@ AS
       SELECT EventId = a.Id,
              a.EventLogId,
              a.AssignmentId,
-             a.SolutionName
+             a.SolutionName,
+			 a.EventDate
       FROM   [dbo].[SubmitEvents] a WITH (NOLOCK)
              INNER JOIN #events b
                      ON b.EventLogId = a.EventLogId
