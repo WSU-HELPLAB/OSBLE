@@ -42,7 +42,7 @@
 
             @* Display Name & Date/Time*@
             <a class="display_name" data-bind="text: senderName, attr: {href: '/Profile/Index/' + senderId}"></a>
-            <span class="utc-time feed-item-date" data-bind="text: timeString(), attr: {datetime: time()}"></span>
+            <span class="feed-item-date" data-bind="text: timeString(), attr: {datetime: time()}"></span>
         </div>
 
         @* Body Content *@
