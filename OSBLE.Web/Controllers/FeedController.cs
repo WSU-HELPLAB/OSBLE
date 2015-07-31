@@ -152,7 +152,7 @@ namespace OSBLE.Controllers
 
         private string GetDisplayTimeString(DateTime time)
         {
-            return time.ToLocalTime().ToShortDateString() + " " + time.ToLocalTime().ToShortTimeString();
+            return time.UTCToCourse(ActiveCourseUser.AbstractCourseID).ToShortDateString() + " " + time.UTCToCourse(ActiveCourseUser.AbstractCourseID).ToShortTimeString();
         }
 
         private object MakeLogCommentJsonObject(LogCommentEvent comment)
