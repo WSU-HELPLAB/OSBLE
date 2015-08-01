@@ -2272,3 +2272,9 @@ a.disabled{
 .show-hide-toggle.shown > .show-only, .show-hide-toggle.not-shown > .hide-only  {
     display: inline !important;
 }
+
+/* Mark as helpful */
+.icon-highlight {
+    opacity: 1 !important;
+    cursor: default !important;
+}
