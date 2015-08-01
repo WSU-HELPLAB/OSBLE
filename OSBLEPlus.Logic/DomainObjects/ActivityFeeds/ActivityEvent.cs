@@ -45,6 +45,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
         public bool CanDelete { get; set; }
         public bool CanReply { get; set; }
         public bool CanEdit { get; set; }
+        public bool CanVote { get; set; }
         public bool ShowProfilePicture { get; set; }
         public string DisplayTitle { get; set; }
 
@@ -68,6 +69,9 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 
             // Verify that user can make new posts (No one can reply to a reply)
             CanReply = currentUser.AbstractRole.CanSubmit && EventType != EventType.LogCommentEvent;
+
+            // Cannot vote for yourself
+            CanVote = currentUser.UserProfileID != SenderId;
 
             ShowProfilePicture = !anonymous;
 

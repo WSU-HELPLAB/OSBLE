@@ -24,6 +24,21 @@
 
             @* Button Controls *@
             <div class="dp_tools">
+                @* Mark as Helpful Button*@
+                @if (isComment)
+                {
+                    @*Don't allow self upvoting*@
+                    <span data-bind="text: '+'"></span>
+                    <span data-bind="text: numberHelpfulMarks"></span>
+                    <div data-bind="if: options.canVote">
+                        <a title="Mark Comment as Helpful"
+                           data-bind="click: MarkCommentHelpful,
+                           css: isMarker(eventId) == true ? 'icon-highlight' : 'icon-no-highlight'">
+                            <span class="glyphicon glyphicon-thumbs-up"></span>
+                        </a>
+                    </div>
+                }
+
                 @* Mail Button *@
                 <div data-bind="if: options.canMail">
                     <a title="Mail This User" data-bind="attr: {href: '/Mail/CreateUser/' + senderId + '?component=' + @genericComponent}"><span class="glyphicon glyphicon-envelope"></span></a>
@@ -77,7 +92,7 @@
                     <input name="response-submit" class="btn btn-default btn-sm" type="button" value="Send" data-bind="click: AddComment" />
                     <input name="response-cancel" class="btn btn-default btn-sm" type="reset" value="Cancel" data-bind="click: HideReplyBox" />
                 </form>
-
+         
                 @* Footer Links *@
                 <ul class="feed-item-links">
                     @* Don't show "details" or "View Conversation link if we're on the details page *@
@@ -95,7 +110,7 @@
                     }
 
                     @* Reply Link *@
-                    <li><a data-bind="attr: {id: 'btn-reply-' + eventId}, click: ShowReplyBox">Reply</a></li>
+                    <li><a data-bind="visible: !isHelpfulMark, attr: {id: 'btn-reply-' + eventId}, click: ShowReplyBox">Reply</a></li>
                 </ul>
             </div>
         }

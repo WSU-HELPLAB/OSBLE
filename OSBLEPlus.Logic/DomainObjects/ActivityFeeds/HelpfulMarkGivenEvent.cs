@@ -21,10 +21,11 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 
         public override string GetInsertScripts()
         {
+            string batchString = BatchId == null ? "NULL" : BatchId.ToString();
             return string.Format(@"
 INSERT INTO dbo.EventLogs (EventTypeID, EventDate, SenderId, BatchId) VALUES ({0}, '{1}', {2}, {5})
 INSERT INTO dbo.HelpfulMarkGivenEvents (EventLogId, LogCommentEventId, EventDate, SolutionName)
-VALUES (SCOPE_IDENTITY(), {3}, '{1}', '{4}')", EventTypeId, EventDate, SenderId, LogCommentEventId, SolutionName, BatchId);
+VALUES (SCOPE_IDENTITY(), {3}, '{1}', '{4}')", EventTypeId, EventDate, SenderId, LogCommentEventId, SolutionName, batchString);
         }
     }
 }

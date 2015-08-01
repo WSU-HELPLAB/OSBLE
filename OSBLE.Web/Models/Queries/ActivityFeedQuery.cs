@@ -124,8 +124,23 @@ namespace OSBLE.Models.Queries
             };
         }
 
-        public static IEnumerable<EventType> GetNecessaryEvents()
+        public static IEnumerable<EventType> GetNecessaryEvents(bool needHelpfulMark = true)
         {
+            List<EventType> l;
+            if (needHelpfulMark)
+            {
+                return new List<EventType>
+                {
+                    EventType.AskForHelpEvent,
+                    EventType.BuildEvent,
+                    EventType.DebugEvent,
+                    EventType.HelpfulMarkGivenEvent,
+                    EventType.ExceptionEvent,
+                    EventType.FeedPostEvent,
+                    EventType.SubmitEvent
+                };
+            }
+
             return new List<EventType>
             {
                 EventType.AskForHelpEvent,
@@ -135,6 +150,7 @@ namespace OSBLE.Models.Queries
                 EventType.FeedPostEvent,
                 EventType.SubmitEvent
             };
+
         } 
 
         private IEnumerable<int> GetEventFilter()

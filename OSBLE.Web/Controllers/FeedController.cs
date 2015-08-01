@@ -158,6 +158,7 @@ namespace OSBLE.Controllers
         private object MakeLogCommentJsonObject(LogCommentEvent comment)
         {
             comment.SetPrivileges(ActiveCourseUser);
+            comment.NumberHelpfulMarks = DBHelper.GetHelpfulMarksLogIds(comment.EventLogId).Count;
             return new
             {
                 EventId = comment.EventLogId,
@@ -166,15 +167,19 @@ namespace OSBLE.Controllers
                 SenderId = comment.SenderId,
                 TimeString = GetDisplayTimeString(comment.EventDate),
                 EventDate = comment.EventDate.Ticks,
+                EventLogId = comment.EventLogId,
                 CanMail = comment.CanMail,
                 CanEdit = comment.CanEdit,
                 CanDelete = comment.CanDelete,
+                CanVote = comment.CanVote,
                 CanReply = false,
+                IsHelpfulMark = false,
                 ShowPicture = comment.ShowProfilePicture,
                 Comments = new List<dynamic>(),
                 HTMLContent = PartialView("Details/_LogCommentEvent", comment).Capture(this.ControllerContext),
                 Content = comment.Content,
-                IdString = comment.EventId.ToString()
+                IdString = comment.EventId.ToString(),
+                NumberHelpfulMarks = comment.NumberHelpfulMarks
             };
         }
 
@@ -185,7 +190,15 @@ namespace OSBLE.Controllers
 
             var comments = MakeCommentListJsonObject(item.Comments, eventLog.EventLogId);
             string viewFolder = details? "Details/_" : "Feed/_";
+            string idString = null;
 
+            if (eventLog.EventType == EventType.HelpfulMarkGivenEvent)
+            {
+                // need to change the detailsId to the Feed details for a HelpfulMarkGivenEvent
+                idString = DBHelper.GetHelpfulMarkFeedSourceId(eventLog.EventLogId).ToString();
+            }
+
+            
             return new
             {
                 EventId = eventLog.EventLogId,
@@ -198,11 +211,12 @@ namespace OSBLE.Controllers
                 CanEdit = eventLog.CanEdit,
                 CanDelete = eventLog.CanDelete,
                 CanReply = eventLog.CanReply,
+                IsHelpfulMark = item.PrettyName == EventType.HelpfulMarkGivenEvent.ToString().ToDisplayText(),
                 ShowPicture = eventLog.ShowProfilePicture,
                 Comments = comments,
                 HTMLContent = PartialView(viewFolder + eventLog.EventType.ToString().Replace(" ", ""), item).Capture(this.ControllerContext),
                 Content = eventLog.EventType == EventType.FeedPostEvent ? (eventLog as FeedPostEvent).Comment : "",
-                IdString = string.Join(",", item.Items.Select(i => i.Event.EventLogId))
+                IdString = idString ?? string.Join(",", item.Items.Select(i => i.Event.EventLogId)) 
             };
         }
 
@@ -388,6 +402,11 @@ namespace OSBLE.Controllers
             }
         }
 
+        [HttpPost]
+        public JsonResult MarkHelpfulComment(int eventLogToMark, int markerId)
+        {
+            return Json(new { helpfulMarks = DBHelper.MarkLogCommentHelpful(eventLogToMark, markerId) });
+        }
 
 
         /*public JsonResult GetComments(int? singleLogId)
@@ -686,7 +705,7 @@ namespace OSBLE.Controllers
         private FeedItem GetFeedItemFromID(int id)
         {
             ActivityFeedQuery query = new ActivityFeedQuery(ActiveCourseUser.AbstractCourseID);
-            query.UpdateEventSelectors(ActivityFeedQuery.GetNecessaryEvents());
+            query.UpdateEventSelectors(ActivityFeedQuery.GetNecessaryEvents(false));
             query.MinLogId = id;
             query.MaxLogId = id;
             IEnumerable<FeedItem> result = query.Execute();
@@ -703,6 +722,15 @@ namespace OSBLE.Controllers
             }
 
             return items;
+        }
+
+        [HttpPost]
+        public JsonResult FindMarker(int currentUserId, int logCommentId)
+        {
+            return Json(new
+            {
+                value = DBHelper.UserMarkedLog(currentUserId, logCommentId)
+            });
         }
     }
 }

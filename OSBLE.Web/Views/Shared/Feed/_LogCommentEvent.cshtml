@@ -16,6 +16,7 @@
                       id="edit-form-textarea-@comment.EventLogId"
                       name="newText"
                       class="form-control feed-edit">@comment.Content</textarea>
+            
                 <button type="submit"
                         onclick="$(this).parents('form:first').submit();editText(@comment.EventLogId, true);"
                         form="edit-form-@comment.EventLogId"

@@ -514,6 +514,133 @@ namespace OSBLE.Utility
             }
         }
 
+        public static List<int> GetHelpfulMarksLogIds(int eventLogId, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    return GetHelpfulMarksLogIds(eventLogId, sqlc);
+                }
+            }
+
+            // get the logCommentId
+            int logId = connection.Query<int>("SELECT Id " +
+                                              "FROM LogCommentEvents " +
+                                              "WHERE EventLogId = @eventId", new { eventId = eventLogId }).FirstOrDefault();
+
+            return connection.Query<int>("SELECT EventLogId " +
+                                      "FROM HelpfulMarkGivenEvents " +
+                                      "WHERE LogCommentEventId = @logId",
+                                      new { logId }).ToList();
+
+        }
+
+        /// <summary>
+        /// Inserts HelpfulMarkGivenEvent
+        /// </summary>
+        /// <returns>Number of helpfulMarks associated with the logComment being marked</returns>
+        public static int MarkLogCommentHelpful(int eventLogId, int markerId, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    return MarkLogCommentHelpful(eventLogId, markerId, sqlc);
+                }
+            }
+
+            List<int> helpfulMarkEventIds = GetHelpfulMarksLogIds(eventLogId, connection);
+
+            // get the logCommentId
+            int logId = connection.Query<int>("SELECT Id " +
+                                              "FROM LogCommentEvents " +
+                                              "WHERE EventLogId = @eventId", new { eventId = eventLogId }).FirstOrDefault();
+
+            List<ActivityEvent> eventLogs =
+                connection.Query<ActivityEvent>("SELECT Id AS EventLogId, EventTypeId AS EventId, EventDate, DateReceived, SenderId, CourseId, BatchId, SolutionName, IsDeleted " + 
+                                                "FROM EventLogs " +
+                                                "WHERE Id = @logId", new {logId = helpfulMarkEventIds}).ToList();
+
+            ActivityEvent senderEvent = eventLogs.Find(x => x.SenderId == markerId);
+            
+            
+            // user clicked again, remove the MarkHelpfulCommentEvent
+            if (senderEvent != null)
+            {
+                connection.Execute("DELETE FROM HelpfulMarkGivenEvents " +
+                                   "WHERE EventLogId = @senderEventId", new {senderEventId = senderEvent.EventLogId});
+
+                connection.Execute("DELETE FROM EventLogs " +
+                   "WHERE Id = @senderEventId", new { senderEventId = senderEvent.EventLogId });
+                // do not execute insert string, just return number of marks
+                return helpfulMarkEventIds.Count - 1;
+            }
+
+            try
+            {
+                HelpfulMarkGivenEvent h = new HelpfulMarkGivenEvent()
+                {
+                    LogCommentEventId = logId,
+                    SenderId = markerId,
+                };
+
+                string sql = h.GetInsertScripts();
+                connection.Execute(sql);
+                return helpfulMarkEventIds.Count + 1;
+            }
+            catch(Exception ex)
+            {
+                return helpfulMarkEventIds.Count;
+            }
+        }
+
+        public static int GetHelpfulMarkFeedSourceId(int helpfulMarkId, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    return GetHelpfulMarkFeedSourceId(helpfulMarkId, sqlc);
+                }
+            }
+
+            return connection.Query<int>("SELECT SourceEventLogId " +
+                                         "FROM LogCommentEvents " +
+                                         "WHERE Id = (SELECT LogCommentEventId " +
+                                         "FROM HelpfulMarkGivenEvents " +
+                                         "WHERE EventLogId = @helpfulMarkId)", new {helpfulMarkId}).SingleOrDefault();
+        }
+
+        public static bool UserMarkedLog(int userId, int logCommentId, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    return UserMarkedLog(userId, logCommentId, sqlc);
+                }
+            }
+
+            // find the log id
+            int logId = connection.Query<int>("SELECT Id " +
+                                              "FROM LogCommentEvents " +
+                                              "WHERE EventLogId = @logCommentId", new {logCommentId}).SingleOrDefault();
+
+            // find eventlogids
+            List<int> helpEvents = connection.Query<int>("SELECT EventLogId " +
+                                                         "FROM HelpfulMarkGivenEvents " +
+                                                         "WHERE LogCommentEventId = @logId", new{logId}).ToList();
+
+            // find the senders
+            List<int> senders = connection.Query<int>("SELECT SenderId " +
+                                                   "FROM EventLogs " +
+                                                   "WHERE Id = @helpEvents", new {helpEvents}).ToList();
+
+            return senders.Contains(userId);
+
+        }
+
         #endregion
 
 

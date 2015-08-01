@@ -16,6 +16,7 @@ using OSBLEPlus.Logic.Utility.Lookups;
 using OSBLE.Interfaces;
 using OSBLE.Models.Users;
 
+
 namespace OSBLEPlus.Logic.DataAccess.Activities
 {
     public class Feeds
@@ -70,12 +71,22 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                 // associate logComments with senderId
 
                 List<LogCommentEvent> nonDeletedLogComments = new List<LogCommentEvent>();
+                //List<ActivityEvent> eventLogs = eventLogsTemp.Distinct(new ActivityEventEqualityComparer()).ToList();
                 foreach (LogCommentEvent log in logComments)
                 {
-                    ActivityEvent e = eventLogs.SingleOrDefault(x => x.EventLogId == log.EventLogId);
-                    if (e == null) continue;
-                    log.SenderId = e.SenderId;
-                    nonDeletedLogComments.Add(log);
+                    try
+                    {
+                        ActivityEvent e = eventLogs.Single(x => x.EventLogId == log.EventLogId);
+                        if (e == null) continue;
+                        
+                        log.SenderId = e.SenderId;
+                        if(!nonDeletedLogComments.Contains(log))
+                            nonDeletedLogComments.Add(log);
+                    }
+                    catch(Exception ex)
+                    {
+                        //
+                    }
                 }
 
 
@@ -126,6 +137,10 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                             xActivityEvent = ComposeExceptionEvent(x, userDictionary, users, exceptions);
                             break;
 
+                        case EventType.HelpfulMarkGivenEvent:
+                            xActivityEvent = ComposeHelpfulMarkGivenEvent(x, userDictionary, users, helpMarks);
+                            break;
+
                         case EventType.FeedPostEvent:
                             xActivityEvent = ComposeFeedPostEvent(x, userDictionary, users, feedPosts);
                             break;
@@ -160,21 +175,34 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                         feedItems.Add(f);
 
                     xActivityEvent = null;
-                    //feedItems.Add(new FeedItem
-                    //{
-                    //    Event = xActivityEvent,
-                    //    Comments =
-                    //        ComposeComments(xActivityEvent, eventLogs, users, logComments, helpMarks, userDictionary)
-                    //});
                 }
             }
             catch (Exception)
             {
-                // do nothing
+                // ignore
             }
             
 
             return feedItems;
+        }
+
+        private static IActivityEvent ComposeHelpfulMarkGivenEvent(IEventLog eventLog,
+            Dictionary<int, IUser> userDictionary, 
+            IList<UserProfile> users, IList<HelpfulMarkGivenEvent> helpfulMarks)
+        {
+            var evt = helpfulMarks.SingleOrDefault(y => y.EventLogId == eventLog.EventLogId);
+            if (evt == null) return null;
+
+            return new HelpfulMarkGivenEvent()
+            {
+                EventId = evt.EventId,
+                EventLogId = evt.EventLogId,
+                SenderId = evt.SenderId,
+                Sender = GetUser(userDictionary, users, eventLog.SenderId),
+                SolutionName = evt.SolutionName,
+                LogCommentEventId = evt.LogCommentEventId,
+                LogComment = evt.LogComment
+            };
         }
 
         private static IActivityEvent ComposeCutCopyPasteEvent(IEventLog eventLog, 
@@ -319,8 +347,8 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
         }
 
         private static IActivityEvent ComposeFeedPostEvent(IEventLog eventLog,
-            Dictionary<int, IUser> userDictionary,
-            IEnumerable<IUser> users, IEnumerable<FeedPostEvent> exceptions)
+            Dictionary<int, IUser> userDictionary, IEnumerable<IUser> users, 
+            IEnumerable<FeedPostEvent> exceptions)
         {
             var evt = exceptions.SingleOrDefault(y => y.EventLogId == eventLog.EventLogId);
             if (evt == null) return null;
