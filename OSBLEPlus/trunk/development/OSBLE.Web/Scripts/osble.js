@@ -180,14 +180,32 @@ $(document).ready(function () {
             btn = btn.parents(".show-hide-toggle").first();
         }
 
-        if (btn.hasClass("shown")) {
+        var shown = btn.hasClass("shown");
+        if (shown) {
             btn.removeClass("shown").addClass("not-shown");
             $(btn.data('target')).hide('blind');
         }
         else {
             btn.removeClass("not-shown").addClass("shown");
+            btn.parent().removeClass("content-hidden");
             $(btn.data('target')).show('blind');
         }
+
+        if (btn.hasClass("cb-options"))
+            setTimeout(function () { OptionsToggleCallback(!shown); }, 400);
     });
 });
 
+function OptionsToggleCallback(shown)
+{
+    if (shown)
+    {
+        $(".options_view").removeClass("content-hidden");
+        $(".analytic-view").removeClass("options-hidden");
+    }
+    else
+    {
+        $(".options_view").addClass("content-hidden");
+        $(".analytic-view").addClass("options-hidden");
+    }
+}

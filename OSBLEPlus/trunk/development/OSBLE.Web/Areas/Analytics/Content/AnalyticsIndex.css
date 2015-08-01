@@ -137,6 +137,7 @@
     padding: 9px;
     background-color: #eee;
     border-radius: 10px;
+    margin-bottom: 10px;
 }
 
 .analytic-view {
@@ -182,4 +183,10 @@
 }
 #options_content {
     margin: 15px;
+}
+.options_view.content-hidden {
+    float: none;
+}
+.analytic-view.options-hidden {
+    width: 100%;
 }

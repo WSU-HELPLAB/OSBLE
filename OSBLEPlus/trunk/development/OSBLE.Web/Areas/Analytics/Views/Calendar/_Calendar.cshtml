@@ -7,7 +7,7 @@
 
 
 <div id="calendar-options" class="col-sm-4 options_view">
-    @Helpers.ToggleButtonHeader("Options", "#options_content")
+    @Helpers.ToggleButtonHeader("Options", "#options_content", "cb-options")
     <div id="options_content">
         @Html.DropDownListFor(m => m.CourseId, new SelectList(Courses.GetCourses(), "Value", "Name"))
 
