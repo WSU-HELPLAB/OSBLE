@@ -1,8 +1,39 @@
-﻿/* calendar */
+﻿/* calendar 
 
 #chart {
-    width: 100%;
+  position: relative;
+  width: 100%;
+  padding-bottom: 80%;
 }
+
+svg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+*/
+
+#chart {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 800px;
+}
+
+@media(max-width: 850px)
+{
+    #chart {
+        margin-left: -3%;
+    }
+}
+
+svg {
+    overflow: visible !important;
+}
+
 
  div[data-wzstep="DataVisualization"] h2
 ,div[data-wzstep="DataVisualization"] select {
@@ -23,7 +54,7 @@ div[data-wzstep="DataVisualization"] div[data-type="spinner"] img {
     padding-top: 100px;
 }
 
-#calendar-section path {
+#calendar-view path {
     stroke-width: 1;
     fill: none;
 }
@@ -55,14 +86,14 @@ div[data-wzstep="DataVisualization"] div[data-type="spinner"] img {
         left: 0;
     }
 /* hourly */
-#calendar-section .axis path,
-#calendar-section .axis line {
+#calendar-view .axis path,
+#calendar-view .axis line {
     fill: none;
     stroke: #000;
     shape-rendering: crispEdges;
 }
 
-#calendar-section .x.axis path {
+#calendar-view .x.axis path {
     display: none;
 }
 

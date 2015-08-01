@@ -1,6 +1,7 @@
 ﻿
 var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 var yearG = 2015, monthG = 01, dayG = 01;
+var currentMonth = 1, currentYear = 2014;
 
 $(document).ready(function () {
 
@@ -52,14 +53,26 @@ function updateCalendar(monthOffset) {
     var measures = getSelectedMeasures();
     var dataservice = $("#main").attr("data-service-path");
 
-    if (measures.length > 0)
+    currentMonth += monthOffset;
+    if (currentMonth > 12)
+    {
+        currentMonth = 1;
+        currentYear++;
+    }
+    if (currentMonth < 1)
+    {
+        currentMonth = 12;
+        currentYear--;
+    }
+
+    if (measures.length > 0) {
         $.ajax({
             url: dataservice + "/api/calendar/",
             //xhrFields: { withCredentials: true },
             type: "GET",
             headers: { "Access-Control-Allow-Origin": dataservice + ".*" },
             data: {
-                ReferenceDate: "2014/01/01",
+                ReferenceDate: currentYear + "/" + currentMonth + "/01",
                 AggregateFunctionId: $("input[name = 'AggregationFunction']").val(),
                 CourseId: $("select[name = 'CourseId']").val(),
                 SelectedMeasures: measures
@@ -68,18 +81,44 @@ function updateCalendar(monthOffset) {
 
             if (data != null) {
                 updateDisplayArea(false);
-                data.month = data.month - 1;
-                $("#currentMonth").text(calendarLabel(data.year, data.month));
 
-                // calendar
-                var chart = d3.trendingCalendar().height(700).onDayClick(onDayClick);
-                d3.select("#chart").selectAll("svg").data([data]).enter().append("svg")
-                    .attr("width", "100%")
-                    .attr("height", 850)
-                    .append("g")
-                    .call(chart);
+                currentMonth = data.month;
+                currentYear = data.year;
+                data.month = data.month - 1;
+                buildCalendar(data);
+            }
+            else {
+                updateDisplayArea(false);
+                showEmptyCalendar()
             }
         });
+    }
+    else {
+        updateDisplayArea(false);
+        showEmptyCalendar();
+    }
+}
+
+function showEmptyCalendar()
+{
+    var data = { year: currentYear, month: currentMonth - 1, day: 1, measures: [], activities: [] };
+    buildCalendar(data);
+}
+
+function buildCalendar(data)
+{
+    $("#currentMonth").text(calendarLabel(data.year, data.month));
+
+    var scalar = $("#chart").width() / 600;
+
+    // calendar
+    var chart = d3.trendingCalendar().height(700).onDayClick(onDayClick);
+    d3.select("#chart").selectAll("svg").data([data]).enter().append("svg")
+        .attr("width", "100%")
+        .attr("height", 700*scalar)
+        .append("g").attr("transform", "scale(" + scalar + ")")
+        .call(chart);
+
 }
 
 function updateMeasureBackground() {

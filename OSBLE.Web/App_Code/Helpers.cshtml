@@ -359,9 +359,9 @@ Also runs content through nl2br to convert newlines to <br /> tags. *@
     @e.ToString()
 }
 
-@helper ToggleButtonHeader(string title, string target)
+@helper ToggleButtonHeader(string title, string target, string extraClasses)
 {
-    <a class="show-hide-toggle" data-target="@target">
+    <a class="show-hide-toggle @extraClasses" data-target="@target">
         <span class="show-only glyphicon glyphicon-chevron-up"></span>
         <span class="hide-only glyphicon glyphicon-chevron-down"></span>
     </a>
