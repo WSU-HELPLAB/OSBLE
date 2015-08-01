@@ -58,13 +58,16 @@ function FeedItem(data) {
     self.parentEventId = data.ParentEventId;
     self.senderName = data.SenderName;
     self.senderId = data.SenderId;
+    self.eventLogId = data.EventLogId;
     self.timeString = ko.observable(data.TimeString);
     self.eventDate = data.EventDate;
-    self.options = new FeedItemOptions(data.CanMail, data.CanDelete, data.CanEdit, data.ShowPicture);
+    self.options = new FeedItemOptions(data.CanMail, data.CanDelete, data.CanEdit, data.ShowPicture, data.CanVote);
     self.show = true;
     self.isComment = self.parentEventId != -1;
+    self.isHelpfulMark = data.IsHelpfulMark;
     self.content = ko.observable(data.Content); // used for editing posts
     self.htmlContent = ko.observable(data.HTMLContent);
+    self.numberHelpfulMarks = ko.observable(data.NumberHelpfulMarks);
     self.idString = data.IdString; // used for items with multiple ids
 
     // load Comments
@@ -115,6 +118,18 @@ function FeedItem(data) {
         });
     };
 
+    self.MarkCommentHelpful = function () {
+        $.ajax({
+            url: "/Feed/MarkHelpfulComment",
+            data: { eventLogToMark: self.eventId, markerId: vm.userId },
+            dataType: "json",
+            method: "POST",
+            success: function (data) {
+                self.numberHelpfulMarks(data.helpfulMarks);
+            }
+        });
+    }
+
     self.AddComment = function () {
         // Get text from the textarea
         var text = $('#feed-reply-textbox-' + self.eventId).val();
@@ -141,13 +156,14 @@ function FeedItem(data) {
     }
 }
 
-function FeedItemOptions(canMail, canDelete, canEdit, showPicture)
+function FeedItemOptions(canMail, canDelete, canEdit, showPicture, canVote)
 {
     var self = this;
     self.canMail = canMail;
     self.canDelete = canDelete;
     self.canEdit = canEdit;
     self.showPicture = showPicture;
+    self.canVote = canVote;
 }
 
 function FeedViewModel(userName, userId) {
@@ -499,6 +515,24 @@ function HideMoreLoading()
     $('#load-old-posts').show();
 }
 
+function isMarker(logCommentId) {
+    $.ajax({
+        url: "/Feed/FindMarker",
+        data: { currentUserId: vm.userId, logCommentId },
+        dataType: "json",
+        method: "POST",
+        success: function (data) {
+            isMarkerCallBack(data.value);
+        },
+        error: function() {
+            return false;
+        }
+    });
+}
+
+function isMarkerCallBack(data) {
+    return data;
+}
 /*
 //Periodically updates view models for feed items.  Useful for displaying an updated count
 //of comments for a given feed item.

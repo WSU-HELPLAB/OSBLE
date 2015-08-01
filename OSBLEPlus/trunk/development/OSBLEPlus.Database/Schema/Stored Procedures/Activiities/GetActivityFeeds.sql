@@ -248,6 +248,10 @@ AS
              INNER JOIN [dbo].[EventLogs] s WITH (NOLOCK)
                      ON s.Id = hm.EventLogId
 					 AND (s.[IsDeleted] IS NULL OR s.[IsDeleted] = 0)
+	  WHERE EXISTS 
+	         (SELECT * FROM #eventTypesFilter WHERE EventTypeId = 8)
+			 -- eventTypesFilter = 8 for HelpfulMarkGivenEvents
+			 
 
       CREATE CLUSTERED INDEX IX_Temp_Events
         ON #events(EventLogId)

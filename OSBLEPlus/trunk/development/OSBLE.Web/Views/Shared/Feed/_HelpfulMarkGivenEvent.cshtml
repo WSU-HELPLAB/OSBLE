@@ -2,9 +2,9 @@
 @model AggregateFeedItem  
 @{
     HelpfulMarkGivenEvent helpful = Model.Items.First().Event as HelpfulMarkGivenEvent;
-    //LogCommentEvent comment = helpful.LogCommentEvent;
+    LogCommentEvent comment = helpful.LogComment;
     //Model.Items.First().LogId = comment.SourceEventLogId;
 } 
-@*@Model.Creator.FirstName marked @comment.EventLog.Sender.FirstName*@
-@*'s comment as being helpful: <br />*@
-@*@comment.Content*@
+@Model.Creator.FirstName marked @helpful.LogComment.Sender.FirstName
+'s comment as being helpful: <br />
+@comment.Content

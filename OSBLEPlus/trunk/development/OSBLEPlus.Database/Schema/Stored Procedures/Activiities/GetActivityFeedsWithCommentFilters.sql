@@ -57,6 +57,7 @@ AS
 			 AND (s.[CourseId] = @CourseId
 				 OR s.[CourseId] IS NULL
 				 OR @CourseId = @anyCourse)
+		     AND s.EventTypeId != 8
 	  GROUP BY s.Id, s.EventTypeId, s.EventDate, s.SenderId, s.CourseId
       ORDER  BY s.EventDate DESC
 

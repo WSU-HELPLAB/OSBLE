@@ -36,7 +36,7 @@ VALUES
 ,(6,	'ExceptionEvent',		0,	1,	1,	1,	2)
 ,(7,	'FeedPostEvent',		1,	0,	1,	0,	1)
 /* helpful mark and log comment shouldn't be listed as activity feeds, they belong to user profiles */
-,(8,	'HelpfulMarkGivenEvent',1,	0,	0,	0,	1)
+,(8,	'HelpfulMarkGivenEvent',1,	0,	1,	0,	1)
 ,(9,	'LogCommentEvent',		1,	0,	0,	0,	1)
 /* */
 ,(10,	'SaveEvent',			0,	0,	0,	1,	2)
