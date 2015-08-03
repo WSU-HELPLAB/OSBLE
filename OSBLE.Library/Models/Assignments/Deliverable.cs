@@ -7,6 +7,12 @@ namespace OSBLE.Models.Assignments
 {
     public enum DeliverableType
     {
+        [OSBLE.Models.Assignments.FileExtensions(new string[] { ".zip" })]
+        PluginSubmission,
+
+        [OSBLE.Models.Assignments.FileExtensions(new string[] { ".zip" })]
+        Zip,
+
         [OSBLE.Models.Assignments.FileExtensions(new string[] { ".c", ".cpp", ".h", ".cs", ".py", ".java" })]
         Code,
 
@@ -18,9 +24,6 @@ namespace OSBLE.Models.Assignments
 
         [OSBLE.Models.Assignments.FileExtensions(new string[] { ".wmv", ".mp4" })]
         Video,
-
-        [OSBLE.Models.Assignments.FileExtensions(new string[] { ".zip" })]
-        Zip,
 
         [OSBLE.Models.Assignments.FileExtensions(new string[] { ".txt" })]
         InBrowserText,
