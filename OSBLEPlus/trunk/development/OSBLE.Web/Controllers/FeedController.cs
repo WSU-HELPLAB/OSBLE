@@ -212,6 +212,7 @@ namespace OSBLE.Controllers
                 CanDelete = eventLog.CanDelete,
                 CanReply = eventLog.CanReply,
                 IsHelpfulMark = item.PrettyName == EventType.HelpfulMarkGivenEvent.ToString().ToDisplayText(),
+                HighlightMark = false,
                 ShowPicture = eventLog.ShowProfilePicture,
                 Comments = comments,
                 HTMLContent = PartialView(viewFolder + eventLog.EventType.ToString().Replace(" ", ""), item).Capture(this.ControllerContext),
@@ -405,7 +406,26 @@ namespace OSBLE.Controllers
         [HttpPost]
         public JsonResult MarkHelpfulComment(int eventLogToMark, int markerId)
         {
-            return Json(new { helpfulMarks = DBHelper.MarkLogCommentHelpful(eventLogToMark, markerId) });
+            return Json(new
+            {
+                helpfulMarks = DBHelper.MarkLogCommentHelpful(eventLogToMark, markerId),
+                isMarker = DBHelper.UserMarkedLog(markerId, eventLogToMark) // markerId is the CU
+            });
+        }
+
+        /// <summary>
+        /// Used for the first pull on a log comment to see if we have already marked the item
+        /// </summary>
+        /// <param name="currentUserId"></param>
+        /// <param name="logCommentId"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult FindMarker(int currentUserId, int logCommentId)
+        {
+            return Json(new
+            {
+                value = DBHelper.UserMarkedLog(currentUserId, logCommentId)
+            });
         }
 
 
@@ -722,15 +742,6 @@ namespace OSBLE.Controllers
             }
 
             return items;
-        }
-
-        [HttpPost]
-        public JsonResult FindMarker(int currentUserId, int logCommentId)
-        {
-            return Json(new
-            {
-                value = DBHelper.UserMarkedLog(currentUserId, logCommentId)
-            });
         }
     }
 }

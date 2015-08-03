@@ -31,9 +31,7 @@
                     <span data-bind="text: '+'"></span>
                     <span data-bind="text: numberHelpfulMarks"></span>
                     <div data-bind="if: options.canVote">
-                        <a title="Mark Comment as Helpful"
-                           data-bind="click: MarkCommentHelpful,
-                           css: isMarker(eventId) == true ? 'icon-highlight' : 'icon-no-highlight'">
+                        <a title="Mark Comment as Helpful" data-bind="click: MarkCommentHelpful, css: { 'icon-highlight' : highlightMark() == true }">
                             <span class="glyphicon glyphicon-thumbs-up"></span>
                         </a>
                     </div>

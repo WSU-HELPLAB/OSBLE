@@ -65,6 +65,7 @@ function FeedItem(data) {
     self.show = true;
     self.isComment = self.parentEventId != -1;
     self.isHelpfulMark = data.IsHelpfulMark;
+    self.highlightMark = ko.observable(data.HighlightMark);
     self.content = ko.observable(data.Content); // used for editing posts
     self.htmlContent = ko.observable(data.HTMLContent);
     self.numberHelpfulMarks = ko.observable(data.NumberHelpfulMarks);
@@ -76,6 +77,16 @@ function FeedItem(data) {
         var commentList = $.map(data.Comments, function (item) { return new FeedItem(item) });
         self.comments(commentList);
     }
+
+    $.ajax({
+        url: "/Feed/FindMarker",
+        data: { currentUserId: vm.userId, logCommentId: self.eventId },
+        dataType: "json",
+        method: "POST",
+        success: function (data) {
+            self.highlightMark(data.value);
+        }
+    });
     
     /**** Methods ****/
     // Delete: called when user clicks the trashcan icon on a post or comment, uses an ajax call to the 
@@ -126,6 +137,7 @@ function FeedItem(data) {
             method: "POST",
             success: function (data) {
                 self.numberHelpfulMarks(data.helpfulMarks);
+                self.highlightMark(data.isMarker);
             }
         });
     }
@@ -515,24 +527,6 @@ function HideMoreLoading()
     $('#load-old-posts').show();
 }
 
-function isMarker(logCommentId) {
-    $.ajax({
-        url: "/Feed/FindMarker",
-        data: { currentUserId: vm.userId, logCommentId },
-        dataType: "json",
-        method: "POST",
-        success: function (data) {
-            isMarkerCallBack(data.value);
-        },
-        error: function() {
-            return false;
-        }
-    });
-}
-
-function isMarkerCallBack(data) {
-    return data;
-}
 /*
 //Periodically updates view models for feed items.  Useful for displaying an updated count
 //of comments for a given feed item.
