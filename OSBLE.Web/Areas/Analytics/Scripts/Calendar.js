@@ -67,7 +67,7 @@ function updateCalendar(monthOffset) {
 
     if (measures.length > 0) {
         $.ajax({
-            url: dataservice + "/api/calendar/",
+            url: dataservice + "/api/Calendar/",
             //xhrFields: { withCredentials: true },
             type: "GET",
             headers: { "Access-Control-Allow-Origin": dataservice + ".*" },
@@ -160,6 +160,10 @@ function onDayClick(year, month, day) {
 
     updateDisplayArea(true);
 
+    // month is given as a zero based index. We need it to corespond 
+    // to the month number (i.e. Jan = 1, Dec =12)
+    month++;
+
     //the year, month, day are originated from Monthly calendar's day click
     //since user could check or uncheck measures
     //these values need to be preserved globally
@@ -167,30 +171,36 @@ function onDayClick(year, month, day) {
 
     d3.select("svg").remove();
 
+    var dataservice = $("#main").attr("data-service-path");
     var measures = getSelectedMeasures();
 
     if (measures.length > 0)
-        $.getJSON(document.location.origin + "/api/ApiCalenderDay/",
-        {
-            attr: {
-                ReferenceDate: "2014/02/16",
+        $.ajax({
+            url: dataservice + "/api/CalendarDay/",
+            //xhrFields: { withCredentials: true },
+            type: "GET",
+            headers: { "Access-Control-Allow-Origin": dataservice + ".*" },
+            data: {
+                ReferenceDate: year + "/" + month + "/" + day,
                 AggregateFunctionId: $("input[name = 'AggregationFunction']").val(),
                 CourseId: $("select[name = 'CourseId']").val(),
-                SelectedMeasures: measures,
-                SelectedUsers: "17,18,19"
+                SelectedMeasures: measures
             }
-        }, function (result) {
+        }).done(function (data) {
 
-            var data = JSON.parse(result);
+            //var data = JSON.parse(result);
 
-            if (data.hourlyAggregations != null && data.hourlyAggregations.measures.length > 0) {
-
-                $("#currentDay").text(monthNames[month] + " " + day + ", " + year);
-
-                drawHourlyChart(data.hourlyAggregations);
+            if (data != null && data.measures.length > 0) {
+                // monthNames is a zero-based array
+                $("#currentDay").text(monthNames[month-1] + " " + day + ", " + year);
+                drawHourlyChart(data);
+            }
+            else
+            {
+                $("#currentDay").text("No Data");
             }
 
-            updateDisplayArea(false);
+            updateDisplayArea(true);
         });
 }
 
@@ -243,12 +253,11 @@ function drawHourlyChart(data) {
 function updateDisplayArea(hourly) {
 
     if (hourly) {
-
+        $(".d3-tip:visible").hide();
         $("#hourly").show();
         $("#calendar").hide();
     }
     else {
-
         $("#hourly").hide();
         $("#calendar").show();
     }
