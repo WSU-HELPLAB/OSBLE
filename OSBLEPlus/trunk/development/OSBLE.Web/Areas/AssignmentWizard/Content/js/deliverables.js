@@ -22,7 +22,25 @@ $(function () {
     $('#remove_selected_deliverable').click(function () {
         removeSelectedDeliverable();
     });
+
+    $("[name=NextButton]").click(function (e) {
+        if (noDeliverables())
+            preventSubmit(e);
+    });
 });
+
+function preventSubmit(e) {
+    e.preventDefault();
+    alert("Click 'add this deliverable to the assignment' currently no deliverables are required listed in the assignment.  Conversely if you do not want deliverables, edit the assignment components and uncheck the box requiring deliverables.");
+}
+
+function noDeliverables() {
+    var deliverableExists = $("#deliverable_0").length;
+
+    if (deliverableExists)
+        return false;
+    return true;
+}
 
 function deliverableFormSubmit(e) {
     if (e.which == '13') {
