@@ -77,16 +77,6 @@ function FeedItem(data) {
         var commentList = $.map(data.Comments, function (item) { return new FeedItem(item) });
         self.comments(commentList);
     }
-
-    $.ajax({
-        url: "/Feed/FindMarker",
-        data: { currentUserId: vm.userId, logCommentId: self.eventId },
-        dataType: "json",
-        method: "POST",
-        success: function (data) {
-            self.highlightMark(data.value);
-        }
-    });
     
     /**** Methods ****/
     // Delete: called when user clicks the trashcan icon on a post or comment, uses an ajax call to the 
@@ -134,15 +124,15 @@ function FeedItem(data) {
             url: "/Feed/MarkHelpfulComment",
             data: { eventLogToMark: self.eventId, markerId: vm.userId },
             dataType: "json",
-            method: "POST",
+            method: "GET",
             success: function (data) {
                 self.numberHelpfulMarks(data.helpfulMarks);
                 self.highlightMark(data.isMarker);
             }
         });
-    }
+    };
 
-    self.AddComment = function () {
+    self.AddComment = function() {
         // Get text from the textarea
         var text = $('#feed-reply-textbox-' + self.eventId).val();
 
@@ -153,19 +143,19 @@ function FeedItem(data) {
 
         $.ajax({
             url: "/Feed/PostComment",
-            data: { id: self.eventId, content: text},
+            data: { id: self.eventId, content: text },
             dataType: "json",
             method: "POST",
-            success: function (dataList) {
-                var commentList = $.map(dataList, function (item) { return new FeedItem(item) });
+            success: function(dataList) {
+                var commentList = $.map(dataList, function(item) { return new FeedItem(item) });
                 self.comments(commentList);
                 PostReplySucceeded(self);
             },
-            error: function () {
+            error: function() {
                 PostReplyFailed(self);
             }
         });
-    }
+    };
 }
 
 function FeedItemOptions(canMail, canDelete, canEdit, showPicture, canVote)
