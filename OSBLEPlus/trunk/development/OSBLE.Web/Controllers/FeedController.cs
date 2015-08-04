@@ -156,10 +156,10 @@ namespace OSBLE.Controllers
             return time.UTCToCourse(ActiveCourseUser.AbstractCourseID).ToShortDateString() + " " + time.UTCToCourse(ActiveCourseUser.AbstractCourseID).ToShortTimeString();
         }
 
-        private object MakeLogCommentJsonObject(LogCommentEvent comment)
+        private object MakeLogCommentJsonObject(LogCommentEvent comment, SqlConnection sql = null)
         {
             comment.SetPrivileges(ActiveCourseUser);
-            comment.NumberHelpfulMarks = DBHelper.GetHelpfulMarksLogIds(comment.EventLogId).Count;
+            comment.NumberHelpfulMarks = DBHelper.GetHelpfulMarksLogIds(comment.EventLogId, sql).Count;
             return new
             {
                 EventId = comment.EventLogId,
@@ -175,6 +175,7 @@ namespace OSBLE.Controllers
                 CanVote = comment.CanVote,
                 CanReply = false,
                 IsHelpfulMark = false,
+                HighlightMark = DBHelper.UserMarkedLog(ActiveCourseUser.UserProfileID, comment.EventLogId, sql),
                 ShowPicture = comment.ShowProfilePicture,
                 Comments = new List<dynamic>(),
                 HTMLContent = PartialView("Details/_LogCommentEvent", comment).Capture(this.ControllerContext),
@@ -225,10 +226,14 @@ namespace OSBLE.Controllers
         private object MakeCommentListJsonObject(IEnumerable<LogCommentEvent> comments, int parentLogID)
         {
             var obj = new List<dynamic>();
-            foreach(LogCommentEvent e in comments)
+            using (SqlConnection sql = DBHelper.GetNewConnection())
             {
-                obj.Add(MakeLogCommentJsonObject(e));
+                foreach (LogCommentEvent e in comments)
+                {
+                    obj.Add(MakeLogCommentJsonObject(e, sql));
+                }
             }
+
             return obj;
         }
 
@@ -404,14 +409,19 @@ namespace OSBLE.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpGet]
         public JsonResult MarkHelpfulComment(int eventLogToMark, int markerId)
         {
-            return Json(new
+            using (SqlConnection sqlc = DBHelper.GetNewConnection())
             {
-                helpfulMarks = DBHelper.MarkLogCommentHelpful(eventLogToMark, markerId),
-                isMarker = DBHelper.UserMarkedLog(markerId, eventLogToMark) // markerId is the CU
-            });
+                int helpfulMarks = DBHelper.MarkLogCommentHelpful(eventLogToMark, markerId, sqlc);
+                bool isMarker = DBHelper.UserMarkedLog(markerId, eventLogToMark, sqlc); // markerId is the CU
+                return Json(new
+                {
+                    helpfulMarks,
+                    isMarker
+                }, JsonRequestBehavior.AllowGet);
+            }
         }
 
         /// <summary>

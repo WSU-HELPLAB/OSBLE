@@ -605,7 +605,7 @@ namespace OSBLE.Utility
                     return GetHelpfulMarkFeedSourceId(helpfulMarkId, sqlc);
                 }
             }
-
+            
             return connection.Query<int>("SELECT SourceEventLogId " +
                                          "FROM LogCommentEvents " +
                                          "WHERE Id = (SELECT LogCommentEventId " +
