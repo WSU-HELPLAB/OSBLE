@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text;
+using System.Data.SqlClient;
 
 using OSBLEPlus.Logic.Utility;
 using OSBLEPlus.Logic.Utility.Lookups;
@@ -22,22 +22,33 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             EventDate = dateTimeValue;
         }
 
-        public override string GetInsertScripts()
+        public override SqlCommand GetInsertCommand()
         {
-            var sql =
-                new StringBuilder(
-                    string.Format(
-                        @"INSERT INTO dbo.EventLogs (EventTypeID, EventDate, SenderId, BatchId) VALUES ({0}, '{1}', {2}, {3})"
-                        , EventTypeId, EventDate, SenderId, BatchId));
-            sql.AppendFormat(@"{0}SELECT {1}=SCOPE_IDENTITY()", Environment.NewLine, StringConstants.SqlHelperLogIdVar);
+            var cmd = new SqlCommand
+            {
+                CommandText = string.Format(@"
+DECLARE {0} INT
+DECLARE {1} INT
+INSERT INTO dbo.EventLogs (EventTypeId, EventDate, SenderId, CourseId)
+VALUES (@EventTypeId, @EventDate, @SenderId, @CourseId)
+SELECT {0}=SCOPE_IDENTITY()
+INSERT INTO dbo.CodeDocuments([FileName],[Content]) VALUES (@FileName, @Content)
+SELECT {1}=SCOPE_IDENTITY()
+INSERT INTO dbo.SaveEvents (EventLogId, EventDate, SolutionName, DocumentId)
+VALUES ({0}, @EventDate, @SolutionName, {1})
+SELECT {0}", StringConstants.SqlHelperLogIdVar, StringConstants.SqlHelperDocIdVar)
+            };
 
-            sql.AppendFormat(@"{0}INSERT INTO dbo.CodeDocuments([FileName],[Content]) VALUES ('{1}','{2}')", Environment.NewLine, Document.FileName, Document.Content);
-            sql.AppendFormat(@"{0}SELECT {1}=SCOPE_IDENTITY()", Environment.NewLine, StringConstants.SqlHelperDocIdVar);
+            cmd.Parameters.AddWithValue("EventTypeId", EventTypeId);
+            cmd.Parameters.AddWithValue("EventDate", EventDate);
+            cmd.Parameters.AddWithValue("SenderId", SenderId);
+            if (CourseId.HasValue) cmd.Parameters.AddWithValue("CourseId", CourseId.Value);
+            else cmd.Parameters.AddWithValue("CourseId", DBNull.Value);
+            cmd.Parameters.AddWithValue("SolutionName", SolutionName);
+            cmd.Parameters.AddWithValue("FileName", Document.FileName);
+            cmd.Parameters.AddWithValue("Content", Document.Content);
 
-            sql.AppendFormat(@"{0}INSERT INTO dbo.SaveEvents (EventLogId, EventDate, SolutionName, DocumentId) VALUES ({1}, '{2}', '{3}', {4})",
-                Environment.NewLine, StringConstants.SqlHelperLogIdVar, EventDate, SolutionName, StringConstants.SqlHelperDocIdVar);
-
-            return sql.ToString();
+            return cmd;
         }
     }
 }

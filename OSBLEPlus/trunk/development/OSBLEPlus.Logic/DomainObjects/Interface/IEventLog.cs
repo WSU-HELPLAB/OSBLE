@@ -12,6 +12,5 @@ namespace OSBLEPlus.Logic.DomainObjects.Interface
         int SenderId { get; set; }
         IUser Sender { get; set; }
         int? CourseId { get; set; }
-        long? BatchId { get; set; }
     }
 }

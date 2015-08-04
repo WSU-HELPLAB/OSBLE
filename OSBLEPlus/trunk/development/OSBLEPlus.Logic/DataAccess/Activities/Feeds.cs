@@ -2,19 +2,14 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Diagnostics;
 using System.Linq;
-using System.Web.UI;
-using System.Xml.Schema;
 using Dapper;
-
-using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
-using OSBLEPlus.Logic.DomainObjects.Interface;
-using OSBLEPlus.Logic.DomainObjects.Profiles;
-using OSBLEPlus.Logic.Utility;
-using OSBLEPlus.Logic.Utility.Lookups;
 using OSBLE.Interfaces;
 using OSBLE.Models.Users;
+using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
+using OSBLEPlus.Logic.DomainObjects.Interface;
+using OSBLEPlus.Logic.Utility;
+using OSBLEPlus.Logic.Utility.Lookups;
 
 
 namespace OSBLEPlus.Logic.DataAccess.Activities

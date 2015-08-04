@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.Caching;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -360,42 +359,33 @@ namespace OSBIDE.Library.ServiceClient
                 webServiceKey = (string)_cache[StringConstants.AuthenticationCacheKey];
             }
 
-            //update send status with the number of logs that need to submit
-            SendStatus.NumberOfTransmissions = logsToBeSaved.Count;
-
-            var batches = logsToBeSaved.Count / BatchSize;
-            for (var b = 0; b < batches + 1; b++)
+            //send logs to the server
+            for (var idx = 0; idx < logsToBeSaved.Count; idx++)
             {
-                // process one batch of logs
-                var from = b * BatchSize;
-                var to = (b + 1) * BatchSize > logsToBeSaved.Count ? logsToBeSaved.Count : (b + 1) * BatchSize;
+                var log = logsToBeSaved[idx];
+
+                //reset the log's sending user just to be safe
+                _logger.WriteToLog(string.Format("Sending {0}th of {1} log(s) to the server", idx + 1, logsToBeSaved.Count), LogPriority.LowPriority);
+                SendStatus.CurrentTransmission = log;
+
+                //update send status with the number of logs that need to submit
+                SendStatus.NumberOfTransmissions = logsToBeSaved.Count;
 
                 try
                 {
-                    //log what's happening
-                    _logger.WriteToLog(string.Format("Sending {0} of {1} logs to the server, start index is {2} and end index is {3}", b + 1, batches + 1, from, to), LogPriority.LowPriority);
-
-                    var currentBatch = logsToBeSaved.GetRange(from, to - from);
-
-                    //update status
-                    SendStatus.CurrentTransmission = currentBatch;
-
                     //compose web request and send to the server
-                    var eventPostRequest = GetEventPostWebRequest(currentBatch, webServiceKey);
+                    var eventPostRequest = GetEventPostWebRequest(log, webServiceKey);
                     var task = AsyncServiceClient.SubmitLog(eventPostRequest);
                     var result = await task;
-                    currentBatch.ForEach(x =>
-                    {
-                        x.BatchId = result;
-                    });
 
                     //log status
                     _logger.WriteToLog(string.Format("The return code of the batch is {0}", result), LogPriority.LowPriority);
+                    log.EventLogId = result;
 
                     //update batch status
                     SendStatus.LastTransmissionTime = DateTime.UtcNow;
-                    SendStatus.LastTransmission = currentBatch;
-                    SendStatus.CompletedTransmissions += currentBatch.Count;
+                    SendStatus.LastTransmission = log;
+                    SendStatus.CompletedTransmissions++;
                 }
                 catch (Exception ex)
                 {
@@ -406,7 +396,7 @@ namespace OSBIDE.Library.ServiceClient
 
             lock (_cache)
             {
-                SaveLogsToCache(logsToBeSaved.Where(x=>!x.BatchId.HasValue || x.BatchId.Value < 0).ToList());
+                SaveLogsToCache(logsToBeSaved.Where(x => !(x.EventLogId > 0)).ToList());
             }
             SendStatus.IsActive = false;
         }
@@ -490,63 +480,48 @@ namespace OSBIDE.Library.ServiceClient
             return logs;
         }
 
-        private static EventPostRequest GetEventPostWebRequest(List<IActivityEvent> logs, string authToken)
+        private static EventPostRequest GetEventPostWebRequest(IActivityEvent log, string authToken)
         {
             var request = new EventPostRequest
             {
                 AuthToken = authToken,
-                AskHelpEvents = new AskForHelpEvent[logs.Count(x => x.EventType == EventType.AskForHelpEvent)],
-                BuildEvents = new BuildEvent[logs.Count(x => x.EventType == EventType.BuildEvent)],
-                CutCopyPasteEvents = new CutCopyPasteEvent[logs.Count(x => x.EventType == EventType.CutCopyPasteEvent)],
-                EditorActivityEvents = new EditorActivityEvent[logs.Count(x => x.EventType == EventType.EditorActivityEvent)],
-                ExceptionEvents = new ExceptionEvent[logs.Count(x => x.EventType == EventType.ExceptionEvent)],
-                DebugEvents = new DebugEvent[logs.Count(x => x.EventType == EventType.DebugEvent)],
-                FeedPostEvents = new FeedPostEvent[logs.Count(x => x.EventType == EventType.FeedPostEvent)],
-                LogCommentEvents = new LogCommentEvent[logs.Count(x => x.EventType == EventType.LogCommentEvent)],
-                HelpfulMarkEvents = new HelpfulMarkGivenEvent[logs.Count(x => x.EventType == EventType.HelpfulMarkGivenEvent)],
-                SaveEvents = new SaveEvent[logs.Count(x => x.EventType == EventType.SaveEvent)],
-                SubmitEvents = new SubmitEvent[logs.Count(x => x.EventType == EventType.SubmitEvent)],
             };
 
-            int a = 0, b = 0, c = 0, d = 0, ea = 0, e = 0, f = 0, l = 0, h = 0, s = 0, sb = 0;
-            foreach (var log in logs)
+            switch (log.EventType)
             {
-                switch (log.EventType)
-                {
-                    case EventType.AskForHelpEvent:
-                        request.AskHelpEvents[a++] = (AskForHelpEvent)log;
-                        break;
-                    case EventType.BuildEvent:
-                        request.BuildEvents[b++] = (BuildEvent)log;
-                        break;
-                    case EventType.CutCopyPasteEvent:
-                        request.CutCopyPasteEvents[c++] = (CutCopyPasteEvent)log;
-                        break;
-                    case EventType.DebugEvent:
-                        request.DebugEvents[d++] = (DebugEvent)log;
-                        break;
-                    case EventType.EditorActivityEvent:
-                        request.EditorActivityEvents[ea++] = (EditorActivityEvent)log;
-                        break;
-                    case EventType.ExceptionEvent:
-                        request.ExceptionEvents[e++] = (ExceptionEvent)log;
-                        break;
-                    case EventType.FeedPostEvent:
-                        request.FeedPostEvents[f++] = (FeedPostEvent)log;
-                        break;
-                    case EventType.LogCommentEvent:
-                        request.LogCommentEvents[l++] = (LogCommentEvent)log;
-                        break;
-                    case EventType.HelpfulMarkGivenEvent:
-                        request.HelpfulMarkEvents[h++] = (HelpfulMarkGivenEvent)log;
-                        break;
-                    case EventType.SaveEvent:
-                        request.SaveEvents[s++] = (SaveEvent)log;
-                        break;
-                    case EventType.SubmitEvent:
-                        request.SubmitEvents[sb++] = (SubmitEvent)log;
-                        break;
-                }
+                case EventType.AskForHelpEvent:
+                    request.AskHelpEvent = (AskForHelpEvent)log;
+                    break;
+                case EventType.BuildEvent:
+                    request.BuildEvent = (BuildEvent)log;
+                    break;
+                case EventType.CutCopyPasteEvent:
+                    request.CutCopyPasteEvent = (CutCopyPasteEvent)log;
+                    break;
+                case EventType.DebugEvent:
+                    request.DebugEvent = (DebugEvent)log;
+                    break;
+                case EventType.EditorActivityEvent:
+                    request.EditorActivityEvent = (EditorActivityEvent)log;
+                    break;
+                case EventType.ExceptionEvent:
+                    request.ExceptionEvent = (ExceptionEvent)log;
+                    break;
+                case EventType.FeedPostEvent:
+                    request.FeedPostEvent = (FeedPostEvent)log;
+                    break;
+                case EventType.LogCommentEvent:
+                    request.LogCommentEvent = (LogCommentEvent)log;
+                    break;
+                case EventType.HelpfulMarkGivenEvent:
+                    request.HelpfulMarkEvent = (HelpfulMarkGivenEvent)log;
+                    break;
+                case EventType.SaveEvent:
+                    request.SaveEvent = (SaveEvent)log;
+                    break;
+                case EventType.SubmitEvent:
+                    request.SubmitEvent = (SubmitEvent)log;
+                    break;
             }
 
             return request;

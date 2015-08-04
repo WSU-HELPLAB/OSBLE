@@ -3,17 +3,21 @@
     public class EventPostRequest
     {
         public string AuthToken { get; set; }
-        public AskForHelpEvent[] AskHelpEvents { get; set; }
-        public BuildEvent[] BuildEvents { get; set; }
-        public CutCopyPasteEvent[] CutCopyPasteEvents { get; set; }
-        public DebugEvent[] DebugEvents { get; set; }
-        public EditorActivityEvent[] EditorActivityEvents { get; set; }
-        public ExceptionEvent[] ExceptionEvents { get; set; }
-        public FeedPostEvent[] FeedPostEvents { get; set; }
-        public HelpfulMarkGivenEvent[] HelpfulMarkEvents { get; set; }
-        public LogCommentEvent[] LogCommentEvents { get; set; }
-        public SaveEvent[] SaveEvents { get; set; }
-        public SubmitEvent[] SubmitEvents { get; set; }
+
+        /// <summary>
+        /// this is efficient for xml serialization
+        /// </summary>
+        public AskForHelpEvent AskHelpEvent { get; set; }
+        public BuildEvent BuildEvent { get; set; }
+        public CutCopyPasteEvent CutCopyPasteEvent { get; set; }
+        public DebugEvent DebugEvent { get; set; }
+        public EditorActivityEvent EditorActivityEvent { get; set; }
+        public ExceptionEvent ExceptionEvent { get; set; }
+        public FeedPostEvent FeedPostEvent { get; set; }
+        public HelpfulMarkGivenEvent HelpfulMarkEvent { get; set; }
+        public LogCommentEvent LogCommentEvent { get; set; }
+        public SaveEvent SaveEvent { get; set; }
+        public SubmitEvent SubmitEvent { get; set; }
     }
 
     public class SubmissionRequest

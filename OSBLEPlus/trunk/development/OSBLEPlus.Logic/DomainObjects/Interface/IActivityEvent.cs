@@ -1,4 +1,6 @@
-﻿using OSBLE.Models.Courses;
+﻿using System.Data.SqlClient;
+using OSBLE.Models.Courses;
+
 namespace OSBLEPlus.Logic.DomainObjects.Interface
 {
     public interface IActivityEvent : IEventLog
@@ -6,7 +8,7 @@ namespace OSBLEPlus.Logic.DomainObjects.Interface
         int EventId { get; set; }
         string SolutionName { get; set; }
         string EventName { get; }
-        string GetInsertScripts();
+        SqlCommand GetInsertCommand();
 
         // for posting
         bool CanDelete { get; set; }

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Data.SqlClient;
 using OSBLEPlus.Logic.DomainObjects.Interface;
+using OSBLEPlus.Logic.Utility;
 using OSBLEPlus.Logic.Utility.Lookups;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
@@ -22,16 +24,29 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             EventDate = dateTimeValue;
         }
 
-        public override string GetInsertScripts()
+        public override SqlCommand GetInsertCommand()
         {
-            string batchString = BatchId == null ? "NULL" : BatchId.ToString();
-            string courseString = CourseId == null ? "NULL" : CourseId.ToString();
-            string s = string.Format(@"
-                INSERT INTO dbo.EventLogs (EventTypeId, EventDate, SenderId, BatchId, CourseId, SolutionName) VALUES ({0}, '{1}', {2}, {6}, {7}, '{4}')
-                INSERT INTO dbo.LogCommentEvents (EventLogId,SourceEventLogId,EventDate,SolutionName,Content)
-                VALUES (SCOPE_IDENTITY(),{3}, '{1}', '{4}', '{5}')", EventTypeId, EventDate, SenderId, SourceEventLogId, SolutionName, Content.Replace("'", "''"), batchString, courseString);
+            var cmd = new SqlCommand
+            {
+                CommandText = string.Format(@"
+DECLARE {0} INT
+INSERT INTO dbo.EventLogs (EventTypeId, EventDate, SenderId, CourseId, SolutionName)
+VALUES (@EventTypeId, @EventDate, @SenderId, @CourseId, @SolutionName)
+SELECT {0}=SCOPE_IDENTITY()
+INSERT INTO dbo.LogCommentEvents (EventLogId,SourceEventLogId,EventDate,SolutionName,Content)
+VALUES ({0}, @SourceEventLogId, @EventDate, @SolutionName,@Content)
+SELECT {0}", StringConstants.SqlHelperLogIdVar)
+            };
+            cmd.Parameters.AddWithValue("EventTypeId", EventTypeId);
+            cmd.Parameters.AddWithValue("EventDate", EventDate);
+            cmd.Parameters.AddWithValue("SenderId", SenderId);
+            if (CourseId.HasValue) cmd.Parameters.AddWithValue("CourseId", CourseId.Value);
+            else cmd.Parameters.AddWithValue("CourseId", DBNull.Value);
+            cmd.Parameters.AddWithValue("SolutionName", SolutionName);
+            cmd.Parameters.AddWithValue("SourceEventLogId", SourceEventLogId);
+            cmd.Parameters.AddWithValue("Content", Content);
 
-            return s;
+            return cmd;
         }
 
         public static string Name { get { return "LogCommentEvent"; } }

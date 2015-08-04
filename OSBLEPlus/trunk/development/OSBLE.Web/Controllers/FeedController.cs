@@ -16,6 +16,7 @@ using OSBLE.Models;
 using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
 using OSBLE.Utility;
+using OSBLEPlus.Logic.DataAccess.Activities;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
 using OSBLEPlus.Logic.DomainObjects.Interface;
 using OSBLEPlus.Logic.Utility;
@@ -198,7 +199,7 @@ namespace OSBLE.Controllers
                 idString = DBHelper.GetHelpfulMarkFeedSourceId(eventLog.EventLogId).ToString();
             }
 
-            
+
             return new
             {
                 EventId = eventLog.EventLogId,
@@ -652,7 +653,7 @@ namespace OSBLE.Controllers
         /// <summary>
         /// Adds a global comment that will appear in the activity feed
         /// </summary>
-        /// <param name="comment"></param>
+        /// <param name="text"></param>
         /// <returns></returns>
         [HttpPost]
         public JsonResult PostFeedItem(string text)
@@ -660,25 +661,19 @@ namespace OSBLE.Controllers
             // We purposefully are not catching exceptions that could be thrown
             // here, because we want this response to fail if there is an error
             if (string.IsNullOrWhiteSpace(text))
-            {
+            { 
                 throw new ArgumentException();
             }
              
             FeedPostEvent log = new FeedPostEvent()
-            {
-                SenderId = CurrentUser.ID,
-                Comment = text,
-                CourseId = ActiveCourseUser.AbstractCourseID,
-                SolutionName = null
-            };
-            int newPostId = 0;
-            using (SqlConnection conn = DBHelper.GetNewConnection())
-            {
-                string sql = log.GetInsertScripts();
-                newPostId = conn.Query<int>(sql).Single();
-            }
-                
-            AggregateFeedItem newPost = new AggregateFeedItem(GetFeedItemFromID(newPostId));
+                {
+                    SenderId = CurrentUser.ID,
+                    Comment = text,
+                    CourseId = ActiveCourseUser.AbstractCourseID,
+                    SolutionName = null
+                };
+
+            var newPost = new AggregateFeedItem(GetFeedItemFromID(Posts.SaveEvent(log)));
             return Json(MakeAggregateFeedItemJsonObject(newPost, false));
         }
 

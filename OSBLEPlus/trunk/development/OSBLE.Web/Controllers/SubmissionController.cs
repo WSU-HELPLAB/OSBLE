@@ -82,7 +82,7 @@ namespace OSBLE.Controllers
                     AssignmentId = id.Value,
                     SenderId = CurrentUser.ID
                 };
-                Posts.SubmitAssignment(sub);
+                Posts.SaveEvent(sub);
                 
 
                 Assignment assignment = db.Assignments.Find(id);

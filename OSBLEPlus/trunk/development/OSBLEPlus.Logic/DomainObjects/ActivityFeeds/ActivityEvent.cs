@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Data.SqlClient;
+
 using OSBLE.Interfaces;
+using OSBLE.Models.Courses;
 using OSBLEPlus.Logic.DomainObjects.Interface;
 using OSBLEPlus.Logic.Utility;
 using OSBLEPlus.Logic.Utility.Lookups;
-using OSBLE.Models.Courses;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
@@ -30,14 +32,13 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
         }
         public string SolutionName { get; set; }
         public int? CourseId { get; set; }
-        public long? BatchId { get; set; }
 
         // Helper method to efficiently generate TSQL insert scripts
         // Don't use property, since the activities need to be serialized to go across the wire
         // Can't use abstract since Dapper ORM needs to instantiate instances of the class
-        public virtual string GetInsertScripts()
+        public virtual SqlCommand GetInsertCommand()
         {
-            return string.Empty;
+            return null;
         }
 
         // for posting

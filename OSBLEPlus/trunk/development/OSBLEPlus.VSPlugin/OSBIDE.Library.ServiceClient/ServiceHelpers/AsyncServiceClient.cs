@@ -137,16 +137,14 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             }
         }
 
-        public static async Task<long> SubmitLog(EventPostRequest request)
+        public static async Task<int> SubmitLog(EventPostRequest request)
         {
             using (var client = GetClient())
             {
                 var task = client.PostAsXmlAsync("api/eventcollection/post", request);
                 await task;
 
-                return task.Result.StatusCode == HttpStatusCode.OK
-                                               ? JsonConvert.DeserializeObject<long>(task.Result.Content.ReadAsStringAsync().Result)
-                                               : -1;
+                return JsonConvert.DeserializeObject<int>(task.Result.Content.ReadAsStringAsync().Result);
             }
         }
 

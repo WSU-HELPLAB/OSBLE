@@ -34,36 +34,15 @@ namespace OSBLEPlus.Services.Tests.Activities
 
                 var request = new EventPostRequest
                 {
+                    // the event save should've been tested in the logic tests
+                    // here only needs to test the data can go across the wire
                     AuthToken = "83-B6-77-B8-54-83-30-7D-0F-EE-68-38-6D-E7-42-5E-2A-D1-3A-72",
-                    AskHelpEvents = new[]
-                    {
-                        new AskForHelpEvent
+                    AskHelpEvent = new AskForHelpEvent
                         {
                             SolutionName = "solution",
                             Code = "c#",
                             SenderId = 1
-                        },
-                        new AskForHelpEvent
-                        {
-                            SolutionName = "solution 2",
-                            Code = "c#",
-                            SenderId = 1
                         }
-
-                    },
-                    BuildEvents = new []
-                    {
-                        new BuildEvent
-                        {
-                            SenderId = 1,
-                            SolutionName = "build solution 1",
-                        },
-                        new BuildEvent
-                        {
-                            SenderId = 1,
-                            SolutionName = "build solution",
-                        }
-                    }
                 };
 
                 var response = await client.PostAsJsonAsync("api/eventcollection/post", request);
