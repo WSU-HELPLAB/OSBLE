@@ -2278,7 +2278,13 @@ a.disabled{
     opacity: 1 !important;
     cursor: default !important;
 }
-
 .icon-no-highlight {
     
+}
+
+/* style fix for course settings page */
+.ui-timepicker-hour-cell > a, .ui-timepicker-minute-cell > a {
+    width: 24px !important;
+    padding: 2px !important;
+    text-align: center;
 }
