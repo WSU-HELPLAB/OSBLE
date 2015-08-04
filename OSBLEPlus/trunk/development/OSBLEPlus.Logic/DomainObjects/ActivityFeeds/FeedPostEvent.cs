@@ -35,7 +35,6 @@ DECLARE {0} INT
 INSERT INTO dbo.EventLogs (EventTypeId, EventDate, DateReceived, SolutionName, SenderId, CourseId)
 VALUES (@EventTypeId, @EventDate, @DateReceived, @SolutionName, @SenderId, @CourseId)
 SELECT {0}=SCOPE_IDENTITY()
-SELECT {8}=SCOPE_IDENTITY()
 INSERT INTO dbo.FeedPostEvents (EventLogId, EventDate, SolutionName, Comment)
 VALUES ({0}, @EventDate, @SolutionName, @Comment)
 SELECT {0}", StringConstants.SqlHelperLogIdVar);
@@ -43,7 +42,7 @@ SELECT {0}", StringConstants.SqlHelperLogIdVar);
             cmd.Parameters.AddWithValue("@EventTypeId", EventTypeId);
             cmd.Parameters.AddWithValue("@EventDate", EventDate);
             cmd.Parameters.AddWithValue("@DateReceived", DateTime.UtcNow);
-            cmd.Parameters.AddWithValue("@SolutionName", SolutionName);
+            cmd.Parameters.AddWithValue("@SolutionName", string.IsNullOrWhiteSpace(SolutionName) ? string.Empty : SolutionName);
             cmd.Parameters.AddWithValue("@SenderId", SenderId);
             if (CourseId.HasValue) cmd.Parameters.AddWithValue("CourseId", CourseId.Value);
             else cmd.Parameters.AddWithValue("CourseId", DBNull.Value);
