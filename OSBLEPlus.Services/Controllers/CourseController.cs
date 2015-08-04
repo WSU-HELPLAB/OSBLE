@@ -60,7 +60,7 @@ namespace OSBLEPlus.Services.Controllers
                 };
             }
 
-            var content = Posts.SubmitAssignment(request.SubmitEvent).ToString();
+            var content = Posts.SaveEvent(request.SubmitEvent).ToString();
             Posts.SaveToFileSystem(request.SubmitEvent);
 
             return new HttpResponseMessage

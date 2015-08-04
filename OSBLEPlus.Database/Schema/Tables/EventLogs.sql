@@ -5,7 +5,6 @@
     [DateReceived] DATETIME NOT NULL,
     [SenderId]     INT      NOT NULL,
     [CourseId]     INT,
-    [BatchId]      BIGINT,
     [SolutionName] VARCHAR(2000) NULL, 
 	[IsDeleted]	   BIT,
     CONSTRAINT [PK_EventLogs_Id] PRIMARY KEY CLUSTERED ([Id] ASC),

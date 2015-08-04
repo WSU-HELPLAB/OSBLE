@@ -33,8 +33,13 @@ namespace OSBLE.Web.Tests.ActivityFeed
                 // this comes from PostFeedItem in the OSBLE.Web
                 // FeedController
                 //////////////////////////////////////////////////
-                string sql = log.GetInsertScripts();
-                conn.Execute(sql);
+                using (var cmd = log.GetInsertCommand())
+                {
+                    cmd.Connection = conn;
+                    conn.Open();
+                    cmd.ExecuteScalar();
+                    conn.Close();
+                }
 
                 string feedPostText = "This is a test FeedPostEvent.";
                 string findPost = "SELECT * " +

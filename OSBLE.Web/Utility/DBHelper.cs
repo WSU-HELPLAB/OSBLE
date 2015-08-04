@@ -579,15 +579,16 @@ namespace OSBLE.Utility
 
             try
             {
-                HelpfulMarkGivenEvent h = new HelpfulMarkGivenEvent()
+                var h = new HelpfulMarkGivenEvent()
                 {
                     LogCommentEventId = logId,
                     SenderId = markerId,
                 };
-
-                string sql = h.GetInsertScripts();
-                connection.Execute(sql);
-                return helpfulMarkEventIds.Count + 1;
+                using (var cmd = h.GetInsertCommand())
+                {
+                    connection.Execute(cmd.CommandText, cmd.Parameters);
+                    return helpfulMarkEventIds.Count + 1;
+                }
             }
             catch(Exception ex)
             {
@@ -680,9 +681,10 @@ namespace OSBLE.Utility
                     SenderId = senderID,
                     CourseId = courseID
                 };
-
-                connection.Execute(e.GetInsertScripts());
-
+                using (var cmd = e.GetInsertCommand())
+                {
+                    connection.Execute(cmd.CommandText, cmd.Parameters);
+                }
                 return true;
             }
             catch (Exception)

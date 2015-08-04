@@ -23,13 +23,13 @@ namespace OSBLEPlus.Services.Controllers
             if (!auth.IsValidKey(request.AuthToken))
                 return new HttpResponseMessage { StatusCode = HttpStatusCode.Forbidden };
 
-            //to be compliant with vs client which only has auth token, web client may carry both auth token and sender id
-            var logs = EventCollectionControllerHelper.GetActivityEvents(request);
-            logs.ForEach(x => x.SenderId = auth.GetActiveUserId(request.AuthToken));
-            var result = Posts.Post(logs);
+            var log = EventCollectionControllerHelper.GetActivityEvent(request);
+            log.SenderId = auth.GetActiveUserId(request.AuthToken);
+            var result = Posts.SaveEvent(log);
+
             return new HttpResponseMessage
             {
-                StatusCode = result > 0 ? HttpStatusCode.OK : HttpStatusCode.InternalServerError,
+                StatusCode = result > 0 ? HttpStatusCode.InternalServerError : HttpStatusCode.OK,
                 Content = new StringContent(result.ToString())
             };
         }

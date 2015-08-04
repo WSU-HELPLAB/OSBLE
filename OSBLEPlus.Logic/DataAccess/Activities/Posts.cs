@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 using System.Web;
 using Dapper;
 using Ionic.Zip;
@@ -19,81 +15,30 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
 {
     public class Posts
     {
-        private const int BatchSize = 100;
-
-        public static long Post(IEnumerable<IActivityEvent> events)
+        public static int SaveEvent(IActivityEvent activityEvent)
         {
             try
             {
-                var sql = new StringBuilder();
-                var activityEvents = events as IActivityEvent[] ?? events.ToArray();
-                var batches = activityEvents.Length / BatchSize;
-                var batchId = DateTime.Now.Ticks;
-
-                for (var b = 0; b < batches + 1; b++)
-                {
-                    sql.Clear();
-                    sql.AppendFormat("DECLARE {0} INT{1}", StringConstants.SqlHelperLogIdVar, Environment.NewLine);
-                    sql.AppendFormat("DECLARE {0} INT{1}", StringConstants.SqlHelperEventIdVar, Environment.NewLine);
-                    sql.AppendFormat("DECLARE {0} INT{1}", StringConstants.SqlHelperDocIdVar, Environment.NewLine);
-                    sql.AppendFormat("DECLARE {0} INT{1}", StringConstants.SqlHelperIdVar, Environment.NewLine);
-
-                    var from = b * BatchSize;
-                    var to = (b + 1) * BatchSize > activityEvents.Length ? activityEvents.Length : (b + 1) * BatchSize;
-
-                    for (var idx = from; idx < to; idx++)
-                    {
-                        var eventLog = activityEvents[idx];
-                        eventLog.BatchId = batchId;
-                        sql.AppendFormat("{0}{1}", eventLog.GetInsertScripts(), Environment.NewLine);
-                    }
-
-                    //execute sql batch insert statements
-                    using (var connection = new SqlConnection(StringConstants.ConnectionString))
-                    {
-                        try
-                        {
-                            connection.Execute(sql.ToString());
-                        }
-                        catch
-                        {
-                            //
-                        }
-                        
-                    }
-                }
-
-                return batchId;
-            }
-            catch (Exception)
-            {
-                //TODO: inject Log4Net to log error details into files
-                return -1;
-            }
-        }
-
-        public static int SubmitAssignment(SubmitEvent submit)
-        {
-            try
-            {
-                var sql = new StringBuilder();
-                sql.AppendFormat("DECLARE {0} INT{1}", StringConstants.SqlHelperLogIdVar, Environment.NewLine);
-                sql.AppendFormat("{0}{1}", submit.GetInsertScripts(), Environment.NewLine);
-
                 //execute sql batch insert statements
                 using (var connection = new SqlConnection(StringConstants.ConnectionString))
                 {
-                    return connection.Query<int>(sql.ToString()).Single();
+                    using (var cmd = activityEvent.GetInsertCommand())
+                    {
+                        cmd.Connection = connection;
+                        connection.Open();
+                        var logId = Convert.ToInt32(cmd.ExecuteScalar());
+                        connection.Close();
+                        return logId;
+                    }
                 }
             }
             catch (Exception)
             {
-                //TODO: inject Log4Net to log error details into files
                 return -1;
             }
         }
 
-        public static void SaveToFileSystem(SubmitEvent submit, string path=null)
+        public static void SaveToFileSystem(SubmitEvent submit, string path = null)
         {
             using (var zipStream = new MemoryStream())
             {
@@ -103,24 +48,23 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                 using (
                     var connection = new SqlConnection(StringConstants.ConnectionString))
                 {
-                    int teamId =  connection.Query<int>("dbo.GetAssignmentTeam",
+                    var teamId = connection.Query<int>("dbo.GetAssignmentTeam",
                         new { assignmentId = submit.AssignmentId, userId = submit.SenderId },
                         commandType: CommandType.StoredProcedure).SingleOrDefault();
 
-
-                try
-                {
-                    if (path == null)
+                    try
                     {
-                        var a = HttpContext.Current.Server.MapPath("~").TrimEnd('\\');
-                        path = string.Format("{0}\\OSBLE.Web\\App_Data\\FileSystem\\", Directory.GetParent(a).FullName);
+                        if (path == null)
+                        {
+                            var a = HttpContext.Current.Server.MapPath("~").TrimEnd('\\');
+                            path = string.Format("{0}\\OSBLE.Web\\App_Data\\FileSystem\\", Directory.GetParent(a).FullName);
+                        }
+                        OSBLE.Models.FileSystem.Directories.GetAssignmentWithId(submit.CourseId ?? 1
+                            , submit.AssignmentId, teamId, path).AddFile(string.Format("{0}.zip", submit.Sender.FullName), zipStream);
                     }
-                    OSBLE.Models.FileSystem.Directories.GetAssignmentWithId(submit.CourseId ?? 1
-                        , submit.AssignmentId, teamId, path).AddFile(string.Format("{0}.zip", submit.Sender.FullName), zipStream);
-                }
-                catch (ZipException)
-                {
-                }
+                    catch (ZipException)
+                    {
+                    }
                 }
             }
         }
@@ -132,12 +76,18 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                 //execute sql batch insert statements
                 using (var connection = new SqlConnection(StringConstants.ConnectionString))
                 {
-                    return connection.Execute(errorLog.GetInsertScripts());
+                    using (var cmd = errorLog.GetInsertCommand())
+                    {
+                        cmd.Connection = connection;
+                        connection.Open();
+                        var errLogId = Convert.ToInt32(cmd.ExecuteScalar());
+                        connection.Close();
+                        return errLogId;
+                    }
                 }
             }
             catch (Exception)
             {
-                //TODO: inject Log4Net to log error details into files
                 return -1;
             }
         }

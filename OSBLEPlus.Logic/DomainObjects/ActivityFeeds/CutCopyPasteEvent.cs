@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.SqlClient;
 using OSBLEPlus.Logic.Utility;
 using OSBLEPlus.Logic.Utility.Lookups;
 
@@ -31,12 +32,30 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             EventDate = dateTimeValue;
         }
 
-        public override string GetInsertScripts()
+        public override SqlCommand GetInsertCommand()
         {
-            return string.Format(@"
-INSERT INTO dbo.EventLogs (EventTypeID, EventDate, SenderId, BatchId) VALUES ({0}, '{1}', {2}, {7})
+            var cmd = new SqlCommand
+            {
+                CommandText = string.Format(@"
+DECLARE {0} INT
+INSERT INTO dbo.EventLogs (EventTypeId, EventDate, SenderId, CourseId) VALUES (@EventTypeId, @EventDate, @SenderId, @CourseId)
+SELECT {0}=SCOPE_IDENTITY()
 INSERT INTO dbo.CutCopyPasteEvents (EventLogId, EventDate, SolutionName, EventAction, DocumentName, Content)
-VALUES (SCOPE_IDENTITY(), '{1}', '{3}', {4}, '{5}', '{6}')", EventTypeId, EventDate, SenderId, SolutionName, EventActionId, DocumentName, Content.Replace("'", "''"), BatchId);
+VALUES ({0}, @EventDate, @SolutionName, @EventAction, @DocumentName, @Content)
+SELECT {0}", StringConstants.SqlHelperLogIdVar)
+            };
+
+            cmd.Parameters.AddWithValue("EventTypeId", EventTypeId);
+            cmd.Parameters.AddWithValue("EventDate", EventDate);
+            cmd.Parameters.AddWithValue("SenderId", SenderId);
+            if (CourseId.HasValue) cmd.Parameters.AddWithValue("CourseId", CourseId.Value);
+            else cmd.Parameters.AddWithValue("CourseId", DBNull.Value);
+            cmd.Parameters.AddWithValue("SolutionName", SolutionName);
+            cmd.Parameters.AddWithValue("EventAction", EventActionId);
+            cmd.Parameters.AddWithValue("DocumentName", DocumentName);
+            cmd.Parameters.AddWithValue("Content", Content);
+
+            return cmd;
         }
     }
 }

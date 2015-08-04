@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
+using OSBLEPlus.Logic.Utility;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
@@ -28,15 +30,34 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             EventDate = dateTimeValue;
         }
 
-        public override string GetInsertScripts()
+        public override SqlCommand GetInsertCommand()
         {
-            return string.Format(@"
-INSERT INTO dbo.EventLogs (EventTypeID, EventDate, SenderId, BatchId) VALUES ({0}, '{1}', {2}, {12})
+            var cmd = new SqlCommand
+            {
+                CommandText = string.Format(@"
+DECLARE {0} INT
+INSERT INTO dbo.EventLogs (EventTypeId, EventDate, SenderId, CourseId) VALUES (@EventTypeId, @EventDate, @SenderId, @CourseId)
+SELECT {0}=SCOPE_IDENTITY()
 INSERT INTO dbo.ExceptionEvents (EventLogId,EventDate,SolutionName,ExceptionType,ExceptionName,ExceptionCode,ExceptionDescription,ExceptionAction,DocumentName,LineNumber,LineContent)
-VALUES (SCOPE_IDENTITY(), '{1}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}', '{11}')",
-            EventTypeId, EventDate, SenderId, SolutionName,
-            ExceptionType, ExceptionName, ExceptionCode, ExceptionDescription, ExceptionAction,
-            DocumentName, LineNumber, LineContent, BatchId);
+VALUES ({0}, @EventDate, @SolutionName, @ExceptionType,@ExceptionName,@ExceptionCode,@ExceptionDescription,@ExceptionAction,@DocumentName,@LineNumber,@LineContent)
+SELECT {0}", StringConstants.SqlHelperLogIdVar)
+            };
+            cmd.Parameters.AddWithValue("EventTypeId", EventTypeId);
+            cmd.Parameters.AddWithValue("EventDate", EventDate);
+            cmd.Parameters.AddWithValue("SenderId", SenderId);
+            if (CourseId.HasValue) cmd.Parameters.AddWithValue("CourseId", CourseId.Value);
+            else cmd.Parameters.AddWithValue("CourseId", DBNull.Value);
+            cmd.Parameters.AddWithValue("SolutionName", SolutionName);
+            cmd.Parameters.AddWithValue("ExceptionType", ExceptionType);
+            cmd.Parameters.AddWithValue("ExceptionName", ExceptionName);
+            cmd.Parameters.AddWithValue("ExceptionCode", ExceptionCode);
+            cmd.Parameters.AddWithValue("ExceptionDescription", ExceptionDescription);
+            cmd.Parameters.AddWithValue("ExceptionAction", ExceptionAction);
+            cmd.Parameters.AddWithValue("DocumentName", DocumentName);
+            cmd.Parameters.AddWithValue("LineNumber", LineNumber);
+            cmd.Parameters.AddWithValue("LineContent", LineContent);
+
+            return cmd;
         }
     }
 }

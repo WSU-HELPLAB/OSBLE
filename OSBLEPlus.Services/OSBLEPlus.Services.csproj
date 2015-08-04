@@ -99,8 +99,8 @@
     <Compile Include="Controllers\CalendarDayController.cs" />
     <Compile Include="Controllers\CalendarController.cs" />
     <Compile Include="Controllers\CourseController.cs" />
-    <Compile Include="Controllers\EventCollectionController.Helper.cs" />
     <Compile Include="Controllers\EventCollectionController.cs" />
+    <Compile Include="Controllers\EventCollectionController.Helper.cs" />
     <Compile Include="Controllers\FeedController.cs" />
     <Compile Include="Controllers\TimelineController.cs">
       <SubType>Code</SubType>

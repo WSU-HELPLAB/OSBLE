@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 
 using OSBLEPlus.Logic.DomainObjects.Interface;
@@ -10,8 +9,8 @@ namespace OSBIDE.Library.ServiceClient
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-        private List<IActivityEvent> _currentTransmission;
-        private List<IActivityEvent> _lastTransmission;
+        private IActivityEvent _currentTransmission;
+        private IActivityEvent _lastTransmission;
         private DateTime _lastTransmissionTime = DateTime.MinValue;
 
         private int _numberOfTransmissions;
@@ -36,7 +35,7 @@ namespace OSBIDE.Library.ServiceClient
                 OnPropertyChanged("IsActive");
             }
         }
-        public List<IActivityEvent> CurrentTransmission
+        public IActivityEvent CurrentTransmission
         {
             get
             {
@@ -48,7 +47,7 @@ namespace OSBIDE.Library.ServiceClient
                 OnPropertyChanged("CurrentTransmission");
             }
         }
-        public List<IActivityEvent> LastTransmission
+        public IActivityEvent LastTransmission
         {
             get
             {

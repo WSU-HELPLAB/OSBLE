@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Data.SqlClient;
 using System.IO;
+using OSBLEPlus.Logic.Utility;
 
 namespace OSBLEPlus.Logic.DomainObjects.Helpers
 {
@@ -33,11 +35,24 @@ namespace OSBLEPlus.Logic.DomainObjects.Helpers
             return log;
         }
 
-        public string GetInsertScripts()
+        public SqlCommand GetInsertCommand()
         {
-            return string.Format(@"
-INSERT INTO [dbo].[LocalErrorLogs] ([SenderId],[LogDate],[Content])
-VALUES ({0},'{1}','{2}'){3}", SenderId, LogDate, Content.Replace("'", "''"), Environment.NewLine);
+            var cmd = new SqlCommand
+            {
+                CommandText = string.Format(@"
+DECLARE {0} INT
+INSERT INTO dbo.LocalErrorLogs ([SenderId],[LogDate],[Content]) VALUES (@SenderId, @LogDate, @Content)
+SELECT {0}=SCOPE_IDENTITY()
+INSERT INTO dbo.SubmitEvents (EventLogId, EventDate, SolutionName, AssignmentId)
+VALUES ({0}, @EventDate, @SolutionName, @AssignmentId)
+SELECT {0}", StringConstants.SqlHelperLogIdVar)
+            };
+
+            cmd.Parameters.AddWithValue("SenderId", SenderId);
+            cmd.Parameters.AddWithValue("LogDate", LogDate);
+            cmd.Parameters.AddWithValue("Content", Content);
+
+            return cmd;
         }
     }
 
