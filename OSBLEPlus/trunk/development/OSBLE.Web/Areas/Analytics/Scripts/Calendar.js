@@ -14,7 +14,7 @@ $(document).ready(function () {
         updateCalendar(0);
     });
 
-    $("input[type='checkbox']").click(function () {
+    $("input[name='SelectedMeasureTypes']").click(function () {
 
         if ($("input[name='SelectedMeasureTypes']:checked").length < 6) {
 
@@ -39,10 +39,34 @@ $(document).ready(function () {
         updateCalendar(0);
     });
 
+    $("#user-show-all").click(function () {
+
+        updateMeasureBackground();
+
+        if ($("#hourlychart").is(":visible")) {
+            onDayClick(yearG, monthG, dayG, false);
+        } else {
+            // update checked values before updating calendar
+            $(".cb-user").prop("checked", this.checked);
+            updateCalendar(0);
+        }
+    });
+
+    $(".cb-user").click(cbUserClicked);
+
     updateMeasureBackground();
     updateRadioDependencies();
     updateCalendar(0);
 });
+
+function cbUserClicked() {
+    updateMeasureBackground();
+    if ($("#hourlychart").is(":visible")) {
+        onDayClick(yearG, monthG, dayG, false);
+    } else {
+        updateCalendar(0);
+    }
+}
 
 function updateCalendar(monthOffset) {
 
@@ -65,9 +89,14 @@ function updateCalendar(monthOffset) {
         currentYear--;
     }
 
-    var selectedUsers = $("input[name='userId']:checked").map(function () {
-        return this.value;
+    var selectedUsers = "";
+    $("input[name='userId']").each(function (index, item) {
+        if ($(item).prop("checked") === true)
+            selectedUsers += $(item).val() + ',';
     });
+    // get rid of the last comma.
+    if (selectedUsers.length > 0)
+        selectedUsers = selectedUsers.substring(0, selectedUsers.length - 1);
 
     if (measures.length > 0 && selectedUsers.length > 0) {
         $.ajax({
@@ -80,7 +109,7 @@ function updateCalendar(monthOffset) {
                 AggregateFunctionId: $("input[name = 'AggregationFunction']").val(),
                 CourseId: $("select[name = 'CourseId']").val(),
                 SelectedMeasures: measures,
-                SubjectUsers: selectedUsers.get().join(',')
+                SubjectUsers: selectedUsers //.get().join(',')
             }
         }).done(function (data) {
 
@@ -94,7 +123,7 @@ function updateCalendar(monthOffset) {
             }
             else {
                 updateDisplayArea(false);
-                showEmptyCalendar()
+                showEmptyCalendar();
             }
         });
     }
