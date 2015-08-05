@@ -678,13 +678,20 @@ namespace OSBLE.Utility
                 {
                     Content = text,
                     SourceEventLogId = logID,
-                    SolutionName = null,
+                    SolutionName = "",
                     SenderId = senderID,
-                    CourseId = courseID
+                    CourseId = courseID,
+                    SourceEvent = GetActivityEvent(logID, connection)
                 };
                 using (var cmd = e.GetInsertCommand())
                 {
-                    connection.Execute(cmd.CommandText, cmd.Parameters);
+                    // this no longer works, need to do cmd.ExecuteScalar() to get the query to run correctly.
+                    //connection.Execute(cmd.CommandText, cmd.Parameters);
+                    cmd.Connection = connection;
+
+                    connection.Open();
+                    cmd.ExecuteScalar();
+                    connection.Close();
                 }
                 return true;
             }
