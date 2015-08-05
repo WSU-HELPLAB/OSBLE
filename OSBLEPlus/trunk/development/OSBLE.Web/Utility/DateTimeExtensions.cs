@@ -28,7 +28,8 @@ public static class DateTimeExtensions
 
             TimeZoneInfo tzInfo = GetTimeZone(offsetVal);
 
-            return TimeZoneInfo.ConvertTimeFromUtc(date, tzInfo);
+            DateTime utcKind = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+            return TimeZoneInfo.ConvertTimeFromUtc(utcKind, tzInfo);
         }
     }
 
