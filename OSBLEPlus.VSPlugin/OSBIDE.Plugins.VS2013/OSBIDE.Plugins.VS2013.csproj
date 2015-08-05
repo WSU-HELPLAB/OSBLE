@@ -17,7 +17,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WashingtonStateUniversity.OSBIDE_Plugins_VS2013</RootNamespace>
-    <AssemblyName>OSBIDE.Plugins.VS2013</AssemblyName>
+    <AssemblyName>OSBLE_VisualStudio_Extension</AssemblyName>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
