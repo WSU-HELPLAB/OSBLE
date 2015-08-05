@@ -39,7 +39,7 @@
         });
 
         // redraw chart
-        $("a.btn").click(function(e) {
+        $("#redraw-btn").click(function(e) {
             e.stopPropagation();
             e.preventDefault();
 
@@ -186,8 +186,7 @@ if (typeof (Chart) == "undefined") {
 
             Draw: function () {
 
-                // update data from the server
-
+                HideNoDataMsg();
                     
                 var dataservice = $("#main").attr("data-service-path");
                 //dataservice = "http://localhost:1271";
@@ -203,17 +202,16 @@ if (typeof (Chart) == "undefined") {
                         timeScale: $("#timescale-setting").val(),
                         timeFrom: $("#timeFrom").val(),
                         timeTo: $("#timeTo").val(),
-                        timeout: $("#timeout").val(),
+                        timeout: 0.5,
                         grayscale: $("#grayscale").is(":checked"),
-                        courseId: parseInt($("[data-course-id]").first().attr("data-course-id")),
+                        courseId: $("select[name = 'CourseId']").val(),
                         userIds: checkedValues
-            }
- }).done(function (data) {
+                    }
+                }).done(function (data) {
 
                     // no chart data available show message
-                    if (data.length === 0) {
-                        $("#chart-area").text("No data in the time range!");
-                        DataVisualization.SetChartVisibility(true);
+                    if (data == null || data.length === 0) {
+                        ShowNoDataMsg();
                         return;
                     }
 
@@ -268,7 +266,7 @@ if (typeof (Chart) == "undefined") {
                     var tds = rows.each(function (r) {
                         d3.select(this)
                             .selectAll("td")
-                     .data(function () { return [r.userId, ""]; })
+                     .data(function () { return [GetUserNameForID(r.userId), ""]; })
                             .enter()
                             .append("td")
                         .text(function (d) { return d; });
@@ -321,4 +319,28 @@ if (typeof (Chart) == "undefined") {
         };
 
     })();
+}
+
+function GetUserNameForID(id)
+{
+    var name = $("#li-user-" + id).data("fullname");
+
+    if (name == null)
+        name = "User (id = " + id + ")";
+
+    return name;
+}
+
+function ShowNoDataMsg()
+{
+    $("div[data-type='chart").hide();
+    $("div[data-type='spinner'").hide();
+    $("div[data-type='legend-hour-view']").hide();
+    $("div[data-type='legend-minute-view']").hide();
+    $('#no_data').show('fade');
+}
+
+function HideNoDataMsg()
+{
+    $('#no_data').hide();
 }

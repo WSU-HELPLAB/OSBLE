@@ -1,32 +1,37 @@
 ﻿
-$(document).ready(function () {
-    
-    $(".menu_item").click(function () {
-        //debugger;
-        //remove id="current" from previous tab
-        $(".current").removeClass("current");
-        //add id="current" to current tab
-        $(this).addClass("current");
+$("#course-id-select").change(function () {
+    $.ajax({
+        url: "GetStudentsForCourseID",
+        method: "POST",
+        data: { courseId: $(this).val() },
+        dataType: "json",
+        success: function (data) {
+            if (data != null) {
+                // first get rid of all current items
+                $(".student-list-item").remove();
 
-        //$("#analytics_options").load("/Areas/Views/Analytics/_DefaultOptions.cshtml");
-        //$.ajax({
-        //        url: '/Analytics/Analytics/GetOptions',
-        //        contentType: 'application/html; charset=utf-8',
-        //        type: 'GET',
-        //        dataType: 'html'
-        //    })
-        //    .success(function(result) {
-        //        $("#analytics_options").html(result);
-        //    })
-        //    .error(function(xhr, status) {
-        //        alert(status);
-        //    });
+                // then loop through the data
+                $.each(data, function (index, value) {
+                    var name = value.FirstName + ' ' + value.LastName;
+                    $("#studentList").append(
+                        '<li id="li-user-"' + value.ID + '" \
+                                data-fullname="' + name + '" class="student-list-item">\
+                                    <input class="cb-user" value="' + value.ID + '" \
+                                    type="checkbox" name="userId" checked="checked" />' +
+                            name +
+                        '</li>'
+                        );
+                });
+            }
+        }
     });
-
 });
 
-
-
-function updateCurrentTab() {
-    
-}
+$("#user-show-all").change(function () {
+    if (this.checked) {
+        $(".cb-user").prop("checked", true);
+    }
+    else {
+        $(".cb-user").prop("checked", false);
+    }
+});

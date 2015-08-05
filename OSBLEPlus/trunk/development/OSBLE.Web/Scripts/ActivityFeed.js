@@ -263,7 +263,9 @@ function FeedViewModel(userName, userId) {
     };
 
     // load initial state from server
-    self.RequestUpdate();
+    $(document).ready(function () {
+        self.RequestUpdate();
+    });
 }
 
 function DetailsViewModel(userName, userId, rootId)

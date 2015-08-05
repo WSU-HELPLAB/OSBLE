@@ -16,7 +16,7 @@ $(document).ready(function () {
 
     $("input[type='checkbox']").click(function () {
 
-        if ($("input[type='checkbox']:checked").length < 6) {
+        if ($("input[name='SelectedMeasureTypes']:checked").length < 6) {
 
             updateMeasureBackground();
 
@@ -65,7 +65,11 @@ function updateCalendar(monthOffset) {
         currentYear--;
     }
 
-    if (measures.length > 0) {
+    var selectedUsers = $("input[name='userId']:checked").map(function () {
+        return this.value;
+    });
+
+    if (measures.length > 0 && selectedUsers.length > 0) {
         $.ajax({
             url: dataservice + "/api/Calendar/",
             //xhrFields: { withCredentials: true },
@@ -75,7 +79,8 @@ function updateCalendar(monthOffset) {
                 ReferenceDate: currentYear + "/" + currentMonth + "/01",
                 AggregateFunctionId: $("input[name = 'AggregationFunction']").val(),
                 CourseId: $("select[name = 'CourseId']").val(),
-                SelectedMeasures: measures
+                SelectedMeasures: measures,
+                SubjectUsers: selectedUsers.get().join(',')
             }
         }).done(function (data) {
 
@@ -123,7 +128,7 @@ function buildCalendar(data)
 
 function updateMeasureBackground() {
 
-    $("input[type='checkbox']").each(function (i, e) {
+    $("input[name='SelectedMeasureTypes']").each(function (i, e) {
         if (!$(e).is(":checked")) {
 
             $(e).next().css({ "background-color": "transparent", "color": "#333" });
@@ -138,7 +143,7 @@ function updateRadioDependencies() {
 
     var aggVal = $("input[type='radio']:checked").val();
 
-    $("input[type='checkbox'][agg-func]").each(function () {
+    $("input[name='SelectedMeasureTypes'][agg-func]").each(function () {
         if ($(this).attr("agg-func") === aggVal) {
             var id = $(this).attr("id");
             $(this).attr("disabled", false).next().attr("for", id);

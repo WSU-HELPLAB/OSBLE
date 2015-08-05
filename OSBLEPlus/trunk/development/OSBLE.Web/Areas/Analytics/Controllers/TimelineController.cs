@@ -21,9 +21,9 @@ namespace OSBLE.Areas.Analytics.Controllers
         //
         // GET: /Analytics/Calendar/
         [ChildActionOnly]
-        public ActionResult Index()
+        public ActionResult Index(int? courseId = null)
         {
-            var model = new List<OSBLEPlus.Logic.DomainObjects.Analytics.StudentData>();
+            var model = CourseDataAccess.GetStudentList(courseId ?? ActiveCourseUser.AbstractCourseID);
             return PartialView("_Timeline", model);
         }
 

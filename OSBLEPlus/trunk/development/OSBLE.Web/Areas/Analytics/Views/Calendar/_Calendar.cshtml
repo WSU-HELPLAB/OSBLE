@@ -9,7 +9,7 @@
 <div id="calendar-options" class="col-sm-4 options_view">
     @Helpers.ToggleButtonHeader("Options", "#options_content", "cb-options")
     <div id="options_content">
-        @Html.DropDownListFor(m => m.CourseId, new SelectList(Courses.GetCourses(), "Value", "Name"))
+        @Html.DropDownListFor(m => m.CourseId, new SelectList(Courses.GetCourses(), "Value", "Name", ViewBag.ActiveCourseUser.AbstractCourseID), new { id = "course-id-select" })
 
         <div>
             <label for="total">
@@ -43,6 +43,13 @@
 
             </div>
         }
+
+        <div class="opt-col-1">
+            <h4>Students:</h4>
+            <ul id="studentList">
+                <li><input type="checkbox" id="user-show-all" checked="checked" /> Show All</li>
+            </ul>
+        </div>
     </div>
     @* ensures that the parent container extends to the proper height *@
     <div class="clearfix"></div>
@@ -77,4 +84,9 @@
 
 <script type="text/javascript" src="@Url.Content("~/Areas/Analytics/Scripts/TrendingCalendar.js")"></script>
 <script type="text/javascript" src="@Url.Content("~/Areas/Analytics/Scripts/Calendar.js")"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#course-id-select').change();
+    });
+</script>
 
