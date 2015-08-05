@@ -584,10 +584,14 @@ namespace OSBLE.Utility
                 {
                     LogCommentEventId = logId,
                     SenderId = markerId,
+                    SolutionName = ""
                 };
                 using (var cmd = h.GetInsertCommand())
                 {
-                    connection.Execute(cmd.CommandText, cmd.Parameters);
+                    cmd.Connection = connection;
+                    connection.Open();
+                    cmd.ExecuteScalar();
+                    connection.Close();
                     return helpfulMarkEventIds.Count + 1;
                 }
             }
