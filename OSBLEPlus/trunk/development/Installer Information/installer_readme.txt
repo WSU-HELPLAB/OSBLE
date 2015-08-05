@@ -10,10 +10,10 @@ How to get find and install the Awesomium redistributable .msm file.
 Note: The default installation directory is C:\Program Files(x86)\Awesomium Technologies LLC
 
 When you build OSBIDE.Installer, you will find "OSBLEDependencies.msi" in 
-[OSBLEPlus.VSPlugin project folder]\OSBLEPlus.VSPlugin\OSBIDE.Installer\Debug\OSBLEDependencies.msi
+[development folder]\OSBIDE.Installer\Debug\OSBLEDependencies.msi
 
 When you build OSBIDE.Plugins.VS2013 you will find "OSBLE_VisualStudio_Extension.vsix"
-[OSBLEPlus.VSPlugin project folder]\OSBIDE.Plugins.VS2013\bin\debug\OSBLE_VisualStudio_Extension.vsix
+[development folder]\OSBLEPlus.VSPlugin\OSBIDE.Plugins.VS2013\debug\OSBLE_VisualStudio_Extension.vsix
 
 The two files above will be needed for future students to run the extension.
 
