@@ -14,14 +14,19 @@ $("#course-id-select").change(function () {
                 $.each(data, function (index, value) {
                     var name = value.FirstName + ' ' + value.LastName;
                     $("#studentList").append(
-                        '<li id="li-user-"' + value.ID + '" \
+                        '<li id="li-user-' + value.ID + '" \
                                 data-fullname="' + name + '" class="student-list-item">\
                                     <input class="cb-user" value="' + value.ID + '" \
-                                    type="checkbox" name="userId" checked="checked" />' +
+                                    type="checkbox" name="userId" checked="checked" /> ' +
                             name +
                         '</li>'
                         );
                 });
+
+                try {
+                    $(".cb-user").click(function () { cbUserClicked(); });
+                }
+                catch (err) {}
             }
         }
     });
