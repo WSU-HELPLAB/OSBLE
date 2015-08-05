@@ -172,8 +172,8 @@ function GetSelectedCourseID()
     return courseID;
 }
 
-$(document).ready(function () {
-    $(".show-hide-toggle").addClass("shown");
+function EnableShowHideToggles() {
+
     $(".show-hide-toggle").click(function (event) {
         var btn = $(event.target);
         if (!btn.hasClass("show-hide-toggle")) {
@@ -194,7 +194,7 @@ $(document).ready(function () {
         if (btn.hasClass("cb-options"))
             setTimeout(function () { OptionsToggleCallback(!shown); }, 400);
     });
-});
+}
 
 function OptionsToggleCallback(shown)
 {

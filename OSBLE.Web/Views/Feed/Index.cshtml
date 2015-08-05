@@ -51,7 +51,8 @@
     </div>
 
     <div id="filters">
-        <form role="form">
+        @Helpers.ToggleButtonHeader("Filters", "#activity-feed-filters", "", false)
+        <form role="form" id="activity-feed-filters" style="display: none">
             
             @* Search by Keyword *@
             <div id="keywordSection" class="form-group">
