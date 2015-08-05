@@ -288,27 +288,6 @@ namespace OSBLE.Controllers
             return View("AjaxFeed", aggregateFeed);
         }
 
-        [HttpPost]
-        public JsonResult PostComment(int id, string content)
-        {            
-            // Check for blank comment
-            if (String.IsNullOrWhiteSpace(content)) {
-                throw new Exception();
-            }
-
-            // Insert the comment
-            bool success = DBHelper.InsertActivityFeedComment(id, CurrentUser.ID, content);
-            if (!success) {
-                throw new Exception();
-            }
-
-            // Get the new comment list by getting the parent feed item
-            FeedItem post = GetFeedItemFromID(id);
-
-            // return the new list of comments in a Json object
-            return Json(MakeCommentListJsonObject(post.Comments, id));
-        }
-
         /// <summary>
         /// Removes a FeedPostEvent, AJAX-style!
         /// </summary>
@@ -686,6 +665,30 @@ namespace OSBLE.Controllers
             var newPost = new AggregateFeedItem(GetFeedItemFromID(Posts.SaveEvent(log)));
             return Json(MakeAggregateFeedItemJsonObject(newPost, false));
         }
+
+        [HttpPost]
+        public JsonResult PostComment(int id, string content)
+        {
+            // Check for blank comment
+            if (String.IsNullOrWhiteSpace(content))
+            {
+                throw new Exception();
+            }
+
+            // Insert the comment
+            bool success = DBHelper.InsertActivityFeedComment(id, CurrentUser.ID, content);
+            if (!success)
+            {
+                throw new Exception();
+            }
+
+            // Get the new comment list by getting the parent feed item
+            FeedItem post = GetFeedItemFromID(id);
+
+            // return the new list of comments in a Json object
+            return Json(MakeCommentListJsonObject(post.Comments, id));
+        }
+
 
         [HttpPost]
         public ActionResult ApplyFeedfilter(IEnumerable<EventType> eventFilter = null, string commentFilter = null )

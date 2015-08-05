@@ -132,8 +132,8 @@ namespace OSBLE.Models.Queries
                 return new List<EventType>
                 {
                     EventType.AskForHelpEvent,
-                    EventType.BuildEvent,
-                    EventType.DebugEvent,
+                    //EventType.BuildEvent,
+                    //EventType.DebugEvent,
                     EventType.HelpfulMarkGivenEvent,
                     EventType.ExceptionEvent,
                     EventType.FeedPostEvent,
