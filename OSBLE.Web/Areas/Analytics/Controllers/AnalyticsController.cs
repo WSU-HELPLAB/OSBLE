@@ -3,7 +3,10 @@ using System.Web.Mvc;
 using OSBLE.Attributes;
 using OSBLE.Controllers;
 using OSBLEPlus.Logic.DomainObjects.Analytics;
-
+using OSBLE.Utility;
+using System.Collections.Generic;
+using OSBLEPlus.Logic.DataAccess.Profiles;
+using System.Linq;
 
 namespace OSBLE.Areas.Analytics.Controllers
 {
@@ -11,8 +14,6 @@ namespace OSBLE.Areas.Analytics.Controllers
     [IsAdmin]
     public class AnalyticsController : OSBLEController
     {
-        //
-        // GET: /Analytics/Calendar/
         public ActionResult Index()
         {
             return RedirectToAction("Load", new { view = "Default" });
@@ -22,6 +23,12 @@ namespace OSBLE.Areas.Analytics.Controllers
         {
             ViewBag.CurrentView = view;
             return View("Index");
+        }
+
+        [HttpPost]
+        public JsonResult GetStudentsForCourseId(int courseId)
+        {
+            return Json(CourseDataAccess.GetStudentList(courseId));
         }
     }
 }

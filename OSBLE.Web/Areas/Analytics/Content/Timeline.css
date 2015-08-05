@@ -66,6 +66,7 @@
     margin-left: 8.333333333333332%;
     overflow-y: visible;
     overflow-x: auto;
+    margin-bottom: 15px;
 }
 
 #chartBody > a {
@@ -84,18 +85,19 @@
 
 #chartBody table td.headcol {
     position: absolute;
-    left: 0;
+    left: 10px;
     width: 8.333333333333332%;
     text-align: right;
     margin-top: 1em;
     font-weight: bold;
     padding: 0;
+    line-height: 18px;
 }
 #chartBody table td>span.tick-label{
     display: block;
     text-align: right;
     font-weight: normal;
-    margin-top: 5px;
+    margin-top: 20px;
 }
 
 span.tick-label span{display:inline-block}
@@ -120,6 +122,10 @@ span.tick-label .point {
 }
 
 /* legend */
+div[data-type='legend-hour-view'], div[data-type='legend-minute-view'], #no_data {
+    display: none;
+}
+
 div[data-type="chart-area"] table {
     font-size: .9em;
 }
@@ -142,11 +148,46 @@ div[data-type="chart-area"] th {
 }
 
 .legend.bar {
-    font-size: 2em;
+    font-size: 22px;
     font-weight: bold;
-    margin-top: -.5em;
+    margin: 0;
+    margin-top: -7px;
+    margin-left: -7px;
     color: #000;
     border: none;
+}
+
+.legend-header h4 {
+    color: black;
+    font-size: 14px;
+    font-weight: bold;
+    font-family: Arial;
+    margin: 0;
+    margin-top: 3px;
+}
+
+.legend-header {
+    border-bottom: 1px solid #ccc;
+    margin-top: -10px;
+}
+
+.legend-table > div {
+    height: 34px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.legend-table {
+   border: none;
+}
+
+.legend-row {
+    margin-left: 0; 
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding-top: 10px;
 }
 
 .idle {
@@ -194,12 +235,6 @@ section[data-type='doc-utils'] a.disabled:hover {
     color: #0082D9;
 }
 
-#timeline-options input[type='text'] {
-    width: 100%;
-    height: 23px;
-    padding: 0;
-}
-
 #timeline-options select {
     height: 23px;
     padding: 0;
@@ -211,4 +246,20 @@ section[data-type='doc-utils'] a.disabled:hover {
 
 #timeline-options div[data-type='chart-area'] {
     margin-left: 120px;
+}
+
+#legend_small, #legend_big {
+    display: none;
+}
+
+#students-label {
+    margin-bottom: 0;
+}
+
+#time-scale-select, cb-grayscale {
+    margin-top: 5px;
+}
+
+#no_data {
+    margin-top: 25px;
 }
