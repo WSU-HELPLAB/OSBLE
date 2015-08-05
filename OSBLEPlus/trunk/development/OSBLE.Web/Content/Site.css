@@ -209,6 +209,7 @@ h3 span.glyphicon {
 .dp_tools a:hover {
     opacity: 1;
     cursor: pointer;
+    text-decoration: none;
 }
 
 .dp_tools * {
@@ -2180,6 +2181,32 @@ div.pagedocname {
     font-size: 8pt;
 }
 
+/* Toggle collapse buttons */
+.toggle-header {
+    color: #999;
+    font-size: 12pt;
+    margin: 0;
+    font-weight: bold;
+}
+.show-hide-toggle {
+    display: block;
+    float: right;
+    color: #ccc;
+    margin-bottom: -2px;
+}
+.show-hide-toggle:hover {
+    color: #999;
+    text-decoration: none;
+}
+
+.filters_header {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+#activity-feed-filters {
+    margin-top: 10px;
+}
+
 /* Activity Feed Filters */
 
 .filter-type-option {
@@ -2266,10 +2293,10 @@ a.disabled{
 .show-hide-toggle, .show-hide-toggle * {
     cursor: pointer;
 }
-.show-hide-toggle > .show-only, .show-hide-toggle > .hide-only {
+.show-hide-toggle.not-shown > .show-only, .show-hide-toggle > .hide-only {
     display: none;
 }
-.show-hide-toggle.shown > .show-only, .show-hide-toggle.not-shown > .hide-only  {
+.show-hide-toggle.not-shown > .hide-only {
     display: inline !important;
 }
 
