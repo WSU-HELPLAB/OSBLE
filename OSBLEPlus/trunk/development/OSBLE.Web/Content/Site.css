@@ -2194,7 +2194,7 @@ div.pagedocname {
 .toggle-header {
     color: #999;
     font-size: 12pt;
-    margin: 0;
+    margin: 0 !important;
     font-weight: bold;
 }
 .show-hide-toggle {
@@ -2208,10 +2208,6 @@ div.pagedocname {
     text-decoration: none;
 }
 
-.filters_header {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-}
 #activity-feed-filters {
     margin-top: 10px;
 }
@@ -2275,9 +2271,14 @@ a.disabled{
 }
 
 /* OSBIDE Layout */
+
 #osbide_header {
     font-size: 14pt;
     margin: 15px;
+}
+
+.osbide-settings {
+    margin-right: 15px;
 }
 
 .osbide_nav_btn {

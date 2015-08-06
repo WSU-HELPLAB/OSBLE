@@ -1,34 +1,69 @@
-﻿<!DOCTYPE html>
+﻿@using System.Configuration
+@using OSBLE.Utility
 
+<!DOCTYPE html>
 <html>
 <head>
     <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/bootstrap-3.3.5/css/bootstrap.min.css")" />
     <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/Site.css")" />
 
     <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-2.0.1.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-ui-1.10.4.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.validate.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.unobtrusive-ajax.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.contextMenu.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.ui.position.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.cookie.js")"></script>
-    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.easing.js")"></script>
+
     <script type="text/javascript" src="@Url.Content("~/Scripts/json2.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/modernizr-2.6.2.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.collapse.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.easing.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.ui.timepicker.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.tmpl.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.selectboxes.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-tooltip.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/Content/bootstrap-3.3.5/js/bootstrap.min.js")"></script>
+
+    <script type="text/javascript" src="@Url.Content("~/Scripts/osble.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/getUtcOffset.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/time.js")"></script>
+    <script type="text/javascript">
+        function increaseZoom(amount)
+        {
+            var zoom = Number($("body").css('zoom'));
+            $("body").css('zoom', zoom + amount);
+        }
+    </script>
 
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
 </head>
-<body>
+<body style="zoom: 0.75">
 
     @* Forward/Back buttons if desired *@
-    @if (!string.IsNullOrEmpty(ViewBag.ForwardURL)) {
+    @if (!string.IsNullOrEmpty(ViewBag.ForwardURL))
+    {
         <a href="@ViewBag.ForwardURL" id="osbide_forward" class="osbide_nav_btn"><span class="glyphicon glyphicon-arrow-right"></span></a>
     }
-    @if (!string.IsNullOrEmpty(ViewBag.BackURL)) {
+    @if (!string.IsNullOrEmpty(ViewBag.BackURL))
+    {
         <a href="@ViewBag.BackURL" id="osbide_forward" class="osbide_nav_btn"><span class="glyphicon glyphicon-arrow-left"></span></a>
     }
 
-    <h1 id="osbide_header">OSBIDE - @ViewBag.Title</h1>
-    <div class="container-fluid" id="main_container">
-        @RenderBody()
+    <div class="osbide-settings dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-cog"></span></a>
+        <ul class="dropdown-menu dropdown-menu-right">
+            <li><a href="#" title="Zoom In" onclick="increaseZoom(0.05)">Zoom +</a></li>
+            <li><a href="#" title="Zoom Out" onclick="increaseZoom(-0.05)">Zoom -</a></li>
+        </ul>
     </div>
+
+    <h1 id="osbide_header">OSBIDE - @ViewBag.Title</h1>
+    <section id="main" data-service-path="@ConfigurationManager.AppSettings["DataServiceUrl"]">
+        <div class="container-fluid osbide-container" id="main_container">
+            @RenderBody()
+        </div>
+    </section>
 </body>
 </html>
