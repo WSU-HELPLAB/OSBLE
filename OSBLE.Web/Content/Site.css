@@ -234,6 +234,15 @@ h3 span.glyphicon {
     margin-right: 10px;
 }
 
+.non-user-text {
+    color: #888;
+    font-style: italic;
+}
+
+.non-user-text em {
+    font-weight: bold;
+}
+
 /* End Dashboard Posts */
 
 /* Files And Links*/
