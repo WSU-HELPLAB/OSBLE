@@ -6,6 +6,7 @@
     ViewBag.Title = "Dashboard";
     bool courseCalendarFlag = false;
     string activeCourseRole = ViewBag.ActiveCourse.AbstractRole.Name;
+    bool hasRootFolderAccess = ViewBag.ActiveCourseUser.AbstractRole.CanModify;
     int courseID = ViewBag.ActiveCourse.AbstractCourse.ID;
     switch (activeCourseRole)
     {
@@ -128,7 +129,7 @@
         <div class="col-sm-3 unactiveContent" id="dashboard_right">
             <h3>
                 Files &amp; Links
-                @if (true) // need to see if the user can add to root folder
+                @if (hasRootFolderAccess) // need to see if the user can add to root folder
                 {
                     <a href="#" title="Create New Folder" onclick="cfm_CreateFolderIconClicked(0)"><span class="glyphicon glyphicon-folder-open"></span></a>
                     <a href="#" title="Upload File" onclick="cfm_AddUploader(0)"><span class="glyphicon glyphicon-open-file"></span></a>

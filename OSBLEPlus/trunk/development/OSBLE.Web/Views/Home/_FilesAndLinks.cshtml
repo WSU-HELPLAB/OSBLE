@@ -65,21 +65,24 @@
                     @name
                 </a>
 
-                <div class="file-controls dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-option-vertical"></span></a>
-                    <ul class="dropdown-menu dropdown-menu-right">
-                        @if (canUploadTo)
-                        {
-                            <li><a href="#" title="Create new sub-folder" onclick="cfm_CreateFolderIconClicked(@stateIndex)"><span class="glyphicon glyphicon-folder-open"></span> Create Sub-folder</a></li>
-                            <li><a href="#" title="Upload a file to this directory" onclick="cfm_AddUploader(@stateIndex)"><span class="glyphicon glyphicon-open-file"></span> Upload File</a></li>
-                        }
-                        @if (canDelete)
-                        {
-                            <li><a href="#" title="Rename this folder" onclick="cfm_RenameFolderIconClicked(@stateIndex)"><span class="glyphicon glyphicon-pencil"></span> Rename Folder</a></li>
-                            <li><a href="#" title="Delete this folder" onclick="cfm_DeleteFolderIconClicked(@stateIndex)"><span class="glyphicon glyphicon-trash"></span> Delete Folder</a></li>
-                        }
-                        </ul>
-                </div>
+                @if (canUploadTo || canDelete) 
+                { 
+                    <div class="file-controls dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-option-vertical"></span></a>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            @if (canUploadTo)
+                            {
+                                <li><a href="#" title="Create new sub-folder" onclick="cfm_CreateFolderIconClicked(@stateIndex)"><span class="glyphicon glyphicon-folder-open"></span> Create Sub-folder</a></li>
+                                <li><a href="#" title="Upload a file to this directory" onclick="cfm_AddUploader(@stateIndex)"><span class="glyphicon glyphicon-open-file"></span> Upload File</a></li>
+                            }
+                            @if (canDelete)
+                            {
+                                <li><a href="#" title="Rename this folder" onclick="cfm_RenameFolderIconClicked(@stateIndex)"><span class="glyphicon glyphicon-pencil"></span> Rename Folder</a></li>
+                                <li><a href="#" title="Delete this folder" onclick="cfm_DeleteFolderIconClicked(@stateIndex)"><span class="glyphicon glyphicon-trash"></span> Delete Folder</a></li>
+                            }
+                            </ul>
+                    </div>
+                }
             </div>
         }
 
