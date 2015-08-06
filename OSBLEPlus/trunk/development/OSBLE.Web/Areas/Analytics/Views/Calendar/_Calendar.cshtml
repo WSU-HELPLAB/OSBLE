@@ -33,7 +33,7 @@
                 {
                     var checkedStatus = !string.IsNullOrWhiteSpace(Model.SelectedMeasures) && Model.SelectedMeasures.Split(',').Contains(measure.MeasureType.ToString("d")) ? "checked='checked'" : string.Empty;
                     var aggregateFunction = measure.AggregateFunction.HasValue ? "agg-func=" + measure.AggregateFunction.Value + "" : string.Empty;
-                    <div>
+                    <div class="measure-container" style="border-color: @measure.Color">
                         <label for="@measure.MeasureType.ToString()">
                             <input type="checkbox" @checkedStatus @aggregateFunction id="@measure.MeasureType.ToString()" name="SelectedMeasureTypes" value="@(measure.MeasureType)" data-color="@measure.Color" />
                             @measure.MeasureType.ToString().ToDisplayText()

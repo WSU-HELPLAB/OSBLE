@@ -120,3 +120,12 @@ div[data-wzstep="DataVisualization"] div[data-type="spinner"] img {
 .calendar-header {
     text-align: center;
 }
+
+.measure-container {
+    border-left: 10px solid;
+}
+
+.measure-container > label {
+    margin: 0;
+    padding: 2px 0px 2px 5px;
+}
