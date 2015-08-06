@@ -130,8 +130,11 @@ namespace OSBIDE.Controls.ViewModels
         }
         #endregion
 
-        private void Logout(object param)
+        private async void Logout(object param)
         {
+            var task = AsyncServiceClient.Logout();
+            var result = await task;
+
             Result = MessageBoxResult.No;
             RequestClose(this, EventArgs.Empty);
         }

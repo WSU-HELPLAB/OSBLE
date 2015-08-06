@@ -62,6 +62,19 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             }
         }
 
+        public static async Task<string> Logout()
+        {
+            using (var client = GetClient())
+            {
+                var task = client.GetAsync(string.Format("{0}/Account/LogOff", StringConstants.WebClientRoot));
+                await task;
+
+                return task.Result.StatusCode == HttpStatusCode.OK
+                                               ? task.Result.Content.ReadAsStringAsync().Result
+                                               : string.Empty;
+            }
+        }
+
         public static async Task<bool> IsValidKey(string authToken)
         {
             using (var client = GetClient())
