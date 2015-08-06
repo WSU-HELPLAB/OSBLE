@@ -426,7 +426,33 @@ namespace OSBLE.Utility
 
             List<LogCommentEvent> comments = GetLogCommentEvents(eventId, connection);
 
-            //FeedPostEvent fpe = GetFeedPostEvent(eventId, connection);
+            List<int> eventLogIds = comments.Select(i => i.EventLogId).ToList();
+
+            // get logCommentEventIds for HelpfulMarks
+            List<int> logIds = new List<int>();
+
+            foreach (int id in eventLogIds)
+            {
+                logIds.AddRange(connection.Query<int>("SELECT Id " +
+                                                      "FROM LogCommentEvents " +
+                                                      "WHERE EventLogId = @id", new{id}).ToList());
+            }
+
+            List<int> helpfulMarkLogIds = new List<int>();
+
+            // Get HelpfulMarks EventLogIds
+            foreach (int id in logIds)
+            {
+                helpfulMarkLogIds.AddRange(connection.Query<int>("SELECT EventLogId " +
+                                                                 "FROM HelpfulMarkGivenEvents " +
+                                                                 "WHERE LogCommentEventId = @id", new{id}).ToList());
+            }
+
+            // need to get all logIds from comments then markhelpful delete as well
+            
+                          //connection.Query<int>("SELECT EventLogId " +
+                          //"FROM HelpfulMarkGivenEvents " +
+                          //"WHERE LogCommentEventId = @logIds", logIds).ToList();
 
             
             if (comments.Count > 0)
@@ -439,8 +465,17 @@ namespace OSBLE.Utility
             
             // soft delete eventlog for feedpost
             connection.Execute("UPDATE EventLogs " +
-                   "SET IsDeleted = 1" +
+                   "SET IsDeleted = 1 " +
                    "WHERE Id = @EventLogId", new { EventLogId = eventId });
+
+            // soft delete MarkHelpfulComment EventLog
+            foreach (int id in helpfulMarkLogIds)
+            {
+                connection.Execute("UPDATE EventLogs " +
+                                  "SET IsDeleted = 1 " +
+                                  "WHERE Id = @EventLogId", new { EventLogId = id });               
+            }
+
         }
 
         public static void DeleteLogComment(int eventId, SqlConnection connection = null)
@@ -456,15 +491,27 @@ namespace OSBLE.Utility
             }
 
             LogCommentEvent l = GetSingularLogComment(eventId, connection);
+            int logId = connection.Query<int>("Select Id " +
+                                           "FROM LogCommentEvents " +
+                                           "WHERE EventLogId = @eventId", new {eventId}).SingleOrDefault();
+
+            List<int> helpfulMarkLogIds = 
+                connection.Query<int>("SELECT EventLogId " +
+                                      "FROM HelpfulMarkGivenEvents " +
+                                      "WHERE LogCommentEventId = @logId", new { logId }).ToList();
+                
 
             // soft delete eventlog
             if (l != null)
             {
                 connection.Execute("UPDATE EventLogs " +
-                                   "SET IsDeleted = 1" +
+                                   "SET IsDeleted = 1 " +
                                    "WHERE Id = @EventLogId", l);
-            }
 
+                connection.Execute("UPDATE EventLogs " +
+                                   "SET IsDeleted = 1 " +
+                                   "WHERE Id = @helpfulMarkLogIds", new {helpfulMarkLogIds});
+            }
         }
 
         public static void EditFeedPost(int eventId, string newText, SqlConnection connection = null)
@@ -559,7 +606,7 @@ namespace OSBLE.Utility
                                               "WHERE EventLogId = @eventId", new { eventId = eventLogId }).FirstOrDefault();
 
             List<ActivityEvent> eventLogs =
-                connection.Query<ActivityEvent>("SELECT Id AS EventLogId, EventTypeId AS EventId, EventDate, DateReceived, SenderId, CourseId, BatchId, SolutionName, IsDeleted " + 
+                connection.Query<ActivityEvent>("SELECT Id AS EventLogId, EventTypeId AS EventId, EventDate, DateReceived, SenderId, CourseId, SolutionName, IsDeleted " + 
                                                 "FROM EventLogs " +
                                                 "WHERE Id = @logId", new {logId = helpfulMarkEventIds}).ToList();
 

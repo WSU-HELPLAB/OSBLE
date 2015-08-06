@@ -105,7 +105,13 @@ namespace OSBLE.Controllers
 
             // order items correctly, currently the Stored Procedure returns items in reverse order even though it orders dates by DESC
             // see GetActivityFeeds.sql or run the Stored Procedure in Sql Server Managment Studio to see output.
-            List<FeedItem> feedItems = returnItems.OrderByDescending(i => i.Event.EventDate).ToList();
+            
+            List<FeedItem> feedItems = new List<FeedItem>();
+            for (int i = returnItems.Count - 1; i >= 0; i--)
+            {
+                feedItems.Add(returnItems[i]);
+            }
+            //.OrderByDescending(i => i.Event.EventDate).ToList();
             List<AggregateFeedItem> aggregateFeed = AggregateFeedItem.FromFeedItems(feedItems);
 
             try
