@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
+using System.Web.Providers.Entities;
 using OSBLE.Models;
 using OSBLE.Models.Users;
 using OSBLEPlus.Logic.Utility.Auth;
@@ -188,7 +189,10 @@ namespace OSBLE.Utility
                             * */
                     }
                 }
-                else
+                else if (HttpContext.Current != null && HttpContext.Current.Session != null && HttpContext.Current.Session["auth"] != null)
+                {
+                    return  HttpContext.Current.Session["auth"] as UserProfile;
+                }else
                 {
                     if (HttpContext.Current != null)
                     {
@@ -199,15 +203,9 @@ namespace OSBLE.Utility
 
                         var auth = new Authentication(path);
 
-                        HttpCookie cookie = new HttpCookie(ProfileCookieKey);
                         UserProfile user = auth.GetActiveUser(authToken);
 
-                        if (user != null)
-                        {
-                            cookie.Values[userNameKey] = Encrypt(user.UserName);
-                            cookie.Expires = DateTime.UtcNow.AddDays(300);
-                            HttpContext.Current.Response.Cookies.Set(cookie);
-                        }
+                        if (HttpContext.Current.Session != null) HttpContext.Current.Session["auth"] = user;
 
                         return user;
                     }
@@ -236,6 +234,9 @@ namespace OSBLE.Utility
                     //removes annoying VS warning message
                     string foo = ex.Message;
                 }
+
+                if (HttpContext.Current.Session["auth"] != null)
+                    HttpContext.Current.Session["auth"] = null;
             }
         }
     }
