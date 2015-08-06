@@ -384,6 +384,8 @@ namespace OSBLE.Controllers
                             newMail.DeleteFromInbox = false;
                             newMail.DeleteFromOutbox = false;
 
+                            if (newMail.ContextID <= 0) newMail.ContextID = ActiveCourseUser.AbstractCourseID;
+
                             //need to create the mail before we can send the notification and set the threadID
                             db.Mails.Add(newMail);
                             db.SaveChanges();
