@@ -1,46 +1,53 @@
 ﻿@using System.Diagnostics
-@using OSBIDE.Library.Models
-@using OSBIDE.Web.Models
-@using OSBIDE.Library.Events
-@using OSBIDE.Library
 @using System.Text
 @using OSBLE.Models.Users
+@using OSBLE.Models.Queries
 @using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+@using OSBLEPlus.Logic.DomainObjects.Interface
+@using OSBLEPlus.Logic.Utility.Lookups
 @using OSBLEPlus.Services.Models
 @using OSBLE.Models.ViewModels
+@using OSBLE.Utility;
 @model ProfileViewModel
 @{
     ViewBag.Title = Model.User.FullName;
     UserProfile currentUser = ViewBag.CurrentUser;
+    bool pointsEnabled = ViewBag.PointsEnabled ?? false;
 }
 
 <section data-tab="Profile">
-    <div class="feed-item-single-left">
-        <img src="@Url.Action("Picture", "Profile", new { id = Model.User.ID })" title="profile image" alt="profile image" />
-    </div>
-    <div class="feed-item-single-right">
-        <h1 style="display: inline;">@Model.User.DisplayName()</h1>
-        @if (ViewBag.CurrentUser.Id == Model.User.ID)
-        {
-            <span>@Html.ActionLink("(Edit your profile)", "Edit")</span>
-        }
-        <table>
-            @*<tr>
-                <td><strong>@Model.Score.Score</strong> points</td>
-            </tr>*@
-            <tr>
-                <td><strong>@Model.NumberOfPosts</strong> post(s)</td>
-            </tr>
-            <tr>
-                <td><strong>@Model.NumberOfComments</strong> comment(s)</td>
-            </tr>
-        </table>
+    <div class="jumbotron" id="profile-page-jumbotron">
+        <div class="left-col">
+            <img src="@Url.Action("Picture", "User", new { id = Model.User.ID, size = 110, area = "" })" title="profile image" alt="profile image" />
+        </div>
+        <div class="right-col">
+            <h1>@Model.User.DisplayName(ViewBag.ActiveCourseUser)</h1>
+            <table>
+                @if(pointsEnabled)
+                { 
+                    <tr>
+                        <td><strong>@* @Model.Score *@</strong> points</td>
+                    </tr>
+                }
+                <tr>
+                    <td><strong>@Model.NumberOfPosts</strong> post(s)</td>
+                </tr>
+                <tr>
+                    <td><strong>@Model.NumberOfComments</strong> comment(s)</td>
+                </tr>
+            </table>
+            @if (currentUser.ID == Model.User.ID)
+            {
+                <a href="@Url.Action("Profile", "Account")" class="btn btn-default">Edit <span class="glyphicon glyphicon-pencil"></span></a>
+            }
+        </div>
+        <div class="clearfix"/>
     </div>
 </section>
-@if (Model.User.Id == currentUser.Id)
+@if (Model.User.ID == currentUser.ID)
 {
     int rowCounter = 0;
-    <section id="subscriptions">
+    <section id="subscriptions" class="profile-content">
         <h1>My Subscriptions</h1>
         @if (Model.EventLogSubscriptions.Count() == 0)
         {
@@ -79,17 +86,17 @@
 
                         <tr class="@rowClass">
                             <td>
-                                <img src="@Url.Action("Picture", "Profile", new { id = item.Creator.Id, size = 24 })" height="24" width="24" title="profile image" alt="profile image" />
+                                <img src="@Url.Action("Picture", "Profile", new { id = item.Creator.ID, size = 24 })" height="24" width="24" title="profile image" alt="profile image" />
                             </td>
                             <td>
-                                @Html.ActionLink(item.Creator.FirstAndLastName, "Index", "Profile", new { id = item.Creator.Id, component = OsbideVsComponent.UserProfile }, new { })
+                                @Html.ActionLink(item.Creator.FullName, "Index", "Profile", new { id = item.Creator.ID }, new { })
                             </td>
                             <td>@item.PrettyName</td>
                             <td>@lastCommentText</td>
                             <td>@item.Comments.Count</td>
                             <td>
-                                @Html.ActionLink("View", "Details", "Feed", new { id = item.Items.FirstOrDefault().LogId, component = OsbideVsComponent.FeedDetails }, new { })
-                                <a style="padding-left:10px;" href="@Url.Action("UnfollowPost", "Feed", new { id = item.Items.FirstOrDefault().LogId, returnUrl = Request.Url.AbsoluteUri })">
+                                @Html.ActionLink("View", "Details", "Feed", new { id = item.Items.FirstOrDefault().Event.EventLogId }, new { })
+                                <a style="padding-left:10px;" href="@Url.Action("UnfollowPost", "Feed", new { id = item.Items.FirstOrDefault().Event.EventLogId, returnUrl = Request.Url.AbsoluteUri })">
                                     <img src="~/Content/icons/unfollow.png" title="unfollow" alt="unfollow" />
                                 </a>
 
@@ -101,7 +108,7 @@
         }
     </section>
 }
-<section id="recent-comments">
+<section id="recent-comments" class="profile-content">
     <h1>Recent Social Activity</h1>
     @if (Model.SocialActivity.TopLevelLogCount == 0)
     {
@@ -114,7 +121,7 @@
             List<int> eventIds = Model.SocialActivity.GetEventIds(date);
 
             <div>
-                <h2>@Helpers.RelativeDate(date)</h2>
+                <h2>@date.ToLongDateString()</h2>
                 <ul>
                     @foreach (int logId in eventIds)
                     {
@@ -123,13 +130,18 @@
                         string content = "";
 
                         //is the user commenting on an anymous event?
-                        var ideEvents = OSBIDE.Web.Models.Queries.ActivityFeedQuery.GetIdeEvents();
-                        EventLog sourceEvent = socialLogs[0].LogCommentEvent.SourceEventLog;
-                        if (ideEvents.Where(e => (int)e == sourceEvent.EventTypeId).FirstOrDefault() != null)
+                        var ideEvents = ActivityFeedQuery.GetIdeEvents();
+                        IActivityEvent sourceEvent = socialLogs[0].LogCommentEvent.SourceEvent;
+                        
+                        if (sourceEvent.Sender == null) {
+                            sourceEvent.Sender = DBHelper.GetUserProfile(sourceEvent.SenderId);
+                        }
+                        
+                        if (ideEvents.Contains(sourceEvent.EventType))
                         {
                             //Is the user the target of an IDE event?  For example, did someone comment on this user's build event?
                             //If so, we don't want to show this as it would ruin the anonymity
-                            if (sourceEvent.SenderId == Model.User.Id)
+                            if (sourceEvent.SenderId == Model.User.ID)
                             {
                                 //skip this record
                                 continue;
@@ -145,31 +157,31 @@
                         {
                             case 1:
                                 content = string.Format("{0} commented on a post by {1}",
-                                socialLogs[0].LogCommentEvent.EventLog.Sender.FirstAndLastName,
-                                Html.ActionLink(sourceEvent.Sender.FirstAndLastName, "Details", "Feed", new { id = logId }, new { }));
+                                socialLogs[0].LogCommentEvent.Sender.FullName,
+                                Html.ActionLink(sourceEvent.Sender.FullName, "Details", "Feed", new { id = logId }, new { }));
                                 break;
 
                             case 2:
                                 content = string.Format("{0} and {1} commented on a post by {2}",
-                                socialLogs[0].LogCommentEvent.EventLog.Sender.FirstAndLastName,
-                                socialLogs[1].LogCommentEvent.EventLog.Sender.FirstAndLastName,
-                                Html.ActionLink(sourceEvent.Sender.FirstAndLastName, "Details", "Feed", new { id = logId }, new { }));
+                                socialLogs[0].LogCommentEvent.Sender.FullName,
+                                socialLogs[1].LogCommentEvent.Sender.FullName,
+                                Html.ActionLink(sourceEvent.Sender.FullName, "Details", "Feed", new { id = logId }, new { }));
                                 break;
 
                             case 3:
                                 content = string.Format("{0}, {1}, and {2} commented on a post by {3}",
-                                socialLogs[0].LogCommentEvent.EventLog.Sender.FirstAndLastName,
-                                socialLogs[1].LogCommentEvent.EventLog.Sender.FirstAndLastName,
-                                socialLogs[2].LogCommentEvent.EventLog.Sender.FirstAndLastName,
-                                Html.ActionLink(sourceEvent.Sender.FirstAndLastName, "Details", "Feed", new { id = logId }, new { }));
+                                socialLogs[0].LogCommentEvent.Sender.FullName,
+                                socialLogs[1].LogCommentEvent.Sender.FullName,
+                                socialLogs[2].LogCommentEvent.Sender.FullName,
+                                Html.ActionLink(sourceEvent.Sender.FullName, "Details", "Feed", new { id = logId }, new { }));
                                 break;
 
                             default:
                                 content = string.Format("{0}, {1}, and {2} other(s) commented on a post by {3}",
-                                socialLogs[0].LogCommentEvent.EventLog.Sender.FirstAndLastName,
-                                socialLogs[1].LogCommentEvent.EventLog.Sender.FirstAndLastName,
+                                socialLogs[0].LogCommentEvent.Sender.FullName,
+                                socialLogs[1].LogCommentEvent.Sender.FullName,
                                 socialLogs.Count - 2,
-                                Html.ActionLink(sourceEvent.Sender.FirstAndLastName, "Details", "Feed", new { id = logId }, new { }));
+                                Html.ActionLink(sourceEvent.Sender.FullName, "Details", "Feed", new { id = logId }, new { }));
                                 break;
                         }
 
@@ -192,7 +204,7 @@
         }
     }
 </section>
-<section>
+<section class="profile-content">
     <h1>All Activity</h1>
-    @Html.Partial("Feed/_Feed", Model.Feed)
+    @*Html.Partial("Feed/_Feed", Model.Feed)*@
 </section>

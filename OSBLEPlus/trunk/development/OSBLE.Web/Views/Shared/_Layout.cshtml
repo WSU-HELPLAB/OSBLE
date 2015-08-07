@@ -14,7 +14,7 @@
     <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery-ui-1.8.13.custom.css")" />
     <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery-ui-timepicker.css")" />
     <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/bootstrap-3.3.5/css/bootstrap.min.css")" />
-    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/Site.css")?version=1.2.80" /> @* Update version to cause browsers to reload css file *@
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/Site.css")?version=1.2.81" /> @* Update version to cause browsers to reload css file *@
     <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/navbar.css")?version=1.10" />
     <link rel="shortcut icon" type="text/css" href="/Content/favicon.ico" />
 
@@ -87,7 +87,7 @@
 
                             <ul class="dropdown-menu">
                                 <li><a href="@Url.Action("Index", "Mail", new { area="" })"><span class="glyphicon glyphicon-envelope"></span> Mail (@ViewBag.UnreadMessageCount)</a></li>
-                                <li><a href="@Url.Action("Profile", "Account", new { area = "" })"><span class="glyphicon glyphicon-user"></span> View Profile</a></li>
+                                <li><a href="@Url.Action("Index", "Profile", new { area = "" })"><span class="glyphicon glyphicon-user"></span> View Profile</a></li>
                                 <li><a href="@Url.Action("Profile", "Account", new { area = "" })"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
                                 <li class="divider"></li>
                                 <li><a href="@Url.Action("LogOff", "Account", new { area = "" })"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>

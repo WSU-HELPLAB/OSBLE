@@ -14,6 +14,13 @@ h1, h2, h3, h4, h5, h6 {
     color: #074974;
 }
 
+h1 {
+    font-size: 30px;
+}
+h2 {
+    font-size: 20px;
+}
+
 a:hover {
     color: #ff0000;
 }
@@ -2324,4 +2331,48 @@ a.disabled{
     width: 24px !important;
     padding: 2px !important;
     text-align: center;
+}
+
+#profile-page-jumbotron {
+    color: #333;
+    box-shadow: 0px 0px 20px #ddd inset;
+}
+#profile-page-jumbotron a {
+    margin-top: 5px;
+    margin-bottom: -20px;
+    color: #333;
+}
+#profile-page-jumbotron img {
+    -moz-box-shadow: 0px 0px 3px #555;
+    -webkit-box-shadow: 0px 0px 3px #555;    
+    box-shadow: 0px 0px 3px #555;
+}
+#profile-page-jumbotron > .left-col {
+    margin-right: 15px;
+    float:left;
+}
+#profile-page-jumbotron > .right-col {
+    float:left;
+}
+#profile-page-jumbotron h1 {
+    margin-top: -10px;
+    margin-bottom: 5px;
+}
+.profile-content {
+    margin-left: 15px;
+}
+
+@media(max-width: 768px){
+    #profile-page-jumbotron > .left-col, #profile-page-jumbotron > .right-col {
+        float:none;
+        margin: 0;
+        text-align: center;
+    }
+    #profile-page-jumbotron table {
+        margin-left: auto;
+        margin-right: auto;
+    }
+    #profile-page-jumbotron h1 {
+        margin-top: 5px;
+    }
 }
