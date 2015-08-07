@@ -294,6 +294,30 @@ function DetailsViewModel(userName, userId, rootId)
     self.RequestUpdate();
 }
 
+function ProfileViewModel(userName, userId, profileUserId) {
+    // userName and userId refer to the user who is viewing the feed
+    // profileUserId is the id of the user who's profile is being viewed.
+    var self = this;
+    self.userName = userName;
+    self.userId = userId;
+    self.profileUserId = profileUserId;
+    self.items = ko.observableArray([]);
+
+    self.RequestUpdate = function () {
+        $.ajax({
+            type: "POST",
+            url: "/Feed/GetProfileFeed",
+            data: { userId: profileUserId },
+            dataType: "json",
+            async: false,
+            cache: false,
+            success: function (data, textStatus, jqXHR) {
+                var itemAsList = [new FeedItem(data.Item)];
+                self.items(itemAsList);
+            }
+        });
+    };
+}
 
 /* Regular JS Functions */
 

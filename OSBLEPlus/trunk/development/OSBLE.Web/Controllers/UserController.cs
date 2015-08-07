@@ -8,11 +8,14 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Mvc.Ajax;
+using OSBLE.Utility;
 
 namespace OSBLE.Controllers
 {
     public class UserController : OSBLEController
     {
+        private const int ONE_DAY = 86400; // there are 86400 seconds in a day
+
         /// <summary>
         /// Identities the specified id.
         /// </summary>
@@ -64,12 +67,13 @@ namespace OSBLE.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [OutputCache(Duration = ONE_DAY, VaryByParam = "*")]
         public FileStreamResult Picture(int id, int size = 128)
         {
             UserProfile user = null;
             // id == -1 means whitelisted user, whitelist users do not have profiles/profileimages so don't check the db.
-            if(id != -1)
-                user = db.UserProfiles.Where(u => u.ID == id).FirstOrDefault();
+            if (id != -1)
+                user = DBHelper.GetUserProfile(id);
 
             System.Drawing.Bitmap userBitmap;
             if (user != null)

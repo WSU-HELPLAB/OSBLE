@@ -2376,3 +2376,17 @@ a.disabled{
         margin-top: 5px;
     }
 }
+
+h2.date-header {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+#recent-comments ul > li {
+    list-style: none;
+}
+#recent-comments ul {
+    margin-left: 0;
+    margin-top: 0;
+    padding-left: 0;
+}

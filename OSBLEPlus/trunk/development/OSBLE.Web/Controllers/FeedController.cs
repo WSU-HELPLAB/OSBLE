@@ -157,6 +157,13 @@ namespace OSBLE.Controllers
             return GetJsonFromViewModel(vm);
         }   
 
+        [HttpPost]
+        public JsonResult GetProfileFeed(int profileUserId)
+        {
+
+            return Json(1);
+        }
+
         private string GetDisplayTimeString(DateTime time)
         {
             return time.UTCToCourse(ActiveCourseUser.AbstractCourseID).ToShortDateString() + " " + time.UTCToCourse(ActiveCourseUser.AbstractCourseID).ToShortTimeString();
