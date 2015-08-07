@@ -121,7 +121,7 @@
             List<int> eventIds = Model.SocialActivity.GetEventIds(date);
 
             <div>
-                <h2>@date.ToLongDateString()</h2>
+                <h2 class="date-header">@date.ToLongDateString()</h2>
                 <ul>
                     @foreach (int logId in eventIds)
                     {
