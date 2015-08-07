@@ -36,7 +36,7 @@
 <div id="results">
 
 </div>
-<script type="text/javascript">
+@*<script type="text/javascript">
 var cookieName = '@(Model.Name)';
 if (cookieName != "") {
     window.setInterval("time()", 5 * 60000);
@@ -55,7 +55,7 @@ function time() {
             }
         }
     });
-}
+}*@
 
 function complete(data) {
     $('#results').append("<p>Name: " + data.Name + ", Session: " + data.SessionValue + " Time: " + data.Time + "</p>");

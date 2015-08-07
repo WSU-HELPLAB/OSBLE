@@ -939,25 +939,25 @@ namespace OSBLE.Controllers
             return View("_AjaxEmpty");
         }
 
-        [OsbleAuthorize]
-        public ActionResult Time()
-        {
-            if (CurrentUser != null)
-            {
-                UserProfile user = db.UserProfiles.Find(CurrentUser.ID);
-                if (user != null)
-                {
-                    return View();
-                }
-                else
-                {
-                    return RedirectToAction("Index");
-                }
-            }
-            else
-            {
-                return RedirectToAction("Index");
-            }
-        }
+        //[OsbleAuthorize]
+        //public ActionResult Time()
+        //{
+        //    if (CurrentUser != null)
+        //    {
+        //        UserProfile user = db.UserProfiles.Find(CurrentUser.ID);
+        //        if (user != null)
+        //        {
+        //            return View();
+        //        }
+        //        else
+        //        {
+        //            return RedirectToAction("Index");
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return RedirectToAction("Index");
+        //    }
+        //}
     }
 }
