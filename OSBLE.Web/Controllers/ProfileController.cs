@@ -39,7 +39,7 @@ namespace OSBLE.Controllers
                 vm.User = CurrentUser;
                 if (id != null)
                 {
-                    UserProfile user = db.UserProfiles.Find(id);
+                    UserProfile user = DBHelper.GetUserProfile((int)id);
                     if (user != null)
                     {
                         vm.User = user;
@@ -82,19 +82,23 @@ namespace OSBLE.Controllers
                                                           "FROM EventTypes e " +
                                                           "WHERE e.EventTypeName = 'LogCommentEvent'").FirstOrDefault();
 
-                    vm.NumberOfPosts = conn.Query<EventLog>(
+                    var posts = conn.Query<EventLog>(
                         "SELECT * " +
-                        "FROM EventLogs e " +
-                        "WHERE (e.LogType = @fpe " +
-                        "OR e.EventTypeId = @afhe) " +
-                        "AND e.SenderId = @UserId",
-                        new {fpe = FeedPostValue, afhe = AskForHelpValue, UserId = CurrentUser.ID}).ToList().Count;
+                        "FROM EventLogs " +
+                        "WHERE EventTypeId = @fpe " +
+                        "AND SenderId = @UserId " +
+                        "ORDER BY EventDate DESC",
+                        new { fpe = FeedPostValue, afhe = AskForHelpValue, UserId = vm.User.ID }).ToList();
+                    vm.NumberOfPosts = posts.Count;
 
-                    vm.NumberOfComments = conn.Query<EventLog>(
-                        "SELECT * " +
-                        "FROM EventLogs e " +
-                        "WHERE (e.LogType = @lcv " +
-                        "AND e.SenderId = @UserId", new {lcv = LogCommentValue, UserId = CurrentUser.ID}).ToList().Count;
+                    var comments = DBHelper.GetCommentsForUserID(vm.User.ID, conn);
+                    //var comments = conn.Query<EventLog>(
+                    //    "SELECT * " +
+                    //    "FROM EventLogs e " +
+                    //    "WHERE (e.EventTypeId = @lcv " +
+                    //    "AND e.SenderId = @UserId) " +
+                    //    "ORDERBY e.EventDate DESCENDING", new { lcv = LogCommentValue, UserId = CurrentUser.ID }).ToList();
+                    vm.NumberOfComments = comments.Count();
 
                     //vm.NumberOfPosts = (from e in Db.EventLogs
                     //                    where (e.LogType == FeedPostEvent.Name || e.LogType == AskForHelpEvent.Name)
@@ -122,49 +126,29 @@ namespace OSBLE.Controllers
                     DateTime maxLookback = DateTime.UtcNow.AddDays(-14);
 
                     //1. find recent comments
-                    CommentActivityLog c = new CommentActivityLog();
                     //c.LogCommentEvent
                     //c.Id
                     //c.LogCommentEventId
                     //c.UserProfile
                     //c.UserProfileId
-                    FeedItem f = new FeedItem();
 
-                    UserProfile up = conn.Query<UserProfile>("FROM UserProfiles u " +
-                                                             "WHERE u.Id=@UserId " +
-                                                             "Select u", new {UserId = CurrentUser.ID}).Single();
-
-                    int userProfileId = CurrentUser.ID;
-
-                    List<EventLog> comments = conn.Query<EventLog>(
-                        "SELECT * " +
-                        "FROM EventLogs e " +
-                        "WHERE (e.LogType = @lcv " +
-                        "AND e.SenderId = @UserId" +
-                        "ORDERBY e.EventDate DESCENDING",
-                        new {lcv = LogCommentValue, UserId = CurrentUser.ID}).ToList();
-
-                    List<CommentActivityLog> socialLogs = new List<CommentActivityLog>();
                     int i = 0;
-                    foreach (EventLog e in comments)
+                    foreach (LogCommentEvent lce in comments)
                     {
-                        LogCommentEvent lce = conn.Query<LogCommentEvent>("FROM LogCommentEvents l " +
-                                                                          "WHERE l.SourceEventId=@seid " +
-                                                                          "Select l").Single();
-
+                        lce.SourceEvent = DBHelper.GetActivityEvent(lce.SourceEventLogId, conn);
+                        lce.Sender = vm.User;
 
                         CommentActivityLog cal = new CommentActivityLog()
                         {
                             Id = i,
                             LogCommentEvent = lce,
-                            LogCommentEventId = lce.SourceEventLogId,
-                            UserProfile = up,
-                            UserProfileId = up.ID
+                            LogCommentEventId = lce.EventLogId,
+                            UserProfile = vm.User,
+                            UserProfileId = vm.User.ID
                         };
 
                         i++;
-
-                        socialLogs.Add(cal);
+                        vm.SocialActivity.AddLog(cal);
                     }
 
                     //List<CommentActivityLog> socialLogs = (from social in Db.CommentActivityLogs
@@ -184,10 +168,6 @@ namespace OSBLE.Controllers
                     //    select social
                     //    ).ToList();
 
-                    foreach (CommentActivityLog commentLog in socialLogs)
-                    {
-                        vm.SocialActivity.AddLog(commentLog);
-                    }
                 }
                 //show subscriptions only if the user is accessing his own page
                 //if (vm.User.Id == CurrentUser.Id)
@@ -209,7 +189,9 @@ namespace OSBLE.Controllers
             catch (Exception ex)
             {
                 //LogErrorMessage(ex);
-                return RedirectToAction("Index", "Home");
+                ViewBag.errorMessage = ex.Message;
+                ViewBag.errorName = ex.GetType().ToString();
+                return View("Error");
             }
         }
 
