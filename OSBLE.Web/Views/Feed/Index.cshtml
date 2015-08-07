@@ -11,14 +11,10 @@
     }
 }
 
-
-<script type="text/javascript" src="@Url.Content("~/Scripts/knockout-3.3.0.js")"></script>
-<script type="text/javascript" src="@Url.Content("~/Scripts/ActivityFeed.js")"></script>
 <script type="text/javascript">
     var vm = new FeedViewModel("@currentUser.FullName", @currentUser.ID);
-    $(document).ready(function () {
-        ko.applyBindings(vm);
-    });
+    ko.applyBindings(vm);
+    vm.RequestUpdate();
 </script>
 
 <section data-tab="ActivityFeed">
@@ -94,3 +90,6 @@
     </div>
 
 </section>
+
+<script type="text/javascript">
+</script>

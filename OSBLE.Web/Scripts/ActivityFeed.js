@@ -262,10 +262,7 @@ function FeedViewModel(userName, userId) {
         });
     };
 
-    // load initial state from server
-    $(document).ready(function () {
-        self.RequestUpdate();
-    });
+    //self.RequestUpdate();
 }
 
 function DetailsViewModel(userName, userId, rootId)
