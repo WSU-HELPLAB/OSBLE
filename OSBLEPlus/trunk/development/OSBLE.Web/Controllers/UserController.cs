@@ -67,7 +67,7 @@ namespace OSBLE.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [OutputCache(Duration = ONE_DAY, VaryByParam = "*")]
+        [OutputCache(Duration = ONE_DAY, VaryByParam = "*", Location = System.Web.UI.OutputCacheLocation.ServerAndClient)]
         public FileStreamResult Picture(int id, int size = 128)
         {
             UserProfile user = null;
