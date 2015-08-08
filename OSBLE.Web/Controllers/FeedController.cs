@@ -139,7 +139,7 @@ namespace OSBLE.Controllers
         /// Returns just the feed part of the activity feed, without the forms at the top for posting/filtering.
         /// </summary>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         public JsonResult GetFeed(string keywords = null, string events = null)
         {
             // Set filters
@@ -231,7 +231,7 @@ namespace OSBLE.Controllers
                 ShowPicture = eventLog.ShowProfilePicture,
                 Comments = comments,
                 HTMLContent = PartialView(viewFolder + eventLog.EventType.ToString().Replace(" ", ""), item).Capture(this.ControllerContext),
-                Content = eventLog.EventType == EventType.FeedPostEvent ? (eventLog as FeedPostEvent).Comment : "",
+                //Content = eventLog.EventType == EventType.FeedPostEvent ? (eventLog as FeedPostEvent).Comment : "",
                 IdString = idString ?? string.Join(",", item.Items.Select(i => i.Event.EventLogId)) 
             };
         }
@@ -257,13 +257,13 @@ namespace OSBLE.Controllers
             {
                 obj.Feed.Add(MakeAggregateFeedItemJsonObject(item, false));
             }
-            return Json(obj);
+            return Json(obj, JsonRequestBehavior.AllowGet);
         }
 
         private JsonResult GetJsonFromViewModel(FeedDetailsViewModel vm)
         {
             var obj = new { Item = MakeAggregateFeedItemJsonObject(vm.FeedItem, true) };
-            return Json(obj);
+            return Json(obj, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>

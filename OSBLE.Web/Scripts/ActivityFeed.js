@@ -243,7 +243,7 @@ function FeedViewModel(userName, userId) {
     self.RequestUpdate = function () {
         ShowLoading();
         $.ajax({
-            type: "POST",
+            type: "GET",
             url: "/Feed/GetFeed",
             dataType: "json",
             data: { keywords: self.keywords(), events: GetCheckedEvents() },

@@ -5,33 +5,4 @@
 }
 <div id="content-@comment.EventLogId">
     <div id="content-comment-@comment.EventLogId">@comment.Comment</div>
-
-    @if (ViewBag.CurrentUser.ID == comment.SenderId || ViewBag.ActiveCourseUser.AbstractRole.CanModify)
-    {
-        <div id="edit-form-items-@comment.EventLogId" style="display: none;">
-            <textarea form="edit-form-@comment.EventLogId"
-                      id="edit-form-textarea-@comment.EventLogId"
-                      name="newText"
-                      class="form-control feed-edit">@comment.Comment</textarea>
-            <button type="submit"
-                    onclick="$(this).parents('form:first').submit();editText(@comment.EventLogId, true)"
-                    form="edit-form-@comment.EventLogId"
-                    id="edit-form-submit-@comment.EventLogId"
-                    class="btn btn-default btn-sm"
-                    value="Submit">
-                Submit
-            </button>
-            <button type="button"
-                    onclick="editText(@comment.EventLogId, false);"
-                    id="edit-form-cancel-@comment.EventLogId"
-                    class="btn btn-default btn-sm">
-                Cancel
-            </button>
-        </div>
-    }
 </div>
-
-
-
-
-
