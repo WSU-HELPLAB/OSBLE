@@ -67,9 +67,23 @@ namespace OSBLE.Controllers
         /// which normally includes these things.
         /// </summary>
         /// <returns></returns>
-        public ActionResult OSBIDE()
+        public ActionResult OSBIDE(int? courseID)
         {
-            return View("Index", "_OSBIDELayout");
+            if (courseID != null) SetCourseID(courseID.Value);
+            return View("Index", "_OSBIDELayout", courseID ?? ActiveCourseUser.UserProfileID);
+        }
+
+        public bool SetCourseID(int courseId)
+        {
+            try
+            {
+                Cache["ActiveCourse"] = courseId;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
         }
 
         private FeedViewModel GetFeedViewModel()
@@ -155,7 +169,7 @@ namespace OSBLE.Controllers
             // Build the model and convert it to JSON to send to the view
             FeedViewModel vm = GetFeedViewModel();
             return GetJsonFromViewModel(vm);
-        }   
+        }
 
         [HttpPost]
         public JsonResult GetProfileFeed(int profileUserId)

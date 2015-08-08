@@ -1,5 +1,6 @@
 ﻿@using System.Configuration
 @using OSBLE.Utility
+@model Int32
 
 <!DOCTYPE html>
 <html>
@@ -51,15 +52,20 @@
         <a href="@ViewBag.BackURL" id="osbide_forward" class="osbide_nav_btn"><span class="glyphicon glyphicon-arrow-left"></span></a>
     }
 
-    <div class="osbide-settings dropdown">
+    @Html.Partial("_OSBIDECourses")
+
+<div class="osbide-settings dropdown">
         <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-cog"></span></a>
         <ul class="dropdown-menu dropdown-menu-right">
             <li><a href="#" title="Zoom In" onclick="increaseZoom(0.05)">Zoom +</a></li>
             <li><a href="#" title="Zoom Out" onclick="increaseZoom(-0.05)">Zoom -</a></li>
+
         </ul>
     </div>
 
-    <h1 id="osbide_header">OSBIDE - @ViewBag.Title</h1>
+   
+
+<h1 id="osbide_header">OSBIDE - @ViewBag.Title</h1>
     <section id="main" data-service-path="@ConfigurationManager.AppSettings["DataServiceUrl"]">
         <div class="container-fluid osbide-container" id="main_container">
             @RenderBody()
