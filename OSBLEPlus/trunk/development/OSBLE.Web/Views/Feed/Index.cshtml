@@ -12,9 +12,11 @@
 }
 
 <script type="text/javascript">
-    var vm = new FeedViewModel("@currentUser.FullName", @currentUser.ID);
-    ko.applyBindings(vm);
-    vm.RequestUpdate();
+    $(document).ready(function() {
+        var vm = new FeedViewModel("@currentUser.FullName", @currentUser.ID);
+        ko.applyBindings(vm); 
+        vm.RequestUpdate();
+    });
 </script>
 
 <section data-tab="ActivityFeed">

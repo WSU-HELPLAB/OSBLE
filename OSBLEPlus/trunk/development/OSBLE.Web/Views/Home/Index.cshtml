@@ -114,12 +114,13 @@
         <div class="col-sm-6 activeContent" id="dashboard_middle">
             <h3>
                 Activity Feed
-                <a href="@Url.Action("DownloadDashboardPosts", "Course")" title="Download Activity Feed as csv">@Helpers.UnPublishButton()</a>
+                @*<a href="@Url.Action("DownloadDashboardPosts", "Course")" title="Download Activity Feed as csv">@Helpers.UnPublishButton()</a>*@
             </h3>
 
             <div id="activity_feed">
-                <div id="activity_feed_content" class="partialContents" data-url="/Feed/Index">
-                    <img src="~/Content/images/ajax-loader.gif" /> Loading...
+                <div id="activity_feed_content" @*class="partialContents" data-url="/Feed/Index"*@ >
+                    @*<img src="~/Content/images/ajax-loader.gif" /> Loading...*@
+                    @{ Html.RenderAction("Index", "Feed"); }
                 </div>
             </div>
 
