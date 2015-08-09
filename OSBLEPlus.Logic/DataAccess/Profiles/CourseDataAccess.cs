@@ -35,7 +35,7 @@ namespace OSBLEPlus.Logic.DataAccess.Profiles
                 using (var multi = connection.QueryMultiple("dbo.GetAssignmentsForCourse",
                         new { CourseId = courseId, CurrentDate = currentTime.Date.AddDays(1).AddSeconds(-1),
                             AssignType = AssignmentTypes.Basic,
-                            FileType=DeliverableType.Zip },
+                            FileType=DeliverableType.PluginSubmission },
                         commandType: CommandType.StoredProcedure))
                 {
                     var assignments = multi.Read<SubmisionAssignment>().ToList();
