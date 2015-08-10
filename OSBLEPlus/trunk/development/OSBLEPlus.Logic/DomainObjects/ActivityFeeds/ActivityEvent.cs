@@ -55,6 +55,18 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             EventDate = DateTime.UtcNow;
         }
 
+        //public ActivityEvent(ActivityEvent a)
+        //{
+        //    EventLogId = a.EventLogId;
+        //    //EventTypeId = a.EventTypeId,
+        //    EventDate = a.EventDate;
+        //    CourseId = a.CourseId;
+        //    DisplayTitle = a.DisplayTitle;
+        //    Sender = a.Sender;
+        //    SenderId = a.SenderId;
+        //    SolutionName = a.SolutionName;
+        //}
+
         public void SetPrivileges(CourseUser currentUser)
         {
             bool anonymous = currentUser.AbstractRole.Anonymized;

@@ -66,7 +66,7 @@
   <ItemGroup>
     <Compile Include="Activities\FeedsTests.cs" />
     <Compile Include="Activities\PostsTests.cs" />
-    <Compile Include="Activities\UnitTest1.cs" />
+    <Compile Include="Activities\GetUserFeedFromId.cs" />
     <Compile Include="Analytics\CalendarTests.cs" />
     <Compile Include="Profiles\UserDataAccessTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -78,6 +78,10 @@
     <ProjectReference Include="..\OSBLE.Library\OSBLE.Library.csproj">
       <Project>{6873caf7-4914-4b62-af7e-bfffa0a9ffd4}</Project>
       <Name>OSBLE.Library</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OSBLE.Web\OSBLE.Web.csproj">
+      <Project>{a88c37d7-0144-490f-8101-bd30b14a48ed}</Project>
+      <Name>OSBLE.Web</Name>
     </ProjectReference>
     <ProjectReference Include="..\OSBLEPlus.Logic\OSBLEPlus.Logic.csproj">
       <Project>{cd97e12a-c4c1-4319-8809-9a3a0eb9d302}</Project>

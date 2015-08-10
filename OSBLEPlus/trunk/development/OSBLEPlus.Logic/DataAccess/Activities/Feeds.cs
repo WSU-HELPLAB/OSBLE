@@ -26,8 +26,17 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
             {
                 var c = string.IsNullOrWhiteSpace(commentFilter) ? string.Empty :  string.Format("%{0}%", commentFilter);
                 var l = string.Join(",", logIds != null ? logIds.Where(i => i > 0).ToArray() : new int[0]);
-                var etypes = eventTypes as int[] ?? eventTypes.ToArray();
-                var t = etypes.Any() ? string.Format("{0}", string.Join(",", etypes)) : string.Empty;
+                string t;
+                try
+                {
+                    var etypes = eventTypes as int[] ?? eventTypes.ToArray();
+                    t = etypes.Any() ? string.Format("{0}", string.Join(",", etypes)) : string.Empty;
+                }
+                catch (Exception ex)
+                {
+                    t = "";
+                }
+                
                 var s = string.Join(",", senderIds != null ? senderIds.Where(i => i > 0).ToArray() : new int[0]);
 
                 var multiResults = connection.QueryMultiple("dbo.GetActivityFeeds",
@@ -39,7 +48,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                                             MaxEventLogId = maxEventLogId ?? 2000000000,
                                             EventLogIds = l,
                                             EventTypes = t,
-                                            CourseId = courseId ?? 0,
+                                            CourseId = courseId ?? -1,
                                             RoleId = roleId ?? 99,
                                             CommentFilter = c,
                                             SenderIds = s,
