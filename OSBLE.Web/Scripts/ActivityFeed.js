@@ -70,6 +70,7 @@ function FeedItem(data) {
     self.htmlContent = ko.observable(data.HTMLContent);
     self.numberHelpfulMarks = ko.observable(data.NumberHelpfulMarks);
     self.idString = data.IdString; // used for items with multiple ids
+    self.activeCourseUserId = data.ActiveCourseUserId;
 
     // load Comments
     self.comments = ko.observableArray([]);
@@ -122,7 +123,7 @@ function FeedItem(data) {
     self.MarkCommentHelpful = function () {
         $.ajax({
             url: "/Feed/MarkHelpfulComment",
-            data: { eventLogToMark: self.eventId, markerId: vm.userId },
+            data: { eventLogToMark: self.eventId, markerId: self.activeCourseUserId },
             dataType: "json",
             method: "GET",
             success: function (data) {
