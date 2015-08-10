@@ -21,7 +21,7 @@ namespace OSBLE.Models.Queries
     {
         private List<EventType> _eventSelectors = new List<EventType>();
         protected List<UserProfile> SubscriptionSubjects = new List<UserProfile>();
-        protected readonly List<int> EventIds = new List<int>();
+        protected List<int> EventIds = new List<int>();
 
         public ActivityFeedQuery(int activeCourseUserCourseId)
         {
@@ -151,6 +151,18 @@ namespace OSBLE.Models.Queries
                 EventType.SubmitEvent
             };
 
+        }
+
+        public static IEnumerable<EventType> GetEventsForUserProfile()
+        {
+            return new List<EventType>
+            {
+                EventType.AskForHelpEvent,
+                EventType.HelpfulMarkGivenEvent,
+                EventType.ExceptionEvent,
+                EventType.FeedPostEvent,
+                EventType.LogCommentEvent,
+            };
         } 
 
         private IEnumerable<int> GetEventFilter()
@@ -310,5 +322,31 @@ namespace OSBLE.Models.Queries
 
             return query.GetAwaiter().GetResult();
         }
+
+        /// <summary>
+        /// For use with user's profile, returns all FeedItems of the user's ID given
+        /// Will still need to be converted to AggregateFeedItems
+        /// </summary>
+        public static IEnumerable<FeedItem> ProfileQuery(int courseUserId)
+        {
+            List<int> eventIds = DBHelper.GetUserFeedFromId(courseUserId).ToList();
+
+            var query = new OSBLEPlus.Services.Controllers.FeedController().Get(
+                new DateTime(2010, 1, 1),   // start date
+                DateTime.Now.AddDays(3),               // end date
+                null,                       // min log id
+                null,                       // max log id
+                eventIds,                   // eventIds
+                null,  // Event Filter
+                null,                       // Course Filter
+                null,                       // Role Filter
+                String.Empty,               // Comment Filter
+                new List<int>(){1},                       // Subscriptions
+                eventIds.Count              // number to return
+                );
+
+            return query.GetAwaiter().GetResult();
+        }
+
     }
 }
