@@ -208,7 +208,8 @@ namespace OSBLE.Controllers
                 HTMLContent = PartialView("Details/_LogCommentEvent", comment).Capture(this.ControllerContext),
                 Content = comment.Content,
                 IdString = comment.EventId.ToString(),
-                NumberHelpfulMarks = comment.NumberHelpfulMarks
+                NumberHelpfulMarks = comment.NumberHelpfulMarks,
+                ActiveCourseUserId = ActiveCourseUser.UserProfileID
             };
         }
 
@@ -246,7 +247,8 @@ namespace OSBLE.Controllers
                 Comments = comments,
                 HTMLContent = PartialView(viewFolder + eventLog.EventType.ToString().Replace(" ", ""), item).Capture(this.ControllerContext),
                 //Content = eventLog.EventType == EventType.FeedPostEvent ? (eventLog as FeedPostEvent).Comment : "",
-                IdString = idString ?? string.Join(",", item.Items.Select(i => i.Event.EventLogId)) 
+                IdString = idString ?? string.Join(",", item.Items.Select(i => i.Event.EventLogId)),
+                ActiveCourseUserId = ActiveCourseUser.UserProfileID
             };
         }
 
