@@ -19,7 +19,7 @@ namespace OSBLEPlus.Logic.Tests.Profiles
 
             // Assert
             Assert.IsNotNull(user);
-            Assert.IsTrue(user.UserId == userId);
+            Assert.IsTrue(user.IUserId == userId);
             Assert.IsTrue(user.IsAdmin);
         }
 
@@ -57,7 +57,7 @@ namespace OSBLEPlus.Logic.Tests.Profiles
             var user = UserDataAccess.GetById(1);
 
             // Act
-            var result = UserDataAccess.LogUserTransaction(user.UserId, DateTime.Now);
+            var result = UserDataAccess.LogUserTransaction(user.IUserId, DateTime.Now);
 
             // Assert
             Assert.IsTrue(result == -1);

@@ -106,6 +106,15 @@ namespace OSBLE.Controllers
 
             List<FeedItem> returnItems = _activityFeedQuery.Execute().ToList();
 
+            // add senders to items
+            using (SqlConnection sqlc = DBHelper.GetNewConnection())
+            {
+                foreach (FeedItem f in returnItems)
+                {
+                    f.Event.Sender = DBHelper.GetUserProfile(f.Event.SenderId, sqlc);
+                }
+            }
+
             //and finally, retrieve our list of feed items
             int maxIdQuery = int.MaxValue;
 
@@ -327,7 +336,7 @@ namespace OSBLE.Controllers
         {
             UserProfile current = DBHelper.GetUserProfile(ActiveCourseUser.UserProfileID);// dp = db.DashboardPosts.Find(id);
 
-            if ((current.UserId == ActiveCourseUser.UserProfileID) || (ActiveCourseUser.AbstractRole.CanGrade))
+            if ((current.IUserId == ActiveCourseUser.UserProfileID) || (ActiveCourseUser.AbstractRole.CanGrade))
             {
                 DBHelper.DeleteFeedPostEvent(id);
             }
@@ -349,7 +358,7 @@ namespace OSBLE.Controllers
         {
             UserProfile current = DBHelper.GetUserProfile(ActiveCourseUser.UserProfileID);// dp = db.DashboardPosts.Find(id);
 
-            if ((current.UserId == ActiveCourseUser.UserProfileID) || (ActiveCourseUser.AbstractRole.CanGrade))
+            if ((current.IUserId == ActiveCourseUser.UserProfileID) || (ActiveCourseUser.AbstractRole.CanGrade))
             {
                 DBHelper.DeleteLogComment(id);
             }
@@ -367,7 +376,7 @@ namespace OSBLE.Controllers
             // do checking, make sure non-authorized users cannot edit posts
 
             UserProfile current = CurrentUser; //DBHelper.GetUserProfile(ActiveCourseUser.UserProfileID);
-            if ((current.UserId == ActiveCourseUser.UserProfileID) || (ActiveCourseUser.AbstractRole.CanGrade))
+            if ((current.IUserId == ActiveCourseUser.UserProfileID) || (ActiveCourseUser.AbstractRole.CanGrade))
             {
                 using (SqlConnection conn = DBHelper.GetNewConnection())
                 {
@@ -397,7 +406,7 @@ namespace OSBLE.Controllers
             // do checking, make sure non-authorized users cannot edit posts
 
             UserProfile current = CurrentUser; //DBHelper.GetUserProfile(ActiveCourseUser.UserProfileID);
-            if ((current.UserId == ActiveCourseUser.UserProfileID) || (ActiveCourseUser.AbstractRole.CanGrade))
+            if ((current.IUserId == ActiveCourseUser.UserProfileID) || (ActiveCourseUser.AbstractRole.CanGrade))
             {
                 using (SqlConnection conn = DBHelper.GetNewConnection()) 
                 {

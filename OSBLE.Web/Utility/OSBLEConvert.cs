@@ -16,7 +16,7 @@ namespace OSBLE.Utility
             // use long form to prevent future confusion
             OSBLEPlus.Logic.DomainObjects.Profiles.User newUser = new OSBLEPlus.Logic.DomainObjects.Profiles.User();
 
-            newUser.DefaultCourseId = 0; // need to pull from DB
+            newUser.IDefaultCourseId = 0; // need to pull from DB
             newUser.DefalutCourse = null; // need to figure out a function to convert from course to ICourse
             newUser.Email = null; // need user's email
             newUser.EmailAllActivityPosts = false; // based off of preferences
@@ -26,8 +26,8 @@ namespace OSBLE.Utility
             newUser.Identification = null; // unsure need to figure this out
             newUser.IsAdmin = false; // most likely false, but need to get from the DB
             newUser.LastName = null;
-            newUser.SchoolId = -1; // need to pull from DB
-            newUser.UserId = -1; // need to pull from DB
+            newUser.ISchoolId = -1; // need to pull from DB
+            newUser.IUserId = -1; // need to pull from DB
 
             return newUser;
         }

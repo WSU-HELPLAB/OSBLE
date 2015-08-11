@@ -27,7 +27,7 @@ namespace OSBLEPlus.Services.Controllers
 
             var auth = new Authentication();
             var hash = auth.LogIn(user);
-            UserDataAccess.LogUserTransaction(user.UserId, DateTime.Now);
+            UserDataAccess.LogUserTransaction(user.IUserId, DateTime.Now);
 
             return new HttpResponseMessage
             {
