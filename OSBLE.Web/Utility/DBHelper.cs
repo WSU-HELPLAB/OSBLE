@@ -5,6 +5,7 @@ using System.Web;
 using Dapper;
 using OSBLEPlus.Logic.Utility;
 using System.Data.SqlClient;
+using System.Web.UI.WebControls;
 using OSBLE.Models.Courses;
 using OSBLE.Models.DiscussionAssignment;
 using OSBLE.Models.HomePage;
@@ -12,6 +13,8 @@ using OSBLE.Models.Users;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
 using OSBLEPlus.Logic.DomainObjects.Interface;
 using OSBLE.Attributes;
+using OSBLE.Models.Queries;
+using OSBLEPlus.Logic.Utility.Lookups;
 
 namespace OSBLE.Utility
 {
@@ -331,7 +334,7 @@ namespace OSBLE.Utility
                 return evt;
             }
 
-            evt = connection.Query<ActivityEvent>("SELECT * " +
+            evt = connection.Query<ActivityEvent>("SELECT Id AS EventLogId, EventTypeId AS EventId, EventDate, DateReceived, SenderId, CourseId, SolutionName, IsDeleted " +
                                                   "FROM EventLogs e " +
                                                   "WHERE e.Id = @EventId ",
                 new {EventId = eventId}
@@ -692,6 +695,60 @@ namespace OSBLE.Utility
 
             return senders.Contains(userId);
 
+        }
+
+        public static IEnumerable<ActivityEvent> GetActivityEventsFromId(int userId, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    return GetActivityEventsFromId(userId, sqlc);
+                }
+            }
+
+            return connection.Query<ActivityEvent>("SELECT Id AS EventLogId, EventTypeId AS EventId, EventDate, DateReceived, SenderId, CourseId, SolutionName, IsDeleted " +
+                                                "FROM EventLogs " +
+                                                "WHERE SenderId = @id " +
+                                                "AND (EventTypeId = 1 OR " +    //AskForHelp
+                                                "EventTypeId = 7 OR " +          //FeedPost
+                                                "EventTypeId = 8 OR " +         //MarkHelpful
+                                                "EventTypeId = 9)" +            //LogComment
+                                                "AND (IsDeleted = 0 OR IsDeleted IS NULL) ",
+                                                new { id = userId }).ToList();
+        }
+
+        public static IEnumerable<LogCommentEvent> GetLogCommentEventsFromEventLogIds(IEnumerable<int> ids,
+            IEnumerable<ActivityEvent> activityEvents, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    return GetLogCommentEventsFromEventLogIds(ids, activityEvents, sqlc);
+                }
+            }
+            
+            LogCommentEvent l = new LogCommentEvent();
+
+            
+            return connection.Query<LogCommentEvent>("SELECT * " +
+                                                  "FROM LogCommentEvents " +
+                                                  "WHERE EventLogId IN @ids", new { ids }).ToList();
+        }
+
+        public static IEnumerable<int> GetUserFeedFromId(int userId, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    return GetUserFeedFromId(userId, sqlc);
+                }
+            }
+            
+            // AddEventTypeIdes here as necessary using the syntax below if you want addition events
+            return GetActivityEventsFromId(userId, connection).ToList().Select(i=>i.EventLogId).ToList();
         }
 
         public static IEnumerable<LogCommentEvent> GetCommentsForUserID(int userID, SqlConnection connection = null)
