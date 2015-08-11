@@ -108,7 +108,7 @@ namespace OSBLEPlus.Logic.Utility.Auth
             var hash = GetAuthKey(profile.Email);
 
             //store profile in the authentication hash
-            _cache[hash] = profile.UserId;
+            _cache[hash] = profile.IUserId;
 
             //store the key to the hash inside a cookie for the user
             cookie.Values[UserNameKey] = hash;

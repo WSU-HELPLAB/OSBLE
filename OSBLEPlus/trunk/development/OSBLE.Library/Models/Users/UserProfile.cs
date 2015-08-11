@@ -87,7 +87,7 @@ namespace OSBLE.Models.Users
         /// Use ID, this is for the IUser interface
         /// </summary>
         [NotMapped]
-        public int UserId
+        public int IUserId
         {
             get { return ID; }
             set { ID = value; }
@@ -116,7 +116,7 @@ namespace OSBLE.Models.Users
         /// Use SchoolID, this is for the IUser interface
         /// </summary>
         [NotMapped]
-        public int SchoolId
+        public int ISchoolId
         {
             get { return SchoolID; }
             set { SchoolID = value; }
@@ -126,7 +126,7 @@ namespace OSBLE.Models.Users
         /// Use DefaultCourse, this is for the IUser interface
         /// </summary>
         [NotMapped]
-        public int DefaultCourseId
+        public int IDefaultCourseId
         {
             get { return DefaultCourse; }
             set { DefaultCourse = value; }

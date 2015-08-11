@@ -51,10 +51,10 @@ namespace OSBLEPlus.Services.Controllers
             if (request.SubmitEvent.Sender == null)
             {
                 var sender = auth.GetActiveUser(request.AuthToken);
-                request.SubmitEvent.SenderId = sender.UserId;
+                request.SubmitEvent.SenderId = sender.IUserId;
                 request.SubmitEvent.Sender = new User
                 {
-                    UserId = sender.UserId,
+                    IUserId = sender.IUserId,
                     FirstName = sender.FirstName,
                     LastName = sender.LastName
                 };

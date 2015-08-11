@@ -418,7 +418,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
         {
             if (!userDictionary.Keys.Contains(userId))
                 // change to firstordefault from single to prevent errors, may cause errors in the future?
-                userDictionary.Add(userId, users.FirstOrDefault(y => y.UserId == userId));
+                userDictionary.Add(userId, users.FirstOrDefault(y => y.IUserId == userId));
                 
 
             return userDictionary[userId];
