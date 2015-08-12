@@ -272,7 +272,7 @@ AS
       FROM   #events
 
       -- Event and Comment Users (2)
-      SELECT DISTINCT UserId = a.ID,
+      SELECT DISTINCT IUserId = a.ID,
                       Email=a.UserName,
                       a.FirstName,
                       a.LastName,
