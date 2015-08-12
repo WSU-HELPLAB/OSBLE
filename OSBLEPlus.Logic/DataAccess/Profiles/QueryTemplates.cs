@@ -3,7 +3,7 @@
     public class UserQuery
     {
         public const string SelectByUserId =
-@"SELECT [ID] AS UserId
+@"SELECT [ID] as IUserId
     ,[UserName] AS Email
     ,[Password]
     ,[AuthenticationHash]
@@ -14,15 +14,16 @@
     ,[Identification]
     ,[IsAdmin]
     ,[CanCreateCourses]
-    ,[DefaultCourse] AS DefaultCourseId
+    ,[DefaultCourse] AS IDefaultCourseId
     ,[EmailAllNotifications]
     ,[EmailAllActivityPosts]
     ,[EmailNewDiscussionPosts]
 FROM [dbo].[UserProfiles]
 WHERE ID = @Id";
 
+        // renamed DefaultCourseId to prevent naming conflict for admin tools
         public const string SelectByUserName =
-@"SELECT [ID] AS UserId
+@"SELECT [ID] as IUserId
     ,[UserName] AS Email
     ,[Password]
     ,[AuthenticationHash]
@@ -33,7 +34,7 @@ WHERE ID = @Id";
     ,[Identification]
     ,[IsAdmin]
     ,[CanCreateCourses]
-    ,[DefaultCourse] AS DefaultCourseId
+    ,[DefaultCourse] AS IDefaultCourseId
     ,[EmailAllNotifications]
     ,[EmailAllActivityPosts]
     ,[EmailNewDiscussionPosts]

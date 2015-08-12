@@ -33,8 +33,22 @@ namespace OSBLE.Controllers
         private ActivityFeedQuery _activityFeedQuery;
         public FeedController()
         {
-            _activityFeedQuery = new ActivityFeedQuery(ActiveCourseUser.AbstractCourseID);
-            _activityFeedQuery.MaxQuerySize = 20;
+            // try to fix activeCourseUser for plugin
+            if (ActiveCourseUser == null && CurrentUser != null)
+            {
+                GetEnrolledCourses();
+                if (ActiveCourseUser == null)
+                {
+                    ViewBag.ErrorName = "User not logged in or registered.";
+                    ViewBag.ErrorMessage = "User needs to register an account and be approved for a class";
+                    return;
+                }
+
+                ViewBag.ErrorName = null;
+                ViewBag.ErrorMessage = null;
+            }
+
+            _activityFeedQuery = new ActivityFeedQuery(ActiveCourseUser.AbstractCourseID) {MaxQuerySize = 20};
             _activityFeedQuery.UpdateEventSelectors(ActivityFeedQuery.GetSocialEvents());
         }
 
@@ -47,6 +61,13 @@ namespace OSBLE.Controllers
         {
             //turned off for now.
             //return RedirectToAction("FeedDown", "Error");
+
+            // give the user an error message, specifically for the plugin
+            if (ViewBag.ErrorName != null)
+            {
+                return View("Error");
+            }
+
             try
             {
                 //FeedViewModel vm = GetFeedViewModel(timestamp, errorType, errorTypeStr, keyword, hash);
