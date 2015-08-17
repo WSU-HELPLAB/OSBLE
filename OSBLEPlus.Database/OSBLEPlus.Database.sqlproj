@@ -228,6 +228,7 @@
     <Build Include="Schema\Stored Procedures\Activiities\GetActivityFeedsWithCommentFilters.sql" />
     <Build Include="Schema\Stored Procedures\Activiities\GetActivityFeedsBasic.sql" />
     <Build Include="Schema\Stored Procedures\Profiles\GetAssignmentTeam.sql" />
+    <Build Include="Schema\Stored Procedures\Activiities\GetActivityFeedById.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Post-Deployment\Script.PostDeployment.sql" />
