@@ -402,7 +402,7 @@ namespace OSBLE.Controllers
                 using (SqlConnection conn = DBHelper.GetNewConnection())
                 {
                     DBHelper.EditFeedPost(id, newText, conn);
-                    AggregateFeedItem item = new AggregateFeedItem(GetFeedItemFromID(id));
+                    AggregateFeedItem item = new AggregateFeedItem(Feeds.Get(id));
                     string html;
                     if (details)
                         html = PartialView("Details/_FeedPostEvent", item).Capture(this.ControllerContext);
@@ -721,7 +721,7 @@ namespace OSBLE.Controllers
                     SolutionName = null
                 };
 
-            var newPost = new AggregateFeedItem(GetFeedItemFromID(Posts.SaveEvent(log)));
+            var newPost = new AggregateFeedItem(Feeds.Get(Posts.SaveEvent(log)));
             return Json(MakeAggregateFeedItemJsonObject(newPost, false));
         }
 
@@ -742,7 +742,7 @@ namespace OSBLE.Controllers
             }
 
             // Get the new comment list by getting the parent feed item
-            FeedItem post = GetFeedItemFromID(id);
+            FeedItem post = Feeds.Get(id);
 
             // return the new list of comments in a Json object
             return Json(MakeCommentListJsonObject(post.Comments, id));
@@ -789,23 +789,13 @@ namespace OSBLE.Controllers
             query.CourseFilter = new Course() { ID = query.CourseFilter.ID };
         }
 
-        private FeedItem GetFeedItemFromID(int id)
-        {
-            ActivityFeedQuery query = new ActivityFeedQuery(ActiveCourseUser.AbstractCourseID);
-            query.UpdateEventSelectors(ActivityFeedQuery.GetNecessaryEvents(false));
-            query.MinLogId = id;
-            query.MaxLogId = id;
-            IEnumerable<FeedItem> result = query.Execute();
-            return result.SingleOrDefault();
-        }
-
         private List<FeedItem> GetFeedItemsFromIDs(IEnumerable<int> ids)
         {
             List<FeedItem> items = new List<FeedItem>();
 
             foreach(int id in ids)
             {
-                items.Add(GetFeedItemFromID(id));
+                items.Add(Feeds.Get(id));
             }
 
             return items;

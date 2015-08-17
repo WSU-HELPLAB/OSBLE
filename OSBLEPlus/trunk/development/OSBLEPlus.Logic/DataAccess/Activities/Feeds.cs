@@ -110,6 +110,68 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
             }
         }
 
+        public static FeedItem Get(int logId)
+        {
+            using (
+                var connection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                var multiResults = connection.QueryMultiple("dbo.GetActivityFeedById",
+                                        new { LogId = logId }, commandType: CommandType.StoredProcedure);
+
+                // multiResults reads in order of the tables declared in dbo.GetActivityEvents
+                // if you need to change these make sure that the table is read in the right order
+
+                var eventLogs = multiResults.Read<ActivityEvent>().ToList();            //1
+                var users = multiResults.Read<UserProfile>().ToList();                  //2
+                var askHelps = multiResults.Read<AskForHelpEvent>().ToList();           //3
+                var builds = multiResults.Read<BuildEvent>().ToList();                  //4
+                var cutcopypastes = multiResults.Read<CutCopyPasteEvent>().ToList();    //5
+                var debugs = multiResults.Read<DebugEvent>().ToList();                  //6
+                var editoractivites = multiResults.Read<EditorActivityEvent>().ToList();//7
+                var exceptions = multiResults.Read<ExceptionEvent>().ToList();          //8
+                var feedPosts = multiResults.Read<FeedPostEvent>().ToList();            //9
+                var helpMark = multiResults.Read<HelpfulMarkGivenEvent>().ToList();     //10
+                var logComments = multiResults.Read<LogCommentEvent>().ToList();        //11
+                var saves = multiResults.Read<SaveEvent>().ToList();                    //12
+                var submits = multiResults.Read<SubmitEvent>().ToList();                //13
+
+                // associate logComments with senderId
+
+                var nonDeletedLogComments = new List<LogCommentEvent>();
+                foreach (var log in logComments)
+                {
+                    try
+                    {
+                        var e = eventLogs.Single(x => x.EventLogId == log.EventLogId);
+                        if (e == null) continue;
+
+                        log.SenderId = e.SenderId;
+                        if (!nonDeletedLogComments.Contains(log))
+                            nonDeletedLogComments.Add(log);
+                    }
+                    catch (Exception ex)
+                    {
+                        //
+                    }
+                }
+
+
+                return NormalizeDataObjects(eventLogs,
+                                            users,
+                                            askHelps,
+                                            builds,
+                                            exceptions,
+                                            feedPosts,
+                                            nonDeletedLogComments,
+                                            helpMark,
+                                            submits,
+                                            cutcopypastes,
+                                            debugs,
+                                            editoractivites,
+                                            saves).FirstOrDefault();
+            }
+        }
+
         private static IEnumerable<FeedItem> NormalizeDataObjects(IList<ActivityEvent> eventLogs, IList<UserProfile> users,
             IList<AskForHelpEvent> askHelps, IList<BuildEvent> builds, IList<ExceptionEvent> exceptions,
             IList<FeedPostEvent> feedPosts, IList<LogCommentEvent> logComments,
