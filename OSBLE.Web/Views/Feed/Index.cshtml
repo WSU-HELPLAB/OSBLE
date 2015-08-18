@@ -12,8 +12,9 @@
 }
 
 <script type="text/javascript">
+    var vm;
     $(document).ready(function() {
-        var vm = new FeedViewModel("@currentUser.FullName", @currentUser.ID);
+        vm = new FeedViewModel("@currentUser.FullName", @currentUser.ID);
         ko.applyBindings(vm); 
         vm.RequestUpdate();
     });
