@@ -389,6 +389,7 @@
     <Content Include="Content\bootstrap-3.3.5\js\bootstrap.js" />
     <Content Include="Content\bootstrap-3.3.5\js\bootstrap.min.js" />
     <Content Include="Content\bootstrap-3.3.5\js\npm.js" />
+    <Content Include="Content\images\ajax-loader-s.gif" />
     <Content Include="Content\images\alert.png" />
     <Content Include="Content\favicon.ico" />
     <Content Include="Content\images\account.png" />
@@ -713,7 +714,6 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\contextMenu.js" />
-    <Content Include="Scripts\CourseDialogs.js" />
     <Content Include="Scripts\CourseFileManager.js" />
     <Content Include="Scripts\CourseFilesUploader.js" />
     <Content Include="Areas\AssessmentWizard\Views\Shared\_Layout.cshtml" />
@@ -740,10 +740,6 @@
     <Content Include="Content\bootstrap-3.3.5\fonts\glyphicons-halflings-regular.woff" />
     <Content Include="Content\bootstrap-3.3.5\fonts\glyphicons-halflings-regular.woff2" />
     <Content Include="Areas\Analytics\Views\Default\_Default.cshtml" />
-    <Content Include="Areas\Analytics\Views\Default\_DefaultOptions.cshtml" />
-    <Content Include="Areas\Analytics\Views\Calendar\_CalendarOptions.cshtml" />
-    <Content Include="Areas\Analytics\Views\Analytics\_AnalyticsMenu.cshtml" />
-    <Content Include="Areas\Analytics\Views\Analytics\_Default.cshtml" />
     <Content Include="Areas\Analytics\Views\Timeline\_TimelineOptions.cshtml" />
     <Content Include="Areas\Analytics\Views\Timeline\DataVisualizationLegend.cshtml">
       <SubType>Code</SubType>
@@ -993,7 +989,6 @@
     <Content Include="Views\Home\_FilesAndLinks.cshtml" />
     <Content Include="Views\Feed\Details\_LogCommentEvent.cshtml" />
     <Content Include="Views\Shared\_OSBIDELayout.cshtml" />
-    <Content Include="Views\Feed\Details\_HelpfulMarkGivenEvent.cshtml" />
     <Content Include="Views\Shared\_OSBIDECourses.cshtml" />
   </ItemGroup>
   <ItemGroup>

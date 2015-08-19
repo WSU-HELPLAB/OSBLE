@@ -12,6 +12,7 @@ using OSBLE.Attributes;
 
 namespace OSBLE.Controllers
 {
+    //[ForceHttp]
     public class PdfCriticalReviewController : OSBLEController
     {
         //
