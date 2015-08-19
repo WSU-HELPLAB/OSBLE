@@ -67,53 +67,59 @@ namespace OSBLE.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [OutputCache(Duration = ONE_DAY, VaryByParam = "*", Location = System.Web.UI.OutputCacheLocation.ServerAndClient)]
+        [OutputCache(Duration = ONE_DAY, VaryByParam = "*", Location = System.Web.UI.OutputCacheLocation.Server)]
         public FileStreamResult Picture(int id, int size = 128)
         {
-            UserProfile user = null;
-            // id == -1 means whitelisted user, whitelist users do not have profiles/profileimages so don't check the db.
-            if (id != -1)
-                user = DBHelper.GetUserProfile(id);
-
-            System.Drawing.Bitmap userBitmap;
-            if (user != null)
+            using (System.Data.SqlClient.SqlConnection conn = DBHelper.GetNewConnection())
             {
-                try
+                ProfileImage img = null;
+                System.Drawing.Bitmap userBitmap;
+
+                // id == -1 means whitelisted user, whitelist users do not have profiles/profileimages so don't check the db.
+                if (id != -1)
                 {
-                    userBitmap = user.ProfileImage.GetProfileImage();
+                    img = DBHelper.GetUserProfileImage(id, conn);
+                    try
+                    {
+                        userBitmap = img.GetProfileImage();
+                    }
+                    catch (Exception)
+                    {
+                        IdenticonRenderer renderer = new IdenticonRenderer();
+                        userBitmap = renderer.Render(DBHelper.GetUserProfile(id, conn).UserName.GetHashCode(), 128);
+                        
+                        MemoryStream mStream = new MemoryStream();
+                        userBitmap.Save(mStream, System.Drawing.Imaging.ImageFormat.Png);
+                        mStream.Position = 0;
+                        
+                        DBHelper.SetUserProfileImage(id, mStream.ToArray(), conn);
+                    }
                 }
-                catch (Exception)
+                else
                 {
                     IdenticonRenderer renderer = new IdenticonRenderer();
-                    userBitmap = renderer.Render(user.UserName.GetHashCode(), 128);
-                    user.SetProfileImage(userBitmap);
-                    db.SaveChanges();
+                    userBitmap = renderer.Render(1, 128);
                 }
-            }
-            else
-            {
-                IdenticonRenderer renderer = new IdenticonRenderer();
-                userBitmap = renderer.Render(1, 128);
-            }
 
-            if (size != 128)
-            {
-                Bitmap bmp = new Bitmap(userBitmap, size, size);
-                Graphics graph = Graphics.FromImage(userBitmap);
-                graph.InterpolationMode = InterpolationMode.High;
-                graph.CompositingQuality = CompositingQuality.HighQuality;
-                graph.SmoothingMode = SmoothingMode.AntiAlias;
-                graph.DrawImage(bmp, new Rectangle(0, 0, size, size));
-                userBitmap = bmp;
-            }
-            else
-            {
-            }
+                if (size != 128)
+                {
+                    Bitmap bmp = new Bitmap(userBitmap, size, size);
+                    Graphics graph = Graphics.FromImage(userBitmap);
+                    graph.InterpolationMode = InterpolationMode.High;
+                    graph.CompositingQuality = CompositingQuality.HighQuality;
+                    graph.SmoothingMode = SmoothingMode.AntiAlias;
+                    graph.DrawImage(bmp, new Rectangle(0, 0, size, size));
+                    userBitmap = bmp;
+                }
+                else
+                {
+                }
 
-            MemoryStream stream = new MemoryStream();
-            userBitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-            stream.Position = 0;
-            return new FileStreamResult(stream, "image/png");
+                MemoryStream stream = new MemoryStream();
+                userBitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                stream.Position = 0;
+                return new FileStreamResult(stream, "image/png");
+            }
         } 
     }
 }

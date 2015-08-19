@@ -34,12 +34,12 @@ namespace OSBLE.Utility
 
         /*** Users *********************************************************************************************************/
         #region Users
-        public static UserProfile GetUserProfile(int id, SqlConnection connection = null)
+        public static UserProfile GetUserProfile(int id, SqlConnection connection = null, bool includeProfilePic = false)
         {
             UserProfile profile = null;
             if (connection == null)
             {
-                using (SqlConnection sqlc = GetNewConnection()) { profile = GetUserProfile(id, sqlc); }
+                using (SqlConnection sqlc = GetNewConnection()) { profile = GetUserProfile(id, sqlc, includeProfilePic); }
                 return profile;
             }
 
@@ -47,6 +47,45 @@ namespace OSBLE.Utility
                 new { uid = id }).SingleOrDefault();
 
             return profile;
+        }
+
+        public static ProfileImage GetUserProfileImage(int id, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection()) { return GetUserProfileImage(id, sqlc); }
+            }
+
+            try
+            {
+                return connection.Query<ProfileImage>("SELECT * FROM ProfileImages WHERE UserID = @uid",
+                    new { uid = id }).Single();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public static void SetUserProfileImage(int id, byte[] pic,  SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection()) { SetUserProfileImage(id, pic, sqlc); }
+                return;
+            }
+
+            // check if we need to insert or update
+            if (GetUserProfileImage(id, connection) == null) // insert
+            {
+                connection.Execute(@"INSERT ProfileImages(UserID, Picture) VALUES (@uid, @picture)",
+                    new { uid = id, picture = pic });
+            }
+            else // update
+            {
+                connection.Execute(@"UPDATE ProfileImages SET Picture = @picture WHERE UserID =  @uid",
+                    new { uid = id, picture = pic });
+            }
         }
 
         public static CourseUser GetCourseUserFromProfileAndCourse(int userProfileID, int courseID, SqlConnection connection = null)
