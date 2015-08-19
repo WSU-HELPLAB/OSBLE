@@ -837,6 +837,10 @@ namespace OSBLE.Controllers
                 UserProfile profile = db.UserProfiles.Where(u => u.ID == CurrentUser.ID).FirstOrDefault();
                 profile.SetProfileImage(null);
                 db.SaveChanges();
+
+                // Reset the cached user profile image on the server
+                ClearImageCache(profile.ID);
+                
                 return RedirectToAction("Profile");
             }
 
@@ -878,11 +882,28 @@ namespace OSBLE.Controllers
                             UserProfile profile = db.UserProfiles.Where(u => u.ID == CurrentUser.ID).FirstOrDefault();
                             profile.SetProfileImage(finalImage);
                             db.SaveChanges();
+
+                            // Reset the cached user profile image on the server
+                            ClearImageCache(profile.ID);
                         }
                     }
                 }
             }
+
             return RedirectToAction("Profile");
+        }
+
+        /// <summary>
+        /// Remove a particular user's profile picture from the output cache so that changes
+        /// can be seen and the old cached version is no longer returned.
+        /// </summary>
+        private void ClearImageCache(int userID)
+        {
+
+            HttpResponse.RemoveOutputCacheItem(Url.Action("Picture", "User", new { id = userID }));
+            HttpResponse.RemoveOutputCacheItem(Url.Action("Picture", "User", new { id = userID, size = 30 }));
+            HttpResponse.RemoveOutputCacheItem(Url.Action("Picture", "User", new { id = userID, size = 52 }));
+            HttpResponse.RemoveOutputCacheItem(Url.Action("Picture", "User", new { id = userID, size = 110 }));
         }
 
         public ActionResult ContactUs()
