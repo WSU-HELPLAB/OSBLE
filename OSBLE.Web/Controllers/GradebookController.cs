@@ -18,6 +18,9 @@ using System.Threading;
 
 namespace OSBLE.Controllers
 {
+#if !DEBUG
+    [RequireHttps]
+#endif
     public class GradebookController : OSBLEController
     {
         public ActionResult Index(string gradebookName = null)
