@@ -102,7 +102,7 @@ namespace OSBLE.Controllers
                             localUser.AuthenticationHash = randomHash;
                             db.SaveChanges();
                             sendVerificationEmail(true,
-                                "https://osble.org" + Url.Action("ActivateAccount",
+                                "https://plus.osble.org" + Url.Action("ActivateAccount",
                                 new { hash = randomHash }),
                                 localUser.FirstName,
                                 localUser.UserName,
@@ -384,7 +384,7 @@ namespace OSBLE.Controllers
                         user.AuthenticationHash = randomHash;
                         db.SaveChanges();
                         sendVerificationEmail(true,
-                            "https://osble.org" + Url.Action("ActivateAccount",
+                            "https://plus.osble.org" + Url.Action("ActivateAccount",
                             new { hash = randomHash }),
                             user.FirstName,
                             user.UserName,
@@ -471,7 +471,7 @@ namespace OSBLE.Controllers
 
                     sendVerificationEmail(
                         false,
-                        "https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }),
+                        "https://plus.osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }),
                         model.FirstName,
                         model.Email,
                         randomHash
@@ -668,7 +668,7 @@ namespace OSBLE.Controllers
 
                     /*
                     sendVerificationEmail(
-                        true, "https://osble.org" +
+                        true, "https://plus.osble.org" +
                         Url.Action("ActivateAccount", new { hash = randomHash }),
                         profile.FirstName,
                         profile.UserName,
@@ -1064,7 +1064,7 @@ namespace OSBLE.Controllers
 
             string message = "Dear " + firstName + @",<br/>
             <br/>
-            Thank you for creating an account at osble.org. Before you can log in, you must activate your 
+            Thank you for creating an account at plus.osble.org. Before you can log in, you must activate your 
             account by <a href='" + link + @"'>visiting this link</a>.  Alternatively, you can visit the url: " + link + @"
             and enter the code &quot;" + hashCode + @"&quot;. 
             <br/>

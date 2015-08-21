@@ -1575,11 +1575,11 @@ namespace OSBLE.Controllers
             if (user != null && user.AbstractCourse != null && user.UserProfile != null)
             {
                 string subject = "Welcome to " + user.AbstractCourse.Name;
-                string link = "https://osble.org";
+                string link = "https://plus.osble.org";
 
                 string message = "Dear " + user.UserProfile.FirstName + " " + user.UserProfile.LastName + @", <br/>
             <br/>
-            Congratulations! You have been enrolled in the following course at osble.org: " + ActiveCourseUser.AbstractCourse.Name +
+            Congratulations! You have been enrolled in the following course at plus.osble.org: " + ActiveCourseUser.AbstractCourse.Name +
                 "You may access this course by <a href='" + link + @"'>clicking on this link</a>. 
             <br/>
             <br/>
@@ -1597,12 +1597,12 @@ namespace OSBLE.Controllers
             var WTU = whitetable.WhiteTableUser;
 
             string subject = "Welcome to OSBLE";
-            string link = "https://osble.org/Account/AcademiaRegister?email=" 
+            string link = "https://plus.osble.org/Account/AcademiaRegister?email=" 
                 + WTU.Email + "&firstname=" + WTU.Name2 + "&lastname=" + WTU.Name1 + "&identification=" + WTU.Identification; 
 
             string message = "Dear " + WTU.Name2 + " " + WTU.Name1 + @", <br/>
                 <br/>
-                Congratulations! You have been enrolled in the following course at osble.org: " + ActiveCourseUser.AbstractCourse.Name +
+                Congratulations! You have been enrolled in the following course at plus.osble.org: " + ActiveCourseUser.AbstractCourse.Name +
             " In order to access this course, please create an OSBLE account with OSBLE first by " +
             "<a href='" + link + @"'>clicking on this link</a>. 
                 <br/>
@@ -1677,8 +1677,8 @@ namespace OSBLE.Controllers
 
             foreach (WhiteTableUser wtUser in wtu)
             {
-                string subject = "Welcome to OSBLE.org";
-                string link = "https://osble.org/Account/AcademiaRegister?email="
+                string subject = "Welcome to PLUS.OSBLE.org";
+                string link = "https://plus.osble.org/Account/AcademiaRegister?email="
                     + wtUser.Email + "&firstname=" + wtUser.Name2 + "&lastname=" + wtUser.Name1 + "&identification=" + wtUser.Identification;
 
                 string message = "Dear " + wtUser.Name2 + " " + wtUser.Name1 + @", <br/>
