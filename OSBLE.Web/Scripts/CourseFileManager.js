@@ -1112,7 +1112,7 @@ function cfm_CopyLinkClicked(stateObjectIndex) {
 
     // Find the appropriate DIV
     var targetDIV = $("#file_" + stateObjectIndex.toString());
-    var copyLink = "https://osble.org";
+    var copyLink = "https://plus.osble.org";
     copyLink += $(targetDIV).data("path");
 
 

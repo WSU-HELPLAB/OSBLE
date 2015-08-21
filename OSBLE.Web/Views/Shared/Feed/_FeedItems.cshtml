@@ -87,7 +87,7 @@
                 @* Reply Form (Hidden by default. Only shows when user clicks reply) *@
                 <form class="feed-reply-form" data-bind="attr: {id: 'feed-reply-' + eventId}">
                     <textarea class="form-control feed-reply-textbox" placeholder="Say something..." data-bind="attr: {id: 'feed-reply-textbox-' + eventId}"></textarea>
-                    <input name="response-submit" class="btn btn-default btn-sm" type="button" value="Send" data-bind="click: AddComment" />
+                    <input name="response-submit" class="btn btn-default btn-sm" type="button" value="Post Reply" data-bind="click: AddComment" />
                     <input name="response-cancel" class="btn btn-default btn-sm" type="reset" value="Cancel" data-bind="click: HideReplyBox" />
                 </form>
          
@@ -99,7 +99,7 @@
                         @* View Conversation Link *@
                         <li>
                             <a data-bind="attr: {id: 'expand-comments-' + eventId}, click: expandComments" class="anchor-pointer" >
-                                <span data-bind="attr: {id: 'expand-comments-text-' + eventId}">View</span> Conversation(<span data-bind="text: comments().length"></span>)
+                                <span data-bind="attr: {id: 'expand-comments-text-' + eventId}">View</span> Replies (<span data-bind="text: comments().length"></span>)
                             </a>
                         </li>
                         

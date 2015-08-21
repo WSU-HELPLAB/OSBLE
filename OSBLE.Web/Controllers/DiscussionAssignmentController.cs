@@ -420,7 +420,7 @@ namespace OSBLE.Controllers
                             }
                         }
                         string subject = "[OSBLE][Moderator] - New Post";
-                        string linkUrl = string.Format("http://osble.org{0}", Url.Action("TeacherIndex", "DiscussionAssignment", new { assignmentID = assignment.ID, discussionTeamID = newPost.DiscussionTeamID }));
+                        string linkUrl = string.Format("http://plus.osble.org{0}", Url.Action("TeacherIndex", "DiscussionAssignment", new { assignmentID = assignment.ID, discussionTeamID = newPost.DiscussionTeamID }));
                         string body = @"
 Greetings,
 
@@ -570,7 +570,7 @@ You may view the discussion on OSBLE by visiting the following link: <a href=""{
             }
 
             string subject = "[OSBLE][Discussion] - New Post";
-            string linkUrl = string.Format("http://osble.org{0}", Url.Action("TeacherIndex", "DiscussionAssignment", new { assignmentID = assignment.ID, discussionTeamID = newPost.DiscussionTeamID }));
+            string linkUrl = string.Format("http://plus.osble.org{0}", Url.Action("TeacherIndex", "DiscussionAssignment", new { assignmentID = assignment.ID, discussionTeamID = newPost.DiscussionTeamID }));
             string body = @"
                             Greetings,
 

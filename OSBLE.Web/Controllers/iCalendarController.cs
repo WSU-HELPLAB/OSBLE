@@ -84,7 +84,7 @@ namespace OSBLE.Controllers
             courseCalendar.Method = "PUBLISH";
             courseCalendar.Name = "VCALENDAR";
             courseCalendar.Version = "2.0";
-            courseCalendar.ProductID = "-//Washington State University//OSBLE.org//EN";
+            courseCalendar.ProductID = "-//Washington State University//PLUS.OSBLE.org//EN";
             courseCalendar.Scale = "GREGORIAN";
             courseCalendar.AddProperty("X-WR-CALNAME", course.Prefix + "-" + course.Number + "-" + course.Semester + "-" + course.Year);
 
@@ -279,7 +279,7 @@ namespace OSBLE.Controllers
             courseCalendar.Method = "PUBLISH";
             courseCalendar.Name = "VCALENDAR";
             courseCalendar.Version = "2.0";
-            courseCalendar.ProductID = "-//Washington State University//OSBLE.org//EN";
+            courseCalendar.ProductID = "-//Washington State University//PLUS.OSBLE.org//EN";
             courseCalendar.Scale = "GREGORIAN";
             courseCalendar.AddProperty("X-WR-CALNAME", course.Prefix + "-" + course.Number + "-" + course.Semester + "-" + course.Year);
 
