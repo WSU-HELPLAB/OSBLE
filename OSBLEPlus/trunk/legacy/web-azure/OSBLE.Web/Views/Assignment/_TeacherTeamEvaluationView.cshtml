@@ -1,0 +1,61 @@
+﻿@using OSBLE.Models
+@using OSBLE.Models.Assignments
+@using OSBLE.Models.Courses
+@using OSBLE.Models.Assignments
+@using OSBLE.Models.ViewModels
+@model Assignment
+
+@{
+    Assignment assignment = ViewBag.Assignment;
+    Assignment PrecAssign = assignment.PreceedingAssignment;
+    Team team = ViewBag.Team;
+    ViewBag.Title = "Team Evaluation";
+    
+}
+
+<h2>@assignment.AssignmentName</h2>
+<h3>@team.Name's team evaluations for @PrecAssign.AssignmentName</h3>
+
+
+@{
+    <table id="TeamEvaluationTable">
+        <tr>
+        <td id="topLeftCell">&nbsp;</td>
+        <th colspan="@(ViewBag.CourseUsersInOrder.Count)">Evaluators</th>
+        <th>Multipliers</th>
+        <th>Comment</th>
+        </tr>
+        <tr>
+        <th>Recipient</th>
+        @foreach (CourseUser cu in ViewBag.CourseUsersInOrder)
+        {
+            <th class="nonBoldTH">@cu.UserProfile.LastAndFirst()</th>
+        }
+        <td></td>
+        <td></td>
+        </tr>
+
+        @{
+            for (int i = 0; i < ViewBag.CourseUsersInOrder.Count; i++)
+            {
+                <tr style="">
+                    <td>@ViewBag.CourseUsersInOrder[i].UserProfile.LastAndFirst()</td>
+                    @for (int j = 0; j < ViewBag.CourseUsersInOrder.Count; j++)
+                    {
+                        <td>@ViewBag.table[j,i]</td>
+                    }
+                    <td style="vertical-align: bottom;">
+                        @ViewBag.MultipliersInOrder[i]
+                    </td>
+                    <td style="vertical-align: bottom;">
+                        @ViewBag.CommentsInOrder[i]
+                    </td>
+                </tr>
+            }
+        }
+    </table>    
+    <br />
+}
+
+<script type="text/javascript">
+</script>

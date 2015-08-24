@@ -1,0 +1,20 @@
+﻿@using OSBLE.Models.Assignments
+@using OSBLE.Areas.AssignmentDetails.ViewModels
+@using OSBLE.Models.Courses;
+@using OSBLE.Resources
+@model AssignmentDetailsViewModel
+@{
+    ViewBag.Title = "Assignment Details";
+    DynamicDictionary headerData = Model.HeaderBuilder.BuildHeader(Model.CurrentAssignment);
+
+}
+@section AssignmentDetails
+{
+   section AssignmentDetails
+}
+@section TableData
+{
+    section TableData
+
+
+}

@@ -1,0 +1,60 @@
+﻿@model OSBLE.Models.HomePage.Event
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>Event</legend>
+
+    <div class="display-label">Course</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Course.Name)
+    </div>
+
+    <div class="display-label">Poster</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Poster.UserName)
+    </div>
+
+    <div class="display-label">StartDate</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.StartDate)
+    </div>
+
+    <div class="display-label">EndDate</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.EndDate)
+    </div>
+
+    <div class="display-label">Title</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Title)
+    </div>
+
+    <div class="display-label">Description</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Description)
+    </div>
+
+    <div class="display-label">Approved</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Approved)
+    </div>
+
+    <div class="display-label">HideTime</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.HideTime)
+    </div>
+
+    <div class="display-label">HideDelete</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.HideDelete)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

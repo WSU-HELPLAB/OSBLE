@@ -1,0 +1,188 @@
+﻿@using OSBLE.Models.HomePage
+@using OSBLE.Models
+@using System.Web.Configuration
+
+@{
+    ViewBag.Title = "Dashboard";
+    bool courseCalendarFlag = false;
+    string activeCourseRole = ViewBag.ActiveCourse.AbstractRole.Name;
+    int courseID = ViewBag.ActiveCourse.AbstractCourse.ID;
+    switch (activeCourseRole)
+    {
+        case "Instructor":
+            courseCalendarFlag = true;
+            break;
+        case "Leader":
+            break;
+        case "Assessment Committee Chair":
+            break;
+        case "Student":
+            courseCalendarFlag = true;
+            break;
+        default:
+            break;
+    }
+    
+}
+
+<div id="dashboard_left">
+    <h3>Notifications</h3>
+
+    <div id="notifications">
+        @if (ViewBag.Notifications.Count == 0)
+        {
+            <p>No Unread Notifications!</p>
+        }
+
+        @{ViewBag.ShowNotificationDelete = true;}
+        @Html.Partial("_ConsolidatedNotifications")
+
+        @if (ViewBag.Notifications.Count != 0)
+        {
+            <div id="markAllAsReadDiv">
+                <form id="MarkAllForm" action="@Url.Action("MarkAllAsRead", "Notification")"
+                      data-ajax="true"
+                      data-ajax-success="$('#notifications_list').hide('slow');$('#markAllAsReadDiv').hide('slow')"
+                      method="post">
+                    <a href="#" onclick="$('#MarkAllForm').submit()">Mark All Notifications As Read</a>
+                </form>
+            </div>
+        }
+
+        <p>@Html.ActionLink("Show All Notifications", "Index", "Notification")</p>
+    </div>
+
+    <h3>
+        Events &amp; Deadlines
+        @if (@ViewBag.ActiveCourse.AbstractRole.CanModify || @ViewBag.ActiveCourse.AbstractCourse.AllowEventPosting)
+        {
+            <a href="@Url.Action("Create", "Event")" title="Add New Event or Deadline">@Helpers.AddButton()</a>
+        }
+        @if (courseCalendarFlag)
+        {
+            <a href="@Url.Action("DownloadCourseCalendar", "iCalendar", new { id = courseID })" title="Download Course Calendar">@Helpers.UnPublishButton()</a>
+            <a href="@Url.Action("SubscribeToCalendar", "iCalendar", new { id = courseID, })" target="_blank" title="Subscribe to Course Calendar">@Helpers.CalendarButton()</a>
+            
+        }
+
+    </h3>
+
+
+    <div id="important_dates">
+        <p>Next @ViewBag.ActiveCourse.AbstractCourse.CalendarWindowOfTime Weeks</p>
+        <div class="partialContents" data-url="/Home/Events">
+            <img src="~/Content/images/ajax-loader.gif" /> Loading...
+        </div>
+        @*@Html.Partial("_Events", (List<Event>)ViewBag.Events)*@
+        <p>@Html.ActionLink("Show All Events", "Index", "Event")</p>
+    </div>
+
+</div>
+
+<div id="dashboard_right">
+    
+    <div id="search_hint">
+        Click the @Helpers.SearchButton() icon above to request access to a course. <a id="hide_search">(close)</a>
+        <div style=""></div>
+    </div>
+    @*@Helpers.CreateToolTip(ToolTips.FileUploader)*@
+
+    <!-- File manager for course files -->    
+    <div id="divFileManager" style="float:right;">
+               
+        (Please wait, loading files...)
+    </div>
+    
+    <!--yc: file upload size change!-->
+    <!-- Scripts for file manager -->
+    <!--yc: currently cant find a way to put this line of code into the script so its placed here for now-->
+
+    <script src="../../Scripts/CourseFilesUploader.js" type="text/javascript"></script>
+    <script src="../../Scripts/CourseFileManager.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        // Write the HTML for the file manager control
+        if (XMLHttpRequest) {
+            cfm_getListing("divFileManager");            
+        }
+        else {
+            document.write("File upload not supported. Please upgrade your web browser.");
+        }        
+    </script>
+
+    @if (false)
+    {
+        // Obviously this code will not be hit because of the if-false above. This is
+        // intentional. The new JavaScript-based file manager should make it so that
+        // this is no longer needed. In the case that we might need to revert to the
+        // old Silverlight uploaded in the future, I figured it would be easier to
+        // comment this out than just delete it. In the future if the new file manager
+        // has been holding up well for a long enough time then this block can be
+        // removed entirely.
+        /*
+        <h3>Advanced File Manager (Silverlight)
+        @{if (ViewBag.CanEditCourseLinks)
+          {
+              <span id="file_upload_silverlight_span">
+              @{ SilverlightObject so = ViewBag.Uploader as SilverlightObject; }
+              @Html.DisplayFor(m => so, "SilverlightObject")
+              </span>
+          }
+        }
+        </h3>
+         * */
+    }
+    
+</div>
+
+<div id="dashboard_middle">
+    <h3>
+        Activity Feed
+        <a href="@Url.Action("DownloadDashboardPosts", "Course")" title="Download Activity Feed as csv">@Helpers.UnPublishButton()</a>
+    </h3>
+
+    <div id="activity_feed">
+        <div class="partialContents" data-url="/Home/ActivityFeed">            
+            <img src="~/Content/images/ajax-loader.gif" /> Loading...
+        </div>
+       @* @Html.Partial("_ActivityFeed")*@
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function (e) {
+        
+        var hideHint = $.cookie('hide_hint');
+        if (hideHint == "true") {
+            $("#search_hint").hide();
+        }
+
+        $("#hide_search").click(function () {
+            $("#search_hint").hide();
+            $.cookie('hide_hint', 'true');
+        });
+
+        $(".partialContents").each(function (index, item) {
+            var startPost = $(location).attr('search');
+            var url = $(item).data("url");
+            if (startPost && url != "/Home/Events") {
+                if (url && url.length > 0) {
+                    url = url + "/" + startPost;
+                    //$(item).load(url);
+                    $(item).load(url, function () {
+                        //$(location).attr("href", ($(location).attr('protocol')+ "//" + $(location).attr('host')));
+                    });
+                }
+            } else {
+                if (url && url.length > 0) {
+                    //$(item).load(url);
+                    $(item).load(url, function () {
+                        //alert($(location).attr('href'));
+                    });
+                }
+            }
+        });
+    });
+
+    
+</script>

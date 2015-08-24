@@ -1,0 +1,241 @@
+﻿
+@model OSBLE.Models.Courses.Course
+
+@using OSBLE.Models
+@using OSBLE.Models.Courses
+@using OSBLE.Utility;
+
+@{
+    ViewBag.Title = "Modify Course";
+}
+
+<h2>Modify Course</h2>
+<!--<a href="~/Views/Course/Edit.cshtml">~/Views/Course/Edit.cshtml</a> yc commenting this out.. why is this here?-->
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/osble.courses.js")" type="text/javascript"></script>
+
+@using (Html.BeginForm("Edit", "Course", FormMethod.Post, new { id = "course_submit" }))
+{
+    @Html.ValidationSummary(true)
+    <input id="utc-offset" name="utc-offset"  value="" type="hidden"/>
+    <h3>Course Information </h3>
+    
+    <table>
+        <tr>    
+        <td>
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Prefix)
+        </div>
+        <div class="editor-field">
+            @Html.TextBoxFor(model => model.Prefix, new { size = 6 })
+        </div>
+        </td>
+
+        <td>
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Number)
+        </div>
+        <div class="editor-field">
+            @Html.TextBoxFor(model => model.Number, new { size = 4 })
+        </div>
+        </td>
+        <td>
+            <div class="editor-label">
+            @Html.LabelFor(model => model.Name)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Name)
+        </div>
+
+        </td>
+
+        </tr>
+
+        <tr>
+        
+        <td>
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Semester)
+        </div>
+        <div class="editor-field">
+            @Html.TextBoxFor(model => model.Semester, new { size = 6 })
+            
+        </div>
+        </td>
+
+        <td>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Year)
+        </div>
+        <div class="editor-field">
+            @Html.TextBoxFor(model => model.Year, new { size = 4 })
+            
+        </div>
+
+        </td>
+
+        </tr>
+    </table>
+    
+    <h3>Course Schedule </h3>
+    
+    <table>
+    <tr>
+        <td>
+            <div class="editor-label">
+            @Html.LabelFor(model => model.StartDate, "Start Date")
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.StartDate)<br />
+            @Html.ValidationMessageFor(model => model.StartDate)
+        </div>
+        </td>
+        <td>
+        <div class="editor-label">
+            @Html.LabelFor(model => model.EndDate, "End Date")
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.EndDate)<br />
+            @Html.ValidationMessageFor(model => model.EndDate)
+        </div>
+        </td>
+    </tr>
+    
+    </table>
+    <h4>Course Timezone @Helpers.CreateToolTip(ToolTips.CourseTimeZone)</h4>
+
+    <div id="timezone">
+        <script type="text/javascript">getTimezone();</script>
+    </div>
+    
+    <h4>Meeting Times @Helpers.CreateToolTip(ToolTips.CourseMeetingTimes) </h4>
+    
+    <div id="meeting_times">
+
+    </div>
+    
+    <div id="meetings_after">
+    <a href="#" onclick="addMeetingTime(); return false;" title="Add Meeting Time">@Helpers.AddButton()</a>
+    </div>
+    
+    <script type="text/javascript">
+    $(function(){
+        @foreach (CourseMeeting cm in Model.CourseMeetings)
+        {                      
+            <text>addMeetingTime({
+                sun_check: "@cm.Sunday",
+                mon_check: "@cm.Monday",
+                tue_check: "@cm.Tuesday",
+                wed_check: "@cm.Wednesday",
+                thu_check: "@cm.Thursday",
+                fri_check: "@cm.Friday",
+                sat_check: "@cm.Saturday",
+                name: "@cm.Name", 
+                location: "@cm.Location",
+                start: "@cm.StartTime.ToString("h:mm tt")",
+                end: "@cm.EndTime.ToString("h:mm tt")"
+            });</text>
+        }
+    });
+    </script>
+    <input type="hidden" id="meetings_max" name="meetings_max" value="0" />
+    
+    <h4>Breaks/Holidays @Helpers.CreateToolTip(ToolTips.CourseBreaks) </h4>
+    
+    <div id="breaks">
+    </div>
+    
+    <div id="breaks_after">
+    <a href="#" onclick="addBreak(); return false;" title="Add Break Time">@Helpers.AddButton()</a>
+    </div>
+    
+    <script type="text/javascript">
+    $(function(){
+        @foreach (CourseBreak cb in Model.CourseBreaks)
+        {
+            <text>addBreak({
+                name: "@cb.Name",
+                start: "@cb.StartDate.ToString("MM/dd/yyy")",
+                end: "@cb.EndDate.ToString("MM/dd/yyyy")"
+            });</text>
+        }
+    });
+    </script>
+    
+    <input type="hidden" id="breaks_max" name="breaks_max" value="0" />
+    
+        <div class="editor-field">
+            @Html.CheckBoxFor(model => model.ShowMeetings) @Html.LabelFor(model => model.ShowMeetings) <br />
+            @Html.ValidationMessageFor(model => model.ShowMeetings)
+        </div>
+        
+    <h3>Course Settings </h3>
+    
+        <div class="editor-field">
+            @Html.CheckBoxFor(model => model.AllowDashboardPosts) @Html.LabelFor(model => model.AllowDashboardPosts) 
+            @Helpers.CreateToolTip(ToolTips.CourseStudentPost) <br />
+            @Html.ValidationMessageFor(model => model.AllowDashboardPosts)
+        </div>
+
+        <div class="editor-field">
+            @Html.CheckBoxFor(model => model.AllowDashboardReplies) @Html.LabelFor(model => model.AllowDashboardReplies) 
+            @Helpers.CreateToolTip(ToolTips.CourseStudentReply) <br />
+            @Html.ValidationMessageFor(model => model.AllowDashboardReplies)
+        </div>
+
+        <div class="editor-field">
+            @Html.CheckBoxFor(model => model.AllowEventPosting, new { onchange = "if($(this).attr('checked')){$('#require_approval').show('highlight');}else{$('#require_approval').hide('highlight');}" }) @Html.LabelFor(model => model.AllowEventPosting) 
+            @Helpers.CreateToolTip(ToolTips.CourseStudentEvent) <br />
+            @Html.ValidationMessageFor(model => model.AllowEventPosting)
+        </div>
+
+        <div class="editor-field" id="require_approval" @if (!Model.AllowEventPosting)
+                                                        {<text>style="display: none;"</text>}>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            @Html.CheckBoxFor(model => model.RequireInstructorApprovalForEventPosting) @Html.LabelFor(model => model.RequireInstructorApprovalForEventPosting) 
+            @Helpers.CreateToolTip(ToolTips.CourseInstructorEventApproval) <br />
+            @Html.ValidationMessageFor(model => model.RequireInstructorApprovalForEventPosting)
+        </div>
+        <div class="editor-field">
+            @Html.CheckBoxFor(model => model.Inactive) @Html.LabelFor(model => model.Inactive) 
+            @Helpers.CreateToolTip(ToolTips.CourseInactive) <br />
+            @Html.ValidationMessageFor(model => model.Inactive)
+        </div>
+
+
+        <br />
+        <div class="editor-field">
+            @Html.LabelFor(model => model.CalendarWindowOfTime)
+            @Html.TextBoxFor(model => model.CalendarWindowOfTime, new { size = 3 })
+            @Helpers.CreateToolTip(ToolTips.CourseCalendarEvents) 
+        </div>
+    
+    <h3>Default Late Policy @Helpers.CreateToolTip(ToolTips.CourseLatePolicy) </h3>
+    
+    <p>
+        Students may submit assignments up to @Html.TextBoxFor(model => model.MinutesLateWithNoPenalty, new { size = 3 })
+        minutes late at no penalty, after which a penalty of @Html.TextBoxFor(model => model.PercentPenalty, new { size = 3 })
+        percent per @Html.TextBoxFor(model => model.HoursLatePerPercentPenalty, new { size = 3 })
+        hours late will be applied.<br />
+        @Html.ValidationMessageFor(model => model.MinutesLateWithNoPenalty)
+        @Html.ValidationMessageFor(model => model.PercentPenalty)
+        @Html.ValidationMessageFor(model => model.HoursLatePerPercentPenalty)
+    </p>
+    
+    
+    <p>
+        Assignments that are submitted more than @Html.TextBoxFor(model => model.HoursLateUntilZero, new { size = 3 })
+        hours after the due date and time will receive an automatic 0. <br />
+        @Html.ValidationMessageFor(model => model.HoursLateUntilZero)
+    </p>
+    
+        @Html.HiddenFor(model => model.ID)
+        <br />
+
+        <p>
+            <input type="submit" value="Update Course" />
+        </p>
+}
+

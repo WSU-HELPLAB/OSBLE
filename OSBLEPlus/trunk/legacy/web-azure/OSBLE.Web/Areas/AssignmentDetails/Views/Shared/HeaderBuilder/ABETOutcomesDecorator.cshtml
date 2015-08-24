@@ -1,0 +1,21 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+}
+
+<tr>
+    <th>ABET Outcomes</th>
+    <td>
+        @{
+            // Make a list of the outcomes
+            <ol>
+                @foreach (string outcome in (IList<string>)(dataModel.ABETOutcomes))
+                {
+                    <li>@outcome</li>
+                }
+            </ol>            
+        }
+    </td>
+</tr>

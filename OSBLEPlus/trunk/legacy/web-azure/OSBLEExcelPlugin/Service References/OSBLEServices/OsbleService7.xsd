@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/OSBLE.Models.HomePage" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.HomePage" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://osble.org/Services/OsbleService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" />
+  <xs:complexType name="Event">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Approved" type="xs:boolean" />
+      <xs:element minOccurs="0" name="Description" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="EndDate" nillable="true" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="EndTime" nillable="true" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="HideDelete" type="xs:boolean" />
+      <xs:element minOccurs="0" name="HideTime" type="xs:boolean" />
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="NoDateTime" type="xs:boolean" />
+      <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" minOccurs="0" name="Poster" nillable="true" type="q1:CourseUser" />
+      <xs:element minOccurs="0" name="PosterID" type="xs:int" />
+      <xs:element minOccurs="0" name="StartDate" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="StartTime" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="Title" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Event" nillable="true" type="tns:Event" />
+</xs:schema>

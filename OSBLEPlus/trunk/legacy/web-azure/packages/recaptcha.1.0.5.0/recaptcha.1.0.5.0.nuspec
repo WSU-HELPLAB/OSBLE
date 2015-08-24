@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>recaptcha</id>
+    <version>1.0.5.0</version>
+    <title>reCAPTCHA plugin for .NET</title>
+    <authors>Adrian Godong,  Ben Maurer,  Mike Hatalski</authors>
+    <owners>Adrian Godong,  Ben Maurer,  Mike Hatalski</owners>
+    <projectUrl>http://code.google.com/p/recaptcha/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>reCAPTCHA is a free CAPTCHA service that helps to digitize books, newspapers and old time radio shows.</description>
+    <summary>reCAPTCHA is a free CAPTCHA service that helps to digitize books, newspapers and old time radio shows.</summary>
+    <releaseNotes />
+    <copyright />
+    <language />
+  </metadata>
+</package>

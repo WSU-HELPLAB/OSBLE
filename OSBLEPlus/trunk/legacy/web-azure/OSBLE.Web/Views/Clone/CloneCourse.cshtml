@@ -1,0 +1,95 @@
+﻿@model OSBLE.Models.Courses.Course
+@using OSBLE.Models.Courses
+
+@using OSBLE.Models
+
+
+@{
+    ViewBag.Title = "Clone An Existing Course";
+}
+
+@if (ViewBag.pastCourses != null && ViewBag.pastCourses.Count > 0)
+{
+    @:<h2>Clone An Existing Course</h2><br />
+    using (Html.BeginForm("CourseSetup", "Clone", FormMethod.Get))
+    {
+        @:<select name="courseId" id="clone_select">
+        bool courseOptGroup = false;
+        bool communityOptGroup = false;
+        bool committeeOptGroup = false;
+        var pastCourses = ViewBag.pastCourses;
+
+        foreach (OSBLE.Models.Courses.CourseUser cu in ViewBag.pastCourses)
+        {
+            //get the semester/year info for the course
+            string semester = "";
+            string year = "";
+
+            if (cu.AbstractCourse is Course)
+            {
+                foreach (var course in pastCourses)
+                {
+                    if (course.AbstractCourse.ID == cu.AbstractCourse.ID)
+                    {
+                        semester = ", " + course.AbstractCourse.Semester.Substring(0, 2).ToUpper() + ", ";
+                        year = course.AbstractCourse.Year;
+                    }
+                }
+            }
+            string courseDisplay = Helpers.CourseTag(cu.AbstractCourse) + " - " + cu.AbstractCourse.Name + semester + year + " (" + cu.AbstractRole.Name + ")";
+
+            // Different display for committees
+            if (cu.AbstractCourse is AssessmentCommittee)
+            {
+                courseDisplay = cu.AbstractCourse.Name + " (" + cu.AbstractRole.Name + ")";
+            }
+
+            CourseUser ac = ViewBag.ActiveCourse as CourseUser;
+
+            if (cu.AbstractCourse is Course && !courseOptGroup)
+            {
+                courseOptGroup = true;
+                @:<optgroup label="Courses">
+            }
+
+            if (cu.AbstractCourse is Community && !communityOptGroup)
+            {
+                communityOptGroup = true;
+                if (courseOptGroup)
+                {
+                    @:</optgroup>
+                }
+                @:<optgroup label="Communities">
+            }
+
+            if (cu.AbstractCourse is AssessmentCommittee && !committeeOptGroup)
+            {
+                committeeOptGroup = true;
+                if (courseOptGroup || communityOptGroup)
+                {
+                    @:</optgroup>
+                }
+                @:<optgroup label="Committees">
+            }
+
+            if ((ac != null) && (ac.AbstractCourseID == cu.AbstractCourseID))
+            {
+                <option value=@cu.AbstractCourseID selected="selected">@courseDisplay</option>
+            }
+            else
+            {
+                <option value=@cu.AbstractCourseID>@courseDisplay</option>
+            }
+        }
+        if (courseOptGroup || communityOptGroup)
+        {
+            @:</optgroup>
+            }
+            @:</select>
+        <input type="submit" name="Clone Course" />
+    }
+}
+else
+{
+    <h2>No Courses To Clone</h2>
+}

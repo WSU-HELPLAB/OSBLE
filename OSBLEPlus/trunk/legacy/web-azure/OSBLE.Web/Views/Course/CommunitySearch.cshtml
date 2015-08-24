@@ -1,0 +1,79 @@
+﻿@model OSBLE.Models.Courses.Course
+
+@using OSBLE.Models;
+@using OSBLE.Controllers;
+
+@{
+    ViewBag.Title = "Community Search";
+}
+
+<h2>Community Search @Helpers.CreateToolTip(ToolTips.CommunitiesSearch)</h2>
+
+@using (Html.BeginForm("CommunitySearchResults", "Course", FormMethod.Post, new { @class = "form-class" }))
+{
+    <fieldset>
+        <legend><b>Search For Communities</b></legend>
+        <form id="searchbox" action="CommunitySearchResults">
+            @Html.TextBox("name", "", new { placeholder = "Search All" } )
+            <input id="submitcommunitysearch" type="submit" value="Search" />
+
+
+        </form>
+
+        @if(ViewBag.CommunitySearchResults != null)
+        {
+            var results = ViewBag.CommunitySearchResults;
+            <fieldset>
+                <legend>Search Results</legend>
+                <table id="searchTable">
+
+                    <tr>
+                        <th >Join</th>
+                        <th >Name</th>   
+                        <th >Nickname</th>                                                                
+                        <th >Description</th>
+                    </tr>
+                    @foreach (var result in results)
+                    {
+                        <tr>
+                            <td>
+                                <a style="margin-right:5px; margin-left:5px;" title="Request to Join Community" href="@Url.Action("ReqestCommunityJoin", "Course", new { id = result.ID })">@Helpers.AddButton()</a>
+                            </td>
+                            <td>@result.Name</td>
+                            <td>@result.Nickname</td>
+                            <td>@result.Description</td>
+                            <td>
+                                @if (ViewBag.SearchResultsLeaders != null)
+                                {
+                                    <table id="searchInstructorTable">
+                                        @{
+                                            var instructors = ViewBag.SearchResultsLeaders;                                
+                                            }
+                                        <tr>
+                                            @foreach (var instructor in instructors)
+                                            {
+                                                if (instructor.AbstractCourseID == result.ID)
+                                                {
+                                                    <td>
+                                                        @instructor.UserProfile.LastName, @instructor.UserProfile.FirstName;
+                                                    </td>
+                                                }
+                                            }
+                                        </tr>
+
+                                    </table>
+                                }
+                            </td>
+                            
+                        </tr>
+                        }
+                </table>
+
+            </fieldset>
+        }
+
+    </fieldset>
+
+}
+
+

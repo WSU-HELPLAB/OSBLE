@@ -1,0 +1,150 @@
+﻿@{
+    ViewBag.Title = "Testing DAINJA ZONE";
+}
+
+<h2>Time Testing</h2>
+
+the datetime now is  = @ViewBag.datetime <br />
+the datetime utcnow is = @ViewBag.utcdatetime <br />
+the server's time zone is == @ViewBag.serverTimezone and it isDaylightsavings ==  @ViewBag.IsDaylightSavings <br />
+
+@foreach (DateTime dtime in ViewBag.dateList)
+{
+    <p>server time @dtime.ToString()</p>
+}
+
+@foreach (DateTime dtime in ViewBag.dateListLocal)
+{
+    <p>local time @dtime.ToString()</p>
+}
+
+@*
+    <br /><br />
+    assuming the course is -8 offset<br />
+    the CurrentOffset == @ViewBag.CalculatedCurrentOffset<br />
+    the Class caluclated timezone = @ViewBag.calculatedClassTimeZone<br />
+    Calcualting  classtimezone-currentoffset == @ViewBag.vdifference<br />
+    The class originaltime which datetime is parsing 1:00:00 PM = @ViewBag.origStarttime<br />
+    the class time
+    after offset is @ViewBag.StartTimeAfterOffset<br />
+    <br />
+
+    @{
+        DateTime local = DateTime.Now;
+        DateTime toUtc = local.ToUniversalTime();
+        DateTime st = DateTime.Parse("1:00:00 PM");
+        DateTime stutc = st.ToUniversalTime();
+    }
+    the non utc time displayed on osble for 1:00:00 PM PARSED :<br />
+    <time class="notutc-time"
+          style="font-size:small;"
+          datetime="@Helpers.DateAsUnixTime(st)"
+          data-original-date="@Helpers.RawDate(st)"
+          data-date-format="hh:mm A">
+        @st.ToString("h:mm tt");
+    </time><br />
+    the utc time displayed on osble for 1:00:00 PM PARSED using the st.ToUniversal  :<br />
+    <time class="utc-time"
+          style="font-size:small;"
+          datetime="@Helpers.DateAsUnixTime(st.ToUniversalTime())"
+          data-original-date="@Helpers.RawDate(st.ToUniversalTime())"
+          data-date-format="hh:mm A">
+        @st.ToUniversalTime().ToString("h:mm tt") (UTC)
+    </time>
+    the utc time displayed on osble for 1:00:00 PM PARSED using the a passed value :<br />
+    <time class="utc-time"
+          style="font-size:small;"
+          datetime="@Helpers.DateAsUnixTime(stutc)"
+          data-original-date="@Helpers.RawDate(stutc)"
+          data-date-format="hh:mm A">
+        @stutc.ToString("h:mm tt") (UTC)
+    </time>
+
+    <br />
+    the non utc time displayed on osble for the local time :<br />
+    <time class="notutc-time"
+          style="font-size:small;"
+          datetime="@Helpers.DateAsUnixTime(local)"
+          data-original-date="@Helpers.RawDate(local)"
+          data-date-format="hh:mm A">
+        @local.ToString("h:mm tt");
+    </time><br />
+    the utc time displayed on osble for local using local.toUniversalTime :<br />
+    <time class="utc-time"
+          style="font-size:small;"
+          datetime="@Helpers.DateAsUnixTime(local.ToUniversalTime())"
+          data-original-date="@Helpers.RawDate(local.ToUniversalTime())"
+          data-date-format="hh:mm A Z">
+        @local.ToUniversalTime().ToString("h:mm tt zzz")
+    </time><br />
+    <br />
+    the utc time displayed on osble for the local time passed by exact value:<br />
+    <time class="notutc-time"
+          style="font-size:small;"
+          datetime="@Helpers.DateAsUnixTime(toUtc)"
+          data-original-date="@Helpers.RawDate(toUtc)"
+          data-date-format="hh:mm A">
+        @toUtc.ToString("h:mm tt");
+    </time><br />
+    <br />
+    the expirement to see if 1:00:00pm from todays date in mst
+    the experiment from mst -> to utc using timezoneinfo == @ViewBag.msttoutc .IsDaylightSavignsTime() == @ViewBag.mstoutcisDaylight<br />
+    the experiment from utc -> to mst using timezoneinfo == @ViewBag.utctomst .IsDaylightSavignsTime() == @ViewBag.mstoutcisDaylight<br />
+    <br />*@
+<br />
+<br />
+parsing 12:00 PM for 1/15/2014 in pst is in raw from server format @ViewBag.utcstoc.ToString("h:mm tt zzz") <br />
+<br />
+the utc time displayed on osble for the original way 12:00:00 PM on 1/15/2014<br />
+<time class="utc-time"
+      style="font-size:small;"
+      datetime="@Helpers.DateAsUnixTime(ViewBag.utcstoc)"
+      data-original-date="@Helpers.RawDate(ViewBag.utcstoc)"
+      data-date-format="hh:mm A">
+    @ViewBag.utcstoc.ToString("h:mm tt") (UTC)
+</time>
+<br />
+the utc time displayed on osble for the newer way with a (utc) after way 12:00:00 PM on 1/15/2014<br />
+<time class="utc-time"
+      style="font-size:small;"
+      datetime="@Helpers.DateAsUnixTime(ViewBag.utcstoc)"
+      data-original-date="@Helpers.RawDate(ViewBag.utcstoc)"
+      data-date-format="hh:mm A Z">
+    @ViewBag.utcstoc.ToString("h:mm tt zzz") (UTC)
+</time>
+the utc time displayed on osble for the newer way for 12:00:00 PM on 1/15/2014<br />
+<time class="utc-time"
+      style="font-size:small;"
+      datetime="@Helpers.DateAsUnixTime(ViewBag.utcstoc)"
+      data-original-date="@Helpers.RawDate(ViewBag.utcstoc)"
+      data-date-format="hh:mm A Z">
+    @ViewBag.utcstoc.ToString("h:mm tt zzz")
+</time>
+<br />
+<br />
+the converted local<br />
+<br />
+<time class="utc-time"
+      style="font-size:small;"
+      datetime="@Helpers.DateAsUnixTime(ViewBag.yo)"
+      data-original-date="@Helpers.RawDate(ViewBag.yo)"
+      data-date-format="hh:mm A">
+    @ViewBag.yo.ToString("h:mm tt") (UTC)
+</time>
+<br />
+the utc time displayed on osble for the newer way with a (utc) after way for a fromutc 12:00:00 PM on 1/15/2014<br />
+<time class="utc-time"
+      style="font-size:small;"
+      datetime="@Helpers.DateAsUnixTime(ViewBag.yo)"
+      data-original-date="@Helpers.RawDate(ViewBag.yo)"
+      data-date-format="hh:mm A Z">
+    @ViewBag.yo.ToString("h:mm tt zzz") (UTC)
+</time>
+the utc time displayed on osble for the newer way for a fromutc 12:00:00 PM on 1/15/2014<br />
+<time class="utc-time"
+      style="font-size:small;"
+      datetime="@Helpers.DateAsUnixTime(ViewBag.yo)"
+      data-original-date="@Helpers.RawDate(ViewBag.yo)"
+      data-date-format="hh:mm A Z">
+    @ViewBag.yo.ToString("h:mm tt zzz")
+</time>

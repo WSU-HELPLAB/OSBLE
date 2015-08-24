@@ -1,0 +1,1 @@
+﻿yc: due to time constraints the migration for clone features have not fully been moved from the course controller and the respective views.

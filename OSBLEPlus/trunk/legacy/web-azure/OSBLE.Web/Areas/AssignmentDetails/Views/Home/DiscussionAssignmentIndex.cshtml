@@ -1,0 +1,155 @@
+﻿@using OSBLE.Models.Assignments
+@using OSBLE.Areas.AssignmentDetails.ViewModels
+@using OSBLE.Models.Courses;
+@using OSBLE.Resources
+@model AssignmentDetailsViewModel
+@{
+    ViewBag.Title = "Assignment Details";
+    DynamicDictionary headerData = Model.HeaderBuilder.BuildHeader(Model.CurrentAssignment);
+
+}
+@section AssignmentDetails
+{
+    <!--No need to pust due date here like other Indexes, as its covered in partial views as InitialFinalPostDueDate-->
+
+    @foreach (string view in Model.HeaderViews)
+    {
+        string viewLocation = string.Format("HeaderBuilder/{0}", view);
+        @Html.Partial(viewLocation, headerData);
+    }
+}
+@section TableData
+{
+    @if (Model.Client.AbstractRole.CanGrade)
+    {
+        var teams = from t in Model.CurrentAssignment.DiscussionTeams
+                    orderby t.Team.Name ascending
+                    select t;
+
+        foreach (DiscussionTeam assignmentTeam in teams)
+        {
+            if (Model.CurrentAssignment.HasDiscussionTeams)
+            {
+                <tr>
+                    <th class="TeamHeader" colspan="6">
+
+                        @{string actionLink = Url.Action("CreateTeam", "Mail", new { area = "", teamID = assignmentTeam.Team.ID });
+                        }
+                        <a href="@actionLink" title="Email this team" >@Helpers.MailButton()</a>
+                        @assignmentTeam.Team.Name -
+                        @(Html.ActionLink("View Discussion",
+                            "TeacherIndex", "DiscussionAssignment",
+                             new
+                             {
+                                 assignmentId = Model.CurrentAssignment.ID,
+                                 discussionTeamID = assignmentTeam.ID,
+                                 area = ""
+                             }, new { }))
+
+                        @{
+                int newPosts = assignmentTeam.GetNewPostsCount(Model.Client.ID);
+                        }
+                        @if (newPosts > 0)
+                        {
+                            @:&nbsp-&nbsp
+                            @:@Html.ActionLink("View " + newPosts.ToString() + " Unread Posts",
+                                "TeacherIndex", "DiscussionAssignment",
+                                 new
+                                 {
+                                     assignmentId = Model.CurrentAssignment.ID,
+                                     courseUserId = 0,
+                                     discussionTeamID = assignmentTeam.ID,
+                                     hightlightValue = OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.NewPosts,
+                                     area = ""
+                                 }, new { })
+                                                            }
+                        @if (assignmentTeam.Assignment.PreceedingAssignment != null)
+                        {
+                            if (assignmentTeam.Assignment.PreceedingAssignment.Type == AssignmentTypes.CriticalReview)
+                            {
+                                if (assignmentTeam.Assignment.PreceedingAssignment.HasStudentRubric == true)
+                                {
+                                    @:&nbsp-&nbsp @Html.ActionLink("View merged rubric",
+                                            "ViewForCriticalReview",
+                                            "Rubric",
+                                            new
+                                            {
+                                                assignmentId = assignmentTeam.Assignment.PrecededingAssignmentID,
+                                                authorTeamId = assignmentTeam.AuthorTeamID,
+                                                area = ""
+                                            },
+                                            new { })
+                        }
+                            }
+                        }
+                        &nbsp-&nbsp
+                        @Html.ActionLink("Access reviewed items to discuss",
+                     "GetDocumentsForCriticalReviewDiscussion",
+                "FileHandler",
+                new { area = "", discussionTeamID = assignmentTeam.ID },
+                new { onclick = "create_and_open_downloading_submission_dialog()" })
+                    </th>
+                </tr>
+            }
+
+            var allTeamMembers = (assignmentTeam as DiscussionTeam).GetAllTeamMembers()
+                .OrderBy(t => t.CourseUser.AbstractRoleID, new OSBLE.Models.Courses.CourseRole.CourseRolesInOrder())
+                .ThenBy(t => t.CourseUser.DisplayName((int)CourseRole.CourseRoles.Instructor));
+
+            foreach (TeamMember member in allTeamMembers)
+            {
+                //TODO: handle case of multiple teams. we may not have to handle this since users can only be on one discussion team
+                //We are figuring out which INDIVIDUAL assignment team this rubric is tied to so we can display the current 
+                //individual user's rubric grade/draft state
+                List<TeamMember> userTeams = member.CourseUser.TeamMemberships.Where(tm => tm.Team.UsedAsAssignmentTeam.Any()).ToList(); //get teams used in an assignment
+                TeamMember tMember = new TeamMember(); //this needs to be a list if we have a case of a user on multiple teams. (wont happen?)
+                foreach (TeamMember rubricTeamMember in userTeams)
+                {
+                    List<AssignmentTeam> teamsUsedAsAssignmentTeam = rubricTeamMember.Team.UsedAsAssignmentTeam.ToList();
+                    foreach (AssignmentTeam aTeam in teamsUsedAsAssignmentTeam)
+                    {
+                        if (aTeam.AssignmentID == Model.CurrentAssignment.ID) //we want to grab the team matching this assignment
+                        {
+                            tMember = rubricTeamMember;
+                        }
+                    }
+                }
+
+                DiscussionTeam singleUserAssignmentTeam = new DiscussionTeam();
+                singleUserAssignmentTeam.Team = new Team();
+                singleUserAssignmentTeam.Team.TeamMembers.Add(tMember);
+                singleUserAssignmentTeam.Team.Name = member.CourseUser.DisplayName(Model.Client.AbstractRoleID, false);
+                singleUserAssignmentTeam.TeamID = tMember.TeamID;
+                singleUserAssignmentTeam.Assignment = assignmentTeam.Assignment;
+                singleUserAssignmentTeam.AssignmentID = assignmentTeam.AssignmentID;
+                singleUserAssignmentTeam.ID = (assignmentTeam as DiscussionTeam).ID;
+
+                <tr>
+                    <td>
+                        @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", id = member.CourseUser.ID });
+                        }
+                        <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
+                        @if (member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA || member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
+                        {
+                            @:<span class="TitleText">@member.CourseUser.DisplayNameWithRole(Model.Client.AbstractRoleID, false)</span>
+                        }
+                        else
+                        {
+                            if (assignmentTeam.AuthorTeamID == member.TeamID)
+                            {
+                                @:(A)
+                            }
+                            @:@member.CourseUser.DisplayName(Model.Client.AbstractRoleID, false)
+                                                        }
+                    </td>
+                    @foreach (string view in Model.TableColumnHeaders.Keys)
+                    {
+                        DynamicDictionary tableData = Model.TeamTableBuilders[assignmentTeam].BuildTableForTeam(singleUserAssignmentTeam);
+                        string viewLocation = string.Format("TableBuilder/{0}", view);
+                        @Html.Partial(viewLocation, tableData);
+                    }
+                </tr>
+            }
+        }
+    }
+}

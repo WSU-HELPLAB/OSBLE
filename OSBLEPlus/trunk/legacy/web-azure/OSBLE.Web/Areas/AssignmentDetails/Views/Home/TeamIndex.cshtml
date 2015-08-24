@@ -1,0 +1,83 @@
+﻿@using OSBLE.Models.Assignments
+@using OSBLE.Areas.AssignmentDetails.ViewModels
+@using OSBLE.Models.Courses;
+@using OSBLE.Resources
+@model AssignmentDetailsViewModel
+@{
+    ViewBag.Title = "Assignment Details";
+    DynamicDictionary headerData = Model.HeaderBuilder.BuildHeader(Model.CurrentAssignment);
+    
+}
+
+@section AssignmentDetails
+{
+    <tr>
+        <th>
+            Due:
+        </th>
+        <td>
+            <time 
+                class="utc-time"
+                datetime="@Helpers.DateAsUnixTime(Model.CurrentAssignment.DueDate)" 
+                data-original-date="@Helpers.RawDate(Model.CurrentAssignment.DueDate)" 
+                data-date-format="MM/DD/YYYY hh:mm A">
+                @Model.CurrentAssignment.DueDate.ToShortDateString() @Model.CurrentAssignment.DueDate.ToShortTimeString() (UTC)
+            </time>
+        </td>
+    </tr>
+    @foreach (string view in Model.HeaderViews)
+    {
+        string viewLocation = string.Format("HeaderBuilder/{0}", view);
+        @Html.Partial(viewLocation, headerData);
+    }
+}
+@section TableData
+{
+    @if (Model.Client.AbstractRole.CanGrade)
+    {
+        bool altRow = false;
+
+        var teams = from pair in Model.TeamTableBuilders
+                    orderby pair.Key.Team.Name ascending
+                    select pair.Key;
+
+        foreach (IAssignmentTeam assignmentTeam in teams)
+        {
+            if (assignmentTeam.Team.TeamMembers.Count() > 1)
+            {
+                <tr class="TeamHeader">
+                    <th colspan="6">
+                        @{string actionLink = Url.Action("CreateTeam", "Mail", new { area = "", teamID = assignmentTeam.Team.ID });
+                        }
+                        <a href="@actionLink" title="Email this team" >@Helpers.MailButton()</a>
+                        @assignmentTeam.Team.Name
+                    </th>
+                </tr>
+        
+            }
+                <tr>
+                    <th class="StudentName">
+                        <lu>
+                            @foreach (TeamMember tm in assignmentTeam.Team.TeamMembers.OrderBy(t => t.CourseUser.DisplayName(Model.Client.AbstractRoleID, false)).ToList())
+                            {
+                                <li id="ReviewsItems">
+                                    @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", id = tm.CourseUser.ID });
+                                      }
+                                    <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
+                        
+                                    @tm.CourseUser.DisplayName(Model.Client.AbstractRoleID, false)
+                                </li>
+                            }
+                        </lu>
+                    </th>
+                    @foreach (string view in Model.TableColumnHeaders.Keys)
+                    {
+                        DynamicDictionary tableData = Model.TeamTableBuilders[assignmentTeam].BuildTableForTeam(assignmentTeam);
+                        string viewLocation = string.Format("TableBuilder/{0}", view);
+                        @Html.Partial(viewLocation, tableData);
+                    }
+                </tr>
+        }
+    }
+}
+} 
