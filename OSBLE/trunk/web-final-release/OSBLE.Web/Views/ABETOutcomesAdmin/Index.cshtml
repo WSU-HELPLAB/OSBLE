@@ -1,0 +1,63 @@
+﻿@{
+    ViewBag.Title = "ABET Outcome Administration";
+}
+
+@section Header
+{
+    <script>
+        // Write JS arrays for the existing options
+        @Html.Raw(ViewBag.JSDeptOpts)
+
+        function abetoutcomeadmin_deptchanged()
+        {
+            var slct = document.getElementById("slctDepartment");
+            
+            var optsArr = ABET_existing_outcomes[slct.selectedIndex];
+            var totalOpts = "";
+            for (var i = 0; i < optsArr.length; i++)
+            {
+                totalOpts += optsArr[i];
+                if (i < optsArr.length - 1)
+                {
+                    totalOpts += "\n";
+                }
+            }
+            document.getElementById("taOptions").value = totalOpts;
+            document.getElementById("taOptions").disabled = false;
+        }
+    
+    </script>
+}
+
+<h2>ABET Outcome Editor</h2>
+
+@if (null == ViewBag.DepartmentList)
+{
+    Html.Raw("The list of departments has not yet been created. ");
+    Html.Raw("Please use the administrative interface to create this list before setting ABET outcomes.");
+    return;
+}
+
+@using (Html.BeginForm("Save", "ABETOutcomesAdmin", FormMethod.Post))
+{
+    // Make a pulldown menu for the list of departments
+    @Html.Raw("Department: <select name=\"slctDepartment\" id=\"slctDepartment\" onchange=\"abetoutcomeadmin_deptchanged()\">");
+    for (int i = 0; i < ViewBag.DepartmentList.Length; i++)
+    {    
+        @Html.Raw(string.Format("<option value=\"{0}\">{0}</option>", ViewBag.DepartmentList[i]));
+    }
+    @Html.Raw("</select>");
+
+    // Create the text area where the actual outcomes will go
+    @Html.Raw("<br />");
+    @Html.Raw("<textarea id=\"taOptions\" name=\"taOptions\" rows=\"10\" cols=\"60\">");
+    // Put the first department's outcomes in it
+    if (ViewBag.DepartmentList.Length > 0)
+    {
+        @Html.Raw(ViewBag.OptionsDictionary[ViewBag.DepartmentList[0]]);
+    }
+    @Html.Raw("</textarea>");
+
+    @Html.Raw("<br />");
+    @Html.Raw("<input type=\"submit\" value=\"Save\" />");
+}

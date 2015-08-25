@@ -1,0 +1,91 @@
+﻿@using OSBLE.Models.Assessments;
+@model Assessment
+@Html.HiddenFor(m => m.ID)
+@section Header
+{
+
+}
+
+<table class="wizard_entry_table">
+    <tr>
+        <td>Course instructor can upload student work</td>
+        <td>@Html.CheckBox(" ")</td>
+    </tr>
+    <tr>
+        <td>Committee chair must make initial post before viewing posts of others</td>
+        <td>@Html.CheckBox(" ")</td>
+    </tr>
+    <tr>
+        <td>Choose instructor(s): @Html.Editor(" ")
+            <ul>
+                <li>Zhe Dang</li>
+                <li>Andy O' Fallon</li>
+            </ul>
+            <input type="submit" value="Compose request e-mail" />
+        </td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+    </tr>
+    <tr>
+        <td>Assessment committe members can upload student work</td>
+        <td>@Html.CheckBox(" ")</td>
+    </tr>
+    <tr>
+        <td>Tagged student work will be imported directly from OSBLE course</td>
+        <td>@Html.CheckBox(" ")</td>
+        @{List<string>TestList = new List<string>();
+          TestList.Add("Test 101");
+          TestList.Add("Test 201");
+          }
+        <td>Choose OSBLE Course: @Html.DropDownList("TestList", new SelectList(TestList))</td>
+    </tr>
+    <tr>
+        <td><br /></td>
+    </tr>
+    <tr>
+        <th>Who will perform the review?</th>
+    </tr>
+    <tr>
+        <th>Course instructor(s) </th>
+        <td>@Html.RadioButton(" ", "Instructor")</td>
+    </tr>
+    <tr>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp; Allow instructor(s) to change their assessment rubrics after they've submitted them</td>
+        <td>@Html.CheckBox(" ")</td>
+    </tr>
+    <tr>
+        <th>Assessment Committee </th>
+        <td>@Html.RadioButton(" ", "Committee")</td>
+    </tr>
+    <tr>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp; Allow committee members to access others' assessment rubrics once they've submitted their own</td>
+        <td>@Html.CheckBox(" ")</td>
+    </tr>
+    <tr>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp; Allow committee members to change their assessment rubrics after they've submitted them</td>
+        <td>@Html.CheckBox(" ")</td>
+    </tr>
+    <tr>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp; Committee chair will participate in review</td>
+        <td>@Html.CheckBox(" ")</td>
+    </tr>
+    <tr>
+        <td><br /></td>
+    </tr>
+    <tr>
+        <th>Send reviews who have not yet submitted their assessment rubrics an initial reminder e-mail</th>
+        <td>@Html.EditorFor(m => m.ReleaseTime)</td>
+        <td>hours before due date</td>
+    </tr>
+    <tr>
+        <th>Send reviewers who have not yet submitted their assessment rubrics a follow-up reminder every</th>
+        <td>@Html.EditorFor(m => m.ReleaseTime)</td>
+        <td>hours until they submit their assessment rubrics.</td>
+    </tr>
+    <tr>
+        <td><input type="submit" value="Compose request e-mail" /></td>
+    </tr>
+</table>
+
+

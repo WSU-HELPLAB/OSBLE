@@ -1,0 +1,16 @@
+﻿@model OSBLE.Models.Courses.Course
+
+@{
+    ViewBag.Title = "CommunityAwaitingApproval";
+    string CommunityName = ViewBag.CommunityName;
+}
+
+<h2>Request To Join [@CommunityName] is Awaiting Leader Approval</h2>
+
+
+<p>
+    Your request to join <strong>[@CommunityName]</strong> has been received. Before you are accepted, you must first recieve approval from the community leader.
+    The leader has been notified of your request.
+</p>
+
+@Html.ActionLink("Back to Community Search", "CommunitySearch")

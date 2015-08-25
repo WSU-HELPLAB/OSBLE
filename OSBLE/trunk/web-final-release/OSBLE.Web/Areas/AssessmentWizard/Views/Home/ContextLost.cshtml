@@ -1,0 +1,15 @@
+﻿@model OSBLE.Models.Assignments.Assignment
+
+@{
+    ViewBag.Title = "Assignment Wizard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Blerp, Bleep, Bloop!</h2>
+<p>
+Silly me!  It appears as though I've completely forgotten what it is you were doing.  
+Maybe some you were inactive for too long.  Or, perhaps a naughty administrator kicked my 
+fragile computer case.  Regardless, not all hope is lost.  
+I can <a href="@Url.Action("Index", new { assignmentId = Model.ID })">try to get you back to where you were</a>
+or I can just return you back to the <a href="@Url.Action("Index", "Assignment", new { area="" })">assignment listing</a>.
+</p>

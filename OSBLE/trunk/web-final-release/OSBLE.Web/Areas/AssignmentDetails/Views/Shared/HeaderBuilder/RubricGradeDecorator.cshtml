@@ -1,0 +1,22 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+    string displayValue = dataModel.AssignmentDetails.DisplayValue;      
+}
+<tr>
+    <th>
+        Graded Rubric:
+    </th>
+    <td>
+        @if (dataModel.AssignmentDetails.hasGrade)
+        {
+            @Html.ActionLink(displayValue, "View", "Rubric", new { assignmentId = dataModel.AssignmentDetails.assignmentID, cuId = dataModel.AssignmentDetails.cuID, area = "" }, new { })
+        }
+        else
+        {
+            @displayValue
+        }
+    </td>
+</tr>
