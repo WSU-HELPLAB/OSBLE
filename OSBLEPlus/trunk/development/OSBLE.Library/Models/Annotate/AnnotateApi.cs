@@ -172,7 +172,7 @@ namespace OSBLE.Models.Annotate
                 try
                 {
                     sendResult = client.DownloadString(uploadString);
-                    WriteLog("UploadDocument: " + sendResult);
+                    //WriteLog("UploadDocument: " + sendResult);
                 }
                 catch (Exception ex)
                 {
@@ -257,7 +257,7 @@ namespace OSBLE.Models.Annotate
                                         osbleUser.LastName
                                         );
             webResult = client.DownloadString(createString);
-            WriteLog("CreateAccount1: " + webResult);
+            //WriteLog("CreateAccount1: " + webResult);
 
             //downgrade user to unlicensed if not OSBLE admin
             if (osbleUser.IsAdmin == false)
@@ -280,7 +280,7 @@ namespace OSBLE.Models.Annotate
                 try
                 {
                     webResult = client.DownloadString(updateString);
-                    WriteLog("CreateAccount2: " + webResult);
+                    //WriteLog("CreateAccount2: " + webResult);
                     result.RawMessage = webResult;
                 }
                 catch (Exception)
@@ -340,7 +340,7 @@ namespace OSBLE.Models.Annotate
             try
             {
                 webResult = client.DownloadString(authorizeString);
-                WriteLog("GiveAccessToDocument: " + webResult);
+                //WriteLog("GiveAccessToDocument: " + webResult);
                 result.RawMessage = webResult;
             }
             catch (Exception)
@@ -387,7 +387,7 @@ namespace OSBLE.Models.Annotate
                                         osbleUser.UserName,
                                         apiKey
                                         );
-            WriteLog("LOGINSTRING: " + loginString);
+            //WriteLog("LOGINSTRING: " + loginString);
             return loginString;
         }
 
@@ -533,7 +533,7 @@ namespace OSBLE.Models.Annotate
             try
             {
                 webResult = client.DownloadString(anonString);
-                WriteLog("SetDocumentAnnonymity: " + webResult);
+                //WriteLog("SetDocumentAnnonymity: " + webResult);
                 result.RawMessage = webResult;
             }
             catch (Exception)
