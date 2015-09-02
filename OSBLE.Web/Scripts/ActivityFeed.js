@@ -53,7 +53,6 @@ function FeedItem(data) {
     // the edit form. (Note: not called if the user cancels their edit)
     self.Edit = function () {
         var text = $("#feed-edit-textbox-" + self.eventId).val();
-        alert(text);
         $.ajax({
             url: self.isComment? "/Feed/EditLogComment" : "/Feed/EditFeedPost",
             data: { id: self.eventId, newText: text },
