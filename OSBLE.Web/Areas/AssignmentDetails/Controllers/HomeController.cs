@@ -9,6 +9,7 @@ using OSBLE.Controllers;
 using OSBLE.Areas.AssignmentDetails.ViewModels;
 using OSBLE.Attributes;
 using OSBLE.Models.FileSystem;
+using OSBLE.Utility;
 
 namespace OSBLE.Areas.AssignmentDetails.Controllers
 {
@@ -80,41 +81,70 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
                 files = attrFiles.GetFilesWithSystemAttribute("assignment_solution", assignmentId.ToString());
 
                 //Check active course user
-                if (files.Count > 0 && (ActiveCourseUser.AbstractCourseID == 1 || ActiveCourseUser.AbstractCourseID == 2 ||
-                    ActiveCourseUser.AbstractCourseID == 3 || ActiveCourseUser.AbstractCourseID == 5))
-                {
-                    StringBuilder sb = new StringBuilder("<ul>");
-                    foreach (string fileName in files)
-                    {
-                        //Check to see if the user is an admin
-                        if (ActiveCourseUser.AbstractCourseID == 1)
-                        {
-                            //Build the URL action for deleting
-                            //Assignment file deletion is handled different.
-                            string UrlAction = Url.Action("DeleteAssignmentFile", "Home", new { courseID = assignment.CourseID.Value, assignmentID = assignment.ID, fileName = System.IO.Path.GetFileName(fileName) });
 
-                            // Make a link for the file
-                            sb.AppendFormat(
+                /////////////////////////
+                // This is checking hard coded AbstractCourseID values,
+                // needs to check if the User is enrolled in the current course ID
+                // this will cause errors in the future, noted for now
+                //////////////////////////
+                
+                //if (files.Count > 0 && (ActiveCourseUser.AbstractCourseID == 1 ||ActiveCourseUser.AbstractCourseID == 2 ||
+                //    ActiveCourseUser.AbstractCourseID == 3 || ActiveCourseUser.AbstractCourseID == 5))
+                if(currentCourses.Contains(ActiveCourseUser))
+                {
+                    bool pastCourseDueDate = DBHelper.AssignmentDueDatePast(assignmentId,
+                        ActiveCourseUser.AbstractCourseID);
+                    DateTime? CourseTimeAfterDueDate = DBHelper.AssignmentDueDateWithLateHoursInCourseTime(assignmentId,
+                        ActiveCourseUser.AbstractCourseID);
+                    
+                    StringBuilder sb;
+
+                    // make sure we don't have an incorrect assignmentId
+                    if (CourseTimeAfterDueDate != null)
+                    {
+                        sb = new StringBuilder("<ul>");
+
+                        foreach (string fileName in files)
+                        {
+                            //Check to see if the user can modify the course
+                            if (ActiveCourseUser.AbstractRole.CanModify)
+                            {
+                                //Build the URL action for deleting
+                                //Assignment file deletion is handled different.
+                                string UrlAction = Url.Action("DeleteAssignmentFile", "Home", new { courseID = assignment.CourseID.Value, assignmentID = assignment.ID, fileName = System.IO.Path.GetFileName(fileName) });
+
+                                string fName = System.IO.Path.GetFileName(fileName);
+                                // Make a link for the file
+                                sb.AppendFormat(
+                                    "<li><a href=\"/Services/CourseFilesOps.ashx?cmd=assignment_file_download" +
+                                    "&courseID={0}&assignmentID={1}&filename={2}\">{3}      </a>" +
+                                    "<a href=\"" + UrlAction + "\"><img src=\"/Content/images/delete_up.png\" alt=\"Delete Button\"></img></a>" +
+                                    "</li>",
+                                    assignment.CourseID.Value,
+                                    assignment.ID,
+                                    fName, 
+                                    fName + " (Viewable after " + CourseTimeAfterDueDate + ")");
+                            }
+                            else if (!pastCourseDueDate)
+                            {
+                                sb.AppendFormat(
+                                    "<li>Viewable after {0}", CourseTimeAfterDueDate);
+                            }
+                            // past due date, give link to the file
+                            else
+                            {
+                                sb.AppendFormat(
                                 "<li><a href=\"/Services/CourseFilesOps.ashx?cmd=assignment_file_download" +
-                                "&courseID={0}&assignmentID={1}&filename={2}\">{2}      </a>" +
-                                "<a href=\"" + UrlAction + "\"><img src=\"/Content/images/delete_up.png\" alt=\"Delete Button\"></img></a>" +
-                                "</li>",
+                                "&courseID={0}&assignmentID={1}&filename={2}\">{2}</li>",
                                 assignment.CourseID.Value,
                                 assignment.ID,
                                 System.IO.Path.GetFileName(fileName));
+                            }
                         }
-                        else
-                        {
-                            sb.AppendFormat(
-                            "<li><a href=\"/Services/CourseFilesOps.ashx?cmd=assignment_file_download" +
-                            "&courseID={0}&assignmentID={1}&filename={2}\">{2}</li>",
-                            assignment.CourseID.Value,
-                            assignment.ID,
-                            System.IO.Path.GetFileName(fileName));
-                        }
+                        sb.Append("</ul>");
+                        ViewBag.SoluFilesHTML = sb.ToString();
                     }
-                    sb.Append("</ul>");
-                    ViewBag.SoluFilesHTML = sb.ToString();
+                    
                 }
 
             }
