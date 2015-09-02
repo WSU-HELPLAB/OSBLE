@@ -1,6 +1,4 @@
 ﻿@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 @model LogCommentEvent
 
-<div class="user-text" id="comment-content-@Model.EventLogId">
-    @Model.Content
-</div>
+<div class="user-text" id="content-comment-@Model.EventLogId">@Model.Content</div>

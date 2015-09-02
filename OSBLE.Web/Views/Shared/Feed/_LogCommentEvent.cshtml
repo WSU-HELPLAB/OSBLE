@@ -5,6 +5,4 @@
 @{
     LogCommentEvent comment = Model.Items.First().Event as LogCommentEvent;
 }
-<div id="content-@comment.EventLogId">
-    <div class="user-text" id="content-comment-@comment.EventLogId">@comment.Content</div>
-</div>
+<div class="user-text" id="content-comment-@comment.EventLogId">@comment.Content</div>
