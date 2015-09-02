@@ -247,7 +247,7 @@ namespace OSBLE.Controllers
             aEvent.StartDate = assignment.DueDate;
             aEvent.StartTime = assignment.DueTime;
             aEvent.PosterID = ActiveCourseUserId;
-            aEvent.Title = assignment.AssignmentName + " Due";
+            aEvent.Title = assignment.AssignmentTypeID == (int)AssignmentTypes.DiscussionAssignment? assignment.AssignmentName + " Closes" : assignment.AssignmentName + " Due";
             aEvent.Approved = true;
             //aEvent.HideTime
             if (aEvent.ID == 0)
@@ -283,6 +283,7 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         static public void UpdateDiscussionEvent(DiscussionSetting ds, Event dEvent, int ActiveCourseUserId, ContextBase db)
         {
+
             //Link to assignment details. Note, since this is hardcoded to osble.org, it will not work locally.
             dEvent.Description = "[url:Assignment Page|plus.osble.org/AssignmentDetails/" + ds.AssignmentID + "]";
             dEvent.EndDate = null;
