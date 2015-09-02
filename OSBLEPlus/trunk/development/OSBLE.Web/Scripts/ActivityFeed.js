@@ -1,55 +1,4 @@
-﻿//Updates a KO view model using the supplied JS object
-//function updateFeedItemViewModel(jsObject) {
-
-//    $.each(jsObject.Data, function (index, value) {
-
-//        //bind to new view model
-//        var model = {
-//            Comments: value.Comments,
-//            NumberOfComments: ko.observable(value.Comments.length),
-//            LastUpdated: ko.observable(new Date())
-//        };
-
-//        //model mapping
-//        var mapping =
-//            {
-//                'Comments': {
-//                    key: function (item) {
-//                        return ko.utils.unwrapObservable(item.CommentId);
-//                    }
-//                }
-//            };
-
-//        //compute local time
-//        $(model.Comments).each(function (index) {
-
-//            var milliseconds = model.Comments[index].UtcUnixDate + "";
-//            var formatString = "MM/DD/YYYY hh:mm A";
-//            var currentDate = moment.utc(milliseconds, 'X');
-//            var localDate = new Date();
-//            var localOffset = localDate.getTimezoneOffset();
-//            currentDate = currentDate.subtract('minutes', localOffset);
-//            model.Comments[index]['LocalDate'] = currentDate.format(formatString);
-//        });
-
-//        var toBind = "feed-item-" + value.OriginalLogId;
-
-//        //view model doesn't exist, create one
-//        if (!AllComments[value.ActualLogId]) {
-
-//            AllComments[value.ActualLogId] = ko.mapping.fromJS(model, mapping);
-//        }
-
-//        //update view model with server data
-//        ko.mapping.fromJS(model, AllComments[value.ActualLogId]);
-
-//        //apply binding if one doesn't already exist
-//        if (!ko.dataFor(document.getElementById(toBind))) {
-//            ko.applyBindings(AllComments[value.ActualLogId], document.getElementById(toBind));
-//        }
-//    });
-//}
-
+﻿
 //KnockoutJS Objects
 function FeedItem(data) {
     // Fields
@@ -103,10 +52,11 @@ function FeedItem(data) {
     // Edit: called when the user clicks the send button after clicking the pencil symbol on a post to reveal
     // the edit form. (Note: not called if the user cancels their edit)
     self.Edit = function () {
-
+        var text = $("#feed-edit-textbox-" + self.eventId).val();
+        alert(text);
         $.ajax({
             url: self.isComment? "/Feed/EditLogComment" : "/Feed/EditFeedPost",
-            data: { id: self.eventId, newText: self.content() },
+            data: { id: self.eventId, newText: text },
             dataType: "json",
             method: "POST",
             success: function (dataObj) {
@@ -133,7 +83,10 @@ function FeedItem(data) {
         });
     };
 
-    self.AddComment = function() {
+    self.AddComment = function () {
+        if (self.isComment)
+            return;
+
         // Get text from the textarea
         var text = $('#feed-reply-textbox-' + self.eventId).val();
 
@@ -345,6 +298,10 @@ function onDeleteSuccess(item)
 
 function ShowEditBox(item)
 {
+    // populate the box with the correct content
+    var text = $("#content-comment-" + item.eventId).text();
+    $('#feed-edit-textbox-' + item.eventId).val(text);
+
     $('#feed-edit-' + item.eventId).show('fade');
     $('#feed-item-content-' + item.eventId).hide();
     $('#btn-edit-' + item.eventId).hide('highlight');
