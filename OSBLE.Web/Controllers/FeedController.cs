@@ -236,7 +236,7 @@ namespace OSBLE.Controllers
                 ShowPicture = comment.ShowProfilePicture,
                 Comments = new List<dynamic>(),
                 HTMLContent = PartialView("Details/_LogCommentEvent", comment).Capture(this.ControllerContext),
-                Content = comment.Content,
+                //Content = comment.Content,
                 IdString = comment.EventId.ToString(),
                 NumberHelpfulMarks = comment.NumberHelpfulMarks,
                 ActiveCourseUserId = ActiveCourseUser.UserProfileID
@@ -395,8 +395,7 @@ namespace OSBLE.Controllers
         public JsonResult EditFeedPost(int id, string newText, bool details = false)
         {
             // do checking, make sure non-authorized users cannot edit posts
-
-            UserProfile current = CurrentUser; //DBHelper.GetUserProfile(ActiveCourseUser.UserProfileID);
+            UserProfile current = CurrentUser ?? DBHelper.GetUserProfile(ActiveCourseUser.UserProfileID);
             if ((current.IUserId == ActiveCourseUser.UserProfileID) || (ActiveCourseUser.AbstractRole.CanGrade))
             {
                 using (SqlConnection conn = DBHelper.GetNewConnection())

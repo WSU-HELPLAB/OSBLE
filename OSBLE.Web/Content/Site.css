@@ -2219,6 +2219,10 @@ div.pagedocname {
     margin-top: 10px;
 }
 
+.user-text {
+    white-space: pre-wrap;
+}
+
 /* Activity Feed Filters */
 
 .filter-type-option {
