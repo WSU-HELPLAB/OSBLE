@@ -91,6 +91,24 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 Assignment.DiscussionSettings = model;
                 db.SaveChanges();
 
+
+                //account for local client time, reset to UTC
+                CourseController cc = new CourseController();
+                var course = ActiveCourseUser.AbstractCourse as Course;
+                if (course != null)
+                {
+                    //get the timezone of the course 
+                    int utcOffset = course.TimeZoneOffset;
+                    TimeZoneInfo tz = cc.getTimeZone(utcOffset);
+                    Assignment.DiscussionSettings.InitialPostDueDate = TimeZoneInfo.ConvertTimeToUtc(Assignment.DiscussionSettings.InitialPostDueDate, tz);
+                    db.SaveChanges();
+                    WasUpdateSuccessful = true;
+                }
+                else
+                {
+                    WasUpdateSuccessful = false;
+                }
+
                 
                 if (Assignment.IsDraft == false)
                 {
@@ -119,22 +137,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
                 }
 
-                //account for local client time, reset to UTC
-                CourseController cc = new CourseController();
-                var course = ActiveCourseUser.AbstractCourse as Course;
-                if (course != null)
-                {
-                    //get the timezone of the course 
-                    int utcOffset = course.TimeZoneOffset;
-                    TimeZoneInfo tz = cc.getTimeZone(utcOffset);
-                    Assignment.DiscussionSettings.InitialPostDueDate = TimeZoneInfo.ConvertTimeToUtc(Assignment.DiscussionSettings.InitialPostDueDate, tz);
-                    db.SaveChanges();
-                    WasUpdateSuccessful = true;
-                }
-                else
-                {
-                    WasUpdateSuccessful = false;
-                }
+               
 
                 
             }
