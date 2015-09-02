@@ -5,6 +5,7 @@ using System.Web;
 using Dapper;
 using OSBLEPlus.Logic.Utility;
 using System.Data.SqlClient;
+using System.Data.SqlTypes;
 using System.Web.UI.WebControls;
 using OSBLE.Models.Courses;
 using OSBLE.Models.DiscussionAssignment;
@@ -13,6 +14,7 @@ using OSBLE.Models.Users;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
 using OSBLEPlus.Logic.DomainObjects.Interface;
 using OSBLE.Attributes;
+using OSBLE.Models.Assignments;
 using OSBLE.Models.Queries;
 using OSBLEPlus.Logic.Utility.Lookups;
 
@@ -257,6 +259,55 @@ namespace OSBLE.Utility
             }
 
             return ids;
+        }
+
+        public static bool AssignmentDueDatePast(int assignmentId, int abstractCourseId, SqlConnection connection = null)
+        {
+            if (assignmentId < 1) return false;
+
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    return AssignmentDueDatePast(assignmentId, abstractCourseId, sqlc);
+                }
+            }
+
+            Assignment a = connection.Query<Assignment>("SELECT * " +
+                                                        "FROM Assignments " +
+                                                        "WHERE ID = @assignmentId", new {assignmentId}).FirstOrDefault();
+            
+            // if assignment is not found, or the current course user is not in the class, return false
+            if (a == null || a.CourseID != abstractCourseId) return false;
+
+            DateTime checkDateWithLateHours = a.DueTime.AddHours(a.HoursLateWindow);
+
+            return (DateTime.UtcNow >= checkDateWithLateHours);
+        }
+
+        public static DateTime? AssignmentDueDateWithLateHoursInCourseTime(int assignmentId, int abstractCourseId,
+            SqlConnection connection = null)
+        {
+            if (assignmentId < 1) return null;
+
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    return AssignmentDueDateWithLateHoursInCourseTime(assignmentId, abstractCourseId, sqlc);
+                }
+            }
+
+            Assignment a = connection.Query<Assignment>("SELECT * " +
+                                                        "FROM Assignments " +
+                                                        "WHERE ID = @assignmentId", new { assignmentId }).FirstOrDefault();
+
+            // if assignment is not found, or the current course user is not in the class, return false
+            if (a == null || a.CourseID != abstractCourseId) return null;
+
+            DateTime utcTime = a.DueTime.AddHours(a.HoursLateWindow);
+
+            return utcTime.UTCToCourse(abstractCourseId);
         }
         #endregion
 

@@ -144,6 +144,8 @@ namespace OSBLE.Models.FileSystem
             // There's a system attribute that would make this public to 
             // any course user.
             XmlNodeList any = m_doc.GetElementsByTagName("any_course_user_can_download");
+
+            
             if (any.Count > 0)
             {
                 return true;
@@ -153,6 +155,9 @@ namespace OSBLE.Models.FileSystem
             // assignment solutions.
             if (ContainsSysAttr("assignment_solution"))
             {
+                // need to check to see if the assignment due date and past due date has passed
+                // if so anyone can download the file
+                
                 return user.AbstractRole.CanModify;
             }
 

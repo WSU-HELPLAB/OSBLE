@@ -1,10 +1,12 @@
 ﻿// Added 5-23-13 by Evan Olds for the OSBLE project
 using System;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
 using OSBLE.Models;
 using OSBLE.Models.Courses;
 using OSBLE.Models.FileSystem;
+using OSBLE.Utility;
 
 namespace OSBLE.Services
 {
@@ -423,8 +425,9 @@ namespace OSBLE.Services
                     return;
                 }
 
-                // Make sure the user has permission to download
-                if (null == courseUser || !af.CanUserDownload(courseUser))
+                // Make sure the user has permission to download, if the user is not able to modify the course or the assignment date is not 
+                // past the due time plus the hours late window
+                if (null == courseUser || (!af.CanUserDownload(courseUser) && !DBHelper.AssignmentDueDatePast(aID, courseUser.AbstractCourseID)))
                 {
                     WriteErrorResponse(context,
                         "User does not have permission to download this file");
