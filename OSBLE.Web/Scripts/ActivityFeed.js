@@ -287,7 +287,11 @@ function GetCheckedEvents()
             str += $(this).data('type') + ',';
         }
     });
-    return str;
+
+    var length = str.length;
+    var stringWithoutComma = str.substr(0, length - 1);
+    
+    return stringWithoutComma;
 }
 
 function onDeleteSuccess(item)
