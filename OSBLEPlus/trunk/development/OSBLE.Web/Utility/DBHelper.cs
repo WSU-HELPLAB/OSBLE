@@ -781,7 +781,7 @@ namespace OSBLE.Utility
             // find the senders
             List<int> senders = connection.Query<int>("SELECT SenderId " +
                                                    "FROM EventLogs " +
-                                                   "WHERE Id = @helpEvents", new {helpEvents}).ToList();
+                                                   "WHERE Id IN @helpEvents", new {helpEvents}).ToList();
 
             return senders.Contains(userId);
 
