@@ -7,6 +7,7 @@ using OSBLEPlus.Logic.Utility;
 using System.Data.SqlClient;
 using System.Data.SqlTypes;
 using System.Web.UI.WebControls;
+using System.Net.Mail;
 using OSBLE.Models.Courses;
 using OSBLE.Models.DiscussionAssignment;
 using OSBLE.Models.HomePage;
@@ -308,6 +309,20 @@ namespace OSBLE.Utility
             DateTime utcTime = a.DueTime.AddHours(a.HoursLateWindow);
 
             return utcTime.UTCToCourse(abstractCourseId);
+        }
+
+        public static List<MailAddress> GetActivityFeedForwardedEmails(int courseID, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection()) { return GetActivityFeedForwardedEmails(courseID, sqlc); }
+            }
+
+            IEnumerable<UserProfile> users = connection.Query<UserProfile>("SELECT u.* FROM UserProfiles u INNER JOIN CourseUsers c ON u.ID = c.UserProfileID WHERE c.AbstractCourseID = @id AND u.EmailAllActivityPosts = 1",
+                new { id = courseID });
+
+            List<MailAddress> addresses = new List<MailAddress>(users.Select(u => new MailAddress(u.UserName, u.FullName)));
+            return addresses;
         }
         #endregion
 
