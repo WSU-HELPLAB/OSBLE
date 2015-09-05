@@ -716,7 +716,7 @@ namespace OSBLE.Utility
             List<ActivityEvent> eventLogs =
                 connection.Query<ActivityEvent>("SELECT Id AS EventLogId, EventTypeId AS EventId, EventDate, DateReceived, SenderId, CourseId, SolutionName, IsDeleted " + 
                                                 "FROM EventLogs " +
-                                                "WHERE Id = @logId", new {logId = helpfulMarkEventIds}).ToList();
+                                                "WHERE Id IN @logId", new {logId = helpfulMarkEventIds}).ToList();
 
             ActivityEvent senderEvent = eventLogs.Find(x => x.SenderId == markerId);
             
@@ -786,20 +786,64 @@ namespace OSBLE.Utility
             // find the log id
             int logId = connection.Query<int>("SELECT Id " +
                                               "FROM LogCommentEvents " +
-                                              "WHERE EventLogId = @logCommentId", new {logCommentId}).SingleOrDefault();
+                                              "WHERE EventLogId = @logCommentId", new { logCommentId }).SingleOrDefault();
 
             // find eventlogids
             List<int> helpEvents = connection.Query<int>("SELECT EventLogId " +
                                                          "FROM HelpfulMarkGivenEvents " +
-                                                         "WHERE LogCommentEventId = @logId", new{logId}).ToList();
+                                                         "WHERE LogCommentEventId = @logId", new { logId }).ToList();
 
             // find the senders
             List<int> senders = connection.Query<int>("SELECT SenderId " +
                                                    "FROM EventLogs " +
-                                                   "WHERE Id IN @helpEvents", new {helpEvents}).ToList();
+                                                   "WHERE Id IN @helpEvents", new { helpEvents }).ToList();
 
             return senders.Contains(userId);
 
+        }
+
+        public static Dictionary<int, bool> DictionaryOfMarkedLogs(int userId, List<int> logCommentIds, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    return DictionaryOfMarkedLogs(userId, logCommentIds, sqlc);
+                }
+            }
+
+            Dictionary<int, bool> senderMarkedComment = new Dictionary<int, bool>();
+            // find the log id
+            List<int> logIds = connection.Query<int>("SELECT Id " +
+                                                     "FROM LogCommentEvents " +
+                                                     "WHERE EventLogId IN @logCommentIds", new {logCommentIds}).ToList();
+
+            
+            foreach (int logId in logIds)
+            {
+                // find eventlogids
+                List<int> helpEvents = connection.Query<int>("SELECT EventLogId " +
+                                             "FROM HelpfulMarkGivenEvents " +
+                                             "WHERE LogCommentEventId = @logId", new { logId }).ToList();
+
+                // find the senders
+                List<int> senders = connection.Query<int>("SELECT SenderId " +
+                                                       "FROM EventLogs " +
+                                                       "WHERE Id IN @helpEvents", new { helpEvents }).ToList();
+
+                if (senders.Contains(userId))
+                {
+                    senderMarkedComment[logId] = true;
+                }
+                else
+                {
+                    senderMarkedComment[logId] = false;
+                }
+
+
+            }
+
+            return senderMarkedComment;
         }
 
         public static IEnumerable<ActivityEvent> GetActivityEventsFromId(int userId, SqlConnection connection = null)
