@@ -213,7 +213,7 @@ namespace OSBLE.Controllers
             return time.UTCToCourse(ActiveCourseUser.AbstractCourseID).ToShortDateString() + " " + time.UTCToCourse(ActiveCourseUser.AbstractCourseID).ToShortTimeString();
         }
 
-        private object MakeLogCommentJsonObject(LogCommentEvent comment, SqlConnection sql = null)
+        private object MakeLogCommentJsonObject(LogCommentEvent comment, Dictionary<int, bool> commentMarkedDictionary, SqlConnection sql = null)
         {
             comment.SetPrivileges(ActiveCourseUser);
             comment.NumberHelpfulMarks = DBHelper.GetHelpfulMarksLogIds(comment.EventLogId, sql).Count;
@@ -232,7 +232,7 @@ namespace OSBLE.Controllers
                 CanVote = comment.CanVote,
                 CanReply = false,
                 IsHelpfulMark = false,
-                HighlightMark = DBHelper.UserMarkedLog(ActiveCourseUser.UserProfileID, comment.EventLogId, sql),
+                HighlightMark = commentMarkedDictionary[comment.EventId],//DBHelper.UserMarkedLog(ActiveCourseUser.UserProfileID, comment.EventLogId, sql),
                 ShowPicture = comment.ShowProfilePicture,
                 Comments = new List<dynamic>(),
                 HTMLContent = PartialView("Details/_LogCommentEvent", comment).Capture(this.ControllerContext),
@@ -285,11 +285,19 @@ namespace OSBLE.Controllers
         private object MakeCommentListJsonObject(IEnumerable<LogCommentEvent> comments, int parentLogID)
         {
             var obj = new List<dynamic>();
+
+            // get all the eventLogIds for the comments passed in
+            List<int> commentIds = comments.Select(comment => comment.EventLogId).ToList();
+
+
+
             using (SqlConnection sql = DBHelper.GetNewConnection())
             {
+                Dictionary<int, bool> logCommentMarkedByCurrentUser =
+                    DBHelper.DictionaryOfMarkedLogs(ActiveCourseUser.UserProfileID, commentIds, sql);
                 foreach (LogCommentEvent e in comments)
                 {
-                    obj.Add(MakeLogCommentJsonObject(e, sql));
+                    obj.Add(MakeLogCommentJsonObject(e, logCommentMarkedByCurrentUser, sql));
                 }
             }
 
@@ -475,7 +483,6 @@ namespace OSBLE.Controllers
                 value = DBHelper.UserMarkedLog(currentUserId, logCommentId)
             });
         }
-
 
         /*public JsonResult GetComments(int? singleLogId)
         {
