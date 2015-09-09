@@ -112,10 +112,10 @@
     </bindingConfiguration>
   </bindingConfigurations>
   <endpoints>
-    <endpoint name="BasicHttpBinding_OsbleService" contract="OSBLEServices.OsbleService" bindingType="basicHttpBinding" address="http://osble.org/Services/OsbleService.svc" bindingConfiguration="BasicHttpBinding_OsbleService">
+    <endpoint name="BasicHttpBinding_OsbleService" contract="OSBLEServices.OsbleService" bindingType="basicHttpBinding" address="http://plus.osble.org/Services/OsbleService.svc" bindingConfiguration="BasicHttpBinding_OsbleService">
       <properties>
         <property path="/address" isComplexType="false" isExplicitlyDefined="true" clrType="System.Uri, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-          <serializedValue>http://osble.org/Services/OsbleService.svc</serializedValue>
+          <serializedValue>http://plus.osble.org/Services/OsbleService.svc</serializedValue>
         </property>
         <property path="/behaviorConfiguration" isComplexType="false" isExplicitlyDefined="false" clrType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
           <serializedValue />
