@@ -137,7 +137,7 @@ namespace OSBLEExcelPlugin
                     string.Format(
                         "Save attempt at {0} only uploaded some of the worksheets in the " + 
                         "workbook. It is recommended that you try again and/or check the " + 
-                        "gradebook status online at OSBLE.org.", DateTime.Now));
+                        "gradebook status online at PLUS.OSBLE.org.", DateTime.Now));
             }            
 
             return new SaveResult(true, null);
