@@ -66,15 +66,26 @@ namespace OSBLEExcelPlugin
             int sheetCount = 0;
             foreach (Worksheet ws in wb.Worksheets)
             {
-                // Make an in-memory CSV for the worksheet
-                string csvTemp = WorksheetToCSVString(ws);
-                if (string.IsNullOrEmpty(csvTemp))
-                {
-                    continue;
-                }
+                // We only want gradebook worksheets.
+                // Check for a "#" in cell A1 before making a CSV
+                var currentWorkSheet = Convert.ToString(ws.Range["A1"].Value);
 
-                sheetCount++;
-                zf.AddEntry(ws.Name + ".csv", Encoding.UTF8.GetBytes(csvTemp));
+                if (currentWorkSheet == null) // Cell is empty
+                {
+                }
+                else if (currentWorkSheet.Contains("#")) //Cell contains #, continue...
+                {
+
+                    // Make an in-memory CSV for the worksheet
+                    string csvTemp = WorksheetToCSVString(ws);
+                    if (string.IsNullOrEmpty(csvTemp))
+                    {
+                        continue;
+                    }
+
+                    sheetCount++;
+                    zf.AddEntry(ws.Name + ".csv", Encoding.UTF8.GetBytes(csvTemp));
+                }
             }
 
             // If we didn't get any data then we can't upload to OSBLE
@@ -162,13 +173,19 @@ namespace OSBLEExcelPlugin
             {
                 for (int y = 1; y <= colCount; y++)
                 {
+                    string cellContents = used.Cells[x, y].Text;
+
+                    //surround any commas in text with double quotes to avoid formatting issue with the csv parsing
+                    if (cellContents.Contains(","))
+                        cellContents = cellContents.Replace(",", "\",\"");
+
                     if (y == colCount)
                     {
-                        sb.AppendLine(used.Cells[x, y].Text);
+                        sb.AppendLine(cellContents);
                     }
                     else
                     {
-                        sb.Append(used.Cells[x, y].Text + ",");
+                        sb.Append(cellContents + ",");
                     }
                 }
             }
