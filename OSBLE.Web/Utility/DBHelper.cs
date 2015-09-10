@@ -964,7 +964,7 @@ namespace OSBLE.Utility
                 using (SqlConnection sqlc = GetNewConnection()) { return GetActivityFeedForwardedEmails(courseID, sqlc); }
             }
 
-            IEnumerable<UserProfile> users = connection.Query<UserProfile>("SELECT u.* FROM UserProfiles u INNER JOIN CourseUsers c ON u.ID = c.UserProfileID WHERE c.AbstractCourseID = @id AND u.EmailAllActivityPosts = 1",
+            IEnumerable<UserProfile> users = connection.Query<UserProfile>("SELECT DISTINCT u.* FROM UserProfiles u INNER JOIN CourseUsers c ON u.ID = c.UserProfileID WHERE c.AbstractCourseID = @id AND u.EmailAllActivityPosts = 1",
                 new { id = courseID });
 
             List<MailAddress> addresses = new List<MailAddress>(users.Select(u => new MailAddress(u.UserName, u.FullName)));
@@ -979,7 +979,7 @@ namespace OSBLE.Utility
             }
 
             IEnumerable<UserProfile> users = connection.Query<UserProfile>(
-                "SELECT u.* " +
+                "SELECT DISTINCT u.* " +
                 "FROM UserProfiles u " +
                 "JOIN EventLogs e ON u.ID = e.SenderId " +
                 "JOIN LogCommentEvents l ON e.Id = l.EventLogId " +
@@ -989,7 +989,7 @@ namespace OSBLE.Utility
             UserProfile originalPoster = GetFeedItemSender(originalPostID, connection);
 
             List<MailAddress> addresses = new List<MailAddress>(users.Select(u => new MailAddress(u.UserName, u.FullName)));
-            if (originalPoster.EmailAllActivityPosts)
+            if (originalPoster.EmailAllActivityPosts && !users.Any(u => u.ID == originalPoster.ID))
                 addresses.Add(new MailAddress(originalPoster.UserName, originalPoster.FullName));
 
             return addresses;
