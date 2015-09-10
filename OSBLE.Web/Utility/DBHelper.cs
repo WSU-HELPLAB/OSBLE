@@ -311,19 +311,6 @@ namespace OSBLE.Utility
             return utcTime.UTCToCourse(abstractCourseId);
         }
 
-        public static List<MailAddress> GetActivityFeedForwardedEmails(int courseID, SqlConnection connection = null)
-        {
-            if (connection == null)
-            {
-                using (SqlConnection sqlc = GetNewConnection()) { return GetActivityFeedForwardedEmails(courseID, sqlc); }
-            }
-
-            IEnumerable<UserProfile> users = connection.Query<UserProfile>("SELECT u.* FROM UserProfiles u INNER JOIN CourseUsers c ON u.ID = c.UserProfileID WHERE c.AbstractCourseID = @id AND u.EmailAllActivityPosts = 1",
-                new { id = courseID });
-
-            List<MailAddress> addresses = new List<MailAddress>(users.Select(u => new MailAddress(u.UserName, u.FullName)));
-            return addresses;
-        }
         #endregion
 
 
@@ -969,6 +956,62 @@ namespace OSBLE.Utility
                 return false;
             }
         }
+
+        public static List<MailAddress> GetActivityFeedForwardedEmails(int courseID, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection()) { return GetActivityFeedForwardedEmails(courseID, sqlc); }
+            }
+
+            IEnumerable<UserProfile> users = connection.Query<UserProfile>("SELECT u.* FROM UserProfiles u INNER JOIN CourseUsers c ON u.ID = c.UserProfileID WHERE c.AbstractCourseID = @id AND u.EmailAllActivityPosts = 1",
+                new { id = courseID });
+
+            List<MailAddress> addresses = new List<MailAddress>(users.Select(u => new MailAddress(u.UserName, u.FullName)));
+            return addresses;
+        }
+
+        public static List<MailAddress> GetReplyForwardedEmails(int originalPostID, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection()) { return GetReplyForwardedEmails(originalPostID, sqlc); }
+            }
+
+            IEnumerable<UserProfile> users = connection.Query<UserProfile>(
+                "SELECT u.* " +
+                "FROM UserProfiles u " +
+                "JOIN EventLogs e ON u.ID = e.SenderId " +
+                "JOIN LogCommentEvents l ON e.Id = l.EventLogId " +
+                "WHERE l.SourceEventLogId = @opID AND u.EmailAllActivityPosts = 1",
+                new { opID = originalPostID });
+
+            UserProfile originalPoster = GetFeedItemSender(originalPostID, connection);
+
+            List<MailAddress> addresses = new List<MailAddress>(users.Select(u => new MailAddress(u.UserName, u.FullName)));
+            if (originalPoster.EmailAllActivityPosts)
+                addresses.Add(new MailAddress(originalPoster.UserName, originalPoster.FullName));
+
+            return addresses;
+        }
+
+        public static UserProfile GetFeedItemSender(int postID, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection()) { return GetFeedItemSender(postID, sqlc); }
+            }
+
+            UserProfile sender = connection.Query<UserProfile>(
+                "SELECT u.* " +
+                "FROM UserProfiles u " +
+                "JOIN EventLogs e ON u.ID = e.SenderId " +
+                "WHERE e.Id = @id",
+                new { id = postID }).SingleOrDefault();
+
+            return sender;
+        }
+
         #endregion
     }
 }
