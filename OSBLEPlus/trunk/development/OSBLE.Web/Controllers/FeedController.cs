@@ -400,6 +400,7 @@ namespace OSBLE.Controllers
         }
 
         [HttpPost]
+        [ValidateInput(false)]
         public JsonResult EditFeedPost(int id, string newText, bool details = false)
         {
             // do checking, make sure non-authorized users cannot edit posts
@@ -429,6 +430,7 @@ namespace OSBLE.Controllers
         }
 
         [HttpPost]
+        [ValidateInput(false)]
         public JsonResult EditLogComment(int id, string newText)
         {
             // do checking, make sure non-authorized users cannot edit posts
@@ -710,6 +712,7 @@ namespace OSBLE.Controllers
         /// <param name="text"></param>
         /// <returns></returns>
         [HttpPost]
+        [ValidateInput(false)]
         public JsonResult PostFeedItem(string text)
         {
             // We purposefully are not catching exceptions that could be thrown
@@ -732,12 +735,13 @@ namespace OSBLE.Controllers
             var newPost = new AggregateFeedItem(Feeds.Get(logID));
             
             // Send emails to those who want to be notified by email
-            SendEmailsToListeners(log.Comment, logID, courseID, DateTime.UtcNow);
+            SendEmailsToListeners(log.Comment, logID, courseID, DateTime.UtcNow, DBHelper.GetActivityFeedForwardedEmails(courseID));
 
             return Json(MakeAggregateFeedItemJsonObject(newPost, false));
         }
 
         [HttpPost]
+        [ValidateInput(false)]
         public JsonResult PostComment(int id, string content)
         {
             // Check for blank comment
@@ -756,6 +760,9 @@ namespace OSBLE.Controllers
             // Get the new comment list by getting the parent feed item
             FeedItem post = Feeds.Get(id);
 
+            // Send emails if neccesary
+            SendEmailsToListeners(content, id, ActiveCourseUser.AbstractCourseID, DateTime.UtcNow, DBHelper.GetReplyForwardedEmails(id), true);
+
             // return the new list of comments in a Json object
             return Json(MakeCommentListJsonObject(post.Comments, id));
         }
@@ -764,17 +771,34 @@ namespace OSBLE.Controllers
         /// Sends an email to those who have access to this post and have the
         /// "Send all activity feed posts to my e-mail address" option checked
         /// </summary>
-        private void SendEmailsToListeners(string postContent, int postID, int courseID, DateTime timePosted)
+        private void SendEmailsToListeners(string postContent, int sourcePostID, int courseID, DateTime timePosted, List<MailAddress> emails, bool isReply = false)
         {
             // first check to see if we need to email anyone about this post
-            List<MailAddress> emails = DBHelper.GetActivityFeedForwardedEmails(courseID);
             if (emails.Count > 0)
             {
-                string subject = string.Format("OSBLE Plus - {0} posted in {1}", CurrentUser.FullName, DBHelper.GetCourseShortNameFromID(courseID));
-                string body = string.Format("{0} made the following post at {1}:\n\n{2}\n\n", CurrentUser.FullName, timePosted.UTCToCourse(courseID), postContent);
+                string subject = "";
+                string body = "";
 
+                using (SqlConnection conn = DBHelper.GetNewConnection())
+                {
+                    if (isReply)
+                    {
+                        FeedPostEvent originalPost = DBHelper.GetFeedPostEvent(sourcePostID, conn);
+                        UserProfile originalPoster = DBHelper.GetFeedItemSender(sourcePostID, conn);
+
+                        subject = string.Format("OSBLE Plus - {0} replied to a post in {1}", CurrentUser.FullName, DBHelper.GetCourseShortNameFromID(courseID, conn));
+                        body = string.Format("{0} replied to a post by {1} at {2}:\n\n{3}\n-----------------------\nOriginal Post:\n{4}\n\n",
+                            CurrentUser.FullName, originalPoster.FullName, timePosted.UTCToCourse(courseID), postContent, originalPost.Comment);
+                    }
+                    else
+                    {
+                        subject = string.Format("OSBLE Plus - {0} posted in {1}", CurrentUser.FullName, DBHelper.GetCourseShortNameFromID(courseID, conn));
+                        body = string.Format("{0} made the following post at {1}:\n\n{2}\n\n", CurrentUser.FullName, timePosted.UTCToCourse(courseID), postContent);
+                    }
+                }
+                
                 // add a link at the bottom to the website
-                body += string.Format("<a href=\"{0}\">View and reply to post in OSBLE</a>", Url.Action("Details", new { id = postID }));
+                body += string.Format("<a href=\"{0}\">View and reply to post in OSBLE</a>", Url.Action("Details", new { id = sourcePostID }));
 
                 // replace all newline chars (since this is html)
                 body = body.Replace("\n", "<br>");
