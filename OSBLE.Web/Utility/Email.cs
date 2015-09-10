@@ -8,12 +8,14 @@ namespace OSBLE.Utility
     {
         public static void Send(string subject, string message, ICollection<MailAddress> to)
         {
-
             //ignore empty sends
             if (to.Count == 0)
             {
                 return;
             }
+
+            // replace all newline chars (since this is html)
+            message = message.Replace("\n", "<br>");
 
             SmtpClient mailClient = new SmtpClient();
 

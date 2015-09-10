@@ -800,9 +800,6 @@ namespace OSBLE.Controllers
                 // add a link at the bottom to the website
                 body += string.Format("<a href=\"{0}\">View and reply to post in OSBLE</a>", Url.Action("Details", new { id = sourcePostID }));
 
-                // replace all newline chars (since this is html)
-                body = body.Replace("\n", "<br>");
-
                 //Send the message
                 Email.Send(subject, body, emails);
             }

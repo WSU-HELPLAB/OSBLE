@@ -534,9 +534,7 @@ namespace OSBLE.Controllers
             MailAddress to = new MailAddress(recipient.UserName, recipient.DisplayName((int)CourseRole.CourseRoles.Instructor));
             List<MailAddress> recipients = new List<MailAddress>();
             recipients.Add(to);
-#if !DEBUG
             Email.Send(subject, body, recipients);
-#endif
         }
 
         /// <summary>
