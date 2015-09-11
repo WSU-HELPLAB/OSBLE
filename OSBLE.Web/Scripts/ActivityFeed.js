@@ -15,7 +15,6 @@ function FeedItem(data) {
     self.isComment = self.parentEventId != -1;
     self.isHelpfulMark = data.IsHelpfulMark;
     self.highlightMark = ko.observable(data.HighlightMark);
-    self.content = ko.observable(data.Content); // used for editing posts
     self.htmlContent = ko.observable(data.HTMLContent);
     self.numberHelpfulMarks = ko.observable(data.NumberHelpfulMarks);
     self.idString = data.IdString; // used for items with multiple ids
