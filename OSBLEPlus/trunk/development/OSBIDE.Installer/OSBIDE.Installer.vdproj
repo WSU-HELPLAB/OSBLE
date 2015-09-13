@@ -65,7 +65,7 @@
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:Release\\OSBIDE.Installer.msi"
+        "OutputFilename" = "8:Release\\OSBLEDependencies.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -82,6 +82,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.5"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.5 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.5"
+                    }
+                }
             }
         }
     }
@@ -180,7 +188,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:OSBLE Dependencies Installer"
         "ProductCode" = "8:{AFD5CE6F-B6B3-4B8B-8E70-149BAD4852AB}"
-        "PackageCode" = "8:{57F93506-33E7-4554-B069-5CB1D5037D84}"
+        "PackageCode" = "8:{F20C78B4-7484-40D6-B90E-53881D860A0C}"
         "UpgradeCode" = "8:{379FC376-46A5-401E-989E-50379DB0F398}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
