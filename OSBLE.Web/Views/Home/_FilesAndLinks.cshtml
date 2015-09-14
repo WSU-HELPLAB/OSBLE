@@ -132,7 +132,7 @@ else // Files
         cfm_states[stateIndex] = stateObj;
     </script>
 
-    <div class="file" data-path="@path" id="file_@stateIndex" data-state_index="@stateIndex">
+    <div class="file" data-path="/FileHandler/CourseDocument?courseId=@courseID&filePath=@path" id="file_@stateIndex" data-state_index="@stateIndex">
 
         <a class="file-header" href="/FileHandler/CourseDocument?courseId=@courseID&filePath=@path" title="@name">
             <img src="@Helpers.GetIconImgPath(path.Substring(path.LastIndexOf('.')))" />
