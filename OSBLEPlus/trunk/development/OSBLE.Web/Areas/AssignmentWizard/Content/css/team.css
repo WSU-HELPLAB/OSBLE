@@ -103,7 +103,8 @@
 .TeamNameTextBox
 {
     border:none;
-    width:175px;
+    width:160px;
+    float: left;
     font-weight:bold;
 }
     
