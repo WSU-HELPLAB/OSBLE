@@ -488,12 +488,6 @@ ul.user_list {
         display: block;
     }
 
-.user_list li div.user_controls {
-    display: none;
-    float: right;
-    padding-right: 3px;
-}
-
 #users_table td {
     width: 250px;
     vertical-align: top;
@@ -1214,19 +1208,39 @@ ul.selector {
     width: 80px;
 }
 
-#notifications_list li .notification_tools, #event_list li .event_tools {
-    display: none;
+#notifications_list li .notification_tools, #event_list li .event_tools, .user_list li .user_controls {
+    opacity: 0;
     float: right;
-    padding-top: 5px;
-    padding-right: 5px;
+}
+
+#notifications_list li .notification_tools *, #event_list li .event_tools *, .user_list li .user_controls * {
+    position: relative;
+    display: block;
+    float: left;
+    top: 0;
+    margin: 0;
+    margin-left: 1px;
+    padding: 0;
+    cursor: pointer;
+}
+
+@media(max-width: 850px)
+{
+    /* No hover functionality on phones */
+    #notifications_list li .notification_tools, #event_list li .event_tools, .user_list li .user_controls {
+        opacity: 1;
+    }
+    #notifications_list li .notification_tools *, #event_list li .event_tools *, .user_list li .user_controls * {
+        margin-left: 3px;
+    }
 }
 
 #notifications_list li div.notification_text {
     margin-right: 20px;
 }
 
-#notifications_list li:hover .notification_tools, #event_list li:hover .event_tools {
-    display: block;
+#notifications_list li:hover .notification_tools, #event_list li:hover .event_tools, .user_list li:hover .user_controls {
+    opacity: 1;
 }
 
 .meeting_time, .break, .deliverable, .recipient {
