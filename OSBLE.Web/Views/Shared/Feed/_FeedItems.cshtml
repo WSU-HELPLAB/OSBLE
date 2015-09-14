@@ -53,7 +53,7 @@
                 </div>
             </div>
 
-            @* Display Name & Date/Time*@
+            @* Display Name & Date/Time *@
             <a class="display_name" data-bind="text: senderName, attr: {href: '/Profile/Index/' + senderId}"></a>
             <span class="feed-item-date" data-bind="text: timeString()"></span>
         </div>
@@ -67,8 +67,8 @@
         <div data-bind="if: options.canEdit">
             <form class="feed-edit-form" data-bind="attr: {id: 'feed-edit-' + eventId}">
                 <textarea class="form-control" data-bind="attr: {id: 'feed-edit-textbox-' + eventId}"></textarea>
-                <input name="response-submit" class="btn btn-default btn-sm" type="button" value="Save" data-bind="click: Edit" />
-                <input name="response-cancel" class="btn btn-default btn-sm" type="reset" value="Cancel" data-bind="click: HideEditBox" />
+                <input name="response-submit" class="btn btn-default btn-sm" type="button" value="Save" data-bind="click: Edit, attr: {id: 'feed-edit-submit-' + eventId}" />
+                <input name="response-cancel" class="btn btn-default btn-sm" type="reset" value="Cancel" data-bind="click: HideEditBox, attr: {id: 'feed-edit-cancel-' + eventId}" />
             </form>
         </div>
 
@@ -87,8 +87,8 @@
                 @* Reply Form (Hidden by default. Only shows when user clicks reply) *@
                 <form class="feed-reply-form" data-bind="attr: {id: 'feed-reply-' + eventId}">
                     <textarea class="form-control feed-reply-textbox" placeholder="Say something..." data-bind="attr: {id: 'feed-reply-textbox-' + eventId}"></textarea>
-                    <input name="response-submit" class="btn btn-default btn-sm" type="button" value="Post Reply" data-bind="click: AddComment" />
-                    <input name="response-cancel" class="btn btn-default btn-sm" type="reset" value="Cancel" data-bind="click: HideReplyBox" />
+                    <input name="response-submit" class="btn btn-default btn-sm" type="button" value="Post Reply" data-bind="click: AddComment, attr: {id: 'feed-reply-submit-' + eventId}" />
+                    <input name="response-cancel" class="btn btn-default btn-sm" type="reset" value="Cancel" data-bind="click: HideReplyBox, attr: {id: 'feed-reply-cancel-' + eventId}" />
                 </form>
          
                 @* Footer Links *@

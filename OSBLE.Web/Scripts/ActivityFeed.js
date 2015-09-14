@@ -52,6 +52,12 @@ function FeedItem(data) {
     // the edit form. (Note: not called if the user cancels their edit)
     self.Edit = function () {
         var text = $("#feed-edit-textbox-" + self.eventId).val();
+
+        // disable posting so user can't "spam" post
+        $("#feed-edit-textbox-" + self.eventId).attr("disabled", "disabled");
+        $("#feed-edit-submit-" + self.eventId).attr("disabled", "disabled");
+        $("#feed-edit-cancel-" + self.eventId).attr("disabled", "disabled");
+
         $.ajax({
             url: self.isComment? "/Feed/EditLogComment" : "/Feed/EditFeedPost",
             data: { id: self.eventId, newText: text },
@@ -60,6 +66,12 @@ function FeedItem(data) {
             success: function (dataObj) {
                 self.htmlContent(dataObj.HTMLContent);
                 self.timeString(dataObj.TimeString);
+
+                // re-enable buttons and textbox
+                $("#feed-edit-textbox-" + self.eventId).removeAttr("disabled");
+                $("#feed-edit-submit-" + self.eventId).removeAttr("disabled");
+                $("#feed-edit-cancel-" + self.eventId).removeAttr("disabled");
+
                 EditSucceeded(self);
             },
             error: function () {
@@ -88,6 +100,11 @@ function FeedItem(data) {
         // Get text from the textarea
         var text = $('#feed-reply-textbox-' + self.eventId).val();
 
+        // Disable buttons and textbox so the user cannot "spam" replies
+        $("#feed-reply-textbox-" + self.eventId).attr("disabled", "disabled");
+        $("#feed-reply-submit-" + self.eventId).attr("disabled", "disabled");
+        $("#feed-reply-cancel-" + self.eventId).attr("disabled", "disabled");
+
         // Make sure the user submited something
         if (text == "") {
             return;
@@ -101,6 +118,12 @@ function FeedItem(data) {
             success: function(dataList) {
                 var commentList = $.map(dataList, function(item) { return new FeedItem(item) });
                 self.comments(commentList);
+
+                // re-enabled buttons and textbox
+                $("#feed-reply-textbox-" + self.eventId).removeAttr("disabled");
+                $("#feed-reply-submit-" + self.eventId).removeAttr("disabled");
+                $("#feed-reply-cancel-" + self.eventId).removeAttr("disabled");
+
                 PostReplySucceeded(self);
             },
             error: function() {
@@ -149,13 +172,13 @@ function FeedViewModel(userName, userId) {
             success: function (data) {
                 self.items.unshift(new FeedItem(data)); // unshift puts object at beginning of array
                 MakePostSucceeded(data.EventId);
+
+                // re-enable posting
+                $('#feed-post-textbox').removeAttr('disabled');
+                $('#btn_post_active').removeAttr('disabled');
             },
             error: function () {
                 MakePostFailed();
-            },
-            complete: function () {
-                $('#feed-post-textbox').removeAttr('disabled');
-                $('#btn_post_active').removeAttr('disabled');
             }
         });
     };
