@@ -12,6 +12,7 @@ namespace OSBLE.Interfaces
         string Identification { get; set; }
         bool IsAdmin { get; set; }
         bool EmailAllActivityPosts { get; set; }
+        bool EmailSelfActivityPosts { get; set; }
         bool EmailAllNotifications { get; set; }
         bool EmailNewDiscussionPosts { get; set; }
         int IDefaultCourseId { get; set; }

@@ -153,6 +153,9 @@ namespace OSBLE.Controllers
             userprofile.LastName = "User";
             userprofile.SchoolID = 1;
             userprofile.EmailAllNotifications = false;
+            userprofile.EmailSelfActivityPosts = false;
+            userprofile.EmailNewDiscussionPosts = false;
+            userprofile.EmailSelfActivityPosts = false;
             userprofile.UserName = "DeleteUser";
 
             db.SaveChanges();

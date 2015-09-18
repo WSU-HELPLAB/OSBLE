@@ -20,6 +20,7 @@ namespace OSBLE.Utility
             newUser.DefalutCourse = null; // need to figure out a function to convert from course to ICourse
             newUser.Email = null; // need user's email
             newUser.EmailAllActivityPosts = false; // based off of preferences
+            newUser.EmailSelfActivityPosts = false;
             newUser.EmailAllNotifications = false;
             newUser.EmailNewDiscussionPosts = false;
             newUser.FirstName = null;

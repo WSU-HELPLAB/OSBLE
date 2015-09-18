@@ -16,6 +16,7 @@ namespace OSBLEPlus.Logic.DomainObjects.Profiles
         public string Identification { get; set; }
         public bool IsAdmin { get; set; }
         public bool EmailAllActivityPosts { get; set; }
+        public bool EmailSelfActivityPosts { get; set; }
         public bool EmailAllNotifications { get; set; }
         public bool EmailNewDiscussionPosts { get; set; }
         public int IDefaultCourseId { get; set; }
