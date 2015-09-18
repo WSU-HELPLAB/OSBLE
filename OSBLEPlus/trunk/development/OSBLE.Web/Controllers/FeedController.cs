@@ -733,9 +733,17 @@ namespace OSBLE.Controllers
 
             int logID = Posts.SaveEvent(log);
             var newPost = new AggregateFeedItem(Feeds.Get(logID));
-            
+
+            //get email addresses for users who want to be notified by email
+            var emailList = DBHelper.GetActivityFeedForwardedEmails(courseID);
+            //remove email for current user if they do not want to get their own posts emailed.
+            bool emailSelf = ActiveCourseUser.UserProfile.EmailSelfActivityPosts;
+            if(!emailSelf)
+            {
+                emailList.RemoveAll(el => el.Address == ActiveCourseUser.UserProfile.Email);
+            }
             // Send emails to those who want to be notified by email
-            SendEmailsToListeners(log.Comment, logID, courseID, DateTime.UtcNow, DBHelper.GetActivityFeedForwardedEmails(courseID));
+            SendEmailsToListeners(log.Comment, logID, courseID, DateTime.UtcNow, emailList);
 
             return Json(MakeAggregateFeedItemJsonObject(newPost, false));
         }
@@ -801,7 +809,9 @@ namespace OSBLE.Controllers
                 body += string.Format("<a href=\"{0}\">View and reply to post in OSBLE</a>", Url.Action("Details", new { id = sourcePostID }));
 
                 //Send the message
+#if !DEBUG
                 Email.Send(subject, body, emails);
+#endif
             }
         }
 

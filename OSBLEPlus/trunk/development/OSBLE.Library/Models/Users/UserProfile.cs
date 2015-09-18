@@ -64,6 +64,9 @@ namespace OSBLE.Models.Users
         [DataMember]
         public bool EmailAllNotifications { get; set; }
 
+        [DataMember]
+        public bool EmailSelfActivityPosts { get; set; }
+
         /// <summary>
         /// If set, will email all activity feed posts to the users
         /// </summary>
@@ -168,6 +171,7 @@ namespace OSBLE.Models.Users
             DefaultCourse = up.DefaultCourse;
             EmailAllNotifications = up.EmailAllNotifications;
             EmailAllActivityPosts = up.EmailAllActivityPosts;
+            EmailSelfActivityPosts = up.EmailSelfActivityPosts;
             EmailNewDiscussionPosts = up.EmailNewDiscussionPosts;
             FirstName = up.FirstName;
             ID = up.ID;
