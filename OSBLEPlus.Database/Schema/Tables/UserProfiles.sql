@@ -14,7 +14,7 @@
     [EmailAllNotifications]   BIT            NOT NULL,
     [EmailAllActivityPosts]   BIT            NOT NULL,
     [EmailNewDiscussionPosts] BIT            NOT NULL,
-    [EmailSelfActivityPosts] BIT NOT NULL, 
+    [EmailSelfActivityPosts]  BIT			 NOT NULL, 
     CONSTRAINT [PK_dbo.UserProfiles] PRIMARY KEY CLUSTERED ([ID] ASC),
     CONSTRAINT [FK_dbo.UserProfiles_dbo.Schools_SchoolID] FOREIGN KEY ([SchoolID]) REFERENCES [dbo].[Schools] ([ID]) ON DELETE CASCADE
 );
