@@ -70,6 +70,7 @@ USING [#UserProfiles] AS Source ON (Target.[ID] = Source.[ID])
          ,Target.[EmailAllNotifications] = Source.[EmailAllNotifications]
          ,Target.[EmailAllActivityPosts] = Source.[EmailAllActivityPosts]
          ,Target.[EmailNewDiscussionPosts] = Source.[EmailNewDiscussionPosts]
+		 ,Target.[EmailSelfActivityPosts] = Source.[EmailSelfActivityPosts]
 
 	WHEN NOT MATCHED BY Target
 	THEN
@@ -87,7 +88,8 @@ USING [#UserProfiles] AS Source ON (Target.[ID] = Source.[ID])
            ,[DefaultCourse]
            ,[EmailAllNotifications]
            ,[EmailAllActivityPosts]
-           ,[EmailNewDiscussionPosts])
+           ,[EmailNewDiscussionPosts]
+		   ,[EmailSelfActivityPosts])
 	VALUES
 	(
 		  Source.[ID]
@@ -105,6 +107,7 @@ USING [#UserProfiles] AS Source ON (Target.[ID] = Source.[ID])
          ,Source.[EmailAllNotifications]
          ,Source.[EmailAllActivityPosts]
          ,Source.[EmailNewDiscussionPosts]
+		 ,Source.[EmailSelfActivityPosts]
 	)
 	WHEN NOT MATCHED BY Source
 	THEN

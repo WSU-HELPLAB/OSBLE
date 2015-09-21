@@ -16,7 +16,7 @@ If the build is done in release instead of debug, then the installer will be loc
 instead of the Debug folder it will be in the Release folder.
 
 When you build OSBIDE.Plugins.VS2013 in debug mode you will find "OSBLE_VisualStudio_Extension.vsix" in this folder:
-[development folder]\OSBLEPlus.VSPlugin\OSBIDE.Plugins.VS2013\debug\OSBLE_VisualStudio_Extension.vsix
+[development folder]\OSBLEPlus.VSPlugin\OSBIDE.Plugins.VS2013\bin\debug\OSBLE_VisualStudio_Extension.vsix
 This version of the plugin installer will work with constants of localhost:8088 and localhost:8087
 
 For a version that uses https://plus.osble.org you want to change the dropdown next to "Start" (to run debugging)
