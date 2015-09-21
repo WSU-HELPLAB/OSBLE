@@ -935,6 +935,9 @@ function cfm_RenameFile(stateObjectIndex) {
         return;
     }
 
+    // remove special chars
+    tb.value = tb.value.replace(/[^a-z0-9._-]+/gi, "");
+
     // New file name cannot be empty
     if (0 == tb.value.length) {
         tb.focus();
@@ -981,6 +984,9 @@ function cfm_RenameFolder(stateObjectIndex) {
         cfm_hideControls(stateObjectIndex);
         return;
     }
+
+    // remove special chars
+    tb.value = tb.value.replace(/[^a-z0-9]+/gi, " ");
 
     // New folder name cannot be empty
     if (0 == tb.value.length) {
