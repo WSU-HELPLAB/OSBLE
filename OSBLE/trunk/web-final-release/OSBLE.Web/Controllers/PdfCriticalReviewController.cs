@@ -177,7 +177,7 @@ namespace OSBLE.Controllers
         /// <param name="assignmentID"></param>
         /// <param name="authorTeamID"></param>
         /// <returns></returns>
-        public ActionResult ReviewGradedDocument(int assignmentID, int authorTeamID)
+        public ActionResult ReviewGradedDocument(int assignmentID, int authorTeamID, int anonReview = 0)
         {
             WebClient client = new WebClient();
             Assignment CRassignment = db.Assignments.Find(assignmentID);
@@ -216,6 +216,11 @@ namespace OSBLE.Controllers
                             {
                                 settings = new CriticalReviewSettings();
                                 settings.Assignment = CRassignment;
+                            }
+
+                            if(anonReview == 1)
+                            {
+                                settings.AnonymizeComments = true;
                             }
                             
                             api.SetDocumentAnonymity(CurrentUser, uploadResult.DocumentCode, uploadResult.DocumentDate, settings);

@@ -48,7 +48,7 @@
                 {
                     <li>
                         @*@Html.ActionLink("View Reviewed Document", "ReviewGradedDocument", "../PdfCriticalReview", new { assignmentId = dataModel.Submission.assignmentID, authorTeamId = dataModel.Submission.authorTeamID }, new { area = "" })*@
-                        <a href="~/PdfCriticalReview/ReviewGradedDocument?assignmentId=@dataModel.Submission.assignmentID&authorTeamId=@dataModel.Submission.authorTeamID">View Reviewed Document</a>
+                        <a href="~/PdfCriticalReview/ReviewGradedDocument?assignmentId=@dataModel.Submission.assignmentID&authorTeamId=@dataModel.Submission.authorTeamID&anonReview=1">View Reviewed Document</a>
                     </li>
                 }
                 else //Document is not published yet, no link to view.
