@@ -244,6 +244,11 @@ namespace OSBLE.Controllers
             {
                 viewModel.TeamList = assignment.AssignmentTeams.OrderBy(t => t.Team.Name).ToList();
             }
+            else if (assignment.DiscussionTeams != null && assignment.DiscussionTeams.Count > 0)
+            {
+                // need a DiscussionTeamList to be able to prevent null reference exceptions when grading a discussion assignment
+                viewModel.DiscussionTeamList = assignment.DiscussionTeams.OrderBy(t => t.Team.Name).ToList();
+            }
             else
             {
                 viewModel.TeamList = assignment.AssignmentTeams.OrderBy(l => l.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName).ThenBy(f => f.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.FirstName).ToList();

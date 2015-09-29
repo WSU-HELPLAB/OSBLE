@@ -3,7 +3,7 @@ using System.Runtime.Caching;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
-
+using Ionic.Zip;
 using OSBLE.Models.Users;
 using OSBLEPlus.Logic.DataAccess.Profiles;
 
@@ -14,6 +14,7 @@ namespace OSBLEPlus.Logic.Utility.Auth
         private readonly FileCache _cache;
         private const string UserNameKey = "UserName";
         public const string ProfileCookieKey = "osble_profile";
+        public const string FileCacheKey = "FileCacheKey";
 
         public Authentication()
             : this(HttpContext.Current.Server.MapPath("~\\App_Data\\"))
@@ -55,9 +56,13 @@ namespace OSBLEPlus.Logic.Utility.Auth
         {
             if (HttpContext.Current != null)
             {
-                var httpCookie = HttpContext.Current.Request.Cookies[ProfileCookieKey];
+                var httpCookie = HttpContext.Current.Request.Cookies[FileCacheKey];
                 if (httpCookie != null)
-                    return httpCookie.Values[UserNameKey];
+                {
+                    // need to decrype the username then find the key in the file system
+                    return httpCookie.Values[FileCacheKey];
+                }
+                    
             }
 
             return string.Empty;
@@ -102,7 +107,7 @@ namespace OSBLEPlus.Logic.Utility.Auth
         /// <param name="profile"></param>
         public string LogIn(UserProfile profile)
         {
-            var cookie = new HttpCookie(ProfileCookieKey);
+            var cookie = new HttpCookie(FileCacheKey);
 
             //compute hash for this login attempt
             var hash = GetAuthKey(profile.Email);
@@ -111,7 +116,7 @@ namespace OSBLEPlus.Logic.Utility.Auth
             _cache[hash] = profile.IUserId;
 
             //store the key to the hash inside a cookie for the user
-            cookie.Values[UserNameKey] = hash;
+            cookie.Values[FileCacheKey] = hash;
 
             //set a really long expiration date for the cookie.  Note that the server's copy of the
             //hash key will expire much sooner than this.
@@ -133,9 +138,27 @@ namespace OSBLEPlus.Logic.Utility.Auth
         {
             if (HttpContext.Current == null) return;
 
-            var httpCookie = HttpContext.Current.Request.Cookies[ProfileCookieKey];
-            if (httpCookie != null)
-                httpCookie.Expires = DateTime.UtcNow.AddDays(-1d);
+            // force delete cookie
+            var httpCookie = HttpContext.Current.Request.Cookies[FileCacheKey];
+            
+            // cookie may not exist
+
+            try
+            {
+                HttpContext.Current.Response.Cookies.Remove(FileCacheKey);
+                httpCookie.Expires = DateTime.Now.AddDays(-10);
+                httpCookie.Value = null;
+                HttpContext.Current.Response.SetCookie(httpCookie);
+            }
+            catch (Exception ex)
+            {
+                // do nothing for now
+                string foo = ex.Message;
+            }
+
+
+            //if (httpCookie != null)
+            //    httpCookie.Expires = DateTime.UtcNow.AddDays(-1d);
         }
 
         public static string GetOsblePasswordHash(string text)

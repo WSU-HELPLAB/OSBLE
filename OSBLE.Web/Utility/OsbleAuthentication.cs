@@ -23,6 +23,7 @@ namespace OSBLE.Utility
         }
         private const string userNameKey = "UserName";
         private const string authKey = "AuthKey";
+        public const string FileCacheKey = "FileCacheKey";
 
         private OSBLEContext db = new OSBLEContext();
 
@@ -225,9 +226,11 @@ namespace OSBLE.Utility
                 //cookie might not exist
                 try
                 {
-                    HttpCookie cookie = HttpContext.Current.Request.Cookies.Get(ProfileCookieKey);
-                    cookie.Expires = DateTime.UtcNow.AddDays(-1d);
-                    HttpContext.Current.Response.Cookies.Set(cookie);
+                    var httpCookie = HttpContext.Current.Request.Cookies[ProfileCookieKey];
+                    HttpContext.Current.Response.Cookies.Remove(ProfileCookieKey);
+                    httpCookie.Expires = DateTime.Now.AddDays(-10);
+                    httpCookie.Value = null;
+                    HttpContext.Current.Response.SetCookie(httpCookie);
                 }
                 catch (Exception ex)
                 {

@@ -52,6 +52,8 @@ namespace OSBLE.Models.ViewModels
 
         public List<AssignmentTeam> TeamList { get; set; }
 
+        public List<DiscussionTeam> DiscussionTeamList { get; set; } 
+
         /// <summary>
         /// Used for the drop down selection, to switch to another rubric evalutaion
         /// </summary>
