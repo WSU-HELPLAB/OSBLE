@@ -371,9 +371,34 @@ function create_and_open_downloading_submission_dialog() {
                 }
                 @if (Model.SelectedAssignment.AssignmentTypeID == 3)
                 {
-                    <td>
-                        @(Html.ActionLink("View " + Model.Evaluation.Recipient.Name + "'s discussion contributions", "TeacherIndex", "DiscussionAssignment", new {assignmentId = Model.SelectedAssignment.ID, courseUserId = Model.Evaluation.Recipient.TeamMembers.FirstOrDefault().CourseUserID, discussionTeamID = Model.SelectedAssignment.AssignmentTeams.IndexOf(Model.SelectedTeam)+1, hightlightValue = "PostsAndReplies"}, new {}))
-                    </td>
+                    int cuid = Model.Evaluation.Recipient.TeamMembers.FirstOrDefault().CourseUserID;
+                    // find user in which team
+
+                    
+                    if (Model.DiscussionTeamList != null)
+                     {
+                         int teamId = -1;
+
+                         foreach (DiscussionTeam dt in Model.DiscussionTeamList)
+                         {
+                             if (dt.Team.TeamMembers.Any(s => s.CourseUserID == cuid))
+                             {
+                                 teamId = dt.ID;
+                                 break;
+                             }
+                         }
+                         <td>
+                             @(Html.ActionLink("View " + Model.Evaluation.Recipient.Name + "'s discussion contributions", "TeacherIndex", "DiscussionAssignment", new { assignmentId = Model.SelectedAssignment.ID, courseUserId = cuid, discussionTeamID = teamId, highlightValueString = "PostsAndReplies" }, new { }))
+                         </td>
+                     }
+                     // one discussion among the whole class
+                     else
+                     {
+                        <td>
+                            @(Html.ActionLink("View " + Model.Evaluation.Recipient.Name + "'s discussion contributions", "TeacherIndex", "DiscussionAssignment", new { assignmentId = Model.SelectedAssignment.ID, courseUserId = cuid, discussionTeamID = Model.SelectedAssignment.AssignmentTeams.IndexOf(Model.SelectedTeam) + 1, highlightValueString = "PostsAndReplies" }, new { }))
+                        </td>
+                     }
+
                 }
             </tr>
                 

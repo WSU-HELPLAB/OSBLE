@@ -283,8 +283,10 @@ namespace OSBLE.Controllers
         /// <param name="discussionTeamID">The discussion team id for discussion to be viewed. If it is a classwide discussion, then any dt in that assignment can be sent.</param>
         /// <returns></returns>
         [CanGradeCourse]
-        public ActionResult TeacherIndex(int assignmentId, int discussionTeamID, int courseUserId = 0, HighlightValue hightlightValue = HighlightValue.None, bool anonymous = false)
+        public ActionResult TeacherIndex(int assignmentId, int discussionTeamID, int courseUserId = 0, string highlightValueString = "None", bool anonymous = false)
         {
+            HighlightValue highlightValue;
+            Enum.TryParse(highlightValueString, out highlightValue);
             Assignment assignment = db.Assignments.Find(assignmentId);
             if (assignment.CourseID == ActiveCourseUser.AbstractCourseID && ActiveCourseUser.AbstractRole.CanGrade)
             {
@@ -311,7 +313,7 @@ namespace OSBLE.Controllers
                     }
                 }
 
-                if (hightlightValue == HighlightValue.None || courseUserId <= 0)  //If hightlightValue == None, we want no selections - so setting student to null.
+                if (highlightValue == HighlightValue.None || courseUserId <= 0)  //If hightlightValue == None, we want no selections - so setting student to null.
                 {
                     student = null;
                 }
@@ -349,7 +351,7 @@ namespace OSBLE.Controllers
                 ViewBag.LastVisit = GetAndUpdateLastVisit(discussionTeamID);
                 ViewBag.CanPost = canPost;
                 ViewBag.DiscussionPostViewModelList = dvm.DiscussionPostViewModels;
-                ViewBag.HighlightValue = hightlightValue;
+                ViewBag.HighlightValue = highlightValue;
                 ViewBag.Posts = posts;
                 ViewBag.Student = student;
                 ViewBag.Assignment = assignment;

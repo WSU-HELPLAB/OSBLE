@@ -13,7 +13,7 @@
             assignmentId = dataModel.ID,
             courseUserId = 0, 
             discussionTeamID = dataModel.DiscussionTeamID,
-            hightlightValue = OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.None,
+            highlightValueString = "None",
             area = "" 
             }, new { })
         @if (newPosts > 0)
@@ -24,7 +24,7 @@
                 assignmentId = dataModel.ID,
                 courseUserId = 0, 
                 discussionTeamID = dataModel.DiscussionTeamID,
-                hightlightValue = OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.NewPosts,
+                highlightValueString = "NewPosts",
                 area = "" 
                 }, new { })    
         }

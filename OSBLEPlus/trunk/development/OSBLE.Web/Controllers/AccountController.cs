@@ -81,6 +81,16 @@ namespace OSBLE.Controllers
                             //log them in
                             OsbleAuthentication.LogIn(localUser);
 
+                            // also log them in on the Authentication for FileCache
+                            var a = System.Web.HttpContext.Current.Server.MapPath("~").TrimEnd('\\');
+                            var path = string.Format("{0}\\OSBLEPlus.Services\\App_Data\\", Directory.GetParent(a).FullName);
+
+                            var auth =
+                                new Authentication(path);
+
+                            // log in localUser to fileCache
+                            auth.LogIn(localUser);
+
                             //..then send them on their way
                             if (string.IsNullOrEmpty(returnUrl) == false)
                             {
@@ -184,7 +194,15 @@ namespace OSBLE.Controllers
         public ActionResult LogOff()
         {
             OsbleAuthentication.LogOut();
+
+            // Need to Delete filecache cookie as well now
+            var a = System.Web.HttpContext.Current.Server.MapPath("~").TrimEnd('\\');
+            var path = string.Format("{0}\\OSBLEPlus.Services\\App_Data\\", Directory.GetParent(a).FullName);
+            var auth = new Authentication(path);
+            auth.LogOut();
+
             context.Session.Clear(); // Clear session on signout.
+            context.Session.Abandon(); // Delete the cookies
 
             return RedirectToAction("Index", "Home");
         }
