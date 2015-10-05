@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Diagnostics.Eventing.Reader;
 
 using EnvDTE;
 using EnvDTE90a;
@@ -178,6 +179,12 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
                 {
                     //let others know that we have created a new event
                     NotifyEventCreated(this, new EventCreatedArgs(oEvent));
+
+                    // if the user started without debugging, we need to turn on the event log listener
+                    if (commandName == "Debug.StartWithoutDebugging")
+                    {
+                        eventLogWatcher.Enabled = true;
+                    }
                 }
             }
         }
@@ -258,6 +265,34 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             ex.ExceptionType = exceptionType;
             ex.SolutionName = Dte.Solution.FullName;
             NotifyEventCreated(this, new EventCreatedArgs(ex));
+        }
+
+        public override void NETErrorEventRecordWritten(object sender, System.Diagnostics.Eventing.Reader.EventRecordWrittenEventArgs e)
+        {
+            EventRecord r = e.EventRecord;
+
+            // parse the data from the log's properties
+            List<string> data = new List<string>();
+            foreach (EventProperty prop in r.Properties)
+            {
+                data.AddRange(prop.Value.ToString().Split('\n'));
+            }
+
+            // verify that it is related to the users app
+            string appName = Path.GetFileNameWithoutExtension(Dte.Solution.FullName);
+            if (data.Contains(appName + ".exe") && r.ProviderName == "Application Error")
+            {
+                // the user's app crashed while they ran it outside of debug mode.
+
+                int code = int.Parse(data[6], System.Globalization.NumberStyles.HexNumber);
+
+                // TODO: find name/type of exception from code    
+                
+
+                EnvDTE.dbgExceptionAction action = dbgExceptionAction.dbgExceptionActionBreak;
+                HandleException("", "", code, "", ref action);
+                
+            }
         }
 
         #endregion

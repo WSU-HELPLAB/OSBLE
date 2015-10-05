@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
+using System.IO;
 using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio.Shell.Interop;
+using System.Diagnostics.Eventing.Reader;
 
 namespace OSBIDE.Library.ServiceClient.ServiceHelpers
 {
@@ -55,6 +57,8 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
         private SolutionEvents solutionEvents = null;
         private ProjectItemsEvents solutionItemsEvents = null;
         private TextEditorEvents textEditorEvents = null;
+
+        protected EventLogWatcher eventLogWatcher = null;
 
         public EventHandlerBase(IServiceProvider serviceProvider, IEventGenerator osbideEvents)
         {
@@ -142,6 +146,18 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
 
             //text editor events
             textEditorEvents.LineChanged += EditorLineChanged;
+
+            // Create an event log watcher that will notify us if any windows event logs
+            // of type Error are created in the "Application" log file. This is so we can
+            // tell if a user experiences a runtime exception while running their code
+            // outside debug mode.
+            string queryStr = "*[System/Level=2]";
+            EventLogQuery query = new EventLogQuery("Application", PathType.LogName, queryStr);
+            eventLogWatcher = new EventLogWatcher(query);
+
+            // subscribe to it's event (Note: it is not enabled yet, it will be enabled if the
+            // user runs without debuging)
+            eventLogWatcher.EventRecordWritten += NETErrorEventRecordWritten;
         }
 
         protected void NotifyEventCreated(object sender, EventCreatedArgs eventArgs)
@@ -225,5 +241,8 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
 
         //text editor event handlers
         public virtual void EditorLineChanged(TextPoint startPoint, TextPoint endPoint, int hint) { }
+
+        //windows event log watcher event handlers
+        public virtual void NETErrorEventRecordWritten(object sender, EventRecordWrittenEventArgs e) { }
     }
 }
