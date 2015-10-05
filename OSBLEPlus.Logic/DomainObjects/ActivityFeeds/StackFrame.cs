@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
@@ -20,7 +21,18 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 
         public int LineNumber { get; set; }
 
-        public ExceptionEvent Exception { get; set; }
+        [NonSerialized]
+        private ExceptionEvent _exception;
+
+        public ExceptionEvent Exception
+        {
+            get
+            {
+                return _exception;
+                
+            }
+            set { _exception = value; }
+        }
 
         /// <summary>
         /// The depth of the stack frame.  A depth of 0 means that it is the top
