@@ -1,0 +1,20 @@
+﻿.discussion_post {
+    margin-top: 25px;
+}
+
+.dp_post_header {
+    padding-bottom: 8px;
+    padding-top: 8px;
+}
+
+.dp_content {
+    margin-top: 8px;
+}
+
+.dp_replies {
+    margin: 25px 20px 5px 60px;
+}
+
+.dp_replylink {
+    margin: 10px 0px 5px 20px;
+}

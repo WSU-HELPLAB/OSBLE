@@ -4,6 +4,7 @@
 @using OSBLE.Models.DiscussionAssignment
 @using OSBLE.Models.Assignments
 @using OSBLE.Models.ViewModels
+@Styles.Render("~/Content/DiscussionAssignment.css")
 @{
 
     Assignment assignment = ViewBag.Assignment;
@@ -149,7 +150,7 @@
     </table>
 </div>
 
-<div id="activity_feed" style="max-width: 1200px">
+<div id="activity_feed" class="panel-group" style="max-width: 1200px">
     <!--Fielddset for prompt & Critical Review Discussion prompt-->
     <div class="promptText">
         @Html.Raw(HttpUtility.HtmlDecode(Helpers.WikiUrlLinking(assignment.AssignmentDescription).ToString()))
@@ -233,6 +234,7 @@
         HelperResult displayPicture;
         string displayName = "";
 
+        
         <!--Generating posts-->
         foreach (DiscussionPostViewModel dpvm in DiscussionPostViewModelList)
         {
@@ -245,7 +247,7 @@
             {
                 displayPicture = DefaultProfilePicture;
             }
-        <div class="dp_post" id="dp_post_@(dpvm.DiscussionPostId)" style="background:white;">
+            <div class="dp_post panel panel-default discussion_post" id="dp_post_@(dpvm.DiscussionPostId)" >
             @if ((ViewBag.LastVisit != null && ViewBag.HighlightValue == OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.NewPosts
                     && dpvm.Posted >= ViewBag.LastVisit && ViewBag.ActiveCourseUser.ID != dpvm.poster.CourseUser.ID)
                 || (ViewBag.Student != null
@@ -260,20 +262,17 @@
                     $('#dp_post_@(dpvm.DiscussionPostId)').css("background", "#FFF8C6");
                 </script>
             }
-            <div class="dp_post_header">
+            <div class="dp_post_header panel-heading">
                 @displayPicture
-                @displayName
-                <br />
 
-                <time 
-                class="utc-time"
+                <a class="display_name" href="/Profile/Index/@dpvm.poster.UserProfile.ID">@displayName</a>
+                <time
+                class="utc-time feed-item-date"
                 datetime="@Helpers.DateAsUnixTime(dpvm.Posted)" 
                 data-original-date="@Helpers.RawDate(dpvm.Posted)" 
                 data-date-format="MM/DD/YYYY hh:mm A">
                     @dpvm.Posted.ToShortDateString() @dpvm.Posted.ToShortTimeString()
                 </time>
-                <br />
-                <br />
             </div>
             <div class="dp_content">
                 @{
@@ -282,62 +281,62 @@
                 }
                 @Html.Raw(content)
             </div>
-            <div class="dp_replies">
-                <div id="dp_replies_for_@(dpvm.DiscussionPostId)">
-                    <!--Generating replies under each post-->
-                    @foreach (ReplyViewModel reply in dpvm.Replies)
-                    {
-                        displayName = reply.poster.DisplayName; //reusing displayName/displayPicture as theyre not used further down the post
-                        if (reply.poster.Anonymize == false)
+            @if (dpvm.Replies.Count > 0)
+            { 
+                <div class="dp_replies panel-group">
+                    <div id="dp_replies_for_@(dpvm.DiscussionPostId)">
+                        <!--Generating replies under each post-->
+                        @foreach (ReplyViewModel reply in dpvm.Replies)
                         {
-                            displayPicture = Helpers.ProfilePicture(Url.Action("ProfilePictureForDiscussion", new { course = reply.poster.CourseUser.AbstractCourseID, userprofile = reply.poster.CourseUser.UserProfileID }));
-                        }
-                        else
-                        {
-                            ;
-                            displayPicture = DefaultProfilePicture;
-                        }
-                        
-                        <div class="dp_post" id="dp_post_@(reply.DiscussionPostId)" style="background:white;">
-                            <div class="dp_post_header">
-                                @displayPicture
-                                @displayName<br />
-                                <time 
-                class="utc-time"
-                datetime="@Helpers.DateAsUnixTime(reply.Posted)" 
-                data-original-date="@Helpers.RawDate(reply.Posted)" 
-                data-date-format="MM/DD/YYYY hh:mm A">
-                                    @reply.Posted.ToShortDateString() @reply.Posted.ToShortTimeString()
-                                </time>
-                                <br />
-                                <br />
+                            displayName = reply.poster.DisplayName; //reusing displayName/displayPicture as theyre not used further down the post
+                            if (reply.poster.Anonymize == false)
+                            {
+                                displayPicture = Helpers.ProfilePicture(Url.Action("ProfilePictureForDiscussion", new { course = reply.poster.CourseUser.AbstractCourseID, userprofile = reply.poster.CourseUser.UserProfileID }));
+                            }
+                            else
+                            {
+                                ;
+                                displayPicture = DefaultProfilePicture;
+                            }
+
+                            <div class="dp_post panel panel-default" id="dp_post_@(reply.DiscussionPostId)" style="background:white;">
+                                <div class="dp_post_header panel-heading">
+                                    @displayPicture
+                                    <a class="display_name" href="/Profile/Index/@reply.poster.UserProfile.ID">@displayName</a>
+                                    <time class="utc-time feed-item-date"
+                                          datetime="@Helpers.DateAsUnixTime(reply.Posted)"
+                                          data-original-date="@Helpers.RawDate(reply.Posted)"
+                                          data-date-format="MM/DD/YYYY hh:mm A">
+                                        @reply.Posted.ToShortDateString() @reply.Posted.ToShortTimeString()
+                                    </time>
+                                </div>
+                                <div class="dp_content">
+                                    @{
+                            content = HttpUtility.HtmlDecode(Helpers.Linkify(reply.Content).ToHtmlString());
+                            content = content.Replace("\n", "<br />");
+                                    }
+                                    @Html.Raw(content)
+                                </div>
                             </div>
-                            <div class="dp_content">
-                                @{
-                        content = HttpUtility.HtmlDecode(Helpers.Linkify(reply.Content).ToHtmlString());
-                        content = content.Replace("\n", "<br />");
-                                }
-                                @Html.Raw(content)
-                            </div>
-                        </div>
-                        
-                        if ((ViewBag.LastVisit != null && ViewBag.HighlightValue == OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.NewPosts
-                                && reply.Posted >= ViewBag.LastVisit && ViewBag.ActiveCourseUser.ID != reply.poster.CourseUser.ID)
-                            || (ViewBag.Student != null
-                                && ViewBag.Student.ID == reply.poster.CourseUser.ID
-                                && (ViewBag.HighlightValue == OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.Replies
-                                    || ViewBag.HighlightValue == OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.PostsAndReplies)
-                                && (ViewBag.ActiveCourse.AbstractRole.CanGrade)))
-                        {
-                        <!--display as highlighted if there is a student selected, and this is that student
+
+                            if ((ViewBag.LastVisit != null && ViewBag.HighlightValue == OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.NewPosts
+                                    && reply.Posted >= ViewBag.LastVisit && ViewBag.ActiveCourseUser.ID != reply.poster.CourseUser.ID)
+                                || (ViewBag.Student != null
+                                    && ViewBag.Student.ID == reply.poster.CourseUser.ID
+                                    && (ViewBag.HighlightValue == OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.Replies
+                                        || ViewBag.HighlightValue == OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.PostsAndReplies)
+                                    && (ViewBag.ActiveCourse.AbstractRole.CanGrade)))
+                            {
+                                <!--display as highlighted if there is a student selected, and this is that student
                                     OR the post is new and highlight value is set to new posts-->
-                        <script type="text/javascript">
-                            $('#dp_post_@(reply.DiscussionPostId)').css("background", "#FFF8C6");
-                        </script>
+                                <script type="text/javascript">
+                                    $('#dp_post_@(reply.DiscussionPostId)').css("background", "#FFF8C6");
+                                </script>
+                            }
                         }
-                    }
+                    </div>
                 </div>
-            </div>
+            }
             @if (assignment.DueDate > DateTime.UtcNow)
             {
                 <div class="dp_replylink"><a href="#" id="reply_@(dpvm.DiscussionPostId)">Reply</a></div>

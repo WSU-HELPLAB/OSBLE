@@ -394,6 +394,7 @@
     <Content Include="Content\bootstrap-3.3.5\js\bootstrap.js" />
     <Content Include="Content\bootstrap-3.3.5\js\bootstrap.min.js" />
     <Content Include="Content\bootstrap-3.3.5\js\npm.js" />
+    <Content Include="Content\DiscussionAssignment.css" />
     <Content Include="Content\images\ajax-loader-s.gif" />
     <Content Include="Content\images\alert.png" />
     <Content Include="Content\favicon.ico" />
