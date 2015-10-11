@@ -139,6 +139,7 @@ h3 span.glyphicon {
 }
 
 .dp_post_header {
+    border-radius: 0 !important;
     padding: 4px;
     padding-bottom: 2px;
     color: #074974 !important;
@@ -2208,7 +2209,7 @@ div.pagedocname {
 }
 
 .feed-item-date {
-    font-size: 8pt;
+    font-size: 8pt !important;
 }
 
 /* Toggle collapse buttons */
