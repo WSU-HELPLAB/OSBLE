@@ -864,10 +864,13 @@ function cfm_FileRenameIconClicked(stateObjectIndex) {
     var targetDIV = document.getElementById("file_controls_" + stateObjectIndex.toString());
 
     //// Add the controls into the DIV
+    var name = state.name;
+    if (name.contains('.'))
+        name = name.substr(0, name.lastIndexOf('.'));
     $('body').append(
 "<div id=\"input_dialog\" title=\"Rename\"> \
         <br /><div><input type=\"text\" id=\"tbRenameFile_" +
-        stateObjectIndex.toString() + "\" value=\"" + state.name +
+        stateObjectIndex.toString() + "\" value=\"" + name +
         "\" style=\"width: 100%; box-sizing: border-box;\"></div>" +
         "<input type=\"button\" value=\"Rename\" style=\"width: 100%;\" " +
         "onclick=\"cfm_RenameFile(" + stateObjectIndex.toString() + ");\" />" +
@@ -937,6 +940,10 @@ function cfm_RenameFile(stateObjectIndex) {
 
     // remove special chars
     tb.value = tb.value.replace(/[^a-z0-9._-]+/gi, "");
+
+    // put the file extention back on
+    if (state.name.contains('.'))
+        tb.value += state.name.substr(state.name.lastIndexOf('.'));
 
     // New file name cannot be empty
     if (0 == tb.value.length) {
