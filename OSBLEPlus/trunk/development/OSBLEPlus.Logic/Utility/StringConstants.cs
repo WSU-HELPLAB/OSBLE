@@ -175,6 +175,11 @@ namespace OSBLEPlus.Logic.Utility
             }
         }
 
+        public static string FileCacheKey
+        {
+            get { return "FileCacheKey"; }
+        }
+
         public static string LibraryVersion
         {
             get { return Assembly.GetExecutingAssembly().GetName().Version.ToString(); }

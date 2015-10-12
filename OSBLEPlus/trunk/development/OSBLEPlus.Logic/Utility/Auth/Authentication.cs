@@ -15,6 +15,7 @@ namespace OSBLEPlus.Logic.Utility.Auth
         private const string UserNameKey = "UserName";
         public const string ProfileCookieKey = "osble_profile";
         public const string FileCacheKey = "FileCacheKey";
+        public const string AuthKey = "AuthKey";
 
         public Authentication()
             : this(HttpContext.Current.Server.MapPath("~\\App_Data\\"))
@@ -56,13 +57,21 @@ namespace OSBLEPlus.Logic.Utility.Auth
         {
             if (HttpContext.Current != null)
             {
-                var httpCookie = HttpContext.Current.Request.Cookies[FileCacheKey];
+                //var httpCookie = HttpContext.Current.Request.Cookies[FileCacheKey];
+
+                //if (httpCookie != null)
+                //{
+                //    // need to decrype the username then find the key in the file system
+                //    return httpCookie.Values[FileCacheKey];
+                //}
+
+                var httpCookie = HttpContext.Current.Request.Cookies[AuthKey];
+
                 if (httpCookie != null)
                 {
-                    // need to decrype the username then find the key in the file system
-                    return httpCookie.Values[FileCacheKey];
+                    return httpCookie.Values[AuthKey];
                 }
-                    
+
             }
 
             return string.Empty;
@@ -107,7 +116,7 @@ namespace OSBLEPlus.Logic.Utility.Auth
         /// <param name="profile"></param>
         public string LogIn(UserProfile profile)
         {
-            var cookie = new HttpCookie(FileCacheKey);
+            var cookie = new HttpCookie(AuthKey);
 
             //compute hash for this login attempt
             var hash = GetAuthKey(profile.Email);
@@ -116,7 +125,7 @@ namespace OSBLEPlus.Logic.Utility.Auth
             _cache[hash] = profile.IUserId;
 
             //store the key to the hash inside a cookie for the user
-            cookie.Values[FileCacheKey] = hash;
+            cookie.Values[AuthKey] = hash;
 
             //set a really long expiration date for the cookie.  Note that the server's copy of the
             //hash key will expire much sooner than this.
@@ -139,13 +148,13 @@ namespace OSBLEPlus.Logic.Utility.Auth
             if (HttpContext.Current == null) return;
 
             // force delete cookie
-            var httpCookie = HttpContext.Current.Request.Cookies[FileCacheKey];
+            var httpCookie = HttpContext.Current.Request.Cookies[AuthKey];
             
             // cookie may not exist
 
             try
             {
-                HttpContext.Current.Response.Cookies.Remove(FileCacheKey);
+                HttpContext.Current.Response.Cookies.Remove(AuthKey);
                 httpCookie.Expires = DateTime.Now.AddDays(-10);
                 httpCookie.Value = null;
                 HttpContext.Current.Response.SetCookie(httpCookie);
