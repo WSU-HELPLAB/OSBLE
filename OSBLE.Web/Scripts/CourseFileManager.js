@@ -15,6 +15,9 @@ var ContextMenu = false;
 var cfm_statesSelected = new Array();
 var cfm_boolMultipleSelected = false;
 
+// The maximum file size a user can upload in MB
+var MAX_FILE_SIZE = 30;
+
 // Call this function to start the asynchronous request for a file listing.
 // When the request completes the inner HTML of the DIV with the specified 
 // ID will be set.
@@ -358,7 +361,8 @@ function cfm_AddUploader(stateObjectIndex) {
     // Add the uploader control into the DIV
     $('body').append(
 "<div id=\"input_dialog\" title=\"Upload File(s)\"> \ " +
-    "<p style=\"font-size: small;\">NOTE: all special characters except '-' and '_' will be stripped from file names.</p>" +
+    "<p style=\"font-size: small;\">NOTE: all special characters except '-' and '_' will be stripped from file names." +
+    "<br/><strong>Maximum file size is " + MAX_FILE_SIZE + "MB.</strong></p>" +
     "Upload files to: " + state.name +
     "<br />" + fileuploader_getcontrolshtml(
         "cfm_files_" + stateObjectIndex.toString(), true,
