@@ -316,6 +316,49 @@ namespace OSBLE.Controllers
             return View("Profile");
         }
 
+        //
+        // POST: /Account/UpdateUserFullName
+        [OsbleAuthorize]
+        [HttpPost]
+        public ActionResult UpdateUserFullName(string firstName, string lastName)
+        {
+            bool changeNameSucceeded = false;
+
+            if (!String.IsNullOrEmpty(firstName) && !String.IsNullOrEmpty(lastName))
+            {
+                try
+                {
+                    UserProfile currentUser = db.UserProfiles.Find(OsbleAuthentication.CurrentUser.ID);
+                    if (currentUser != null)
+                    {
+
+                        //change and save first/last name
+                        currentUser.FirstName = firstName;
+                        currentUser.LastName = lastName;
+                        db.Entry(currentUser).State = EntityState.Modified;
+                        db.SaveChanges();
+                        changeNameSucceeded = true;
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("ChangeName", "OSBLE was unable to change user full name. (Error saving changes)");
+                }
+            }
+
+            if (changeNameSucceeded)
+            {
+                return RedirectToAction("Profile");
+            }            
+            else
+            {
+                ModelState.AddModelError("ChangeName", "OSBLE was unable to change user First and Last name. Please enter both a First and Last Name");
+            }
+            //we were unable to update the user's name
+            return View("Profile");
+        }
+
         [OsbleAuthorize]
         [HttpPost]
         public ActionResult UpdateEmailSettings()
