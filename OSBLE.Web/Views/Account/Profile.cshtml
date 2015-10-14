@@ -12,12 +12,21 @@
 <h2>Current User Information @Helpers.CreateToolTip(ToolTips.CurrentuserInformation)</h2>
 <div>
     
-@using (Html.BeginForm("UpdateUserEmail", "Account"))
+    <style>
+        th.user_info {
+            width:100px;
+            text-align:right;
+            vertical-align:middle;
+        }
+       
+    </style>
+
+@using (Html.BeginForm("UpdateUserFullName", "Account"))
 {
 
     <table>
         <tr>
-            <th>
+            <th class="user_info">
                 Institution:
             </th>
             <td style="background: #E4E4E4; text-align: center; width: 300px;">
@@ -26,19 +35,38 @@
             <td></td>
         </tr>
         <tr>
-            <th>
+            <th class="user_info">
                 Name:
             </th>
             <td style="background: #E4E4E4; text-align: center">
                 @ViewBag.CurrentUser.LastName, @ViewBag.CurrentUser.FirstName
             </td>
-            <td></td>
+            <td>
+                
+            </td>            
         </tr>
         <tr>
-            <th>
+            <td></td>
+            <td>
+                <input name="firstName" id="firstName" class="fillInput" placeholder="First Name" />
+                <input name="lastName" id="lastName" class="fillInput" placeholder="Last Name" />
+                @Html.ValidationMessage("ChangeName")
+            </td>
+            <td>
+                <input type="submit" value="Change Name" class="profileSubmitButton" />
+            </td>
+        </tr>
+    </table>
+    <br />
+}
+@using (Html.BeginForm("UpdateUserEmail", "Account"))
+{
+        <table>
+        <tr>
+            <th class="user_info">
                 Email<br />Address: 
             </th>
-            <td style="background: #E4E4E4; text-align: center">
+            <td style="background: #E4E4E4; text-align: center; width: 300px;">
                 <br />
                 @ViewBag.CurrentUser.UserName
             </td>
@@ -79,8 +107,8 @@
 {
     <table>
         <tr>
-            <th>
-                School ID:
+            <th class="user_info">
+                School <br /> ID:
             </th>
             <td style="background: #E4E4E4; text-align: center; width: 300px;">
                 @ViewBag.CurrentUser.Identification
