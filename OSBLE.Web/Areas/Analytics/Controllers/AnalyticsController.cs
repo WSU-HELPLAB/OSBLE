@@ -28,7 +28,8 @@ namespace OSBLE.Areas.Analytics.Controllers
         [HttpPost]
         public JsonResult GetStudentsForCourseId(int courseId)
         {
-            return Json(CourseDataAccess.GetStudentList(courseId));
+            DateTime start = DBHelper.GetCourseStart(courseId);
+            return Json(new {Students = CourseDataAccess.GetStudentList(courseId), StartYear = start.Year, StartMonth = start.Month });
         }
     }
 }

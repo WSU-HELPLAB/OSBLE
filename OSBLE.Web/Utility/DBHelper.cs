@@ -148,6 +148,16 @@ namespace OSBLE.Utility
             return name;
         }
 
+        public static DateTime GetCourseStart(int courseID, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection()) { return GetCourseStart(courseID, sqlc); }
+            }
+
+            return connection.Query<DateTime>("SELECT StartDate FROM AbstractCourses WHERE ID = @id", new { id = courseID }).SingleOrDefault();
+        }
+
         public static IEnumerable<CourseUser> GetAllCurrentCourses(int userProfileID, SqlConnection connection = null)
         {
             IEnumerable<CourseUser> currentCourses = null;
