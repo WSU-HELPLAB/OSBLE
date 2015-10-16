@@ -88,10 +88,47 @@
 
     });
 </script>
+
+<script>
+    function RosterPillButtonPressed(roleName, section)
+    {
+        $('td.section-' + section).removeClass("active");
+        $('td.section-' + section + '.role-' + roleName).addClass("active");
+        $('.roster-btn.section-' + section).removeClass("btn-primary");
+        $('.roster-btn.section-' + section + '.role-' + roleName).addClass("btn-primary");
+    }
+
+    $(document).ready(function () {
+        $('.roster_table td:first-child').addClass("active");
+    });
+</script>
+
 @foreach (RosterController.UsersBySection usersBySection in ViewBag.UsersBySections)
 {
     <h3>@Helpers.DisplaySection(usersBySection.SectionNumber)
     </h3>
+    
+    @* Button Pills used to simplify navigation on mobile devices (only visible when width < 850px)*@
+    <div class="btn-group btn-group-justified roster_pills">
+        @{ bool firstRole = true; }
+        @foreach (RosterController.UsersByRole ubr in usersBySection.UsersByRole)
+        {
+            if (ubr.Count > 0)
+            { 
+                <div class="btn-group">  
+                    <button type="button" class="roster-btn role-@ubr.RoleName section-@usersBySection.SectionNumber btn@(firstRole ? " btn-primary" : "")" onclick="RosterPillButtonPressed('@ubr.RoleName' , @usersBySection.SectionNumber )">
+                        @ubr.RoleName
+                    </button>
+                </div>
+            
+                if (firstRole)
+                {
+                    firstRole = false;
+                }
+            }
+        }
+    </div>
+    
     <table class="roster_table">
         <tr>
             @foreach (RosterController.UsersByRole userByRole in usersBySection.UsersByRole)
@@ -100,7 +137,7 @@
                 //the only person who should see the white list is instructors and ta's. TA's cannot modify
                 if (userByRole.RoleName == "Withdrawn" && ViewBag.WhiteTableUsers.Count != 0)
                 { 
-                <td>
+                <td class="role-Withdrawn section-@usersBySection.SectionNumber">
                     <!--Prints the users in the whitetable for the current class-->
                 <h3>Whitelisted(<span id="roleheader_@(usersBySection.SectionNumber)_whitetable">@ViewBag.WhiteTableUsers.Count.ToString()</span>)
                     @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
@@ -152,7 +189,7 @@
                 }
                 if (userByRole.Count > 0 && userByRole.RoleName != "Pending")
                 {  
-                <td>
+                <td class="role-@userByRole.RoleName section-@usersBySection.SectionNumber">
                     <h3>
                         @userByRole.RoleName (<span id="roleheader_@(usersBySection.SectionNumber)_@(userByRole.RoleName)">@userByRole.Count.ToString()</span>)
                         @if (userByRole.RoleName == "Student" && ViewBag.ActiveCourse.AbstractRole.CanModify)
@@ -231,39 +268,40 @@
                 }
                 else if (userByRole.Count > 0 && userByRole.RoleName == "Pending")
                 {
-                   <td>
-                    <h3>
-                        @userByRole.RoleName (<span id="roleheader_@(usersBySection.SectionNumber)_@(userByRole.RoleName)">@userByRole.Count.ToString()</span> )
-                        <a title="Approve ALL Pending Users" href="@Url.Action("BatchApprove", "Roster")">@Helpers.ThumbsUpButton()</a>
-                        <a title="Deny ALL Pending Users" href="@Url.Action("BatchDeny", "Roster")">@Helpers.ThumbsDownButton()</a>
-                        @try
-                        {
-                            @Helpers.CreateToolTip(ToolTips.RosterRolesDictionary[userByRole.RoleName]);
-                        }
-                        catch (KeyNotFoundException e)
-                        {
-                            @Helpers.CreateToolTip("Key not found: " + e);
-                        }
-                    </h3> 
-                    <ul class="user_list">
-                        @foreach (OSBLE.Models.Users.UserProfile user in userByRole.Users)
-                        {
-                            <li id="user_item_@(user.ID)">
-                                @if ((user != ViewBag.CurrentUser) || ViewBag.CanEditSelf == true)
-                                {
-                                    <div class="user_controls">
-                                        @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
-                                        {
-                                            <a title="Approve this User" href="@Url.Action("ApprovePending", "Roster", new { userId = user.ID })">@Helpers.ThumbsUpButton()</a>
-                                            <a title="Deny this User" href="@Url.Action("DenyPending", "Roster", new { userId = user.ID })">@Helpers.ThumbsDownButton()</a>
-                                        }
-                                    </div>
-                                }
-                                @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", new { userProfile = user.ID }))
-                                <span class="roster_name">@Helpers.DisplayFullNameOrPending(user)</span> </li>
-                        }
-                    </ul>
-                </td> 
+                    <td class="role-@userByRole.RoleName section-@usersBySection.SectionNumber">
+                        <h3>
+                            @userByRole.RoleName (<span id="roleheader_@(usersBySection.SectionNumber)_@(userByRole.RoleName)">@userByRole.Count.ToString()</span> )
+                            <a title="Approve ALL Pending Users" href="@Url.Action("BatchApprove", "Roster")">@Helpers.ThumbsUpButton()</a>
+                            <a title="Deny ALL Pending Users" href="@Url.Action("BatchDeny", "Roster")">@Helpers.ThumbsDownButton()</a>
+                            @try
+                            {
+                                @Helpers.CreateToolTip(ToolTips.RosterRolesDictionary[userByRole.RoleName]);
+                            }
+                            catch (KeyNotFoundException e)
+                            {
+                                @Helpers.CreateToolTip("Key not found: " + e);
+                            }
+                        </h3>
+                        <ul class="user_list">
+                            @foreach (OSBLE.Models.Users.UserProfile user in userByRole.Users)
+                            {
+                                <li id="user_item_@(user.ID)">
+                                    @if ((user != ViewBag.CurrentUser) || ViewBag.CanEditSelf == true)
+                                    {
+                                        <div class="user_controls">
+                                            @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                                            {
+                                                <a title="Approve this User" href="@Url.Action("ApprovePending", "Roster", new { userId = user.ID })">@Helpers.ThumbsUpButton()</a>
+                                                <a title="Deny this User" href="@Url.Action("DenyPending", "Roster", new { userId = user.ID })">@Helpers.ThumbsDownButton()</a>
+                                            }
+                                        </div>
+                                    }
+                                    @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", new { userProfile = user.ID }))
+                                    <span class="roster_name">@Helpers.DisplayFullNameOrPending(user)</span>
+                                </li>
+                            }
+                        </ul>
+                    </td>
                 }
             }
             
