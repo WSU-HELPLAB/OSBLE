@@ -454,16 +454,15 @@ h3 span.glyphicon {
 ul.user_list {
     padding-left: 0;
     margin-left: 0;
-    width: 230px;
 }
 
 .user_list li {
     list-style: none;
-    width: 230px;
+    width: 270px;
     border-bottom: 1px solid #aaccff;
     border: 1px solid #eeeeff;
     border-bottom: 3px solid #eeeeff;
-    min-height: 43px;
+    min-height: 46px;
     padding-top: 4px;
     margin-bottom: 7px;
     font-size: 10pt;
@@ -2408,4 +2407,46 @@ h2.date-header {
     margin-left: 0;
     margin-top: 0;
     padding-left: 0;
+}
+
+/* Roster (Users) Page */
+.roster_pills 
+{
+    display: none;
+}
+
+.roster_table
+{
+    display: block;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+@media (max-width: 850px)
+{    
+    .roster_pills {
+        display: block;
+    }
+
+    .roster_table td {
+        display: none;
+    }
+
+    .roster_table td.active {
+        display: block;
+    }
+
+    .roster_table, .roster_table tbody, .roster_table tr
+    {
+        display: block;
+        width: 100%;
+    }
+
+    .user_list li {
+        width: 100%;
+    }
+
+    .user_controls {
+        margin-right: 4px;
+    }
 }
