@@ -11,7 +11,7 @@ $("#course-id-select").change(function () {
                 $(".student-list-item").remove();
 
                 // then loop through the data
-                $.each(data, function (index, value) {
+                $.each(data.Students, function (index, value) {
                     var name = value.FirstName + ' ' + value.LastName;
                     $("#studentList").append(
                         '<li id="li-user-' + value.ID + '" \
@@ -26,7 +26,13 @@ $("#course-id-select").change(function () {
                 try {
                     $(".cb-user").click(function () { cbUserClicked(); });
                 }
-                catch (err) {}
+                catch (err) { }
+
+                // Only needs to be done for the calendar
+                try {
+                    SetCalendarDate(data.StartYear, data.StartMonth, 1);
+                }
+                catch (err) { }
             }
         }
     });

@@ -1,7 +1,30 @@
 ﻿
 var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 var yearG = 2015, monthG = 01, dayG = 01;
-var currentMonth = 1, currentYear = 2014;
+var today = new Date();
+var currentMonth = today.getMonth() + 1, currentYear = today.getFullYear();
+
+function SetCalendarDate(year, month, day)
+{
+    // if this happens, there was probably an error. Or the user
+    // selected "Any". In either case, we don't want to change the
+    // default calendar date.
+    if (year < 1900)
+        return;
+
+    yearG = currentYear = year;
+    monthG = currentMonth = month;
+    dayG = day;
+
+    updateMeasureBackground();
+    if ($("#hourlychart").is(":visible")) {
+
+        onDayClick(yearG, monthG, dayG, false);
+    } else {
+
+        updateCalendar(0);
+    }
+}
 
 $(document).ready(function () {
 
