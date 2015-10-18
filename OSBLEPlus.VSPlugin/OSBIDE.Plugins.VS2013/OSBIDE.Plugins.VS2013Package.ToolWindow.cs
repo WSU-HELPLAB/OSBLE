@@ -241,7 +241,7 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
                         _client.IsCollectingData = true;
                         _client.StartSending();
                     }
-                    MessageBox.Show("Welcome to OSBIDE!");
+                    MessageBox.Show("Welcome to OSBLE!");
                 }
                 else
                 {
@@ -259,7 +259,7 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
                 _client.IsCollectingData = false;
                 _client.StopSending();
                 _cache[StringConstants.AuthenticationCacheKey] = string.Empty;
-                MessageBox.Show("You have been logged out of OSBIDE.");
+                MessageBox.Show("You have been logged out of OSBLE.");
             }
         }
     }

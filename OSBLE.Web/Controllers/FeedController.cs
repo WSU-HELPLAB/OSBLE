@@ -48,7 +48,9 @@ namespace OSBLE.Controllers
                 ViewBag.ErrorMessage = null;
             }
 
-            _activityFeedQuery = new ActivityFeedQuery(ActiveCourseUser.AbstractCourseID) {MaxQuerySize = 20};
+            // after check make sure we set a courseUser before we make an instalce of the activityFeedQuery
+            if (ActiveCourseUser == null) return;
+            _activityFeedQuery = new ActivityFeedQuery(ActiveCourseUser.AbstractCourseID) { MaxQuerySize = 20 };
             _activityFeedQuery.UpdateEventSelectors(ActivityFeedQuery.GetSocialEvents());
         }
 
@@ -88,6 +90,7 @@ namespace OSBLE.Controllers
         /// which normally includes these things.
         /// </summary>
         /// <returns></returns>
+        [OsbleAuthorize]
         public ActionResult OSBIDE(int? courseID)
         {
             if (courseID != null) SetCourseID(courseID.Value);
@@ -193,7 +196,8 @@ namespace OSBLE.Controllers
             if (events != null)
             {
                 var eventList = events.Replace(" ", "").Split(',').Where(s => s != "");
-                _activityFeedQuery.UpdateEventSelectors(eventList.Select(s => (EventType)int.Parse(s)));
+                var listOfEvents = eventList.Select(s => (EventType) int.Parse(s)).ToList();
+                _activityFeedQuery.UpdateEventSelectors(listOfEvents);
             }
 
             // Build the model and convert it to JSON to send to the view
