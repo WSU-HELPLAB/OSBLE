@@ -11,6 +11,18 @@ namespace OSBLEPlus.Services.Controllers
 {
     public class CalendarDayController : ApiController
     {
+        /// <summary>
+        /// Gets the Hourly Aggregates from the Calendar
+        /// </summary>
+        /// <param name="attr">
+        /// attr has the following POCO format
+        /// public DateTime ReferenceDate { get; set; }
+        /// public AggregateFunction AggregateFunctionId { get; set; }
+        /// public int? CourseId { get; set; }
+        /// public string SelectedMeasures { get; set; }
+        /// public string SubjectUsers { get; set; }
+        /// </param>
+        /// <returns></returns>
         [AllowAdmin]
         public HourlyAggregations Get([FromUri]CalendarAttributes attr)
         {

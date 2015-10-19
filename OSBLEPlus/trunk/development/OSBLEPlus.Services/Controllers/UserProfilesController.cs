@@ -15,6 +15,12 @@ namespace OSBLEPlus.Services.Controllers
 {
     public class UserProfilesController : ApiController
     {
+        /// <summary>
+        /// Logs the user in with the passed username and hashed password
+        /// </summary>
+        /// <param name="e">Username</param>
+        /// <param name="hp">Hashed Password</param>
+        /// <returns>HttpResponeMessage</returns>
         [HttpGet]
         public HttpResponseMessage Login(string e, string hp)
         {
@@ -36,11 +42,37 @@ namespace OSBLEPlus.Services.Controllers
             };
         }
 
+        /// <summary>
+        /// Get's the active user from an authentication key
+        /// </summary>
+        /// <param name="a">Authentication Key</param>
+        /// <returns>IUser which has the following POCO format
+        ///  int IUserId { get; set; }
+        /// string Email { get; set; }
+        /// string FirstName { get; set; }
+        /// string LastName { get; set; }
+        /// string FullName { get; }
+        /// int ISchoolId { get; set; }
+        /// string Identification { get; set; }
+        /// bool IsAdmin { get; set; }
+        /// bool EmailAllActivityPosts { get; set; }
+        /// bool EmailSelfActivityPosts { get; set; }
+        /// bool EmailAllNotifications { get; set; }
+        /// bool EmailNewDiscussionPosts { get; set; }
+        /// int IDefaultCourseId { get; set; }
+        /// ICourse DefalutCourse { get; set; }
+        /// string DisplayName(CourseUser viewingUser);
+        /// </returns>
         public IUser GetActiveUser(string a)
         {
             return (new Authentication()).GetActiveUser(a);
         }
 
+        /// <summary>
+        /// Checks if the Authentication Key passed in is valid
+        /// </summary>
+        /// <param name="a">Authentication Key</param>
+        /// <returns>bool</returns>
         [HttpGet]
         public bool IsValidKey(string a)
         {
@@ -54,6 +86,21 @@ namespace OSBLEPlus.Services.Controllers
             return false;
         }
 
+        /// <summary>
+        /// Gets the Courses the User is associated with in the database
+        /// </summary>
+        /// <param name="a">Authentication Key</param>
+        /// <returns>List of ProfileCourse which has the following POCO format
+        /// public int Id { get; set; }
+        /// public int Number { get; set; }
+        /// public string NamePrefix { get; set; }
+        /// public string Description { get; set; }
+        /// public string Name { get; set; }
+        /// public string Semester { get; set; }
+        /// public int Year { get; set; }
+        /// public DateTime StartDate { get; set; }
+        /// public DateTime EndDate { get; set; }
+        /// </returns>
         public List<ProfileCourse> GetCoursesForUser(string a)
         {
             var auth = new Authentication();
@@ -66,6 +113,11 @@ namespace OSBLEPlus.Services.Controllers
             return null;
         }
 
+        /// <summary>
+        /// Gets the most recent Social Activity
+        /// </summary>
+        /// <param name="a">Authentication Key</param>
+        /// <returns>DateTime value</returns>
         [HttpGet]
         public DateTime MostRecentSocialActivity(string a)
         {
@@ -81,6 +133,15 @@ namespace OSBLEPlus.Services.Controllers
             return lastSocialActivity;
         }
 
+        /// <summary>
+        /// Submits an error log from the local user's machine
+        /// </summary>
+        /// <param name="request">
+        /// request is a LocalerrorLogRequest that has the following POCO format
+        /// public string AuthToken { get; set; }
+        /// public LocalErrorLog Log { get; set; }
+        /// </param>
+        /// <returns></returns>
         [HttpPost]
         public HttpResponseMessage SubmitLocalErrorLog(LocalErrorLogRequest request)
         {

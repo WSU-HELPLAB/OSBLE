@@ -13,6 +13,10 @@ namespace OSBLEPlus.Services.Controllers
 {
     public class CourseController : ApiController
     {
+        /// <summary>
+        /// Returns the DateTime of the most recent item
+        /// </summary>
+        /// <returns>DateTime</returns>
         [HttpGet]
         public DateTime MostRecentWhatsNewItem()
         {
@@ -20,6 +24,12 @@ namespace OSBLEPlus.Services.Controllers
             return recentWhatsNew == null ? DateTime.MinValue : recentWhatsNew.DatePosted;
         }
 
+        /// <summary>
+        /// Returns a list of Submission assignments
+        /// </summary>
+        /// <param name="id">Course ID for the class</param>
+        /// <param name="a">Authentication Key for the Course to access the assignment</param>
+        /// <returns></returns>
         public List<SubmisionAssignment> GetAssignmentsForCourse(int id, string a)
         {
             if ((new Authentication()).IsValidKey(a))
@@ -30,6 +40,12 @@ namespace OSBLEPlus.Services.Controllers
             return null;
         }
 
+        /// <summary>
+        /// Get's the last submit date for an assignment
+        /// </summary>
+        /// <param name="id">Course ID for the class</param>
+        /// <param name="a">Authentication Key for the Course to access the assignment</param>
+        /// <returns></returns>
         public DateTime? GetLastSubmitDateForAssignment(int id, string a)
         {
             var auth = new Authentication();
@@ -41,6 +57,15 @@ namespace OSBLEPlus.Services.Controllers
             return null;
         }
 
+        /// <summary>
+        /// Post submits and assignment
+        /// </summary>
+        /// <param name="request">
+        /// request has the following POCO Format:
+        /// public string AuthToken { get; set; }
+        /// public SubmitEvent SubmitEvent { get; set; }
+        /// </param>
+        /// <returns></returns>
         [HttpPost]
         public HttpResponseMessage Post(SubmissionRequest request)
         {

@@ -11,6 +11,18 @@ namespace OSBLEPlus.Services.Controllers
 {
     public class CalendarController : ApiController
     {
+        /// <summary>
+        /// Takes a CalendarAttributes class, returns the Daily Aggregation from the calendar
+        /// </summary>
+        /// <param name="attr">
+        /// attr has the following POCO format
+        /// public DateTime ReferenceDate { get; set; }
+        /// public AggregateFunction AggregateFunctionId { get; set; }
+        /// public int? CourseId { get; set; }
+        /// public string SelectedMeasures { get; set; }
+        /// public string SubjectUsers { get; set; }
+        /// </param>
+        /// <returns></returns>
         [AllowAdmin]
         public DailyAggregations Get([FromUri]CalendarAttributes attr)
         {
