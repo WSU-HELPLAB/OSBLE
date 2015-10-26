@@ -11,24 +11,24 @@
 
 @using (Html.BeginForm())
 {
-    <div>
+    <div class="col-xs-10 col-xs-offset-1 col-sm-6 col-sm-offset-3 col-md-8 col-md-offset-2">
         <div class="editor-label">
             @Html.LabelFor(m => m.SchoolName)
         </div>
         <div class="editor-label">
-            @Html.DropDownListFor(m => m.SchoolName, new SelectList(Model.Schools))
+            @Html.DropDownListFor(m => m.SchoolName, new SelectList(Model.Schools), new { @class = "form-control" })
         </div>
         <div class="editor-label">
             @Html.LabelFor(m => m.SchoolID)
         </div>
         <div class="editor-label">
-            @Html.TextBoxFor(m => m.SchoolID)
+            @Html.TextBoxFor(m => m.SchoolID, new { @class = "form-control" })
         </div>
         <div>
             @*@Html.Partial("_ReCaptcha")*@
         </div>
         <p>
-            <input type="submit" value="Find Username" />
+            <input type="submit" class="btn btn-default" value="Find Username" />
         </p>
     </div>
 }
