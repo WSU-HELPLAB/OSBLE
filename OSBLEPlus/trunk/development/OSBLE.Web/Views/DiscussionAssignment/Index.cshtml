@@ -265,7 +265,7 @@
             <div class="dp_post_header panel-heading">
                 @displayPicture
 
-                <a class="display_name" href="/Profile/Index/@dpvm.poster.UserProfile.ID">@displayName</a>
+                <a class="display_name" href="@(dpvm.poster.Anonymize? "#" : "/Profile/Index/" + dpvm.poster.UserProfile.ID)">@displayName</a>
                 <time
                 class="utc-time feed-item-date"
                 datetime="@Helpers.DateAsUnixTime(dpvm.Posted)" 
