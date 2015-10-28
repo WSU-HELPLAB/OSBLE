@@ -302,7 +302,7 @@
                             <div class="dp_post panel panel-default" id="dp_post_@(reply.DiscussionPostId)" style="background:white;">
                                 <div class="dp_post_header panel-heading">
                                     @displayPicture
-                                    <a class="display_name" href="/Profile/Index/@reply.poster.UserProfile.ID">@displayName</a>
+                                    <a class="display_name" href="@(dpvm.poster.Anonymize? "#" : "/Profile/Index/" + reply.poster.UserProfile.ID)">@displayName</a>
                                     <time class="utc-time feed-item-date"
                                           datetime="@Helpers.DateAsUnixTime(reply.Posted)"
                                           data-original-date="@Helpers.RawDate(reply.Posted)"
