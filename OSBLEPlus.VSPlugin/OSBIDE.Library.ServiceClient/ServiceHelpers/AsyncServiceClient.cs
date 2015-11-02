@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using System.Web;
 using Newtonsoft.Json;
-
+using OSBLE.Models.Users;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
 using OSBLEPlus.Logic.DomainObjects.Helpers;
 using OSBLEPlus.Logic.DomainObjects.Profiles;
@@ -19,6 +21,11 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
     {
         public static HttpClient GetClient()
         {
+            ServicePointManager.ServerCertificateValidationCallback =
+                delegate(object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+                {
+                    return true;
+                };
             var client = new HttpClient { BaseAddress = new Uri(StringConstants.DataServiceRoot) };
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -53,7 +60,7 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             {
                 var task = client.GetAsync(string.Format("api/userprofiles/login?e={0}&hp={1}",
                                             userName,
-                                            Authentication.GetOsblePasswordHash(password)));
+                                            UserProfile.GetPasswordHash(password)));
                 await task;
 
                 return task.Result.StatusCode == HttpStatusCode.OK

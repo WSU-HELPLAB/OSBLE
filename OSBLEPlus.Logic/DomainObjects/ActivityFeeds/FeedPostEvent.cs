@@ -48,18 +48,21 @@ SELECT {0}", StringConstants.SqlHelperLogIdVar);
             else cmd.Parameters.AddWithValue("CourseId", DBNull.Value);
             cmd.Parameters.AddWithValue("@Comment", Comment);
 
-            var hashTags = GetMentionTags();
-            var userTags = GetMentionTags();
-            if (hashTags.Count > 0 || userTags.Count > 0)
-            {
-                sql =
-                    string.Format(
-                        "{0}{1}SET {2}=SCOPE_IDENTITY(){1}EXEC dbo.InsertPostTags @postId={2}, @usertags, @hashtags",
-                        sql, Environment.NewLine, StringConstants.SqlHelperLogIdVar);
 
-                cmd.Parameters.AddWithValue("@usertags", userTags);
-                cmd.Parameters.AddWithValue("@hashtags", hashTags);
-            }
+            //This is overwriting the sql insert command that this is calling
+            //We need to do this insert separately
+            //var hashTags = GetMentionTags();
+            //var userTags = GetMentionTags();
+            //if (hashTags.Count > 0 || userTags.Count > 0)
+            //{
+            //    sql =
+            //        string.Format(
+            //            "{0}{1}SET {2}=SCOPE_IDENTITY(){1}EXEC dbo.InsertPostTags @postId={2}, @usertags, @hashtags",
+            //            sql, Environment.NewLine, StringConstants.SqlHelperLogIdVar);
+
+            //    cmd.Parameters.AddWithValue("@usertags", userTags);
+            //    cmd.Parameters.AddWithValue("@hashtags", hashTags);
+            //}
 
             cmd.CommandText = sql;
 
