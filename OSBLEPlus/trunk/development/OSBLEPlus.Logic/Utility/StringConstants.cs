@@ -20,10 +20,13 @@ namespace OSBLEPlus.Logic.Utility
             get
             {
 #if DEBUG
-                return "http://localhost:8088";                
+                //return "https://192.168.0.12:8088/";
+                return "https://helplab3.eecs.wsu.edu/";
+                //return "https://plus.osble.org/";
+                //return "http://localhost:8088";                
 #else
-                //return "http://osble.org";
-                return "https://plus.osble.org";
+    //return "http://osble.org";
+                return "https://plus.osble.org/";
 #endif
             }
         }
@@ -33,10 +36,13 @@ namespace OSBLEPlus.Logic.Utility
             get
             {
 #if DEBUG
-                return "http://localhost:8087";                
+                //return "https://plus.osble.org:8087/";
+                //return "https://192.168.0.12:8087";
+                return "https://helplab3.eecs.wsu.edu:8087/";
+                //return "http://localhost:8087/";                
 #else
-                //return "http://osble.org:8087";
-                return "https://plus.osble.org:8087";
+    //return "http://osble.org:8087/";
+                return "https://plus.osble.org:8087/";
 #endif
             }
         }
@@ -99,6 +105,7 @@ namespace OSBLEPlus.Logic.Utility
             get
             {
 #if DEBUG
+                //string path = Path.Combine(DataRoot, "cache_release");
                 string path = Path.Combine(DataRoot, "cache_debug");
 #else
                 string path = Path.Combine(DataRoot, "cache_release");
