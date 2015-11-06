@@ -241,8 +241,9 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         static public void UpdateAssignmentEvent(Assignment assignment, Event aEvent, int ActiveCourseUserId, ContextBase db)
         {
-            //Link to assignment details. Note, since this is hardcoded to osble.org, it will not work locally.
-            aEvent.Description = "[url:Assignment Page|plus.osble.org/AssignmentDetails/" + assignment.ID + "]"; 
+            //Link to assignment details.
+            UrlHelper u = new UrlHelper(System.Web.HttpContext.Current.Request.RequestContext);
+            aEvent.Description = "[url:Assignment Page|" + u.Action("Index", "Home", new { assignmentId = assignment.ID, area = "AssignmentDetails" }, System.Web.HttpContext.Current.Request.Url.Scheme) + "]"; //plus.osble.org/AssignmentDetails/" + assignment.ID + "]"; 
             aEvent.EndDate = null;
             aEvent.StartDate = assignment.DueDate;
             aEvent.StartTime = assignment.DueTime;
@@ -285,7 +286,10 @@ namespace OSBLE.Controllers
         {
 
             //Link to assignment details. Note, since this is hardcoded to osble.org, it will not work locally.
-            dEvent.Description = "[url:Assignment Page|plus.osble.org/AssignmentDetails/" + ds.AssignmentID + "]";
+
+            UrlHelper u = new UrlHelper(System.Web.HttpContext.Current.Request.RequestContext);
+            dEvent.Description = "[url:Assignment Page|" + u.Action("Index", "Home", new { assignmentId = ds.AssignmentID, area = "AssignmentDetails" }, System.Web.HttpContext.Current.Request.Url.Scheme) + "]";
+            //dEvent.Description = "[url:Assignment Page|plus.osble.org/AssignmentDetails/" + ds.AssignmentID + "]";
             dEvent.EndDate = null;
             dEvent.StartDate = ds.InitialPostDueDate;
             dEvent.StartTime = ds.InitialPostDueDueTime;
