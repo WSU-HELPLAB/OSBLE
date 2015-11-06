@@ -35,7 +35,8 @@
                 @for (int i = 0; i < ListOfTeamNames.Count; i++)
                 {
                     <td style="border: none">
-                        @Html.ActionLink("Discussion for " + ListOfTeamNames[i],
+                        @{ string discussionLinkText = assignment.DiscussionSettings.HasAnonymousStudentsToStudents? "View Discussion" : "Discussion for " + ListOfTeamNames[i]; }
+                        @Html.ActionLink(discussionLinkText,
                                             "Index", "DiscussionAssignment",
                                               new { assignmentId = assignment.ID, discussionTeamId = ListOfTeamIDs[i], area = "" },
                                              new { })
