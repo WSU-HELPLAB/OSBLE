@@ -92,14 +92,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 Assignment.HoursLateWindow = (ActiveCourseUser.AbstractCourse as Course).HoursLateUntilZero;
             }
 
-            //yc:daylightsavings shift!
-            CourseController cc = new CourseController();
-            int utcOffset = (ActiveCourseUser.AbstractCourse as Course).TimeZoneOffset;
-            TimeZoneInfo tz = cc.getTimeZone(utcOffset);
+            // Put the due date and release time in course time (to display)
+            Assignment.ReleaseDate = Assignment.ReleaseDate.UTCToCourse(Assignment.CourseID);
+            Assignment.DueDate = Assignment.DueDate.UTCToCourse(Assignment.CourseID);
 
             return View(Assignment);
         }
 
+        // This is called when the user moves on from this page and chooses to save their progress
         [HttpPost]
         public ActionResult Index(Assignment model)
         {
@@ -110,14 +110,16 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
                 Assignment.CourseID = ActiveCourseUser.AbstractCourseID;
 
-                CourseController cc = new CourseController();
-                int utcOffset = (ActiveCourseUser.AbstractCourse as Course).TimeZoneOffset;
-                TimeZoneInfo tz = cc.getTimeZone(utcOffset);
+                //CourseController cc = new CourseController();
+                //int utcOffset = (ActiveCourseUser.AbstractCourse as Course).TimeZoneOffset;
+                //TimeZoneInfo tz = cc.getTimeZone(utcOffset);
+                
+                //Assignment.ReleaseDate = TimeZoneInfo.ConvertTimeToUtc(Assignment.ReleaseDate, tz);
+                //Assignment.DueDate = TimeZoneInfo.ConvertTimeToUtc(Assignment.DueDate, tz);
 
-
-
-                Assignment.ReleaseDate = TimeZoneInfo.ConvertTimeToUtc(Assignment.ReleaseDate, tz);
-                Assignment.DueDate = TimeZoneInfo.ConvertTimeToUtc(Assignment.DueDate, tz);
+                // Put times back into UTC
+                Assignment.ReleaseDate = Assignment.ReleaseDate.CourseToUTC(Assignment.CourseID);
+                Assignment.DueDate = Assignment.DueDate.CourseToUTC(Assignment.CourseID);
 
                 //update our DB
                 if (Assignment.ID == 0)
