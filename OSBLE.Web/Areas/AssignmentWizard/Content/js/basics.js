@@ -9,11 +9,11 @@ function documentReady() {
     var dueMoment = moment(dueDateStr, "MM/DD/YYYY hh:mm A");
 
     //record the local offset
-    $("#utc-offset").val(localOffset);
+    //$("#utc-offset").val(localOffset);
 
     //adjust our moments by the local offset
-    releaseMoment = releaseMoment.subtract('minutes', localOffset);
-    dueMoment = dueMoment.subtract('minutes', localOffset);
+    //releaseMoment = releaseMoment.subtract('minutes', localOffset);
+    //dueMoment = dueMoment.subtract('minutes', localOffset);
 
     //republish modified times to the browser
     $("#ReleaseDate").val(releaseMoment.format('MM/DD/YYYY'));
