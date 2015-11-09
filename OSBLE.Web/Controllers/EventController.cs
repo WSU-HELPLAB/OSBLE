@@ -533,43 +533,6 @@ namespace OSBLE.Controllers
             //lies within the StartDate and EndDate parameters. 
             List<Event> events = DBHelper.GetApprovedCourseEvents(ActiveCourseUser.AbstractCourseID, StartDate, EndDate).ToList<Event>();
 
-            // NOTE to AJ: This is where I need to change the type from Event to List<FeedItems> for OSBLEPlus
-
-            //List<FeedItems> events;
-
-            /////////////////////////////////////
-            /// TEST CODE FOR AJ USING DAPPER ///
-            /////////////////////////////////////
-            /*using (SqlConnection sqlConnection = new SqlConnection(StringConstants.ConnectionString))
-            {
-                                List<CourseUser> users = (from cu in db.CourseUsers
-                                      where cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID
-                                      && cu.AbstractRole.CanSubmit
-                                      orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
-                                      select cu).ToList();
-                
-                List<CourseUser>testUsers = sqlConnection.Query<CourseUser>("SELECT * FROM CourseUsers " +
-                                                                 "WHERE AbstractCourseID = @activeCourseId " +
-                                                                 "AND AbstractRoleID = @roleId",
-                    new {activeCourseId = ActiveCourseUser.AbstractCourseID, roleId = (int)CourseRole.CourseRoles.Student }).ToList();
-
-                foreach (CourseUser cu in testUsers)
-                {
-                    cu.AbstractCourse = ActiveCourseUser.AbstractCourse;
-
-                    cu.UserProfile = sqlConnection.Query<UserProfile>("SELECT * FROM UserProfiles " +
-                                                     "WHERE UserProfileID = ID").FirstOrDefault();
-
-                    
-
-                }
-            }*/
-            
-            //yc: daylight savings thigns
-            //int courseOffset = ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset;
-            int courseOffset = (ActiveCourseUser.AbstractCourse).GetType() != typeof(Community) ? ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset : 0;
-            ViewBag.ctzoffset = courseOffset;
-
             // Add course meeting times and breaks.
             if (ActiveCourseUser.AbstractCourse is Course && ((ActiveCourseUser.AbstractCourse as Course).ShowMeetings == true))
             {
@@ -644,9 +607,24 @@ namespace OSBLE.Controllers
                             //printing in utc time for browser to convert for you
                             CourseController cc = new CourseController();
                             e.Title = cm.Name + " - " + cm.Location;
-                            //to combat timezone shifts 
-                            e.StartDate = current.AddHours((double)cm.StartTime.Hour).AddMinutes((double)cm.StartTime.Minute);
-                            e.EndDate = current.AddHours((double)cm.EndTime.Hour).AddMinutes((double)cm.EndTime.Minute);
+
+                            // please do not change this
+                            #region Create Start and End DateTimes
+                            // Because we want course meetings to appear at the same time regardless of daylight savings time,
+                            // we need to first convert the start and end times to course time to create the start and end times
+                            // of the event. Since these contain the date they were set, when they are converted they will contain
+                            // the correct time information. This way we garauntee that 10a.m. will
+                            // always be 10a.m., even though the UTC time stamp for 10a.m. will be different once daylight 
+                            // savings happens. Basically, the point here is to ignore this change.
+
+                            DateTime eventStartInCourseTime = new DateTime(current.Year, current.Month, current.Day).Add(cm.StartTime.UTCToCourse(course.ID).TimeOfDay);
+                            DateTime eventEndInCourseTime = new DateTime(current.Year, current.Month, current.Day).Add(cm.EndTime.UTCToCourse(course.ID).TimeOfDay);
+
+                            // convert back to UTC (because that's what the view expects)
+                            e.StartDate = eventStartInCourseTime.CourseToUTC(course.ID);
+                            e.EndDate = eventEndInCourseTime.CourseToUTC(course.ID);
+                            #endregion
+
                             e.HideDelete = true;
 
                             // Do not show Course meetings outside of course start/end date and breaks.
