@@ -823,7 +823,7 @@ namespace OSBLE.Controllers
                 }
                 
                 // add a link at the bottom to the website
-                body += string.Format("<a href=\"{0}\">View and reply to post in OSBLE</a>", Url.Action("Details", new { id = sourcePostID }));
+                body += string.Format("<a href=\"{0}\">View and reply to post in OSBLE</a>", Url.Action("Details", "Feed", new { id = sourcePostID }, Request.Url.Scheme ));
 
                 //Send the message
 #if !DEBUG
