@@ -1022,6 +1022,18 @@ namespace OSBLE.Utility
             return sender;
         }
 
+        public static bool IsEventDeleted(int postID, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection()) { return IsEventDeleted(postID, sqlc); }
+            }
+
+            bool? isDeleted = connection.Query<bool?>("SELECT IsDeleted FROM EventLogs WHERE Id = @id", 
+                new { id = postID }).SingleOrDefault();
+            return isDeleted.HasValue && isDeleted.Value;
+        }
+
         #endregion
     }
 }

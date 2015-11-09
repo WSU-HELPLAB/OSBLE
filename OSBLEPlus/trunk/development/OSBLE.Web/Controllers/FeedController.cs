@@ -655,6 +655,19 @@ namespace OSBLE.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+            // Verify that none of the event logs have been deleted
+            string[] ids = id.Split(',');
+            int idNum = 0;
+            foreach (string s in ids)
+            {
+                if (!int.TryParse(s, out idNum) || DBHelper.IsEventDeleted(idNum))
+                {
+                    ViewBag.ErrorName = "Item not found";
+                    ViewBag.ErrorMessage = "One or more of the posts you are looking for has been deleted or is otherwise not available.";
+                    return View("Error");
+                }
+            }
+
             ViewBag.RootId = id;
             return View();
         }
