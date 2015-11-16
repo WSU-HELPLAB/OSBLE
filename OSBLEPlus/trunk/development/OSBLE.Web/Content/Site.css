@@ -2312,6 +2312,20 @@ a.disabled{
     color: white;
 }
 
+#osbide-nav .btn {
+    border-radius: 0;
+}
+
+#osbide-nav div:first-child .btn {
+    border-bottom-right-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+#osbide-nav div:last-child .btn {
+    border-bottom-left-radius: 4px;
+    border-top-left-radius: 4px;
+}
+
 .osbide_nav_btn {
     padding-top: 3px !important;
     padding-left: 6px !important;
