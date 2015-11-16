@@ -6,7 +6,7 @@
 
 @using (var connection = DBHelper.GetNewConnection())
 {
-    <li class="dropdown" id="course_select">
+    <div class="dropdown btn btn-primary" id="course_select">
         @{ string currentCourseName = ""; }
 
         @if (ViewBag.ActiveCourseUser != null)
@@ -56,5 +56,5 @@
                 }
             }
         </ul>
-    </li>
+    </div>
 }

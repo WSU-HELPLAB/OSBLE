@@ -2300,10 +2300,16 @@ a.disabled{
 #osbide_header {
     font-size: 14pt;
     margin: 15px;
+    float: left;
 }
 
-.osbide-settings {
-    margin-right: 15px;
+#osbide-nav {
+    margin: 10px 15px 10px 15px;
+    float: right;
+}
+
+#osbide-nav .dropdown-toggle {
+    color: white;
 }
 
 .osbide_nav_btn {
