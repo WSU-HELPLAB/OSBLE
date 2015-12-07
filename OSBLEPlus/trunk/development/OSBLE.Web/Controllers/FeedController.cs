@@ -891,5 +891,15 @@ namespace OSBLE.Controllers
             int index = DBHelper.GetUserProfileIndexForName(firstName, lastName);
             return Json(new { Index = index });
         }
+
+        [HttpGet]
+        public ActionResult ShowHashtag(string hashtag)
+        {
+            if (hashtag == null || hashtag == "")
+                return RedirectToAction("Index", "Home");
+
+            ViewBag.Hashtag = hashtag;
+            return View();
+        }
     }
 }
