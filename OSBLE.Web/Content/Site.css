@@ -66,6 +66,40 @@ h3 span.glyphicon {
     }
 }
 
+@media (max-width: 610px)
+{
+    #dashboard_pills {
+        height: 68px;
+    }
+
+    #dashboard_pills > div {
+        margin: 0;
+        float: left;
+        width: 50%;
+        height: 34px;
+    }
+
+    #dashboard_pills .dbp_1 > * {
+        border-bottom-left-radius: 0;
+        margin-bottom: 0;
+    }
+
+    #dashboard_pills .dbp_2 > * {
+        border-top-right-radius: 4px;
+        margin-bottom: 0;
+    }
+
+    #dashboard_pills .dbp_3 > * {
+        border-bottom-left-radius: 4px;
+        margin-top: 0;
+    }
+
+    #dashboard_pills .dbp_4 > * {
+        border-top-right-radius: 0;
+        margin-top: 0;
+    }
+}
+
 /* keeps things from being on the very bottom edge of the screen on tablets and phones*/
 @media(max-width: 992px)
 {

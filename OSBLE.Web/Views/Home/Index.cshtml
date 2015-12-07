@@ -29,24 +29,29 @@
 
 @* Dashboard Pills (used when width < 850px) *@
 <div class="btn-group btn-group-justified" id="dashboard_pills">
-    <div class="btn-group">  <button type="button" id="btn_notifications" class="btn">Notifications <span id="notifications_badge" class="badge">@ViewBag.Notifications.Count</span></button>               </div>
-    <div class="btn-group">  <button type="button" id="btn_activity_feed" class="btn btn-primary">Activity Feed</button>   </div>
-    <div class="btn-group">  <button type="button" id="btn_files" class="btn">Files &amp; Links</button>                      </div>
+    <div class="btn-group dbp_1">  <button type="button" id="btn_notifications" class="btn">Notifications <span id="notifications_badge" class="badge">@ViewBag.Notifications.Count</span></button> </div>
+    <div class="btn-group dbp_2">  <button type="button" id="btn_events_deadlines" class="btn">Events &amp; Deadlines</button> </div>
+    @* <br class="dbp_separator" /> *@
+    <div class="btn-group dbp_3">  <button type="button" id="btn_activity_feed" class="btn btn-primary">Activity Feed</button> </div>
+    <div class="btn-group dbp_4">  <button type="button" id="btn_files" class="btn">Files &amp; Links</button> </div>
 </div>
 
 <script type="text/javascript">
-    function setContent(btnID, divID) {
+    function setContent(btnID, divID, subDivID) {
         $(".activeContent").removeClass("activeContent").addClass("unactiveContent");
         $("#" + divID).addClass("activeContent").removeClass("unactiveContent");
+        if (subDivID != null && subDivID != "")
+            $("#" + subDivID).addClass("activeContent").removeClass("unactiveContent");
 
         $(".btn-primary").removeClass("btn-primary");
         $("#" + btnID).addClass("btn-primary");
     }
 
     $(document).ready(function () {
-        $("#btn_activity_feed").click(function () { setContent("btn_activity_feed", "dashboard_middle"); });
-        $("#btn_notifications").click(function () { setContent("btn_notifications", "dashboard_left"); });
-        $("#btn_files").click(function () { setContent("btn_files", "dashboard_right"); });
+        $("#btn_activity_feed").click(function () { setContent("btn_activity_feed", "dashboard_middle", ""); });
+        $("#btn_notifications").click(function () { setContent("btn_notifications", "dashboard_left", "dashboard_notifications"); });
+        $("#btn_events_deadlines").click(function () { setContent("btn_events_deadlines", "dashboard_left", "dashboard_events") });
+        $("#btn_files").click(function () { setContent("btn_files", "dashboard_right", ""); });
     });
 </script>
 
@@ -54,60 +59,62 @@
 @* Dashboard Content *@
 <div id="dashboard_outer">
     <div class="row" id="dashboard_inner">
-
-        <!---------------- NOTIFICATIONS --------------------->
         <div class="col-sm-3 unactiveContent" id="dashboard_left">
-            <h3>Notifications</h3>
 
-            <div id="notifications">
-                @if (ViewBag.Notifications.Count == 0)
-                {
-                    <p>No Unread Notifications!</p>
-                }
+            <!---------------- NOTIFICATIONS --------------------->
+            <div id="dashboard_notifications" class="unactiveContent">
+                <h3>Notifications</h3>
 
-                @{ViewBag.ShowNotificationDelete = true;}
-                @Html.Partial("_ConsolidatedNotifications")
+                <div id="notifications">
+                    @if (ViewBag.Notifications.Count == 0)
+                    {
+                        <p>No Unread Notifications!</p>
+                    }
 
-                @if (ViewBag.Notifications.Count != 0)
-                {
-                    <div id="markAllAsReadDiv">
-                        <form id="MarkAllForm" action="@Url.Action("MarkAllAsRead", "Notification")"
-                              data-ajax="true"
-                              data-ajax-success="$('#notifications_list').hide('slow');$('#markAllAsReadDiv').hide('slow');$('#notifications_badge').hide('slow');"
-                              method="post">
-                            <a href="#" onclick="$('#MarkAllForm').submit()">Mark All Notifications As Read</a>
-                        </form>
-                    </div>
-                }
+                    @{ViewBag.ShowNotificationDelete = true;}
+                    @Html.Partial("_ConsolidatedNotifications")
 
-                <p>@Html.ActionLink("Show All Notifications", "Index", "Notification")</p>
-            </div>
+                    @if (ViewBag.Notifications.Count != 0)
+                    {
+                        <div id="markAllAsReadDiv">
+                            <form id="MarkAllForm" action="@Url.Action("MarkAllAsRead", "Notification")"
+                                  data-ajax="true"
+                                  data-ajax-success="$('#notifications_list').hide('slow');$('#markAllAsReadDiv').hide('slow');$('#notifications_badge').hide('slow');"
+                                  method="post">
+                                <a href="#" onclick="$('#MarkAllForm').submit()">Mark All Notifications As Read</a>
+                            </form>
+                        </div>
+                    }
 
-            <h3>
-                Events &amp; Deadlines
-                @if (@ViewBag.ActiveCourse.AbstractRole.CanModify || @ViewBag.ActiveCourse.AbstractCourse.AllowEventPosting)
-                {
-                    <a href="@Url.Action("Create", "Event")" title="Add New Event or Deadline">@Helpers.AddButton()</a>
-                }
-                @if (courseCalendarFlag)
-                {
-                    <a href="@Url.Action("DownloadCourseCalendar", "iCalendar", new { id = courseID })" title="Download Course Calendar">@Helpers.UnPublishButton()</a>
-                    <a href="@Url.Action("SubscribeToCalendar", "iCalendar", new { id = courseID, })" target="_blank" title="Subscribe to Course Calendar">@Helpers.CalendarButton()</a>
-
-                }
-
-            </h3>
-
-
-            <div id="important_dates">
-                <p>Next @ViewBag.ActiveCourse.AbstractCourse.CalendarWindowOfTime Weeks</p>
-                <div class="partialContents" data-url="/Home/Events">
-                    <img src="~/Content/images/ajax-loader.gif" /> Loading...
+                    <p>@Html.ActionLink("Show All Notifications", "Index", "Notification")</p>
                 </div>
-                @*@Html.Partial("_Events", (List<Event>)ViewBag.Events)*@
-                <p>@Html.ActionLink("Show All Events", "Index", "Event")</p>
             </div>
 
+            <!---------------- EVENTS & DEADLINES --------------------->
+            <div id="dashboard_events" class="unactiveContent">
+                <h3>
+                    Events &amp; Deadlines
+                    @if (@ViewBag.ActiveCourse.AbstractRole.CanModify || @ViewBag.ActiveCourse.AbstractCourse.AllowEventPosting)
+                    {
+                        <a href="@Url.Action("Create", "Event")" title="Add New Event or Deadline">@Helpers.AddButton()</a>
+                    }
+                    @if (courseCalendarFlag)
+                    {
+                        <a href="@Url.Action("DownloadCourseCalendar", "iCalendar", new { id = courseID })" title="Download Course Calendar">@Helpers.UnPublishButton()</a>
+                        <a href="@Url.Action("SubscribeToCalendar", "iCalendar", new { id = courseID, })" target="_blank" title="Subscribe to Course Calendar">@Helpers.CalendarButton()</a>
+
+                    }
+                </h3>
+
+                <div id="important_dates">
+                    <p>Next @ViewBag.ActiveCourse.AbstractCourse.CalendarWindowOfTime Weeks</p>
+                    <div class="partialContents" data-url="/Home/Events">
+                        <img src="~/Content/images/ajax-loader.gif" /> Loading...
+                    </div>
+                    @*@Html.Partial("_Events", (List<Event>)ViewBag.Events)*@
+                    <p>@Html.ActionLink("Show All Events", "Index", "Event")</p>
+                </div>
+            </div>
         </div>
 
         <!--------------------- ACTIVITY FEED --------------------->
