@@ -997,6 +997,7 @@
     <Content Include="Views\Feed\Details\_LogCommentEvent.cshtml" />
     <Content Include="Views\Shared\_OSBIDELayout.cshtml" />
     <Content Include="Views\Shared\_OSBIDECourses.cshtml" />
+    <Content Include="Views\Feed\ShowHashtag.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

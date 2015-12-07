@@ -1,0 +1,34 @@
+﻿@using OSBLE.Models.Courses
+@using OSBLEPlus.Logic.Utility
+@using OSBLEPlus.Logic.Utility.Lookups
+@using OSBLE.Models.Queries
+@using OSBLE.Models.Users
+@{
+    UserProfile currentUser = ViewBag.CurrentUser;
+    string defaultEvents = string.Join(",", ActivityFeedQuery.GetSocialEvents().Select(e => (int)e));
+    if (string.IsNullOrEmpty(ViewBag.Title))
+    {
+        ViewBag.Title = "Posts with #" + ViewBag.Hashtag;
+    }
+}
+
+<script type="text/javascript">
+    var vm;
+    $(document).ready(function() {
+        vm = new FeedViewModel("@currentUser.FullName", @currentUser.ID);
+        ko.applyBindings(vm);
+        vm.keywords("@ViewBag.Hashtag");
+    });
+</script>
+
+<h3>Posts with #@ViewBag.Hashtag</h3>
+
+@* This is a message displayed while the feed is loading posts *@
+<div id="loadingMsg" class="message">
+    @Helpers.LoadingSmall() Loading Posts...
+</div>
+
+@* Feed is inserted here *@
+<div id="dp_posts" class="panel-group">
+    @Html.Partial("Feed/_Feed")
+</div>

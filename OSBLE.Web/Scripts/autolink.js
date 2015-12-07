@@ -2,7 +2,7 @@
 //Downloaded from: https://github.com/bryanwoods/autolink-js
 
 (function () {
-    var autoLink, linkUsernames,
+    var autoLink, linkUsernames, linkHashtags,
       __slice = [].slice;
 
     autoLink = function () {
@@ -11,7 +11,7 @@
 
         pattern = /(^|[\s\n>]|<br\/?>)((?:https?|ftp):\/\/[\-A-Z0-9+\u0026\u2019@#\/%?=()~_|!:,.;]*[\-A-Z0-9+\u0026@#\/%=~()_|])/gi;
         if (!(options.length > 0)) {
-            return this.replace(pattern, "$1<a href='$2'>$2</a>").linkUsernames();
+            return this.replace(pattern, "$1<a href='$2'>$2</a>").linkUsernames().linkHashtags();
         }
         option = options[0];
         linkAttributes = ((function () {
@@ -29,7 +29,7 @@
             var link;
             link = (typeof option.callback === "function" ? option.callback(url) : void 0) || ("<a href='" + url + "'" + linkAttributes + ">" + url + "</a>");
             return "" + space + link;
-        }).linkUsernames();
+        }).linkUsernames().linkHashtags();
     };
 
     linkUsernames = function () {
@@ -54,7 +54,13 @@
         });
     };
 
+    linkHashtags = function () {
+        var htPattern = /(^|[\s\n>]|<br\/?>)#([a-z]+)/gi;
+        return this.replace(htPattern, '$1<a href="/Feed/ShowHashtag?hashtag=$2">#$2</a>');
+    }
+
     String.prototype['autoLink'] = autoLink;
     String.prototype['linkUsernames'] = linkUsernames;
+    String.prototype['linkHashtags'] = linkHashtags;
 
 }).call(this);
