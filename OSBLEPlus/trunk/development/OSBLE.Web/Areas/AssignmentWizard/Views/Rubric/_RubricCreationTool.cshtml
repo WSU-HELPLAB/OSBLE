@@ -526,7 +526,6 @@ The current rubric will be replaced with a new one and all progress will be lost
             var row2 = table.rows[rowIndex];
             var row = table.rows[rowIndex - 1];
 
-
             animateSwap(row, row2, table);
         }
     }
@@ -546,8 +545,8 @@ The current rubric will be replaced with a new one and all progress will be lost
         var animationTime = 300;
         var i = 0;
 
-        //animations don't work well in firefox, so just perform the swap with no animation
-        if ($.browser.mozilla) {
+        //animations don't work well in (old) firefox, so just perform the swap with no animation
+        if ($.browser != null && $.browser.mozilla) {
             $(topRow).insertAfter($(topRow).next());
             var counter = 0;
             var cellLength = table.rows[0].cells.length;
