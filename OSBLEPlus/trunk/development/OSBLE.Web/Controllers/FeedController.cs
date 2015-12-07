@@ -884,5 +884,12 @@ namespace OSBLE.Controllers
 
             return items;
         }
+
+        [HttpPost]
+        public JsonResult GetProfileIndexForName(string firstName, string lastName)
+        {
+            int index = DBHelper.GetUserProfileIndexForName(firstName, lastName);
+            return Json(new { Index = index });
+        }
     }
 }

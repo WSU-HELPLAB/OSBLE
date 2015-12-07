@@ -124,6 +124,24 @@ namespace OSBLE.Utility
             return profile;
         }
 
+        public static int GetUserProfileIndexForName(string firstName, string lastName, SqlConnection connection = null)
+        {
+            int index = -1;
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    index = GetUserProfileIndexForName(firstName, lastName, sqlc);
+                }
+                return index;
+            }
+
+            index = connection.Query<int>("SELECT Id FROM UserProfiles WHERE FirstName = @FirstName AND LastName = @LastName",
+                new { FirstName = firstName, LastName = lastName }).FirstOrDefault();
+
+            return index;
+        }
+
         #endregion
 
 
