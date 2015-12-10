@@ -18,14 +18,14 @@ namespace OSBLEPlus.Logic.Utility.Auth
         public const string AuthKey = "AuthKey";
 
         public Authentication()
-            : this(HttpContext.Current.Server.MapPath("~\\App_Data\\"))
+            : this(HttpContext.Current.Server.MapPath("~\\"))
         {
         }
 
         public Authentication(string path)
         {
             //set up cache
-            _cache = FileCacheHelper.GetGlobalCacheInstance(FileCacheHelper.GetCachePath(path));
+            _cache = FileCacheHelper.GetGlobalCacheInstance();            
             _cache.DefaultRegion = "AuthenticationService";
 
             //have our cache kill things after 2 days

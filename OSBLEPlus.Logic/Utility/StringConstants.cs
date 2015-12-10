@@ -20,10 +20,12 @@ namespace OSBLEPlus.Logic.Utility
             get
             {
 #if DEBUG
-                return "http://localhost:8088";                
+                //return "http://localhost:8088";                
+                return "https://helplab3.eecs.wsu.edu";
 #else
-    //return "http://osble.org";
-                return "https://plus.osble.org";
+
+                //return "https://plus.osble.org";
+                return "https://helplab3.eecs.wsu.edu";
 #endif
             }
         }
@@ -33,10 +35,12 @@ namespace OSBLEPlus.Logic.Utility
             get
             {
 #if DEBUG
-                return "http://localhost:8087";                
+                //return "http://localhost:8087";                
+                return "https://helplab3.eecs.wsu.edu/plusservices";
 #else
                 //return "http://osble.org:8087";
-                return "https://plus.osble.org:8087";
+                //return "https://plus.osble.org:8087";
+                return "https://helplab3.eecs.wsu.edu/plusservices";
 #endif
             }
         }

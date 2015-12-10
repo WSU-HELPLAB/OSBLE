@@ -200,7 +200,7 @@ namespace OSBLE.Utility
                         var authToken = HttpContext.Current.Request.QueryString["auth"];
 
                         var a = HttpContext.Current.Server.MapPath("~").TrimEnd('\\');
-                        var path = string.Format("{0}\\OSBLEPlus.Services\\App_Data\\", Directory.GetParent(a).FullName);
+                        var path = string.Format(Directory.GetParent(a).FullName);
 
                         var auth = new Authentication(path);
 

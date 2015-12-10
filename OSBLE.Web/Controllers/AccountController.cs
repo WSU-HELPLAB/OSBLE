@@ -83,7 +83,7 @@ namespace OSBLE.Controllers
 
                             // also log them in on the Authentication for FileCache
                             var a = System.Web.HttpContext.Current.Server.MapPath("~").TrimEnd('\\');
-                            var path = string.Format("{0}\\OSBLEPlus.Services\\App_Data\\", Directory.GetParent(a).FullName);
+                            var path = string.Format(Directory.GetParent(a).FullName);
 
                             var auth =
                                 new Authentication(path);
@@ -150,7 +150,7 @@ namespace OSBLE.Controllers
         public ActionResult TokenLogin(string authToken, string destinationUrl = "/")
         {
             var tempPath = System.Web.HttpContext.Current.Server.MapPath("~").TrimEnd('\\');
-            var path = string.Format("{0}\\OSBLEPlus.Services\\App_Data\\", Directory.GetParent(tempPath).FullName);
+            var path = string.Format(Directory.GetParent(tempPath).FullName);
             var auth = new Authentication(path);
             var profile = auth.GetActiveUser(authToken);
             if (profile == null || string.IsNullOrWhiteSpace(profile.UserName))
@@ -197,7 +197,7 @@ namespace OSBLE.Controllers
 
             // Need to Delete filecache cookie as well now
             var a = System.Web.HttpContext.Current.Server.MapPath("~").TrimEnd('\\');
-            var path = string.Format("{0}\\OSBLEPlus.Services\\App_Data\\", Directory.GetParent(a).FullName);
+            var path = string.Format(Directory.GetParent(a).FullName);
             var auth = new Authentication(path);
             auth.LogOut();
 

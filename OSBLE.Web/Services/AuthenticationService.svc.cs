@@ -9,11 +9,10 @@ using OSBLE.Models.Services.Uploader;
 using System.Web.Security;
 using OSBLE.Models.Users;
 using System.Security.Cryptography;
-using OSBLE.Utility;
 using System.Runtime.Caching;
 using System.Text;
 using System.Web;
-
+using OSBLEPlus.Logic.Utility;
 namespace OSBLE.Services
 {
     /// <summary>

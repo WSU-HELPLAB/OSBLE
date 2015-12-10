@@ -103,14 +103,15 @@ namespace OSBLE.Controllers
             {
                 if (assignment.CourseID == ActiveCourseUser.AbstractCourseID)
                 {
-                    Stream stream = FileSystem.FindZipFile(ActiveCourseUser.AbstractCourse as Course, assignment);
-
                     string zipFileName = assignment.AssignmentName + ".zip";
 
-                    if (stream != null)
+                    // If you download the file once it never updates if new submissions are posted, this has been commented out for now
+                    // Unfortunately every time you click Download All it will keep the zip files in {PathToCache}/Courses/{CourseID}/ZipFolder
+                    // We may want to rework this in the near future, but for now it works
+                    /*if (stream != null)
                     {
                         return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
-                    }
+                    }*/
 
                     string submissionfolder = FileSystem.GetAssignmentSubmissionFolder(assignment.Course, assignment.ID);
 
@@ -146,7 +147,7 @@ namespace OSBLE.Controllers
 
                             FileSystem.CreateZipFolder(ActiveCourseUser.AbstractCourse as Course, zipfile, assignment);
                         }
-                        stream = FileSystem.GetDocumentForRead(zipfile.Name);
+                        Stream stream = FileSystem.GetDocumentForRead(zipfile.Name);
 
                         return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
                     }
