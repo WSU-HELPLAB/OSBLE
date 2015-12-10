@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Web;
+using System.Web.Hosting;
 using Ionic.Zip;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Services.Uploader;
@@ -20,16 +22,12 @@ namespace OSBLE
 
         #region old FileSystem Code (deprecated)
 
-        public static string GetCachePath()
-        {
-            return Path.Combine(HttpContext.Current.Server.MapPath("~\\App_Data\\"), "Cache");
-        }
-
+        
         public static string RootPath
         {
             get
             {
-                return HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
+                return ConfigurationManager.AppSettings["OSBLEFileSystem"];
             }
         }
 
@@ -76,7 +74,7 @@ namespace OSBLE
                 fList.AbsolutePath = file;
                 fList.Name = Path.GetFileName(file);
                 fList.LastModified = File.GetLastWriteTime(file);
-                fList.FileUrl = FileSystem.CourseDocumentPathToWebUrl(file);
+                fList.FileUrl = CourseDocumentPathToWebUrl(file);
 
                 //set file ordering if it exists
                 if (ordering.ContainsKey(fList.Name))
@@ -471,7 +469,7 @@ namespace OSBLE
         /// <returns></returns>
         public static string CourseDocumentPathToWebUrl(string filePath)
         {
-            int startOfWebPath = filePath.IndexOf("FileSystem");
+                        int startOfWebPath = filePath.IndexOf("FileSystem");
 
             //get the raw url (not web accessible due to MVC restrictions)
             string rawUrl = VirtualPathUtility.ToAbsolute("~/" + filePath.Substring(startOfWebPath));

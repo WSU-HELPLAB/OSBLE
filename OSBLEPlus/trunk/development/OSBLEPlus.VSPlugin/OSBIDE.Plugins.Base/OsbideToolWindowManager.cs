@@ -52,6 +52,11 @@ namespace OSBIDE.Plugins.Base
             OpenToolWindow(new UserProfileToolWindow(), _profileVm, vsPackage);
         }
 
+        public void CloseProfileWindow(Package vsPackage = null)
+        {
+            CloseToolWindow(new UserProfileToolWindow(), vsPackage);
+        }
+
         public void OpenGenericToolWindow(Package vsPackage = null, string url = "")
         {
             _genericWindowVm.AuthKey = _cache[StringConstants.AuthenticationCacheKey] as string;
@@ -62,6 +67,11 @@ namespace OSBIDE.Plugins.Base
             OpenToolWindow(new GenericOsbideToolWindow(), _genericWindowVm, vsPackage);
         }
 
+        public void CloseGenericToolWindow(Package vsPackage = null)
+        {
+            CloseToolWindow(new GenericOsbideToolWindow(), vsPackage);
+        }
+
         public void OpenActivityFeedDetailsWindow(Package vsPackage = null)
         {
             _activityFeedDetailsVm.AuthKey = _cache[StringConstants.AuthenticationCacheKey] as string;
@@ -69,6 +79,11 @@ namespace OSBIDE.Plugins.Base
 
             //ensures that we get a new tool window with each click
             _detailsToolWindowId++;
+        }
+
+        public void CloseActivityFeedDetailsWindow(Package vsPackage = null)
+        {
+            CloseToolWindow(new ActivityFeedDetailsToolWindow(), vsPackage);
         }
 
         public void OpenActivityFeedWindow(Package vsPackage = null, string url = "")
@@ -81,16 +96,31 @@ namespace OSBIDE.Plugins.Base
             OpenToolWindow(new ActivityFeedToolWindow(), _activityFeedVm, vsPackage);
         }
 
+        public void CloseActivityFeedWindow(Package vsPackage = null)
+        {
+            CloseToolWindow(new ActivityFeedToolWindow(), vsPackage);
+        }
+
         public void OpenCreateAccountWindow(Package vsPackage = null)
         {
             _createAccountVm.AuthKey = string.Empty;
             OpenToolWindow(new CreateAccountToolWindow(), _createAccountVm, vsPackage);
         }
 
+        public void CloseCreateAccountWindow(Package vsPackage = null)
+        {
+            CloseToolWindow(new CreateAccountToolWindow(), vsPackage);
+        }
+
         public void OpenAskTheProfessorWindow(Package vsPackage = null)
         {
             _askTheProfessorVm.AuthKey = _cache[StringConstants.AuthenticationCacheKey] as string;
             OpenToolWindow(new AskTheProfessorToolWindow(), _askTheProfessorVm, vsPackage);
+        }
+
+        public void CloseAskTheProfessorWindow(Package vsPackage = null)
+        {
+            CloseToolWindow(new AskTheProfessorToolWindow(), vsPackage);
         }
 
         private void OpenToolWindow(ToolWindowPane pane, BrowserViewModel vm, Package vsPackage, int toolId = 0)
@@ -112,6 +142,23 @@ namespace OSBIDE.Plugins.Base
                 );
             var windowFrame = (IVsWindowFrame)window.Frame;
             ErrorHandler.ThrowOnFailure(windowFrame.Show());
+        }
+
+        private void CloseToolWindow(ToolWindowPane pane, Package vsPackage, int toolID = 0)
+        {
+            if (vsPackage == null)
+            {
+                vsPackage = _vsPackage;
+            }
+            var window = vsPackage.FindToolWindow(pane.GetType(), toolID, true);
+            if ((null == window) || (null == window.Frame))
+            {
+                // window already closed
+                return;
+            }
+
+            var windowFrame = (IVsWindowFrame) window.Frame;
+            windowFrame.CloseFrame((uint)__FRAMECLOSE.FRAMECLOSE_NoSave);
         }
 
         private void NavigationRequested(object sender, OsbideResourceInterceptor.ResourceInterceptorEventArgs e)

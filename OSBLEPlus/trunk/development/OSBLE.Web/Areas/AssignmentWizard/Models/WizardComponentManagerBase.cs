@@ -5,11 +5,12 @@ using System.Web;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Caching;
-using OSBLE.Utility;
 using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
 using System.IO;
 using OSBLE.Models.Users;
+using OSBLE.Utility;
+using FileCacheHelper = OSBLEPlus.Logic.Utility.FileCacheHelper;
 
 namespace OSBLE.Areas.AssignmentWizard.Models
 {

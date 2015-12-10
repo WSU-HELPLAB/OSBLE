@@ -17,16 +17,11 @@ using OSBLE.Models.AbstractCourses.Course;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
-using OSBLE.Utility;
-using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
-using OSBLEPlus.Logic.DomainObjects.Interface;
-using OSBLEPlus.Logic.Utility;
-using OSBLEPlus.Logic.Utility.Auth;
-using OSBLEPlus.Logic.Utility.Lookups;
-using FileCacheHelper = OSBLE.Utility.FileCacheHelper;
 using System.Threading.Tasks;
 using Dapper;
+using OSBLE.Utility;
 using OSBLEPlus.Services.Models;
+using FileCacheHelper = OSBLEPlus.Logic.Utility.FileCacheHelper;
 
 namespace OSBLE.Controllers
 {

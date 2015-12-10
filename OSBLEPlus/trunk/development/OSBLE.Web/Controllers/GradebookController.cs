@@ -8,12 +8,13 @@ using Ionic.Zip;
 using OSBLE.Models.FileSystem;
 using OSBLE.Models;
 using System.Runtime.Caching;
-using OSBLE.Utility;
 using OSBLE.Resources;
 using OSBLE.Models.Courses;
 using OSBLE.Attributes;
 using OSBLE.Resources.CSVReader;
 using System.Threading;
+using OSBLE.Utility;
+using FileCacheHelper = OSBLEPlus.Logic.Utility.FileCacheHelper;
 
 
 namespace OSBLE.Controllers

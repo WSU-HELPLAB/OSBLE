@@ -19,6 +19,15 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
     {
         public static HttpClient GetClient()
         {
+            // THIS IS FOR DEBUGGING ONLY, THIS TURNS OFF HTTPS VALIDATION
+            // DO NOT USE ON THE LIVE SERVER
+#if DEBUG
+            ServicePointManager.ServerCertificateValidationCallback =
+                delegate(object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+                {
+                    return true;
+                };
+#endif
             var client = new HttpClient { BaseAddress = new Uri(StringConstants.DataServiceRoot) };
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -53,7 +62,7 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             {
                 var task = client.GetAsync(string.Format("api/userprofiles/login?e={0}&hp={1}",
                                             userName,
-                                            Authentication.GetOsblePasswordHash(password)));
+                                            UserProfile.GetPasswordHash(password)));
                 await task;
 
                 return task.Result.StatusCode == HttpStatusCode.OK

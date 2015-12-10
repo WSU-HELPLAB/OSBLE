@@ -137,6 +137,11 @@ namespace OSBIDE.Controls.ViewModels
 
             Result = MessageBoxResult.No;
             RequestClose(this, EventArgs.Empty);
+
+            // need to clear out the logged in username/pw
+            // refresh awesomium
+            OnPropertyChanged("Logout");
+            
         }
 
         private async void Login(object param)

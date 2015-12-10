@@ -7,11 +7,12 @@ using OSBLE.Models.Annotate;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Caching;
-using OSBLE.Utility;
 using System.IO;
 using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Controllers;
 using OSBLE.Models;
+using OSBLE.Utility;
+using FileCacheHelper = OSBLEPlus.Logic.Utility.FileCacheHelper;
 
 namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
 {

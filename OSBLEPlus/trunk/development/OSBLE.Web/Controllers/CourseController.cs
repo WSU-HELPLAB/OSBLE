@@ -1339,6 +1339,8 @@ namespace OSBLE.Controllers
                 dashboardPosts.Add(dp);
             }
 
+            ///TODO: THIS WILL MOST LIKELY NEED TO CHANGE, don't want to mess with it right now
+            //Should not be using httpcontext with new path method
             string path = HttpContext.Server.MapPath("~/App_Data/Cache/ActivityFeedExport/" + ActiveCourseUser.AbstractCourseID.ToString());
 
             if (!Directory.Exists(path))

@@ -38,7 +38,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
             }
         }
 
-        public static void SaveToFileSystem(SubmitEvent submit, string path = null)
+        public static void SaveToFileSystem(SubmitEvent submit)
         {
             using (var zipStream = new MemoryStream())
             {
@@ -54,13 +54,8 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
 
                     try
                     {
-                        if (path == null)
-                        {
-                            var a = HttpContext.Current.Server.MapPath("~").TrimEnd('\\');
-                            path = string.Format("{0}\\OSBLE.Web\\App_Data\\FileSystem\\", Directory.GetParent(a).FullName);
-                        }
                         OSBLE.Models.FileSystem.Directories.GetAssignmentWithId(submit.CourseId ?? 1
-                            , submit.AssignmentId, teamId, path).AddFile(string.Format("{0}.zip", submit.Sender.FullName), zipStream);
+                            , submit.AssignmentId, teamId).AddFile(string.Format("{0}.zip", submit.Sender.FullName), zipStream);
                     }
                     catch (ZipException)
                     {

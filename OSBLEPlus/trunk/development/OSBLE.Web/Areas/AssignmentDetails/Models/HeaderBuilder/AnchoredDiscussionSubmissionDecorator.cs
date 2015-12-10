@@ -7,8 +7,9 @@ using OSBLE.Resources;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using System.Runtime.Caching;
-using OSBLE.Utility;
 using OSBLE.Controllers;
+using OSBLE.Utility;
+using FileCacheHelper = OSBLEPlus.Logic.Utility.FileCacheHelper;
 
 namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
 {

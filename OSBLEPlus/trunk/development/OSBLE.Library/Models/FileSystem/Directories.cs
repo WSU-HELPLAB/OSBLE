@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Web;
+using System.Web.Hosting;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 
@@ -46,6 +50,12 @@ namespace OSBLE.Models.FileSystem
     /// </summary>
     public static class Directories
     {
+        private static string GetDefaultPath()
+        {
+            return ConfigurationManager.AppSettings["FileSystemDirectory"];
+            //string toReturn = Directory.GetParent(HostingEnvironment.ApplicationPhysicalPath).ToString();
+            //return Directory.GetParent(toReturn) + "\\OSBLEPlusFileSystem\\";
+        }
         /// <summary>
         /// Gets the storage directory for data files related to administrative actions 
         /// and content. Currently these are OSBLE-wide settings. That is, there is not 
@@ -54,7 +64,7 @@ namespace OSBLE.Models.FileSystem
         /// </summary>
         public static OSBLEDirectory GetAdmin()
         {
-            string path = HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
+            string path = GetDefaultPath();            
             path = System.IO.Path.Combine(path, "Admin");
 
             // Make sure the directory exists
@@ -68,8 +78,8 @@ namespace OSBLE.Models.FileSystem
 
         public static AssignmentFilePath GetAssignment(int courseID, int assignmentID, string r = null)
         {
-            string path = r ?? HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
 
+            string path = r ?? GetDefaultPath();
             path = System.IO.Path.Combine(path, "Courses", courseID.ToString(),
                 "Assignments", assignmentID.ToString());
 
@@ -84,7 +94,7 @@ namespace OSBLE.Models.FileSystem
 
         public static AssignmentFilePath GetAssignmentWithId(int courseID, int assignmentID, int teamid, string r = null)
         {
-            string path = r ?? HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
+            string path = r ?? GetDefaultPath();
 
             path = System.IO.Path.Combine(path, "Courses", courseID.ToString(),
                 "Assignments", assignmentID.ToString(), "Submissions", teamid.ToString());
@@ -104,7 +114,7 @@ namespace OSBLE.Models.FileSystem
         /// </summary>
         public static OSBLEDirectory GetAssignmentSubmission(int courseID, int assignmentID, int teamID)
         {
-            string root = HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
+            string root = GetDefaultPath();
             string data = System.IO.Path.Combine(root, "Courses", courseID.ToString(),
                 "Assignments", assignmentID.ToString(), "Submissions", teamID.ToString());
             string attr = System.IO.Path.Combine(root, "Courses", courseID.ToString(),
@@ -121,7 +131,7 @@ namespace OSBLE.Models.FileSystem
 
         public static OSBLEDirectory GetCourseDocs(int courseID)
         {
-            string path = HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
+            string path = GetDefaultPath();
             path = System.IO.Path.Combine(path, "Courses", courseID.ToString(), 
                 "CourseDocs");
 
@@ -136,7 +146,7 @@ namespace OSBLE.Models.FileSystem
 
         public static OSBLEDirectory GetCourseZipFolder(int courseID)
         {
-            string path = HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
+            string path = GetDefaultPath();
             path = System.IO.Path.Combine(path, "Courses", courseID.ToString(),
                 "ZipFolder");
 
@@ -151,7 +161,7 @@ namespace OSBLE.Models.FileSystem
 
         public static GradebookFilePath GetGradebook(int courseID)
         {
-            string path = HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
+            string path = GetDefaultPath();
             path = System.IO.Path.Combine(path, "Courses", courseID.ToString(), "Gradebook");
 
             // Make sure the directory exists
@@ -165,7 +175,7 @@ namespace OSBLE.Models.FileSystem
 
         public static OSBLEDirectory GetReview(int courseID, int assignmentID, int authorTeamID, int reviewerTeamID)
         {
-            string path = HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
+            string path = GetDefaultPath();
             path = System.IO.Path.Combine(path, "Courses", courseID.ToString(),
                 "Assignments", assignmentID.ToString(), "Reviews", authorTeamID.ToString(),
                 reviewerTeamID.ToString());
@@ -187,7 +197,7 @@ namespace OSBLE.Models.FileSystem
         /// </summary>
         public static OSBLEDirectory GetUser(int userID)
         {
-            string root = HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
+            string root = GetDefaultPath();
             
             // Get the data and attribute paths
             string dataPath = System.IO.Path.Combine(root, "Users", userID.ToString());
