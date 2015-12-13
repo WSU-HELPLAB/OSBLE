@@ -22,7 +22,7 @@ namespace OSBLE
 
         #region old FileSystem Code (deprecated)
 
-        
+
         public static string RootPath
         {
             get
@@ -469,7 +469,10 @@ namespace OSBLE
         /// <returns></returns>
         public static string CourseDocumentPathToWebUrl(string filePath)
         {
-                        int startOfWebPath = filePath.IndexOf("FileSystem");
+            //Get the last directory declared within the Web.Config string for the FileSystem
+            string fileSystemPath = ConfigurationManager.AppSettings["FileSystemDirectory"];
+            string[] dirs =  fileSystemPath.Split(new char[]{'\\','/'}).Where(s => s.Length > 0).ToArray();
+            int startOfWebPath = filePath.IndexOf(dirs.Last(), StringComparison.Ordinal);
 
             //get the raw url (not web accessible due to MVC restrictions)
             string rawUrl = VirtualPathUtility.ToAbsolute("~/" + filePath.Substring(startOfWebPath));

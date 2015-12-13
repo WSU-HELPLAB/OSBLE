@@ -14,7 +14,7 @@ namespace OSBLEPlus.Logic.Utility
         public static string GetCachePath()
         {
             return ConfigurationManager.AppSettings["FileCacheDirectory"];
-        }        
+        }
 
         /// <summary>
         /// Returns a <see cref="FileCache"/> with the default region tailored to the
@@ -45,7 +45,7 @@ namespace OSBLEPlus.Logic.Utility
                 DefaultRegion = client.ID.ToString(),
                 DefaultPolicy = new CacheItemPolicy() {SlidingExpiration = new TimeSpan(7, 0, 0, 0)},
                 MaxCacheSize = 2000000000 // 2GB
-            };          
+            };
             
             return fc;
         }

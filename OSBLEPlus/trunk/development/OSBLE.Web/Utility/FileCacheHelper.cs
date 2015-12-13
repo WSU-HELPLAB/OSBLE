@@ -10,7 +10,7 @@ namespace OSBLE.Utility
     ///TODO: remove this file from source control, it is not used anymore.
     //public class FileCacheHelper
     //{
-        
+
 
     //    /*/// <summary>
     //    /// Returns a cache instance for global, cross-session information.  You probably
