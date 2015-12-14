@@ -9,16 +9,16 @@ namespace OSBLEPlus.Services.Areas.HelpPage.Controllers
     /// <summary>
     /// The controller that will handle requests for the help page.
     /// </summary>
-    public class HelpController : Controller
+    public class APIHelpController : Controller
     {
         private const string ErrorViewName = "Error";
 
-        public HelpController()
+        public APIHelpController()
             : this(GlobalConfiguration.Configuration)
         {
         }
 
-        public HelpController(HttpConfiguration config)
+        public APIHelpController(HttpConfiguration config)
         {
             Configuration = config;
         }
