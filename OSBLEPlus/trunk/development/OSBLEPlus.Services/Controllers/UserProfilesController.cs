@@ -10,6 +10,7 @@ using OSBLEPlus.Logic.DataAccess.Profiles;
 using OSBLEPlus.Logic.DomainObjects.Helpers;
 using OSBLEPlus.Logic.DomainObjects.Profiles;
 using OSBLEPlus.Logic.Utility.Auth;
+using OSBLEPlus.Services.Models;
 
 namespace OSBLEPlus.Services.Controllers
 {
@@ -21,13 +22,13 @@ namespace OSBLEPlus.Services.Controllers
         /// <param name="e">Username</param>
         /// <param name="hp">Hashed Password</param>
         /// <returns>HttpResponeMessage</returns>
-        [HttpGet]
-        public HttpResponseMessage Login(string e, string hp)
+        [HttpPost]
+        public HttpResponseMessage Login([FromBody] APILogin json)
         {
-            if (!UserDataAccess.ValidateUser(e, hp))
+            if (!UserDataAccess.ValidateUser(json.e, json.hp))
                 return new HttpResponseMessage { StatusCode = HttpStatusCode.Unauthorized };
 
-            var user = UserDataAccess.GetByName(e);
+            var user = UserDataAccess.GetByName(json.e);
             if (user == null)
                 return new HttpResponseMessage { StatusCode = HttpStatusCode.Unauthorized };
 
