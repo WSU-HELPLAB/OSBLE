@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Security;
+using System.Runtime.Serialization.Json;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using Newtonsoft.Json;
-
+using OSBLE.Models.Users;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
 using OSBLEPlus.Logic.DomainObjects.Helpers;
 using OSBLEPlus.Logic.DomainObjects.Profiles;
@@ -60,9 +64,18 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
         {
             using (var client = GetClient())
             {
-                var task = client.GetAsync(string.Format("api/userprofiles/login?e={0}&hp={1}",
-                                            userName,
-                                            UserProfile.GetPasswordHash(password)));
+                // Send post data via key/value pairs in a dictionary to be deserialized into json
+                // for the new HttpPost method.
+                Dictionary<string, string> values = new Dictionary<string, string>()
+                {
+                    {"e", userName},
+                    {"hp", UserProfile.GetPasswordHash(password)}
+                };
+
+                var content = new FormUrlEncodedContent(values);
+
+                var task = client.PostAsync("api/userprofiles/login", content);
+
                 await task;
 
                 return task.Result.StatusCode == HttpStatusCode.OK
