@@ -10,7 +10,7 @@
         }
         else
         {
-            @Html.ActionLink(modelDescription.Name, "ResourceModel", "Help", new { modelName = modelDescription.Name }, null)
+            @Html.ActionLink(modelDescription.Name, "ResourceModel", "APIHelp", new { modelName = modelDescription.Name }, null)
         }
     }
     else if (modelDescription is CollectionModelDescription)
