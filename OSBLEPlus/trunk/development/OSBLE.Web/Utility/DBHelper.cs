@@ -204,7 +204,15 @@ namespace OSBLE.Utility
             else
             {
                 IEnumerable<int> roleIDs = GetRoleIDsFromDiscriminator("CourseRole", connection);
-                courses = connection.Query<CourseUser>("SELECT * FROM CourseUsers WHERE UserProfileID = @uid AND AbstractRoleID IN @rids",
+                courses = connection.Query<CourseUser>(
+                     "SELECT * " +
+                    "FROM CourseUsers cusers " +
+                    "INNER JOIN AbstractCourses acourses " +
+                    "ON cusers.AbstractCourseID = acourses.ID " +
+                    "WHERE UserProfileID = @uid " +
+                    "AND AbstractRoleID IN @rids " +
+                    "AND Hidden = 0 " +
+                    "AND IsDeleted = 0 ",
                     new { uid = userProfileID, rids = roleIDs });
             }
 
@@ -222,7 +230,15 @@ namespace OSBLE.Utility
             else
             {
                 IEnumerable<int> roleIDs = GetRoleIDsFromDiscriminator("CommunityRole",connection);
-                communities = connection.Query<CourseUser>("SELECT * FROM CourseUsers WHERE UserProfileID = @uid AND AbstractRoleID IN @rids",
+                communities = connection.Query<CourseUser>(
+                    "SELECT * " +
+                    "FROM CourseUsers cusers " +
+                    "INNER JOIN AbstractCourses acourses " +
+                    "ON cusers.AbstractCourseID = acourses.ID " +
+                    "WHERE UserProfileID = @uid " +
+                    "AND AbstractRoleID IN @rids " +
+                    "AND Hidden = 0 " +
+                    "AND IsDeleted = 0 ",
                     new { uid = userProfileID, rids = roleIDs });
             }
 
