@@ -39,7 +39,7 @@
                     foreach (CourseUser cu in courses)
                     {
                         <li class="course-item @(Model == cu.AbstractCourseID ? "active" : "")" data-courseid="@cu.AbstractCourseID">
-                        @Html.ActionLink(DBHelper.GetCourseFullNameFromCourseUser(cu, connection), "OSBIDE", "Feed", new {courseID = cu.AbstractCourseID}, null)
+                        @Html.ActionLink(DBHelper.GetCourseShortNameFromID(cu.AbstractCourseID, connection), "OSBIDE", "Feed", new {courseID = cu.AbstractCourseID}, null)
                         </li>
                     }
                 }
@@ -50,7 +50,7 @@
                     foreach (CourseUser cu in communities)
                     {
                         <li class="course-item @(Model == cu.AbstractCourseID ? "active" : "")" data-courseid="@cu.AbstractCourseID">
-                            @Html.ActionLink(DBHelper.GetCourseFullNameFromCourseUser(cu, connection), "OSBIDE", "Feed", new {courseID = cu.AbstractCourseID}, null)
+                            @Html.ActionLink(DBHelper.GetCourseShortNameFromID(cu.AbstractCourseID, connection), "OSBIDE", "Feed", new {courseID = cu.AbstractCourseID}, null)
                         </li>
                     }
                 }
