@@ -9,6 +9,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 
         public virtual BuildEvent BuildEvent { get { return _build; } set { _build = value; } }
 
+        [NonSerialized]
         private BuildEvent _build;
 
         public int ErrorListItemId { get; set; }
