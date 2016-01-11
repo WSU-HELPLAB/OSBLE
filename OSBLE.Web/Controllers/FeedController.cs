@@ -93,8 +93,13 @@ namespace OSBLE.Controllers
         [OsbleAuthorize]
         public ActionResult OSBIDE(int? courseID)
         {
-            if (courseID != null) SetCourseID(courseID.Value);
-            return View("Index", "_OSBIDELayout", courseID ?? ActiveCourseUser.UserProfileID);
+            if (courseID != null) 
+                SetCourseID(courseID.Value);
+            else
+                courseID = ActiveCourseUser.AbstractCourseID;
+
+            ViewBag.ActiveCourse = DBHelper.GetCourseUserFromProfileAndCourse(ActiveCourseUser.UserProfileID, (int)courseID);
+            return View("Index", "_OSBIDELayout", courseID);
         }
 
         public bool SetCourseID(int courseId)

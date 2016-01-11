@@ -100,10 +100,47 @@ namespace OSBLE.Utility
                 return cu;
             }
 
-            cu = connection.Query<CourseUser>("SELECT * FROM CourseUsers WHERE UserProfileID = @uid AND AbstractCourseID = @courseID",
+            cu = connection.Query<CourseUser>("SELECT * FROM CourseUsers WHERE UserProfileID = @uid AND AbstractCourseID = @cid",
                 new { uid = userProfileID, cid = courseID }).FirstOrDefault();
+            
+            // Get non-basic data
+            AbstractRole role = GetAbstractRole(cu.AbstractRoleID, connection);
+            AbstractCourse course = GetAbstractCourse(courseID, connection);
+            cu.AbstractRole = role;
+            cu.AbstractCourse = course;
 
             return cu;
+        }
+
+        public static AbstractRole GetAbstractRole(int roleID, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection()) { return GetAbstractRole(roleID, sqlc); }
+            }
+
+            string discriminator = connection.Query<string>("SELECT Discriminator FROM AbstractRoles WHERE ID = @id", new { id = roleID }).Single();
+            AbstractRole role = null;
+            switch(discriminator)
+            {
+                case "CourseRole":
+                    role = connection.Query<CourseRole>("SELECT * FROM AbstractRoles WHERE ID = @id", new { id = roleID }).Single();
+                    break;
+                case "CommunityRole":
+                    role = connection.Query<CommunityRole>("SELECT * FROM AbstractRoles WHERE ID = @id", new { id = roleID }).Single();
+                    break;
+                case "AssessmentCommitteeChairRole":
+                    role = connection.Query<AssessmentCommitteeChairRole>("SELECT * FROM AbstractRoles WHERE ID = @id", new { id = roleID }).Single();
+                    break;
+                case "AssessmentCommitteeMemberRole":
+                    role = connection.Query<AssessmentCommitteeMemberRole>("SELECT * FROM AbstractRoles WHERE ID = @id", new { id = roleID }).Single();
+                    break;
+                case "ABETEvaluatorRole":
+                    role = connection.Query<ABETEvaluatorRole>("SELECT * FROM AbstractRoles WHERE ID = @id", new { id = roleID }).Single();
+                    break;
+            }
+
+            return role;
         }
 
         public static UserProfile GetUserProfile(string userName, SqlConnection connection = null)
@@ -147,6 +184,28 @@ namespace OSBLE.Utility
 
         /*** Courses & Communities *****************************************************************************************/
         #region Courses
+        public static AbstractCourse GetAbstractCourse(int courseID, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection()) { return GetAbstractCourse(courseID, sqlc); }
+            }
+
+            string discriminator = connection.Query<string>(@"SELECT Discriminator FROM AbstractCourses WHERE ID = @id", new { id = courseID }).SingleOrDefault();
+            AbstractCourse course = null;
+            switch(discriminator)
+            {
+                case "Course":
+                    course = connection.Query<Course>(@"SELECT * FROM AbstractCourses WHERE ID = @id", new { id = courseID }).SingleOrDefault();
+                    break;
+                case "Community":
+                    course = connection.Query<Community>(@"SELECT * FROM AbstractCourses WHERE ID = @id", new { id = courseID }).SingleOrDefault();
+                    break;
+            }
+
+            return course;
+        }
+
         public static string GetCourseShortNameFromID(int courseID, SqlConnection connection = null)
         {
             string name = "";
