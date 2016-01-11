@@ -350,7 +350,7 @@ namespace OSBLE.Controllers
                 }
                 return true;
             }
-            catch
+            catch(Exception ex)
             {
                 return false;
             }
