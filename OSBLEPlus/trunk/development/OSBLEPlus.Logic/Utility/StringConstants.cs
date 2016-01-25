@@ -21,11 +21,10 @@ namespace OSBLEPlus.Logic.Utility
             {
 #if DEBUG
                 //return "http://localhost:8088";                
-                return "https://helplab3.eecs.wsu.edu";
+                return "https://plus.osble.org/";
 #else
 
-                //return "https://plus.osble.org";
-                return "https://helplab3.eecs.wsu.edu";
+                return "https://plus.osble.org/";
 #endif
             }
         }
@@ -36,7 +35,7 @@ namespace OSBLEPlus.Logic.Utility
             {
 #if DEBUG
                 //return "http://localhost:8087";                
-                return "https://helplab3.eecs.wsu.edu/plusservices";
+                return "https://plus.osble.org/plusservices/";
 #else
                 //return "http://osble.org:8087";
                 //return "https://plus.osble.org:8087";

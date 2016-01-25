@@ -87,8 +87,8 @@ function FeedItem(data) {
             dataType: "json",
             method: "GET",
             success: function (data) {
-                self.numberHelpfulMarks(data.helpfulMarks);
                 self.highlightMark(data.isMarker);
+                MarkHelpfulSucceeded(self, data.helpfulMarks);
             }
         });
     };
@@ -115,22 +115,23 @@ function FeedItem(data) {
             data: { id: self.eventId, content: text },
             dataType: "json",
             method: "POST",
-            success: function(dataList) {
-                var commentList = $.map(dataList, function(item) { return new FeedItem(item) });
-                self.comments(commentList);
-
-                // re-enabled buttons and textbox
-                $("#feed-reply-textbox-" + self.eventId).removeAttr("disabled");
-                $("#feed-reply-submit-" + self.eventId).removeAttr("disabled");
-                $("#feed-reply-cancel-" + self.eventId).removeAttr("disabled");
-
-                PostReplySucceeded(self);
+            success: function (dataList) {
+                PostReplySucceeded(self, dataList);
             },
             error: function() {
                 PostReplyFailed(self);
             }
         });
     };
+
+    self.GetComment = function (id) {
+        var post = null;
+        $.each(self.comments(), function (index, value) {
+            if (value.eventId == id)
+                post = value;
+        });
+        return post;
+    }
 }
 
 function FeedItemOptions(canMail, canDelete, canEdit, showPicture, canVote)
@@ -143,16 +144,57 @@ function FeedItemOptions(canMail, canDelete, canEdit, showPicture, canVote)
     self.canVote = canVote;
 }
 
-function FeedViewModel(userName, userId) {
+function FeedViewModel(userName, userId, current) {
     var self = this;
     self.userName = userName;
     self.userId = userId;
     self.items = ko.observableArray();
-
     self.keywords = ko.observable("");
     self.keywords.subscribe(function (newValue) {
         self.RequestUpdate();
     });
+
+
+    // *** AUTO-UPDATE WEB SOCKET STUFF ***
+    self.hub = $.connection.activityFeedHub;
+
+    self.hub.client.addNewReply = function (postID, dataList) {
+        // Add the reply to the page
+        var post = self.GetPost(postID);
+        if (post != null) {
+            var commentList = $.map(dataList, function (item) {
+                SetPermissions(item);
+                return new FeedItem(item)
+            });
+            post.comments(commentList);
+
+            HighlightNewReply(postID);
+        }
+    };
+
+    self.hub.client.addNewPost = function (courseID, postData) {
+        if (courseID == GetSelectedCourseID()) {
+            SetPermissions(postData);
+            self.items.unshift(new FeedItem(postData)); // unshift puts object at beginning of array
+            HighlightNewPost(postData.EventId);
+        }
+    }
+
+    self.hub.client.addMarkHelpful = function (postID, replyPostID, numHelpfulMarks) {
+        var post = self.GetPost(postID);
+        if (post != null) {
+            var comment = post.GetComment(replyPostID);
+            if (comment != null) {
+                comment.numberHelpfulMarks(numHelpfulMarks);
+            }
+        }
+    }
+
+    // Start the connection
+    $.connection.hub.qs = { "userID": self.userId, "courseID": GetSelectedCourseID() };
+    $.connection.hub.start();
+    // *************************************
+
 
     self.MakePost = function () {
         var text = $("#feed-post-textbox").val();
@@ -170,12 +212,7 @@ function FeedViewModel(userName, userId) {
             dataType: "json",
             data: { text: text },
             success: function (data) {
-                self.items.unshift(new FeedItem(data)); // unshift puts object at beginning of array
-                MakePostSucceeded(data.EventId);
-
-                // re-enable posting
-                $('#feed-post-textbox').removeAttr('disabled');
-                $('#btn_post_active').removeAttr('disabled');
+                MakePostSucceeded(data);
             },
             error: function () {
                 MakePostFailed();
@@ -237,7 +274,15 @@ function FeedViewModel(userName, userId) {
         });
     };
 
-    //self.RequestUpdate();
+
+    self.GetPost = function (id) {
+        var post = null;
+        $.each(self.items(), function (index, value) {
+            if (value.eventId == id)
+                post = value;
+        });
+        return post;
+    };
 }
 
 function DetailsViewModel(userName, userId, rootId)
@@ -247,6 +292,37 @@ function DetailsViewModel(userName, userId, rootId)
     self.userId = userId;
     self.rootId = rootId;
     self.items = ko.observableArray([]);
+
+
+    // *** AUTO-UPDATE WEB SOCKET STUFF ***
+    self.hub = $.connection.activityFeedHub;
+
+    self.hub.client.addNewReply = function (postID, dataList) {
+        if (postID == self.rootId) {
+            var commentList = $.map(dataList, function (item) {
+                SetPermissions(item);
+                return new FeedItem(item);
+            });
+            self.items()[0].comments(commentList);
+
+            HighlightNewReply(postID);
+        }
+    };
+
+    self.hub.client.addMarkHelpful = function (postID, replyPostID, numHelpfulMarks) {
+        if (postID == self.rootId) {
+            var comment = self.items()[0].GetComment(replyPostID);
+            if (comment != null) {
+                comment.numberHelpfulMarks(numHelpfulMarks);
+            }
+        }
+    }
+
+    // Start the connection
+    $.connection.hub.qs = { "userID": self.userId, "courseID": GetSelectedCourseID() };
+    $.connection.hub.start();
+    // *************************************
+
 
     self.RequestUpdate = function () {
         $.ajax({
@@ -275,6 +351,16 @@ function ProfileViewModel(userName, userId, profileUserId) {
     self.profileUserId = profileUserId;
     self.items = ko.observableArray([]);
 
+    // *** AUTO-UPDATE WEB SOCKET STUFF ***
+    self.hub = $.connection.activityFeedHub;
+
+    //TODO: add methods for update
+
+    // Start the connection
+    $.connection.hub.qs = { "userID": self.userId, "courseID": GetSelectedCourseID() };
+    $.connection.hub.start();
+    // *************************************
+
     self.RequestUpdate = function () {
         $.ajax({
             type: "POST",
@@ -291,7 +377,40 @@ function ProfileViewModel(userName, userId, profileUserId) {
     };
 }
 
+
+
+
 /* Regular JS Functions */
+
+function SetPermissions(post)
+{
+    // don't bother reseting permissions if we were the poster 
+    // (only if post, we do need to worry about this with replies)
+    if (post.ParentEventId == -1 && post.SenderId == vm.userId)
+        return;
+
+    $.ajax({
+        type: "POST",
+        async: false,
+        url: "/Feed/GetPermissions",
+        datatype: "json",
+        data: { eventId: post.EventId },
+        success: function (data) {
+            post.CanDelete = data.canDelete;
+            post.CanEdit = data.canEdit;
+            post.CanMail = data.canMail;
+            post.CanVote = data.canVote;
+            post.ShowPicture = data.showPicture;
+        },
+        error: function () {
+            post.CanDelete = false;
+            post.CanEdit = false;
+            post.CanMail = false;
+            post.CanVote = false;
+            post.ShowPicture = false;
+        }
+    });
+}
 
 function CheckEvents(events)
 {
@@ -373,13 +492,23 @@ function expandComments(item) {
     }
 }
 
-function MakePostSucceeded(newPostId)
+function HighlightNewPost(postID)
+{
+    // Show a nifty animation for the new post
+    $('#feed-item-' + postID).hide().show('easeInBounce');
+}
+
+function MakePostSucceeded(newPost)
 {
     // Clear the textbox
     $('#feed-post-textbox').val('');
 
-    // Show a nifty animation for the new post
-    $('#feed-item-' + newPostId).hide().show('easeInBounce');
+    // re-enable posting
+    $('#feed-post-textbox').removeAttr('disabled');
+    $('#btn_post_active').removeAttr('disabled');
+
+    // notify others about the new post
+    vm.hub.server.notifyNewPost(newPost);
 }
 
 function MakePostFailed()
@@ -387,10 +516,16 @@ function MakePostFailed()
     ShowError('#feed-post-form', 'Unable to create post, check internet connection.', false);
 }
 
-function PostReplySucceeded(item) {
-    var replies = $("#feed-item-comments-" + item.eventId);
+function HighlightNewReply(postID)
+{
+    var replies = $("#feed-item-comments-" + postID);
+    replies.children().last().hide().show('easeInBounce');
+}
+
+function PostReplySucceeded(item, dataList) {
 
     // make sure comments block is visible
+    var replies = $("#feed-item-comments-" + item.eventId);
     if (replies.css('display') == 'none') {
         expandComments(item);
     }
@@ -402,8 +537,13 @@ function PostReplySucceeded(item) {
     $("#btn-reply-" + item.eventId).show();
     $("#feed-reply-" + item.eventId).hide();
 
-    // highlight the new reply
-    replies.children().last().hide().show('easeInBounce');
+    // notify everyone that a reply was made
+    vm.hub.server.notifyNewReply(item.eventId, dataList);
+
+    // re-enabled buttons and textbox
+    $("#feed-reply-textbox-" + item.eventId).removeAttr("disabled");
+    $("#feed-reply-submit-" + item.eventId).removeAttr("disabled");
+    $("#feed-reply-cancel-" + item.eventId).removeAttr("disabled");
 }
 
 function PostReplyFailed(item)
@@ -425,6 +565,11 @@ function EditFailed(item)
 {
     // Set the error message text and display it for 4 seconds
     ShowError('#feed-edit-' + item.eventId, 'Unable to edit post. Check internet connection.', true);    
+}
+
+function MarkHelpfulSucceeded(item, numMarks)
+{
+    vm.hub.server.notifyAddMarkHelpful(item.parentEventId, item.eventId, numMarks);
 }
 
 function LoadOldPosts()

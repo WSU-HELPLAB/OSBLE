@@ -14,7 +14,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
     {
         // EventLogs table contents
         public int EventLogId { get; set; }
-        protected virtual int EventTypeId { get; set; }
+        public virtual int EventTypeId { get; set; }
 
         public EventType EventType
         {
