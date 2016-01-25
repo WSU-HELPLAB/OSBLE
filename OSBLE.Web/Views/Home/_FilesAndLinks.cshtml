@@ -136,7 +136,14 @@ else // Files
     <div class="file" data-path="/FileHandler/CourseDocument?courseId=@courseID&filePath=@path" id="file_@stateIndex" data-state_index="@stateIndex">
 
         <a class="file-header" href="/FileHandler/CourseDocument?courseId=@courseID&filePath=@path" title="@name">
-            <img src="@Helpers.GetIconImgPath(path.Substring(path.LastIndexOf('.')))" />
+            @if (path.IndexOf('.') > -1) // if path contains '.'
+            { 
+                <img src="@Helpers.GetIconImgPath(path.Substring(path.LastIndexOf('.')))" />
+            }
+            else
+            {
+                <img src="@Helpers.GetIconImgPath("")" />
+            }
             @name
         </a>
         

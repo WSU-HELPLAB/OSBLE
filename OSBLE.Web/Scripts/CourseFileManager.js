@@ -869,7 +869,7 @@ function cfm_FileRenameIconClicked(stateObjectIndex) {
 
     //// Add the controls into the DIV
     var name = state.name;
-    if (name.contains('.'))
+    if (name.indexOf('.') > -1)
         name = name.substr(0, name.lastIndexOf('.'));
     $('body').append(
 "<div id=\"input_dialog\" title=\"Rename\"> \
@@ -946,7 +946,7 @@ function cfm_RenameFile(stateObjectIndex) {
     tb.value = tb.value.replace(/[^a-z0-9._-]+/gi, "");
 
     // put the file extention back on
-    if (state.name.contains('.'))
+    if (state.name.indexOf('.') > -1)
         tb.value += state.name.substr(state.name.lastIndexOf('.'));
 
     // New file name cannot be empty
