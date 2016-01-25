@@ -102,12 +102,15 @@ namespace OSBLE.Utility
 
             cu = connection.Query<CourseUser>("SELECT * FROM CourseUsers WHERE UserProfileID = @uid AND AbstractCourseID = @cid",
                 new { uid = userProfileID, cid = courseID }).FirstOrDefault();
-            
-            // Get non-basic data
-            AbstractRole role = GetAbstractRole(cu.AbstractRoleID, connection);
-            AbstractCourse course = GetAbstractCourse(courseID, connection);
-            cu.AbstractRole = role;
-            cu.AbstractCourse = course;
+
+            if (cu != null)
+            {
+                // Get non-basic data
+                AbstractRole role = GetAbstractRole(cu.AbstractRoleID, connection);
+                AbstractCourse course = GetAbstractCourse(courseID, connection);
+                cu.AbstractRole = role;
+                cu.AbstractCourse = course;
+            }
 
             return cu;
         }
@@ -529,7 +532,7 @@ namespace OSBLE.Utility
                 return evt;
             }
 
-            evt = connection.Query<ActivityEvent>("SELECT Id AS EventLogId, EventTypeId AS EventId, EventDate, DateReceived, SenderId, CourseId, SolutionName, IsDeleted " +
+            evt = connection.Query<ActivityEvent>("SELECT Id AS EventLogId, EventTypeId, EventDate, DateReceived, SenderId, CourseId, SolutionName, IsDeleted " +
                                                   "FROM EventLogs e " +
                                                   "WHERE e.Id = @EventId ",
                 new {EventId = eventId}

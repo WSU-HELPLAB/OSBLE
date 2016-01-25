@@ -22,6 +22,8 @@ using OSBLEPlus.Logic.DomainObjects.Interface;
 using OSBLEPlus.Logic.Utility;
 using OSBLEPlus.Logic.Utility.Auth;
 using OSBLEPlus.Logic.Utility.Lookups;
+using OSBLE.Hubs;
+using Microsoft.AspNet.SignalR;
 
 namespace OSBLE.Controllers
 {
@@ -31,6 +33,7 @@ namespace OSBLE.Controllers
     {
         //private UserFeedSetting _userSettings = ;
         private ActivityFeedQuery _activityFeedQuery;
+
         public FeedController()
         {
             // try to fix activeCourseUser for plugin
@@ -905,6 +908,20 @@ namespace OSBLE.Controllers
 
             ViewBag.Hashtag = hashtag;
             return View();
+        }
+
+        public JsonResult GetPermissions(int eventId)
+        {
+            ActivityEvent e = DBHelper.GetActivityEvent(eventId);
+            e.SetPrivileges(ActiveCourseUser);
+
+            return Json(new { 
+                canDelete = e.CanDelete, 
+                canEdit = e.CanEdit, 
+                canMail = e.CanMail, 
+                canVote = e.CanVote, 
+                showPicture = e.ShowProfilePicture
+            });
         }
     }
 }
