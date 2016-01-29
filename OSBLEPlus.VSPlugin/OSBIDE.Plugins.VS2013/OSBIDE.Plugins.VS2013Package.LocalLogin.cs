@@ -45,8 +45,15 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
         {
             var task = AsyncServiceClient.Login(userName, password);
             var result = await task;
-
+            Init_BrowserLogin(result);
             InitStepTwo_LoginCompleted(result);
+        }
+
+        private void Init_BrowserLogin(string authKey) //initialize browser authentication/activecourseuser
+        {
+            _manager.OpenActivityFeedWindow(null, 
+                                            StringConstants.WebClientRoot + "/Account/TokenLogin?authToken=" + authKey +
+                                            "&destinationUrl=" + StringConstants.WebClientRoot + "/feed/osbide/");
         }
 
         private void InitStepTwo_LoginCompleted(string authKey)

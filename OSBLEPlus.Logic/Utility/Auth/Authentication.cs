@@ -147,17 +147,13 @@ namespace OSBLEPlus.Logic.Utility.Auth
         {
             if (HttpContext.Current == null) return;
 
-            // force delete cookie
-            var httpCookie = HttpContext.Current.Request.Cookies[AuthKey];
-            
-            // cookie may not exist
-
+            // force delete cookies 
             try
             {
-                HttpContext.Current.Response.Cookies.Remove(AuthKey);
-                httpCookie.Expires = DateTime.Now.AddDays(-10);
-                httpCookie.Value = null;
-                HttpContext.Current.Response.SetCookie(httpCookie);
+                foreach (string cookie in HttpContext.Current.Request.Cookies.AllKeys)
+                {                    
+                    HttpContext.Current.Response.Cookies[cookie].Expires = DateTime.Now.AddDays(-10);                    
+                }                
             }
             catch (Exception ex)
             {
@@ -165,9 +161,8 @@ namespace OSBLEPlus.Logic.Utility.Auth
                 string foo = ex.Message;
             }
 
-
-            //if (httpCookie != null)
-            //    httpCookie.Expires = DateTime.UtcNow.AddDays(-1d);
+            if (HttpContext.Current.Session["auth"] != null)
+                HttpContext.Current.Session["auth"] = null;
         }
 
         public static string GetOsblePasswordHash(string text)

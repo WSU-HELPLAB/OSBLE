@@ -4,15 +4,21 @@
 "ProjectType" = "8:{978C614F-708E-4E1A-B201-565925725DBA}"
 "IsWebType" = "8:FALSE"
 "ProjectName" = "8:OSBIDE.Installer"
-"LanguageId" = "3:1036"
+"LanguageId" = "3:1033"
 "CodePage" = "3:1252"
-"UILanguageId" = "3:1036"
+"UILanguageId" = "3:1033"
 "SccProjectName" = "8:"
 "SccLocalPath" = "8:"
 "SccAuxPath" = "8:"
 "SccProvider" = "8:"
     "Hierarchy"
     {
+        "Entry"
+        {
+        "MsmKey" = "8:_B0AB5C67C27D4433BB34A84275D4A8F4"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
         "Entry"
         {
         "MsmKey" = "8:_C2FFF8078AF8430F9C12CA1B8815D655"
@@ -23,6 +29,12 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_C2FFF8078AF8430F9C12CA1B8815D655"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_B0AB5C67C27D4433BB34A84275D4A8F4"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -120,6 +132,37 @@
         }
         "File"
         {
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_B0AB5C67C27D4433BB34A84275D4A8F4"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:Ionic.Zip, Version=1.9.1.8, Culture=neutral, PublicKeyToken=57c4b11f586df8eb, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_B0AB5C67C27D4433BB34A84275D4A8F4"
+                    {
+                    "Name" = "8:Ionic.Zip.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:..\\packages\\DotNetZip.1.9.1.8.Signed\\Ionic.Zip.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_9A89E9D5327A47BB813C9A85E9E80EA6"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
         }
         "FileType"
         {
@@ -180,7 +223,7 @@
         }
         "MsiBootstrapper"
         {
-        "LangId" = "3:1036"
+        "LangId" = "3:1033"
         "RequiresElevation" = "11:FALSE"
         }
         "Product"
@@ -188,11 +231,11 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:OSBLE Dependencies Installer"
         "ProductCode" = "8:{AFD5CE6F-B6B3-4B8B-8E70-149BAD4852AB}"
-        "PackageCode" = "8:{F20C78B4-7484-40D6-B90E-53881D860A0C}"
+        "PackageCode" = "8:{FE82C107-CB2E-4E76-B08F-C039CBA2E45A}"
         "UpgradeCode" = "8:{379FC376-46A5-401E-989E-50379DB0F398}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
-        "RemovePreviousVersions" = "11:FALSE"
+        "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
         "ProductVersion" = "8:1.0.0"

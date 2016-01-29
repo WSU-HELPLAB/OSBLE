@@ -96,10 +96,23 @@ namespace OSBLE.Controllers
         [OsbleAuthorize]
         public ActionResult OSBIDE(int? courseID)
         {
-            if (courseID != null) 
+            if (courseID != null)
+            {
                 SetCourseID(courseID.Value);
-            else
+            }
+            else if(ActiveCourseUser != null)
+            {
                 courseID = ActiveCourseUser.AbstractCourseID;
+            }
+
+            if (ActiveCourseUser == null || courseID == null) //may get here using the plugin
+            {
+                using (AccountController account = new AccountController())
+                {
+                    Authentication authenticate = new Authentication();
+                    return account.TokenLogin(authenticate.GetAuthenticationKey(), StringConstants.WebClientRoot + "/feed/osbide/");
+                }
+            }
 
             ViewBag.ActiveCourse = DBHelper.GetCourseUserFromProfileAndCourse(ActiveCourseUser.UserProfileID, (int)courseID);
             return View("Index", "_OSBIDELayout", courseID);
@@ -160,7 +173,7 @@ namespace OSBLE.Controllers
 
             // order items correctly, currently the Stored Procedure returns items in reverse order even though it orders dates by DESC
             // see GetActivityFeeds.sql or run the Stored Procedure in Sql Server Managment Studio to see output.
-            
+
             List<FeedItem> feedItems = new List<FeedItem>();
             for (int i = returnItems.Count - 1; i >= 0; i--)
             {
@@ -204,7 +217,7 @@ namespace OSBLE.Controllers
             if (events != null)
             {
                 var eventList = events.Replace(" ", "").Split(',').Where(s => s != "");
-                var listOfEvents = eventList.Select(s => (EventType) int.Parse(s)).ToList();
+                var listOfEvents = eventList.Select(s => (EventType)int.Parse(s)).ToList();
                 _activityFeedQuery.UpdateEventSelectors(listOfEvents);
             }
 
@@ -261,7 +274,7 @@ namespace OSBLE.Controllers
             eventLog.SetPrivileges(ActiveCourseUser);
 
             var comments = MakeCommentListJsonObject(item.Comments, eventLog.EventLogId);
-            string viewFolder = details? "Details/_" : "Feed/_";
+            string viewFolder = details ? "Details/_" : "Feed/_";
             string idString = null;
 
             if (eventLog.EventType == EventType.HelpfulMarkGivenEvent)
@@ -319,7 +332,7 @@ namespace OSBLE.Controllers
         private JsonResult GetJsonFromViewModel(FeedViewModel vm)
         {
             var obj = new { Feed = new List<dynamic>(), HasLastPost = vm.Feed.Count < _activityFeedQuery.MaxQuerySize };
-            foreach(AggregateFeedItem item in vm.Feed)
+            foreach (AggregateFeedItem item in vm.Feed)
             {
                 obj.Feed.Add(MakeAggregateFeedItemJsonObject(item, false));
             }
@@ -428,9 +441,10 @@ namespace OSBLE.Controllers
                         html = PartialView("Details/_FeedPostEvent", item).Capture(this.ControllerContext);
                     else
                         html = PartialView("Feed/_FeedPostEvent", item).Capture(this.ControllerContext);
-                    return Json(new { 
-                        HTMLContent = html, 
-                        TimeString = GetDisplayTimeString(item.MostRecentOccurance) 
+                    return Json(new
+                    {
+                        HTMLContent = html,
+                        TimeString = GetDisplayTimeString(item.MostRecentOccurance)
                     });
                 }
             }
@@ -450,11 +464,12 @@ namespace OSBLE.Controllers
             UserProfile current = CurrentUser; //DBHelper.GetUserProfile(ActiveCourseUser.UserProfileID);
             if ((current.IUserId == ActiveCourseUser.UserProfileID) || (ActiveCourseUser.AbstractRole.CanGrade))
             {
-                using (SqlConnection conn = DBHelper.GetNewConnection()) 
+                using (SqlConnection conn = DBHelper.GetNewConnection())
                 {
                     DBHelper.EditLogComment(id, newText, conn);
                     LogCommentEvent c = DBHelper.GetSingularLogComment(id, conn);
-                    return Json(new { 
+                    return Json(new
+                    {
                         HTMLContent = PartialView("Details/_LogCommentEvent", c).Capture(this.ControllerContext),
                         TimeString = GetDisplayTimeString(c.EventDate)
                     });
@@ -584,7 +599,7 @@ namespace OSBLE.Controllers
             // Get one more post since the first one will already be
             // in the feed.
             _activityFeedQuery.MaxQuerySize++;
-            
+
             FeedViewModel vm = GetFeedViewModel();
 
             // restore the original end date and query size
@@ -680,6 +695,7 @@ namespace OSBLE.Controllers
             return View();
         }
 
+        [OsbleAuthorize]
         public ActionResult OSBIDEDetails(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
@@ -743,10 +759,10 @@ namespace OSBLE.Controllers
             // We purposefully are not catching exceptions that could be thrown
             // here, because we want this response to fail if there is an error
             if (string.IsNullOrWhiteSpace(text))
-            { 
+            {
                 throw new ArgumentException();
             }
-             
+
             int courseID = ActiveCourseUser.AbstractCourseID;
             FeedPostEvent log = new FeedPostEvent()
                 {
@@ -763,7 +779,7 @@ namespace OSBLE.Controllers
             var emailList = DBHelper.GetActivityFeedForwardedEmails(courseID);
             //remove email for current user if they do not want to get their own posts emailed.
             bool emailSelf = ActiveCourseUser.UserProfile.EmailSelfActivityPosts;
-            if(!emailSelf)
+            if (!emailSelf)
             {
                 emailList.RemoveAll(el => el.Address == ActiveCourseUser.UserProfile.Email);
             }
@@ -829,9 +845,9 @@ namespace OSBLE.Controllers
                         body = string.Format("{0} made the following post at {1}:\n\n{2}\n\n", CurrentUser.FullName, timePosted.UTCToCourse(courseID), postContent);
                     }
                 }
-                
+
                 // add a link at the bottom to the website
-                body += string.Format("<a href=\"{0}\">View and reply to post in OSBLE</a>", Url.Action("Details", "Feed", new { id = sourcePostID }, Request.Url.Scheme ));
+                body += string.Format("<a href=\"{0}\">View and reply to post in OSBLE</a>", Url.Action("Details", "Feed", new { id = sourcePostID }, Request.Url.Scheme));
 
                 //Send the message
 #if !DEBUG
@@ -842,7 +858,7 @@ namespace OSBLE.Controllers
 
 
         [HttpPost]
-        public ActionResult ApplyFeedfilter(IEnumerable<EventType> eventFilter = null, string commentFilter = null )
+        public ActionResult ApplyFeedfilter(IEnumerable<EventType> eventFilter = null, string commentFilter = null)
         {
             if (eventFilter != null)
             {
@@ -885,7 +901,7 @@ namespace OSBLE.Controllers
         {
             List<FeedItem> items = new List<FeedItem>();
 
-            foreach(int id in ids)
+            foreach (int id in ids)
             {
                 items.Add(Feeds.Get(id));
             }
@@ -915,11 +931,12 @@ namespace OSBLE.Controllers
             ActivityEvent e = DBHelper.GetActivityEvent(eventId);
             e.SetPrivileges(ActiveCourseUser);
 
-            return Json(new { 
-                canDelete = e.CanDelete, 
-                canEdit = e.CanEdit, 
-                canMail = e.CanMail, 
-                canVote = e.CanVote, 
+            return Json(new
+            {
+                canDelete = e.CanDelete,
+                canEdit = e.CanEdit,
+                canMail = e.CanMail,
+                canVote = e.CanVote,
                 showPicture = e.ShowProfilePicture
             });
         }

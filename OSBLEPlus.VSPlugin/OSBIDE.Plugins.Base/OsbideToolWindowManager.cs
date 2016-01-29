@@ -92,8 +92,16 @@ namespace OSBIDE.Plugins.Base
             if (string.IsNullOrEmpty(url) == false)
             {
                 _activityFeedVm.Url = url;
-            }
+            }            
             OpenToolWindow(new ActivityFeedToolWindow(), _activityFeedVm, vsPackage);
+        }
+
+        public void RedirectActivityFeedWindow(string url = "")
+        {            
+            if (string.IsNullOrEmpty(url) == false)
+            {
+                _activityFeedVm.Url = url;
+            }            
         }
 
         public void CloseActivityFeedWindow(Package vsPackage = null)
