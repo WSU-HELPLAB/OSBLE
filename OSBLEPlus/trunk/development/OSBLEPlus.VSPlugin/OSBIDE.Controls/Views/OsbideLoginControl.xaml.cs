@@ -109,9 +109,7 @@ namespace OSBIDE.Controls.Views
             {
                 // remove the text from the boxes when user logs out
                 EmailTextBox.Text = String.Empty;
-                PasswordTextBox.Password = String.Empty;                
-
-                // refresh awesomium without cache to ensure that the cache key is not used for the old user
+                PasswordTextBox.Password = String.Empty;
             }
         }
 

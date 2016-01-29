@@ -43,7 +43,7 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
             {
                 try
                 {
-                    _manager.OpenActivityFeedWindow(null, url);
+                    _manager.OpenActivityFeedWindow(null, StringConstants.WebClientRoot + "/feed/osbide/");
                 }
                 catch (Exception ex)
                 {
@@ -260,7 +260,13 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
                 _client.IsCollectingData = false;
                 _client.StopSending();
                 _cache.Remove(StringConstants.AuthenticationCacheKey);
+                //We need to clear the awesomium caches...?
+                _manager.OpenActivityFeedWindow(null, StringConstants.WebClientRoot + "/Account/LogOff");
                 _manager.CloseActivityFeedWindow();
+                //redirect the feed url after we've logged out
+                _manager.RedirectActivityFeedWindow(StringConstants.WebClientRoot + "/feed/osbide/");
+                _manager.CloseProfileWindow();                
+
                 MessageBox.Show("You have been logged out of OSBLE.");
             }
         }
