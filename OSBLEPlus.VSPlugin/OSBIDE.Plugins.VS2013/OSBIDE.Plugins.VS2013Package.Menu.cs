@@ -112,7 +112,7 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
                     Missing.Value,
                     Missing.Value, 1, true);
                 // Set the caption of the submenuitem
-                osbideControl.Caption = "View Error in OSBIDE";
+                osbideControl.Caption = "View Error in OSBLE+";
                 _osbideErrorListEvent = (CommandBarEvents)dte.Events.get_CommandBarEvents(osbideControl);
                 _osbideErrorListEvent.Click += osbideCommandBarEvent_Click;
             }
@@ -169,7 +169,7 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
             }
             else
             {
-                MessageBox.Show(@"You must be logged into OSBIDE in order to submit an assignment.");
+                MessageBox.Show(@"You must be logged into OSBLE+ in order to submit an assignment.");
             }
         }
 

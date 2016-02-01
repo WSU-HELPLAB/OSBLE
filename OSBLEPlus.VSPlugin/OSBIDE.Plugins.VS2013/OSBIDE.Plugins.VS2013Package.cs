@@ -105,7 +105,7 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
             if (_userName == null || _userPassword == null)
             {
                 _hasStartupErrors = true;
-                MessageBox.Show("Thank you for installing OSBIDE.  To complete the installation, you must enter your user information, which can be done by clicking on the \"Tools\" menu and selecting \"Log into OSBIDE\".", "Welcome to OSBIDE", MessageBoxButton.OK);
+                MessageBox.Show("Thank you for installing the OSBLE+ Visual Studio Plugin.  To complete the installation, you must enter your user information, which can be done by clicking on the \"Tools\" menu and selecting \"Log into OSBLE+\".", "Welcome to OSBLE+", MessageBoxButton.OK);
             }
             else 
             {
@@ -125,8 +125,8 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
         {
             var dte = (DTE2)GetService(typeof(SDTE));
             var cbs = ((CommandBars)dte.CommandBars);
-            var cb = cbs["OSBIDE Toolbar"];
-            var toolsControl = cb.Controls["My OSBIDE Profile"];
+            var cb = cbs["OSBLE+"];
+            var toolsControl = cb.Controls["My OSBLE+ Profile"];
             var profileButton = (CommandBarButton)toolsControl;
 
             if (hasSocial)
@@ -145,19 +145,19 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
         {
             var dte = (DTE2)GetService(typeof(SDTE));
             var cbs = ((CommandBars)dte.CommandBars);
-            var cb = cbs["OSBIDE Toolbar"];
-            var toolsControl = cb.Controls["Log into OSBIDE"];
+            var cb = cbs["OSBLE+"];
+            var toolsControl = cb.Controls["Log into OSBLE+"];
             var loginButton = (CommandBarButton)toolsControl;
 
             if (_client.IsSendingData)
             {
                 loginButton.Picture = (StdPicture)IconConverter.GetIPictureDispFromImage(Resources.login_active);
-                loginButton.TooltipText = "Connected to OSBIDE";
+                loginButton.TooltipText = "Connected to OSBLE+";
             }
             else
             {
                 loginButton.Picture = (StdPicture)IconConverter.GetIPictureDispFromImage(Resources.login);
-                loginButton.TooltipText = "Not connected to OSBIDE. Click to log in.";
+                loginButton.TooltipText = "Not connected to OSBLE+. Click to log in.";
             }
         }
 
@@ -171,7 +171,7 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
                     // --- Show the commandbar
                     var dte = GetService(typeof(SDTE)) as DTE2;
                     var cbs = ((CommandBars)dte.CommandBars);
-                    var cb = cbs["OSBIDE Toolbar"];
+                    var cb = cbs["OSBLE+"];
                     cb.Visible = true;
 
                     // --- Unsubscribe from events
@@ -193,7 +193,7 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
             {
                 _errorLogger.WriteToLog("Awesomium Error: " + ex.Message, LogPriority.HighPriority);
             }
-            MessageBox.Show("It appears as though your system is missing prerequisite components necessary for OSBIDE to operate properly.  Until this is resolved, you will not be able to access certain OSBIDE components within Visual Studio.  You can download the prerequisite files and obtain support by visiting http://osbide.codeplex.com.", "OSBIDE", MessageBoxButton.OK);
+            MessageBox.Show("It appears as though your system is missing prerequisite components necessary for the OSBLE+ Visual Studio Plugin to operate properly.  Until this is resolved, you will not be able to access certain OSBLE+ components within Visual Studio.  You can download the prerequisite files and obtain support by visiting http://osble.codeplex.com.", "OSBLE+", MessageBoxButton.OK);
         }
     }
 }
