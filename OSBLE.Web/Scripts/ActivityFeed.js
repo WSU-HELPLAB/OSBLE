@@ -1,4 +1,8 @@
 ﻿
+window.onbeforeunload = function () {
+    $.connection.hub.stop();
+};
+
 //KnockoutJS Objects
 function FeedItem(data) {
     // Fields
@@ -64,15 +68,15 @@ function FeedItem(data) {
             dataType: "json",
             method: "POST",
             success: function (dataObj) {
-                self.htmlContent(dataObj.HTMLContent);
-                self.timeString(dataObj.TimeString);
+                //self.htmlContent(dataObj.HTMLContent);
+                //self.timeString(dataObj.TimeString);
 
                 // re-enable buttons and textbox
                 $("#feed-edit-textbox-" + self.eventId).removeAttr("disabled");
                 $("#feed-edit-submit-" + self.eventId).removeAttr("disabled");
                 $("#feed-edit-cancel-" + self.eventId).removeAttr("disabled");
 
-                EditSucceeded(self);
+                EditSucceeded(self, dataObj.HTMLContent, dataObj.TimeString);
             },
             error: function () {
                 EditFailed(self);
@@ -187,6 +191,25 @@ function FeedViewModel(userName, userId, current) {
             if (comment != null) {
                 comment.numberHelpfulMarks(numHelpfulMarks);
             }
+        }
+    }
+
+    self.hub.client.editReply = function (postID, replyPostID, content, timeString) {
+        var post = self.GetPost(postID);
+        if (post != null) {
+            var comment = post.GetComment(replyPostID);
+            if (comment != null) {
+                comment.htmlContent(content);
+                comment.timeString(timeString);
+            }
+        }
+    }
+
+    self.hub.client.editPost = function (postID, content, timeString) {
+        var post = self.GetPost(postID);
+        if (post != null) {
+            post.htmlContent(content);
+            post.timeString(timeString);
         }
     }
 
@@ -315,6 +338,24 @@ function DetailsViewModel(userName, userId, rootId)
             if (comment != null) {
                 comment.numberHelpfulMarks(numHelpfulMarks);
             }
+        }
+    }
+
+    self.hub.client.editReply = function (postID, replyPostID, content, timeString) {
+        if (postID == self.rootId) {
+            var comment = self.items()[0].GetComment(replyPostID);
+            if (comment != null) {
+                comment.htmlContent(content);
+                comment.timeString(timeString);
+            }
+        }
+    }
+
+    self.hub.client.editPost = function (postID, content, timeString) {
+        if (postID == self.rootId) {
+            var post = self.items()[0];
+            post.htmlContent(content);
+            post.timeString(timeString);
         }
     }
 
@@ -552,8 +593,18 @@ function PostReplyFailed(item)
     ShowError('#feed-reply-' + item.eventId, 'Unable to submit reply. Check internet connection.', true);
 }
 
-function EditSucceeded(item)
+function EditSucceeded(item, content, timeString)
 {
+    //notify everyone that an edit was made
+    if (item.isComment)
+    {
+        vm.hub.server.notifyEditReply(item.parentEventId, item.eventId, content, timeString);
+    }
+    else
+    {
+        vm.hub.server.notifyEditPost(item.eventId, content, timeString);
+    }
+
     // clear textbox
     $("#feed-edit-textbox-" + item.eventId).val('');
 

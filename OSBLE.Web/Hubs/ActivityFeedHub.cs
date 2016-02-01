@@ -47,16 +47,16 @@ namespace OSBLE.Hubs
             Clients.Group(courseID.ToString()).addNewPost(courseID, post);
         }
 
-        public void NotifyEditPost(int postID, string newContent)
+        public void NotifyEditPost(int postID, string newContent, string timeString)
         {
             int courseID = int.Parse(Context.QueryString["courseID"]);
-            Clients.Group(courseID.ToString()).editPostContent(postID, newContent);
+            Clients.Group(courseID.ToString()).editPost(postID, newContent, timeString);
         }
 
-        public void NotifyEditReply(int postID, int replyID, string newContent)
+        public void NotifyEditReply(int postID, int replyID, string newContent, string timeString)
         {
             int courseID = int.Parse(Context.QueryString["courseID"]);
-            Clients.Group(courseID.ToString()).editReplyContent(postID, replyID, newContent);
+            Clients.Group(courseID.ToString()).editReply(postID, replyID, newContent);
         }
 
         // Note: this method can also remove helpful marks
