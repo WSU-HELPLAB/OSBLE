@@ -52,7 +52,7 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
             }
             else
             {
-                MessageBox.Show("You must be logged into OSBIDE in order to access this window.");
+                MessageBox.Show("You must be logged into OSBLE+ in order to access this window.");
             }
         }
 
@@ -77,7 +77,7 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
             }
             else
             {
-                MessageBox.Show("You must be logged into OSBIDE in order to access this window.");
+                MessageBox.Show("You must be logged into OSBLE+ in order to access this window.");
             }
         }
 
@@ -97,7 +97,7 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
             }
             else
             {
-                MessageBox.Show("You must be logged into OSBIDE in order to access this window.");
+                MessageBox.Show("You must be logged into OSBLE+ in order to access this window.");
             }
         }
 
@@ -118,7 +118,7 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
             }
             else
             {
-                MessageBox.Show("You must be logged into OSBIDE in order to access this window.");
+                MessageBox.Show("You must be logged into OSBLE+ in order to access this window.");
             }
         }
 
@@ -139,7 +139,7 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
             var cacheItem = _cache[StringConstants.AuthenticationCacheKey];
             if (cacheItem != null && string.IsNullOrEmpty(cacheItem.ToString()))
             {
-                MessageBox.Show("You must be logged into OSBIDE in order to access this window.");
+                MessageBox.Show("You must be logged into OSBLE+ in order to access this window.");
                 return;
             }
 
@@ -241,7 +241,7 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
                         _client.IsCollectingData = true;
                         _client.StartSending();
                     }
-                    MessageBox.Show("Welcome to OSBLE!");
+                    MessageBox.Show("Welcome to OSBLE+!");
                     _manager.OpenActivityFeedWindow();
                 }
                 else
@@ -265,9 +265,9 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
                 _manager.CloseActivityFeedWindow();
                 //redirect the feed url after we've logged out
                 _manager.RedirectActivityFeedWindow(StringConstants.WebClientRoot + "/feed/osbide/");
-                _manager.CloseProfileWindow();                
+                _manager.CloseProfileWindow();
 
-                MessageBox.Show("You have been logged out of OSBLE.");
+                MessageBox.Show("You have been logged out of OSBLE+.");
             }
         }
     }

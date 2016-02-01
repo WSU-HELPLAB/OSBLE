@@ -6,7 +6,7 @@
              xmlns:wfi="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
              xmlns:winForms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
              mc:Ignorable="d" Height="206" Width="380"
-        Title="OSBIDE Login" ResizeMode="NoResize"
+        Title="OSBLE+ Login" ResizeMode="NoResize"
         >
     <Grid Margin="10,10,10,10">
         <Grid.RowDefinitions>
@@ -23,7 +23,7 @@
         </Grid.ColumnDefinitions>
 
         <!--0,0 to 0,1 -->
-        <TextBlock Grid.Row="0" Grid.Column="0" TextWrapping="Wrap" FontSize="14">Log into OSBIDE:</TextBlock>
+        <TextBlock Grid.Row="0" Grid.Column="0" TextWrapping="Wrap" FontSize="14">Log into OSBLE+:</TextBlock>
 
         <!--1,0 and 1,1-->
         <TextBlock Grid.Row="1" Grid.Column="0" FontWeight="Bold" Margin="0,5,0,0">Email Address:

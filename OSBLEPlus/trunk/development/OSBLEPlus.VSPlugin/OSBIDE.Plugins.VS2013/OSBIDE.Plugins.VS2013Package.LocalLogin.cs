@@ -60,7 +60,7 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
         {
             if (string.IsNullOrWhiteSpace(authKey))
             {
-                var result = MessageBox.Show("It appears as though your OSBIDE user name or password has changed since the last time you opened Visual Studio.  Would you like to log back into OSBIDE?", "Log Into OSBIDE", MessageBoxButton.YesNo);
+                var result = MessageBox.Show("It appears as though your OSBLE+ user name or password has changed since the last time you opened Visual Studio.  Would you like to log back into OSBLE+?", "Log Into OSBLE+", MessageBoxButton.YesNo);
                 if (result == MessageBoxResult.Yes)
                 {
                     OpenLoginScreen(this, EventArgs.Empty);

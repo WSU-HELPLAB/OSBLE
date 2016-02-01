@@ -44,7 +44,7 @@
         <Parent guid="guidOSBIDE_VSPackageCmdSet" id="OsbideToolbar"/>
         <CommandFlag>DefaultDocked</CommandFlag>
         <Strings>
-          <ButtonText>OSBIDE Toolbar</ButtonText>
+          <ButtonText>OSBLE+</ButtonText>
         </Strings>
       </Menu>
     </Menus>
@@ -92,7 +92,7 @@
         <Icon guid="guidImages" id="login" />
         <Strings>
           <CommandName>cmdidOsbideCommand</CommandName>
-          <ButtonText>Log into OSBIDE</ButtonText>
+          <ButtonText>Log into OSBLE+</ButtonText>
         </Strings>
       </Button>
 
@@ -101,7 +101,7 @@
         <Icon guid="guidImages" id="login" />
         <Strings>
           <CommandName>cmdidOsbideCommand</CommandName>
-          <ButtonText>Log into OSBIDE</ButtonText>
+          <ButtonText>Log into OSBLE+</ButtonText>
         </Strings>
       </Button>
 
@@ -120,7 +120,7 @@
         <Icon guid="guidImages" id="feed" />
         <Strings>
           <CommandName>cmdidOsbideActivityFeedTool</CommandName>
-          <ButtonText>OSBIDE Activity Feed</ButtonText>
+          <ButtonText>OSBLE+ Activity Feed</ButtonText>
         </Strings>
       </Button>
 
@@ -129,7 +129,7 @@
         <Icon guid="guidImages" id="generic" />
         <Strings>
           <CommandName>cmdidOsbideActivityFeedDetailsTool</CommandName>
-          <ButtonText>OSBIDE Feed Item Details</ButtonText>
+          <ButtonText>OSBLE+ Feed Item Details</ButtonText>
         </Strings>
       </Button>
 
@@ -139,7 +139,7 @@
         <Icon guid="guidImages" id="profile" />
         <Strings>
           <CommandName>cmdidOsbideUserProfileTool</CommandName>
-          <ButtonText>My OSBIDE Profile</ButtonText>
+          <ButtonText>My OSBLE+ Profile</ButtonText>
         </Strings>
       </Button>
 
@@ -148,7 +148,7 @@
         <Icon guid="guidImages" id="documentation" />
         <Strings>
           <CommandName>cmdidOsbideDocumentationTool</CommandName>
-          <ButtonText>View OSBIDE Manual</ButtonText>
+          <ButtonText>View OSBLE+ Plugin Manual</ButtonText>
         </Strings>
       </Button>
 
@@ -157,7 +157,7 @@
         <Icon guid="guidImages" id="webLink" />
         <Strings>
           <CommandName>cmdidOsbideWebLinkTool</CommandName>
-          <ButtonText>View OSBIDE in browser</ButtonText>
+          <ButtonText>View OSBLE+ in browser</ButtonText>
         </Strings>
       </Button>
 
@@ -166,7 +166,7 @@
         <Icon guid="guidImages" id="generic" />
         <Strings>
           <CommandName>cmdidOsbideCreateAccountTool</CommandName>
-          <ButtonText>Create OSBIDE Account</ButtonText>
+          <ButtonText>Create OSBLE+ Account</ButtonText>
         </Strings>
       </Button>
 
@@ -175,7 +175,7 @@
         <Icon guid="guidImages" id="generic" />
         <Strings>
           <CommandName>cmdidOsbideGenericToolWindow</CommandName>
-          <ButtonText>Generic OSBIDE Window</ButtonText>
+          <ButtonText>Generic OSBLE+ Window</ButtonText>
         </Strings>
       </Button>
 
