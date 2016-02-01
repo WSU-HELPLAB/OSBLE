@@ -154,9 +154,9 @@ function FeedViewModel(userName, userId, current) {
     self.userId = userId;
     self.items = ko.observableArray();
     self.keywords = ko.observable("");
-    self.keywords.subscribe(function (newValue) {
-        self.RequestUpdate();
-    });
+    //self.keywords.subscribe(function (newValue) {
+    //    self.RequestUpdate();
+    //});
 
 
     // *** AUTO-UPDATE WEB SOCKET STUFF ***
@@ -297,7 +297,6 @@ function FeedViewModel(userName, userId, current) {
         });
     };
 
-
     self.GetPost = function (id) {
         var post = null;
         $.each(self.items(), function (index, value) {
@@ -306,6 +305,11 @@ function FeedViewModel(userName, userId, current) {
         });
         return post;
     };
+
+    $("#activity-feed-filters").submit(function (e) {
+        self.RequestUpdate();
+        return false; // prevent page refresh
+    });
 }
 
 function DetailsViewModel(userName, userId, rootId)
