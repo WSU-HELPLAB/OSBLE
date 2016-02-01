@@ -59,7 +59,7 @@
     <div class="btn-group" id="osbide-nav">
         <div class="osbide-settings dropdown">
             <a class="dropdown-toggle btn btn-primary" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-cog"></span></a>
-            <ul class="dropdown-menu dropdown-menu-right">
+            <ul class="dropdown-menu">
                 <li><a href="#" title="Zoom In" onclick="increaseZoom(0.05)">Zoom +</a></li>
                 <li><a href="#" title="Zoom Out" onclick="increaseZoom(-0.05)">Zoom -</a></li>
 
@@ -68,9 +68,7 @@
 
         @Html.Partial("_OSBIDECourses")
     </div>
-   
-    <h1 id="osbide_header">@ViewBag.Title</h1>
-    
+
     <section id="main" data-service-path="@ConfigurationManager.AppSettings["DataServiceUrl"]">
         <div class="container-fluid osbide-container" id="main_container">
             @RenderBody()

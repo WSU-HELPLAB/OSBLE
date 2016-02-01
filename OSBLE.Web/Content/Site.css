@@ -2331,16 +2331,9 @@ a.disabled{
 
 /* OSBIDE Layout */
 
-#osbide_header {
-    font-size: 14pt;
-    margin: 15px;
-    float: left;
-}
-
 /* */
 #osbide-nav {
     margin: 10px 15px 10px 15px;
-    float: right;
 }
 
 #osbide-nav .dropdown-toggle {
