@@ -56,7 +56,7 @@
             
             @* Search by Keyword *@
             <div id="keywordSection" class="form-group">
-                <label id="feedSearchIcon" for="feedSearchInput"><span class="glyphicon glyphicon-search"></span></label>
+                <button id="feedSearchIcon" for="feedSearchInput" onclick="vm.RequestUpdate()"><span class="glyphicon glyphicon-search"></span></button>
                 <input id="feedSearchInput" type="text" data-bind="textInput: keywords" class="form-control" autocomplete="off" placeholder="Search by keyword..." />
             </div>
 
