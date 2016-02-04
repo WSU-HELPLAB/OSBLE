@@ -20,11 +20,10 @@ namespace OSBLEPlus.Logic.Utility
             get
             {
 #if DEBUG
-                //return "http://localhost:8088";                
-                return "https://plus.osble.org/";
+                return "http://localhost/";                                                
 #else
 
-                return "https://plus.osble.org/";
+                return "https://plus.osble.org/";                
 #endif
             }
         }
@@ -34,12 +33,9 @@ namespace OSBLEPlus.Logic.Utility
             get
             {
 #if DEBUG
-                //return "http://localhost:8087";                
-                return "https://plus.osble.org/plusservices/";
+                return "http://localhost/plusservices/";
 #else
-                //return "http://osble.org:8087";
-                //return "https://plus.osble.org:8087";
-                return "https://helplab3.eecs.wsu.edu/plusservices";
+                return "http://plus.osble.org/plusservices/";
 #endif
             }
         }
@@ -65,8 +61,8 @@ namespace OSBLEPlus.Logic.Utility
         }
 
         public static string ProfileUrl
-        {
-            get { return string.Format("{0}/Account/Profile", WebClientRoot); }
+        {            
+            get { return string.Format("{0}/Profile", WebClientRoot); }
         }
 
         public static string WhatsNewUrl
