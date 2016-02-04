@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("OSBIDE.Plugins.VS2013")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Washington State University")]
+[assembly: AssemblyCompany("HELP Lab")]
 [assembly: AssemblyProduct("OSBIDE.Plugins.VS2013")]
 [assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
