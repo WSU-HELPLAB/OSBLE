@@ -21,7 +21,7 @@ namespace OSBIDE.Plugins.Base
         private readonly BrowserViewModel _profileVm = new BrowserViewModel();
         private readonly BrowserViewModel _activityFeedVm = new BrowserViewModel();
         private readonly BrowserViewModel _activityFeedDetailsVm = new BrowserViewModel();
-        private readonly BrowserViewModel _createAccountVm = new BrowserViewModel();
+        private readonly BrowserViewModel _createAccountVm = new BrowserViewModel();        
         private readonly BrowserViewModel _askTheProfessorVm = new BrowserViewModel();
         private readonly BrowserViewModel _genericWindowVm = new BrowserViewModel();
         private static int _detailsToolWindowId;
@@ -212,6 +212,16 @@ namespace OSBIDE.Plugins.Base
                     uiShell.PostExecCommand(ref commandSet, CommonPkgCmdIDList.cmdidOsbideGenericToolWindow, 0, ref inputParameters);
                     break;
             }
+        }
+
+        public void CloseAllWindows(Package vsPackage = null)
+        {
+            CloseToolWindow(new ActivityFeedDetailsToolWindow(), vsPackage);
+            CloseToolWindow(new ActivityFeedToolWindow(), vsPackage);
+            CloseToolWindow(new AskTheProfessorToolWindow(), vsPackage);
+            CloseToolWindow(new CreateAccountToolWindow(), vsPackage);
+            CloseToolWindow(new GenericOsbideToolWindow(), vsPackage);
+            CloseToolWindow(new UserProfileToolWindow(), vsPackage);
         }
     }
 }

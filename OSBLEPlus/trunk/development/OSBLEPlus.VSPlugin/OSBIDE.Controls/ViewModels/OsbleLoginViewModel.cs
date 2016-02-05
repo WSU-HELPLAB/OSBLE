@@ -18,14 +18,14 @@ namespace OSBIDE.Controls.ViewModels
         private bool _isLoggedIn;
 
         public event EventHandler RequestClose = delegate { };
-        public event EventHandler RequestCreateAccount = delegate { };
+        public event EventHandler RequestCreateAccount = delegate { };        
 
         public OsbleLoginViewModel()
         {
             LoginCommand = new DelegateCommand(Login, CanIssueCommand);
             LogoutCommand = new DelegateCommand(Logout, CanIssueCommand);
             CancelCommand = new DelegateCommand(Cancel, CanIssueCommand);
-            CreateAccountCommand = new DelegateCommand(CreateAccount, CanIssueCommand);
+            CreateAccountCommand = new DelegateCommand(CreateAccount, CanIssueCommand);            
 
             _buttonsEnabled = true;
             _loadingIconVisible = false;
@@ -35,7 +35,7 @@ namespace OSBIDE.Controls.ViewModels
         public ICommand LoginCommand { get; set; }
         public ICommand LogoutCommand { get; set; }
         public ICommand CancelCommand { get; set; }
-        public ICommand CreateAccountCommand { get; set; }
+        public ICommand CreateAccountCommand { get; set; }        
         public MessageBoxResult Result { get; private set; }
 
         public bool IsLoggedIn
@@ -132,15 +132,30 @@ namespace OSBIDE.Controls.ViewModels
 
         private async void Logout(object param)
         {
-            var task = AsyncServiceClient.Logout();
-            var result = await task;
+            try
+            {
+                var task = AsyncServiceClient.Logout();
+                var result = await task;
 
-            Result = MessageBoxResult.No;
-            RequestClose(this, EventArgs.Empty);
+                Result = MessageBoxResult.No;
+                RequestClose(this, EventArgs.Empty);
 
-            // need to clear out the logged in username/pw
-            // refresh awesomium
-            OnPropertyChanged("Logout");
+                // need to clear out the logged in username/pw
+                // refresh awesomium
+                OnPropertyChanged("Logout");
+            }
+            catch (Exception e)
+            {
+                Result = MessageBoxResult.No;
+                RequestClose(this, EventArgs.Empty);
+
+                // need to clear out the logged in username/pw
+                // refresh awesomium
+                OnPropertyChanged("Logout");
+                MessageBox.Show("There was an error logging you out from OSBLE+. If this issue persists, please contact support@osble.org with the following error message.\n\nError: " + e.InnerException.ToString(), "Log Into OSBLE+", MessageBoxButton.OK);                
+            }
+
+           
             
         }
 
@@ -151,10 +166,20 @@ namespace OSBIDE.Controls.ViewModels
             ButtonsEnabled = false;
             ErrorText = string.Empty;
 
-            var task = AsyncServiceClient.Login(Email, Password);
-            var result = await task;
+            //TODO: handle the try catch exception
+            try
+            {
+                var task = AsyncServiceClient.Login(Email, Password);
+                var result = await task;
 
-            LoginCompleted(result);
+                LoginCompleted(result);
+            }
+            catch (Exception e)
+            {
+                ErrorText = "Unable to connect to OSBLE+";                
+                LoginCompleted("exception");
+            }
+            
         }
 
         private void LoginCompleted(string result)
@@ -162,24 +187,27 @@ namespace OSBIDE.Controls.ViewModels
             LoadingIconVisible = false;
             ButtonsEnabled = true;
 
-            //hash longer than 0 means success
-            try
+            if(!result.Equals("exception"))
             {
-                if (result.Length > 0)
+                //hash longer than 0 means success
+                try
                 {
-                    AuthenticationHash = result;
-                    Result = MessageBoxResult.OK;
-                    RequestClose(this, EventArgs.Empty);
+                    if (result.Length > 0)
+                    {
+                        AuthenticationHash = result;
+                        Result = MessageBoxResult.OK;
+                        RequestClose(this, EventArgs.Empty);
+                    }
+                    else
+                    {
+                        ErrorText = "Invalid email or password.";
+                    }
                 }
-                else
+                catch (Exception)
                 {
-                    ErrorText = "Invalid email or password.";
+                    ErrorText = "Error processing request (http).";
                 }
-            }
-            catch (Exception)
-            {
-                ErrorText = "Error processing request (http).";
-            }
+            }                        
         }
 
         private void CreateAccount(object param)
@@ -187,7 +215,7 @@ namespace OSBIDE.Controls.ViewModels
             RequestCreateAccount(this, EventArgs.Empty);
             Cancel(this);
         }
-
+        
         private void Cancel(object param)
         {
             Result = MessageBoxResult.Cancel;
