@@ -47,7 +47,7 @@
 @if (Model.User.ID == currentUser.ID)
 {
     int rowCounter = 0;
-    <section id="subscriptions" class="profile-content">
+    @*<section id="subscriptions" class="profile-content">
         <h1>My Subscriptions</h1>
         @if (Model.EventLogSubscriptions.Count() == 0)
         {
@@ -106,7 +106,7 @@
                 </tbody>
             </table>
         }
-    </section>
+    </section>*@
 }
 <section id="recent-comments" class="profile-content">
     <h1>Recent Social Activity</h1>
@@ -205,6 +205,7 @@
     }
 </section>
 <section class="profile-content">
-    <h1>All Activity</h1>
+    @*<h1>All Activity</h1>*@
     @*Html.Partial("Feed/_Feed", Model.Feed)*@
+    
 </section>
