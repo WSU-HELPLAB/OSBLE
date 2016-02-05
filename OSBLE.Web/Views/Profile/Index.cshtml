@@ -116,7 +116,7 @@
     }
     else
     {
-        foreach (DateTime date in Model.SocialActivity.ActivityDates)
+        foreach (DateTime date in Model.SocialActivity.ActivityDates.OrderByDescending(l => l.Date))
         {
             List<int> eventIds = Model.SocialActivity.GetEventIds(date);
 
