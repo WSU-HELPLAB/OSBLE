@@ -43,17 +43,36 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
 
         private async void Login(string userName, string password)
         {
-            var task = AsyncServiceClient.Login(userName, password);
-            var result = await task;
-            Init_BrowserLogin(result);
-            InitStepTwo_LoginCompleted(result);
+            try
+            {
+                var task = AsyncServiceClient.Login(userName, password);
+                var result = await task;
+                Init_BrowserLogin(result);
+                InitStepTwo_LoginCompleted(result);
+            }
+            catch (Exception e)
+            {
+                var result = MessageBox.Show("The OSBLE+ Visual Studio Plugin is unable to connect to the OSBLE+ server.  If this issue persists, please contact support@osble.org with the error message.\n\nError: " + e.InnerException.ToString(), "Log Into OSBLE+", MessageBoxButton.OK);                
+                _manager.CloseAllWindows();
+            }            
         }
 
         private void Init_BrowserLogin(string authKey) //initialize browser authentication/activecourseuser
         {
-            _manager.OpenActivityFeedWindow(null, 
+            if (string.IsNullOrWhiteSpace(authKey))
+            {
+                var result = MessageBox.Show("It appears as though your OSBLE+ user name or password has changed since the last time you opened Visual Studio.  Would you like to log back into OSBLE+?", "Log Into OSBLE+", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.Yes)
+                {
+                    OpenLoginScreen(this, EventArgs.Empty);
+                }
+            }
+            else
+            {
+                _manager.OpenActivityFeedWindow(null,
                                             StringConstants.WebClientRoot + "/Account/TokenLogin?authToken=" + authKey +
                                             "&destinationUrl=" + StringConstants.WebClientRoot + "/feed/osbide/");
+            }            
         }
 
         private void InitStepTwo_LoginCompleted(string authKey)
