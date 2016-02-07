@@ -45,6 +45,8 @@ namespace OSBLE
             //    "~/Content/Calendar.css",
             //    "~/Content/AnalyticsIndex.css?version=1.1"
             //    ));
+
+            //bundles.Add(new StyleBundle("~/Content/syntaxhighlight").IncludeDirectory("~/Content/themes/highlight", "*.css", true));            
         }
     }
 }

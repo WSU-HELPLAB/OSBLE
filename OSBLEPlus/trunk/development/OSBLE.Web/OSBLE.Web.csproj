@@ -36,6 +36,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <FilesToIncludeForPublish>OnlyFilesToRunTheApp</FilesToIncludeForPublish>
+    <ExcludeGeneratedDebugSymbol>false</ExcludeGeneratedDebugSymbol>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -423,185 +425,562 @@
     <Content Include="Content\bootstrap-3.3.5\js\bootstrap.min.js" />
     <Content Include="Content\bootstrap-3.3.5\js\npm.js" />
     <Content Include="Content\DiscussionAssignment.css" />
-    <Content Include="Content\images\ajax-loader-s.gif" />
-    <Content Include="Content\images\alert.png" />
+    <Content Include="Content\images\ajax-loader-s.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\alert.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\favicon.ico" />
-    <Content Include="Content\images\account.png" />
-    <Content Include="Content\images\add_up.png" />
-    <Content Include="Content\images\ajax-loader.gif" />
-    <Content Include="Content\images\arrow_down.png" />
-    <Content Include="Content\images\arrow_left.png" />
-    <Content Include="Content\images\arrow_right.png" />
-    <Content Include="Content\images\calendar_icon.png" />
-    <Content Include="Content\images\cut_context.png" />
-    <Content Include="Content\images\default.jpg" />
-    <Content Include="Content\images\delete_up.png" />
-    <Content Include="Content\images\delete_up_disabled.png" />
-    <Content Include="Content\images\edit_up.png" />
-    <Content Include="Content\images\enroll.png" />
-    <Content Include="Content\images\fileextimages\aac.png" />
-    <Content Include="Content\images\fileextimages\ai.png" />
-    <Content Include="Content\images\fileextimages\aiff.png" />
-    <Content Include="Content\images\fileextimages\avi.png" />
-    <Content Include="Content\images\fileextimages\bmp.png" />
-    <Content Include="Content\images\fileextimages\c.png" />
-    <Content Include="Content\images\fileextimages\cpp.png" />
-    <Content Include="Content\images\fileextimages\css.png" />
-    <Content Include="Content\images\fileextimages\dat.png" />
-    <Content Include="Content\images\fileextimages\dmg.png" />
-    <Content Include="Content\images\fileextimages\doc.png" />
-    <Content Include="Content\images\fileextimages\dotx.png" />
-    <Content Include="Content\images\fileextimages\dwg.png" />
-    <Content Include="Content\images\fileextimages\dxf.png" />
-    <Content Include="Content\images\fileextimages\eps.png" />
-    <Content Include="Content\images\fileextimages\exe.png" />
-    <Content Include="Content\images\fileextimages\flv.png" />
-    <Content Include="Content\images\fileextimages\gif.png" />
-    <Content Include="Content\images\fileextimages\h.png" />
-    <Content Include="Content\images\fileextimages\hpp.png" />
-    <Content Include="Content\images\fileextimages\html.png" />
-    <Content Include="Content\images\fileextimages\ics.png" />
-    <Content Include="Content\images\fileextimages\iso.png" />
-    <Content Include="Content\images\fileextimages\java.png" />
-    <Content Include="Content\images\fileextimages\jpg.png" />
-    <Content Include="Content\images\fileextimages\key.png" />
-    <Content Include="Content\images\fileextimages\mid.png" />
-    <Content Include="Content\images\fileextimages\mp3.png" />
-    <Content Include="Content\images\fileextimages\mp4.png" />
-    <Content Include="Content\images\fileextimages\mpg.png" />
-    <Content Include="Content\images\fileextimages\odf.png" />
-    <Content Include="Content\images\fileextimages\ods.png" />
-    <Content Include="Content\images\fileextimages\odt.png" />
-    <Content Include="Content\images\fileextimages\otp.png" />
-    <Content Include="Content\images\fileextimages\ots.png" />
-    <Content Include="Content\images\fileextimages\ott.png" />
-    <Content Include="Content\images\fileextimages\pdf.png" />
-    <Content Include="Content\images\fileextimages\php.png" />
-    <Content Include="Content\images\fileextimages\png.png" />
-    <Content Include="Content\images\fileextimages\ppt.png" />
-    <Content Include="Content\images\fileextimages\psd.png" />
-    <Content Include="Content\images\fileextimages\py.png" />
-    <Content Include="Content\images\fileextimages\qt.png" />
-    <Content Include="Content\images\fileextimages\rar.png" />
-    <Content Include="Content\images\fileextimages\rb.png" />
-    <Content Include="Content\images\fileextimages\rtf.png" />
-    <Content Include="Content\images\fileextimages\sql.png" />
-    <Content Include="Content\images\fileextimages\tga.png" />
-    <Content Include="Content\images\fileextimages\tgz.png" />
-    <Content Include="Content\images\fileextimages\tiff.png" />
-    <Content Include="Content\images\fileextimages\txt.png" />
-    <Content Include="Content\images\fileextimages\wav.png" />
-    <Content Include="Content\images\fileextimages\xls.png" />
-    <Content Include="Content\images\fileextimages\xlsx.png" />
-    <Content Include="Content\images\fileextimages\xml.png" />
-    <Content Include="Content\images\fileextimages\yml.png" />
-    <Content Include="Content\images\fileextimages\zip.png" />
-    <Content Include="Content\images\fileextimages\_blank.png" />
-    <Content Include="Content\images\fileextimages\_page.png" />
-    <Content Include="Content\images\Folder-icon.png" />
-    <Content Include="Content\images\folder_plus.png" />
-    <Content Include="Content\images\gradebookexamples\DblExclimationExample.png" />
-    <Content Include="Content\images\gradebookexamples\ExclimationExample.png" />
-    <Content Include="Content\images\gradebookexamples\PoundExample.png" />
-    <Content Include="Content\images\gradebookexamples\RequiredFormatingExample.PNG" />
-    <Content Include="Content\images\help.png" />
-    <Content Include="Content\images\helplab_logo.png" />
-    <Content Include="Content\images\help\add_ta_1.png" />
-    <Content Include="Content\images\help\add_ta_2.png" />
-    <Content Include="Content\images\help\add_ta_3.png" />
-    <Content Include="Content\images\help\basic_1.png" />
-    <Content Include="Content\images\help\basic_2.png" />
-    <Content Include="Content\images\help\basic_3.png" />
-    <Content Include="Content\images\help\basic_4.png" />
-    <Content Include="Content\images\help\basic_5.png" />
-    <Content Include="Content\images\help\basic_6.png" />
-    <Content Include="Content\images\help\basic_7.png" />
-    <Content Include="Content\images\help\create_1.png" />
-    <Content Include="Content\images\help\create_2.png" />
-    <Content Include="Content\images\help\create_3.png" />
-    <Content Include="Content\images\help\create_4.png" />
-    <Content Include="Content\images\help\discussion_1.png" />
-    <Content Include="Content\images\help\discussion_2.png" />
-    <Content Include="Content\images\help\discussion_3.png" />
-    <Content Include="Content\images\help\discussion_4.png" />
-    <Content Include="Content\images\help\discussion_5.png" />
-    <Content Include="Content\images\help\discussion_6.png" />
-    <Content Include="Content\images\help\discussion_7.png" />
-    <Content Include="Content\images\help\gradebook_1.png" />
-    <Content Include="Content\images\help\gradebook_2.png" />
-    <Content Include="Content\images\help\gradebook_3.png" />
-    <Content Include="Content\images\help\gradebook_4.png" />
-    <Content Include="Content\images\help\gradebook_5.png" />
-    <Content Include="Content\images\help\gradebook_6.png" />
-    <Content Include="Content\images\help\gradebook_7.png" />
-    <Content Include="Content\images\help\review_1.png" />
-    <Content Include="Content\images\help\review_2.png" />
-    <Content Include="Content\images\help\review_3.png" />
-    <Content Include="Content\images\help\review_4.png" />
-    <Content Include="Content\images\help\review_5.png" />
-    <Content Include="Content\images\help\review_6.png" />
-    <Content Include="Content\images\help\roster_1.png" />
-    <Content Include="Content\images\help\roster_2.png" />
-    <Content Include="Content\images\help\roster_3.png" />
-    <Content Include="Content\images\help\roster_4.png" />
-    <Content Include="Content\images\help\selected_course.png" />
-    <Content Include="Content\images\help\uploadfiles_1.png" />
-    <Content Include="Content\images\help\uploadfiles_2.png" />
-    <Content Include="Content\images\help\uploadfiles_3.png" />
-    <Content Include="Content\images\help\uploadfiles_4.png" />
-    <Content Include="Content\images\help\uploadfiles_5.png" />
-    <Content Include="Content\images\help\uploadfiles_6.png" />
-    <Content Include="Content\images\help_top_menu.png" />
-    <Content Include="Content\images\info_circle.png" />
-    <Content Include="Content\images\light-bulb-pencil.png" />
-    <Content Include="Content\images\logo.png" />
-    <Content Include="Content\images\logoff.png" />
-    <Content Include="Content\images\logon_bg.jpg" />
-    <Content Include="Content\images\logon_bg.png" />
-    <Content Include="Content\images\logon_logo.png" />
-    <Content Include="Content\images\logo_text.png" />
-    <Content Include="Content\images\mail.png" />
-    <Content Include="Content\images\mail_up.png" />
-    <Content Include="Content\images\move_down.png" />
-    <Content Include="Content\images\move_up.png" />
-    <Content Include="Content\images\navbar_logo.png" />
-    <Content Include="Content\images\page_white_add.png" />
-    <Content Include="Content\images\page_white_delete.png" />
-    <Content Include="Content\images\page_white_edit.png" />
-    <Content Include="Content\images\publish.png" />
-    <Content Include="Content\images\refresh.png" />
-    <Content Include="Content\images\thumbs_up.png" />
-    <Content Include="Content\images\thumb_down.png" />
-    <Content Include="Content\images\tooltip\109_AllAnnotations_Help_16x16_72.png" />
-    <Content Include="Content\images\tooltip\bubble-1.png" />
-    <Content Include="Content\images\tooltip\bubble-2.png" />
-    <Content Include="Content\images\tooltip\bubble-3.png" />
-    <Content Include="Content\images\tooltip\bubble-4.png" />
-    <Content Include="Content\images\tooltip\bubble-5.png" />
-    <Content Include="Content\images\tooltip\bubble-6.png" />
-    <Content Include="Content\images\tooltip\bubble-7.png" />
-    <Content Include="Content\images\tooltip\bubble-8.png" />
-    <Content Include="Content\images\tooltip\bubble-tail2.png" />
-    <Content Include="Content\images\ui-bg_flat_0_aaaaaa_40x100.png" />
-    <Content Include="Content\images\ui-bg_flat_65_ffffff_40x100.png" />
-    <Content Include="Content\images\ui-bg_flat_75_074974_40x100.png" />
-    <Content Include="Content\images\ui-bg_flat_75_f0f0f0_40x100.png" />
-    <Content Include="Content\images\ui-bg_flat_75_ffffff_40x100.png" />
-    <Content Include="Content\images\ui-bg_glass_55_fbf9ee_1x400.png" />
-    <Content Include="Content\images\ui-bg_glass_65_ffffff_1x400.png" />
-    <Content Include="Content\images\ui-bg_glass_75_074974_1x400.png" />
-    <Content Include="Content\images\ui-bg_glass_75_e6e6e6_1x400.png" />
-    <Content Include="Content\images\ui-bg_highlight-soft_75_074974_1x100.png" />
-    <Content Include="Content\images\ui-bg_inset-soft_95_fef1ec_1x100.png" />
-    <Content Include="Content\images\ui-icons_222222_256x240.png" />
-    <Content Include="Content\images\ui-icons_2e83ff_256x240.png" />
-    <Content Include="Content\images\ui-icons_454545_256x240.png" />
-    <Content Include="Content\images\ui-icons_888888_256x240.png" />
-    <Content Include="Content\images\ui-icons_cd0a0a_256x240.png" />
-    <Content Include="Content\images\ui-icons_eeeeee_256x240.png" />
-    <Content Include="Content\images\ui-icons_eee_256x240.png" />
-    <Content Include="Content\images\ui-icons_ffffff_256x240.png" />
-    <Content Include="Content\images\unpublish.png" />
+    <Content Include="Content\images\account.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\add_up.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ajax-loader.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\arrow_down.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\arrow_left.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\arrow_right.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\calendar_icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\cut_context.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\default.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\delete_up.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\delete_up_disabled.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\edit_up.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\enroll.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\aac.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\ai.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\aiff.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\avi.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\bmp.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\c.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\cpp.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\css.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\dat.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\dmg.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\doc.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\dotx.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\dwg.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\dxf.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\eps.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\exe.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\flv.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\gif.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\h.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\hpp.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\html.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\ics.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\iso.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\java.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\jpg.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\key.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\mid.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\mp3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\mp4.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\mpg.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\odf.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\ods.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\odt.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\otp.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\ots.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\ott.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\pdf.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\php.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\png.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\ppt.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\psd.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\py.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\qt.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\rar.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\rb.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\rtf.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\sql.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\tga.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\tgz.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\tiff.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\txt.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\wav.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\xls.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\xlsx.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\xml.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\yml.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\zip.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\_blank.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\_page.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\Folder-icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\folder_plus.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\gradebookexamples\DblExclimationExample.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\gradebookexamples\ExclimationExample.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\gradebookexamples\ExcludeWorksheetExample1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\gradebookexamples\ExcludeWorksheetExample2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\gradebookexamples\PoundExample.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\gradebookexamples\RequiredFormatingExample.PNG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\helplab_logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\add_ta_1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\add_ta_2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\add_ta_3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\basic_1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\basic_2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\basic_3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\basic_4.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\basic_5.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\basic_6.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\basic_7.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\create_1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\create_2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\create_3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\create_4.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\discussion_1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\discussion_2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\discussion_3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\discussion_4.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\discussion_5.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\discussion_6.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\discussion_7.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\gradebook_1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\gradebook_2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\gradebook_3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\gradebook_4.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\gradebook_5.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\gradebook_6.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\gradebook_7.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\review_1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\review_2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\review_3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\review_4.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\review_5.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\review_6.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\roster_1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\roster_2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\roster_3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\roster_4.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\selected_course.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\uploadfiles_1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\uploadfiles_2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\uploadfiles_3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\uploadfiles_4.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\uploadfiles_5.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\uploadfiles_6.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help_top_menu.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\info_circle.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\light-bulb-pencil.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\logoff.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\logon_bg.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\logon_bg.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\logon_logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\logo_text.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\mail.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\mail_up.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\move_down.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\move_left.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\move_right.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\move_up.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\navbar_logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\page_white_add.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\page_white_delete.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\page_white_edit.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\publish.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\refresh.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\search_up.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\thumbs_up.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\thumb_down.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\tooltip\109_AllAnnotations_Help_16x16_72.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\tooltip\109_AllAnnotations_Help_19x19_72.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\tooltip\bubble-1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\tooltip\bubble-2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\tooltip\bubble-3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\tooltip\bubble-4.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\tooltip\bubble-5.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\tooltip\bubble-6.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\tooltip\bubble-7.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\tooltip\bubble-8.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\tooltip\bubble-tail2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-bg_flat_0_aaaaaa_40x100.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-bg_flat_65_ffffff_40x100.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-bg_flat_75_074974_40x100.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-bg_flat_75_f0f0f0_40x100.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-bg_flat_75_ffffff_40x100.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-bg_glass_55_fbf9ee_1x400.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-bg_glass_65_ffffff_1x400.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-bg_glass_75_074974_1x400.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-bg_glass_75_e6e6e6_1x400.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-bg_highlight-soft_75_074974_1x100.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-bg_inset-soft_95_fef1ec_1x100.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-icons_222222_256x240.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-icons_2e83ff_256x240.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-icons_454545_256x240.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-icons_888888_256x240.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-icons_cd0a0a_256x240.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-icons_eeeeee_256x240.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-icons_eee_256x240.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-icons_ffffff_256x240.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\unpublish.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\withdraw.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\jquery-tooltip.css" />
     <Content Include="Content\jquery-ui-1.8.13.custom.css" />
     <Content Include="Content\jquery-ui-timepicker.css" />
@@ -670,6 +1049,7 @@
     <Content Include="Content\themes\base\minified\jquery.ui.tabs.min.css" />
     <Content Include="Content\themes\base\minified\jquery.ui.theme.min.css" />
     <Content Include="Content\themes\base\minified\jquery.ui.tooltip.min.css" />
+    <Content Include="Content\themes\highlight\vs.css" />
     <Content Include="crossdomain.xml" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -702,8 +1082,6 @@
     <Content Include="Areas\AssignmentWizard\Views\TeamEvaluation\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Team\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\_ViewStart.cshtml" />
-    <Content Include="Content\images\fileextimages\.DS_Store" />
-    <Content Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\CriticalReviewStudentDownloadDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\CriticalReviewSubmissionDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\DiscussionTeamMemberDecorator.cshtml" />
@@ -785,6 +1163,7 @@
     <Content Include="Areas\Analytics\Content\jquery.datetimepicker.css" />
     <None Include="Properties\PublishProfiles\filesystem.pubxml" />
     <None Include="Scripts\jquery-2.0.1.intellisense.js" />
+    <Content Include="Scripts\highlight.pack.js" />
     <Content Include="Scripts\jquery-2.0.1.js" />
     <Content Include="Scripts\jquery-2.0.1.min.js" />
     <Content Include="Scripts\jquery-2.0.1.min.map" />

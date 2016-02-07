@@ -8,4 +8,5 @@
     //TODO: Add "download code" button
 } 
 <span class="user-text">@help.UserComment</span>
-<pre><code class="cpp">@Html.Raw(code)</code></pre>
+@* shouldn't need class="cpp" on the code block below, it should autodetect, but put it back if it's not working *@
+<pre><code >@Html.Raw(code)</code></pre>
