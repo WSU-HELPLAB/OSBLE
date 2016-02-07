@@ -43,7 +43,8 @@
                     }
                     <li>
                         [@errorItem.ErrorListItem.Line] @errorItem.ErrorListItem.Description
-                        <pre><code class="cpp">@string.Join("\n", content)</code></pre>
+                        @* shouldn't need class="cpp" on the code block below, it should autodetect, but put it back if it's not working *@
+                        <pre><code >@string.Join("\n", content)</code></pre>
                     </li>
                 }
             </ul>
