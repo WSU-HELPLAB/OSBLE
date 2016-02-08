@@ -132,7 +132,9 @@ namespace OSBLE.Controllers
         }
 
         private FeedViewModel GetFeedViewModel()
-        {   
+        {
+            var query = _activityFeedQuery;
+
             FeedViewModel vm = new FeedViewModel();
 
             List<FeedItem> returnItems = _activityFeedQuery.Execute().ToList();
