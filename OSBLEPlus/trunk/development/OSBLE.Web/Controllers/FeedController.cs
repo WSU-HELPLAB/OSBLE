@@ -198,6 +198,16 @@ namespace OSBLE.Controllers
         [HttpGet]
         public JsonResult GetFeed(string keywords = null, string events = null)
         {
+            // if all events unchecked, return empty feed
+            if (events == "")
+            {
+                FeedViewModel emptyVM = new FeedViewModel()
+                {
+                    Feed = new List<AggregateFeedItem>()
+                };
+                return GetJsonFromViewModel(emptyVM);
+            }
+
             // Set filters
             if (!string.IsNullOrWhiteSpace(keywords))
                 _activityFeedQuery.CommentFilter = keywords;
