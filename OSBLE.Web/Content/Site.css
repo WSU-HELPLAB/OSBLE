@@ -2252,9 +2252,15 @@ div.pagedocname {
     margin: 0 !important;
     font-weight: bold;
 }
-.show-hide-toggle {
+
+.toggle-arrow {
     display: block;
     float: right;
+    margin-top: 2px;
+}
+
+.show-hide-toggle {
+    display: block;
     color: #ccc;
     margin-bottom: -2px;
 }

@@ -364,10 +364,11 @@ Also runs content through nl2br to convert newlines to <br /> tags. *@
 @helper ToggleButtonHeader(string title, string target, string extraClasses, bool defaultShown = true)
 {
     <a class="show-hide-toggle @(extraClasses) @(defaultShown == true? "shown" : "not-shown")" data-target="@target">
-        <span class="show-only glyphicon glyphicon-chevron-up"></span>
-        <span class="hide-only glyphicon glyphicon-chevron-down"></span>
+        <span class="toggle-header">@title</span>
+        <span class="toggle-arrow show-only glyphicon glyphicon-chevron-up"></span>
+        <span class="toggle-arrow hide-only glyphicon glyphicon-chevron-down"></span>
     </a>
-    <h4 class="toggle-header">@title</h4>
+    @**<h4 class="toggle-header">@title</h4>*@
     <script type="text/javascript">
         EnableShowHideToggles();
     </script>
