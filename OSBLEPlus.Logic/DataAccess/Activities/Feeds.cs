@@ -257,13 +257,14 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
             IList<UserProfile> users, IList<HelpfulMarkGivenEvent> helpfulMarks)
         {
             var evt = helpfulMarks.SingleOrDefault(y => y.EventLogId == eventLog.EventLogId);
+
             if (evt == null) return null;
 
             return new HelpfulMarkGivenEvent()
             {
                 EventId = evt.EventId,
                 EventLogId = evt.EventLogId,
-                SenderId = evt.SenderId,
+                SenderId = evt.Sender.IUserId,
                 Sender = GetUser(userDictionary, users, eventLog.SenderId),
                 SolutionName = evt.SolutionName,
                 LogCommentEventId = evt.LogCommentEventId,
