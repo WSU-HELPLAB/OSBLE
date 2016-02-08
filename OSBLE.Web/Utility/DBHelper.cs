@@ -801,15 +801,35 @@ namespace OSBLE.Utility
 
             List<int> helpfulMarkEventIds = GetHelpfulMarksLogIds(eventLogId, connection);
 
-            // get the logCommentId
+            // get the Log Comment ID
             int logId = connection.Query<int>("SELECT Id " +
                                               "FROM LogCommentEvents " +
                                               "WHERE EventLogId = @eventId", new { eventId = eventLogId }).FirstOrDefault();
+            // get the Source Event Log ID
+            int sourceLogId = connection.Query<int>("SELECT SourceEventLogId " +
+                                                    "From LogCommentEvents " +
+                                                    "WHERE EventLogId = @eventId", new { eventId = eventLogId }).FirstOrDefault();
+
+            // get the Source Event Course ID
+            int? sourceCourseId = null;
+
+            try
+            {
+                sourceCourseId = connection.Query<int>("SELECT CourseId " +
+                                                       "FROM EventLogs " +
+                                                       "WHERE Id = @SourceEventId", new {SourceEventId = sourceLogId}).FirstOrDefault();
+            }
+            catch (NullReferenceException ex)
+            {
+                // do nothing
+            }
 
             List<ActivityEvent> eventLogs =
                 connection.Query<ActivityEvent>("SELECT Id AS EventLogId, EventTypeId AS EventId, EventDate, DateReceived, SenderId, CourseId, SolutionName, IsDeleted " + 
                                                 "FROM EventLogs " +
                                                 "WHERE Id IN @logId", new {logId = helpfulMarkEventIds}).ToList();
+
+
 
             ActivityEvent senderEvent = eventLogs.Find(x => x.SenderId == markerId);
             
@@ -828,12 +848,28 @@ namespace OSBLE.Utility
 
             try
             {
-                var h = new HelpfulMarkGivenEvent()
+                HelpfulMarkGivenEvent h;
+                if (sourceCourseId == null)
                 {
-                    LogCommentEventId = logId,
-                    SenderId = markerId,
-                    SolutionName = ""
-                };
+                    h = new HelpfulMarkGivenEvent()
+                    {
+                        LogCommentEventId = logId,
+                        SenderId = markerId,
+                        SolutionName = ""
+                    };
+                }
+                else
+                {
+                    h = new HelpfulMarkGivenEvent()
+                    {
+                        LogCommentEventId = logId,
+                        SenderId = markerId,
+                        CourseId = sourceCourseId,
+                        SolutionName = ""
+                    };
+                }
+
+
                 using (var cmd = h.GetInsertCommand())
                 {
                     cmd.Connection = connection;
