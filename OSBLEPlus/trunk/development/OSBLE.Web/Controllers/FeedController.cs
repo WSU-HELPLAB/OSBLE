@@ -132,22 +132,8 @@ namespace OSBLE.Controllers
         }
 
         private FeedViewModel GetFeedViewModel()
-        {
-            var query = _activityFeedQuery;
-
-            //query.CommentFilter = hash == 0 ? keyword : "#" + keyword;
-
+        {   
             FeedViewModel vm = new FeedViewModel();
-
-            //if (timestamp > 0)
-            //{
-            //    DateTime pullDate = new DateTime(timestamp);
-            //    query.StartDate = pullDate;
-            //}
-            //else
-            //{
-            //    query.MaxQuerySize = 20;
-            //}
 
             List<FeedItem> returnItems = _activityFeedQuery.Execute().ToList();
 
@@ -156,7 +142,7 @@ namespace OSBLE.Controllers
             {
                 foreach (FeedItem f in returnItems)
                 {
-                    f.Event.Sender = DBHelper.GetUserProfile(f.Event.SenderId, sqlc);
+                    f.Event.Sender = DBHelper.GetUserProfile(f.Event.SenderId, sqlc);                    
                 }
             }
 
