@@ -51,6 +51,9 @@
         $("#btn_notifications").click(function () { setContent("btn_notifications", "dashboard_left", "dashboard_notifications"); });
         $("#btn_events_deadlines").click(function () { setContent("btn_events_deadlines", "dashboard_left", "dashboard_events") });
         $("#btn_files").click(function () { setContent("btn_files", "dashboard_right", ""); });
+
+        // set the click event for the "new activity" notification
+        $("#new-activity-badge").click(function () { $("#dashboard_middle").removeClass("new-activity") });
     });
 </script>
 
@@ -121,6 +124,7 @@
         <div class="col-sm-6 activeContent" id="dashboard_middle">
             <h3>
                 Activity Feed
+                <span class="badge new-activity-badge" id="new-activity-badge" style="display: none">New Activity</span>
                 @*<a href="@Url.Action("DownloadDashboardPosts", "Course")" title="Download Activity Feed as csv">@Helpers.UnPublishButton()</a>*@
             </h3>
 

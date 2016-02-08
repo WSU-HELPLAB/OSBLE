@@ -176,7 +176,24 @@ h3 span.glyphicon {
     border-radius: 0 !important;
     padding: 4px;
     padding-bottom: 2px;
-    color: #074974 !important;
+    color: #074974;
+}
+
+.new-replies .dp_post_header {
+    background-color: #65A9FF !important;
+}
+
+.new-reply-badge {
+    background-color: #074974 !important;
+    float: right;
+}
+
+.new-replies .new-reply-badge {
+    display: block !important;
+}
+
+.new-activity .new-activity-badge {
+    display: inline !important;
 }
 
 .dp_post_header img {

@@ -169,6 +169,9 @@ function FeedViewModel(userName, userId, current) {
             post.comments(commentList);
 
             HighlightNewReply(postID);
+
+            if (post.SenderId != self.userId)
+                ShowNewActivityBadge();
         }
     };
 
@@ -177,6 +180,10 @@ function FeedViewModel(userName, userId, current) {
             SetPermissions(postData);
             self.items.unshift(new FeedItem(postData)); // unshift puts object at beginning of array
             HighlightNewPost(postData.EventId);
+
+            if (postData.SenderId != self.userId) {
+                ShowNewActivityBadge();
+            }
         }
     }
 
@@ -510,17 +517,23 @@ function HideReplyBox(item) {
     $("#feed-reply-" + item.eventId).hide('blind');
 }
 
+function AreRepliesExpanded(itemID)
+{
+    return $("#feed-item-comments-" + itemID).css('display') != 'none';
+}
+
 function expandComments(item) {
     var commentsTextSpan = "#expand-comments-text-" + item.eventId;
     var replies = "#feed-item-comments-" + item.eventId;
+    var post = "#feed-item-" + item.eventId;
 
     if ($(replies).css('display') == 'none') {
         $(replies).show('blind');
         $(commentsTextSpan).text("Hide");
+        $(post).removeClass("new-replies");
     }
     else {
         var height = (window.innerHeight > 0) ? window.innerHeight : screen.height;
-        var post = "#feed-item-" + item.eventId;
 
         // scroll helps if reply box was really big
         if ($(post).height() > height) {
@@ -561,6 +574,11 @@ function HighlightNewReply(postID)
 {
     var replies = $("#feed-item-comments-" + postID);
     replies.children().last().hide().show('easeInBounce');
+
+    if (!AreRepliesExpanded(postID))
+    {
+        $("#feed-item-" + postID).addClass("new-replies");
+    }
 }
 
 function PostReplySucceeded(item, dataList) {
@@ -717,6 +735,16 @@ function HideMoreLoading()
 {
     $('#loadingMoreMsg').hide();
     $('#load-old-posts').show();
+}
+
+function ShowNewActivityBadge()
+{
+    $("#dashboard_middle").addClass("new-activity");
+}
+
+function HideNewActivityBadge()
+{
+    $("#dashboard_middle").removeClass("new-activity");
 }
 
 /*
