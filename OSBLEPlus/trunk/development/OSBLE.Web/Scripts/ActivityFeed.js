@@ -1,8 +1,4 @@
 ﻿
-window.onbeforeunload = function () {
-    $.connection.hub.stop();
-};
-
 //KnockoutJS Objects
 function FeedItem(data) {
     // Fields
