@@ -166,13 +166,17 @@
 /* Options view toggle button */
 .show-hide-toggle {
     display: block;
-    float: right;
     color: #ccc;
     margin-bottom: -2px;
 }
 .show-hide-toggle:hover {
     color: #999;
     text-decoration: none;
+}
+.toggle-arrow {
+    display: block;
+    float:right;
+    margin-top: 2px;
 }
 .options_header {
     color: #999;
