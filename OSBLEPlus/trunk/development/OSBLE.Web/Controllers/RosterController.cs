@@ -16,6 +16,7 @@ using OSBLE.Models.AbstractCourses.Course;
 using OSBLE.Models.HomePage; //yc: added for notifcations
 using OSBLE.Utility;
 using System.Net.Mail;
+using OSBLEPlus.Logic.Utility;
 
 namespace OSBLE.Controllers
 {
@@ -1597,7 +1598,7 @@ namespace OSBLE.Controllers
             var WTU = whitetable.WhiteTableUser;
 
             string subject = "Welcome to OSBLE";
-            string link = "https://plus.osble.org/Account/AcademiaRegister?email=" 
+            string link = StringConstants.WebClientRoot + "Account/AcademiaRegister?email=" 
                 + WTU.Email + "&firstname=" + WTU.Name2 + "&lastname=" + WTU.Name1 + "&identification=" + WTU.Identification; 
 
             string message = "Dear " + WTU.Name2 + " " + WTU.Name1 + @", <br/>
@@ -1636,7 +1637,7 @@ namespace OSBLE.Controllers
             if (wtUser != null)
             {
                 string subject = "Welcome to OSBLE";
-                string link = "https://osble.org/Account/AcademiaRegister?email="
+                string link = StringConstants.WebClientRoot + "Account/AcademiaRegister?email="
                     + wtUser.Email + "&firstname=" + wtUser.Name2 + "&lastname=" + wtUser.Name1 + "&identification=" + wtUser.Identification;
 
                 string message = "Dear " + wtUser.Name2 + " " + wtUser.Name1 + @", <br/>
