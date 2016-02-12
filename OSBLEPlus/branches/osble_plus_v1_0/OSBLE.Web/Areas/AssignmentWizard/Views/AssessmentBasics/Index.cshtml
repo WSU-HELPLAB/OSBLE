@@ -1,0 +1,52 @@
+﻿@using OSBLE.Models.Assignments;
+@model Assignment
+@Html.HiddenFor(m => m.ID)
+@section Header
+{
+    <script src="@Url.Content("~/areas/AssignmentWizard/Content/js/basics.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/areas/AssignmentWizard/Content/js/assignmentFilesUploader.js")?version=1.1" type="text/javascript"></script>
+
+    @* These Files are now included in the layout *@
+    @*<script src="../../Scripts/CourseFilesUploader.js?version=1.1" type="text/javascript"></script>
+        <script src="../../Scripts/CourseFileManager.js?version=1.1" type="text/javascript"></script>
+    *@
+}
+<table class="wizard_entry_table">
+    <tr>
+        <th>Assessment Name:</th>
+        <td class="entryField">@Html.EditorFor(m => m.AssignmentName)</td>
+        <td>@Html.ValidationMessageFor(m => m.AssignmentName)</td>
+    </tr>
+    <tr>
+        <th>Assessment Description:</th>
+        <td>@Html.TextAreaFor(m => m.AssignmentDescription, new { cols = 50, rows = 4, style = "width: 30em" })<img style="vertical-align: top" src="/Content/images/light-bulb-pencil.png" title="Tip: To add links to the description, encapsulate them in wiki-linking format. Example: &quot[url:Click Here|http://www.google.com]&quot" alt="Tip: To add links to the description, encapsulate them in wiki-linking format. Example: &quot[url:Click Here|http://www.google.com]&quot" /></td>
+        <td>@Html.ValidationMessageFor(m => m.AssignmentDescription)</td>
+    </tr>
+    <tr>
+        <th>Assessment Files:</th>
+        <td>Choose File
+        <input type="hidden" name="AssignmentID" value="@ViewBag.ID" />
+            <div id="descriptionFilesDIV"></div>
+        </td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.Type):</th>
+        <td>@Model.Type.Explode()</td>
+        <td>&nbsp;</td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.ReleaseDate):</th>
+        <td>@Html.EditorFor(m => m.ReleaseDate) at @Html.EditorFor(m => m.ReleaseTime)</td>
+        <td>@Html.ValidationMessageFor(m => m.ReleaseDate)</td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.DueDate):</th>
+        <td>@Html.EditorFor(m => m.DueDate) at @Html.EditorFor(m => m.DueTime)</td>
+        <td>@Html.ValidationMessageFor(m => m.DueDate)</td>
+    </tr>
+</table>
+
+<script>
+    // Call the update function to get file listing and put in upload controls
+    assignmentfilemanager_update(@ViewBag.ID);
+</script>

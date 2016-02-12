@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{2D58ACFA-54B2-4A27-9C13-415D5345A602}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OSBLEPlus.Library.Shell.Signed</RootNamespace>
+    <AssemblyName>OSBLEPlus.Library.Shell.Signed</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DDay.iCal">
+      <HintPath>..\..\packages\DDay.iCal.1.0.2.575\lib\DDay.iCal.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework">
+      <HintPath>..\..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="Ionic.Zip">
+      <HintPath>..\..\packages\DotNetZip.1.9.1.8.Signed\Ionic.Zip.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.4.0.20710.0\lib\net40\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\OSBLE.Library\Attributes\EmailAttribute.cs" />
+    <Compile Include="..\..\OSBLE.Library\FileSystem.cs" />
+    <Compile Include="..\..\OSBLE.Library\IdenticonRenderer.cs" />
+    <Compile Include="..\..\OSBLE.Library\Interfaces\IAssignment.cs" />
+    <Compile Include="..\..\OSBLE.Library\Interfaces\ICourse.cs" />
+    <Compile Include="..\..\OSBLE.Library\Interfaces\IUser.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\AbstractCourses\AbstractCourse.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\AbstractCourses\AbstractRole.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\AbstractCourses\AssessmentCommittee\ABETEvaluatorRole.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\AbstractCourses\AssessmentCommittee\AssessmentCommittee.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\AbstractCourses\AssessmentCommittee\AssessmentCommitteeChairRole.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\AbstractCourses\AssessmentCommittee\AssessmentCommitteeMemberRole.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\AbstractCourses\AssessmentCommittee\AssessmentCommitteeRole.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\AbstractCourses\Community\Community.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\AbstractCourses\Community\CommunityRole.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\AbstractCourses\CourseRubric.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\AbstractCourses\Course\Course.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\AbstractCourses\Course\CourseBreak.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\AbstractCourses\Course\CourseMeeting.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\AbstractCourses\Course\CourseRole.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\AbstractCourses\Course\CourseUser.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\AbstractCourses\Course\CourseWhiteTable.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\AbstractCourses\Course\Rubrics\CellDescription.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\AbstractCourses\Course\Rubrics\CriterionEvaluation.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\AbstractCourses\Course\Rubrics\Criterion.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\AbstractCourses\Course\Rubrics\Level.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\AbstractCourses\Course\Rubrics\Rubric.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\AbstractCourses\Course\Rubrics\RubricEvaluation.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\AbstractCourses\Course\WhiteTableUser.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\AccountModels.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\ActivityLog.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Annotate\AnnotateApi.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Annotate\AnnotateDocumentReference.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Annotate\AnnotateResult.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Assessments\Assessment.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Assessments\AssessmentTypes.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Assignments\AbetAssignmentOutcome.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Assignments\AbetSubmissionTag.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Assignments\Assignment.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Assignments\AssignmentTeam.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Assignments\AssignmentTypes.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Assignments\CommentCategory.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Assignments\CommentCategoryConfiguration.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Assignments\CommentCategoryOption.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Assignments\CriticalReviewSettings.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Assignments\Deliverable.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Assignments\DiscussionAssignmentMetaInfo.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Assignments\DiscussionSettings.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Assignments\DiscussionTeam.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Assignments\IAssignmentTeam.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Assignments\IReviewTeam.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Assignments\ReviewTeam.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Assignments\Team.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Assignments\TeamConverter.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Assignments\TeamEvaluation.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Assignments\TeamEvaluationComment.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Assignments\TeamEvaluationSettings.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Assignments\TeamMember.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\ContextBase.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\DiscussionAssignment\DiscussionPost.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\FileSystem\AssignmentFilePath.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\FileSystem\OSBLEFile.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\FileSystem\OSBLEDirectory.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\FileSystem\FileCollection.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\FileSystem\Directories.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\FileSystem\GradebookFilePath.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\HomePage\AbstractDashboard.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\HomePage\DashboardPost.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\HomePage\DashboardReply.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\HomePage\Event.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\HomePage\Notification.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\IModelBuilderExtender.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\OSBLEContext.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\School.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Services\Uploader\AbstractListing.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Services\Uploader\DirectoryListing.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Services\Uploader\FileListing.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Services\Uploader\ParentDirectoryListing.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Services\Uploader\UserSession.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Setting.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\SilverlightObject.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\SimpleContext.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\ToolTips.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Triggers\CourseUserDeleteTrigger.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Triggers\DiscussionTeamDeleteTrigger.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Triggers\ModelTrigger.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Triggers\TeamDeleteTrigger.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Users\Mail.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Users\ProfileImage.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\Users\UserProfile.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\ViewModels\DiscussionViewModel.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\ViewModels\ReviewInterfaceModels.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\ViewModels\RubricViewModel.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\ViewModels\SerializableTeamMembers.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\ViewModels\StudioAssignmentViewModel.cs" />
+    <Compile Include="..\..\OSBLE.Library\Models\ViewModels\TeamCreationViewModel.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Key.snk" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,9 @@
+To get debugging working,
+
+
+1. Install the VS 2013 SDK (Required to run/debug the plugin project) http://www.microsoft.com/en-us/download/details.aspx?id=40758
+2. Install the Awesomium sdk at http://www.awesomium.com/
+3. set OSBIDE.Plugins.VS2013 to startup project
+4. OSBIDE.Plugins.VS2013 properties select Start external program: and point it to your VS install devenv.exe, 
+5.g. "C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\devenv.exe"
+6. under Startup Options / Command line arguments: add "/RootSuffix Exp"

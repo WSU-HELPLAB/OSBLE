@@ -1,0 +1,105 @@
+﻿@*@using System.Diagnostics
+@using OSBIDE.Library.Models
+@using OSBIDE.Library.Events
+@using OSBIDE.Web.Models
+@using OSBIDE.Data.DomainObjects
+@using System.IO
+@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+@model AggregateFeedItem
+@{
+    int marginOfError = 3;
+    BuildEvent exBuild = null;
+    Dictionary<int, ExceptionEvent> exceptionLines = new Dictionary<int, ExceptionEvent>();
+    //List<CodeDocument> docs = new List<CodeDocument>();
+    
+    //count unique line numbers
+    //foreach (FeedItem item in Model.Items)
+    //{
+    //    ExceptionEvent exEvent = item.Event as ExceptionEvent;
+    //    if (exEvent == null)
+    //    {
+    //        continue;
+    //    }
+    //    exceptionLines[exEvent.LineNumber] = exEvent;
+    //}
+    //ExceptionEvent ee = exceptionLines.Values.FirstOrDefault();
+    //if (ee != null)
+    //{
+    //    docs = ee.GetCodeDocuments();
+    //    exBuild = ee.GetBuildEvent();
+    //}
+}
+<style type="text/css">
+    .exception {
+        background: #aed7ff;
+    }
+</style>
+@if (exBuild != null)
+{
+    <div>@Html.ActionLink("View Compilation History", "Diff", new { controller = "BuildEvent", id = exBuild.EventLogId })</div>
+}
+@foreach (ExceptionEvent exEvent in exceptionLines.Values)
+{
+    <h1>@exEvent.ExceptionDescription</h1>
+    <article>
+        <h2>Stack Trace</h2>
+        @if (exEvent.StackFrames.Count == 0)
+        {
+            @:Not Available
+            }
+        @foreach (StackFrame frame in exEvent.StackFrames)
+        {
+            string errorFile = Path.GetFileName(frame.FileName);
+            CodeDocument doc = docs.Where(d => d.FileName.Contains(errorFile) == true).FirstOrDefault();
+            if (doc == null)
+            {
+                continue;
+            }
+            int smallest = frame.LineNumber - marginOfError;
+            int largest = frame.LineNumber + marginOfError;
+            List<string> content = new List<string>();
+            for (int i = smallest; i < largest; i++)
+            {
+                string text = doc.Lines.ElementAtOrDefault(i);
+                if (text != null)
+                {
+                    text = HttpUtility.HtmlEncode(text).Replace("\t", "&nbsp;&nbsp;&nbsp;");
+                    if (i == frame.LineNumber)
+                    {
+                        text = string.Format(@"<span class=""exception"">[{0}]</span>{1}", i, text);
+                    }
+                    else
+                    {
+                        text = string.Format(@"[{0}]{1}", i, text);
+                    }
+                    content.Add(text);
+                }
+            }
+            <h3>Function: @frame.FunctionName</h3>
+            <strong>Code</strong>
+            <div>
+
+                <pre><code class="cpp">@Html.Raw(string.Join("\n", content))</code></pre>
+            </div>
+            <strong>Local Variables</strong>
+            <table>
+                
+                @foreach (StackFrameVariable variable in frame.Variables)
+                {
+                    <tr>
+                        <td style="padding:4px;"><pre>@variable.Name</pre></td>
+                        <td style="padding:4px;"><pre>@variable.Value.Trim()</pre></td>
+                    </tr>
+                }
+
+            </table>
+            
+                if (frame.FunctionName.ToLower().CompareTo("main") == 0)
+                {
+                    //stop once we reach the main() function.  We have to manually check as
+                    //OSBIDE ends up throwing in a lot of extra strack traces that don't help us.
+                    break;
+                }
+        }
+    </article>
+}*@

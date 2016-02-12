@@ -1,0 +1,11 @@
+﻿@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+@model AggregateFeedItem  
+@{
+    HelpfulMarkGivenEvent helpful = Model.Items.First().Event as HelpfulMarkGivenEvent;
+    LogCommentEvent comment = helpful.LogComment;
+    //Model.Items.First().LogId = comment.SourceEventLogId;
+} 
+<span class="non-user-text">
+    <em>@Model.Creator.FirstName</em> marked <em>@helpful.LogComment.Sender.FirstName</em>'s comment as being helpful:
+</span><br />
+@comment.Content

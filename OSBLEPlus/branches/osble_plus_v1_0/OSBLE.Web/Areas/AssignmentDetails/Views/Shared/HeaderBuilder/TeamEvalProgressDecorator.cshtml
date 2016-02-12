@@ -1,0 +1,15 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+    int completedEvals = dataModel.GradingProgress.completedEvals;
+    int totalEvals = dataModel.GradingProgress.totalEvals;
+}
+
+<tr>
+<th>Team Evaluations Progress:</th>
+<td>
+    @completedEvals of @totalEvals team evaluations completed by students.
+</td>
+</tr>

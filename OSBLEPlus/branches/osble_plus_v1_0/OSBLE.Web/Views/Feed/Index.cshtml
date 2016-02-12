@@ -1,0 +1,99 @@
+﻿@using OSBLE.Models.Courses
+@using OSBLEPlus.Logic.Utility
+@using OSBLEPlus.Logic.Utility.Lookups
+@using OSBLE.Models.Queries
+@using OSBLE.Models.Users
+@{
+    UserProfile currentUser = ViewBag.CurrentUser;
+    string defaultEvents = string.Join(",", ActivityFeedQuery.GetSocialEvents().Select(e => (int)e));
+    if (string.IsNullOrEmpty(ViewBag.Title)) {
+        ViewBag.Title = "Activity Feed";
+    }
+}
+
+<script type="text/javascript" src="@Url.Content("~/signalr/hubs")"></script>
+<script type="text/javascript">
+    var vm;
+    $(document).ready(function() {
+        vm = new FeedViewModel("@currentUser.FullName", @currentUser.ID);
+        ko.applyBindings(vm); 
+        vm.RequestUpdate();
+    });
+</script>
+
+<section data-tab="ActivityFeed">
+    <div id="activity_new_post">
+        @if (ViewBag.ActiveCourse.AbstractRole != null)
+        {
+            if ((ViewBag.ActiveCourse.AbstractRole.CanGrade == true) || (ViewBag.ActiveCourse.AbstractRole.Anonymized) || ((ViewBag.ActiveCourse.AbstractCourse is Course) && (ViewBag.ActiveCourse.AbstractCourse.AllowDashboardPosts) == true))
+            {
+                @* Make new post form *@
+                <form id="feed-post-form" role="form">
+                    <div class="form-group">
+                        <textarea id="feed-post-textbox" class="form-control" rows="4" placeholder="Enter new feed post here..."></textarea>
+                    </div>
+                    <input type="submit" data-bind="click: MakePost" id="btn_post_active" class="btn btn-default" name="post_active" value="Post to @Helpers.CourseTag(ViewBag.ActiveCourse.AbstractCourse)" />
+
+                    @*if (ViewBag.IsInstructor)
+                    {
+                    <input type="submit" id="btn_post_all" class="btn btn-default" name="post_all" value="Post to All Courses I Teach" onclick="return confirm('Post this message to all your taught courses?');" />
+                    <label class="checkbox-inline"><input type="checkbox" value="True" name="send_email" /> Email to Class</label>
+                    }
+
+                    if (ViewBag.IsLeader)
+                    {
+                    <label class="checkbox-inline"><input type="checkbox" value="True" name="send_email" /> Email to Community</label>
+                    }*@
+
+                </form>
+            }
+        }
+    </div>
+
+    <div id="filters">
+        @Helpers.ToggleButtonHeader("Filters & Search", "#activity-feed-filters", "", false)
+        <form role="form" id="activity-feed-filters" style="display: none">
+            
+            @* Search by Keyword *@
+            <div id="keywordSection" class="form-group">
+                <button id="feedSearchIcon" for="feedSearchInput" onclick="vm.RequestUpdate()"><span class="glyphicon glyphicon-search"></span></button>
+                <input id="feedSearchInput" type="text" data-bind="textInput: keywords" class="form-control" autocomplete="off" placeholder="Search by keyword..." />
+            </div>
+
+            @* Event Type Checkboxes *@
+            <div id="filter-type" class="form-group">
+                @foreach (EventType e in ActivityFeedQuery.GetNecessaryEvents())
+                {
+                    <div class="checkbox filter-type-option">
+                        <label>
+                            @Html.CheckBox("event_" + e.ToString(), ActivityFeedQuery.GetSocialEvents().Contains(e), new {
+                                id = "event_" + ((int)e).ToString(),
+                                @class = "event_checkbox",
+                                data_type = ((int)e),
+                                onchange = "vm.RequestUpdate()"
+                            })
+                            @Helpers.GetOptionNameOfEventType(e)
+                        </label>
+                    </div>
+                }
+                @* This allows the parent div to properly "contain" all the checkboxes *@
+                <div style="clear: both"></div>
+            </div>
+
+        </form>
+    </div>
+
+    @* This is a message displayed while the feed is loading posts *@
+    <div id="loadingMsg" class="message">
+        @Helpers.LoadingSmall() Loading Posts...
+    </div>
+
+    @* Feed is inserted here *@
+    <div id="dp_posts" class="panel-group">
+        @Html.Partial("Feed/_Feed")
+    </div>
+
+</section>
+
+<script type="text/javascript">
+</script>

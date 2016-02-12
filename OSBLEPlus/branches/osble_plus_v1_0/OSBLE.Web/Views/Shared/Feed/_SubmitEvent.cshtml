@@ -1,0 +1,5 @@
+﻿@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+@model AggregateFeedItem
+<span class="non-user-text">
+    <em>@Model.Creator.FirstName</em> submitted &quot;@Path.GetFileNameWithoutExtension(Model.Items.First().Event.SolutionName)&quot;.
+</span>

@@ -1,0 +1,94 @@
+﻿@using OSBLEPlus.Logic.DataAccess.Lookups
+@using OSBLEPlus.Logic.DomainObjects.Analytics
+@using OSBLEPlus.Logic.Utility
+
+@model CalendarAttributes
+@Styles.Render("~/Areas/Analytics/Content/Calendar.css")
+
+
+<div id="calendar-options" class="col-sm-4 options_view">
+    @Helpers.ToggleButtonHeader("Options", "#options_content", "cb-options")
+    <div id="options_content">
+        @Html.DropDownListFor(m => m.CourseId, new SelectList(Courses.GetCourses(), "Value", "Name", ViewBag.ActiveCourseUser.AbstractCourseID), new { id = "course-id-select" })
+
+        <div>
+            <label for="total">
+                <input type="radio" id="total" name="AggregationFunction" value="@AggregateFunction.Total" checked="checked" />
+                Total&nbsp;&nbsp;
+            </label>
+            <label for="average">
+                <input type="radio" id="average" name="AggregationFunction" value="@AggregateFunction.Avg" />
+                Average
+            </label>
+        </div>
+
+        @{int i = 0;}
+        @foreach (var category in MeasureDefinitions.All.Keys)
+        {
+            @* Creates a two column layout for phones *@
+            <div class="@(i++ % 2 == 0? "opt-col-1" : "opt-col-2")">
+
+                <h4>@category.ToString().ToDisplayText()</h4>
+                @foreach (var measure in MeasureDefinitions.All[category])
+                {
+                    var checkedStatus = !string.IsNullOrWhiteSpace(Model.SelectedMeasures) && Model.SelectedMeasures.Split(',').Contains(measure.MeasureType.ToString("d")) ? "checked='checked'" : string.Empty;
+                    var aggregateFunction = measure.AggregateFunction.HasValue ? "agg-func=" + measure.AggregateFunction.Value + "" : string.Empty;
+                    <div class="measure-container" style="border-color: @measure.Color">
+                        <label for="@measure.MeasureType.ToString()">
+                            <input type="checkbox" @checkedStatus @aggregateFunction id="@measure.MeasureType.ToString()" name="SelectedMeasureTypes" value="@(measure.MeasureType)" data-color="@measure.Color" />
+                            @measure.MeasureType.ToString().ToDisplayText()
+                        </label>
+                    </div>
+                }
+
+            </div>
+        }
+
+        <div class="opt-col-1">
+            <h4>Students:</h4>
+            <ul id="studentList">
+                <li><input type="checkbox" id="user-show-all" checked="checked" /> Show All</li>
+            </ul>
+        </div>
+    </div>
+    @* ensures that the parent container extends to the proper height *@
+    <div class="clearfix"></div>
+</div>
+    
+
+<div id="calendar-view" class="col-sm-8 analytic-view">
+    <div id="calendar">
+        <div class="calendar-header">
+            <button id="back" name="back" class="btn btn-primary"><span class="glyphicon glyphicon-chevron-left"></span></button>
+            <h4 id="currentMonth">May 2013</h4>
+            <button id="forward" name="forward" class="btn btn-primary"><span class="glyphicon glyphicon-chevron-right"></span></button>
+        </div>
+
+        <div id="chart"></div>
+    </div>
+    <div id="hourly">
+        <div class="row">
+            <div class="col-xs-7"><h4 id="currentDay">December 21, 2014</h4></div>
+            <div class="col-xs-5"><a href="javascript:">back to calendar view</a></div>
+        </div>
+        <div id="hourlychart"></div>
+    </div>
+    
+    @* ensures that the parent container extends to the proper height *@
+    <div class="clearfix"></div>
+</div>
+
+
+<script type="text/javascript" src="@Url.Content("~/Areas/Analytics/Scripts/d3.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Areas/Analytics/Scripts/d3-tip.min.js")"></script>
+
+<script type="text/javascript" src="@Url.Content("~/Areas/Analytics/Scripts/TrendingCalendar.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Areas/Analytics/Scripts/Calendar.js")"></script>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('#course-id-select').change();
+        $('#user-show-all').prop('checked', true);
+    });
+</script>
+

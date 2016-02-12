@@ -1,0 +1,51 @@
+﻿@using OSBLE.Areas.AssessmentWizard.Controllers;
+@using OSBLE.Areas.AssessmentWizard.Models;
+@using System.Collections;
+@model ICollection<AssessmentBaseController>
+@{
+    ViewBag.Title = "Assignment Wizard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    int optionalComponentCount = Model.Where(m => m.IsRequired == false).Count();
+    string assignmentType = ViewBag.AssignmentType;
+}
+<h1>Select Components for @assignmentType Assignment</h1>
+<p>
+Please select the optional components that you would like to use for this assignment. 
+</p>
+@using (Html.BeginForm())
+{
+<fieldset>
+<legend>Components</legend>
+@if (optionalComponentCount == 0)
+{
+    <text>This assignment type has no optional components.</text>
+}
+<table>
+@{
+    foreach (AssessmentBaseController component in Model)
+    {
+        string checkedText = "";
+        if(component.IsSelected)
+        {
+            checkedText = "checked=\"checked\" ";
+        }
+        if (component.IsRequired)
+        {
+            //required elements are hidden and automatically selected by the wizard
+            <tr style="display:none;">
+                <td colspan="2"><input type="hidden" name="component_@(component.ControllerName)" value="@(component.ControllerName)" /></td>
+            </tr>
+        }
+        else
+        {
+        <tr>
+            <td><input @checkedText type="checkbox" id="component_@(component.ControllerName)" name="component_@(component.ControllerName)" value="@(component.ControllerName)" /></td>
+            <td><label for="component_@(component.ControllerName)">@component.ControllerDescription</label></td>
+        </tr>
+        }
+    }
+}
+</table>
+</fieldset>
+<input type="submit" value="Continue" name="@ViewBag.BeginWizardButton" id="@ViewBag.BeginWizardButton" />
+}

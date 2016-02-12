@@ -1,0 +1,83 @@
+﻿@using OSBLE.Models
+@using OSBLE.Models.Assignments
+@{
+    List<Assignment> assignments = ViewBag.Assignments;
+    List<TeamEvaluation> teamEvals = ViewBag.TeamEvaluations;
+    int PastCount = ViewBag.PastCount;
+    int PresentCount = ViewBag.PresentCount;
+    int FutureCount = ViewBag.FutureCount;
+    bool isFutureAssignment = false;
+}
+
+<table class="assignTable" cellspacing="0">
+    <tr>
+        <th style="font-size:larger; padding-right:20px">Assignment</th>
+        <th style="font-size:larger">Due Date</th>
+    </tr>
+
+    @{
+        for (int i = 0; i < assignments.Count; i++)
+        {
+            //if/else blocks used to for adding rows as headers between Past, Present, Future
+            if (i == 0 && PresentCount > 0)
+            {
+                <tr>
+                    <td colspan="100%" style="padding-right: 0; font-size: large" class="osbleColorBold">
+                        Present (@PresentCount)
+                    </td>
+                </tr>
+            }
+            
+            else if (i == (PresentCount) && PastCount > 0)
+            {             
+                if (PresentCount > 0)
+                {
+                    //Only put a an empty row if there is something above this category
+                    <tr>
+                        <td style="padding-bottom: 10px">
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td colspan="100%" style="padding-right: 0; font-size: large" class="osbleColorBold">
+                        Past (@PastCount)
+                    </td>
+                </tr>
+            }
+            else if (i == (PastCount + PresentCount) && FutureCount > 0)
+            {
+                isFutureAssignment = true;
+                if ((PastCount + PresentCount) > 0)
+                {
+                    //Only put a an empty row if there is something above this category
+                    <tr>
+                        <td style="padding-bottom: 10px">
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td colspan="100%" style="padding-right: 0; font-size: large" class="osbleColorBold">
+                        Future (@FutureCount)
+                    </td>
+                </tr>
+            }
+
+            //Now that headers are in place, inserting a assignment
+            <tr class="checkeredRow"  >
+                <td > <!--Cell for name-->
+                    @Html.ActionLink(assignments[i].AssignmentName, "Index", "Home", new { area = "AssignmentDetails", assignmentId = assignments[i].ID }, null)
+                </td>
+                <td>
+                <time 
+                class="utc-time"
+                datetime="@Helpers.DateAsUnixTime(assignments[i].DueDate)" 
+                data-original-date="@Helpers.RawDate(assignments[i].DueDate)" 
+                data-date-format="MM/DD/YYYY hh:mm A">
+                    @assignments[i].DueDate.ToShortDateString() @assignments[i].DueDate.ToShortTimeString() (UTC)
+                </time>
+                </td>
+            </tr>
+                
+        }
+    }
+</table>

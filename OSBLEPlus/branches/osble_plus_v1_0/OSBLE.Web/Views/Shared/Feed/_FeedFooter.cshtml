@@ -1,0 +1,11 @@
+﻿@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+<section>
+    <a id="load-old-posts" data-bind="click: LoadMorePosts">Load earlier posts...</a>
+    <div id="loadingMoreMsg" class="message">Loading...</div>
+</section>
+<div id="hidden-workspace">
+</div>
+<div id="hidden-updates-workspace" style="display: none;"></div>
+
+@* This is the error message box, it's hidden normally, and only displays when something goes wrong *@
+<div class="panel panel-danger" id="errMsgPanel"><div class="panel-heading" id="errText"></div></div>

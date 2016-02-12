@@ -1,0 +1,36 @@
+﻿@using OSBLE.Models.Assignments
+@model TeamEvaluationSettings
+
+@{
+    ViewBag.Title = "Team Evaluation";
+}
+@Html.ValidationSummary() 
+@Html.HiddenFor( m => m.AssignmentID)
+<style type="text/css">
+.wizard_entry_table th
+{
+    font-size:.9em;
+    width: 200px;
+}
+.entry
+{
+    width:150px;
+}
+</style>
+<table class="wizard_entry_table">
+    <tr>
+        <th>@Html.LabelFor(m => m.MaximumMultiplier)</th>
+        <td>@Html.EditorFor(m => m.MaximumMultiplier)</td>
+        <td>@Html.ValidationMessageFor(m => m.MaximumMultiplier)</td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.DiscrepancyCheckSize)</th>
+        <td>@Html.EditorFor(m => m.DiscrepancyCheckSize)</td>
+        <td>@Html.ValidationMessageFor(m => m.DiscrepancyCheckSize)</td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.RequiredCommentLength)</th>
+        <td>@Html.EditorFor(m => m.RequiredCommentLength)</td>
+        <td>@Html.ValidationMessageFor(m => m.RequiredCommentLength)</td>
+    </tr>
+</table>

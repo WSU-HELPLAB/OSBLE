@@ -1,0 +1,27 @@
+﻿@{
+    ViewBag.Title = "Departments Administration";
+}
+
+<h2>Departments Administration</h2>
+
+@using (Html.BeginForm("Save", "Departments", FormMethod.Post))
+{
+    @Html.Raw("<textarea rows=\"20\" cols=\"60\" name=\"taDepts\">");
+    if (null != ViewBag.DepartmentList)
+    {
+        foreach (string dept in ViewBag.DepartmentList)
+        {
+            @Html.Raw(dept + "\r\n");
+        }
+    }
+    @Html.Raw("</textarea>");
+    
+    <br />
+    
+    <p>Please enter a list of school departments in the text area above.</p>
+    <ul>
+        <li>Put one department name per line</li>
+        <li>Do not use quotes or special characters</li>
+    </ul>
+    <input type="submit" value="Save" />
+}

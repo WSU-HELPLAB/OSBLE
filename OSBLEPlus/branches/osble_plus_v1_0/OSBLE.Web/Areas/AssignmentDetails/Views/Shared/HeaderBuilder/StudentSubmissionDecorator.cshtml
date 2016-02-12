@@ -1,0 +1,84 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+
+    AjaxOptions options = new AjaxOptions()
+    {
+        LoadingElementId = "Loading",
+        HttpMethod = "Get",
+        UpdateTargetId = "submitFiles",
+        OnComplete = "SubmissionLoaded"
+    };               
+}
+
+
+<tr>
+    <th>
+        Submission:
+    </th>
+    <td>
+        @if (dataModel.Submission.hasSubmitted == false)
+        {
+            @Ajax.ActionLink("Submit", "Create", "Submission", new { id = dataModel.Submission.assignmentID, area = "" }, options, new object())
+        }
+        else
+        {
+            String submissionTime = dataModel.Submission.SubmissionTime;
+            DateTime sub = DateTime.Parse(submissionTime);
+            <ul id="SubmissionItems">
+            <li>
+                <time class="utc-time-link"
+                      datetime="@Helpers.DateAsUnixTime(sub)"
+                      data-original-date="@Helpers.RawDate(sub)"
+                      data-date-format="MM/DD/YY hh:mm:ss A">
+                    @(Html.ActionLink(submissionTime + " (UTC)", "getCurrentUsersZip", "FileHandler", new { assignmentID = dataModel.Submission.assignmentID, area = "" }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
+                </time>
+                
+</li>
+            <li>
+                @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = dataModel.Submission.assignmentID, area = "" }, options, new object())  
+            </li>
+               @{                   
+            
+                   
+               }
+                @if(dataModel.IsAnnotatable)
+                {
+                    <li>
+                        @*@Html.ActionLink("View Reviewed Document", "ReviewGradedDocument", "../PdfCriticalReview", new { assignmentId = dataModel.Submission.assignmentID, authorTeamId = dataModel.Submission.authorTeamID }, new { area = "" })*@
+                        <a href="~/PdfCriticalReview/ReviewGradedDocument?assignmentId=@dataModel.Submission.assignmentID&authorTeamId=@dataModel.Submission.authorTeamID&anonReview=1">View Reviewed Document</a>
+                    </li>
+                }
+                else //Document is not published yet, no link to view.
+                {                                
+                }
+                
+
+            @if (dataModel.Submission.SubmissionReceived)
+            {
+                <li id="SubmissionReceivedText">Submission received</li>
+            }
+            </ul>            
+        }
+</tr>
+
+<!--Elements for submission modal box and loading message-->
+<text id="Loading" style="display:none"> <br />Please Wait...</text>
+<div id="submit_files_dialog" style="display:none">
+    <div id= "submitFiles"></div>
+    <script type="text/javascript">
+        $(function () {
+            $('#submit_files_dialog').dialog(
+            {
+                modal: true,
+                autoOpen: false,
+                height: 600,
+                width: 500
+            });
+        });
+    </script>
+    </div>
+</div>
+

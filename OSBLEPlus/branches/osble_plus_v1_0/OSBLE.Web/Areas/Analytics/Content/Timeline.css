@@ -1,0 +1,265 @@
+﻿/* visualization form items*/
+ .form-group * {
+    white-space: nowrap;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+ .form-group input[type="checkbox"] {
+    margin-top: 10px;
+}
+
+ a[data-wzstep="Procedure"] {
+    margin-top: -.5em;
+}
+
+.form-group a.btn {
+    background-color: #efefef;
+    color: #1a3750;
+    border: none;
+}
+
+ .form-group a.btn:hover {
+        background-color: #d7d7d7;
+    }
+
+.ui-timepicker-table td a {
+    font-size: .9em;
+    width: 1.5em;
+    padding: .2em;
+}
+
+.ui-widget-header {
+    color: #333;
+    font-size: .9em;
+}
+
+.ui-timepicker-table th.periods {
+    font-size: .9em;
+}
+/* d3 */
+.bullet {
+    font: 10px sans-serif;
+}
+
+    .bullet .measure {
+        stroke: #333;
+        stroke-width: 1px;
+    }
+
+    .bullet .marker {
+        stroke: #000;
+        stroke-width: 2px;
+    }
+
+    .bullet .tick line {
+        stroke: #666;
+        stroke-width: .5px;
+    }
+
+    .bullet .title {
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+#chartBody {
+    margin-left: 8.333333333333332%;
+    overflow-y: visible;
+    overflow-x: auto;
+    margin-bottom: 15px;
+}
+
+#chartBody > a {
+    padding-left: 35px;
+}
+
+#chartBody table {
+    border: none;
+    margin-top: 15px;
+}
+
+#chartBody table td {
+    padding:0 2em 0 .5em;
+    line-height: 30px;
+}
+
+#chartBody table td.headcol {
+    position: absolute;
+    left: 10px;
+    width: 8.333333333333332%;
+    text-align: right;
+    margin-top: 1em;
+    font-weight: bold;
+    padding: 0;
+    line-height: 18px;
+}
+#chartBody table td>span.tick-label{
+    display: block;
+    text-align: right;
+    font-weight: normal;
+    margin-top: 20px;
+}
+
+span.tick-label span{display:inline-block}
+span.tick-label .arrow {
+    width:35px;
+}
+
+span.tick-label .line {
+    margin-top:4px;
+    width:30px;
+    background:#333;
+    height:2px;
+    float:left;
+}
+span.tick-label .point {	
+    width: 0; 
+	height: 0; 
+	border-top: 5px solid transparent;
+	border-bottom: 5px solid transparent;
+	border-left: 5px solid #333;
+    float:right;
+}
+
+/* legend */
+div[data-type='legend-hour-view'], div[data-type='legend-minute-view'], #no_data {
+    display: none;
+}
+
+div[data-type="chart-area"] table {
+    font-size: .9em;
+}
+
+div[data-type="chart-area"] table thead > tr > th,
+div[data-type="chart-area"] table tbody > tr > td {
+    border: none;
+}
+
+div[data-type="chart-area"] th {
+    text-decoration: underline;
+}
+
+.legend {
+    display: inline-block;
+    text-align: center;
+    width: 25px;
+    margin-right: 3px;
+    border: 1px solid #333;
+}
+
+.legend.bar {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 0;
+    margin-top: -7px;
+    margin-left: -7px;
+    color: #000;
+    border: none;
+}
+
+.legend-header h4 {
+    color: black;
+    font-size: 14px;
+    font-weight: bold;
+    font-family: Arial;
+    margin: 0;
+    margin-top: 3px;
+}
+
+.legend-header {
+    border-bottom: 1px solid #ccc;
+    margin-top: -10px;
+}
+
+.legend-table > div {
+    height: 34px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.legend-table {
+   border: none;
+}
+
+.legend-row {
+    margin-left: 0; 
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding-top: 10px;
+}
+
+.idle {
+    background-color: #fff;
+    fill: #fff;
+}
+
+.edit {
+    background-color: #99ccff;
+    fill: #99ccff;
+}
+
+.debug {
+    background-color: #ff5900;
+    fill: #ff5900;
+    color: #fff;
+}
+
+.run {
+    background-color: #007d00;
+    fill: #007d00;
+    color: #fff;
+}
+
+.debug.grayscale {
+    background-color: #666;
+    fill: #666;
+}
+
+.run.grayscale {
+    background-color: #222;
+    fill: #222;
+}
+
+.edit.grayscale {
+    background-color: #999;
+    fill: #999;
+    color:#fff;
+}
+
+section[data-type='doc-utils'] a.disabled:hover {
+    cursor: default;
+    text-decoration: none;
+    border-bottom: none;
+    color: #0082D9;
+}
+
+#timeline-options select {
+    height: 23px;
+    padding: 0;
+}
+
+#timeline-options div {
+    padding-top: 5px;
+}
+
+#timeline-options div[data-type='chart-area'] {
+    margin-left: 120px;
+}
+
+#legend_small, #legend_big {
+    display: none;
+}
+
+#students-label {
+    margin-bottom: 0;
+}
+
+#time-scale-select, cb-grayscale {
+    margin-top: 5px;
+}
+
+#no_data {
+    margin-top: 25px;
+}

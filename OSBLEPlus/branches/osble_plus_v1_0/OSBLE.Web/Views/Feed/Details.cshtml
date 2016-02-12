@@ -1,0 +1,117 @@
+﻿@using OSBLE.Models.Users
+@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+@{
+    string rootId = ViewBag.RootId;
+    ViewBag.Title = string.Format("Details - {0}", rootId);
+    UserProfile currentUser = ViewBag.CurrentUser;
+    ViewBag.ShowDetails = true;
+}
+<script type="text/javascript" src="@Url.Content("~/Scripts/knockout-2.2.1.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/ActivityFeed.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/signalr/hubs")"></script>
+<script type="text/javascript">
+    var vm = new DetailsViewModel("@currentUser.FullName", @currentUser.ID, "@rootId");
+    $(document).ready(function () {
+        ko.applyBindings(vm);
+    });
+</script>
+
+<section id="Details" data-bind="foreach: items">
+    @Html.Partial("Feed/_FeedItems");
+</section>
+
+@*
+@section Scripts {
+    @*Scripts.Render("~/bundles/highlight")
+    @Styles.Render("~/Content/css/highlight")*
+
+    <script type="text/javascript">
+
+        var AllComments = {};
+
+        $(document).ready(function () {
+
+            //get comment updates
+            getCommentUpdates();
+
+        });
+
+        //Periodically updates view models for feed items.  Useful for displaying an updated count
+        //of comments for a given feed item.
+        function getCommentUpdates() {
+
+            var log_id = '@firstLogId';
+
+            //make the ajax call
+            $.ajax(
+                {
+                    url: "@Url.Action("GetComments", "Feed")",
+                    data: { singleLogId: log_id },
+                    dataType: "json",
+                    type: "GET",
+                    success: updateFeedItemViewModel
+                });
+
+            //call ourselves again in 60 seconds
+            setTimeout(getCommentUpdates, 60000)
+        }
+
+        //Updates a KO view model using the supplied JS object
+        function updateFeedItemViewModel(jsObject) {
+
+            $.each(jsObject.Data, function (index, value) {
+
+                //bind to new view model
+                var model = {
+                    Comments: value.Comments,
+                    NumberOfComments: ko.observable(value.Comments.length),
+                    LastUpdated: ko.observable(new Date())
+                };
+
+                //model mapping
+                var mapping =
+                    {
+                        'Comments': {
+                            key: function (item) {
+                                return ko.utils.unwrapObservable(item.CommentId);
+                            }
+                        }
+                    };
+
+                //compute local time
+                $(model.Comments).each(function (index) {
+
+                    var milliseconds = model.Comments[index].UtcUnixDate + "";
+                    var formatString = "MM/DD/YYYY hh:mm A";
+                    var currentDate = moment.utc(milliseconds, 'X');
+                    var localDate = new Date();
+                    var localOffset = localDate.getTimezoneOffset();
+                    currentDate = currentDate.subtract('minutes', localOffset);
+                    model.Comments[index]['LocalDate'] = currentDate.format(formatString);
+                });
+
+                var toBind = "feed-item-" + value.OriginalLogId;
+
+                //view model doesn't exist, create one
+                if (!AllComments[value.ActualLogId]) {
+
+                    AllComments[value.ActualLogId] = ko.mapping.fromJS(model, mapping);
+                }
+
+                //update view model with server data
+                ko.mapping.fromJS(model, AllComments[value.ActualLogId]);
+
+                //apply binding if one doesn't already exist
+                if (!ko.dataFor(document.getElementById(toBind))) {
+                    ko.applyBindings(AllComments[value.ActualLogId], document.getElementById(toBind));
+                }
+
+                //unhide comments
+                $('#' + toBind).css("display", "block");
+            });
+        }
+
+    </script>
+}
+<script>hljs.initHighlightingOnLoad();</script>
+*@

@@ -1,0 +1,8 @@
+﻿@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+@model List<AggregateFeedItem>
+@{
+    Layout = null;
+    string action = ViewContext.RouteData.Values["Action"].ToString();
+    ViewBag.FeedItemStyle = "feed-item-ajax " + action;
+}
+@Html.Partial("Feed/_FeedItems", Model)

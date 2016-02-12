@@ -1,0 +1,32 @@
+﻿@model System.Web.Mvc.HandleErrorInfo
+
+@{
+    ViewBag.Title = "Error";
+    string errorName = ViewBag.ErrorName ?? "Unknown Error";
+    string errorMessage = ViewBag.ErrorMessage ?? "An unknown error has occured.";
+}
+
+<h2 id="errName">Sorry, an error occurred while processing your request.</h2>
+
+<a id="showErr" href="#">Show error message</a>
+<p id="errMsg" style="display: none">@errorName: @errorMessage</p>
+<br /><br />
+@Html.ActionLink("Back to dashboard", "Index", "Home")
+
+<script type="text/javascript" >
+    $("#showErr").click(function () {
+        var errMsg = $("#errMsg");
+        if (errMsg.css('display') == 'none')
+        {
+            errMsg.show('blind');
+            $("#showErr").text('Hide error message');
+        }
+        else
+        {
+            errMsg.hide('blind');
+            $("#showErr").text('Show error message');
+        }
+
+        return false;
+    });
+</script>

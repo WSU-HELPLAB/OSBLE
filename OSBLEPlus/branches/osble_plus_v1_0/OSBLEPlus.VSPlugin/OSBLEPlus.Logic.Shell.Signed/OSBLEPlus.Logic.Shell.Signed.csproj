@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C8D4FEB7-2E69-4C21-B51F-49DED7D96AC9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OSBLEPlus.Logic.Shell.Signed</RootNamespace>
+    <AssemblyName>OSBLEPlus.Logic.Shell.Signed</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Dapper.Signed">
+      <HintPath>..\..\packages\Dapper.1.42.Signed\Dapper.Signed.dll</HintPath>
+    </Reference>
+    <Reference Include="FileCache.Signed">
+      <HintPath>..\..\packages\FileCache.Signed.1.4.0\lib\FileCache.Signed.dll</HintPath>
+    </Reference>
+    <Reference Include="Ionic.Zip">
+      <HintPath>..\..\packages\DotNetZip.1.9.1.8.Signed\Ionic.Zip.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\StackFrame.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\WhatsNewItem.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\StackFrameVariable.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\ErrorType.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\CutCopyPasteEvent.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\EditorActivityEvent.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\DebugEvent.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\BreakPoint.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\BuildDocument.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\BuildError.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\BuildEventBreakPoint.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\BuildEventErrorListItem.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DataAccess\Activities\Posts.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DataAccess\Activities\Feeds.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DataAccess\Analytics\Calendar.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DataAccess\Lookups\Courses.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DataAccess\Profiles\CourseDataAccess.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\SubmisionAssignment.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\Helpers\LocalErrorLog.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\Interface\IActivityEvent.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\Interface\IEventLog.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\Profiles\ProfileCourse.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\Utility\Auth\Authentication.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DataAccess\Profiles\QueryTemplates.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DataAccess\Profiles\UserDataAccess.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\ActivityEvent.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\AskForHelpEvent.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\BuildEvent.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\ErrorListItem.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\EventPostRequest.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\ExceptionEvent.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\FeedItem.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\FeedPostEvent.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\HelpfulMarkGivenEvent.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\LogCommentEvent.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\SubmitEvent.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\Analytics\CalendarAttributes.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\Analytics\DailyAggregations.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\Analytics\HourlyAggregations.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\Analytics\MeasureDefinitions.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\Analytics\TimelineChartData.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\Analytics\TimelineCriteria.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\Analytics\VisualizationParams.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\Analytics\StateMachineEvent.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\Utility\Auth\IAuthentication.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\Utility\ConstantsAndEnums.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\Utility\Logging\ILogger.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\Utility\Logging\LocalErrorLogger.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\Utility\Logging\LogMessage.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\Utility\Lookups\DebugAction.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\Utility\Lookups\EventType.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\Utility\Lookups\NameValuePair.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\Utility\ObjectBinder.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\Utility\StringConstants.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\Profiles\User.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\Utility\FileCacheHelper.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\SaveEvent.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\CodeDocument.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\CodeDocumentBreakPoint.cs" />
+    <Compile Include="..\..\OSBLEPlus.Logic\DomainObjects\ActivityFeeds\CodeDocumentErrorListItem.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Key.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OSBLEPlus.Library.Shell.Signed\OSBLEPlus.Library.Shell.Signed.csproj">
+      <Project>{2d58acfa-54b2-4a27-9c13-415d5345a602}</Project>
+      <Name>OSBLEPlus.Library.Shell.Signed</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

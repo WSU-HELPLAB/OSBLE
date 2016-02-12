@@ -1,0 +1,107 @@
+﻿@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+@model OSBLEPlus.Logic.DomainObjects.ActivityFeeds.AggregateFeedItem
+@{
+    int buildCount = 1;
+    BuildEvent build = (Model.Items.First().Event as BuildEvent);
+    //int errorCount = build.CriticalErrorCount;
+    List<string> recentUserErrors = new List<string>();
+    //List<UserBuildErrorsByType> recentClassErrors = new List<UserBuildErrorsByType>();
+    List<string> criticalBuildErrors = build.CriticalErrorNames;
+    //List<ErrorType> AllErrorTypes = new List<ErrorType>();
+    if (ViewBag.RecentUserErrors != null)
+    {
+        recentUserErrors = ViewBag.RecentUserErrors as List<string>;
+    }
+    if (ViewBag.RecentClassErrors != null)
+    {
+        //recentClassErrors = ViewBag.RecentClassErrors as List<UserBuildErrorsByType>;
+    }
+    if (ViewBag.ErrorTypes != null)
+    {
+        //AllErrorTypes = ViewBag.ErrorTypes as List<ErrorType>;
+    }
+
+    //building the basic output message
+    string outputString = build.CriticalErrorCount > 0?
+        "{0} attempted to compile \"{1}\"{2} and encountered errors{3}" :
+        "{0} compiled \"{1}\" successfully{2}.";
+    string param0 = Model.Creator.FirstName;
+    string param1 = Path.GetFileNameWithoutExtension(Model.Items.First().Event.SolutionName);
+    string param2 = "";
+    //string param3 = errorCount.ToString();
+    string param4 = ".";
+    if (buildCount > 1)
+    {
+        param2 = string.Format(" {0} times", buildCount);
+    }
+    //if (errorCount > 0)
+    //{
+    //    param4 = ":";
+    ///}
+}
+@string.Format(outputString, param0, param1, param2, @*param3,*@ param4)
+<table>
+    @foreach (string error in criticalBuildErrors)
+    {
+        if(error == null)
+        {
+            continue;
+        }
+        
+        //what is the error type that we're having?
+        //ErrorType thisError = AllErrorTypes.Where(e => e.Name.CompareTo(error) == 0).FirstOrDefault();
+        //if (thisError == null)
+        //{
+        //    thisError = new ErrorType();
+        //}
+
+        @*//did the viewer also have this issue?
+    bool viewerHasError = recentUserErrors.Contains(error);
+
+    //did others in the class have this issue?
+    UserBuildErrorsByType match = recentClassErrors.Where(c => c.ErrorName.CompareTo(error) == 0).FirstOrDefault();
+    int otherUserErrorCount = 0;
+    string otherUserErrorsString = "";
+    if (match != null)
+    {
+        otherUserErrorCount = match.Users.Count;
+        switch (otherUserErrorCount)
+        {
+            case 1:
+                otherUserErrorsString = string.Format("{0} also recently had this error", match.Users.FirstOrDefault().FirstAndLastName);
+                break;
+
+            case 2:
+                otherUserErrorsString = string.Format("{0} and {1} also recently had this error", match.Users[0].FirstAndLastName, match.Users[1].FirstAndLastName);
+                break;
+
+            default:
+                //randomly draw two users
+                int maxVal = match.Users.Count - 1;
+                Random rnd = new Random();
+                int index = rnd.Next(1, maxVal);
+                OsbideUser user1 = match.Users[index];
+                OsbideUser user2 = match.Users[index - 1];
+                otherUserErrorsString = string.Format("{0}, {1}, and {2} others also recently had this error", user1.FirstAndLastName, user2.FirstAndLastName, otherUserErrorCount);
+                break;
+        }
+    }
+
+    <tr>
+        <td style="padding: 4px;">@Html.ActionLink(error, "Index", "Feed", new { errorType = thisError.Id }, new { })
+        </td>
+        <td style="padding: 4px;">
+            @if (viewerHasError == true)
+            {
+                @Helpers.ProfileImage(ViewBag.CurrentUser.Id, 16, "you've also recently had this errror", "you've also recently had this errror")
+            }
+        </td>
+        <td style="padding: 4px;">
+            @if (otherUserErrorCount > 0)
+            {
+                <img src="~/Content/icons/users_16.png" alt="@otherUserErrorsString" title="@otherUserErrorsString"/>
+            }
+        </td>
+    </tr>*@
+    }
+</table>

@@ -1,0 +1,60 @@
+﻿@model Int32
+@using OSBLE.Models.AbstractCourses.Course
+@using OSBLE.Models.Courses
+@using OSBLE.Utility
+
+
+@using (var connection = DBHelper.GetNewConnection())
+{
+    <div class="dropdown" id="course_select">
+        @{ string currentCourseName = ""; }
+
+        @if (ViewBag.ActiveCourseUser != null)
+        {
+            currentCourseName = DBHelper.GetCourseShortNameFromID(Model, connection);
+            <a data-course-id="@Model" class="dropdown-toggle btn btn-primary" data-toggle="dropdown" href="#">
+                @currentCourseName
+                <span class="caret"></span>
+            </a>
+        }
+        else
+        {
+            <a class="dropdown-toggle btn btn-primary" data-toggle="dropdown" href="#">
+                No Courses 
+                <span class="caret"></span>
+            </a>
+        }
+
+        <ul class="dropdown-menu">
+
+            @if(ViewBag.ActiveCourseUser != null)
+            {
+                IEnumerable<CourseUser> courses = DBHelper.GetCoursesFromUserProfileID(OsbleAuthentication.CurrentUser.ID, connection);
+                IEnumerable<CourseUser> communities = DBHelper.GetCommunitiesFromUserProfileID(OsbleAuthentication.CurrentUser.ID, connection);
+
+                @* First, loop through just courses: *@
+                if (courses.Any())
+                {
+                    <li class="dropdown-header">Courses</li>
+                    foreach (CourseUser cu in courses)
+                    {
+                        <li class="course-item @(Model == cu.AbstractCourseID ? "active" : "")" data-courseid="@cu.AbstractCourseID">
+                        @Html.ActionLink(DBHelper.GetCourseShortNameFromID(cu.AbstractCourseID, connection), "OSBIDE", "Feed", new {courseID = cu.AbstractCourseID}, null)
+                        </li>
+                    }
+                }
+                @* Then, loop through communities: *@
+                if (communities.Any())
+                {
+                    <li class="dropdown-header">Communities</li>
+                    foreach (CourseUser cu in communities)
+                    {
+                        <li class="course-item @(Model == cu.AbstractCourseID ? "active" : "")" data-courseid="@cu.AbstractCourseID">
+                            @Html.ActionLink(DBHelper.GetCourseShortNameFromID(cu.AbstractCourseID, connection), "OSBIDE", "Feed", new {courseID = cu.AbstractCourseID}, null)
+                        </li>
+                    }
+                }
+            }
+        </ul>
+    </div>
+}

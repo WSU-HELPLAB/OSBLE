@@ -1,0 +1,11 @@
+﻿@{
+    Layout = null;
+}
+
+@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+@model List<LogCommentEvent>
+<input type="hidden" id="last-poll-tick" value="@ViewBag.LastPollTick" />
+@foreach (LogCommentEvent comment in Model)
+{
+    @Html.Partial("_CommentSingle", comment)
+}

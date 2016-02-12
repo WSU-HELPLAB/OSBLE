@@ -1,0 +1,16 @@
+﻿@{
+    ViewBag.Title = "Annotate";
+    string annotateUrl = ViewBag.AnnotateUrl;
+}
+<iframe id="AnnotateFrame" src="@(annotateUrl)" style="width:99%;"></iframe>
+<script type="text/javascript">
+    $(document).ready(scaleAnnotateFrame);
+    $(window).resize(scaleAnnotateFrame);
+
+    function scaleAnnotateFrame() {
+        $('#AnnotateFrame').width($(window).width() - 20);
+        $('#AnnotateFrame').height($(window).height() - 110);        
+        if (location.protocol == "https:")
+            location.protocol = "http:";
+    }
+</script>

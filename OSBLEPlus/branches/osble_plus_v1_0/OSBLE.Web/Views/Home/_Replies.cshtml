@@ -1,0 +1,51 @@
+﻿@model LogCommentEvent
+@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+
+@* New Reply Box *@
+
+
+    <div class="dp_replylink">
+        <a href="#" id="reply_@(Model.SourceEventLogId)">Reply</a>
+    </div>
+    <div class="dp_replybox" id="replybox_@(Model.SourceEventLogId)">
+        <form action="@Url.Action("NewReply")"
+                data-ajax="true"
+                data-ajax-update="#dp_replies_for_@(Model.SourceEventLogId)"
+                data-ajax-begin="$('#reply_@(Model.SourceEventLogId)_button').attr('disabled', 'disabled')"
+                data-ajax-failure="alert('There was an error sending your reply.')"
+                data-ajax-complete="$('#reply_@(Model.SourceEventLogId)_button').removeAttr('disabled'); $('body').css('cursor', 'default');"
+                data-ajax-success="$('.dp_new_post').show('blind',{},'slow',function(){$(this).removeClass('dp_new_post');}); $('#dp_replybox_content_@(Model.SourceEventLogId)').val(''); parseDates()"
+                data-ajax-mode="after"
+                method="post">
+            <input type="hidden" name="reply_to" value="@Model.SourceEventLogId" />
+            <input type="hidden" name="latest_reply" value="0" id="latest_reply_@(Model.SourceEventLogId)" />
+            <span id="remCharsReply" name="remainingCharsReply" readonly="true" value="(@ViewBag.MaxActivityFeedLength) Characters left"></span><br />
+            <textarea name="Content" rows="5" cols="40" id="dp_replybox_content_@(Model.SourceEventLogId)" placeholder="Enter reply here..."
+                        onkeyup="RemainingCharsReply(@(Model.SourceEventLogId))" onkeydown="RemainingCharsReply(@(Model.SourceEventLogId))"></textarea><br />
+            <input id="reply @(Model.SourceEventLogId) button" type="submit" name="post_reply" value="Post Reply" onclick="refreshCount()" />
+        </form>
+
+        <br />
+        <div class="dp_replylink">
+            <a href="#" id="replycancel_@(Model.SourceEventLogId)">Cancel</a>
+        </div>
+    </div>
+    <script type="text/javascript">
+            $("#reply_@(Model.SourceEventLogId)").click(function () {
+                $("#reply_@(Model.SourceEventLogId)").hide();
+                $("#replybox_@(Model.SourceEventLogId)").show('blind');
+                return false;
+            });
+
+            $("#replycancel_@(Model.SourceEventLogId)").click(function () {
+                $("#reply_@(Model.SourceEventLogId)").show('highlight');
+                $("#replybox_@(Model.SourceEventLogId)").hide('blind');
+                return false;
+            });
+
+    </script>
+}
+<div id="after_replies_@(Model.SourceEventLogId)"></div>
+
+</div>
+ @* End of Replies *@

@@ -1,0 +1,52 @@
+﻿@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+@model AggregateFeedItem
+@{
+    int marginOfError = 3;    
+}
+@foreach (FeedItem item in Model.Items)
+{
+    BuildEvent build = item.Event as BuildEvent;
+    if (build == null)
+    {
+        continue;
+    }
+    List<BuildEventErrorListItem> errorItems = build.CriticalErrorItems;
+    
+    <section>
+        <h1>Build Errors</h1>
+        <div>(@Html.ActionLink("View Compilation History", "Diff", new { controller = "BuildEvent", id = build.EventLogId }))</div>
+            <ul>
+
+                @if (errorItems.Count == 0)
+                {
+                    <li>This build had no errors.</li>
+                }
+
+                @foreach (BuildEventErrorListItem errorItem in errorItems)
+                {
+                    string errorFile = Path.GetFileName(errorItem.ErrorListItem.File);
+                    BuildDocument doc = build.Documents.Where(d => d.Document.FileName.ToLower() == errorItem.ErrorListItem.File.ToLower()).FirstOrDefault();
+                    if (doc == null)
+                    {
+                        continue;
+                    }
+                    int smallest = errorItem.ErrorListItem.Line - marginOfError;
+                    int largest = errorItem.ErrorListItem.Line + marginOfError;
+                    List<string> content = new List<string>();
+                    for (int i = smallest; i < largest; i++)
+                    {
+                        string text = doc.Document.Lines.ElementAtOrDefault(i);
+                        if (text != null)
+                        {
+                            content.Add(string.Format("[{0}]{1}", i, text));
+                        }
+                    }
+                    <li>
+                        [@errorItem.ErrorListItem.Line] @errorItem.ErrorListItem.Description
+                        @* shouldn't need class="cpp" on the code block below, it should autodetect, but put it back if it's not working *@
+                        <pre><code >@string.Join("\n", content)</code></pre>
+                    </li>
+                }
+            </ul>
+    </section>
+}

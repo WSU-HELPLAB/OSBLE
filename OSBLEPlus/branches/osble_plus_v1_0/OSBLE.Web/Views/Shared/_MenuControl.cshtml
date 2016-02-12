@@ -1,0 +1,19 @@
+﻿
+@if (ViewBag.Menu != null)
+{
+    foreach (OSBLE.Controllers.OSBLEController.MenuItem m in ViewBag.Menu)
+    {
+        if (ViewBag.CurrentUser != null && ViewBag.ActiveCourse != null && m.IsVisibleTo(ViewBag.CurrentUser, ViewBag.ActiveCourse))
+        {
+            <li class="NavTab @(ViewBag.CurrentTab == m.Name?"active":"")">
+                @Html.ActionLink(m.Name, m.Action, m.Controller, new { area = m.Area }, null)
+            </li>
+        }
+    }
+
+    //add the "more" dropdown
+    <li id="MoreDrop" class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#">More <span class="caret"></span></a>
+        <ul id="MoreList" class="dropdown-menu"></ul>
+    </li>
+}

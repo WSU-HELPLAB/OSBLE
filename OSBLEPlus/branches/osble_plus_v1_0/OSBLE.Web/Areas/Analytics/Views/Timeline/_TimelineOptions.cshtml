@@ -1,0 +1,63 @@
+﻿@using OSBLEPlus.Logic.DataAccess.Lookups
+@using OSBLEPlus.Logic.DomainObjects.Analytics
+@using OSBLEPlus.Logic.Utility
+
+@{
+    int currentCourseID = ViewBag.ActiveCourseUser.AbstractCourseID;
+}
+
+@model List<OSBLEPlus.Logic.DomainObjects.Analytics.StudentData>
+@using (Html.BeginForm("GetCSVData", "Timeline", FormMethod.Post, new {@class = "form-horizontal", role = "form"}))
+{
+    <div id="timeline-options">
+        <label for="CourseId">Course:</label>
+        @Html.DropDownList("CourseId", new SelectList(Courses.GetCourses(), "Value", "Name", currentCourseID), new { @class = "form-control", id = "course-id-select" })
+
+        <div id="time-scale-select">
+            <label for="ScaleSetting">Time Scale:</label>
+            <select name="ScaleSetting" id="timescale-setting" class="form-control">
+                @foreach (var e in Enum<TimeScale>.Get())
+                {
+                    var selected = e.Value == (int) TimeScale.Days ? "selected" : string.Empty;
+                    <option value="@e.Value" @selected>@e.Text</option>
+                }
+            </select>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-6">
+                <label for="timeFrom">From</label>
+                <input type="text" id="timeFrom" class="form-control date-input-text" value="2014-01-15 00:00" />
+            </div>
+            <div class="col-xs-6">
+                <label for="timeTo">To</label>
+                <input type="text" id="timeTo" class="form-control date-input-text" value="2014-01-17 23:55" />
+            </div>
+        </div>
+    
+        @*
+        <div>Idle Timeout (min):</div>
+        <div><input class="form-control" type="text" id="timeout" name="Timeout" placeholder="3"/>
+        </div>
+        *@
+        <div id="cb-grayscale">
+            <label for="grayscale">Grayscale: <input type="checkbox" id="grayscale" /></label>
+        </div>
+        
+        <div>
+            <label for="studentList" id="students-label">Students:</label>
+            <ul id="studentList">
+                <li><input type="checkbox" id="user-show-all" checked="checked" /> Show All</li>
+                @foreach (var student in Model)
+                {
+                    <li id="li-user-@student.ID" data-fullname="@student.FirstName @student.LastName" class="student-list-item">
+                        <input class="cb-user" value="@student.ID" type="checkbox" name="userId" checked="checked" />
+                        @student.FirstName @student.LastName
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+
+    <a id="download">Export current visualization to CSV</a>
+}

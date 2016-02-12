@@ -1,0 +1,7 @@
+﻿@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+@model OSBLEPlus.Logic.DomainObjects.ActivityFeeds.AggregateFeedItem
+@{
+    AskForHelpEvent help = Model.Items.First().Event as AskForHelpEvent;
+} 
+<span class="non-user-text"><em>@Model.Creator.FirstName</em> asked the following question:</span><br />
+<span class="user-text">@help.UserComment</span>
