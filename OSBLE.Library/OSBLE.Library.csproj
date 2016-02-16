@@ -156,6 +156,7 @@
     <Compile Include="Models\HomePage\Event.cs" />
     <Compile Include="Models\HomePage\Notification.cs" />
     <Compile Include="Models\IModelBuilderExtender.cs" />
+    <Compile Include="Models\OSBLECommunity\OSBLECommunityGrid.cs" />
     <Compile Include="Models\OSBLEContext.cs" />
     <Compile Include="Models\School.cs" />
     <Compile Include="Models\Services\Uploader\AbstractListing.cs" />
@@ -178,6 +179,7 @@
     <Compile Include="Models\ViewModels\CommentsViewModel.cs" />
     <Compile Include="Models\ViewModels\DiscussionViewModel.cs" />
     <Compile Include="Models\ViewModels\GetItemUpdatesViewModel.cs" />
+    <Compile Include="Models\ViewModels\OSBLECommunityViewModel.cs" />
     <Compile Include="Models\ViewModels\ProfileViewModel.cs" />
     <Compile Include="Models\ViewModels\ReviewInterfaceModels.cs" />
     <Compile Include="Models\ViewModels\RubricViewModel.cs" />

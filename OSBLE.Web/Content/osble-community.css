@@ -1,0 +1,182 @@
+﻿body {
+            text-align: center;
+        }
+
+        #community_banner {
+            background: #074974;
+            border-bottom: 2px solid #000000;
+            color: white;
+            text-align: center;
+            position: relative;
+            top: 50%;
+        }
+
+        .container {
+            text-align: center;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .column, .column-right {
+            width: 40%;
+            min-width: 600px;
+            padding-bottom: 10px;
+            margin: auto;
+            text-align: center;
+            float: left;
+            max-width: 700px;
+        }
+
+        .combined {
+            margin: 5px;
+        }
+
+        .portlet {
+            margin: 0 1em 1em 0;
+            padding: 5px;
+            min-width: 600px;
+            max-width: 700px;
+        }
+
+        .portlet-header {
+            padding: 0.2em 0.3em;
+            position: relative;
+        }
+
+        .portlet-toggle {
+            position: absolute;
+            top: 50%;
+            right: 0;
+            margin-top: -8px;
+        }
+
+        .portlet-content {
+            padding: 0.4em;
+        }
+
+        .portlet-placeholder {
+            border: 1px dotted black;
+            margin: 0 1em 1em 0;
+            height: 50px;
+        }
+
+        .c-table {
+            width: 100%;
+            border: outset;
+            border-width: 10px;
+        }
+
+            .c-table.portlet {
+                margin-top: 5px;
+            }
+
+        .c-header-title {
+            background: #074974;
+            color: white;
+            font-size: x-large;
+            text-align: left;
+            padding-left: 10px;
+            border-right-style: none;
+            border-bottom-style: inset;
+            border-width: 5px;
+            margin-bottom: 5px;
+        }
+
+        .c-info {
+            background: #074974;
+            color: white;
+            border-left-style: none;
+            width: 20%;
+            text-align: right;
+            padding-right: 10px;
+            border-bottom-style: inset;
+            border-width: 5px;
+        }
+
+        .community {
+            margin: auto;
+            text-align: center;
+        }
+
+        .left-cell {
+            background-color: #CCCCCC;
+            text-align: center;
+            border-bottom-style: inset;
+        }
+
+        .mid-cell {
+            background-color: #EEEEEE;
+            border-bottom-style: inset;
+        }
+
+        .right-cell {
+            height: auto;
+            border-bottom-style: inset;
+        }
+
+        .right-cell-ok {
+            background-color: #009933;
+            text-align: center;
+            height: 100%;
+            border-bottom-style: inset;
+            padding: 5px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px #000000;
+        }
+
+        .right-cell-goal {
+            background-color: #ff5c33;
+            text-align: center;
+            height: 100%;
+            border-bottom-style: inset;
+            padding: 5px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px #000000;
+        }
+
+        .right-cell-attn {
+            background-color: #0c79c0;
+            text-align: center;
+            height: 100%;
+            border-bottom-style: inset;
+            padding: 5px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px #000000;
+        }
+
+        .rate {
+            padding: 5px;
+            border-bottom-style: none;
+        }
+
+            .rate a:link, .rate a:visited {
+                color: white;
+            }
+
+        .chart-div {
+            display: inline-block;
+            margin: 0 auto;
+        }
+
+        .placeholder {
+            width: 100%; /*need to adjust to fit*/
+            text-align: left;
+            margin: 0px;
+            border-left-style: inset;
+        }
+
+        .column-left {
+            width: 18%;
+            min-width: 300px;
+            float: left;
+            margin: 5px;
+        }
+
+        #updates {
+            background-color: #ffcc00;
+            border-color: #074974;
+            border-style: solid;
+        }

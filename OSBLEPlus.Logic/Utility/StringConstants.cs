@@ -20,10 +20,10 @@ namespace OSBLEPlus.Logic.Utility
             get
             {
 #if DEBUG
-                return "http://localhost/";                                                
+                return "http://localhost/";                     
 #else
 
-                return "https://plus.osble.org/";                
+                return "https://plus.osble.org/";
 #endif
             }
         }
@@ -35,7 +35,7 @@ namespace OSBLEPlus.Logic.Utility
 #if DEBUG
                 return "http://localhost/plusservices/";
 #else
-                return "http://plus.osble.org/plusservices/";
+                return "https://plus.osble.org/plusservices/";                
 #endif
             }
         }
@@ -65,6 +65,11 @@ namespace OSBLEPlus.Logic.Utility
             get { return string.Format("{0}/Profile", WebClientRoot); }
         }
 
+        public static string CommunityUrl
+        {
+            get { return string.Format("{0}/OSBLECommunity", WebClientRoot); }
+        }
+
         public static string WhatsNewUrl
         {
             get { return string.Format("{0}/WhatsNew", WebClientRoot); }
@@ -72,12 +77,12 @@ namespace OSBLEPlus.Logic.Utility
 
         public static string UpdateUrl
         {
-            get { return string.Format("{0}/Content/osble.zip", WebClientRoot); }
+            get { return string.Format("{0}/Content/osble_plugin.zip", WebClientRoot); }
         }
 
         public static string LocalUpdatePath
         {
-            get { return Path.Combine(DataRoot, "osbide_debug.vsix"); }
+            get { return Path.Combine(DataRoot, "osble_plugin.vsix"); }
         }
 
         public static string DataRoot

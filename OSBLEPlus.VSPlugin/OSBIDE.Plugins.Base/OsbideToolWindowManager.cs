@@ -19,6 +19,7 @@ namespace OSBIDE.Plugins.Base
         private readonly Package _vsPackage;
         private readonly BrowserViewModel _chatVm = new BrowserViewModel();
         private readonly BrowserViewModel _profileVm = new BrowserViewModel();
+        private readonly BrowserViewModel _communityVm = new BrowserViewModel();
         private readonly BrowserViewModel _activityFeedVm = new BrowserViewModel();
         private readonly BrowserViewModel _activityFeedDetailsVm = new BrowserViewModel();
         private readonly BrowserViewModel _createAccountVm = new BrowserViewModel();        
@@ -33,11 +34,12 @@ namespace OSBIDE.Plugins.Base
             _interceptor.NavigationRequested += NavigationRequested;
             _chatVm.Url = StringConstants.ChatUrl;
             _profileVm.Url = StringConstants.ProfileUrl;
+            _communityVm.Url = StringConstants.CommunityUrl;
             _activityFeedVm.Url = StringConstants.ActivityFeedUrl;
             _activityFeedDetailsVm.Url = StringConstants.ActivityFeedUrl;
             _createAccountVm.Url = StringConstants.CreateAccountUrl;
             _askTheProfessorVm.Url = StringConstants.AskTheProfessorUrl;
-            _genericWindowVm.Url = StringConstants.ProfileUrl;
+            _genericWindowVm.Url = StringConstants.ProfileUrl;            
         }
 
         public void OpenChatWindow(Package vsPackage = null)
@@ -52,9 +54,20 @@ namespace OSBIDE.Plugins.Base
             OpenToolWindow(new UserProfileToolWindow(), _profileVm, vsPackage);
         }
 
+        public void OpenCommunityWindow(Package vsPackage = null)
+        {
+            _communityVm.AuthKey = _cache[StringConstants.AuthenticationCacheKey] as string;
+            OpenToolWindow(new CommunityToolWindow(), _communityVm, vsPackage);
+        }
+
         public void CloseProfileWindow(Package vsPackage = null)
         {
             CloseToolWindow(new UserProfileToolWindow(), vsPackage);
+        }
+
+        public void CloseCommunityWindow(Package vsPackage = null)
+        {
+            CloseToolWindow(new CommunityToolWindow(), vsPackage);
         }
 
         public void OpenGenericToolWindow(Package vsPackage = null, string url = "")
@@ -206,7 +219,7 @@ namespace OSBIDE.Plugins.Base
                 case VsComponent.UserProfile:
                     _profileVm.Url = e.Url;
                     uiShell.PostExecCommand(ref commandSet, CommonPkgCmdIDList.cmdidOsbideUserProfileTool, 0, ref inputParameters);
-                    break;
+                    break;                
                 case VsComponent.GenericComponent:
                     _genericWindowVm.Url = e.Url;
                     uiShell.PostExecCommand(ref commandSet, CommonPkgCmdIDList.cmdidOsbideGenericToolWindow, 0, ref inputParameters);
@@ -222,6 +235,9 @@ namespace OSBIDE.Plugins.Base
             CloseToolWindow(new CreateAccountToolWindow(), vsPackage);
             CloseToolWindow(new GenericOsbideToolWindow(), vsPackage);
             CloseToolWindow(new UserProfileToolWindow(), vsPackage);
+            
+            if (_cache.Contains("community") && Boolean.Equals(true, _cache["community"]))
+                CloseToolWindow(new CommunityToolWindow(), vsPackage);
         }
     }
 }

@@ -122,6 +122,27 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
             }
         }
 
+        private void ShowCommunityTool(object sender, EventArgs e)
+        {
+            var cacheItem = _cache[StringConstants.AuthenticationCacheKey];
+            if (cacheItem != null && string.IsNullOrEmpty(cacheItem.ToString()) == false)
+            {
+                try
+                {
+                    if (_cache.Contains("community") && Boolean.Equals(true, _cache["community"]))
+                        _manager.OpenCommunityWindow();                    
+                }
+                catch (Exception ex)
+                {
+                    ShowAwesomiumError(ex);
+                }
+            }
+            else
+            {
+                MessageBox.Show("You must be logged into OSBLE+ in order to access this window.");
+            }
+        }
+
         private void ShowCreateAccountTool(object sender, EventArgs e)
         {
             try
@@ -243,6 +264,8 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
                     }
                     MessageBox.Show("Welcome to OSBLE+!");
                     _manager.OpenActivityFeedWindow();
+                    if (_cache.Contains("community") && Boolean.Equals(true, _cache["community"]))
+                        _manager.OpenCommunityWindow();
                 }
                 else
                 {
@@ -266,6 +289,8 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
                 //redirect the feed url after we've logged out
                 _manager.RedirectActivityFeedWindow(StringConstants.WebClientRoot + "/feed/osbide/");
                 _manager.CloseProfileWindow();
+                if (_cache.Contains("community") && Boolean.Equals(true, _cache["community"])) 
+                    _manager.CloseCommunityWindow();
 
                 MessageBox.Show("You have been logged out of OSBLE+.");
             }

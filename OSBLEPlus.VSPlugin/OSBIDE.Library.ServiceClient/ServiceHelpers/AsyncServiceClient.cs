@@ -49,6 +49,17 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             }
         }
 
+        public static async Task<string> CommunityStatus()
+        {
+            using (var client = GetClient())
+            {
+                var task = client.GetStringAsync("api/community/communityenabled");
+                await task;
+
+                return task.Result.TrimEnd('"').TrimStart('"');
+            }
+        }
+
         public static async Task<DateTime> GetMostRecentWhatsNewItem()
         {
             using (var client = GetClient())
