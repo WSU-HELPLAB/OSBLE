@@ -13,6 +13,7 @@ namespace OSBIDE.Plugins.Base
         public const string guidOsbideActivityFeedDetailsTool = "eee1c7ba-00ea-4b22-88d7-6cb17837c3d5";
         public const string guidOsbideChatTool = "eee1c7ba-00ea-4b22-88d7-6cb17837c3d6";
         public const string guidOsbideUserProfileTool = "eee1c7ba-00ea-4b22-88d7-6cb17837c3d7";
+        public const string guidCommunityTool = "eee1c7ba-00ea-4b22-88d7-6cb17837aaaa";
         public const string guidOSBIDE_ContextMenuCmdSetString = "eee1c7ba-00ea-4b22-88d7-6cb17837c3d8";
         public const string guidOsbideCreateAccountTool = "eee1c7ba-00ea-4b22-88d7-6cb17837c3d9";
         public const string guidOsbideAskTheProfessorTool = "eee1c7ba-00ea-4b22-88d7-6cb17837c3da";

@@ -42,7 +42,39 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
         }
 
         private async void Login(string userName, string password)
-        {
+        {            
+            try //configure community window
+            {
+                var task = AsyncServiceClient.CommunityStatus();
+                var result = await task;
+                if(String.Equals("true", result))
+                {
+                    if (_cache.Contains("community"))
+                        _cache["community"] = true;
+                    else
+                        _cache.Add("community", true, DateTime.UtcNow.Date.AddDays(1));
+                }
+                else
+                {
+                    if (_cache.Contains("community"))
+                    {
+                        _cache.Remove("community");
+                        _cache.Add("community", false, DateTime.UtcNow.Date.AddDays(-1));
+                    }
+
+                    else
+                    {
+                        _cache.Add("community", false, DateTime.UtcNow.Date.AddDays(-1));
+                    }
+                    _manager.CloseCommunityWindow();
+                        
+                }
+            }
+            catch (Exception e)
+            {
+                //do nothing for now, keep community disabled
+            }
+
             try
             {
                 var task = AsyncServiceClient.Login(userName, password);
@@ -55,10 +87,10 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
                 var result = MessageBox.Show("The OSBLE+ Visual Studio Plugin is unable to connect to the OSBLE+ server.  If this issue persists, please contact support@osble.org with the error message.\n\nError: " + e.InnerException.ToString(), "Log Into OSBLE+", MessageBoxButton.OK);                
                 _manager.CloseAllWindows();
             }            
-        }
+        }        
 
         private void Init_BrowserLogin(string authKey) //initialize browser authentication/activecourseuser
-        {
+        {      
             if (string.IsNullOrWhiteSpace(authKey))
             {
                 var result = MessageBox.Show("It appears as though your OSBLE+ user name or password has changed since the last time you opened Visual Studio.  Would you like to log back into OSBLE+?", "Log Into OSBLE+", MessageBoxButton.YesNo);
@@ -72,6 +104,8 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
                 _manager.OpenActivityFeedWindow(null,
                                             StringConstants.WebClientRoot + "/Account/TokenLogin?authToken=" + authKey +
                                             "&destinationUrl=" + StringConstants.WebClientRoot + "/feed/osbide/");
+                if (_cache.Contains("community") && Boolean.Equals(true, _cache["community"]))                
+                    _manager.OpenCommunityWindow();
             }            
         }
 

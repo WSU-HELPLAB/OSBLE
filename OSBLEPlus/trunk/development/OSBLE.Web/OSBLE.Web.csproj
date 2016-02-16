@@ -308,6 +308,7 @@
     <Compile Include="Controllers\MailController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\OpenIdController.cs" />
+    <Compile Include="Controllers\OSBLECommunityController.cs" />
     <Compile Include="Controllers\OSBLEController.cs" />
     <Compile Include="Controllers\PdfCriticalReviewController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
@@ -376,6 +377,7 @@
     <Compile Include="Utility\OpenId\Util.cs" />
     <Compile Include="Utility\OsbleAuthentication.cs" />
     <Compile Include="Utility\OSBLEConvert.cs" />
+    <Compile Include="Utility\RenderPartialToStringExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Code\Libraries\LumenWorks.Framework.IO.dll" />
@@ -425,6 +427,7 @@
     <Content Include="Content\bootstrap-3.3.5\js\bootstrap.min.js" />
     <Content Include="Content\bootstrap-3.3.5\js\npm.js" />
     <Content Include="Content\DiscussionAssignment.css" />
+    <Content Include="Content\font-awesome.min.css" />
     <Content Include="Content\images\ajax-loader-s.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -672,6 +675,7 @@
     <Content Include="Content\images\gradebookexamples\RequiredFormatingExample.PNG">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\help-circled.png" />
     <Content Include="Content\images\help.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -816,6 +820,7 @@
     <Content Include="Content\images\help_top_menu.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\information-circled.png" />
     <Content Include="Content\images\info_circle.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -984,6 +989,7 @@
     <Content Include="Content\jquery-tooltip.css" />
     <Content Include="Content\jquery-ui-1.8.13.custom.css" />
     <Content Include="Content\jquery-ui-timepicker.css" />
+    <Content Include="Content\jquery-ui.css" />
     <Content Include="Content\jquery.contextMenu.css" />
     <Content Include="Content\navbar.css" />
     <Content Include="Content\themes\base\images\animated-overlay.gif" />
@@ -1217,6 +1223,7 @@
     <Content Include="Views\Clone\readme.txt" />
     <Content Include="Views\OpenId\AskUser_old.aspx" />
     <Content Include="Views\OpenId\Provider.aspx" />
+    <Content Include="Content\osble-community.css" />
     <Content Include="Views\Shared\LogOnUserControl.ascx" />
     <Content Include="Views\Shared\Xrds.aspx" />
     <Content Include="Views\User\Identity.aspx" />
@@ -1407,6 +1414,14 @@
     <Content Include="Views\Shared\_OSBIDELayout.cshtml" />
     <Content Include="Views\Shared\_OSBIDECourses.cshtml" />
     <Content Include="Views\Feed\ShowHashtag.cshtml" />
+    <Content Include="Views\OSBLECommunity\Error.cshtml" />
+    <Content Include="Views\OSBLECommunity\Index.cshtml" />
+    <Content Include="Views\OSBLECommunity\OSBLECommunityGenericError.cshtml" />
+    <Content Include="Views\OSBLECommunity\_CommunityStanding.cshtml" />
+    <Content Include="Views\OSBLECommunity\_Goals.cshtml" />
+    <Content Include="Views\OSBLECommunity\_Online.cshtml" />
+    <Content Include="Views\OSBLECommunity\_PersonalStanding.cshtml" />
+    <Content Include="Views\OSBLECommunity\_RecentActivity.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -143,6 +143,15 @@
         </Strings>
       </Button>
 
+      <Button guid="guidOSBIDE_VSPackageCmdSet" id="cmdidCommunityTool" priority="0x0100" type="Button">
+        <Parent guid="guidOSBIDE_VSPackageCmdSet" id="MyMenuGroup" />        
+        <Icon guid="guidImages" id="generic" />
+        <Strings>
+          <CommandName>cmdidCommunityTool</CommandName>
+          <ButtonText>OSBLE+ Community</ButtonText>
+        </Strings>
+      </Button>
+
       <Button guid="guidOSBIDE_VSPackageCmdSet" id="cmdidOsbideDocumentationTool" priority="0x0100" type="Button">
         <Parent guid="guidOSBIDE_VSPackageCmdSet" id="MyMenuGroup" />
         <Icon guid="guidImages" id="documentation" />
@@ -207,6 +216,7 @@
       <IDSymbol name="cmdidOsbideActivityFeedDetailsTool" value="0x0104"/>
       <IDSymbol name="cmdidOsbideChatTool" value="0x0105"/>
       <IDSymbol name="cmdidOsbideUserProfileTool" value="0x0106"/>
+      <IDSymbol name="cmdidCommunityTool" value="0x010F"/>
       <IDSymbol name="cmdidOsbideCreateAccountTool" value="0x0108"/>
       <IDSymbol name="cmdidOsbideAskTheProfessor" value="0x0109"/>
       <IDSymbol name="OsbideToolbar" value="0x0110"/>
@@ -235,7 +245,7 @@
       <IDSymbol name="loginActive" value="6" />
       <IDSymbol name="documentation" value="7" />
       <IDSymbol name="askForHelp" value="8" />
-      <IDSymbol name="webLink" value="9" />
+      <IDSymbol name="webLink" value="9" />      
     </GuidSymbol>
   </Symbols>
 

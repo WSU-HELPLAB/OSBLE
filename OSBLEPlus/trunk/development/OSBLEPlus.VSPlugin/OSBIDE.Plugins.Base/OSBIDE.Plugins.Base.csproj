@@ -93,6 +93,7 @@
     <Compile Include="OsbideToolWindowManager.cs" />
     <Compile Include="CommonPkgCmdID.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="CommunityToolWindow.cs" />
     <Compile Include="UserProfileToolWindow.cs" />
   </ItemGroup>
   <ItemGroup>

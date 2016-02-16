@@ -46,6 +46,7 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
     [ProvideToolWindow(typeof(ActivityFeedDetailsToolWindow), Style = VsDockStyle.MDI, MultiInstances = true)]
     [ProvideToolWindow(typeof(ChatToolWindow), Style = VsDockStyle.MDI)]
     [ProvideToolWindow(typeof(UserProfileToolWindow), Style = VsDockStyle.MDI)]
+    [ProvideToolWindow(typeof(CommunityToolWindow), Style = VsDockStyle.MDI)]
     [ProvideToolWindow(typeof(CreateAccountToolWindow), Style = VsDockStyle.MDI)]
     [ProvideToolWindow(typeof(GenericOsbideToolWindow), Style = VsDockStyle.MDI)]
     [ProvideAutoLoad(UIContextGuids80.NoSolution)]

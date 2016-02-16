@@ -58,6 +58,11 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
                 var profileWindowId = new CommandID(CommonGuidList.guidOSBIDE_VSPackageCmdSet, (int)CommonPkgCmdIDList.cmdidOsbideUserProfileTool);
                 var menuProfileWin = new MenuCommand(ShowProfileTool, profileWindowId);
                 mcs.AddCommand(menuProfileWin);
+                
+                //community page
+                var communityWindowId = new CommandID(CommonGuidList.guidOSBIDE_VSPackageCmdSet, (int)CommonPkgCmdIDList.cmdidCommunityTool);
+                var menuCommunityWin = new MenuCommand(ShowCommunityTool, communityWindowId);
+                mcs.AddCommand(menuCommunityWin);
 
                 //"ask for help context" menu
                 var askForHelpId = new CommandID(CommonGuidList.guidOSBIDE_ContextMenuCmdSet, (int)CommonPkgCmdIDList.cmdOsbideAskForHelp);
