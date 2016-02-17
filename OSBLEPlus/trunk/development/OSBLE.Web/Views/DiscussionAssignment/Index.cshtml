@@ -132,7 +132,14 @@
                     <text style="font-weight: bold">Select Discussion: </text>
 
                     <select id="@selectBoxID">
-                        @foreach (DiscussionTeam dt in ViewBag.DiscussionTeamList)
+                        @{ 
+                            IEnumerable<DiscussionTeam> teams = ViewBag.DiscussionTeamList;
+                            IEnumerable<DiscussionTeam> orderedTeams =
+                                from team in teams
+                                orderby team.TeamName
+                                select team;  
+                        }
+                        @foreach (DiscussionTeam dt in orderedTeams)
                         {
 @*generating select box*@
                             string optionText = "<option value=\"{0}\"{1}>{2}</option>";
