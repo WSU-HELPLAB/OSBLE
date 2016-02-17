@@ -6,13 +6,15 @@
     UserProfile currentUser = ViewBag.CurrentUser;
     ViewBag.ShowDetails = true;
 }
-<script type="text/javascript" src="@Url.Content("~/Scripts/knockout-2.2.1.js")"></script>
-<script type="text/javascript" src="@Url.Content("~/Scripts/ActivityFeed.js")"></script>
+@*<script type="text/javascript" src="@Url.Content("~/Scripts/knockout-2.2.1.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/ActivityFeed.js")"></script>*@
 <script type="text/javascript" src="@Url.Content("~/signalr/hubs")"></script>
 <script type="text/javascript">
-    var vm = new DetailsViewModel("@currentUser.FullName", @currentUser.ID, "@rootId");
+    var vm;
     $(document).ready(function () {
+        vm = new DetailsViewModel("@currentUser.FullName", @currentUser.ID, "@rootId");
         ko.applyBindings(vm);
+        vm.RequestUpdate();
     });
 </script>
 

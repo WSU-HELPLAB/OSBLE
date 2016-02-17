@@ -386,8 +386,6 @@ function DetailsViewModel(userName, userId, rootId)
             }
         });
     };
-
-    self.RequestUpdate();
 }
 
 function ProfileViewModel(userName, userId, profileUserId) {
