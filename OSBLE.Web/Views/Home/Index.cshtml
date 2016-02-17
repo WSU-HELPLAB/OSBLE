@@ -31,7 +31,7 @@
 <div class="btn-group btn-group-justified" id="dashboard_pills">
     <div class="btn-group dbp_1">  <button type="button" id="btn_notifications" class="btn">Notifications <span id="notifications_badge" class="badge">@ViewBag.Notifications.Count</span></button> </div>
     <div class="btn-group dbp_2">  <button type="button" id="btn_events_deadlines" class="btn">Calendar</button> </div>
-    <div class="btn-group dbp_3">  <button type="button" id="btn_activity_feed" class="btn btn-primary">Activity Feed</button> </div>
+    <div class="btn-group dbp_3">  <button type="button" id="btn_activity_feed" class="btn btn-primary">Activity Feed <span class="badge new-activity-badge" style="display: none">new</span></button> </div>
     <div class="btn-group dbp_4">  <button type="button" id="btn_files" class="btn">Files &amp; Links</button> </div>
 </div>
 
@@ -52,8 +52,8 @@
         $("#btn_events_deadlines").click(function () { setContent("btn_events_deadlines", "dashboard_left", "dashboard_events") });
         $("#btn_files").click(function () { setContent("btn_files", "dashboard_right", ""); });
 
-        // set the click event for the "new activity" notification
-        $("#new-activity-badge").click(function () { $("#dashboard_middle").removeClass("new-activity") });
+        // set the click event for the "new activity" notifications
+        $(".new-activity-badge").click(function () { $(".new-activity-badge").hide(); });
     });
 </script>
 
@@ -124,7 +124,7 @@
         <div class="col-sm-6 activeContent" id="dashboard_middle">
             <h3>
                 Activity Feed
-                <span class="badge new-activity-badge" id="new-activity-badge" style="display: none">New Activity</span>
+                <span class="badge new-activity-badge" style="display: none">New Activity</span>
                 @*<a href="@Url.Action("DownloadDashboardPosts", "Course")" title="Download Activity Feed as csv">@Helpers.UnPublishButton()</a>*@
             </h3>
 

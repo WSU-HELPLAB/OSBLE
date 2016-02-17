@@ -739,12 +739,14 @@ function HideMoreLoading()
 
 function ShowNewActivityBadge()
 {
-    $("#dashboard_middle").addClass("new-activity");
+    //$("#dashboard_middle").addClass("new-activity");
+    $(".new-activity-badge").show();
 }
 
 function HideNewActivityBadge()
 {
-    $("#dashboard_middle").removeClass("new-activity");
+    //$("#dashboard_middle").removeClass("new-activity");
+    $(".new-activity-badge").hide();
 }
 
 /*
