@@ -1,6 +1,78 @@
-﻿
-@* template for partials, need to pass models and create unique class name for each type of partial *@
+﻿@* template for partials, need to pass models and create unique class name for each type of partial *@
 
-<div id="Online" class="" style="border: dotted #0094ff; margin-top: 5px;">
-    <h1>Who's online?</h1>
+@model OSBLE.Models.ViewModels.OSBLECommunityOnlineViewModel
+
+@using OSBLE.Models
+
+<style type="text/css">
+    .online {
+        width: 100%;
+    }
+
+        .online td {
+            padding: 10px;
+        }
+
+    #Online {
+        border: outset;
+        border-width: 10px;
+    }
+
+    .online-header {
+        text-align: center;
+    }
+
+    .profile_image {
+        text-align: right;
+    }
+
+    .profile_mail {
+        text-align: left;
+    }
+</style>
+
+<div id="Online" class="" style="margin-top: 5px;">
+    <table class="online">
+        <thead>
+            <tr>
+                <th class="c-header-title portlet-header online-header" colspan="3">Who's Online?</th>
+            </tr>
+        </thead>
+
+        @if (Model.OnlineUser.Count == 0)
+        {
+            <tbody>
+                <tr>
+                    <td colspan="3">
+                        No Users Online
+                    </td>
+                </tr>
+            </tbody>
+        }
+        else
+        {
+            foreach (KeyValuePair<string, int> entry in Model.OnlineUser)
+            {
+                <tbody>
+                    <tr>
+                        <td class="profile_image">
+                            <a href="@Url.Action("Index", "Profile", new { id = entry.Value, area ="" })" target="_blank">
+                                <img src="@Url.Action("Picture", "User", new { id = entry.Value, size = 30 })"
+                                     alt="Picture of @entry.Key"
+                                     class="profile_picture" />
+                            </a>
+                        </td>
+                        <td>
+                            <a href="@Url.Action("Index", "Profile", new { id = entry.Value, area ="" })" target="_blank">
+                                @entry.Key @*UserFullName*@
+                            </a>
+                        </td>
+                        <td class="profile_mail">
+                            <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { id = entry.Value })" target="_blank">@Helpers.MailButton()</a>
+                        </td>
+                    </tr>
+                </tbody>
+            }
+        }
+    </table>
 </div>
