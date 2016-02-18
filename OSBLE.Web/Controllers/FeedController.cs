@@ -201,6 +201,8 @@ namespace OSBLE.Controllers
             // if all events unchecked, return empty feed
             if (events == "")
             {
+                // update cookie to contain no items in the feed
+                ActivityFeedQuery.FilterCookies(new List<EventType>());
                 FeedViewModel emptyVM = new FeedViewModel()
                 {
                     Feed = new List<AggregateFeedItem>()
@@ -216,6 +218,10 @@ namespace OSBLE.Controllers
             {
                 var eventList = events.Replace(" ", "").Split(',').Where(s => s != "");
                 var listOfEvents = eventList.Select(s => (EventType)int.Parse(s)).ToList();
+
+                // update cookies if someone changed their list of selected events
+                ActivityFeedQuery.FilterCookies(listOfEvents);
+
                 _activityFeedQuery.UpdateEventSelectors(listOfEvents);
             }
 

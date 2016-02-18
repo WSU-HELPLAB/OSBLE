@@ -16,7 +16,7 @@
     var vm;
     $(document).ready(function() {
         vm = new FeedViewModel("@currentUser.FullName", @currentUser.ID);
-        ko.applyBindings(vm); 
+        ko.applyBindings(vm);
         vm.RequestUpdate();
     });
 </script>
@@ -66,10 +66,11 @@
                 {
                     <div class="checkbox filter-type-option">
                         <label>
-                            @Html.CheckBox("event_" + e.ToString(), ActivityFeedQuery.GetSocialEvents().Contains(e), new {
-                                id = "event_" + ((int)e).ToString(),
+                            @Html.CheckBox("event_" + e.ToString(), String.CompareOrdinal(ActivityFeedQuery.GetCookies(e), "True") == 0, new
+                            {
+                                id = "event_" + ((int) e).ToString(),
                                 @class = "event_checkbox",
-                                data_type = ((int)e),
+                                data_type = ((int) e),
                                 onchange = "vm.RequestUpdate()"
                             })
                             @Helpers.GetOptionNameOfEventType(e)

@@ -805,6 +805,17 @@ namespace OSBLE.Utility
             int logId = connection.Query<int>("SELECT Id " +
                                               "FROM LogCommentEvents " +
                                               "WHERE EventLogId = @eventId", new { eventId = eventLogId }).FirstOrDefault();
+
+            int logSenderId = connection.Query<int>("SELECT SenderId " +
+                                                    "FROM EventLogs " +
+                                                    "WHERE Id = @logCommentId ", new {logCommentId = logId}).FirstOrDefault();
+
+            // do not allow user to possibly mark their own comment as helpful
+            if (logSenderId == markerId)
+            {
+                return helpfulMarkEventIds.Count;
+            }
+
             // get the Source Event Log ID
             int sourceLogId = connection.Query<int>("SELECT SourceEventLogId " +
                                                     "From LogCommentEvents " +
