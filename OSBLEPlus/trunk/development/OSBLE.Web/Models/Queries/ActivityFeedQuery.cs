@@ -5,6 +5,7 @@ using System.Data.SqlTypes;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.WebPages.Scope;
 using Dapper;
 using DDay.Collections;
@@ -109,6 +110,48 @@ namespace OSBLE.Models.Queries
                 //EventType.HelpfulMarkGivenEvent,
                 EventType.SubmitEvent,
             };
+        }
+
+        public static string GetCookies(EventType e)
+        {
+            HttpCookie cookie = HttpContext.Current.Request.Cookies["FilterCookie"] ?? new HttpCookie("FilterCookie");
+
+            // setup cookies to default value if they don't exist
+            if (cookie.Values[e.ToString()] == null)
+            {
+                cookie.Values[e.ToString()] = GetSocialEvents().Contains(e).ToString();
+            }
+
+            cookie.Expires = DateTime.Now.AddDays(365);
+
+            HttpContext.Current.Response.Cookies.Add(cookie);
+
+            return cookie.Values[e.ToString()];
+        }
+
+        public static void FilterCookies(IEnumerable<EventType> events)
+        {
+            HttpCookie cookie = HttpContext.Current.Request.Cookies["FilterCookie"] ?? new HttpCookie("FilterCookie");
+
+            List<EventType> falseEvents = GetNecessaryEvents().Where(s => events.All(e => e != s)).ToList();
+
+            foreach (var e in falseEvents)
+            {
+                cookie.Values[e.ToString()] = "False";
+            }
+            foreach (var e in events)
+            {
+                cookie.Values[e.ToString()] = "True";
+            }
+
+            // if they do exist, get form data to update values
+
+
+            // keep cookie values for a year
+            cookie.Expires = DateTime.Now.AddDays(365);
+
+            // add it to the context
+            HttpContext.Current.Response.Cookies.Add(cookie);
         }
 
         /// <summary>
