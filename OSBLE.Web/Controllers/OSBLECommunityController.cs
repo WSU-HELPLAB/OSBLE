@@ -71,8 +71,8 @@ namespace OSBLE.Controllers
             //Note: using "__" to prepend the 'widget' type that is being returned.
             switch (gridType)
             {                                               
-                case "Online":
-                    return gridType + "__" + ControllerContext.RenderPartialToString("_Online", null);
+                case "Online":                    
+                    return gridType + "__" + ControllerContext.RenderPartialToString("_Online", LastLogActivity(StringConstants.OnlineActivtyMetricInMinutes));
                 case "RecentActivity":
                     return gridType + "__" + ControllerContext.RenderPartialToString("_RecentActivity", null);
                 case "Goals":
@@ -185,6 +185,48 @@ namespace OSBLE.Controllers
             catch (Exception e)
             {                
                 return e.Message;
+            }            
+        }
+
+        /// <summary>
+        /// Gets a list of user names with log activity in the last [input] minutes
+        /// </summary>
+        /// <param name="minutes">number of minutes</param>
+        /// <returns>list of user names</returns>
+        public OSBLECommunityOnlineViewModel LastLogActivity(int minutes)
+        {
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+
+                    string query =  @"SELECT DISTINCT " +
+                                    "UserProfiles.FirstName AS FirstName, " +
+                                    "UserProfiles.LastName AS LastName, " +
+                                    "UserProfiles.ID AS UserProfileID " +
+                                    "FROM ((dbo.UserProfiles AS UserProfiles " +
+                                    "INNER JOIN dbo.EventLogs AS EventLogs ON (UserProfiles.ID  = EventLogs.SenderId )) " +
+                                    "INNER JOIN dbo.EventTypes AS EventTypes ON (EventTypes.EventTypeId  = EventLogs.EventTypeId )) " +
+                                    "WHERE Eventlogs.EventDate > DATEADD(mi, -@minutes, GETDATE())";
+
+                    var results = sqlConnection.Query(query, new { minutes = minutes });
+                    var vm = new OSBLECommunityOnlineViewModel();
+
+                    foreach (var user in results)
+                    {
+                        vm.OnlineUser.Add(user.LastName + ", " + user.FirstName, user.UserProfileID);
+                    }                    
+
+                    sqlConnection.Close();
+
+                    return vm;
+                }
+            }
+            catch (Exception e)
+            {                
+                //todo handle error
+                return new OSBLECommunityOnlineViewModel();
             }            
         }
     }   

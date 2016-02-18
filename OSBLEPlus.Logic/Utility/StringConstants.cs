@@ -20,7 +20,7 @@ namespace OSBLEPlus.Logic.Utility
             get
             {
 #if DEBUG
-                return "http://localhost/";                     
+                return "http://localhost/";                                     
 #else
 
                 return "https://plus.osble.org/";
@@ -194,6 +194,14 @@ namespace OSBLEPlus.Logic.Utility
             get
             {
                 return "http://osble.codeplex.com/documentation";
+            }
+        }
+
+        public static int OnlineActivtyMetricInMinutes
+        {
+            get
+            {
+                return 30;
             }
         }
 
