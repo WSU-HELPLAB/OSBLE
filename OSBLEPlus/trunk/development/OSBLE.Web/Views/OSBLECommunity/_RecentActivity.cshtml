@@ -1,5 +1,75 @@
 ﻿@* template for partials, need to pass models and create unique class name for each type of partial *@
 
-<div id="RecentActivity" style="border: dotted #ff006e; margin-top: 5px;">
-    <h1>Recent Activity</h1>
+@model List<OSBLE.Models.ViewModels.OSBLECommunityRecentActivtyViewModel>
+
+@using OSBLE.Models
+
+<style type="text/css">
+    .recent-activity {
+        width: 100%;
+    }
+
+        .recent-activity td {
+            padding: 10px;
+        }
+
+    #RecentActivity {
+        border: outset;
+        border-width: 10px;
+    }
+
+    .recent-activity-header {
+        text-align: center;
+    }
+</style>
+
+<div id="RecentActivity" style="margin-top: 5px;">
+    <table class="recent-activity">
+        <thead>
+            <tr>
+                <th class="c-header-title portlet-header recent-activity-header" colspan="3">Recent Activty</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var userEvent in Model)
+            {
+                <tr>
+                    <td>
+                        @userEvent.EventDate.ToString()
+                    </td>
+
+                    @{ string firstName = userEvent.User.Keys.First();}
+
+                    @*TODO: redo the text*@
+                    @switch (userEvent.Event.Keys.First())
+                    {
+                        case "AskForHelpEvent":
+                            <td>@firstName asked for help.</td>
+                            break;
+                        case "ExceptionEvent":
+                        <td>@firstName had a runtime exception.</td>
+                            break;
+                        case "FeedPostEvent":
+                        <td>@firstName made a post.</td>
+                            break;
+                        case "HelpfulMarkGivenEvent":
+                        <td>@firstName marked a comment helpful.</td>
+                            break;
+                        case "LogCommentEvent":
+                        <td>@firstName replied to a post.</td>
+                            break;
+                        case "SubmitEvent":
+                        <td>@firstName submitted an assignment.</td>
+                            break;
+                        default:
+                        <td>[unknown activity]</td>
+                            break;
+                    }
+                    <td>
+                        @Helpers.Info() @*TODO: add link to details page*@
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
