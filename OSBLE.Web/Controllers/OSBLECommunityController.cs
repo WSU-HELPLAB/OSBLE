@@ -74,7 +74,7 @@ namespace OSBLE.Controllers
                 case "Online":                    
                     return gridType + "__" + ControllerContext.RenderPartialToString("_Online", LastLogActivity(StringConstants.OnlineActivtyMetricInMinutes));
                 case "RecentActivity":
-                    return gridType + "__" + ControllerContext.RenderPartialToString("_RecentActivity", null);
+                    return gridType + "__" + ControllerContext.RenderPartialToString("_RecentActivity", RecentActivty());
                 case "Goals":
                     return gridType + "__" + ControllerContext.RenderPartialToString("_Goals", null);
                 case "CommunityStanding":
@@ -193,7 +193,7 @@ namespace OSBLE.Controllers
         /// </summary>
         /// <param name="minutes">number of minutes</param>
         /// <returns>list of user names</returns>
-        public OSBLECommunityOnlineViewModel LastLogActivity(int minutes)
+        public OSBLECommunityOnlineViewModel LastLogActivity(int minutes = 30)
         {
             try
             {
@@ -228,6 +228,60 @@ namespace OSBLE.Controllers
                 //todo handle error
                 return new OSBLECommunityOnlineViewModel();
             }            
+        }
+
+        /// <summary>
+        /// returns a list of viewmodel objects with the last @numberOfEvents event details
+        /// </summary>
+        /// <param name="numberOfEvents">number of results to return</param>
+        /// <returns>a list of OSBLECommunityRecentActivityViewModels</returns>
+        public List<OSBLECommunityRecentActivtyViewModel> RecentActivty(int numberOfEvents = 20)
+        {
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+
+                    string query = @"SELECT TOP (@numberOfEvents) " +
+		                            "EventLogs.Id as EventLogId " +
+		                            ",EventTypes.EventTypeId " +
+		                            ",EventTypes.EventTypeName " +
+		                            ",[EventDate] " +
+		                            ",[SenderId]	as UserId " +
+		                            ",UserProfiles.FirstName " +
+                                    "FROM [OSBLEPlus].[dbo].[EventLogs] " +
+                                    "INNER JOIN EventTypes " +
+                                    "ON EventLogs.EventTypeId = EventTypes.EventTypeId " +
+                                    "INNER JOIN UserProfiles " +
+                                    "ON EventLogs.SenderId = UserProfiles.ID " +
+                                    "WHERE EventLogs.EventTypeId IN (1, 6, 7, 8, 9, 11) " +
+                                    "ORDER BY EventDate DESC ";
+
+                    var results = sqlConnection.Query(query, new { numberOfEvents = numberOfEvents });
+                    List<OSBLECommunityRecentActivtyViewModel> vms = new List<OSBLECommunityRecentActivtyViewModel>();
+
+                    foreach (var userEvent in results)
+                    {
+                        OSBLECommunityRecentActivtyViewModel vm = new OSBLECommunityRecentActivtyViewModel();
+                        
+                        vm.User.Add(userEvent.FirstName, userEvent.UserId);
+                        vm.Event.Add(userEvent.EventTypeName, userEvent.EventLogId);
+                        vm.EventDate = userEvent.EventDate;
+
+                        vms.Add(vm);
+                    }                    
+
+                    sqlConnection.Close();
+
+                    return vms;
+                }
+            }
+            catch (Exception e)
+            {                
+                //todo handle error
+                return new List<OSBLECommunityRecentActivtyViewModel>();
+            }
         }
     }   
 }
