@@ -215,7 +215,7 @@ namespace OSBLE.Controllers
 
                     foreach (var user in results)
                     {
-                        vm.OnlineUser.Add(user.LastName + ", " + user.FirstName, user.UserProfileID);
+                        vm.OnlineUser.Add(user.FirstName + " " + user.LastName, user.UserProfileID);
                     }                    
 
                     sqlConnection.Close();
@@ -243,7 +243,8 @@ namespace OSBLE.Controllers
                 {
                     sqlConnection.Open();
 
-                    string query = @"SELECT TOP (@numberOfEvents) " +
+                                    //Recent activity for top level posts ItemType: 1, 6, 7, 11
+                    string query =  @"SELECT TOP (@numberOfEvents) " +
 		                            "EventLogs.Id as EventLogId " +
 		                            ",EventTypes.EventTypeId " +
 		                            ",EventTypes.EventTypeName " +
@@ -255,26 +256,75 @@ namespace OSBLE.Controllers
                                     "ON EventLogs.EventTypeId = EventTypes.EventTypeId " +
                                     "INNER JOIN UserProfiles " +
                                     "ON EventLogs.SenderId = UserProfiles.ID " +
-                                    "WHERE EventLogs.EventTypeId IN (1, 6, 7, 8, 9, 11) " +
-                                    "ORDER BY EventDate DESC ";
+                                    "WHERE EventLogs.EventTypeId IN (1, 6, 7, 11) " +
+                                    "ORDER BY EventDate DESC " +
+                                    
+                                    //Recent activty for reply level posts ItemType: 9
+                                    "SELECT TOP (@numberOfEvents) " +
+                                    //"EventLogs.Id as EventLogId   " +
+                                    "LogCommentEvents.SourceEventLogId AS EventLogId " + //we need to point to the top level post
+                                    ",EventTypes.EventTypeId   " +
+                                    ",EventTypes.EventTypeName   " +
+                                    ",Eventlogs.EventDate " +
+                                    ",[SenderId]	as UserId   " +
+                                    ",UserProfiles.FirstName " +                                    
+                                    "FROM [OSBLEPlus].[dbo].[EventLogs]   " +
+                                    "INNER JOIN EventTypes   " +
+                                    "ON EventLogs.EventTypeId = EventTypes.EventTypeId   " +
+                                    "INNER JOIN UserProfiles   " +
+                                    "ON EventLogs.SenderId = UserProfiles.ID " +
+                                    "INNER JOIN LogCommentEvents " +
+                                    "ON EventLogs.Id = LogCommentEvents.EventLogId " +
+                                    "WHERE EventLogs.EventTypeId IN (9)  " +
+                                    "ORDER BY EventDate DESC " +
 
-                    var results = sqlConnection.Query(query, new { numberOfEvents = numberOfEvents });
+                                    //Recent activty for markedhelpful posts ItemType: 8
+                                    "SELECT TOP (@numberOfEvents ) " +
+                                    "LogCommentEvents.SourceEventLogId AS EventLogId " + //we need to point to the top level post
+                                    ",Eventlogs.EventTypeId " +
+                                    ",EventTypes.EventTypeName   " +
+                                    ",HelpfulMarkGivenEvents.EventDate " +
+                                    ",UserProfiles.ID As UserId " +
+                                    ",UserProfiles.FirstName " +
+                                    "FROM (((dbo.HelpfulMarkGivenEvents " +
+                                    "INNER JOIN dbo.LogCommentEvents " +
+	                                "ON (LogCommentEvents.Id  = HelpfulMarkGivenEvents.LogCommentEventId )) " +
+                                    "INNER JOIN dbo.EventLogs " +
+	                                "ON (EventLogs.Id  = HelpfulMarkGivenEvents.EventLogId )) " +
+                                    "INNER JOIN dbo.UserProfiles " +
+	                                "ON (UserProfiles.ID  = EventLogs.SenderId )) " +
+                                    "INNER JOIN EventTypes " +
+                                    "ON EventLogs.EventTypeId = EventTypes.EventTypeId " +
+                                    "ORDER BY HelpfulMarkGivenEvents.EventDate DESC";
+
                     List<OSBLECommunityRecentActivtyViewModel> vms = new List<OSBLECommunityRecentActivtyViewModel>();
 
-                    foreach (var userEvent in results)
+                    using (var queries = sqlConnection.QueryMultiple(query, new { numberOfEvents = numberOfEvents }))
                     {
-                        OSBLECommunityRecentActivtyViewModel vm = new OSBLECommunityRecentActivtyViewModel();
-                        
-                        vm.User.Add(userEvent.FirstName, userEvent.UserId);
-                        vm.Event.Add(userEvent.EventTypeName, userEvent.EventLogId);
-                        vm.EventDate = userEvent.EventDate;
+                        var resultsTopLevelPosts = queries.Read().ToList();
+                        var resultsComments = queries.Read().ToList();
+                        var resultsMarkHelpful = queries.Read().ToList();
 
-                        vms.Add(vm);
-                    }                    
+                        foreach (var userEvent in resultsTopLevelPosts) //transfer query results to viewmodels
+                        {                            
+                            vms.Add(BuildVM(userEvent));
+                        }
 
+                        foreach (var userEvent in resultsComments) //transfer query results to viewmodels
+                        {                         
+                            vms.Add(BuildVM(userEvent));
+                        }
+
+                        foreach (var userEvent in resultsMarkHelpful) //transfer query results to viewmodels
+                        {                            
+                            vms.Add(BuildVM(userEvent));
+                        } 
+                    }
+                    
                     sqlConnection.Close();
 
-                    return vms;
+                    //order and only take the top numberOfEvents
+                    return vms.OrderByDescending(v => v.EventDate).Take(numberOfEvents).ToList();
                 }
             }
             catch (Exception e)
@@ -282,6 +332,14 @@ namespace OSBLE.Controllers
                 //todo handle error
                 return new List<OSBLECommunityRecentActivtyViewModel>();
             }
+        }        
+        private OSBLECommunityRecentActivtyViewModel BuildVM(dynamic queryResult)
+        {
+            OSBLECommunityRecentActivtyViewModel vm = new OSBLECommunityRecentActivtyViewModel();
+            vm.User.Add(queryResult.FirstName, queryResult.UserId);
+            vm.Event.Add(queryResult.EventTypeName, queryResult.EventLogId);
+            vm.EventDate = queryResult.EventDate;
+            return vm;
         }
     }   
 }
