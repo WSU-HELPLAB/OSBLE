@@ -38,10 +38,18 @@
             }
         </div>
         <div class="panel-footer">
-            @* TODO: create modal dialog that pops up with a box to post on the feed *@
-            <a href="@Url.Action("OSBIDE", "Feed", new { area ="" })" target="_blank">
-                Make a post on the activity feed.
-            </a>
+            <ul style="list-style-type:none">
+                <li>
+                    @* TODO: create modal dialog that pops up with a box to post on the feed *@
+                    <a href="@Url.Action("OSBIDE", "Feed", new { area ="" })" target="_blank">
+                        Make a post on the activity feed.
+                    </a>
+                </li>
+                <li>
+                    @* TODO: format date correctly. currently it's mis-matched from the recent activity time *@
+                    Last Activity: @Model.LastActivty.TimeOfDay
+                </li>
+            </ul>
         </div>
     </div>
 </div>
