@@ -1,6 +1,4 @@
-﻿@using OSBLE.Models.ViewModels
-
-@model OSBLE.Models.ViewModels.OSBLECommunityViewModel
+﻿@model OSBLE.Models.ViewModels.OSBLECommunityViewModel
 
 @{
     int userProfileId = Model.UserProfileId;
@@ -46,7 +44,7 @@
                 min: 75,
                 max: 150,
                 value: 100,
-                slide: function( event, ui ) {                    
+                slide: function( event, ui ) {
                     changeZoom(ui.value);
                 }
             });
@@ -73,14 +71,15 @@
         }
 
         function addNewGrid(type, category, chartDraw) {
-            ShowLoading();            
-            var gridPresent = false; //used to verify we're not trying to add a grid that's already on the grid-stack            
+            ShowLoading();
+            var gridPresent = false; //used to verify we're not trying to add a grid that's already on the grid-stack
             var id = ""; //will store new id from controller ajax call
 
             $.ajax({ //get the new grid html
                 url: '/OSBLECommunity/GetGridPartialView/',
                 data: { gridType: type },
                 dataType: "html",
+                async: false,
                 success: function (data) {
                     //split off the new grid id from the partial view
                     var temp = data.split('__');   //todo... find a better way to get this without delimiter. could end up splitting a view
@@ -90,11 +89,14 @@
 
                     if(category == "updates")
                     {
-                        $('.column-left').append(temp[1]);
+                        //$('.column-left').append(temp[1]);
+                        $('.col-md-3').append(temp[1]);
                     }
                     else
                     {
-                        $('.column').append(temp[1]);
+                        //$('.column').append(temp[1]);
+                        //$('#body-row').append(temp[1]);
+                        $('.col-md-6').append(temp[1]);
                     }
 
 
@@ -121,14 +123,14 @@
                         var chart = new google.visualization.ComboChart(document.getElementById('communitychart'));
 
                         //set chart options
-                        var options = {                            
+                        var options = {
                             legend: "none",
                             position: "top",
                             fontsize: "16px",
                             //chartArea: {  width: "50%" },
                             legend: {position: 'bottom'},
-                            width: 500,
-                            height: 500,
+                            width: 400,
+                            height: 400,
                             is3D: true,
                             //backgroundColor: '#e6e6e6',
                             series: {0: {type: 'bars', visibleInLegend: false,}},
@@ -159,8 +161,8 @@
                             fontsize: "16px",
                             chartArea: {  width: "60%", height: "80%" },
                             legend: {position: 'bottom'},
-                            width: 500,
-                            height: 500,
+                            width: 400,
+                            height: 400,
                             //backgroundColor: '#e6e6e6',
                         };
 
@@ -193,56 +195,84 @@
 
         //TODO: need to switch this to load from user configured / pushed items
         $(document).ready(function () {
+            addNewGrid("Online", "updates");
+            addNewGrid("RecentActivity", "updates");
             addNewGrid("Goals");
             addNewGrid("CommunityStanding");
             addNewGrid("PersonalStanding");
-            addNewGrid("Online", "updates");
-            addNewGrid("RecentActivity", "updates");
         });
+
+
 
     </script>
 
 </head>
 <body>
-    <nav id="community_banner">
-        <div class="container-fluid">
 
-            <ul class="nav navbar-nav navbar-right" style="padding: 5px; margin: 5px;">
-                <li>
-                    @* This is a message displayed while items are loading *@
-                    <div id="loadingMsg" class="message">
-                        @Helpers.LoadingSmall() Adding Widget...
+    <div class="container-fluid">
+        <div class="row">
+           
+            <div class="col-md-12">
+
+                <nav id="community-banner" class="navbar  navbar-static-top">
+                    <div class="navbar-header  navbar-right">
+                        <ul class="nav navbar-nav" style="padding: 5px; margin: 5px;">
+                            <li>
+                                @* This is a message displayed while items are loading *@
+                                <div id="loadingMsg" class="message">
+                                    @Helpers.LoadingSmall() Adding Widget...
+                                </div>
+                            </li>
+                            <li>
+                                <span id="zoom_pct">100%</span>
+                            </li>
+                            <li>
+                                <div id="slider" style="width: 200px; padding: 5px; margin: 5px; margin-right: 20px;"></div>
+                            </li>
+                            <li><a href="#" title="Zoom In" onclick="increaseZoom(0.05)">Zoom +</a></li>
+                            <li><a href="#" title="Zoom Out" onclick="increaseZoom(-0.05)">Zoom -</a></li>
+                        </ul>
                     </div>
-                </li>
-                <li>
-                    <span id="zoom_pct">100%</span>
-                </li>
-                <li>
-                    <div id="slider" style="width: 200px; padding: 5px; margin: 5px; margin-right: 20px;"></div>
-                </li>
-                <li class="dropdown">
-                    <span class="glyphicon glyphicon-cog dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></span>
-                    <ul class="dropdown-menu">
-                        <li><a href="#" title="Zoom In" onclick="increaseZoom(0.05)">Zoom +</a></li>
-                        <li><a href="#" title="Zoom Out" onclick="increaseZoom(-0.05)">Zoom -</a></li>
-                    </ul>
-                </li>
-            </ul>
-
-        </div><!-- /.container-fluid -->
-    </nav>
-
-    
-    <div class="container">
-        <!-- column holds items -->
-        <div class="column-left">
-            <div id="updates">UPDATES</div>
+                </nav>
+            </div>
         </div>
-        <div class="column combined">
-            <div class="placeholder ui-state-disabled" style="background-color: gray; text-align: center;">COLUMN 1</div>
-        </div>
-        <div class="column-right combined">
-            <div class="placeholder ui-state-disabled" style="background-color: gray; text-align: center;">COLUMN 2</div>
+        <div class="row" id="body-row">
+            <div class="col-md-3 col-sm-4">
+
+            </div>
+
+            <div class="col-md-6 col-sm-8">
+            </div>
+
+            <div class="modal fade" id="modal-container-111272" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                ×
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">
+                                DIALOG ? For boxes
+                            </h4>
+                        </div>
+                        <div class="modal-body">
+                            [RELATED INFO]
+                        </div>
+                        <div class="modal-footer">
+
+                            <button type="button" class="btn btn-default" data-dismiss="modal">
+                                Close
+                            </button>
+                            @*<button type="button" class="btn btn-primary">
+                                    Save changes
+                                </button>*@
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
         </div>
     </div>
 </body>

@@ -1,63 +1,94 @@
 ﻿@* template for partials, need to pass models and create unique class name for each type of partial *@
-<div id="Goals" class="c-table portlet">
 
-    <table class="portlet-content">
-        <tr>
-            <th class="c-header-title portlet-header" colspan="3">Goals</th>
-            <th class="c-info">
-                <img class="c-help"
-                     src="../../Content/images/tooltip/109_AllAnnotations_Help_19x19_72.png"
-                     alt="(?)"  />
-            </th>
-        </tr>
-        <tr>
-            <td class="left-cell">
-                Getting started!
-                <br />(Time)
-            </td>
-            <td colspan="2" class="mid-cell">
+<style type="text/css">
+    .goals-panel-body-left, .goals-panel-body-center, .goals-panel-body-right {
+        display: inline-block;
+    }
+
+    .goals-panel-body-left {
+        width: 20%;
+        border-right: inset;
+    }
+
+    .goals-panel-body-center {
+        width: 50%;
+        border-right: inset;
+    }
+
+    .goals-panel-body-right {
+        width: 25%;
+    }
+</style>
+
+<div class="c-table portlet" id="Goals">
+    <div class="list-group">
+        <span href="#" class="list-group-item active">
+            Goals<span class="badge">
+                <a id="modal-111272" href="#modal-container-111272" role="button" data-toggle="modal">
+                    <img class="c-help"
+                         src="../../Content/images/tooltip/109_AllAnnotations_Help_19x19_72.png"
+                         alt="(?)" />
+                </a>
+            </span>
+        </span>
+        <div class="list-group-item">
+            <div class="goals-panel-body-left">
+                Getting started! (Time)
+            </div>
+            <div class="goals-panel-body-center">
                 Create [Programming Assignment #2] project solution on the day it’s assigned [1/19/2016]
-            </td>
-            <td class="right-cell">
+            </div>
+            <div class="goals-panel-body-right">
                 <div class="right-cell-goal">
                     [2] days past
                 </div>
                 <div class="right-cell-attn">
                     @Helpers.Alert()
                 </div>
-            </td>
-        </tr>
-        <tr>
-            <td class="left-cell">
-                Keep trying!
-                <br />(Time)
-            </td>
-            <td colspan="2" class="mid-cell">Spend 3 hours coding in-IDE working on [Programming Assignment #1]</td>
-            <td class="right-cell-ok">OK</td>
-        </tr>
-        <tr>
-            <td class="left-cell">
-                Code Debugger <br />(Programming)
-            </td>
-            <td colspan="2" class="mid-cell">Code execution at least [80%] of runs in debug mode</td>
-            <td class="right-cell-ok">OK</td>
-        </tr>
-        <tr>
-            <td class="left-cell">
+            </div>
+        </div>
+        <div class="list-group-item">
+            <div class="goals-panel-body-left">
+                Keep trying!(Time)
+            </div>
+            <div class="goals-panel-body-center">
+                Spend 3 hours coding in-IDE working on [Programming Assignment #1]
+            </div>
+            <div class="goals-panel-body-right">
+                <div class="right-cell-ok">
+                    OK
+                </div>
+            </div>
+        </div>
+        <div class="list-group-item">
+            <div class="goals-panel-body-left">
+                Code Debugger (Programming)
+            </div>
+            <div class="goals-panel-body-center">
+                Code execution at least [80%] of runs in debug mode
+            </div>
+            <div class="goals-panel-body-right">
+                <div class="right-cell-ok">
+                    OK
+                </div>
+            </div>
+        </div>
+        <div class="list-group-item">
+            <div class="goals-panel-body-left">
                 Participate! <br />(Social)
-            </td>
-            <td colspan="2" class="mid-cell">At least [2] posts per week made</td>
-            <td>
+            </div>
+            <div class="goals-panel-body-center">
+                At least [2] posts per week made
+            </div>
+            <div class="goals-panel-body-right">
                 <div class="right-cell-goal">
                     [1] posts
                 </div>
                 <div class="right-cell-attn">
                     @Helpers.Alert()
                 </div>
-            </td>
-        </tr>
-        <tr>
-            <td class="c-info rate" colspan="4">Was this useful? <a href="#">[Yes]</a> <a href="#">[No]</a></td>
-        </tr>
-    </table>
+            </div>
+        </div>
+        <span class="list-group-item active"><span class="badge">Was this Useful? <a href="#">[Yes]</a> <a href="#">[No]</a></span>&nbsp;</span>
+    </div>
 </div>
