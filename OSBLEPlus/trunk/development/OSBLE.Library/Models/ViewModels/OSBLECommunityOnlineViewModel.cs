@@ -9,10 +9,12 @@ namespace OSBLE.Models.ViewModels
     public class OSBLECommunityOnlineViewModel
     {
         public Dictionary <string, int> OnlineUser { get; set; }
+        public DateTime LastActivty { get; set; }
         
         public OSBLECommunityOnlineViewModel()
         {
             OnlineUser = new Dictionary<string, int>();
+            LastActivty = new DateTime();
         }
     }
 }
