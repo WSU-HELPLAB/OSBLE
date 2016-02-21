@@ -12,6 +12,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
     <title>OSBLE+ Community</title>
 
     <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-2.0.1.min.js")"></script>
@@ -26,19 +27,7 @@
     <script>
         //load google chart api
         google.load("visualization", "1.0", { packages: ["corechart"] });
-
-        $(function() { //make the two columns sortable
-            $( ".column, .column-right" ).sortable({
-                connectWith: ".combined",
-                handle: ".portlet-header",
-                cancel: ".portlet-toggle",
-                placeholder: "portlet-placeholder",
-                items: "div:not(.ui-state-disabled)",
-                cursor: "move",
-                cursorAt: { top: -5, left: -5 },
-            });
-        });
-
+        
         $(function() { //initialize the zoom slider
             $( "#slider" ).slider({
                 min: 75,
@@ -201,9 +190,6 @@
             addNewGrid("CommunityStanding");
             addNewGrid("PersonalStanding");
         });
-
-
-
     </script>
 
 </head>

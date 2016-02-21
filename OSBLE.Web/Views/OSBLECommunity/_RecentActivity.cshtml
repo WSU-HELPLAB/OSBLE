@@ -1,40 +1,5 @@
-﻿@* template for partials, need to pass models and create unique class name for each type of partial *@
-
+﻿@using System.Globalization
 @model List<OSBLE.Models.ViewModels.OSBLECommunityRecentActivtyViewModel>
-
-<style type="text/css">
-
-    .recent-activity {
-        padding: 10px;
-        border-bottom: inset;
-    }
-
-    .activity-header {
-        padding-top: 0;
-        padding-bottom: 0;
-        font-style: italic;
-        font-weight: bold;
-    }
-
-    .recent-activity-header {
-        text-align: center;
-    }
-
-    .activity-panel-body-left, .activity-panel-body-center, .activity-panel-body-right {
-        display: inline-block;
-        padding: 5px;
-    }
-
-    .activity-panel-body-left, .activity-panel-body-center {
-        width: 35%;
-        border-bottom: inset;
-    }
-
-    .activity-panel-body-right {
-        width: 20%;
-        border-bottom: inset;
-    }
-</style>
 
 <div id="RecentActivity">
     <div class="panel panel-primary">
@@ -59,7 +24,8 @@
         {
             <div class="panel-body">
                 <div class="activity-panel-body-left">
-                    @userEvent.EventDate.ToString()
+                    @* TODO: need to format this to convert to course time, currently still UTC *@
+                    @userEvent.EventDate.ToString(CultureInfo.InvariantCulture)
                 </div>
                 <div class="activity-panel-body-center">
                     @{ string firstName = userEvent.User.Keys.First();}
@@ -99,7 +65,7 @@
         }
 
         <div class="panel-footer">
-            @* Make the # populate based on settings *@
+            @* TODO: Make the # populate based on settings *@
             Latest 20 activites
         </div>
     </div>
