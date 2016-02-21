@@ -2,100 +2,106 @@
 
 @model List<OSBLE.Models.ViewModels.OSBLECommunityRecentActivtyViewModel>
 
-@using OSBLE.Models
-
 <style type="text/css">
+
     .recent-activity {
-        width: 100%;
+        padding: 10px;
+        border-bottom: inset;
     }
 
-        .recent-activity td {
-            padding: 10px;
-            border-bottom: inset;
-        }
-
-    .activity-header td {
-        padding-left: 5px;
-        padding-right: 5px;
-        padding-top: 1px;
-        padding-bottom: 1px;
+    .activity-header {
+        padding-top: 0;
+        padding-bottom: 0;
         font-style: italic;
         font-weight: bold;
-    }
-
-    #RecentActivity {
-        border: outset;
-        border-width: 10px;
     }
 
     .recent-activity-header {
         text-align: center;
     }
+
+    .activity-panel-body-left, .activity-panel-body-center, .activity-panel-body-right {
+        display: inline-block;
+        padding: 5px;
+    }
+
+    .activity-panel-body-left, .activity-panel-body-center {
+        width: 35%;
+        border-bottom: inset;
+    }
+
+    .activity-panel-body-right {
+        width: 20%;
+        border-bottom: inset;
+    }
 </style>
 
-<div id="RecentActivity" style="margin-top: 5px;">
-    <table class="recent-activity">
-        <thead>
-            <tr>
-                <th class="c-header-title portlet-header recent-activity-header" colspan="3">Recent Activty</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr class="activity-header">
-                <td>
-                    Time
-                </td>
-                <td>
-                    Activty
-                </td>
-                <td>
-                    Details
-                </td>
-            </tr>
-            @foreach (var userEvent in Model)
-            {
-                <tr>
-                    <td>
-                        @userEvent.EventDate.ToString()
-                    </td>
+<div id="RecentActivity">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                Recent Activty
+            </h3>
+        </div>
+        <div class="panel-body activity-header">
+            <div class="activity-panel-body-left">
+                Time
+            </div>
+            <div class="activity-panel-body-center">
+                Activity
+            </div>
+            <div class="activity-panel-body-right">
+                Details
+            </div>
+        </div>
 
-                    <td>
-                        @{ string firstName = userEvent.User.Keys.First();}
-                        <a href="@Url.Action("Index", "Profile", new { id = userEvent.User.Values.First(), area ="" })" target="_blank">
-                            @firstName
-                        </a>
-                        @*TODO: redo the text*@
-                        @switch (userEvent.Event.Keys.First())
-                        {
-                            case "AskForHelpEvent":
-                                @: asked for help.
-                            break;
-                            case "ExceptionEvent":
-                            @: had a runtime exception.
-                            break;
-                            case "FeedPostEvent":
-                            @: made a post.
-                            break;
-                            case "HelpfulMarkGivenEvent":
-                            @: marked a comment helpful.
-                            break;
-                            case "LogCommentEvent":
-                            @: replied to a post.
-                            break;
-                            case "SubmitEvent":
-                            @: submitted an assignment.
-                            break;
-                            default:
-                            @: [unknown activity]
-                            break;
-                        }
-                    </td>
-                    <td>
-                        <a title="Details" href="@Url.Action("Details", "Feed", new { id = userEvent.Event.Values.First() })" target="_blank">@Helpers.Info()</a>
-                        @*TODO: add link to details page*@
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+        @foreach (var userEvent in Model)
+        {
+            <div class="panel-body">
+                <div class="activity-panel-body-left">
+                    @userEvent.EventDate.ToString()
+                </div>
+                <div class="activity-panel-body-center">
+                    @{ string firstName = userEvent.User.Keys.First();}
+                    <a href="@Url.Action("Index", "Profile", new { id = userEvent.User.Values.First(), area ="" })" target="_blank">
+                        @firstName
+                    </a>
+                    @*TODO: redo the text*@
+                    @switch (userEvent.Event.Keys.First())
+                    {
+                        case "AskForHelpEvent":
+                            @: asked for help.
+                                break;
+                        case "ExceptionEvent":
+                        @: had a runtime exception.
+                                break;
+                        case "FeedPostEvent":
+                        @: made a post.
+                                break;
+                        case "HelpfulMarkGivenEvent":
+                        @: marked a comment helpful.
+                                break;
+                        case "LogCommentEvent":
+                        @: replied to a post.
+                                break;
+                        case "SubmitEvent":
+                        @: submitted an assignment.
+                                break;
+                        default:
+                        @: [unknown activity]
+                                break;
+                    }
+                </div>
+                <div class="activity-panel-body-right">
+                    <a title="Details" href="@Url.Action("Details", "Feed", new { id = userEvent.Event.Values.First() })" target="_blank">@Helpers.Info()</a>
+                </div>
+            </div>
+        }
+
+        <div class="panel-footer">
+            @* Make the # populate based on settings *@
+            Latest 20 activites
+        </div>
+    </div>
 </div>
+

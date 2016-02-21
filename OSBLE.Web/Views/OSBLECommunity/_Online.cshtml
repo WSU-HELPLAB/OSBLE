@@ -2,22 +2,7 @@
 
 @model OSBLE.Models.ViewModels.OSBLECommunityOnlineViewModel
 
-@using OSBLE.Models
-
 <style type="text/css">
-    .online {
-        width: 100%;
-    }
-
-        .online td {
-            padding: 10px;
-            border-bottom: inset;
-        }
-
-    #Online {
-        border: outset;
-        border-width: 10px;
-    }
 
     .online-header {
         text-align: center;
@@ -30,50 +15,57 @@
     .profile_mail {
         text-align: left;
     }
+
+    .panel-body-left, .panel-body-center, .panel-body-right {
+        display: inline-block;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
 </style>
 
-<div id="Online" class="" style="margin-top: 5px;">
-    <table class="online">
-        <thead>
-            <tr>
-                <th class="c-header-title portlet-header online-header" colspan="3">Who's Online?</th>
-            </tr>
-        </thead>
-
-        @if (Model.OnlineUser.Count == 0)
-        {
-            <tbody>
-                <tr>
-                    <td colspan="3">
-                        No Users Online
-                    </td>
-                </tr>
-            </tbody>
-        }
-        else
-        {
-            foreach (KeyValuePair<string, int> entry in Model.OnlineUser)
+<div  id="Online">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                Who's Online?
+            </h3>
+        </div>
+        <div class="panel-body">
+            @if (Model.OnlineUser.Count == 0)
             {
-                <tbody>
-                    <tr>
-                        <td class="profile_image">
-                            <a href="@Url.Action("Index", "Profile", new { id = entry.Value, area ="" })" target="_blank">
-                                <img src="@Url.Action("Picture", "User", new { id = entry.Value, size = 30 })"
-                                     alt="Picture of @entry.Key"
-                                     class="profile_picture" />
-                            </a>
-                        </td>
-                        <td>
-                            <a href="@Url.Action("Index", "Profile", new { id = entry.Value, area ="" })" target="_blank">
-                                @entry.Key @*UserFullName*@
-                            </a>
-                        </td>
-                        <td class="profile_mail">
-                            <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { id = entry.Value })" target="_blank">@Helpers.MailButton()</a>
-                        </td>
-                    </tr>
-                </tbody>
+                <div class="panel-body-center">
+                    No Users Online
+                </div>
             }
-        }
-    </table>
+            else
+            {
+                foreach (KeyValuePair<string, int> entry in Model.OnlineUser)
+                {
+                    <div class="panel-body-left">
+                        <a href="@Url.Action("Index", "Profile", new { id = entry.Value, area ="" })" target="_blank">
+                            <img src="@Url.Action("Picture", "User", new { id = entry.Value, size = 30 })"
+                                 alt="Picture of @entry.Key"
+                                 class="profile_picture" />
+                        </a>
+                    </div>
+                    <div class="panel-body-center profile_image">
+                        <a href="@Url.Action("Index", "Profile", new { id = entry.Value, area ="" })" target="_blank">
+                            @entry.Key @*UserFullName*@
+                        </a>
+                    </div>
+                    <div class="panel-body-right profile_mail">
+                        <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { id = entry.Value })" target="_blank">@Helpers.MailButton()</a>
+                    </div>
+
+                }
+            }
+        </div>
+        <div class="panel-footer">
+            @* TODO: create modal dialog that pops up with a box to post on the feed *@
+            <a href="@Url.Action("OSBIDE", "Feed", new { area ="" })" target="_blank">
+                Make a post on the activity feed.
+            </a>
+        </div>
+    </div>
 </div>
+
