@@ -196,10 +196,11 @@
 <body>
 
     <div class="container-fluid">
+        
+@* HEADER/NAVBAR SECTION*@
         <div class="row">
            
             <div class="col-md-12">
-
                 <nav id="community-banner" class="navbar  navbar-static-top">
                     <div class="navbar-header  navbar-right">
                         <ul class="nav navbar-nav" style="padding: 5px; margin: 5px;">
@@ -213,7 +214,7 @@
                                 <span id="zoom_pct">100%</span>
                             </li>
                             <li>
-                                <div id="slider" style="width: 200px; padding: 5px; margin: 5px; margin-right: 20px;"></div>
+                                <div id="slider"></div>
                             </li>
                             <li><a href="#" title="Zoom In" onclick="increaseZoom(0.05)">Zoom +</a></li>
                             <li><a href="#" title="Zoom Out" onclick="increaseZoom(-0.05)">Zoom -</a></li>
@@ -222,44 +223,47 @@
                 </nav>
             </div>
         </div>
+
+@* BODY SECTION *@
         <div class="row" id="body-row">
-            <div class="col-md-3 col-sm-4">
-
+            <div class="col-md-3 col-sm-4  col-lg-3">
             </div>
-
-            <div class="col-md-6 col-sm-8">
-            </div>
-
-            <div class="modal fade" id="modal-container-111272" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                                ×
-                            </button>
-                            <h4 class="modal-title" id="myModalLabel">
-                                DIALOG ? For boxes
-                            </h4>
-                        </div>
-                        <div class="modal-body">
-                            [RELATED INFO]
-                        </div>
-                        <div class="modal-footer">
-
-                            <button type="button" class="btn btn-default" data-dismiss="modal">
-                                Close
-                            </button>
-                            @*<button type="button" class="btn btn-primary">
-                                    Save changes
-                                </button>*@
-                        </div>
-                    </div>
-
-                </div>
-
+            <div class="col-md-6 col-sm-8  col-lg-9">
             </div>
         </div>
+
+
+    </div> @*end container-fluid div*@ 
+    
+@* MODAL DIALOG SECTION *@
+    <div class="modal fade" id="modal-container-111272" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        ×
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        DIALOG ? For boxes
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    [RELATED INFO]
+                </div>
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        Close
+                    </button>
+                    @*<button type="button" class="btn btn-primary">
+                            Save changes
+                        </button>*@
+                </div>
+            </div>
+
+        </div>
+
     </div>
 </body>
 </html>
