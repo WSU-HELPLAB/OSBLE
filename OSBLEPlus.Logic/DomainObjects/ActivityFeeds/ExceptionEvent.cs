@@ -59,5 +59,28 @@ SELECT {0}", StringConstants.SqlHelperLogIdVar)
 
             return cmd;
         }
+
+        /// <summary>
+        /// Attempt to make exception event view code work. Code was
+        /// copied from OSBIDE and requires this function.
+        /// </summary>
+        /// <returns></returns>
+        public List<CodeDocument> GetCodeDocuments()
+        {
+            List<CodeDocument> docs = new List<CodeDocument>();
+            docs.Add(new CodeDocument()
+            {
+                Id = EventId,
+                Content = LineContent,
+                FileName = DocumentName
+            });
+            return docs;
+        }
+
+        public BuildEvent GetBuildEvent()
+        {
+            BuildEvent bEvent = new BuildEvent();
+            return bEvent;
+        }
     }
 }
