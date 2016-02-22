@@ -101,6 +101,15 @@ div.col-md-12 {
     display: inline-block;
     padding-left: 10px;
     padding-right: 10px;
+    text-align: center;
+}
+
+.panel-body-left, .panel-body-right {
+    width: 20%;    
+}
+
+.panel-body-center {
+    width: 50%;
 }
 
 .recent-activity {

@@ -7,17 +7,18 @@
                 Who's Online?
             </h3>
         </div>
-        <div class="panel-body">
-            @if (Model.OnlineUser.Count == 0)
+
+        @if (Model.OnlineUser.Count == 0)
+        {
+            <div class="panel-body-center">
+                No Users Online
+            </div>
+        }
+        else
+        {
+            foreach (KeyValuePair<string, int> entry in Model.OnlineUser)
             {
-                <div class="panel-body-center">
-                    No Users Online
-                </div>
-            }
-            else
-            {
-                foreach (KeyValuePair<string, int> entry in Model.OnlineUser)
-                {
+                <div class="panel-body">
                     <div class="panel-body-left">
                         <a href="@Url.Action("Index", "Profile", new { id = entry.Value, area ="" })" target="_blank">
                             <img src="@Url.Action("Picture", "User", new { id = entry.Value, size = 30 })"
@@ -33,10 +34,10 @@
                     <div class="panel-body-right profile_mail">
                         <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { id = entry.Value })" target="_blank">@Helpers.MailButton()</a>
                     </div>
-
-                }
+                </div>
             }
-        </div>
+        }
+
         <div class="panel-footer">
             <ul style="list-style-type:none">
                 <li>
