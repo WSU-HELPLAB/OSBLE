@@ -6,7 +6,7 @@
 @Styles.Render("~/Areas/Analytics/Content/Calendar.css")
 
 
-<div id="calendar-options" class="col-sm-4 options_view">
+<div id="calendar-options" class="col-sm-3 options_view">
     @Helpers.ToggleButtonHeader("Options", "#options_content", "cb-options")
     <div id="options_content">
         @Html.DropDownListFor(m => m.CourseId, new SelectList(Courses.GetCourses(), "Value", "Name", ViewBag.ActiveCourseUser.AbstractCourseID), new { id = "course-id-select" })
@@ -55,8 +55,7 @@
     <div class="clearfix"></div>
 </div>
     
-
-<div id="calendar-view" class="col-sm-8 analytic-view">
+<div id="calendar-view" class="col-sm-6 analytic-view">
     <div id="calendar">
         <div class="calendar-header">
             <button id="back" name="back" class="btn btn-primary"><span class="glyphicon glyphicon-chevron-left"></span></button>
@@ -78,6 +77,10 @@
     <div class="clearfix"></div>
 </div>
 
+<div id="activities" class="col-sm-2" style="margin-top: 100px;">
+    <ul id="activities-list">        
+    </ul>
+</div>
 
 <script type="text/javascript" src="@Url.Content("~/Areas/Analytics/Scripts/d3.min.js")"></script>
 <script type="text/javascript" src="@Url.Content("~/Areas/Analytics/Scripts/d3-tip.min.js")"></script>
