@@ -278,19 +278,30 @@
                     });
                 }
 
-                // events
-                g.append("svg:g").selectAll("eventText").data(inputData.activities).enter().append("text")
-                    .attr("x", function(d, i) {
-                        return cellPositions[getPositionId(cellPositions, d.month, d.day)].pos[0];
-                    })
-                    .attr("y", function(d, i) {
-                        return cellPositions[getPositionId(cellPositions, d.month, d.day)].pos[1];
-                    })
-                    .attr("dx", padding) // right padding
-                    .attr("dy", cellheight / 2) // vertical alignment : middle
-                    .attr("transform", "translate(" + padding + "," + headingHeight + ")")
-                    .text(function(d) { return d.name; })
-                    .call(wrap, cellwidth, (rowCount - 3.5) * cellheight, padding);
+                // events     
+                //clear previous view events
+                $("#activities-list").empty();
+                //rebuild new events list
+                $(inputData.activities).each(function () {                    
+                    //need to account for 0 based month index
+                    var month = parseInt(this.month) + 1;
+                    var activity = "<li>" + month + "/" + this.day + " \t" + this.name + "</li>";
+                    $("#activities-list").append(activity);
+                });
+                //TODO: handle this better --- currently drawing long named events or multiple events stacks them in the same space...
+                //this does not work for text on the calendar
+                //g.append("svg:g").selectAll("eventText").data(inputData.activities).enter().append("text")
+                //    .attr("x", function(d, i) {
+                //        return cellPositions[getPositionId(cellPositions, d.month, d.day)].pos[0];
+                //    })
+                //    .attr("y", function(d, i) {
+                //        return cellPositions[getPositionId(cellPositions, d.month, d.day)].pos[1];
+                //    })
+                //    .attr("dx", padding) // right padding
+                //    .attr("dy", cellheight / 2) // vertical alignment : middle
+                //    .attr("transform", "translate(" + padding + "," + headingHeight + ")")
+                //    .text(function(d) { return d.name; })
+                //    .call(wrap, cellwidth, (rowCount - 3.5) * cellheight, padding);
             });
         }
 
