@@ -265,7 +265,8 @@ function drawHourlyChart(data) {
 
     var margin = { top: 20, right: 20, bottom: 30, left: 50 },
         width = 600 - margin.left - margin.right,
-        height = 300 - margin.top - margin.bottom;
+        height = 300 - margin.top - margin.bottom,
+		padding = -100;
 
     var x = d3.scale.linear().domain([0, 24]).range([0, width]);
     var y = d3.scale.linear().domain([0, data.max]).range([height, 0]);
@@ -305,6 +306,16 @@ function drawHourlyChart(data) {
             .attr("d", line(data.measures[m].values))
             .style("stroke", data.measures[m].color);
     }
+
+    svg.append("text")
+            .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+            .attr("transform", "translate(" + (padding / 2) + "," + (height / 2) + ")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+            .text("Count");
+
+    svg.append("text")
+            .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+            .attr("transform", "translate(" + (width / 2) + "," + (height - (padding / 2)) + ")")  // centre below axis
+            .text("24hr Period");
 }
 
 function updateDisplayArea(hourly) {
