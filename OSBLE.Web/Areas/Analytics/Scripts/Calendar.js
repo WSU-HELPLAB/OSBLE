@@ -91,7 +91,7 @@ function cbUserClicked() {
     }
 }
 
-function updateCalendar(monthOffset) {
+function updateCalendar(monthOffset, selectedMonth, selectedYear) {
 
     d3.select("svg").remove();
     updateDisplayArea(false);
@@ -100,17 +100,24 @@ function updateCalendar(monthOffset) {
     var measures = getSelectedMeasures();
     var dataservice = $("#main").attr("data-service-path");
 
-    currentMonth += monthOffset;
-    if (currentMonth > 12)
-    {
-        currentMonth = 1;
-        currentYear++;
+    //user used the datepicker to choose a new month/year
+    if (selectedMonth != undefined && selectedYear != undefined)
+    {        
+        currentMonth = parseInt(selectedMonth) + 1; //+1 to account for javascript 0 based month index
+        currentYear = selectedYear;
     }
-    if (currentMonth < 1)
+    else //user used the forward/backward button to change months
     {
-        currentMonth = 12;
-        currentYear--;
-    }
+        currentMonth += monthOffset;
+        if (currentMonth > 12) {
+            currentMonth = 1;
+            currentYear++;
+        }
+        if (currentMonth < 1) {
+            currentMonth = 12;
+            currentYear--;
+        }
+    }    
 
     var selectedUsers = "";
     $("input[name='userId']").each(function (index, item) {
@@ -346,3 +353,4 @@ function calendarLabel(year, month) {
         return monthNames[month] + " " + year + " - " + monthNames[monthTo] + " " + (year + 1);
     }
 }
+

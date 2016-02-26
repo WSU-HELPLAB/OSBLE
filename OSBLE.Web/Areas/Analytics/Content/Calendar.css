@@ -133,3 +133,17 @@ div[data-wzstep="DataVisualization"] div[data-type="spinner"] img {
 #activities-list {    
     padding: 5px;
 }
+
+/*styles for calendar month/year datepicekr*/
+
+.ui-datepicker .ui-datepicker-title select {
+        color: black;
+    }
+    .ui-datepicker-trigger {
+        margin-right: 10px;
+        margin-left: -10px;
+        margin-top: -10px;
+    }
+    .ui-datepicker-calendar {
+        display: none;
+    }
