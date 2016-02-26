@@ -5,7 +5,6 @@
 @model CalendarAttributes
 @Styles.Render("~/Areas/Analytics/Content/Calendar.css")
 
-
 <div id="calendar-options" class="col-sm-3 options_view">
     @Helpers.ToggleButtonHeader("Options", "#options_content", "cb-options")
     <div id="options_content">
@@ -58,8 +57,9 @@
 <div id="calendar-view" class="col-sm-6 analytic-view">
     <div id="calendar">
         <div class="calendar-header">
-            <button id="back" name="back" class="btn btn-primary"><span class="glyphicon glyphicon-chevron-left"></span></button>
-            <h4 id="currentMonth">May 2013</h4>
+            <button id="back" name="back" class="btn btn-primary"><span class="glyphicon glyphicon-chevron-left"></span></button>            
+            <h4 id="currentMonth" class="datepicker">May 2013 </h4>
+            <input type="text" id="datepicker" style="visibility: hidden; width: 0;">
             <button id="forward" name="forward" class="btn btn-primary"><span class="glyphicon glyphicon-chevron-right"></span></button>
         </div>
 
@@ -92,6 +92,20 @@
     $(document).ready(function () {
         $('#course-id-select').change();
         $('#user-show-all').prop('checked', true);
+    });
+
+    $(function () {
+        $("#datepicker").datepicker({
+            showOn: "button",
+            buttonImage: "@Url.Content("~/Content/images/calendar_icon.png")",
+            buttonImageOnly: true,
+            changeMonth: true,
+            changeYear: true,
+            showButtonPanel: true,            
+            onClose: function (data, date) {                
+                updateCalendar(0, date.selectedMonth, date.selectedYear);
+            }
+        });
     });
 </script>
 
