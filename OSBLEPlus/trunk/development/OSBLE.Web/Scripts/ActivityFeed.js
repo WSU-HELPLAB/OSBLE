@@ -179,11 +179,7 @@ function FeedViewModel(userName, userId, current) {
         if (courseID == GetSelectedCourseID()) {
             SetPermissions(postData);
             self.items.unshift(new FeedItem(postData)); // unshift puts object at beginning of array
-            HighlightNewPost(postData.EventId);
-
-            if (postData.SenderId != self.userId) {
-                ShowNewActivityBadge();
-            }
+            HighlightNewPost(postData.EventId, postData.SenderId == self.userId);
         }
     }
 
@@ -481,6 +477,16 @@ function GetCheckedEvents()
     return stringWithoutComma;
 }
 
+function IsEventTypeChecked(eventType)
+{
+    $('.event_checkbox').each(function (index, value) {
+        if (value.checked == true && value.data('type') == eventType) {
+            return true;
+        }
+    });
+    return false;
+}
+
 function onDeleteSuccess(item)
 {
     $('#feed-item-' + item.eventId).hide('blind', {}, 'slow', function () { $(this).remove(); });
@@ -544,10 +550,15 @@ function expandComments(item) {
     }
 }
 
-function HighlightNewPost(postID)
+function HighlightNewPost(postID, isCurrentUserPost)
 {
     // Show a nifty animation for the new post
     $('#feed-item-' + postID).hide().show('easeInBounce');
+
+    if (!isCurrentUserPost) {
+        ShowNewActivityBadge();
+        ShowNewPostBadge(postID);
+    }
 }
 
 function MakePostSucceeded(newPost)
@@ -745,6 +756,16 @@ function HideNewActivityBadge()
 {
     //$("#dashboard_middle").removeClass("new-activity");
     $(".new-activity-badge").hide();
+}
+
+function ShowNewPostBadge(postID)
+{
+    $('#feed-item-' + postID + ' .new-post-badge').show();
+}
+
+function HideNewPostBadge(postID)
+{
+    $('#feed-item-' + postID + ' .new-post-badge').hide();
 }
 
 /*

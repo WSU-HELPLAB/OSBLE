@@ -53,7 +53,10 @@
         $("#btn_files").click(function () { setContent("btn_files", "dashboard_right", ""); });
 
         // set the click event for the "new activity" notifications
-        $(".new-activity-badge").click(function () { $(".new-activity-badge").hide(); });
+        $(".new-activity-badge").click(function () {
+            $(".new-activity-badge").hide();
+            $(".new-post-badge").hide();
+        });
     });
 </script>
 
@@ -124,7 +127,7 @@
         <div class="col-sm-6 activeContent" id="dashboard_middle">
             <h3>
                 Activity Feed
-                <span class="badge new-activity-badge" style="display: none">New Activity</span>
+                <span class="badge new-activity-badge" style="display: none" data-toggle="tooltip" title="Click to dismiss">New Activity</span>
                 @*<a href="@Url.Action("DownloadDashboardPosts", "Course")" title="Download Activity Feed as csv">@Helpers.UnPublishButton()</a>*@
             </h3>
 
