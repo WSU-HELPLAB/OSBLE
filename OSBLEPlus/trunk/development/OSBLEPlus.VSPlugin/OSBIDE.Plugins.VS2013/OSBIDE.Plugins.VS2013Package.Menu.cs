@@ -146,7 +146,7 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
             }
             else
             {
-                MessageBox.Show(@"OSBIDE only supports search for errors");
+                MessageBox.Show(@"OSBLE+ only supports search for errors");
             }
         }
 
