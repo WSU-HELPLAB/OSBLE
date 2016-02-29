@@ -11,7 +11,6 @@ using OSBLEPlus.Logic.DomainObjects.Interface;
 using OSBLEPlus.Logic.Utility;
 using OSBLEPlus.Logic.Utility.Lookups;
 
-
 namespace OSBLEPlus.Logic.DataAccess.Activities
 {
     public class Feeds
@@ -54,7 +53,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                                             SenderIds = s,
                                             TopN = topN ?? 20
                                         }, commandType: CommandType.StoredProcedure);
-                
+
                 // multiResults reads in order of the tables declared in dbo.GetActivityEvents
                 // if you need to change these make sure that the table is read in the right order
 
