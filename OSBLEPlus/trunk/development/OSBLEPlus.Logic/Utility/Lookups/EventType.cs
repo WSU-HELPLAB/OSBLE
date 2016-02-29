@@ -4,7 +4,7 @@ namespace OSBLEPlus.Logic.Utility.Lookups
 {
     public enum EventType
     {
-        [Description("Ask For Help Event")]
+        [Description("Help Requests")] // Finalized
         AskForHelpEvent = 1,
         [Description("Build Event")]
         BuildEvent = 2,
@@ -12,19 +12,19 @@ namespace OSBLEPlus.Logic.Utility.Lookups
         CutCopyPasteEvent = 3,
         [Description("Debug Event")]
         DebugEvent = 4,
-        [Description("Editor Activity Event")]
+        [Description("Editor Activity Event")] 
         EditorActivityEvent = 5,
-        [Description("Exception Event")]
+        [Description("Runtime Errors")] // Finalized
         ExceptionEvent = 6,
-        [Description("Feed Post Event")]
+        [Description("Posts")] // Finalized
         FeedPostEvent = 7,
-        [Description("Helpful Mark Given Event")]
+        [Description("Helpful Responses")] // Finalized
         HelpfulMarkGivenEvent = 8,
         [Description("Log Comment Event")]
         LogCommentEvent = 9,
         [Description("Save Event")]
         SaveEvent = 10,
-        [Description("Submit Event")]
+        [Description("Assignment Submissions")] // Finalized
         SubmitEvent = 11,
         [Description("Null")]
         Null = 12
