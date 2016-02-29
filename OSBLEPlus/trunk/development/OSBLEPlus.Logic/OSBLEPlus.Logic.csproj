@@ -128,6 +128,7 @@
     <Compile Include="Utility\Logging\LogMessage.cs" />
     <Compile Include="Utility\Lookups\DebugAction.cs" />
     <Compile Include="Utility\Lookups\EventType.cs" />
+    <Compile Include="Utility\Lookups\GetEnumDisplayName.cs" />
     <Compile Include="Utility\Lookups\NameValuePair.cs" />
     <Compile Include="Utility\ObjectBinder.cs" />
     <Compile Include="Utility\StringConstants.cs" />

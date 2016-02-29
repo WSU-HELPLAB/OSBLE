@@ -360,9 +360,7 @@ Also runs content through nl2br to convert newlines to <br /> tags. *@
 
 @helper GetOptionNameOfEventType(EventType e)
 {
-    // in the future this will be more in depth
-    // and give prettier names
-    @e.ToString()
+    @GetEnumDisplayName.GetDisplayName(e)
 }
 
 @helper ToggleButtonHeader(string title, string target, string extraClasses, bool defaultShown = true)
