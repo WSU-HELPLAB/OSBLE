@@ -22,12 +22,14 @@
                 <img data-bind="attr: {src: '/user/' + senderId + '/Picture?size=52'}" class="profile_picture" title="profile image" alt="profile image" />
             </div>
 
-            @* New replies notification*@
+            @* New replies & post notifications *@
             @if (!isComment)
             { 
                 <div class="badge new-reply-badge" style="display:none">New Replies</div>
+                <div class="badge new-post-badge" style="display:none" data-bind="click: HideNewPostBadge(eventId)">New</div>
             }
-
+            
+            
             @* Button Controls *@
             <div class="dp_tools">
                 

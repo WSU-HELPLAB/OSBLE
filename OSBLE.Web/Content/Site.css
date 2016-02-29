@@ -183,9 +183,13 @@ h3 span.glyphicon {
     background-color: #65A9FF !important;
 }
 
-.new-reply-badge {
+.new-reply-badge, .new-post-badge {
     background-color: #074974 !important;
     float: right;
+}
+
+.new-post-badge, .new-activity-badge {
+    cursor: pointer;
 }
 
 .new-replies .new-reply-badge {
