@@ -826,6 +826,7 @@ namespace OSBLE.Controllers
         /// </summary>
         private void SendEmailsToListeners(string postContent, int sourcePostID, int courseID, DateTime timePosted, List<MailAddress> emails, bool isReply = false)
         {
+#if !DEBUG
             // first check to see if we need to email anyone about this post
             if (emails.Count > 0)
             {
@@ -854,10 +855,10 @@ namespace OSBLE.Controllers
                 body += string.Format("<a href=\"{0}\">View and reply to post in OSBLE</a>", Url.Action("Details", "Feed", new { id = sourcePostID }, Request.Url.Scheme));
 
                 //Send the message
-#if !DEBUG
+
                 Email.Send(subject, body, emails);
+        }
 #endif
-            }
         }
 
 
