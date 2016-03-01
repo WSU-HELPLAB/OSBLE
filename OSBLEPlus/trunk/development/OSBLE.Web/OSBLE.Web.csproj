@@ -281,6 +281,7 @@
     <Compile Include="Attributes\EmailAttribute.cs" />
     <Compile Include="Attributes\FileCacheAttribute.cs" />
     <Compile Include="Attributes\ForceHttp.cs" />
+    <Compile Include="Attributes\IsInstructor.cs" />
     <Compile Include="Attributes\IsAdmin.cs" />
     <Compile Include="Attributes\IsCommunity.cs" />
     <Compile Include="Attributes\IsNotAnonymized.cs" />

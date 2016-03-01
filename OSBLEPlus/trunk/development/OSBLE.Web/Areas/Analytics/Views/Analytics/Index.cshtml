@@ -11,7 +11,7 @@
 @* Similar to dashboard pills, except it displays even at higher screen widths *@
 <div id="analytics_menu">
     <div class="btn-group btn-group-justified" id="analytics_pills">
-        @Html.ActionLink("Summary", "Load", "Analytics", new { view = "Default" }, new { @class = currentView == "Default" ? "btn btn-primary" : "btn" })
+        @*@Html.ActionLink("Summary", "Load", "Analytics", new { view = "Default" }, new { @class = currentView == "Default" ? "btn btn-primary" : "btn" })*@
         @Html.ActionLink("Calendar", "Load", "Analytics", new { view = "Calendar" }, new { @class = currentView == "Calendar" ? "btn btn-primary" : "btn" })
         @Html.ActionLink("Timeline", "Load", "Analytics", new { view = "Timeline" }, new { @class = currentView == "Timeline" ? "btn btn-primary" : "btn" })
     </div>   

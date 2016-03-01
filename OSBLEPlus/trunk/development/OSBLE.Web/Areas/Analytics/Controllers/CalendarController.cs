@@ -7,7 +7,8 @@ using OSBLEPlus.Logic.DomainObjects.Analytics;
 namespace OSBLE.Areas.Analytics.Controllers
 {
     [OsbleAuthorize]
-    [IsAdmin]
+    //[IsAdmin]
+    [IsInstructor]
     public class CalendarController : OSBLEController
     {
         //

@@ -15,7 +15,8 @@ using OSBLEPlus.Logic.Utility;
 namespace OSBLE.Areas.Analytics.Controllers
 {
     [OsbleAuthorize]
-    [IsAdmin]
+    //[IsAdmin]
+    [IsInstructor]
     public class TimelineController : OSBLEController
     {
         //
