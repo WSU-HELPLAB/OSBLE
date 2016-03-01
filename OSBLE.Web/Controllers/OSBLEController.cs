@@ -283,8 +283,8 @@ namespace OSBLE.Controllers
                     false),
                 new MenuItem("Committee Settings", "Committee", "Edit", true, true, true, false, false, true, true, true),
                 new MenuItem("Administration", "Admin", "Index", false, false, false, true, false, false, false),
-                new MenuItem("Analytics", "Analytics", "Index", false, false, false, true, false, false, false, false,
-                    "Analytics")
+                //new MenuItem("Analytics", "Analytics", "Index", false, false, false, true, false, false, false, false, "Analytics")
+                new MenuItem("Analytics", "Analytics", "Index", true, false, false, false, false, false, false, false, "Analytics")
             };
 
             ViewBag.Menu = menu;

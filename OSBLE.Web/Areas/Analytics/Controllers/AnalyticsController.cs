@@ -11,12 +11,16 @@ using System.Linq;
 namespace OSBLE.Areas.Analytics.Controllers
 {
     [OsbleAuthorize]
-    [IsAdmin]
+    //[IsAdmin]
+    [IsInstructor]
+    
     public class AnalyticsController : OSBLEController
     {
         public ActionResult Index()
         {
-            return RedirectToAction("Load", new { view = "Default" });
+            //for demo load calendar default
+            //return RedirectToAction("Load", new { view = "Default" });
+            return RedirectToAction("Load", new { view = "Calendar" });
         }
 
         public ActionResult Load(string view)
