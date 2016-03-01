@@ -676,7 +676,6 @@
     <Content Include="Content\images\gradebookexamples\RequiredFormatingExample.PNG">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\images\help-circled.png" />
     <Content Include="Content\images\help.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -821,7 +820,6 @@
     <Content Include="Content\images\help_top_menu.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\images\information-circled.png" />
     <Content Include="Content\images\info_circle.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
