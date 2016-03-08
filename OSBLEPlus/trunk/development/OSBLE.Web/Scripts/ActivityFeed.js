@@ -220,6 +220,7 @@ function FeedViewModel(userName, userId, current) {
 
     self.MakePost = function () {
         var text = $("#feed-post-textbox").val();
+        var emailToClass = $("[name='send_email']").is(':checked');
 
         if (text == "")
             return;
@@ -232,7 +233,7 @@ function FeedViewModel(userName, userId, current) {
             type: "POST",
             url: "/Feed/PostFeedItem",
             dataType: "json",
-            data: { text: text },
+            data: { text: text, emailToClass: emailToClass },
             success: function (data) {
                 MakePostSucceeded(data);
             },

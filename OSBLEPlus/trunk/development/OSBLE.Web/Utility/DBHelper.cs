@@ -1110,14 +1110,25 @@ namespace OSBLE.Utility
             }
         }
 
-        public static List<MailAddress> GetActivityFeedForwardedEmails(int courseID, SqlConnection connection = null)
+        public static List<MailAddress> GetActivityFeedForwardedEmails(int courseID, SqlConnection connection = null, bool emailToClass = false)
         {
             if (connection == null)
             {
-                using (SqlConnection sqlc = GetNewConnection()) { return GetActivityFeedForwardedEmails(courseID, sqlc); }
+                using (SqlConnection sqlc = GetNewConnection()) { return GetActivityFeedForwardedEmails(courseID, sqlc, emailToClass); }
             }
 
-            IEnumerable<UserProfile> users = connection.Query<UserProfile>("SELECT DISTINCT u.* FROM UserProfiles u INNER JOIN CourseUsers c ON u.ID = c.UserProfileID WHERE c.AbstractCourseID = @id AND u.EmailAllActivityPosts = 1",
+            string query = "";
+
+            if(emailToClass) //email to all course users
+            {
+                query = "SELECT DISTINCT u.* FROM UserProfiles u INNER JOIN CourseUsers c ON u.ID = c.UserProfileID WHERE c.AbstractCourseID = @id ";
+            }
+            else //email to just those that have email forwarding enabled
+            {
+                query = "SELECT DISTINCT u.* FROM UserProfiles u INNER JOIN CourseUsers c ON u.ID = c.UserProfileID WHERE c.AbstractCourseID = @id AND u.EmailAllActivityPosts = 1";
+            }
+
+            IEnumerable<UserProfile> users = connection.Query<UserProfile>(query,
                 new { id = courseID });
 
             List<MailAddress> addresses = new List<MailAddress>(users.Select(u => new MailAddress(u.UserName, u.FullName)));

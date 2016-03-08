@@ -34,12 +34,12 @@
                     </div>
                     <input type="submit" data-bind="click: MakePost" id="btn_post_active" class="btn btn-default" name="post_active" value="Post to @Helpers.CourseTag(ViewBag.ActiveCourse.AbstractCourse)" />
 
-                    @*if (ViewBag.IsInstructor)
+                    @if (ViewBag.IsInstructor)
                     {
-                    <input type="submit" id="btn_post_all" class="btn btn-default" name="post_all" value="Post to All Courses I Teach" onclick="return confirm('Post this message to all your taught courses?');" />
+                    @*<input type="submit" id="btn_post_all" class="btn btn-default" name="post_all" value="Post to All Courses I Teach" onclick="return confirm('Post this message to all your taught courses?');" />*@
                     <label class="checkbox-inline"><input type="checkbox" value="True" name="send_email" /> Email to Class</label>
                     }
-
+                    @*
                     if (ViewBag.IsLeader)
                     {
                     <label class="checkbox-inline"><input type="checkbox" value="True" name="send_email" /> Email to Community</label>
