@@ -75,6 +75,10 @@ namespace OSBLE.Controllers
 
             try
             {
+                if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor)
+                    ViewBag.IsInstructor = true;
+                else
+                    ViewBag.IsInstructor = false;
                 //FeedViewModel vm = GetFeedViewModel(timestamp, errorType, errorTypeStr, keyword, hash);
                 return PartialView();
             }
@@ -109,10 +113,20 @@ namespace OSBLE.Controllers
             {
                 using (AccountController account = new AccountController())
                 {
+                    if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor)
+                        ViewBag.IsInstructor = true;
+                    else
+                        ViewBag.IsInstructor = false;
+
                     Authentication authenticate = new Authentication();
                     return account.TokenLogin(authenticate.GetAuthenticationKey(), StringConstants.WebClientRoot + "/feed/osbide/");
                 }
             }
+
+            if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor)
+                ViewBag.IsInstructor = true;
+            else
+                ViewBag.IsInstructor = false;
 
             ViewBag.ActiveCourse = DBHelper.GetCourseUserFromProfileAndCourse(ActiveCourseUser.UserProfileID, (int)courseID);
             return View("Index", "_OSBIDELayout", courseID);
@@ -758,7 +772,7 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         [HttpPost]
         [ValidateInput(false)]
-        public JsonResult PostFeedItem(string text)
+        public JsonResult PostFeedItem(string text, bool emailToClass = false)
         {
             // We purposefully are not catching exceptions that could be thrown
             // here, because we want this response to fail if there is an error
@@ -766,6 +780,8 @@ namespace OSBLE.Controllers
             {
                 throw new ArgumentException();
             }
+
+            
 
             int courseID = ActiveCourseUser.AbstractCourseID;
             FeedPostEvent log = new FeedPostEvent()
@@ -780,7 +796,7 @@ namespace OSBLE.Controllers
             var newPost = new AggregateFeedItem(Feeds.Get(logID));
 
             //get email addresses for users who want to be notified by email
-            var emailList = DBHelper.GetActivityFeedForwardedEmails(courseID);
+            var emailList = DBHelper.GetActivityFeedForwardedEmails(courseID, null, emailToClass);
             //remove email for current user if they do not want to get their own posts emailed.
             bool emailSelf = ActiveCourseUser.UserProfile.EmailSelfActivityPosts;
             if (!emailSelf)
