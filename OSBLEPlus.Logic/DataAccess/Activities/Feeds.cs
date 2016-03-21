@@ -26,6 +26,13 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                 var c = string.IsNullOrWhiteSpace(commentFilter) ? string.Empty :  string.Format("%{0}%", commentFilter);
                 var l = string.Join(",", logIds != null ? logIds.Where(i => i > 0).ToArray() : new int[0]);
                 string t;
+
+                // get possible posts with user names in them
+                List<string> possibleNames = new List<string>();
+                List<int> possibleLogIds = new List<int>();
+
+                List<FeedItem> nameFilterFeedItems = new List<FeedItem>();
+
                 try
                 {
                     var etypes = eventTypes as int[] ?? eventTypes.ToArray();
@@ -34,6 +41,46 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                 catch (Exception ex)
                 {
                     t = "";
+                }
+
+                // add all the possible names of users from the comment filter to a list of logIds
+                if (!string.IsNullOrEmpty(commentFilter))
+                {
+                    possibleNames = commentFilter.Split(' ').ToList();
+                    string sql = "SELECT u.ID " +
+                                 "FROM UserProfiles u " +
+                                 "WHERE u.FirstName LIKE @name OR u.LastName LIKE @name";
+
+                    foreach (string name in possibleNames)
+                    {
+                        string partialName = "%" + name + "%";
+                        int id = connection.Query<int>(sql, new {name = partialName}).SingleOrDefault();
+
+                        if (id > 0 && !possibleLogIds.Contains(id))
+                        {
+                            possibleLogIds.Add(id);
+                        }
+                    }
+
+                    // recursive call to Get
+                    if (possibleLogIds.Count > 0)
+                    {
+                        nameFilterFeedItems.AddRange(
+                            Get(
+                                dateReceivedMin,
+                                dateReceivedMax,
+                                minEventLogId,
+                                maxEventLogId,
+                                logIds,
+                                eventTypes,
+                                courseId,
+                                roleId,
+                                "",
+                                possibleLogIds,
+                                topN)
+                            );
+                    }
+
                 }
                 
                 var s = string.Join(",", senderIds != null ? senderIds.Where(i => i > 0).ToArray() : new int[0]);
@@ -92,20 +139,34 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                     }
                 }
 
+                var itemsToAdd = NormalizeDataObjects(
+                        eventLogs,
+                        users,
+                        askHelps,
+                        builds,
+                        exceptions,
+                        feedPosts,
+                        nonDeletedLogComments,
+                        helpMark,
+                        submits,
+                        cutcopypastes,
+                        debugs,
+                        editoractivites,
+                        saves
+                    );
 
-                return NormalizeDataObjects(eventLogs,
-                                            users,
-                                            askHelps,
-                                            builds,
-                                            exceptions,
-                                            feedPosts,
-                                            nonDeletedLogComments,
-                                            helpMark,
-                                            submits,
-                                            cutcopypastes,
-                                            debugs,
-                                            editoractivites,
-                                            saves);
+                // remove duplicate items
+                List<int> logIdsContained = nameFilterFeedItems.Select(x => x.Event.EventLogId).ToList();
+
+                foreach (var item in itemsToAdd)
+                {
+                    if (!logIdsContained.Contains(item.Event.EventLogId))
+                    {
+                        nameFilterFeedItems.Add(item);
+                    }
+                }   
+
+                return nameFilterFeedItems;
             }
         }
 
