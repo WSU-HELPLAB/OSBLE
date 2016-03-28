@@ -937,6 +937,18 @@ namespace OSBLE.Controllers
             return Json(new { Index = index });
         }
 
+        [HttpPost]
+        public JsonResult GetProfileName(int id)
+        {
+            string name = "";
+            UserProfile up = DBHelper.GetUserProfile(id);
+            if (up != null)
+            {
+                name = up.DisplayName(ActiveCourseUser).Replace(" ", "");
+            }
+            return Json(new { Name = name });
+        }
+
         [HttpGet]
         public ActionResult ShowHashtag(string hashtag)
         {
@@ -960,6 +972,64 @@ namespace OSBLE.Controllers
                 canVote = e.CanVote,
                 showPicture = e.ShowProfilePicture
             });
+        }
+
+        private class AutocompleteObject
+        {
+            public int value { get; set; }
+
+            public string label { get; set; }
+
+            public AutocompleteObject(int value, string label)
+            {
+                this.value = value;
+                this.label = label;
+            }
+        }
+
+        /// <summary>
+        /// Autocomplete Search for Posts. Returns JSON.
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult AutoCompleteNames()
+        {
+            string term = Request.Params["term"].ToString().ToLower();
+            // If we are not anonymous in a course, allow search of all users.
+            List<int> authorizedCourses = currentCourses
+                .Where(c => c.AbstractRole.Anonymized == false)
+                .Select(c => c.AbstractCourseID)
+                .ToList();
+
+            List<UserProfile> authorizedUsers = db.CourseUsers
+                .Where(c => authorizedCourses.Contains(c.AbstractCourseID))
+                .Select(c => c.UserProfile)
+                .ToList();
+
+            // If we are anonymous, limit search to ourselves plus instructors/TAs
+            List<int> addedCourses = currentCourses
+                .Where(c => c.AbstractRole.Anonymized == true)
+                .Select(c => c.AbstractCourseID)
+                .ToList();
+
+            List<UserProfile> addedUsers = db.CourseUsers
+                .Where(c => addedCourses.Contains(c.AbstractCourseID) && ((c.UserProfileID == CurrentUser.ID) || (c.AbstractRole.CanGrade == true)))
+                .Select(c => c.UserProfile)
+                .ToList();
+
+            // Combine lists into one distinct list of users, removing all pending users.
+            List<UserProfile> users = authorizedUsers.Union(addedUsers).Where(u => u.UserName != null).OrderBy(u => u.LastName).Distinct().ToList();
+
+            // Search list for our search string
+            users = users.Where(u => (u.FirstName + " " + u.LastName).ToLower().IndexOf(term) != -1).ToList();
+
+            List<AutocompleteObject> outputList = new List<AutocompleteObject>();
+
+            foreach (UserProfile u in users)
+            {
+                outputList.Add(new AutocompleteObject(u.ID, u.FirstName + u.LastName));
+            }
+
+            return Json(outputList, JsonRequestBehavior.AllowGet);
         }
     }
 }
