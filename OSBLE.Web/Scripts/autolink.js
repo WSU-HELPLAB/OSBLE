@@ -33,22 +33,21 @@
     };
 
     linkUsernames = function () {
-        var unPattern = /(^|[\s\n>]|<br\/?>)@([A-Z][a-z]+)([A-Z][a-z]+)/g;
-        return this.replace(unPattern, function (match, space, first, last) {
-            var index = -1;
-
+        var unPattern = /(^|[\s\n>]|<br\/?>)@id=([0-9]+)/g;
+        return this.replace(unPattern, function (match, space, index) {
+            var name = "";
             $.ajax({
-                url: "/Feed/GetProfileIndexForName",
-                data: { firstName: first, lastName: last },
+                url: "/Feed/GetProfileName",
+                data: { id: index },
                 method: "POST",
                 async: false,
                 success: function (data) {
-                    index = data.Index;
+                    name = data.Name;
                 }
-            });
+            })
 
             if (index > 0)
-                return space + '<a href="/Profile/Index/' + index + '">@' + first + last + '</a>';
+                return space + '<a href="/Profile/Index/' + index + '">@' + name + '</a>';
             else
                 return match;
         });

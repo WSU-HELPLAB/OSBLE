@@ -225,6 +225,8 @@ function FeedViewModel(userName, userId, current) {
         if (text == "")
             return;
 
+        text = ReplaceNamesWithIDs(text);
+
         // Disable buttons while waiting for server response
         $('#feed-post-textbox').attr('disabled', 'disabled');
         $('#btn_post_active').attr('disabled', 'disabled');
@@ -310,6 +312,9 @@ function FeedViewModel(userName, userId, current) {
         self.RequestUpdate();
         return false; // prevent page refresh
     });
+
+    // Initialize @person functionality
+    InitializePostTextbox();
 }
 
 function DetailsViewModel(userName, userId, rootId)
@@ -769,42 +774,111 @@ function HideNewPostBadge(postID)
     $('#feed-item-' + postID + ' .new-post-badge').hide();
 }
 
-/*
-//Periodically updates view models for feed items.  Useful for displaying an updated count
-//of comments for a given feed item.
-function getCommentUpdates() {
+var nameIdDict = [];
+function InitializePostTextbox()
+{
+    var textbox = "#feed-post-textbox";
+    var isCompleting = false;
+    var atPosition = 0;
+    var keysTyped = 0;
+    var didSearch = false;
+    nameIdDict = [];
+    
+    $(textbox).on('keypress', function (event) {
+        if (event.key == '@')
+        {
+            // This occurs when someone types the @ symbol into the new post textbox
+            $(textbox).autocomplete("enable");
+            isCompleting = true;
+            keysTyped = 0;
+            atPosition = $(textbox).getSelectionStart();
+        }
+        if (event.key == ' ' || event.key == '.' ||
+            event.key == ',' || event.key == 'Enter')
+        {
+            $(textbox).autocomplete("disable");
+            isCompleting = false;
+        }
+        if (event.key == 'Backspace') {
+            keysTyped--;
+            if (keysTyped <= 0)
+            {
+                $(textbox).autocomplete("disable");
+                isCompleting = false;
+            }
+        }
+        else if ($(textbox).getSelectionStart() != atPosition + keysTyped)
+        {
+            $(textbox).autocomplete("disable");
+            isCompleting = false;
+        }
+        else if (isCompleting)
+        {
+            var textAfterAt = "";
+            if (keysTyped > 0)
+               textAfterAt = $(textbox).val().substr(atPosition + 1, keysTyped - 1) + event.key;
 
-    var ModelIds = Array();
+            //alert("ap=" + atPosition + " kt=" + keysTyped + " text=" + textAfterAt + ".");
 
-    //request comment updates for all feed items
-    $(".feed-item-single").each(function (index) {
-        var log_id = $(this).attr("data-id");
-        ModelIds.push(log_id);
+            didSearch = true;
+            $(textbox).autocomplete("search", textAfterAt);
+            keysTyped++;
+        }
     });
 
-    //make the ajax call
-    $.ajax(
-        {
-            url: "/Feed/GetComments",
-            data: { logIds: JSON.stringify(ModelIds) },
-            dataType: "json",
-            type: "POST",
-            success: updateFeedItemViewModel
-        });
+    $(textbox).autocomplete({
+        source: "/Feed/AutoCompleteNames",
+        select: function (event, ui) {
+            var keyValPair = [ "@" + ui.item.label, "@id=" + ui.item.value ];
+            nameIdDict.push(keyValPair);
 
-    //call ourselves again in 20 seconds
-    setTimeout(getCommentUpdates, 20000)
-}
-
-function getRecentFeedItemsSuccess(html) {
-    var trimmed = $.trim(html);
-    if (trimmed.length > 0) {
-        $("#hidden-workspace").append(html);
-        parseDates();
-        if ($("#hidden-workspace").find('.feed-item-single').length > 0) {
-            $("#feed-items").prepend(html);
+            var textBefore = $(textbox).val().substr(0, atPosition);
+            var endPos = atPosition + 1 + keysTyped;
+            var textAfter = $(textbox).val().substr(endPos, $(textbox).val().length - endPos);
+            ui.item.value = textBefore + "@" + ui.item.label + ' ' + textAfter;
+        },
+        search: function (event, ui) {
+            if (!didSearch)
+            {
+                event.preventDefault();
+            }
+            didSearch = false;
+        },
+        focus: function (event, ui) { return false; },
+        _renderItem: function (ul, item) {
+            return $("<li>")
+            .data("item.autocomplete", item)
+            .append('<a><img src="/user/' + item.value + '/picture?size=25" class="small_profile_picture" alt="Profile Picture" /> ' + item.label + '</a>')
+            .appendTo(ul);
         }
-        $("#hidden-workspace").empty();
-    }
+    });
+
+    $(textbox).autocomplete("disable");
 }
-*/
+
+function ReplaceNamesWithIDs(text)
+{
+    for (i = 0; i < nameIdDict.length; i++) {
+        text = text.replace(nameIdDict[i][0], nameIdDict[i][1]);
+    }
+    nameIdDict = [];
+    return text;
+}
+
+jQuery.fn.getSelectionStart = function () {
+    if (this.lengh == 0) return -1;
+    input = this[0];
+
+    var pos = input.value.length;
+
+    if (input.createTextRange) {
+        var r = document.selection.createRange().duplicate();
+        r.moveEnd('character', input.value.length);
+        if (r.text == '')
+            pos = input.value.length;
+        pos = input.value.lastIndexOf(r.text);
+    } else if (typeof (input.selectionStart) != "undefined")
+        pos = input.selectionStart;
+
+    return pos;
+}
