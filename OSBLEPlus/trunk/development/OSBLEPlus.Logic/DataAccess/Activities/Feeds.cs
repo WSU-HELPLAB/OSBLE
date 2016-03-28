@@ -29,7 +29,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
 
                 // get possible posts with user names in them
                 List<string> possibleNames = new List<string>();
-                List<int> possibleLogIds = new List<int>();
+                List<int> possibleNameIds = new List<int>();
 
                 List<FeedItem> nameFilterFeedItems = new List<FeedItem>();
 
@@ -47,23 +47,45 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                 if (!string.IsNullOrEmpty(commentFilter))
                 {
                     possibleNames = commentFilter.Split(' ').ToList();
-                    string sql = "SELECT u.ID " +
-                                 "FROM UserProfiles u " +
-                                 "WHERE u.FirstName LIKE @name OR u.LastName LIKE @name";
+                    string nameSql = "SELECT u.ID " +
+                                     "FROM UserProfiles u " +
+                                     "WHERE u.FirstName LIKE @name OR u.LastName LIKE @name";
 
                     foreach (string name in possibleNames)
                     {
                         string partialName = "%" + name + "%";
-                        int id = connection.Query<int>(sql, new {name = partialName}).SingleOrDefault();
+                        int id = connection.Query<int>(nameSql, new {name = partialName}).SingleOrDefault();
 
-                        if (id > 0 && !possibleLogIds.Contains(id))
+                        if (id > 0 && !possibleNameIds.Contains(id))
                         {
-                            possibleLogIds.Add(id);
+                            possibleNameIds.Add(id);
                         }
                     }
 
+                    // Format names into a comma separated list
+                    int[] nameIds = possibleNameIds.ToArray();
+                    string nID = nameIds.Any() ? string.Format("{0}", string.Join(",", nameIds)) : string.Empty;
+
+                    // sql query, -1 needs to be in the sender Ids list otherwise SQL will complain
+                    // This gets a list of all the event logs with either names of students/teachers, or by comment values
+                    string eventLogSql = string.Format(@"SELECT Id " +
+                                                        "FROM EventLogs " +
+                                                        "WHERE EventLogs.SenderId IN (-1{0}) OR EventLogs.Id IN ( " +
+                                                            "SELECT DISTINCT SourceEventLogId AS EventLogId " +
+                                                            "FROM LogCommentEvents " +
+                                                            "JOIN EventLogs e ON " +
+                                                            "e.Id = LogCommentEvents.EventLogId " +
+                                                            "WHERE Content LIKE @filter OR SenderId IN (-1{0}) " +
+                                                            "UNION " +
+                                                            "SELECT FeedPostEvents.EventLogId " +
+                                                            "FROM FeedPostEvents " +
+                                                            "WHERE FeedPostEvents.Comment LIKE @filter) ", string.IsNullOrEmpty(nID) ? nID : "," + nID);
+
+
+                    List<int> eventLogsForComments = connection.Query<int>(eventLogSql, new {filter = commentFilter}).ToList();
+
                     // recursive call to Get
-                    if (possibleLogIds.Count > 0)
+                    if (possibleNameIds.Count > 0 || eventLogsForComments.Count > 0)
                     {
                         nameFilterFeedItems.AddRange(
                             Get(
@@ -71,12 +93,12 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                                 dateReceivedMax,
                                 minEventLogId,
                                 maxEventLogId,
-                                logIds,
+                                eventLogsForComments, // send list of EventLogs to filter
                                 eventTypes,
                                 courseId,
                                 roleId,
                                 "",
-                                possibleLogIds,
+                                null,
                                 topN)
                             );
                     }
