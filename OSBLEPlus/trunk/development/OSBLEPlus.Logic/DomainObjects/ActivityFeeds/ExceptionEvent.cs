@@ -34,6 +34,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
         {
             var cmd = new SqlCommand
             {
+                //TODO: Add iterative process to insert into StackFrameVariables/StackFrames
                 CommandText = string.Format(@"
 DECLARE {0} INT
 INSERT INTO dbo.EventLogs (EventTypeId, EventDate, SenderId, CourseId) VALUES (@EventTypeId, @EventDate, @SenderId, @CourseId)
