@@ -110,19 +110,73 @@
 }
 <section id="recent-comments" class="profile-content">
     <h1>Recent Social Activity</h1>
-    @if (Model.SocialActivity.TopLevelLogCount == 0)
+    @if (Model.SocialActivity.TopLevelLogCount == 0 && Model.Feed.Feed.Count == 0)
     {
         @:No recent activity.
     }
     else
     {
-        foreach (DateTime date in Model.SocialActivity.ActivityDates.OrderByDescending(l => l.Date))
-        {
-            List<int> eventIds = Model.SocialActivity.GetEventIds(date);
+        HashSet<DateTime> dates = new HashSet<DateTime>();
 
+        foreach (AggregateFeedItem item in Model.Feed.Feed)
+        {
+            dates.Add(item.MostRecentOccurance.Date);
+        }
+        foreach (DateTime dt in Model.SocialActivity.ActivityDates)
+        {
+            dates.Add(dt.Date);
+        }
+
+        foreach (DateTime date in dates.OrderByDescending(l => l.Date))
+        {
+            List<int> eventIds;
+            try
+            {
+                eventIds = Model.SocialActivity.GetEventIds(date);
+            }
+            catch
+            {
+                eventIds = new List<int>();
+            }
+            
+            IEnumerable<AggregateFeedItem> items = Model.Feed.Feed.Where(m => m.MostRecentOccurance.Date == date);
+            
             <div>
                 <h2 class="date-header">@date.ToLongDateString()</h2>
                 <ul>
+                    @foreach (AggregateFeedItem afi in items)
+                    {
+                        if (!afi.IsAnonymous)
+                        {
+                            string content = "";
+                            DateTime maxDate = afi.MostRecentOccurance;
+                            if (afi.FeedItemType == "Feed Post Event")
+                            {
+                                content = afi.Creator.FullName + " made a post";
+                            }
+                            if (afi.FeedItemType == "Helpful Mark Given Event")
+                            {
+                                content = afi.Creator.FullName + "marked a comment as helpful";
+                            }
+
+                            if (content != "")
+                            { 
+                                <li>
+                                    @content
+                                    <span class="comments-table-date">
+                                        (
+                                        <time class="utc-time"
+                                              datetime="@Helpers.DateAsUnixTime(maxDate)"
+                                              data-original-date="@Helpers.RawDate(maxDate)"
+                                              data-date-format="hh:mm A">
+                                            @maxDate.ToString("hh:mmtt") (UTC)
+                                        </time>
+                                        )
+                                    </span>.
+                                </li>
+                            }
+                        }
+                    }
                     @foreach (int logId in eventIds)
                     {
                         List<CommentActivityLog> socialLogs = Model.SocialActivity.GetLogs(date, logId);
