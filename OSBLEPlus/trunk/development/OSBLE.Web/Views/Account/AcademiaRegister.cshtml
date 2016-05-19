@@ -53,24 +53,39 @@
                 @Html.ValidationMessageFor(m => m.ConfirmPassword)
             </div>
 
-
             <h3>Identification</h3>
 
-            <div class="editor-label">
+            <div class="editor-label">      <!-- First Name -->
                 @Html.LabelFor(m => m.FirstName)
             </div>
             <div class="editor-field">
                 @Html.TextBoxFor(m => m.FirstName, new { tabindex = "5", @class = "form-control" })<br />
                 @Html.ValidationMessageFor(m => m.FirstName)
             </div>
-            <div class="editor-label">
+            <div class="editor-label">      <!-- Last Name -->
                 @Html.LabelFor(m => m.LastName)
             </div>
             <div class="editor-field">
                 @Html.TextBoxFor(m => m.LastName, new { tabindex = "6", @class = "form-control" })<br />
                 @Html.ValidationMessageFor(m => m.LastName)
             </div>
+            <div class="editor-label">      <!-- Last Name Confirmation -->
+                @Html.LabelFor(m => m.ConfirmLastName)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(m => m.ConfirmLastName, new { tabindex = "7", @class = "form-control" })<br />
+                @Html.ValidationMessageFor(m => m.ConfirmLastName)
+            </div>
+            <div class="editor-label">      <!-- First Name Confirmation -->
+                @Html.LabelFor(m => m.ConfirmFirstName)
+            </div>
+            <div class="editor-field">
+                @Html.TextBoxFor(m => m.ConfirmFirstName, new { tabindex = "8", @class = "form-control" })<br />
+                @Html.ValidationMessageFor(m => m.ConfirmFirstName)
+            </div>
+
             <h3>School Information</h3>
+
             <div class="editor-label">
                 @* @Html.LabelFor(model => model.SchoolID, "School Name")
                 <br />*@
@@ -78,7 +93,7 @@
             </div>
             <div class="editor-field">
                 @try {
-                    @Html.DropDownList("SchoolID", null, new { tabindex = "7", @class = "form-control" })<br />
+                    @Html.DropDownList("SchoolID", null, new { tabindex = "9", @class = "form-control" })<br />
             } catch (Exception e) { }
                 @Html.ValidationMessageFor(model => model.SchoolID, "You must select a school.")
             </div>
@@ -88,14 +103,14 @@
                 @Helpers.CreateToolTip(ToolTips.AccountRegisterID)
             </div>
             <div class="editor-field">
-                @Html.TextBoxFor(m => m.Identification, new { tabindex = "8", @class = "form-control" })<br />
+                @Html.TextBoxFor(m => m.Identification, new { tabindex = "10", @class = "form-control" })<br />
                 @Html.ValidationMessageFor(m => m.Identification)
             </div>
             <div class="editor-label">
                 @Html.LabelFor(m => m.ConfirmIdentification)
             </div>
             <div class="editor-field">
-                @Html.TextBoxFor(m => m.ConfirmIdentification, new { tabindex = "9", @class = "form-control" })<br />
+                @Html.TextBoxFor(m => m.ConfirmIdentification, new { tabindex = "11", @class = "form-control" })<br />
                 @Html.ValidationMessageFor(m => m.ConfirmIdentification)
             </div>
 
@@ -104,7 +119,7 @@
             </div>
 
             <p>
-                <input type="submit" class="btn btn-default" value="Register" tabindex="10" />
+                <input type="submit" class="btn btn-default" value="Register" tabindex="12" />
                 <!-- style="font-size: 1.2em; padding: 0.25em;" -->
             </p>
         </div>
