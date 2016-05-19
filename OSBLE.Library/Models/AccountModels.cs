@@ -70,9 +70,19 @@ namespace OSBLE.Models
         public string FirstName { get; set; }
 
         [Required]
+        [System.Web.Mvc.Compare("FirstName", ErrorMessage = "The first name and confirm first name do not match.")]
+        [Display(Name = "Confirm first name")]
+        public string ConfirmFirstName { get; set; }
+
+        [Required]
         [StringLength(50)]
         [Display(Name = "Last name")]
         public string LastName { get; set; }
+
+        [Required]
+        [System.Web.Mvc.Compare("LastName", ErrorMessage = "The last name and confirm last name do not match.")]
+        [Display(Name = "Confirm last name")]
+        public string ConfirmLastName { get; set; }
 
         [Required]
         [Display(Name = "School")]
