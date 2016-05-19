@@ -64,7 +64,16 @@
             </td>
         </tr>
         <tr>
-            <td colspan="2"><input type="checkbox" name="IncludeEndDate" id="IncludeEndDate" checked="checked" /><label for="IncludeEndDate">Show end date and time in calendar</label></td>
+            @{
+                if (Request.Params["start"] != null)
+                {
+                    <td colspan="2"><input type="checkbox" name="IncludeEndDate" id="IncludeEndDate" /><label for="IncludeEndDate">Show end date and time in calendar</label></td>
+                }
+                else 
+                {
+                    <td colspan="2"><input type="checkbox" checked="checked" name="IncludeEndDate" id="IncludeEndDate" /><label for="IncludeEndDate">Show end date and time in calendar</label></td>
+                }
+            }
         </tr>
     </table>
     <br />
