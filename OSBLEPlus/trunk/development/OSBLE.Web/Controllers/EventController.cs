@@ -91,7 +91,17 @@ namespace OSBLE.Controllers
                 //start should contain the time in utc
 
                 e.StartTime = e.StartDate;
-                e.EndTime = e.StartTime.AddHours(1.0); //automatically add an hour
+
+                if (Request.Params["end"] != null)
+                {
+                    string end = Request.Params["end"];
+                    e.EndTime = DateTime.Parse(end);
+                }
+                else
+                {
+                    e.EndTime = e.StartTime.AddHours(1.0); //automatically add an hour
+                }
+
                 
             }
             else
@@ -116,7 +126,8 @@ namespace OSBLE.Controllers
                 else
                 {
                     //default to noon for one hour
-                    e.StartTime = e.StartDate.AddHours(12.0);
+                    //e.StartTime = e.StartDate.AddHours(12.0);         // Not correct way to set to noon, changed to line below
+                    e.StartTime = new DateTime(e.StartDate.Year, e.StartDate.Month, e.StartDate.Day, 12, 0, 0);
                     e.EndTime = e.StartTime.AddHours(1.0);
                     //not in utc time, just leave!
                     return View(e);
@@ -124,7 +135,8 @@ namespace OSBLE.Controllers
             }
             //convert times to local course time for user viewing here 
             e.StartTime = e.StartTime.UTCToCourse(ActiveCourseUser.AbstractCourseID);
-            e.EndTime = ((DateTime) (e.EndTime)).CourseToUTC(ActiveCourseUser.AbstractCourseID);
+            //e.EndTime = ((DateTime) (e.EndTime)).CourseToUTC(ActiveCourseUser.AbstractCourseID);
+            e.EndTime = ((DateTime)(e.EndTime)).UTCToCourse(ActiveCourseUser.AbstractCourseID);
 
             return View(e);
         }
@@ -136,7 +148,6 @@ namespace OSBLE.Controllers
         [CanPostEvent]
         public ActionResult Create(Event e)
         {
-
             // Set to current user and poster
             e.Poster = ActiveCourseUser;
 
