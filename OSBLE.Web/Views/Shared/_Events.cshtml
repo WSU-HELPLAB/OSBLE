@@ -43,7 +43,7 @@
             <div class="event_tools">
                 @if (ViewBag.ActiveCourse.AbstractCourse.AllowEventPosting)
                 {
-                    <a href="@Url.Action("Create", "Event", new { start = e.StartDate })" title="Add Event At This Time">@Helpers.AddButton()</a>
+                    <a href="@Url.Action("Create", "Event", new { start = e.StartDate, end = e.EndDate})" title="Add Event At This Time">@Helpers.AddButton()</a>
                 }
                 @if (ViewBag.ActiveCourse.AbstractRole.CanModify && !e.HideDelete)
                 {
