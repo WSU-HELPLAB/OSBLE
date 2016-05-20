@@ -66,12 +66,14 @@
     <div class="row" id="dashboard_inner">
         <div class="col-sm-3 unactiveContent" id="dashboard_left">
 
-             @*-------------- NOTIFICATIONS -------------------*@ 
-            
+            @*-------------- NOTIFICATIONS -------------------*@
+
             <div id="dashboard_notifications" class="unactiveContent">
                 <h3>Notifications</h3>
 
                 <div id="notifications">
+
+
                     @if (ViewBag.Notifications.Count == 0)
                     {
                         <p>No Unread Notifications!</p>
@@ -80,6 +82,7 @@
                     @{ViewBag.ShowNotificationDelete = true;}
                     @Html.Partial("_ConsolidatedNotifications")
 
+                    
                     @if (ViewBag.Notifications.Count != 0)
                     {
                         <div id="markAllAsReadDiv">
@@ -92,7 +95,23 @@
                         </div>
                     }
 
-                    <p>@Html.ActionLink("Show All Notifications", "Index", "Notification")</p>
+
+                    @{
+                        if (ViewBag.Notifications.Count > 5)
+                        {
+                            String temp = "Displaying 5 out of " + @Html.Raw(ViewBag.Notifications.Count).ToString() + " (Show All)";
+                            <p>
+                                @Html.ActionLink(temp, "Index", "Notification")
+                            </p>
+                        }
+                        else
+                        {
+                            <p>
+                                @Html.ActionLink("Show All Notifications", "Index", "Notification")
+                            </p>
+                        }
+                    }
+
                 </div>
             </div>
 
@@ -132,7 +151,7 @@
             </h3>
 
             <div id="activity_feed">
-                <div id="activity_feed_content" @*class="partialContents" data-url="/Feed/Index"*@ >
+                <div id="activity_feed_content" @*class="partialContents" data-url="/Feed/Index"*@>
                     @*<img src="~/Content/images/ajax-loader.gif" /> Loading...*@
                     @{ Html.RenderAction("Index", "Feed"); }
                 </div>
@@ -162,10 +181,9 @@
             <!--yc: file upload size change!-->
             <!-- Scripts for file manager -->
             <!--yc: currently cant find a way to put this line of code into the script so its placed here for now-->
-
             @* These Files are now included in the layout *@
             @*<script src="../../Scripts/CourseFilesUploader.js?version=1.1" type="text/javascript"></script>
-               <script src="../../Scripts/CourseFileManager.js?version=1.1" type="text/javascript"></script>
+                <script src="../../Scripts/CourseFileManager.js?version=1.1" type="text/javascript"></script>
             *@
             <script type="text/javascript">
                 // Write the HTML for the file manager control
