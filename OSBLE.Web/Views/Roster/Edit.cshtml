@@ -29,6 +29,21 @@
         </div>
 
         <div class="editor-label">
+            @Html.LabelFor(model => model.UserProfileID, "StudentID")
+        </div>
+        <div class="editor-label">
+            <input type="text" disabled="disabled" value="@Model.UserProfile.Identification" />
+        </div>
+    
+        <div class="editor-label">
+            @Html.LabelFor(model => model.UserProfileID, "Email")
+            @Helpers.CreateToolTip(ToolTips.RosterEmail)
+        </div>
+        <div class="editor-label">
+            <input type="text" disabled="disabled" value="@Model.UserProfile.Email" />
+        </div>
+
+        <div class="editor-label">
             @Html.LabelFor(model => model.AbstractRoleID, "Course Role")
             @Helpers.CreateToolTip(ToolTips.RosterRole) 
         </div>
