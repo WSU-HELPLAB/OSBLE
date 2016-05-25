@@ -530,7 +530,11 @@ namespace OSBLE.Controllers
                     break;
             }
 
-            body += "\n\n---\nDo not reply to this email.\nVisit this link to " + action + ": " + getDispatchURL(n.ID);
+            body += "\n\n---\nDo not reply to this email.\nVisit this link to " + action + ": ";
+            string str = getDispatchURL(n.ID);
+            body += string.Format("<br /><br /><a href=\"{0}\">\"{0}\"</a>", str);
+           
+
             MailAddress to = new MailAddress(recipient.UserName, recipient.DisplayName((int)CourseRole.CourseRoles.Instructor));
             List<MailAddress> recipients = new List<MailAddress>();
             recipients.Add(to);
