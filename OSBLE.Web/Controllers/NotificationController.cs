@@ -19,7 +19,7 @@ namespace OSBLE.Controllers
         //
         // GET: /Notification/
         public ActionResult Index()
-        {
+        {                                                                      
             ViewBag.Notifications = db.Notifications.Where(n => (n.RecipientID == ActiveCourseUser.ID)).OrderByDescending(n => n.Posted).ToList();
             return View();
         }
@@ -146,10 +146,12 @@ namespace OSBLE.Controllers
             Notification n = new Notification();
             n.ItemType = Notification.Types.Mail;
             n.ItemID = mail.ID;
-            CourseUser recipient = db.CourseUsers.FirstOrDefault(cu => cu.UserProfileID == mail.ToUserProfileID);
+            CourseUser recipient = db.CourseUsers.FirstOrDefault(cu => cu.UserProfileID == mail.ToUserProfileID && cu.AbstractCourseID == mail.ContextID);
+            //CourseUser recipient = db.CourseUsers.FirstOrDefault(cu => cu.UserProfileID == mail.ToUserProfileID); //FLAG THIS LINE
             if (recipient != null)
                 n.RecipientID = recipient.ID;
-            CourseUser sender = db.CourseUsers.FirstOrDefault(cu => cu.UserProfileID == mail.FromUserProfileID);
+            CourseUser sender = db.CourseUsers.FirstOrDefault(cu => cu.UserProfileID == mail.FromUserProfileID && cu.AbstractCourseID == mail.ContextID);
+            //CourseUser sender = db.CourseUsers.FirstOrDefault(cu => cu.UserProfileID == mail.FromUserProfileID);
             if (sender != null)
                 n.SenderID = sender.ID;
 
@@ -228,7 +230,6 @@ namespace OSBLE.Controllers
                 n.ItemID = e.ID;
                 n.RecipientID = instructor.ID;
                 n.SenderID = e.Poster.ID;
-
 
                 addNotification(n);
             }
@@ -380,17 +381,14 @@ namespace OSBLE.Controllers
             CourseUser recipient = (from a in db.CourseUsers
                                     where a.ID == n.RecipientID
                                     select a).FirstOrDefault();
+                        
+            #if !DEBUG
 
-            #if DEBUG
-            emailNotification(n);
+                if (recipient.UserProfile.EmailAllNotifications && !(recipient.UserProfile.EmailAllActivityPosts && n.ItemType == Notification.Types.Dashboard))
+                {
+                    emailNotification(n);
+                }
             #endif
-#if !DEBUG
-
-            if (recipient.UserProfile.EmailAllNotifications && !(recipient.UserProfile.EmailAllActivityPosts && n.ItemType == Notification.Types.Dashboard))
-            {
-                emailNotification(n);
-            }
-#endif
         }
 
         /// <summary>
