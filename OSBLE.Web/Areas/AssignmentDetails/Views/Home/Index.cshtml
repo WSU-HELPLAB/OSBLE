@@ -2,11 +2,16 @@
 @using OSBLE.Areas.AssignmentDetails.ViewModels
 @using OSBLE.Models.Courses;
 @using OSBLE.Resources
+
+
+
+
 @model AssignmentDetailsViewModel
 @{
     ViewBag.Title = "Assignment Details";
     DynamicDictionary headerData = Model.HeaderBuilder.BuildHeader(Model.CurrentAssignment);
 }
+
 @section AssignmentDetails
 {
     <tr>
@@ -30,39 +35,90 @@
     }
 }
 
-@section TableData
-{
-    @if (Model.Client.AbstractRole.CanGrade)
+    @section TableData
     {
-        bool altRow = false;
+        @if (Model.Client.AbstractRole.CanGrade)
+        {
 
-        var teams = from pair in Model.TeamTableBuilders
+            var teams = from pair in Model.TeamTableBuilders
+                        orderby pair.Key.Team.TeamMembers.FirstOrDefault().CourseUser.Section ascending
+                        select pair.Key;
+
+            HashSet<int> sections = new HashSet<int>(); //This hash set is to get all of the sections for this assignment
+
+            foreach (IAssignmentTeam assignmentTeam in teams) //iterate through all sections and add them to hash set
+            {
+                sections.Add(assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.Section);
+            }
+
+            teams = from pair in Model.TeamTableBuilders
                     orderby pair.Key.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(Model.Client.AbstractRoleID, false) ascending
                     select pair.Key;
-        
-        foreach (IAssignmentTeam assignmentTeam in teams)
-        {
-            string rowText = "class=\"NormalRow\"";
-            if (altRow)
+
+
+            //this bool is to determine whether or not there needs to be a row with a section header.
+            bool sectionBool = false;
+
+            //only show sections if there are more than 1 section
+            bool showSections = false;
+            
+            if (sections.Count > 1)
             {
-                rowText = "class=\"AltRow\"";
+                showSections = true;
             }
-            altRow = !altRow;
-            <tr @Html.Raw(rowText)>
-                <th class="StudentName">
-                    @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", 
-                            id = assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUserID });
-                    }
-                    <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
-                    @assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(Model.Client.AbstractRoleID, false)
-                </th>
-                @foreach (string view in Model.TableColumnHeaders.Keys)
+            
+
+            foreach (int section in sections)
+            {
+                sectionBool = false;
+                bool altRow = false;
+
+                foreach (IAssignmentTeam assignmentTeam in teams)
                 {
-                    DynamicDictionary tableData = Model.TeamTableBuilders[assignmentTeam].BuildTableForTeam(assignmentTeam);
-                    string viewLocation = string.Format("TableBuilder/{0}", view);
-                    @Html.Partial(viewLocation, tableData);
+                    if (assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.Section != section) //check if this student belongs in this section.
+                    {
+                        continue;
+                    }
+
+                    if ( (! sectionBool) && showSections)
+                    { 
+                        <tr class="SectionRow">
+                            <th class="Student" colspan="1">
+                                Section: @Html.Raw(section)
+                            </th>
+
+                            <td colspan="5">
+                                @Html.ActionLink("[Download Section Submissions]", "GetAllSubmissionsForAssignment", "FileHandler", new { assignmentID = Model.CurrentAssignment.ID, downloadSection = section, area = "" }, new { onclick = "create_and_open_downloading_submission_dialog()", style = "text-decoration:none" })
+                            </td>
+                        </tr>
+                        sectionBool = true;
+                     }
+                     
+                    string rowText = "class=\"NormalRow\"";
+                    if (altRow)
+                    {
+                        rowText = "class=\"AltRow\"";
+                    }
+                    altRow = !altRow;
+                    <tr @Html.Raw(rowText)>
+                        <th class="StudentName">
+                            @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "",
+                                    id = assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfileID });
+                            }
+
+                            <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
+                            @assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(Model.Client.AbstractRoleID, false)  <!-- This displays the user name -->
+                        </th>
+
+                        @foreach (string view in Model.TableColumnHeaders.Keys) // This loop populates the rest of the rows for a table
+                        {
+                            DynamicDictionary tableData = Model.TeamTableBuilders[assignmentTeam].BuildTableForTeam(assignmentTeam);
+                            string viewLocation = string.Format("TableBuilder/{0}", view);
+                            @Html.Partial(viewLocation, tableData);
+                        }
+
+                </tr>
                 }
-        </tr>
+            }
         }
     }
-}

@@ -399,6 +399,7 @@
     <Content Include="Areas\Analytics\Scripts\jquery.datetimepicker.js" />
     <Content Include="Areas\Analytics\Scripts\TrendingCalendar.js" />
     <Content Include="Areas\AssignmentDetails\Content\css\Home.css" />
+    <Content Include="Areas\AssignmentDetails\Content\css\Section.css" />
     <Content Include="Areas\AssignmentDetails\Content\js\Home.js" />
     <Content Include="Areas\AssignmentWizard\Content\css\criticalReview.css" />
     <Content Include="Areas\AssignmentWizard\Content\css\home.css" />

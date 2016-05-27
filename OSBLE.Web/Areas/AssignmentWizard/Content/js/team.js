@@ -8,7 +8,8 @@ function documentReady() {
             {
                 connectWith: ".TeamSortable",
                 forcePlaceholderSize: true,
-                update: dragComplete
+                receive: dragComplete
+
             }).disableSelection();
 
 
@@ -20,6 +21,12 @@ function documentReady() {
         start: hideErrors
     }).disableSelection();
 
+    $("#AvailableStudent").sortable(
+    {
+        connectWith: ".TeamSortable",
+        forcePlaceholderSize: true,
+        start: hideErrors
+    }).disableSelection();
 
     //various event listeners
     $("#WizardForm").submit(processForm);
@@ -46,7 +53,8 @@ function dragComplete(event, ui) {
     var dragElement = $(ui.item.context);
 
     //the data ID of the element (contains key information that we will need to send back to server)
-    var elementDataId = dragElement.attr("data-id");
+    var elementDataId = dragElement.attr("id");
+   
 
     //the review list that the element is trying to be added to
     var list = dragElement.parent().contents();
@@ -66,6 +74,32 @@ function dragComplete(event, ui) {
         alreadyOnTeamError(reviewerName, reviewItem);
         dragElement.remove();
     }
+
+    //if not in matching sections
+    var parentid = $(dragElement.parent().parent()).attr("id");
+    if (!document.getElementById('allow_cross_section').checked && parentid != "AvailableStudentList") //if no cross teams are allowed, check for adding a team member to a different section
+    {
+        if (list.length > 1) //make sure there is one other student in the team, or it doesn't matter
+        {
+            var firstTeamMember = list[0]; 
+            if (firstTeamMember === dragElement.context)
+            {
+                firstTeamMember = list[1];
+            }    
+            
+            var FirstTeamMembAttr = $(firstTeamMember).attr("section");
+            var ElementSection = $(dragElement).attr("section");
+            
+            if (!(FirstTeamMembAttr === ElementSection)) {
+                alert("You must checkmark 'Allow Cross_Section teams' to have teams with members across sections.");
+                var availables = document.getElementById("AvailableStudent");
+                availables.appendChild(dragElement.context);
+                //dragElement.remove();
+                
+                //re add drag element to where it was.....
+            }
+        }       
+    }   
 }
 
 //Determines if the provided list already contains the supplied element.
@@ -73,7 +107,7 @@ function dragComplete(event, ui) {
 function hasDataId(list, dataId) {
     var count = 0;
     $(list).each(function () {
-        if ($(this).attr("data-id") == dataId) {
+        if ($(this).attr("id") == dataId) {
             count++;
         }
     }
@@ -129,6 +163,7 @@ var teamCounter = 1;
 
 //Creates a new team div and places it on the 
 function createTeam(evt, teamName) {
+    teamCounter = document.getElementsByClassName("TeamDiv").length + 1;
     var divId = "teamDiv_" + teamCounter + "_0";
     var listId = 'team_' + teamCounter + "_0";
     if (teamName == undefined) {
@@ -179,12 +214,11 @@ function clearAllTeams() {
 
     //reset the team counter
     teamCounter = 1;
-
 }
 
 //Creates the supplied number of teams and randomly assigns students
 //to these teams
-function buildTeams(numberOfTeams) {
+function buildTeamsCross(numberOfTeams) {
 
     //clear out any pre-existing layout
     clearAllTeams();
@@ -247,9 +281,86 @@ function buildTeams(numberOfTeams) {
     });
 }
 
+//Builds teams based on section
+function buildTeams(numTeamsArray, studentArrays) { //TODO:: MAYBE HAVE TO CHANGE THE TWO GENERATE BY # OF TEAMS AND GENERATE BY # OF STUDENTS
+    //clear out any pre-existing layout
+    clearAllTeams();
+
+    //wait for all teams to be removed before continuing
+    $(".TeamDiv").promise().done(function () {
+        //var allSections = Array();
+        //var unassignedStudents = Array();
+        var allStudents = $.find('.Student');
+        var numStudents = allStudents.length;
+
+        for (var x = 0; x < numTeamsArray.length; x++)
+        {
+            for (var i = 0; i < numTeamsArray[x]; i++) {
+                createTeam(undefined, undefined);
+            }
+        }
+                    
+        //again, we need to wait for team creation to finish before we continue
+        $(".TeamDiv").promise().done(function () {
+            //build a team and student array            
+            var teamCounter = Array();
+            var allTeams = $.find('.TeamDiv');
+                        
+            var teamArrayIndex = 0;
+
+            for (var x = 0; x < numTeamsArray.length; x++)
+            {
+                //prime the arrays
+                for (var i = 0; i < numTeamsArray[x]; i++) {
+                    teamCounter[i+teamArrayIndex] = { id: allTeams[i+teamArrayIndex].id, count: 0 };
+                }
+
+                //assign students to teams
+                while (studentArrays[x].length > 0) {
+
+                    //pick a random student
+                    var studentIndex = Math.floor(Math.random() * studentArrays[x].length);
+                    var student = studentArrays[x][studentIndex];
+
+                    //pick the smallest team
+                    var smallestTeamId;
+                    var smallestTeamSize;
+                    var smallestTeamIndex;
+
+                    smallestTeamId = 0;
+                    smallestTeamSize = numStudents + 1;
+                    var smallestTeamIndex = 0;
+
+                    //This loop needs to start from teamArrayIndex in order to skip all filled teams
+                    for (var i = teamArrayIndex; i < teamCounter.length; i++) { 
+                        if (teamCounter[i].count <= smallestTeamSize) {
+                            smallestTeamSize = teamCounter[i].count;
+                            smallestTeamId = teamCounter[i].id;
+                            smallestTeamIndex = i;
+                        }
+                    }
+
+                    //increase the size of the selected team by 1
+                    teamCounter[smallestTeamIndex].count++;
+
+                    //assign the student to the team
+                    addStudentToTeam(student.id, smallestTeamId);
+
+                    //remove students from the list of possible students
+                    studentArrays[x] = studentArrays[x].slice(0, studentIndex).concat(studentArrays[x].slice(studentIndex + 1, studentArrays[x].length));
+                }
+
+                //teamArrayIndex will be a placeholder to skip all used up teams
+                teamArrayIndex += (teamCounter.length - teamArrayIndex); 
+            }
+            
+        });
+    });
+}
 //Auto generates a team configuration doing its best to create teams using
 //the size stored inside the "AutoGenByStudentTextBox"    
-function generateTeamsByNumberOfStudents() {
+function generateTeamsByNumberOfStudents() { //TODO:: EDIT THIS
+
     var studentsPerTeam = $('#AutoGenByStudentTextBox').val();
     if (studentsPerTeam == undefined || studentsPerTeam == 0) {
         alert("The number of students per team needs to be greater than 0");
@@ -257,9 +368,52 @@ function generateTeamsByNumberOfStudents() {
     }
 
     //create the appropriate number of teams needed
-    var numStudents = $.find('.Student').length;
-    var numTeams = Math.floor(numStudents / studentsPerTeam);
-    buildTeams(numTeams);
+    var allStudents = $.find('.Student');
+    var numStudents = allStudents.length;
+    var studentArrays = Array() //array of student arrays grouped by section
+    var numTeamsArray = Array() //array of each sections team ammount
+    var allSections = Array()
+    
+
+    //grab the checkmark box, see if checked.
+    if (document.getElementById("allow_cross_section").checked) //cross section teams allowed
+    {
+        var numTeams = Math.floor(numStudents / studentsPerTeam);
+        buildTeamsCross(numTeams);
+    }
+
+    else //cross section teams not allowed
+    {        
+        for (var i = 0; i < numStudents; i++) //This populates the allSections
+        {
+            var temp = String(allStudents[i].getAttribute('SECTION'));
+
+            if ($.inArray(temp, allSections) === -1) { //check if this section is already in the sections array
+                allSections.push(allStudents[i].getAttribute('SECTION'));
+            }
+        }
+
+        allSections.sort(); //sort the sections so they're in order.
+
+        for (var x = 0; x < allSections.length; x++) {
+            studentArrays.push(Array())
+            for (var i = 0; i < numStudents; i++) {
+                if (allStudents[i].getAttribute('SECTION') === allSections[x]) //if this student belongs to this section, add them to this section
+                {
+                    studentArrays[x].push(allStudents[i]);
+                }
+            }
+        }
+
+        for (var x = 0; x < allSections.length; x++) //populate the ammount of teams per section
+        {
+            numTeamsArray.push(Math.floor(studentArrays[x].length / studentsPerTeam));
+        }
+
+
+        buildTeams(numTeamsArray, studentArrays);
+    }
+
 }
 
 //Auto generates a team configuration based on the number of teams entered inside the
@@ -270,7 +424,50 @@ function generateTeamsByNumberOfTeams() {
         alert("The number of teams to be generated must be greater than 0");
         return;
     }
-    buildTeams(totalTeams);
+
+    var allStudents = $.find('.Student');
+    var numStudents = allStudents.length;
+    var studentArrays = Array() //array of student arrays grouped by section
+    var numTeamsArray = Array() //array of each sections team ammount
+    var allSections = Array()
+    
+    if (document.getElementById('allow_cross_section').checked) //if cross section teams are allowed
+    {
+        buildTeamsCross(totalTeams);
+    }
+
+    else //if cross section teams are not allowed
+    {
+
+        for (var i = 0; i < numStudents; i++) //This populates the allSections
+        {
+            var temp = String(allStudents[i].getAttribute('SECTION'));
+
+            if ($.inArray(temp, allSections) === -1) { //check if this section is already in the sections array
+                allSections.push(allStudents[i].getAttribute('SECTION'));
+            }
+        }
+
+        allSections.sort(); //sort the sections so they're in order.
+
+        for (var x = 0; x < allSections.length; x++) //populate the studentsArray. Add students to studentArrays index if section matches
+        {
+            studentArrays.push(Array())
+            for (var i = 0; i < numStudents; i++) {
+                if (allStudents[i].getAttribute('SECTION') === allSections[x]) //if this student belongs to this section, add them to this section
+                {
+                    studentArrays[x].push(allStudents[i]);
+                }
+            }
+        }
+
+        for (var x = 0; x < allSections.length; x++) //fill every slot of team size, with the specified team size.
+        {
+            numTeamsArray.push(totalTeams);
+        }
+
+        buildTeams(numTeamsArray, studentArrays);
+    }
 }
 
 //Adds a student (li element's ID, ex: "cu_1") 
