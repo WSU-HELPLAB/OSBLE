@@ -95,7 +95,7 @@ namespace OSBLE.Controllers
         [RequireActiveCourse]
         [CanGradeCourse]
         [NotForCommunity]
-        public ActionResult GetAllSubmissionsForAssignment(int assignmentID)
+        public ActionResult GetAllSubmissionsForAssignment(int assignmentID, int downloadSection = -1)
         {
             Assignment assignment = db.Assignments.Find(assignmentID);
 
@@ -141,7 +141,19 @@ namespace OSBLE.Controllers
                                         folderName = currentTeam.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ActiveCourseUser.AbstractRoleID);
                                     }
 
-                                    zipfile.AddDirectory(submissionDirectory.FullName, folderName);
+                                    if (downloadSection != -1) //check if a downloadSection was specified
+                                    {
+                                        if (currentTeam.TeamMembers.FirstOrDefault().CourseUser.Section == (downloadSection)) //if specified, only add those who are in this section
+                                        {
+                                            zipfile.AddDirectory(submissionDirectory.FullName, folderName);
+                                        }
+                                    }
+
+                                    else //if no section specified, download all
+                                    {
+                                        zipfile.AddDirectory(submissionDirectory.FullName, folderName);
+                                    }
+                                    
                                 }
                             }
 
@@ -159,6 +171,91 @@ namespace OSBLE.Controllers
             }
             return RedirectToAction("Index", "Home");
         }
+
+        //very similar to get all assignments, however this will only grab the assignments from teams that are in cross sections.
+        [OsbleAuthorize]
+        [RequireActiveCourse]
+        [CanGradeCourse]
+        [NotForCommunity]
+        public ActionResult GetAllSubmissionsForCrossSections(int assignmentID)
+        {
+            Assignment assignment = db.Assignments.Find(assignmentID);
+            
+            if (! assignment.HasTeams) //if no teams, don't execute
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            try
+            {
+                if (assignment.CourseID == ActiveCourseUser.AbstractCourseID)
+                {
+                    string zipFileName = assignment.AssignmentName + ".zip";
+
+                    string submissionfolder = FileSystem.GetAssignmentSubmissionFolder(assignment.Course, assignment.ID);
+
+                    using (ZipFile zipfile = new ZipFile())
+                    {
+                        DirectoryInfo acitvityDirectory = new DirectoryInfo(submissionfolder);
+
+                        if (!acitvityDirectory.Exists)
+                        {
+                            FileSystem.CreateZipFolder(ActiveCourseUser.AbstractCourse as Course, zipfile, assignment);
+                        }
+
+                        else
+                        {
+                            foreach (DirectoryInfo submissionDirectory in acitvityDirectory.GetDirectories())
+                            {
+                                Team currentTeam = (from c in assignment.AssignmentTeams where c.TeamID.ToString() == submissionDirectory.Name select c.Team).FirstOrDefault();
+
+                                if (currentTeam != null)
+                                {
+
+                                    int firstSection;
+                                    firstSection = currentTeam.TeamMembers.FirstOrDefault().CourseUser.Section;
+                                    bool Cross;
+                                    Cross = false;
+
+                                    foreach(TeamMember tm in currentTeam.TeamMembers)
+                                    {
+                                        if (tm.CourseUser.Section != firstSection)
+                                        {
+                                            Cross = true;
+                                            break; 
+                                        }
+                                            
+                                    }
+
+                                    if (! Cross)
+                                    {
+                                        continue;
+                                    }
+
+                                    string folderName = currentTeam.Name;
+
+                                    zipfile.AddDirectory(submissionDirectory.FullName, folderName);
+
+                                }
+                            }
+
+                            FileSystem.CreateZipFolder(ActiveCourseUser.AbstractCourse as Course, zipfile, assignment);
+                        }
+                        Stream stream = FileSystem.GetDocumentForRead(zipfile.Name);
+
+                        return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
+                    }
+                }
+            }
+
+            catch (Exception e)
+            {
+                throw new Exception("Error in GetSubmissionZip", e);
+            }
+            return RedirectToAction("Index", "Home");
+        }
+
+        
         
         /// <summary>
         /// For the given team id and assignment id, it returns the submission. (Including critical reviews performed)
