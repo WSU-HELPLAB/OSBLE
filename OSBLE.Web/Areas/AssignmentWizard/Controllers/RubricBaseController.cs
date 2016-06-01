@@ -104,6 +104,9 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             Rubric rubric = db.Rubrics.Find(rubricID);
             bool globalCommentsChecked = false;
             bool criteriaCommentsChecked = false;
+            bool enableHalfStep = false;
+            bool enableQuarterStep = false;
+
             if (rubric != null)
             {
                 rubricDescription = rubric.Description;
@@ -125,7 +128,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 }
                 globalCommentsChecked = rubric.HasGlobalComments;
                 criteriaCommentsChecked = rubric.HasCriteriaComments;
-
+                enableHalfStep = rubric.EnableHalfStep;
+                enableQuarterStep = rubric.EnableQuarterStep;
             }
 
             else
@@ -147,6 +151,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
             ViewBag.globalCommentsCheckedValue = globalCommentsChecked ? "checked" : "";
             ViewBag.criteriaCommentsCheckedValue = criteriaCommentsChecked ? "checked" : "";
+            ViewBag.enableHalfStepCheckedValue = enableHalfStep ? "checked" : "";
+            ViewBag.enableQuarterStepCheckedValue = enableQuarterStep ? "checked" : "";
             ViewBag.rubricDescription = rubricDescription;
             ViewBag.levels = levels;
             ViewBag.ActiveCourse = ActiveCourseUser;
@@ -188,6 +194,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             List<int> pointSpreads = getPointSpreads(keys);
             bool globalComments = hasGlobalComments();
             bool criteriaComments = hasCriteriaComments();
+            bool enableHalfStep = allowHalfStep();
+            bool enableQuarterStep = allowQuarterStep();
             string rubricDescription = getRubricName();
 
             if (Assignment.Rubric != null) //A rubric already exists
@@ -214,6 +222,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     Assignment.Rubric.Description = rubricDescription;
                     Assignment.Rubric.HasCriteriaComments = criteriaComments;
                     Assignment.Rubric.HasGlobalComments = globalComments;
+                    Assignment.Rubric.EnableHalfStep = enableHalfStep;
+                    Assignment.Rubric.EnableQuarterStep = enableQuarterStep;
 
                     //Updating Criteria and CellDescriptions
                     int outVal = 0;
@@ -260,10 +270,10 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                                 //To adjust scores, we must multiply their score by the ratio of Pointsread change. 
                                 //(i.e. if the spread goes from 5 to 10, their scores must be doubled)
                                 double multiplier = newLevelPointSpreadSum / oldLevelPointSpreadSum;
-                                int newScore = (int)Math.Round(critEvals[i].Score.Value * multiplier);
+                                double newScore = critEvals[i].Score.Value * multiplier;
                                 if (newScore > newLevelPointSpreadSum) //If rounding up leads them to a higher grade than possible, set it to max.
                                 {
-                                    newScore = (int)newLevelPointSpreadSum;
+                                    newScore = newLevelPointSpreadSum;
                                 }
                                 critEvals[i].Score = newScore;
                                 db.Entry(critEvals[i]).State = System.Data.EntityState.Modified;
@@ -279,6 +289,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                                         pointSpreads,
                                         globalComments,
                                         criteriaComments,
+                                        enableHalfStep,
+                                        enableQuarterStep,
                                         rubricDescription);
                     Assignment.RubricID = rubricID;
                     db.Entry(Assignment).State = System.Data.EntityState.Modified;
@@ -292,6 +304,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                                         pointSpreads,
                                         globalComments,
                                         criteriaComments,
+                                        enableHalfStep,
+                                        enableQuarterStep,
                                         rubricDescription);
                 Assignment.RubricID = rubricID;
                 db.Entry(Assignment).State = System.Data.EntityState.Modified;
@@ -417,6 +431,28 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         }
 
         /// <summary>
+        /// Returns true if the rubric from the HttpPost has half-point grades enabled
+        /// </summary>
+        /// <returns></returns>
+        private bool allowHalfStep()
+        {
+            string stepValue = Request.Form["gradeStepRadio"].ToString();
+            if (stepValue == "halfStep") return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Returns true if the rubric from the HttpPost has quarter-point grades enabled
+        /// </summary>
+        /// <returns></returns>
+        private bool allowQuarterStep()
+        {
+            string stepValue = Request.Form["gradeStepRadio"].ToString();
+            if (stepValue == "quarterStep") return true;
+            return false;
+        }
+       
+        /// <summary>
         /// Returns the name of the rubric from the HttpPost
         /// </summary>
         /// <returns></returns>
@@ -493,6 +529,9 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
             bool hasGlobalComments = true;
             bool hasCriteriaComments = true;
+            bool enableHalfStep = true;
+            bool enableQuarterStep = true;
+
             if (Request.Params["globalComments"] == null)
             {
                 hasGlobalComments = false;
@@ -501,6 +540,16 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             if (Request.Params["criterionComments"] == null)
             {
                 hasCriteriaComments = false;
+            }
+
+            if (Request.Params["halfStep"] == null)
+            {
+                enableHalfStep = false;
+            }
+
+            if (Request.Params["quarterStep"] == null)
+            {
+                enableQuarterStep = false;
             }
 
             string rubricDescription = Request.Params["rubricDescription"];
@@ -514,6 +563,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 pointSpreads,
                 hasGlobalComments,
                 hasCriteriaComments,
+                enableHalfStep,
+                enableQuarterStep,
                 rubricDescription);
         }
 
@@ -537,12 +588,16 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             List<int> pointSpreads,
             bool hasGlobalComments,
             bool hasCriteriaComments,
+            bool enableHalfStep,
+            bool enableQuarterStep,
             string rubricDescription)
         {
             Rubric rubric = new Rubric();
 
             rubric.HasGlobalComments = hasGlobalComments;
             rubric.HasCriteriaComments = hasCriteriaComments;
+            rubric.EnableHalfStep = enableHalfStep;
+            rubric.EnableQuarterStep = enableQuarterStep;
             rubric.Description = rubricDescription;
 
             db.Rubrics.Add(rubric);

@@ -75,8 +75,8 @@ namespace OSBLE.Controllers
                 string critCommentKey = String.Format("{0}_{1}", ViewBag.CritCommentPrefix, critEval.CriterionID);
                 if (Request.Form.AllKeys.Contains(critScoreKey))
                 {
-                    int score = 0;
-                    Int32.TryParse(Request.Form[critScoreKey], out score);
+                    double score = 0;
+                    Double.TryParse(Request.Form[critScoreKey], out score);
                     critEval.Score = score;
                 }
                 if (Request.Form.AllKeys.Contains(critCommentKey))
@@ -169,7 +169,7 @@ namespace OSBLE.Controllers
                 CriterionEvaluation critEval = new CriterionEvaluation();
                 critEval.Criterion = crit;
                 critEval.CriterionID = crit.ID;
-                critEval.Score = 0;
+                critEval.Score = 0.0;
                 critEval.Comment = "";
                 viewModel.Evaluation.CriterionEvaluations.Add(critEval);
             }
@@ -225,7 +225,7 @@ namespace OSBLE.Controllers
                     CriterionEvaluation critEval = new CriterionEvaluation();
                     critEval.Criterion = crit;
                     critEval.CriterionID = crit.ID;
-                    critEval.Score = 0;
+                    critEval.Score = 0.0;
                     critEval.Comment = "";
                     viewModel.Evaluation.CriterionEvaluations.Add(critEval);
                 }
@@ -330,7 +330,7 @@ namespace OSBLE.Controllers
                     CriterionEvaluation critEval = new CriterionEvaluation();
                     critEval.Criterion = crit;
                     critEval.CriterionID = crit.ID;
-                    critEval.Score = 0;
+                    critEval.Score = 0.0;
                     critEval.Comment = "";
                     viewModel.Evaluation.CriterionEvaluations.Add(critEval);
                 }
@@ -529,7 +529,7 @@ namespace OSBLE.Controllers
                 List<double?> averageScores = new List<double?>();
                 for (int i = 0; i < mergedViewModel.MergedEvaluations.FirstOrDefault().CriterionEvaluations.Count; i++)
                 {
-                    List<int?> scoreList = mergedViewModel.MergedEvaluations.Select(e => e.CriterionEvaluations.ElementAt(i).Score).ToList();
+                    List<double?> scoreList = mergedViewModel.MergedEvaluations.Select(e => e.CriterionEvaluations.ElementAt(i).Score).ToList();
                     double? average = scoreList.Sum() / (double)scoreList.Count;
                     averageScores.Add(average);
                 }
@@ -679,7 +679,7 @@ namespace OSBLE.Controllers
                                 // Makeing sure the points field was populated
                                 if(!parsedData.ElementAt(0).StartsWith("***"))
                                 {
-                                    ce.Score = Convert.ToInt32(parsedData.ElementAt(0));
+                                    ce.Score = Convert.ToDouble(parsedData.ElementAt(0));
                                     // removing the points row after getting the value
                                     parsedData.RemoveAt(0);
                                 }

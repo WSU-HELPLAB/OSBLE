@@ -10,13 +10,16 @@
     int sliderTableLength = 880;
     int maxLevelScore = (from c in Model.Rubric.Levels
                          select c.PointSpread).Sum();
-    int textInputLenght = 25;
-    int sliderTableCellWidth = (sliderTableLength / maxLevelScore) - textInputLenght;
+    int textInputLength = 25;
+    int sliderTableCellWidth = (sliderTableLength / maxLevelScore) - textInputLength;
+    int numLevels = 0;
     string selectedAssignment = ViewBag.AssignmentSelectId;
     string selectedTeam = ViewBag.TeamSelectId;
     bool isEditable = ViewBag.isEditable;
     string textBoxDisabled = "";
     List<double?> averageScores = ViewBag.averageScores;
+    string[] colors = new string[10] { "FF5040", "FF7A4B", "FF9B52", "FFAF3A", "FFC610", "FFFA7F", "1AFF0F", "71FFB8", "31ADFF", "1F4EFF" };
+    double colorStep = 0.0;
 
     if (!isEditable)
     {
@@ -34,8 +37,15 @@
 
     @{foreach (RubricEvaluation re in Model.MergedEvaluations)
       {
+          numLevels = Model.Rubric.Levels.Count;
+          colorStep = 10.0 / (double)numLevels;
           foreach (CriterionEvaluation critEval in re.CriterionEvaluations)
           {
+              //
+              bool allowHalfStep = critEval.Criterion.Rubric.EnableHalfStep;
+              bool allowQuarterStep = critEval.Criterion.Rubric.EnableQuarterStep;
+              //
+              
               string sliderUpdateFunction = "";
               string disabledOption = "";
               if (isEditable)
@@ -58,10 +68,19 @@
                               "value: " + critEval.Score + ", ",
                               "min: 0, ",
                               "max: ", maxLevelScore, ", ",
-                              "step: 1, ",
+                              "step: 1.0, ",
                               sliderUpdateFunction,
                               disabledOption,
                                   "});\n");
+              if (allowQuarterStep)
+              {
+                  js = js.Replace("step: 1.0", "step: 0.25");
+              }
+              else if (allowHalfStep)
+              {
+                  js = js.Replace("step: 1.0", "step: 0.5");  
+              }
+              
         @Html.Raw(js)
           }
       }  
@@ -80,7 +99,6 @@
         var width = parseFloat($(window).width());
     
         $("#criterion_div").width(width + "px");
-
     });
 
 </script>
@@ -122,7 +140,7 @@
 
 .text_input_score
 {
-    width: @(textInputLenght)px;
+    width: @(textInputLength + 20)px;
     background: #9BB7C4;
 }
 
@@ -134,22 +152,43 @@
 
 .level_1
 {
-    background: #FF8991;
+    background: #@(colors[0]);
 }
-
 .level_2
 {
-    background: #FF9335;
+    background: #@(colors[Math.Min((int)(1  * colorStep), 9)]);
 }
-
 .level_3
 {
-    background: #00DD04;
+    background: #@(colors[Math.Min((int)(2  * colorStep), 9)]);
 }
-
 .level_4
 {
-    background: #75BAFF;
+    background: #@(colors[Math.Min((int)(3  * colorStep), 9)]);
+}
+.level_5
+{
+    background: #@(colors[Math.Min((int)(4  * colorStep), 9)]);
+}
+.level_6
+{
+    background: #@(colors[Math.Min((int)(5  * colorStep), 9)]);
+}
+.level_7
+{
+    background: #@(colors[Math.Min((int)(6  * colorStep), 9)]);
+}
+.level_8
+{
+    background: #@(colors[Math.Min((int)(7  * colorStep), 9)]);
+}
+.level_9
+{
+    background: #@(colors[Math.Min((int)(8  * colorStep), 9)]);
+}
+.level_10
+{
+    background: #@(colors[Math.Min((int)(9  * colorStep), 9)]);
 }
 
 </style>
@@ -196,16 +235,20 @@
                               {
                                   counter++;
                                   string cssClass = "level_4";
-                                  if (counter < 5)
+                                  if (counter < 11)
                                   {
                                       cssClass = "level_" + counter.ToString();
                                   } 
-                                    <th class="@cssClass" style="width:@(sliderTableCellWidth * level.PointSpread)px;">@level.LevelTitle
+                                    <th class="@cssClass" style="width:@(sliderTableCellWidth * (level.PointSpread))px;">@level.LevelTitle
                                         (@previousMax - @(previousMax + level.PointSpread - 1))
                                     </th>
+                                    @*<th class="@cssClass" style="width:10px;">
+                                        @level.LevelTitle
+                                    (@previousMax - @(previousMax + level.PointSpread - 1))
+                                    </th>*@
                                   previousMax += level.PointSpread;
                               }
-                              }
+}
                         </tr>
                         <tr>
                             <td colspan="@(Model.Rubric.Levels.Count + 1)">
@@ -229,12 +272,6 @@
                         </tr>
                     </table>
                             <br />
-                            
-                            
-                            
-                            
-                            
-                            
                         }
 
                     @*If there are multiple RubricEvaluations, we want to generate a comments and slider 
@@ -262,22 +299,26 @@
                             <th class="zero_score">
                                 0
                             </th>
-                            @{previousMax = 1;
-                              int counter = 0;
-                              foreach (Level level in Model.Rubric.Levels)
-                              {
-                                  counter++;
-                                  string cssClass = "level_4";
-                                  if (counter < 5)
-                                  {
-                                      cssClass = "level_" + counter.ToString();
-                                  } 
-                                    <th class="@cssClass" style="width:@(sliderTableCellWidth * level.PointSpread)px;">@level.LevelTitle
-                                        (@previousMax - @(previousMax + level.PointSpread - 1))
+                            @{
+                                previousMax = 1;
+                                int counter = 0;
+                                foreach (Level level in Model.Rubric.Levels)
+                                {
+                                    counter++;
+                                    string cssClass = "level_4";
+                                    if (counter < 11)
+                                    {
+                                        cssClass = "level_" + counter.ToString();
+                                    }
+                                    
+                                    <th class="@cssClass" style="width:@(sliderTableCellWidth * (level.PointSpread))px;">
+                                        @level.LevelTitle
+                                    (@previousMax - @(previousMax + level.PointSpread - 1))
                                     </th>
-                                  previousMax += level.PointSpread;
-                              }
-                              }
+                                    
+                                    previousMax += level.PointSpread;
+                                }
+                            }
                             
                             <th class="text_input_score">
                             </th>

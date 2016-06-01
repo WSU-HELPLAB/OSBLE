@@ -149,6 +149,18 @@ ul.RubricList
                 <li>
                     <input type="checkbox" name="criterionComments" @ViewBag.criteriaCommentsCheckedValue/>Comments for each criterion
                 </li>
+                <li>
+                    <h5>Point increment for grade scale:</h5>
+                </li>
+                <li>
+                    <input type="radio" class="gradeIncrement" name="gradeStepRadio" value="fullStep" checked="checked" />Allow only full-point grades in rubric evaluation
+                </li>
+                <li>
+                    <input type="radio" class="gradeIncrement" name="gradeStepRadio" value="halfStep" @ViewBag.enableHalfStepCheckedValue />Allow half-point grades in rubric evaluation
+                </li>
+                <li>
+                    <input type="radio" class="gradeIncrement" name="gradeStepRadio" value="quarterStep" @ViewBag.enableQuarterStepCheckedValue />Allow quarter-point grades in rubric evaluation
+                </li>
             </ul>
         </td>
 
