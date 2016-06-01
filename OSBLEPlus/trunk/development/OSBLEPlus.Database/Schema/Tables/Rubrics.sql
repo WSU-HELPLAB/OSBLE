@@ -3,6 +3,8 @@
     [Description]         NVARCHAR (MAX) NOT NULL,
     [HasCriteriaComments] BIT            NOT NULL,
     [HasGlobalComments]   BIT            NOT NULL,
+    [EnableHalfStep] BIT NOT NULL, 
+    [EnableQuarterStep] BIT NOT NULL, 
     CONSTRAINT [PK_dbo.Rubrics] PRIMARY KEY CLUSTERED ([ID] ASC)
 );
 

@@ -20,6 +20,12 @@ namespace OSBLE.Models.Courses.Rubrics
         [Required]
         public bool HasGlobalComments { get; set; }
 
+        [Required]
+        public bool EnableHalfStep { get; set; }
+
+        [Required]
+        public bool EnableQuarterStep { get; set; }
+
         [Association("Levels", "ID", "RubricID")]
         public virtual IList<Level> Levels { get; set; }
 
@@ -33,6 +39,8 @@ namespace OSBLE.Models.Courses.Rubrics
         {
            Levels = new List<Level>();
            Criteria = new List<Criterion>();
+           EnableHalfStep = false;
+           EnableQuarterStep = false;
         }
 
         public void BuildRelationship(DbModelBuilder modelBuilder)

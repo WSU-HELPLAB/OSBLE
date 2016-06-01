@@ -66,7 +66,9 @@ namespace OSBLE.Areas.AssignmentWizard.ViewModels
                         assignment.AssignmentName,
                         assignment.ID,
                         assignment.RubricID,
-                        assignment.StudentRubricID
+                        assignment.StudentRubricID,
+                        assignment.Rubric.EnableHalfStep,
+                        assignment.Rubric.EnableQuarterStep
                         ));
                 }
 
@@ -77,7 +79,9 @@ namespace OSBLE.Areas.AssignmentWizard.ViewModels
                         assignment.AssignmentName,
                         assignment.ID,
                         assignment.RubricID,
-                        assignment.StudentRubricID
+                        assignment.StudentRubricID,
+                        assignment.Rubric.EnableHalfStep,
+                        assignment.Rubric.EnableQuarterStep
                         ));
                 }
             }
@@ -93,18 +97,24 @@ namespace OSBLE.Areas.AssignmentWizard.ViewModels
         public int AssignmentID { get; set; }
         public int? RubricID { get; set; }
         public int? StudentRubricID { get; set; }
+        public bool EnableHalfStep { get; set; }
+        public bool EnableQuarterStep { get; set; }
 
         public RubricViewModel(string rubricDescription, 
                 string assignmentName, 
                 int assignmentID, 
                 int? rubricID,
-                int? studentRubricID)
+                int? studentRubricID,
+                bool enableHalfStep,
+                bool enableQuarterStep)
         {
             RubricDescription = rubricDescription;
             AssignmentName = assignmentName;
             AssignmentID = assignmentID;
             RubricID = rubricID;
             StudentRubricID = studentRubricID;
+            EnableHalfStep = enableHalfStep;
+            EnableQuarterStep = enableQuarterStep;
         }
     }
 }

@@ -19,8 +19,8 @@
   string publishButton = ViewBag.PublishButtonId;
   string gradeId = "grade";
   int sliderTableLength = 880;
-  int textInputLenght = 25;
-  int sliderTableCellWidth = (sliderTableLength / maxLevelScore) - textInputLenght;
+  int textInputLength = 25;
+  int sliderTableCellWidth = (sliderTableLength / maxLevelScore) - textInputLength;
 
   DateTime? publishTime = Model.Evaluation.DatePublished;
 
@@ -37,39 +37,39 @@
 }
 <script type="text/javascript">
 
-$(document).ready(function () {
-    var height = parseFloat($(window).height());
-    height = height - 275;
-    $("#internalScrollID").height(height + "px");
-
-    var width = parseFloat($(window).width());
-    width = width - 20;
-    $("#rubric_evaluator").width(width + "px");
-    $("#internalScrollID").width(width + "px");
-    width = width - 70;
-    $(".criterion_div").width(width + "px");
-    
-
-    $(window).bind('resize', resizeWindow);
-
-    function resizeWindow(e) {
+    $(document).ready(function () {
         var height = parseFloat($(window).height());
         height = height - 275;
         $("#internalScrollID").height(height + "px");
 
         var width = parseFloat($(window).width());
-        if (width > 1000) {
-            width = width - 20;
-            $("#rubric_evaluator").width(width + "px");
-            $("#internalScrollID").width(width + "px");
-            width = width - 70;
-            $(".criterion_div").width(width + "px");
+        width = width - 20;
+        $("#rubric_evaluator").width(width + "px");
+        $("#internalScrollID").width(width + "px");
+        width = width - 70;
+        $(".criterion_div").width(width + "px");
+
+
+        $(window).bind('resize', resizeWindow);
+
+        function resizeWindow(e) {
+            var height = parseFloat($(window).height());
+            height = height - 275;
+            $("#internalScrollID").height(height + "px");
+
+            var width = parseFloat($(window).width());
+            if (width > 1000) {
+                width = width - 20;
+                $("#rubric_evaluator").width(width + "px");
+                $("#internalScrollID").width(width + "px");
+                width = width - 70;
+                $(".criterion_div").width(width + "px");
+            }
+
         }
+    });
 
-    }
-});
-
-function create_and_open_downloading_submission_dialog() {
+    function create_and_open_downloading_submission_dialog() {
 
         //create the div that we will then make into a dialog
 
@@ -88,7 +88,7 @@ function create_and_open_downloading_submission_dialog() {
             height: 300,
             closeOnEscape: true,
             close: remove_downloading_submission_dialog,
-            buttons: {"OK": remove_downloading_submission_dialog}
+            buttons: { "OK": remove_downloading_submission_dialog }
         });
 
         $('#downloading_submission_dialog').dialog('open');
@@ -106,25 +106,23 @@ function create_and_open_downloading_submission_dialog() {
         $('#downloading_submission_dialog').remove();
     }
 
-    function switchEvaluation()
-    {
+    function switchEvaluation() {
         var assignmentID = $('#@selectedAssignment').val();
         var teamID = $('#@selectedTeam').val();
         window.location.replace("/Rubric?assignmentId=" + assignmentID + "&cuId=" + teamID);
     }
 
-    function switchEvalButton(aId, cId)
-    {
+    function switchEvalButton(aId, cId) {
         window.location.replace("/Rubric?assignmentId=" + aId + "&cuId=" + cId);
     }
 
-    function updateGrade()
-    {
+    function updateGrade() {
         var grade = 0.0;
         @{foreach (Criterion crit in Model.Rubric.Criteria)
           {
               string targetId = String.Format("\"#{0}_{1}\"", critInputPrefix, crit.ID);
-              @Html.Raw("\tgrade += $(" + targetId + ").val() / " + maxLevelScore + " * " + crit.Weight / totalRubricPoints + ";\n")
+              //@Html.Raw("\tgrade += $(" + targetId + ").val() / " + Convert.ToDouble(maxLevelScore) + " * " + crit.Weight / totalRubricPoints + ";\n")
+              @Html.Raw("\tgrade += $(" + targetId + ").val() / " + Convert.ToDouble(maxLevelScore) + " * " + crit.Weight / totalRubricPoints + ";\n")
           }
         }
         $('#@gradeId').html(Math.round(grade * 100) + "%");
@@ -147,8 +145,6 @@ function create_and_open_downloading_submission_dialog() {
             width: 500,
             height: 225,
             closeOnEscape: false
-            
-            
         });
     }
 </script>

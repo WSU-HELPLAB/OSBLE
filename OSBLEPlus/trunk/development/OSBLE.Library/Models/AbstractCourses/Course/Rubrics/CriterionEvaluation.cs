@@ -19,7 +19,7 @@ namespace OSBLE.Models.Courses.Rubrics
         public int RubricEvaluationID { get; set; }
         public virtual RubricEvaluation RubricEvaluation { get; set; }
 
-        public int? Score { get; set; }
+        public double? Score { get; set; }
 
         [StringLength(4000)]
         public string Comment { get; set; }

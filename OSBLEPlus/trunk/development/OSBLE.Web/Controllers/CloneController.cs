@@ -375,6 +375,8 @@ namespace OSBLE.Controllers
                     Rubric nr = new Rubric();
                     nr.HasGlobalComments = Source.Rubric.HasGlobalComments;
                     nr.HasCriteriaComments = Source.Rubric.HasCriteriaComments;
+                    nr.EnableHalfStep = Source.Rubric.EnableHalfStep;
+                    nr.EnableQuarterStep = Source.Rubric.EnableQuarterStep;
                     nr.Description = Source.Rubric.Description;
                     Destination.Rubric = nr;
                     db.Entry(Destination).State = EntityState.Modified;
@@ -437,6 +439,8 @@ namespace OSBLE.Controllers
                     Rubric nr = new Rubric();
                     nr.HasGlobalComments = Source.Rubric.HasGlobalComments;
                     nr.HasCriteriaComments = Source.Rubric.HasCriteriaComments;
+                    nr.EnableHalfStep = Source.Rubric.EnableHalfStep;
+                    nr.EnableQuarterStep = Source.Rubric.EnableQuarterStep;
                     nr.Description = Source.Rubric.Description;
 
                     db.Rubrics.Add(nr);

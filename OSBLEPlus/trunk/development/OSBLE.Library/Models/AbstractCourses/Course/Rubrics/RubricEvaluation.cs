@@ -106,7 +106,7 @@ namespace OSBLE.Models.Courses.Rubrics
                         double currentWeight = critEval.Criterion.Weight;
                         sumOfWeights += currentWeight;
 
-                        int? currentScore = critEval.Score;
+                        double? currentScore = critEval.Score;
 
                         if (currentScore.HasValue)
                         {
