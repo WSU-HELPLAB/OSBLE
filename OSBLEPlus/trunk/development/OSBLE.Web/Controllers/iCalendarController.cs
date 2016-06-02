@@ -143,9 +143,22 @@ namespace OSBLE.Controllers
                     else //no longer DST
                     {
                         bool matchingStartDay = false;
-                        while (!matchingStartDay)
-                        {
-                            switch (currentTime.DayOfWeek)
+
+                        /*
+                         * if there happens to be a "meeting times" in the database without a day of the week associated with
+                         * the meeting, we need to skip the while and switch case, otherwise it's an infinite loop!
+                        */
+                        bool meetingTimeWithoutDaysOfWeek = cm.Sunday || cm.Monday || cm.Tuesday || cm.Wednesday 
+                                                            || cm.Thursday || cm.Friday || cm.Saturday ? false : true;
+
+                        int count = 0; //infinite loop protection x2!
+
+                        //WHILE matchingStartDay is false (default false) AND the meeting time has at least one day of the week
+                        //AND if we've hit a count of 7, that means we've already checked each day of the week and will never find one!
+                        //exit while if we fail either of these conditions!
+                        while ((!matchingStartDay && !meetingTimeWithoutDaysOfWeek) && count < 7)
+                        {                            
+                            switch (currentTime.DayOfWeek) //find which day of the week for this meeting
                             {
                                 case DayOfWeek.Monday:
                                     if (cm.Monday)
@@ -185,16 +198,20 @@ namespace OSBLE.Controllers
                                 currentTime = new DateTime(currentTime.Year, currentTime.Month, currentTime.AddDays(1).Day,
                                                         evtStart.Hour, evtStart.Minute, evtStart.Second, DateTimeKind.Utc);
                             }
+                            count++; //infinite loop protection x2! if we've reached 7 we've cycled all weekdays, so get us out of here!
                         }
 
-                        evt.Start = new iCalDateTime(currentTime.UTCToCourse(ActiveCourseUser.AbstractCourseID));
-                        evt.End = new iCalDateTime(evtEnd.UTCToCourse(ActiveCourseUser.AbstractCourseID));
-                        evt.LastModified = new iCalDateTime(DateTime.Now);
-                        evt.Summary = cm.Name;
-                        evt.Location = cm.Location;
-                        evt.RecurrenceRules.Add(pattern);
+                        //proceed only if there was a day of the week found for this course meeting time
+                        if(!meetingTimeWithoutDaysOfWeek && matchingStartDay)
+                        {
+                            evt.Start = new iCalDateTime(currentTime.UTCToCourse(ActiveCourseUser.AbstractCourseID));
+                            evt.End = new iCalDateTime(evtEnd.UTCToCourse(ActiveCourseUser.AbstractCourseID));
+                            evt.LastModified = new iCalDateTime(DateTime.Now);
+                            evt.Summary = cm.Name;
+                            evt.Location = cm.Location;
+                            evt.RecurrenceRules.Add(pattern);
+                        }                        
                     }
-
                 }
 
                 //create the course breaks 
@@ -339,7 +356,20 @@ namespace OSBLE.Controllers
                     else //no longer DST
                     {
                         bool matchingStartDay = false;
-                        while (!matchingStartDay)
+
+                        /*
+                         * if there happens to be a "meeting times" in the database without a day of the week associated with
+                         * the meeting, we need to skip the while and switch case, otherwise it's an infinite loop!
+                        */
+                        bool meetingTimeWithoutDaysOfWeek = cm.Sunday || cm.Monday || cm.Tuesday || cm.Wednesday
+                                                            || cm.Thursday || cm.Friday || cm.Saturday ? false : true;
+
+                        int count = 0; //infinite loop protection x2!
+
+                        //WHILE matchingStartDay is false (default false) AND the meeting time has at least one day of the week
+                        //AND if we've hit a count of 7, that means we've already checked each day of the week and will never find one!
+                        //exit while if we fail either of these conditions!
+                        while ((!matchingStartDay && !meetingTimeWithoutDaysOfWeek) && count < 7)                        
                         {
                             switch (currentTime.DayOfWeek)
                             {
@@ -381,16 +411,20 @@ namespace OSBLE.Controllers
                                 currentTime = new DateTime(currentTime.Year, currentTime.Month, currentTime.AddDays(1).Day,
                                                         evtStart.Hour, evtStart.Minute, evtStart.Second, DateTimeKind.Utc);
                             }
+                            count++; //infinite loop protection x2! if we've reached 7 we've cycled all weekdays, so get us out of here!
                         }
 
-                        evt.Start = new iCalDateTime(currentTime.UTCToCourse(ActiveCourseUser.AbstractCourseID));
-                        evt.End = new iCalDateTime(evtEnd.UTCToCourse(ActiveCourseUser.AbstractCourseID));
-                        evt.LastModified = new iCalDateTime(DateTime.Now);
-                        evt.Summary = cm.Name;
-                        evt.Location = cm.Location;
-                        evt.RecurrenceRules.Add(pattern);
+                        //proceed only if there was a day of the week found for this course meeting time
+                        if (!meetingTimeWithoutDaysOfWeek && matchingStartDay)
+                        {
+                            evt.Start = new iCalDateTime(currentTime.UTCToCourse(ActiveCourseUser.AbstractCourseID));
+                            evt.End = new iCalDateTime(evtEnd.UTCToCourse(ActiveCourseUser.AbstractCourseID));
+                            evt.LastModified = new iCalDateTime(DateTime.Now);
+                            evt.Summary = cm.Name;
+                            evt.Location = cm.Location;
+                            evt.RecurrenceRules.Add(pattern);
+                        }    
                     }
-
                 }// end foreach
 
                 //create the course breaks 
