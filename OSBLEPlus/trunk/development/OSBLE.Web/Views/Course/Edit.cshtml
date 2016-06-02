@@ -235,7 +235,35 @@
         <br />
 
         <p>
-            <input type="submit" value="Update Course" />
+            <input type="submit" value="Update Course" name="updateCourse" />            
         </p>
 }
 
+
+<script type="text/javascript">
+
+    $("input[name=updateCourse]").click(function (e) {        
+        
+        //check each meeting_times box to make sure the user is not creating a meeting times with no days.
+        $('#meeting_times').children('div').each(function () {
+            var meetingsChecked = 0;
+            //search each meeting_time checkbox for at least 1 meeting time. 
+            $(this).find(':checkbox').each(function () {
+                if ($(this).is(':checked'))
+                    meetingsChecked++;                
+            });
+            
+            //if we have not found at least one checked meeting time, prevent submitting changes
+            if(meetingsChecked == 0)
+            {
+                preventSubmit(e);
+                return false; //exit the foreach
+            }            
+        }); 
+    });
+
+    function preventSubmit(e) {
+        e.preventDefault();
+        alert("All meeeting times must have at least 1 day checked. Please check at least 1 day of the week for all meeting times or click the 'X' to remove the meeting time without a day checked.");
+    }
+</script>

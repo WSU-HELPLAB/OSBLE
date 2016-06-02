@@ -690,6 +690,7 @@ namespace OSBLE.Controllers
             ViewBag.CurrentTab = "Course Settings";
             Course course = (Course)db.Courses.Find(ActiveCourseUser.AbstractCourseID);
 
+            //TODO: look into utcOffset - It's possible this is not used anymore!
             //Get the user's time zone cookie and convert it to int
             System.Web.HttpCookie cookieOffset = new System.Web.HttpCookie("utcOffset");
             cookieOffset = Request.Cookies["utcOffset"];
@@ -703,14 +704,14 @@ namespace OSBLE.Controllers
             {
                 utcOffset = 0;
             }
+            //TODO: utcOffset block end
 
-            //yc: this edit no longer needs to check this anymore. may have to remove all of this if statement
-            //If it exists, which it should update all of the meetings to reflect the correct utc adjusted time.
+
             //locate timezone offset
             int courseOffset = (ActiveCourseUser.AbstractCourse).GetType() != typeof(Community) ? ((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset : 0;
             TimeZoneInfo tz = getTimeZone(courseOffset);
 
-            if (utcOffset != 0)
+            if (courseOffset != 0)
             {
                 ICollection<CourseMeeting> Meetings = course.CourseMeetings;
                 foreach (CourseMeeting meeting in Meetings)
@@ -720,8 +721,10 @@ namespace OSBLE.Controllers
 
                 }
             }
-            else //Rare case where a cookie doesn't exist set the time to null essentially
-            {
+            //Rare case where a cookie doesn't exist set the time to null essentially
+            //TODO: check case where this happens. Allowing the user to try and save course meetings without meeting days breaks assignment editing and publishing!
+            else 
+            {   
                 ICollection<CourseMeeting> Meetings = course.CourseMeetings;
                 foreach (CourseMeeting meeting in Meetings)
                 {
