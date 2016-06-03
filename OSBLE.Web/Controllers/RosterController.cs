@@ -1098,6 +1098,28 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index");
         }
 
+        //takes a list of ids
+        //converts them to ints
+        //changes the users with those ids to have the passed in section
+        
+        public bool EditSections(List<int> ids, int section, int courseID)
+        {
+            foreach (int id in ids)
+            {
+
+                CourseUser temp = (from c in db.CourseUsers
+                                   where c.UserProfileID == id
+                                   && c.AbstractCourseID == courseID
+                                   select c).FirstOrDefault();
+
+                temp.Section = section;
+            }
+
+                db.SaveChanges();
+
+            return true;
+        }
+
         //
         // POST: /Roster/Edit/5
 
