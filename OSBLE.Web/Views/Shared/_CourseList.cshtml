@@ -10,7 +10,7 @@
         @if (ViewBag.ActiveCourseUser != null)
         {
             currentCourseName = DBHelper.GetCourseShortNameFromID(ViewBag.ActiveCourseUser.AbstractCourseID, connection);
-            <a data-course-id="@ViewBag.ActiveCourseUser.AbstractCourseID" class="dropdown-toggle" data-toggle="dropdown" href="#">
+            <a id="data-course-link" data-course-id="@ViewBag.ActiveCourseUser.AbstractCourseID" class="dropdown-toggle" data-toggle="dropdown" href="#">
                 @currentCourseName
                 <span class="caret"></span>
             </a>
