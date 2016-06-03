@@ -20,6 +20,8 @@
     });
 </script>
 
+
+
 <h2>
     Roster</h2>
 <h4>@ViewBag.Notice</h4>
@@ -64,6 +66,116 @@
     Quick Filter By Name: @Helpers.CreateToolTip(ToolTips.RosterQuickFilter)
     <input type="text" id="roster_find" />
 </div>
+
+<div>
+
+    <text>Move checked students to section: </text>
+    <select id="sectionSelection">
+        @{
+        int count = 0;
+        foreach (RosterController.UsersBySection usersBySection in ViewBag.UsersBySections)
+        {
+            <option value="@usersBySection.SectionNumber">@usersBySection.SectionNumber</option>
+            count = Int32.Parse(usersBySection.SectionNumber) + 1; //alwasy set count to the highest number
+        }
+
+        <option value="@count.ToString()">New Section (@count)</option>
+        }
+    </select>
+    <input type="button" id="moverButton" value="Move selected" />
+</div>
+
+
+<script type="text/javascript">
+    var moveSectionButton = document.getElementById("moverButton");
+
+    //execute this when button is pressed
+    moveSectionButton.addEventListener("click", moveUsers);
+
+    function moveUsers() {
+        //code after move users clicked
+        var users = document.getElementsByClassName("moveThisUser");
+        var checkedUsers = Array();
+        var didChangeUser = false;
+        var sectionDropdown = document.getElementById("sectionSelection").selectedIndex;
+        var sectionOptions = document.getElementById("sectionSelection").options;
+
+        sectionDestination = sectionOptions[sectionDropdown].value;
+
+        var classID = document.getElementById("data-course-link").getAttribute("data-course-id");
+        var courseIDs = Array();
+
+        $.each(users, function (i, val) {
+            if (this.checked) //if the user is checked, add the user element to the array
+            {
+                checkedUsers.push(this.parentElement);
+            }
+        });
+
+        //go through all the checked users and change their section
+        $.each(checkedUsers, function (i, val) {
+            var children = this.childNodes;
+            var selectedUser;
+
+            for (i = 0; i < children.length; i++) {
+                if (children[i].id === "userID") {
+                    selectedUser = children[i];
+                    break;
+                }
+            }
+
+            var userID = selectedUser.getAttribute("studentID");
+            courseIDs.push(userID);
+            //EditSections(userID, sectionDestination, classID);
+
+            didChangeUser = true;
+        });
+
+        EditSections(courseIDs, sectionDestination, classID);
+    }
+
+    function EditSections(userIDs, desiredSection, abstractCourseID)
+    {
+        $.ajax({
+            url: '/Roster/EditSections/',
+            dataType: "json",
+            traditional: true,
+            data: { ids: userIDs, section: desiredSection, courseID: abstractCourseID },
+            complete: function () {
+                window.location.reload();
+            }
+        })
+    }
+
+    function changeColor(block) {
+        var box;
+        for (x = 0; x < block.childNodes.length; x++) {
+            if (block.childNodes[x].id === "moveStudentBox") {
+                box = block.childNodes[x];
+            }
+        }
+
+        if (box.checked) {
+            box.checked = false;
+        }
+        else {
+            box.checked = true;
+        }
+        
+        //alert("Background color is: " + block.style.backgroundColor);
+
+        if (block.style.backgroundColor === "") {
+            block.style.backgroundColor = "#A6A6A6"; //#595959
+            block.style.color = "white";
+        }
+        else {
+            block.style.backgroundColor = "";
+            block.style.color = "black";
+        }
+    }
+</script>
+
+
 @* Hides anything that doesn't match search filter *@
 <script type="text/javascript">
     if ("Cat".match(".*as")) alert('hi');
@@ -85,7 +197,6 @@
                 }
             }
         });
-
     });
 </script>
 
@@ -107,13 +218,12 @@
 
     bool whitelistFlag = true;
 
+    <h4 style="color:black;">Click on users to select multiple to move many at once</h4>
     foreach (RosterController.UsersBySection usersBySection in ViewBag.UsersBySections)
     {
         <h3>@Helpers.DisplaySection(usersBySection.SectionNumber)
-        </h3>
-    
+        </h3>  
  
-    
         @* Button Pills used to simplify navigation on mobile devices (only visible when width < 850px)*@
         <div class="btn-group btn-group-justified roster_pills">
             @{ bool firstRole = true; }
@@ -164,10 +274,7 @@
                                     if (WTuser.Email != String.Empty && WTuser.Email != null)
                                     {
                                         <li id="wtuser_item_@WTuser.ID">
-
                                             <div class="user_controls">
-
-
                                                 <a title="Send Course Invitation Email" href="@Url.Action("resendWhiteTableEmail", "Roster", new { wtUserId = WTuser.ID })">@Helpers.MailButton()</a>
 
                                                 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
@@ -200,10 +307,7 @@
                                 }
                             </ul>
                             whitelistFlag = false; //only display this one time.
-                        }
-                    
-                    
-
+                        }              
                     </td>
                     }
                     if (userByRole.Count > 0 && userByRole.RoleName != "Pending")
@@ -235,7 +339,7 @@
                         <ul class="user_list">
                             @foreach (OSBLE.Models.Users.UserProfile user in userByRole.Users)
                             {
-                                <li id="user_item_@(user.ID)">
+                                <li onclick="changeColor(this)" id="user_item_@(user.ID)" class="UserLI">
                                     @if ((user != ViewBag.CurrentUser) || ViewBag.CanEditSelf == true)
                                     {
                                         <div class="user_controls">
@@ -247,12 +351,11 @@
 
                                             @if (user.UserName != null)
                                             {
-                                                <a title="Mail This User" href="@Url.Action("CreateUserProfileId", "Mail", new { id = user.ID })">@Helpers.MailButton()</a>
-                                            
+                                                <a title="Mail This User" href="@Url.Action("CreateUserProfileId", "Mail", new { id = user.ID })">@Helpers.MailButton()</a>                                            
                                             }
+                                            
                                             @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                                             {
-                                            
                                                 <a title="Modify This User" href="@Url.Action("Edit", "Roster", new { userProfileID = user.ID })">@Helpers.EditButton()</a>
                                                 <form action="@Url.Action("Delete")"
                                     style="display: inline;"
@@ -279,12 +382,16 @@
                                         </div>
                                     }
                                     @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", new { userProfile = user.ID }))
-                                    <span class="roster_name">@Helpers.DisplayFullNameOrPending(user)</span> </li>
-                            
+                                    <span class="roster_name">@Helpers.DisplayFullNameOrPending(user)</span>
+                                    <data id="userID" studentID="@user.ID"></data>
+                                    <br />
+                                    <input id="moveStudentBox" type="checkbox" style="visibility:hidden;" class="moveThisUser" />
+                                    </li>                            
                             }
                         </ul>
                     </td>
                     }
+                    
                     else if (userByRole.Count > 0 && userByRole.RoleName == "Pending")
                     {
                         <td class="role-@userByRole.RoleName section-@usersBySection.SectionNumber">
@@ -316,20 +423,16 @@
                                             </div>
                                         }
                                         @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", new { userProfile = user.ID }))
-                                        <span class="roster_name">@Helpers.DisplayFullNameOrPending(user) 
-                                    
-
+                                        <span class="roster_name">@Helpers.DisplayFullNameOrPending(user)                                    
                                         </span>
                                     </li>
                                 }
                             </ul>
                         </td>
                     }
-                }
-            
+                }            
             </tr>
 
         </table>
     }
 }
-
