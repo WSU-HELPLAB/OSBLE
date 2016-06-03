@@ -10,6 +10,7 @@
     List<CourseUser> allUsers = ViewBag.AllUsers;
     List<Assignment> previousTeamAssignments = ViewBag.PreviousTeamAssignments;
     ViewBag.ComponentName = "Discussion Team Settings";
+    HashSet<int> sections = new HashSet<int>();
 }
 
 @section Header
@@ -53,7 +54,10 @@ else
 @Html.HiddenFor(m => m.ID)
 <div>
     <h3>Generate Teams Automatically</h3>
-    <input id="allow_cross_section" type="checkbox" name="crossSection" value="yes">Allow Cross-Section teams<br>
+    <div id="checkContainer">
+        <input id="allow_cross_section" type="checkbox" name="crossSection" value="yes">Allow Cross-Section teams
+        <br>
+    </div>
     <ul>
         <li id="studentsPerTeam">
             Create a configuration with at least <input type="text" id="AutoGenByStudentTextBox" /> students per team per section
@@ -104,6 +108,9 @@ else
                     Section: @cu.Section
                     <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @studentDisplayName" title="remove @studentDisplayName" onclick="removeFromTeam(this)" />
                 </li>
+
+                 <li style="hidden"
+                 @sections.Add(cu.Section) ; />
             }
         }
     </ul>
@@ -169,6 +176,9 @@ else
                             <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @displayName" title="remove @displayName" onclick="removeFromTeam(this)" />
                         </li>
                     }
+
+                    <li style="hidden"
+                     @sections.Add(member.CourseUser.Section) ; />
                 }
             </ul>
         </div>
@@ -201,11 +211,40 @@ else
     <input type="hidden" id="team_@(team.TeamID)" name="team_@(team.TeamID)" value="@team.Team.Name" />
 }
 
+
+@if (sections.Count > 1)
+{
+    <div id="moreThanOneSection" istrue="true"></div>
+}
+else
+{
+    <div id="moreThanOneSection" istrue="false"></div>
+}
+
 </div>
 <br />
 <br />
 
 <script type="text/javascript">
+
+    document.getElementById("allow_cross_section").addEventListener("change", changeText);
+
+    $('document').ready(function () { //on load determine if there are multiple sections. If not, disable the check and hide it.
+        var temp = document.getElementById("moreThanOneSection");
+
+        if (temp.getAttribute("isTrue") != "true") { //if there's only one section, disable the cross section team box
+            var disableThis = document.getElementById("checkContainer");
+            disableThis.hidden = true;
+
+            document.getElementById("studentsPerTeam").innerHTML = 'Create a configuration with at least <input type="text" id="AutoGenByStudentTextBox"  /> students per team' +
+        '<button type="button" id="AutoGenByStudentButton" onclick="generateTeamsByNumberOfStudents()">Go</button>'
+            document.getElementById("teamPerCourse").innerHTML = 'Create a configuration with <input type="text" id="AutoGenByteamTextBox" size="3" /> total teams' +
+        '<button type="button" id="AutoGenByTeamButton" onclick="generateTeamsByNumberOfTeams()">Go</button>'
+        }
+
+
+
+    });
 
 
     //change the text when checkbox is checked.
