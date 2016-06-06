@@ -242,8 +242,21 @@
 
 <script type="text/javascript">
 
+    //validate the days of the weeks checkboxes
     $("input[name=updateCourse]").click(function (e) {        
         
+        //clear any meeting times validation messages
+        $(".meeting_weekday_validation").each(function () {            
+            $(this).remove();
+        });
+        //clear validation background
+        $('[id^=weekday_checkbox_]').each(function () {
+            $(this).css("background-color", "");
+        });
+
+        var meeting_validation_failed = false;
+        var id_list = new Array(); //keep track of tables which failed validation
+
         //check each meeting_times box to make sure the user is not creating a meeting times with no days.
         $('#meeting_times').children('div').each(function () {
             var meetingsChecked = 0;
@@ -255,15 +268,34 @@
             
             //if we have not found at least one checked meeting time, prevent submitting changes
             if(meetingsChecked == 0)
-            {
-                preventSubmit(e);
-                return false; //exit the foreach
+            {                
+                var id = $(this).attr("id");
+                id = id[id.length - 1]; //get the id for the current meeting_times table
+                id_list.push(id); //add to list
+                meeting_validation_failed = true;                
             }            
-        }); 
+        });
+
+        if(meeting_validation_failed)
+        {
+            //go through list of meeting_times tables and add validation message and change the checkbox row background color
+            for (var i = 0; i < id_list.length; i++) {
+                $('#' + 'meeting_time_table_' + id_list[i]).append(meetingValidationTemplate); //template is in osble.courses.js
+                $('#' + 'weekday_checkbox_' + id_list[i]).css("background-color", "#ffeeee");
+            }            
+
+            //make sure we have at least 1 validation object, if so scroll to the top of that object
+            if (id_list.length>0) {
+                $('html, body').animate({
+                    scrollTop: ($('#' + 'meeting_time_table_' + id_list[0]).first().offset().top)
+                }, 500);
+            }
+
+            preventSubmit(e); //we failed validation... we don't want to submit until it is fixed!
+        }
     });
 
     function preventSubmit(e) {
-        e.preventDefault();
-        alert("All meeeting times must have at least 1 day checked. Please check at least 1 day of the week for all meeting times or click the 'X' to remove the meeting time without a day checked.");
+        e.preventDefault();        
     }
 </script>
