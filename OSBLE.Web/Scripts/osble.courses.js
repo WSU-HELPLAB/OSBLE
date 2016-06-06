@@ -3,7 +3,7 @@
             <div class="meeting_time_tools">\
                 <a href="#" title="Delete This Meeting Time" onclick="$(this).parent().parent().hide(\'highlight\',function(){$(this).remove()}); return false;"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a>\
             </div>\
-            <table>\
+            <table id="meeting_time_table_${count}">\
             <tr>\
                 <td>S</td>\
                 <td>M</td>\
@@ -13,7 +13,7 @@
                 <td>F</td>\
                 <td>S</td>\
             </tr>\
-            <tr>\
+            <tr id="weekday_checkbox_${count}">\
                 <td>\
                     <input type="checkbox" ${sun_check} value="true" name="meeting_sunday_${count}" />\
                 </td>\
@@ -75,6 +75,11 @@
         </div>\
         ';
 
+var meetingValidationTemplate = '\
+            <tr class="meeting_weekday_validation" >\
+                <td colspan="7" style="color: red;">Required: select at least 1 day of the week</td>\
+            </tr>\
+            ';
 
 var breakTemplate = '\
         <div class="break" id="break_${count}">\
