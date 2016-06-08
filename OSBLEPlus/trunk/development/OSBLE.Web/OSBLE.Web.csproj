@@ -713,6 +713,7 @@
     <Content Include="Content\images\help\basic_7.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\help\basic_mobile_1.PNG" />
     <Content Include="Content\images\help\create_1.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -725,27 +726,14 @@
     <Content Include="Content\images\help\create_4.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\images\help\discussion_1.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\images\help\discussion_2.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\images\help\discussion_3.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\images\help\discussion_4.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\images\help\discussion_5.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\images\help\discussion_6.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\images\help\discussion_7.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Content\images\help\create_mobile_1.PNG" />
+    <Content Include="Content\images\help\create_mobile_2.PNG" />
+    <Content Include="Content\images\help\discussion_1.PNG" />
+    <Content Include="Content\images\help\discussion_2.PNG" />
+    <Content Include="Content\images\help\discussion_3.PNG" />
+    <Content Include="Content\images\help\discussion_4.PNG" />
+    <Content Include="Content\images\help\discussion_5.PNG" />
+    <Content Include="Content\images\help\discussion_6.PNG" />
     <Content Include="Content\images\help\gradebook_1.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -797,6 +785,7 @@
     <Content Include="Content\images\help\roster_4.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\help\roster_mobile_1.PNG" />
     <Content Include="Content\images\help\selected_course.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
