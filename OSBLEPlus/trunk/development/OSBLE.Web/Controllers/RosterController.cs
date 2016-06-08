@@ -213,6 +213,14 @@ namespace OSBLE.Controllers
         [NotForCommunity]
         public ActionResult ImportRoster(HttpPostedFileBase file)
         {
+            string extension = Path.GetExtension(file.FileName);
+
+            if (((file != null) && (file.ContentLength > 0)) && !String.Equals(".csv", extension))
+            {
+                ViewBag.Error = "OSBLE was unable to import the selected file.\nCurrently OSBLE+ only accepts comma-separated ('.csv') files.\nPlease choose a roster in the .csv format and try again.";
+                return View("RosterError");
+            }
+
             if ((file != null) && (file.ContentLength > 0))
             {
                 // Save file into session
