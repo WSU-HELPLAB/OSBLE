@@ -6,6 +6,12 @@
     ViewBag.Title = "Roster";
 }
 
+<style type="text/css">
+    .disabled {
+        color: #999;
+    }
+</style>
+
 <script type="text/javascript">
     $(document).ready(function () {
         $("#deleteAllWithdrawnStudents").click(function () {
@@ -17,7 +23,7 @@
                 return false;
             }
         });
-    });
+    });    
 </script>
 
 
@@ -48,8 +54,9 @@
             Upload a comma-separated (CSV) roster of students in this course:<br />
             @using (Html.BeginForm("ImportRoster", "Roster", FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
-                <input type="file" name="file" />
-                <input type="submit" value="Upload Roster" />
+                <input id="import_roster_pick_file" type="file" name="file" accept=".csv" />
+                <input id="import_roster_submit" class="disabled" type="submit" value="Upload Roster" disabled="disabled" />
+                <p id="import_roster_error" class="error" hidden="hidden">Currently OSBLE+ only accepts comma-separated ('.csv') files. Please choose a roster in the .csv format and try again.</p>
             }
         </div>
     </div>
@@ -211,6 +218,20 @@
 
     $(document).ready(function () {
         $('.roster_table td:first-child').addClass("active");
+    });
+
+    $('#import_roster_pick_file').change(function () {        
+        var fileExtension = ['csv']; //TODO: change here when support for other files types are added
+        if ($.inArray($(this).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+            $("#import_roster_submit").prop('disabled', true);
+            $("#import_roster_submit").addClass("disabled");
+            $("#import_roster_error").prop('hidden', false);            
+        }
+        else {
+            $("#import_roster_submit").prop('disabled', false);
+            $("#import_roster_submit").removeClass("disabled");
+            $("#import_roster_error").prop('hidden', true);
+        }
     });
 </script>
 
