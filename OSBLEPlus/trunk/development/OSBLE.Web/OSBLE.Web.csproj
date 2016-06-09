@@ -726,6 +726,7 @@
     <Content Include="Content\images\help\create_4.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\help\create_5.PNG" />
     <Content Include="Content\images\help\create_mobile_1.PNG" />
     <Content Include="Content\images\help\create_mobile_2.PNG" />
     <Content Include="Content\images\help\discussion_1.PNG" />
