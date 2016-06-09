@@ -7,16 +7,69 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var height = parseFloat($(window).height());
+        height = height - 275;
+        $("#internalScrollID").height(height + "px");
+
+        var width = parseFloat($(window).width());
+        width = width - 20;
+        $("#rubric_evaluator").width(width + "px");
+        $("#internalScrollID").width(width + "px");
+        width = width - 70;
+        $(".criterion_div").width(width + "px");
+
+        $(window).bind('resize', resizeWindow);
+
+        function resizeWindow(e) {
+            var height = parseFloat($(window).height());
+            height = height - 275;
+            $("#internalScrollID").height(height + "px");
+
+            var width = parseFloat($(window).width());
+            if (width > 1000) {
+                width = width - 20;
+                $("#rubric_evaluator").width(width + "px");
+                $("#internalScrollID").width(width + "px");
+                width = width - 70;
+                $(".criterion_div").width(width + "px");
+            }
+        }
+    });
+
+    function displayImportRubric(e) {
+        e.preventDefault();
+        $("#import_all_rubrics_from_csv").dialog({
+            modal: true,
+            resizable: false,
+            width: 500,
+            height: 225,
+            closeOnEscape: false
+        });
+    }
+</script>
+
 <h2>Rubric Evaluation of @ViewBag.AssignmentName </h2>
-@*<a href="/Rubric/ExportAllToCSV">Export Rubric For Each Student</a>*@
-@Html.ActionLink("Export All Rubric's", "ExportAllToCSV", new { assignID = Model.SelectedAssignment.ID }, new { })
-<a href="/Rubric/ImportAllToCSV">Import Rubric For Each Student</a>
+@Html.ActionLink("Download Rubric For Offline Editing", "ExportAllToFile", new { assignID = Model.SelectedAssignment.ID }, new { })
+<br />
+<a href="/Rubric/ImportAllFromFile" onclick="displayImportRubric(event);">Upload Completed Rubric For All Students</a>
 <div><br /></div>
 
-@if (ViewBag.DisplayGrade)
-{
-    <h3>Grade: @ViewBag.Grade</h3>
-}
-          
+<div id='import_all_rubrics_from_csv' title="Import file" style="display:none;">
+    Upload a text file containing all student's rubric for this assignment:<br /><br />
+    @using (Html.BeginForm("ImportAllFromFile", "Rubric", FormMethod.Post,
+        new { enctype = "multipart/form-data", assignment = Model.SelectedAssignment.AssignmentName}))
+    {
+        <input type="file" id="file" name="file" size="2" accept=".txt" required="required" />
+        <input type="submit" value="Begin Import Process..." />
+    }
+    @{  // Grab session variables so ImportAllFromFile can validate the rubric
+        Session["AssignmentId"] = Model.SelectedAssignment.ID;
+        Session["AssignmentName"] = Model.SelectedAssignment.AssignmentName;
+    }
+</div>
+
 @Html.Partial("_Display", Model)
           
