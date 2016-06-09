@@ -305,6 +305,7 @@ namespace OSBLE.Controllers
                 foreach (RubricEvaluation re in evaluations)
                 {
                     re.IsPublished = true;
+                    re.DatePublished = DateTime.Now;
                     (new NotificationController()).SendRubricEvaluationCompletedNotification(assignment, re.Recipient);
                 }
                 db.SaveChanges();

@@ -1,0 +1,16 @@
+﻿@{
+    ViewBag.Title = "Import Success";
+    string redirectUrlDetails = "../AssignmentDetails/" + Session["AssignmentId"];
+    string redirectUrlAssignments = "../Assignment";
+}
+
+<h3>Import Rubric</h3>
+
+<h2>Rubric was successfully imported!</h2>
+
+<div>
+    <br />
+    <a href="@redirectUrlDetails">Back to Assignment Details</a>
+    <br />
+    <a href="@redirectUrlAssignments">Back to All Assignments</a>
+</div>

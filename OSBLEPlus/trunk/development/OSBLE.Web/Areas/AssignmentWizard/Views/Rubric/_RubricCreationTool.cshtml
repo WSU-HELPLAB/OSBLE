@@ -93,6 +93,9 @@ ul.RubricList
 
 <html>
 <body>
+    <h5>Rubric Title:</h5>
+    <textarea name="rubricDescription" rows="2" cols="40">@ViewBag.rubricDescription</textarea>
+    <br /> <br />
 <table>
     <tr>
         <td>
@@ -162,10 +165,6 @@ ul.RubricList
                     <input type="radio" class="gradeIncrement" name="gradeStepRadio" value="quarterStep" @ViewBag.enableQuarterStepCheckedValue />Allow quarter-point grades in rubric evaluation
                 </li>
             </ul>
-        </td>
-
-        <td>
-            <textarea  name="rubricDescription" rows="2" cols="40">@ViewBag.rubricDescription</textarea>
         </td>
     </tr>
 </table>

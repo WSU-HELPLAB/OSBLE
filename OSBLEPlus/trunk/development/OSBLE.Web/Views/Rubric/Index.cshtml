@@ -76,7 +76,7 @@
         $('body').append(
        '<div id="downloading_submission_dialog" title="Download Submission"> \
         <p>Please wait while we prepare your download.</p> \
-    </div>');
+        </div>');
 
         //make the div we just created into a dialog box
 
@@ -168,20 +168,37 @@
     {
         width: 1200px;
     }
+
+    .disabledButton
+    {
+        opacity: .4;
+    }
 </style>
 
 
 
-<div id='import_rubric_from_csv'  title="Import file" style="display:none;">Upload a text file containing this students rubric:<br /><br />
-    @using (Html.BeginForm("ImportIndividualToCSV", "Rubric",  FormMethod.Post, new { enctype = "multipart/form-data" }))
+<div id='import_rubric_from_csv'  title="Import file" style="display:none;">Upload a text file containing this student's rubric:<br /><br />
+    @using (Html.BeginForm("ImportIndividualFromFile", "Rubric",  FormMethod.Post, 
+        new { enctype = "multipart/form-data", assignment = Model.SelectedAssignment.AssignmentName}))
     {
-        <input type="file" id="file" name="file" size="2" />
+        <input type="file" id="file" name="file" size="2" accept=".txt" required="required"/>
         <input type="submit" value="Begin Import Process..." />
     }
 </div>
 
 <div id="rubric_evaluator">
-    <h1>Rubric Evaluation of @Model.SelectedAssignment.AssignmentName for @Model.Evaluation.Recipient.DisplayName(ViewBag.ActiveCourse.AbstractRole)
+    @{
+        ViewBag.CurrentRubricStudentName = Model.Evaluation.Recipient.DisplayName(ViewBag.ActiveCourse.AbstractRole);
+    }
+    <h1>Rubric Evaluation of @Model.SelectedAssignment.AssignmentName for @ViewBag.CurrentRubricStudentName
+    
+    @{  // Record Assignment and Student info for validation and redirection in RubricController and ImportError.cshtml
+        Session["AssignmentName"] = Model.SelectedAssignment.AssignmentName;
+        Session["AssignmentId"] = Model.SelectedAssignment.ID;
+        Session["StudentName"] = ViewBag.CurrentRubricStudentName;
+        Session["CuId"] = @Model.Evaluation.Recipient.TeamMembers.FirstOrDefault().CourseUserID;
+    }
+
     @if (!student)
     {
         if (Model.Evaluation.Recipient.TeamMembers.Count > 1)
@@ -463,21 +480,23 @@
             }
             <tr>
 
-                @*<a href="/Rubric/ExportIndividualToCSV"> Export @Model.Evaluation.Recipient.DisplayName(ViewBag.ActiveCourse.AbstractRole)'s Rubric</a>*@
-                @{string rubricUserName = "Export " + @Model.Evaluation.Recipient.DisplayName(ViewBag.ActiveCourse.AbstractRole) + "'s Rubric";}
+                @{
+                    string rubricUserName = "Export " + @Model.Evaluation.Recipient.DisplayName(ViewBag.ActiveCourse.AbstractRole) + "'s Rubric";
+                    Session["StudentName"] = @Model.Evaluation.Recipient.DisplayName(ViewBag.ActiveCourse.AbstractRole);
+                    Session["CuId"] = @Model.Evaluation.Recipient.TeamMembers.FirstOrDefault().CourseUserID;
+                }
                 <td style="padding-right:10px;">
-                    @Html.ActionLink(rubricUserName, "ExportIndividualToCSV", new { teamID = Model.Evaluation.Recipient.ID, assignID = Model.SelectedAssignment.ID }, new { })
+                    @Html.ActionLink(rubricUserName, "ExportIndividualToFile", new { teamID = Model.Evaluation.Recipient.ID, assignID = Model.SelectedAssignment.ID }, new { })
                 </td>
                 <td style="padding-right:10px; padding-left:10px;">
                     <a href="" onclick="displayImportRubric(event);">Import @Model.Evaluation.Recipient.DisplayName(ViewBag.ActiveCourse.AbstractRole)'s Rubric</a>
-                    @*<a href="/Rubric/ImportIndividualToCSV"> Import @Model.Evaluation.Recipient.DisplayName(ViewBag.ActiveCourse.AbstractRole)'s Rubric</a>*@
                 </td>
 
 
                 @if (Model.Evaluation.IsPublished == true || editable == false)
                 {
                     <td>
-                        <input disabled="disabled" type="submit" name="@draftButton" value="Save as Draft" />
+                        <input disabled="disabled" type="submit" name="@draftButton" value="Save as Draft" class="disabledButton"/>
                     </td>
                 }
                 else

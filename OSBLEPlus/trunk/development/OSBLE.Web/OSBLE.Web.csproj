@@ -1319,9 +1319,9 @@
     <Content Include="Views\Roster\ImportRoster.cshtml" />
     <Content Include="Views\Roster\Index.cshtml" />
     <Content Include="Views\Roster\RosterError.cshtml" />
-    <Content Include="Views\Rubric\ExportAllToCSV.cshtml" />
-    <Content Include="Views\Rubric\ExportIndividualToCSV.cshtml" />
-    <Content Include="Views\Rubric\ImportIndividualToCSV.cshtml" />
+    <Content Include="Views\Rubric\ExportAllToFile.cshtml" />
+    <Content Include="Views\Rubric\ExportIndividualToFile.cshtml" />
+    <Content Include="Views\Rubric\ImportIndividualFromFile.cshtml" />
     <Content Include="Views\Rubric\Index.cshtml" />
     <Content Include="Views\Rubric\View.cshtml" />
     <Content Include="Views\Rubric\ViewForCriticalReview.cshtml" />
@@ -1412,6 +1412,9 @@
     <Content Include="Views\OSBLECommunity\_Online.cshtml" />
     <Content Include="Views\OSBLECommunity\_PersonalStanding.cshtml" />
     <Content Include="Views\OSBLECommunity\_RecentActivity.cshtml" />
+    <Content Include="Views\Rubric\ImportError.cshtml" />
+    <Content Include="Views\Rubric\ImportAllFromFile.cshtml" />
+    <Content Include="Views\Rubric\ImportSuccess.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
