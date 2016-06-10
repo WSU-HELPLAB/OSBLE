@@ -28,67 +28,70 @@ namespace OSBLE.Controllers
         {
             Notification n = db.Notifications.Find(id);
 
-            // Notification exists and belongs to current user.
-            if ((n != null) && (n.RecipientID == ActiveCourseUser.ID))
+            if (n != null)
             {
-                // Mark notification as read.
-                n.Read = true;
-                db.SaveChanges();
+                CourseUser recipient = db.CourseUsers.FirstOrDefault(cu => cu.ID == n.RecipientID);
 
-                // Determine which item type and dispatch to the appropriate action/controller
-                switch (n.ItemType)
+                // Notification exists and belongs to current user.
+                if (recipient.UserProfileID == ActiveCourseUser.UserProfileID)
                 {
-                    case Notification.Types.Mail:
-                        return RedirectToAction("View", "Mail", new { ID = n.ItemID });
-                    case Notification.Types.EventApproval:
-                        return RedirectToAction("Approval", "Event", new { ID = n.ItemID });
-                    case Notification.Types.Dashboard:
-                        var DashBoardRead = (from d in db.Notifications
-                                             where d.RecipientID == ActiveCourseUser.ID && d.ItemType == Notification.Types.Dashboard && d.ItemID == n.ItemID
-                                             select d).ToList();
-                        foreach (var foo in DashBoardRead)
-                        {
-                            foo.Read = true;
-                        }
-                        db.SaveChanges();
-                        return RedirectToAction("ViewThread", "Home", new { ID = n.ItemID });
-                    case Notification.Types.FileSubmitted:
-                        return RedirectToAction("getCurrentUsersZip", "FileHandler", new { assignmentID = n.ItemID });
-                    case Notification.Types.InlineReviewCompleted:
-                        return RedirectToAction("Details", "PeerReview", new { ID = n.ItemID });
-                    case Notification.Types.RubricEvaluationCompleted:
-                        return RedirectToAction("View", "Rubric", new { assignmentId = n.ItemID, teamId = n.SenderID });
-                    case Notification.Types.TeamEvaluationDiscrepancy:
-                        //n.Data = PrecedingTeamId + ";" + TeamEvaluationAssignment.ID;
-                        int precteamId = 0;
-                        int teamEvalAssignmnetID = 0;
-                        int.TryParse(n.Data.Split(';')[0], out precteamId);
-                        int.TryParse(n.Data.Split(';')[1], out teamEvalAssignmnetID);
-                        return RedirectToAction("TeacherTeamEvaluation", "Assignment", new { precedingTeamId = precteamId, TeamEvaluationAssignmentId = teamEvalAssignmnetID });
-                    case Notification.Types.JoinCourseApproval:
-                        //this is done to mark all notifications that were consolidated as read
-                        var CourseMarkRead = (from d in db.Notifications
-                                              where d.RecipientID == ActiveCourseUser.ID && d.ItemType == Notification.Types.JoinCourseApproval && d.ItemID == ActiveCourseUser.AbstractCourseID
-                                              select d).ToList();
-                        foreach (var foo in CourseMarkRead)
-	                    {
-		                    foo.Read = true;
-	                    }
-                        db.SaveChanges();
-                        return RedirectToAction("Index", "Roster", new { ID = n.ItemID });
-                    case Notification.Types.JoinCommunityApproval:
-                        //this is done to mark all notifications that were consolidated as read
-                        var CommunityMarkRead = (from d in db.Notifications
-                                                 where d.RecipientID == ActiveCourseUser.ID && d.ItemType == Notification.Types.JoinCourseApproval && d.ItemID == ActiveCourseUser.AbstractCourseID
-                                                 select d).ToList();
-                        foreach (var foo in CommunityMarkRead)
-	                    {
-		                    foo.Read = true;
-	                    }
-                        db.SaveChanges();
-                        return RedirectToAction("Index", "Roster", new { ID = n.ItemID });
-                    
+                    // Mark notification as read.
+                    n.Read = true;
+                    db.SaveChanges();
 
+                    // Determine which item type and dispatch to the appropriate action/controller
+                    switch (n.ItemType)
+                    {
+                        case Notification.Types.Mail:
+                            return RedirectToAction("View", "Mail", new { ID = n.ItemID });
+                        case Notification.Types.EventApproval:
+                            return RedirectToAction("Approval", "Event", new { ID = n.ItemID });
+                        case Notification.Types.Dashboard:
+                            var DashBoardRead = (from d in db.Notifications
+                                                 where d.RecipientID == ActiveCourseUser.ID && d.ItemType == Notification.Types.Dashboard && d.ItemID == n.ItemID
+                                                 select d).ToList();
+                            foreach (var foo in DashBoardRead)
+                            {
+                                foo.Read = true;
+                            }
+                            db.SaveChanges();
+                            return RedirectToAction("ViewThread", "Home", new { ID = n.ItemID });
+                        case Notification.Types.FileSubmitted:
+                            return RedirectToAction("getCurrentUsersZip", "FileHandler", new { assignmentID = n.ItemID });
+                        case Notification.Types.InlineReviewCompleted:
+                            return RedirectToAction("Details", "PeerReview", new { ID = n.ItemID });
+                        case Notification.Types.RubricEvaluationCompleted:
+                            return RedirectToAction("View", "Rubric", new { assignmentId = n.ItemID, teamId = n.SenderID });
+                        case Notification.Types.TeamEvaluationDiscrepancy:
+                            //n.Data = PrecedingTeamId + ";" + TeamEvaluationAssignment.ID;
+                            int precteamId = 0;
+                            int teamEvalAssignmnetID = 0;
+                            int.TryParse(n.Data.Split(';')[0], out precteamId);
+                            int.TryParse(n.Data.Split(';')[1], out teamEvalAssignmnetID);
+                            return RedirectToAction("TeacherTeamEvaluation", "Assignment", new { precedingTeamId = precteamId, TeamEvaluationAssignmentId = teamEvalAssignmnetID });
+                        case Notification.Types.JoinCourseApproval:
+                            //this is done to mark all notifications that were consolidated as read
+                            var CourseMarkRead = (from d in db.Notifications
+                                                  where d.RecipientID == ActiveCourseUser.ID && d.ItemType == Notification.Types.JoinCourseApproval && d.ItemID == ActiveCourseUser.AbstractCourseID
+                                                  select d).ToList();
+                            foreach (var foo in CourseMarkRead)
+                            {
+                                foo.Read = true;
+                            }
+                            db.SaveChanges();
+                            return RedirectToAction("Index", "Roster", new { ID = n.ItemID });
+                        case Notification.Types.JoinCommunityApproval:
+                            //this is done to mark all notifications that were consolidated as read
+                            var CommunityMarkRead = (from d in db.Notifications
+                                                     where d.RecipientID == ActiveCourseUser.ID && d.ItemType == Notification.Types.JoinCourseApproval && d.ItemID == ActiveCourseUser.AbstractCourseID
+                                                     select d).ToList();
+                            foreach (var foo in CommunityMarkRead)
+                            {
+                                foo.Read = true;
+                            }
+                            db.SaveChanges();
+                            return RedirectToAction("Index", "Roster", new { ID = n.ItemID });
+                    }
                 }
             }
 
@@ -248,20 +251,15 @@ namespace OSBLE.Controllers
 
             foreach (CourseUser instructor in instructors)
             {
-
-
                 Notification n = new Notification();
                 n.ItemType = Notification.Types.JoinCourseApproval;
                 n.ItemID = c.ID;
                 n.RecipientID = instructor.ID;
                 n.SenderID = sender.ID;                 
 
-                addNotification(n);
-                               
+                addNotification(n);       
             }
-            db.SaveChanges();
-            
-            
+            db.SaveChanges();            
         }
 
         [NonAction]
@@ -527,9 +525,9 @@ namespace OSBLE.Controllers
                     break;
             }
 
-            body += "\n\n---\nDo not reply to this email.\nVisit this link to " + action + ": ";
+            body += "\n\n---\nDo not reply to this email.\n";
             string str = getDispatchURL(n.ID);
-            body += string.Format("<br /><br /><a href=\"{0}\">{0}</a>", str);
+            body += string.Format("<br /><br /><a href=\"{0}\">Click this link to {1}</a>", str, action);
             
             MailAddress to = new MailAddress(recipient.UserName, recipient.DisplayName((int)CourseRole.CourseRoles.Instructor));
             List<MailAddress> recipients = new List<MailAddress>();
