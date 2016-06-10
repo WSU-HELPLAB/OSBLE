@@ -70,6 +70,16 @@
 
         foreach (int section in sections)
         {
+            // For TAs, we only want the TA to see students in the section they are in
+            CourseUser currentUser = ViewBag.ActiveCourseUser;
+            if (currentUser != null)
+            {
+                if (currentUser.AbstractRole.Name == "TA" && currentUser.Section != section)
+                {
+                    continue;
+                }
+            }
+            
             sectionBool = false;
 
             foreach (IAssignmentTeam assignmentTeam in teams)
