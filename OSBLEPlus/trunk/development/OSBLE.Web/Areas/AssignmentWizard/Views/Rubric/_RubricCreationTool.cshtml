@@ -11,6 +11,7 @@
     {
         dropDownKey = "/AssignmentWizard/StudentRubric/LoadExistingRubric";
     }
+    int maximumRubricLevels = 10;
 } 
 
 @Html.HiddenFor(m => m.ID)
@@ -473,6 +474,13 @@ The current rubric will be replaced with a new one and all progress will be lost
 
         var rowCount = table.rows.length;
         var columnCount = table.rows[0].cells.length;
+
+        // Before adding new level, check to see if we're not already at the max
+        if (columnCount > @maximumRubricLevels + 1)
+        {
+            alert("You may not put more than @maximumRubricLevels.ToString() levels in a rubric.");
+            return;
+        }
 
         //loop over each row and append a copy of the last cell in that row to the end
         for (var i = 0; i < rowCount; i++) {
