@@ -225,7 +225,7 @@ else
 {
     // There will (potentially) be ABET options in the table that need to
     // be within a form so that they can be saved.
-    using (Html.BeginForm("SaveABET", "Home", FormMethod.Post))
+    using (Html.BeginForm("SaveABET", "Home", FormMethod.Post, new { style = "padding-bottom: 15px;" }))
     {
         <input type="hidden" name="hdnCourseID" value="@Model.CurrentAssignment.CourseID.Value" />
         <input type="hidden" name="hdnAssignmentID" value="@Model.CurrentAssignment.ID" />
@@ -258,12 +258,12 @@ else
                     @RenderSection("TableData", false)
             </table>
         
-        if (null != Model.CurrentAssignment.ABETDepartment)
-        {
+                    if (null != Model.CurrentAssignment.ABETDepartment)
+                    {
                 <!-- Button to save changes to ABET stuff -->
                 <br />
                 <input type="submit" value="Save" />
-        }
+                    }
         <!--Element for modal confirmation box-->
         <div id="confirmDeleteWindow" style="display: none;" title="Delete Assignment">
             <div id="confirmForm">
@@ -277,7 +277,7 @@ else
                 }
             </div>
         </div>
-        }
+    }
 }
 
 else

@@ -66,8 +66,17 @@
 
         foreach (int section in sectionList)
         {
+            // For TAs, we only want the TA to see students in the section they are in
+            CourseUser currentUser = ViewBag.ActiveCourseUser;
+            if (currentUser != null)
+            {
+                if (currentUser.AbstractRole.Name == "TA" && currentUser.Section != section)
+                {
+                    continue;
+                }
+            }
+            
             sectionBool = false;
-
 
             foreach (DiscussionTeam assignmentTeam in teams)
             {
@@ -100,7 +109,6 @@
 
                 if ((!sectionBool) && showSections)
                 {
-
                     <tr class="SectionRow">
                         <th class="Student" colspan="6">
                             Section: @Html.Raw(section)
@@ -116,7 +124,6 @@
 
                 if (Model.CurrentAssignment.HasDiscussionTeams)
                 {
-
                     <tr>
                         <th class="TeamHeader" colspan="6">
 
