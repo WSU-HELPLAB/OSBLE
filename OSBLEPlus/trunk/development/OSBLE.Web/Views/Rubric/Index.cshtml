@@ -348,6 +348,12 @@
                         @userCount/@atList.Count()
                     </td>
                 </tr>
+                <tr>
+                    <td>
+                        @{string redirectUrl = "../AssignmentDetails/" + Model.SelectedAssignment.ID;}
+                        <a href="@redirectUrl">Back to Assignment Details</a>
+                    </td>
+                </tr>
             
                 </table>
             } @* End instructor only components *@
