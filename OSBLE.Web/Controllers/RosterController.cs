@@ -1081,6 +1081,141 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index");
         }
 
+        [CanModifyCourse]
+        [HttpPost]
+        public ActionResult ChangeStudentsToWithdrawnRole()
+        {
+
+            string temp = Request.Form["withdrawIDList"];
+            string[] ids;
+            ids = temp.Split(',', ' ');
+            List<UserProfile> studentList = new List<UserProfile>();
+            int parseID;
+
+            List<int> idInts = new List<int>();
+
+            //cast the id to int
+            foreach (string id in ids)
+            {
+                if (Int32.TryParse(id, out parseID))
+                {
+                    idInts.Add(parseID);
+                }
+            }
+
+            //grab all selected students in current class.
+            if (null != ActiveCourseUser)
+            {
+                List<CourseUser> students = (from c in db.CourseUsers
+                                             where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                                             c.AbstractRoleID == (int)CourseRole.CourseRoles.Student &&
+                                             idInts.Contains(c.UserProfileID)
+                                             select c).ToList();
+
+                foreach (CourseUser student in students)
+                {
+                    if (ModelState.IsValid)
+                    {
+                        student.AbstractRoleID = (int)CourseRole.CourseRoles.Withdrawn;
+                        db.Entry(student).State = EntityState.Modified;
+                        db.SaveChanges();
+                    }
+                }
+            }
+            
+            return RedirectToAction("Index");
+        }
+
+
+        /// <summary>
+        /// This will grab a list of user IDs from a post and change the users to students
+        /// </summary>
+        /// <returns>
+        /// A view with updated roles
+        /// </returns>
+
+        [CanModifyCourse]
+        [HttpPost]
+        public ActionResult ChangeWithdrawnUsersToStudentRole()
+        {
+            string temp = Request.Form["enrollIDList"];
+            string[] ids;
+            ids = temp.Split(',', ' ');
+            List<UserProfile> studentList = new List<UserProfile>();
+            int parseID;
+
+            List<int> idInts = new List<int>();
+
+            //cast the id to int
+            foreach (string id in ids)
+            {
+                if (Int32.TryParse(id, out parseID))
+                {
+                    idInts.Add(parseID);
+                }
+            }
+
+            //grab all selected students in current class.
+            if (null != ActiveCourseUser)
+            {
+                List<CourseUser> students = (from c in db.CourseUsers
+                                             where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                                             c.AbstractRoleID == (int)CourseRole.CourseRoles.Withdrawn &&
+                                             idInts.Contains(c.UserProfileID)
+                                             select c).ToList();
+
+                foreach (CourseUser student in students)
+                {
+                    if (ModelState.IsValid)
+                    {
+                        student.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+                        db.Entry(student).State = EntityState.Modified;
+                        db.SaveChanges();
+                    }
+                }
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        [CanModifyCourse]
+        [HttpPost]
+        public ActionResult removeSelectedUsers()
+        {
+            string temp = Request.Form["removeIDList"];
+            string[] ids;
+            ids = temp.Split(',', ' ');
+            List<UserProfile> studentList = new List<UserProfile>();
+            int parseID;
+
+            List<int> idInts = new List<int>();
+
+            //cast the id to int
+            foreach (string id in ids)
+            {
+                if (Int32.TryParse(id, out parseID))
+                {
+                    idInts.Add(parseID);
+                }
+            }
+
+            //find all withdrawn students for current course
+            List<CourseUser> students = (from c in db.CourseUsers
+                                            where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                                            c.AbstractRoleID == (int)CourseRole.CourseRoles.Withdrawn &&
+                                            idInts.Contains(c.UserProfileID)
+                                            select c).ToList();
+            int count = students.Count();
+
+            foreach (CourseUser p in students)
+            {
+                db.CourseUsers.Remove(p);
+            }
+
+            db.SaveChanges();
+            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " withdrawn students have been removed from the course" });
+        }
+
         //Students
         //
 
@@ -1454,8 +1589,6 @@ namespace OSBLE.Controllers
                         }
                         db.SaveChanges();
                     }
-
-                    
                 }
             }
         }

@@ -9,14 +9,14 @@
 @* Section headers for user tabs. *@
 @helper DisplaySection(string sectionNum)
     {
-        if (sectionNum != "0")
-        {
+        //if (sectionNum != "0")
+        //{
     <text>Section @sectionNum</text>
-        }
-        else
+        //}
+        @*else
         {
     <text>All Sections</text>
-        }
+        }*@
 }
 @* Only use this helper in a place that requires an active course (uses [RequireActiveCourse] attribute) *@
 @helper DisplayName(UserProfile user, CourseUser activeCourse, bool show = false)
