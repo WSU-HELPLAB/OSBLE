@@ -72,7 +72,12 @@ function preventSubmit(e) {
 }
 
 function noDeliverables() {
-    var deliverableExists = $("#deliverable_0").length;
+    var deliverableExists = false;
+
+    //check for any deliverables
+    $("#deliverable_data").children().each(function () {
+        deliverableExists = true;
+    });
 
     if (deliverableExists)
         return false;
