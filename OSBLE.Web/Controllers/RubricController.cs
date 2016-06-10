@@ -187,8 +187,16 @@ namespace OSBLE.Controllers
             CourseUser cu = db.CourseUsers.Find(cuId);
             RubricViewModel viewModel = new RubricViewModel();
 
+            // For TAs, make sure they are allowed to view this student!
+            if (ActiveCourseUser.AbstractRole.Name == "TA")
+            {
+                if (ActiveCourseUser.Section != cu.Section)
+                {
+                    return viewModel;
+                }
+            }
+            
             Assignment assignment = db.Assignments.Find(assignmentId);
-
             AssignmentTeam assignmentTeam;
             viewModel.Student = false;
 
