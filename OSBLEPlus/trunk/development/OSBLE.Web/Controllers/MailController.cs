@@ -424,6 +424,37 @@ namespace OSBLE.Controllers
             return View("Create", new Mail());
         }
 
+        /// <summary>
+        /// This method will set up a mail page with the recipients as all posted user IDs
+        /// </summary>
+        /// <returns>
+        /// a mail view with recipients as selected users that were passed in
+        /// </returns>
+        [HttpPost]
+        public ActionResult CreateUserProfileIds()
+        {
+            string temp = Request.Form["emailIDList"];
+            string[] ids;
+            ids = temp.Split(',',' ');
+            List<UserProfile> recipientList = new List<UserProfile>();
+            int parseID;
+
+            List <int> idInts = new List<int> ();
+
+            foreach (string id in ids)
+            {
+                if (Int32.TryParse(id, out parseID))
+                {
+                    idInts.Add(parseID);
+                }
+            }
+
+            recipientList = db.UserProfiles.Where(up => idInts.Contains(up.ID)).ToList();
+
+            setUpMailViewBags(recipientList);
+            return View("Create", new Mail());
+        }
+
         public ActionResult CreateWhiteTableUserProfileId(int id)
         {
             var profile = db.WhiteTableUsers.Find(id);
@@ -436,9 +467,6 @@ namespace OSBLE.Controllers
             }
             setUpWhiteTableMailViewBags(recipientList);
             return View("Create", new Mail());
-
-
-
         }
 
         public ActionResult CreateUser(int id)
