@@ -11,7 +11,33 @@ var deliverableIndex = 0;
 // onLoad
 $(function () {
     $('#add_new_deliverable').click(function () {
-        addNewDeliverable(true);
+
+        //clear validation formatting
+        clearValidation();
+
+        //check if a pluginSubmission has already been added
+        var pluginSubmission = false;
+        $(".deliverable td:contains('PluginSubmission (.zip)')").each(function () {
+            pluginSubmission = true;
+        });
+
+        //get dropdown value
+        var deliverableType = $("#new_deliverable_type :selected").text();        
+        var otherSubmissions = false;
+        //if dropdown is plugin, check to make sure there are no other submissions, we want to limit plugin submissions to 1 deliverable.
+        if (deliverableType == "PluginSubmission (.zip)") {
+            $("#deliverable_data").children().each(function () {
+                otherSubmissions = true;
+            });
+        }                    
+       
+        if (pluginSubmission || otherSubmissions) {
+            $("#plugin_submission_validation").prop('hidden', false);
+            $("#plugin_submission_validation_div").addClass("disabled");            
+        }        
+        else {
+            addNewDeliverable(true);
+        }        
         return false;
     });
 
@@ -29,9 +55,20 @@ $(function () {
     });
 });
 
+function clearValidation() {
+    $("#new_deliverable_validation").prop('hidden', true);
+    $("#new_deliverable_name").removeClass("disabled");
+    $("#add_deliverable_validation").prop('hidden', true);
+    $("#add_deliverable_div").removeClass("disabled");
+    $("#plugin_submission_validation").prop('hidden', true);
+    $("#plugin_submission_validation_div").removeClass("disabled");
+}
+
 function preventSubmit(e) {
+    clearValidation();
     e.preventDefault();
-    alert("Click 'add this deliverable to the assignment' currently no deliverables are required listed in the assignment.  Conversely if you do not want deliverables, edit the assignment components and uncheck the box requiring deliverables.");
+    $("#add_deliverable_validation").prop('hidden', false);
+    $("#add_deliverable_div").addClass("disabled");    
 }
 
 function noDeliverables() {
@@ -62,8 +99,9 @@ function addNewDeliverable(isAdd, deliverableData) {
     }
 
     if (deliverableData.name == undefined || deliverableData.name == "") {
-        if (isAdd) {
-            alert('The deliverable name is required.');
+        if (isAdd) {            
+            $("#new_deliverable_validation").prop('hidden', false);
+            $("#new_deliverable_name").addClass("disabled");
         }
         return false;
     }
