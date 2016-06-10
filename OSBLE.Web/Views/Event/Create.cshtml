@@ -10,20 +10,7 @@
 <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/areas/AssignmentWizard/Content/js/basics.js")" type="text/javascript"></script>
 
-<script type="text/javascript">
-    function begin() {
-        $("#createEvent").attr("disabled", "disabled");
-    }
-    function completed() {
-        var delay = 1000;           // Delay in milliseconds
-        setTimeout(function () {
-            $("#createEvent").removeAttr("disabled");
-        }, delay);                  // Disable create event button after delay, prevents spamming
-        window.location.href = '.'; // Redirect to /Events page
-    }
-</script>
-
-@using (Ajax.BeginForm("Create", "Event", new AjaxOptions { HttpMethod = "POST", OnComplete = "completed", OnBegin = "begin"}))
+@using (Ajax.BeginForm("Create", "Event", new AjaxOptions { HttpMethod = "POST", OnBegin = "begin", OnComplete = "completed"}))
 {
     @Html.ValidationSummary()
 
@@ -98,9 +85,35 @@
     </div>
     
     <p>
-        <input type="submit" value="Create Event" id="createEvent" />
+        <table cellspacing="10" cellpadding="10">
+            <tr>
+                <td>
+                    <input type="submit" value="Create Event" id="createEvent" />
+                </td><td></td>
+                <td>
+                    <img src="@Url.Content("~/Areas/Analytics/Content/loading.gif")" class="spinner-img" hidden="hidden" id="loadingSpinner"/>
+                </td>
+            </tr>
+        </table>
     </p>
 }
 <div>
     @Html.ActionLink("Back to List", "Index")
 </div>
+
+<script type="text/javascript">
+    function begin() {
+        $("#loadingSpinner").prop("hidden", false);
+        $("#createEvent").addClass("disabled");
+        $("#createEvent").attr("disabled", "disabled");
+    }
+    function completed() {
+        window.location.href = '.'; // Redirect to /Events page
+    }
+</script>
+
+<style type="text/css">
+    .disabled {
+        opacity : 0.5;
+    }
+</style>
