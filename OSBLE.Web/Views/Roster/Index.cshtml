@@ -107,27 +107,27 @@
     {
         <input type="hidden" name="emailIDList" id="emailIDList" value="" />
         <text>Mail: </text>
-        <a title="Mail Selected Users" onclick="massMail()">@Helpers.MailButton() | </a>       
+        <a title="Mail Selected Users" onclick="massMail()">@Helpers.MailButton()</a>       
     }
 
     @using (Html.BeginForm("ChangeStudentsToWithdrawnRole", "Roster", FormMethod.Post, new { id = "withdrawForm", style = "display: inline;"}))
     {
         <input type="hidden" name="withdrawIDList" id="withdrawIDList" value="" />
-        <text>Withdraw: </text>
-        <a title="Withdraw selected students" onclick="massWithdraw()">@Helpers.WithdrawButton() | </a>
+        <text> | Withdraw: </text>
+        <a title="Withdraw selected students" onclick="massWithdraw()">@Helpers.WithdrawButton()</a>
     }
 
     @using (Html.BeginForm("ChangeWithdrawnUsersToStudentRole", "Roster", FormMethod.Post, new { id = "enrollForm", style = "display: inline;" }))
     {
         <input type="hidden" name="enrollIDList" id="enrollIDList" value="" />
-        <text>Enroll: </text>
-        <a title="Enroll selected users" onclick="massEnroll()">@Helpers.EnrollButton() | </a>
+        <text> | Enroll: </text>
+        <a title="Enroll selected users" onclick="massEnroll()">@Helpers.EnrollButton()</a>
     }
 
     @using (Html.BeginForm("removeSelectedUsers", "Roster", FormMethod.Post, new { id = "removeForm", style = "display: inline;" }))
     {
         <input type="hidden" name="removeIDList" id="removeIDList" value="" />
-        <text>Remove withdrawn: </text>
+        <text> | Remove withdrawn: </text>
         <a title="Remove selected students" onclick="massRemove()">@Helpers.DeleteButton()</a>
     }
     <br />
@@ -370,7 +370,6 @@
                 this.checked = false;
             });
         }
-
 
         showOrHideMultiple();
 
