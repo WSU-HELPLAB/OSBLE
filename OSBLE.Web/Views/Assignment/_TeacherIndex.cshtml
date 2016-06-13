@@ -100,8 +100,9 @@
                     }
                     else
                     {
-                        <a title="Must Unpublish Before Delete" class="pointerOnMouseOver">@Helpers.DeleteButtonDisabled()</a>
+                        <a title="Must Unpublish Before Delete" onclick="alert('Unpublish this assignment for deletion')" class="pointerOnMouseOver">@Helpers.DeleteButtonDisabled()</a>
                     }
+
                 </td>
                 <td > <!--Cell for name-->
                     @Html.ActionLink(assignments[i].AssignmentName, "Index", "Home", new { area = "AssignmentDetails", assignmentId = assignments[i].ID }, null)
@@ -156,3 +157,4 @@
         }
     }
 </table>
+
