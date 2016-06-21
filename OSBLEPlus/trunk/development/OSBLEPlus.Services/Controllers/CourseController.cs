@@ -34,7 +34,7 @@ namespace OSBLEPlus.Services.Controllers
         {
             if ((new Authentication()).IsValidKey(a))
             {
-                return CourseDataAccess.GetAssignmentsForCourse(id, DateTime.Today);
+                return CourseDataAccess.GetAssignmentsForCourse(id, DateTime.UtcNow);
             }
 
             return null;
