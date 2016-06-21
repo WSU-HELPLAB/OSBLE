@@ -33,7 +33,7 @@ namespace OSBLEPlus.Logic.DataAccess.Profiles
                 var connection = new SqlConnection(StringConstants.ConnectionString))
             {
                 using (var multi = connection.QueryMultiple("dbo.GetAssignmentsForCourse",
-                        new { CourseId = courseId, CurrentDate = currentTime.Date.AddDays(1).AddSeconds(-1),
+                        new { CourseId = courseId, CurrentDate = currentTime,
                             AssignType = AssignmentTypes.Basic,
                             FileType=DeliverableType.PluginSubmission },
                         commandType: CommandType.StoredProcedure))
