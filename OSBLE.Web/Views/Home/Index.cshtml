@@ -118,7 +118,7 @@
             @*-------------- EVENTS & DEADLINES -------------------*@
             <div id="dashboard_events" class="unactiveContent">
                 <h3>
-                    Events &amp; Deadlines
+                    Calendar
                     @if (@ViewBag.ActiveCourse.AbstractRole.CanModify || @ViewBag.ActiveCourse.AbstractCourse.AllowEventPosting)
                     {
                         <a href="@Url.Action("Create", "Event")" title="Add New Event or Deadline">@Helpers.AddButton()</a>
