@@ -53,7 +53,6 @@ function documentReady() {
 }
 
 function teamSortableComplete(event, ui) {
-    debugger;
     var OrigLIElement = ui.item.context;
     var myDataId = $(OrigLIElement).attr('data-id');
     var list = $(OrigLIElement).parent().contents();
