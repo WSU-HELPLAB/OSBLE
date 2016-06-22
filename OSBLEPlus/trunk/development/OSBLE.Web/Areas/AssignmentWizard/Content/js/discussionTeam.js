@@ -127,14 +127,16 @@ function teamSortableComplete(event, ui) {
         });
     }
 
+
     var parentid = $($(OrigLIElement).parent().parent()).attr("id");
     if (!document.getElementById('allow_cross_section').checked && parentid != "AvailableStudentList" && IsStudent) //if no cross teams are allowed, check for adding a team member to a different section
     {
-        if (list.length > 1) //make sure there is one other student in the team, or it doesn't matter
+        var teamMates = $(ULElement).find('.ui-state-default');
+        if (teamMates.length > 1) //make sure there is one other student in the team, or it doesn't matter
         {
-            var firstTeamMember = list[0];
+            var firstTeamMember = teamMates[0];
             if (firstTeamMember === $(OrigLIElement).context) {
-                firstTeamMember = list[1];
+                firstTeamMember = teamMates[1];
             }
 
             var FirstTeamMembAttr = $(firstTeamMember).attr("section");

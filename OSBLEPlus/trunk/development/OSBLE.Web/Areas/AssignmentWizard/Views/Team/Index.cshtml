@@ -50,6 +50,11 @@
     </li>
 </ul>
 </div>
+
+<div id="ErrorBox">
+    This is the error box
+</div>
+
 <div id="TeamContent">
 <div id="TeamCreationOptions">
     <a id="CreateTeamLink" class="NoDecoration">
@@ -63,7 +68,7 @@
     <ul id="AvailableStudent" class="TeamSortable">
         @foreach (CourseUser cu in unassignedUsers)
         {
-            <li id="cu_@(cu.ID)" section="section_@cu.Section" class="ui-state-default Student">
+            <li id="cu_@(cu.ID)" section="@cu.Section" class="ui-state-default Student">
             @cu.UserProfile.LastName, @cu.UserProfile.FirstName
             <br />
             Section: @cu.Section
@@ -91,7 +96,7 @@
                 {
                     if (member.CourseUser != null) //catch the case where a withdrawn users is part of a team. They will be a member nut no longer a courseuser
                     {
-                    <li id="cu_@(member.CourseUserID)" section="section_@member.CourseUser.Section" class="ui-state-default Student">
+                    <li id="cu_@(member.CourseUserID)" section="@member.CourseUser.Section" class="ui-state-default Student">
                     @member.CourseUser.UserProfile.LastName, @member.CourseUser.UserProfile.FirstName
                     <br />
                     Section: @member.CourseUser.Section
