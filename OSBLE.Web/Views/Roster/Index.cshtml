@@ -2,6 +2,8 @@
 @using OSBLE.Models.Courses;
 @using OSBLE.Models
 @model IEnumerable<OSBLE.Models.Courses.CourseUser>
+
+
 @{
     ViewBag.Title = "Roster";
 }
@@ -12,6 +14,12 @@
     }
 </style>
 
+@*<link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/prettify.css")" />
+<link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/style.css")" />
+<script type="text/javascript" src="@Url.Content("~/Scripts/prettify.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/jquery.multiselect.js")"></script>*@
+<script type="text/javascript" src="@Url.Content("~/Scripts/RosterScripts.js")"></script>
+    
 <script type="text/javascript">
     $(document).ready(function () {
         $("#deleteAllWithdrawnStudents").click(function () {
@@ -81,14 +89,15 @@
    
     <h4>Selected User Actions:</h4>
     <text>Move to section: </text>
-    <select id="sectionSelection">
+    <select multiple id="sectionSelection" style="color:black;">
+        <option value="-2">All Sections</option>
         <option value="0">0</option>
         @{
             string count = "1";
             bool flag = true;
             foreach (RosterController.UsersBySection usersBySection in ViewBag.UsersBySections)
             {
-                if (usersBySection.SectionNumber != "0")
+                if (usersBySection.SectionNumber != "0" && usersBySection.SectionNumber != "-1" && usersBySection.SectionNumber != "-2")
                 {
                     <option value="@usersBySection.SectionNumber">@usersBySection.SectionNumber</option>
                     if (count == usersBySection.SectionNumber)
@@ -100,7 +109,7 @@
             <option value="@count">New Section (@count)</option>
         }
     </select>
-    <input type="button" id="moverButton" value="Move" />
+    <input type="button" id="moverButton" onclick="moveUsers()" value="Move" />
     <br />
     <br />
     @using (Html.BeginForm("CreateUserProfileIds", "Mail", FormMethod.Post, new { id = "emailForm", style = "display: inline;"}))
@@ -133,433 +142,6 @@
     <br />
     <br />
 </div>
-
-
-<script type="text/javascript">
-    var moveSectionButton = document.getElementById("moverButton");
-    var clickCounter = 0;
-
-    //execute this when button is pressed
-    moveSectionButton.addEventListener("click", moveUsers);
-
-    //on loading/reloading the page this will execute and populate the variables as needed.
-    $(document).ready(function () {
-
-        var boxes = document.getElementsByClassName("sectionRoleCheckBox");
-        $.each(boxes, function (i, val) {
-            this.checked = false;
-        });
-
-        boxes = document.getElementsByClassName("sectionCheckBox");
-        $.each(boxes, function (i, val) {
-            this.checked = false;
-        });
-        
-        document.getElementById("selectAllUsers").checked = false;
-
-        var students = document.getElementsByClassName("UserLI");
-
-        $.each(students, function (i, val) {
-            var check = grabCheckBoxFromStudentLI(this);
-            check.checked = false;
-            this.style.backgroundColor = ""; //#595959
-            this.style.color = "black";
-        });
-
-        clickCounter = 0;
-
-    });
-
-
-    //This will move the selected users to the specified section
-    function moveUsers() {
-        //code after move users clicked
-        var users = document.getElementsByClassName("moveThisUser");
-        var checkedUsers = Array();
-        var sectionDropdown = document.getElementById("sectionSelection").selectedIndex;
-        var sectionOptions = document.getElementById("sectionSelection").options;
-
-        sectionDestination = sectionOptions[sectionDropdown].value;
-
-        var classID = document.getElementById("data-course-link").getAttribute("data-course-id");
-
-        var courseIDs = grabIDsOfSelected();
-
-        EditSections(courseIDs, sectionDestination, classID);
-    }
-
-
-    //mail all selected users
-    function massMail() {
-        var IDs = grabIDsOfSelected();
-        var IDString = idsToString(IDs);
-
-        //update element to equal IDString
-        $("#emailIDList").val(IDString);
-
-        //submit the form
-        $("#emailForm").submit();
-    }
-
-    function massWithdraw(){
-        var IDs = grabIDsOfSelected();
-        var IDString = idsToString(IDs);
-
-        //update element to equal IDstring
-        $("#withdrawIDList").val(IDString);
-
-        //submit the form
-        $("#withdrawForm").submit();
-    }
-
-    function massEnroll() {
-        var IDs = grabIDsOfSelected();
-        var IDString = idsToString(IDs);
-
-        //update element to equal IDstring
-        $("#enrollIDList").val(IDString);
-
-        //submit the form
-        $("#enrollForm").submit();
-    }
-
-    function massRemove() {
-        if (confirm("Are you sure you want to remove these users?") == true) {
-           
-        } else {
-            return;
-        }
-
-        var IDs = grabIDsOfSelected();
-        var IDString = idsToString(IDs);
-        //update element to equal idstring
-        $("#removeIDList").val(IDString);
-
-        //submit the form
-        $("#removeForm").submit();
-    }
-  
-
-    //this method grabs the IDs of all selected users
-    function grabIDsOfSelected() {
-        var IDs = Array();
-        var students = document.getElementsByClassName("UserLI");
-
-        $.each(students, function (i, val) {
-            var temp = grabCheckBoxFromStudentLI(this);
-
-            //if this student is selected, add the ID to the list
-            if (temp.checked) {
-                var ID = this.querySelectorAll('[id=userID]');
-                IDs.push(ID[0].getAttribute("studentID"));
-            }
-        });
-
-        return IDs;
-    }
-
-    function idsToString(IDs){
-        var myStr = ""
-        $.each(IDs, function(i, val){
-            myStr += this + ",";
-        });
-
-        return myStr;
-    }
-
-
-    //this will use an Ajax call to use the controller method to move the users
-    function EditSections(userIDs, desiredSection, abstractCourseID) {
-        $.ajax({
-            url: '/Roster/EditSections/',
-            dataType: "json",
-            traditional: true,
-            data: { ids: userIDs, section: desiredSection, courseID: abstractCourseID },
-            complete: function () {
-                window.location.reload();
-            }
-        })
-    }
-
-
-
-    //if you click an individual button
-    function blockClicked(block) {
-        var box = grabCheckBoxFromStudentLI(block);
-
-        if (box.checked) {
-            changeToUncheck(block, box);
-            triggerCheckBox(block, false);
-        }
-        else {
-            changeToCheck(block, box);
-            triggerCheckBox(block, true);
-        }
-
-        ////check how many students are selected and update page styling
-        showOrHideMultiple();
-    }
-
-
-    //if you click a section button
-    function roleClicked(roleCheck) {
-
-        var currentSection = roleCheck.getAttribute("section");
-
-        var sectionBlock = roleCheck.parentElement.parentElement;
-        var students = sectionBlock.querySelectorAll('[class=UserLI]');
-
-        //select all students that are in this section
-        if (roleCheck.checked) {
-            $.each(students, function (i, val) {
-                var temp = grabCheckBoxFromStudentLI(this);
-
-                changeToCheck(this, temp);
-            });
-        }
-
-            //deselect all students that are in this section
-        else {
-            $.each(students, function (i, val) {
-                var temp = grabCheckBoxFromStudentLI(this);
-                changeToUncheck(this, temp);
-            });
-        }
-
-
-        allInSectionOrNot(currentSection);
-        allCheckedOrNot();
-
-
-        //check how many students are selected and update page styling
-        showOrHideMultiple();
-    }
-
-    //this method will select/deselect all students
-    function selectAll(selectAllBox) {
-        var allStudents = document.getElementsByClassName("UserLI");
-
-        //if you want to select all students
-        if (selectAllBox.checked) {
-            $.each(allStudents, function (i, val) {
-                var box = grabCheckBoxFromStudentLI(this);
-                changeToCheck(this, box);
-            });
-
-            $.each(document.getElementsByClassName("sectionRoleCheckBox"), function (i, val) {
-                this.checked = true;
-            });
-
-            $.each(document.getElementsByClassName("sectionCheckBox"), function (i, val) {
-                this.checked = true;
-            });
-        }
-
-            //if you want to deselect all students
-        else {
-            $.each(allStudents, function (i, val) {
-                var box = grabCheckBoxFromStudentLI(this);
-                changeToUncheck(this, box);
-            });
-
-            $.each(document.getElementsByClassName("sectionRoleCheckBox"), function (i, val) {
-                this.checked = false;
-            });
-
-            $.each(document.getElementsByClassName("sectionCheckBox"), function (i, val) {
-                this.checked = false;
-            });
-        }
-
-        showOrHideMultiple();
-
-    }
-
-    //for each role in the section, check or uncheck users
-    function sectionCheckChange(sectionCheck) {
-        debugger;
-        var roles = sectionCheck.parentElement.querySelectorAll('[class=sectionRoleCheckBox]');
-
-        $.each(roles, function (i, val) {
-            var students = this.parentElement.parentElement.querySelectorAll('[class=UserLI]');
-            if (sectionCheck.checked) {
-                this.checked = true;
-            }
-            else {
-                this.checked = false;
-            }
-
-            $.each(students, function (x, value) {
-                var temp = grabCheckBoxFromStudentLI(this);
-
-                if (sectionCheck.checked) {
-                    changeToCheck(this, temp);
-                }
-                else {
-                    changeToUncheck(this, temp);
-                }
-            });
-        });
-
-        allCheckedOrNot();
-        showOrHideMultiple();
-
-    }
-
-    //changes the studentLI to be checked
-    function changeToCheck(studentLI, studentCheckBox) {
-        if (!studentCheckBox.checked) {
-            studentCheckBox.checked = true;
-            studentLI.style.backgroundColor = "#A6A6A6"; //#595959
-            studentLI.style.color = "white";
-            clickCounter++;
-        }
-    }
-
-    //changes the studentLI to be unchecked
-    function changeToUncheck(studentLI, studentCheckBox) {
-        if (studentCheckBox.checked) {
-            studentCheckBox.checked = false;
-            studentLI.style.backgroundColor = ""; //#595959
-            studentLI.style.color = "black";
-            clickCounter--;
-        }
-    }
-
-    //this fetches the hidden checkbox from a studentLI
-    function grabCheckBoxFromStudentLI(studentLI) {
-        for (x = 0; x < studentLI.childNodes.length; x++) {
-            if (studentLI.childNodes[x].id == "moveStudentBox") {
-                return studentLI.childNodes[x];
-            }
-        }
-        return null;
-    }
-
-    //this changes the styling of the multipleUserActions section
-    function showOrHideMultiple() {
-        var multipleActionHeader = document.getElementById("multipleSelectedAction");
-
-        if (clickCounter > 1) {
-            //TODO:: Display the multiple email, the multiple move, multiple withdraw, multiple KARATE CHOP!
-            multipleActionHeader.style.backgroundColor = "#dbdbdb";
-        }
-
-        else {
-            //multipleActionHeader.style = "display: none;";
-            multipleActionHeader.style.backgroundColor = "";
-        }
-    }
-
-
-    //this method is when you change one checkbox. Determines if the roleSection checkbox needs to be checked and all other checkboxes.
-    function triggerCheckBox(studentLI, added) {
-        var container = studentLI.parentElement.parentElement; //grab the block which contains
-        var students = studentLI.parentElement.childNodes;
-        var change = true;
-        var box;
-        var header;
-
-        //grab the container
-        for (x = 0; x < container.childNodes.length; x++) {
-            if (container.childNodes[x].id === "sectionRoleHeader") {
-                header = container.childNodes[x];
-                break;
-            }
-        }
-
-        //grab the check box
-        for (x = 0; x < header.childNodes.length; x++) {
-            if (header.childNodes[x].id === "sectionRoleCheckAll") {
-                box = header.childNodes[x];
-                break;
-            }
-        }
-
-        //now we have the box and the header
-        //if we just checked a user
-        if (added === true) {
-            $.each(students, function (i, val) {
-                var studentBox = grabCheckBoxFromStudentLI(this);
-
-                if (studentBox != null) //not guranteed every child node is a student LI
-                {
-                    if (!studentBox.checked) //if you find a box that's unchecked, return
-                    {
-                        change = false;
-                    }
-                }
-            });
-
-            //if you hit here, you're ready to check the box.
-            if (change === true) {
-                box.checked = true;
-                allInSectionOrNot(box.getAttribute("section"));
-                allCheckedOrNot();
-            }
-        }
-
-            //if you remove even one, you need to uncheck the box
-        else {
-            box.checked = false;
-            var sectionBoxes = document.getElementsByClassName("sectionCheckBox");
-            for (x = 0; x < sectionBoxes.length; x++) {
-                if (sectionBoxes[x].getAttribute("section") === box.getAttribute("section")) {
-                    sectionBoxes[x].checked = false;
-                }
-            }
-            document.getElementById("selectAllUsers").checked = false;
-        }
-    }
-
-    //check if all roleBoxes in a section are checked, if so, check the section box
-    function allInSectionOrNot(section) {
-        var Boxes = document.getElementsByClassName("sectionCheckBox");
-        var sectionBox;
-        var flag = true;
-
-        for (x = 0; x < Boxes.length; x++) {
-            if (Boxes[x].getAttribute("section") === section) {
-                sectionBox = Boxes[x];
-            }
-        }
-
-        Boxes = document.getElementsByClassName("sectionRoleCheckBox");
-        $.each(Boxes, function (i, val) {
-            if (this.getAttribute("section") === section) {
-                if (!this.checked) {
-                    flag = false;
-                }
-            }
-        });
-
-        if (flag === true) {
-            sectionBox.checked = true;
-        }
-        else {
-            sectionBox.checked = false;
-        }
-    }
-
-    //whenever you check or uncheck a box, call this function to see if the select all box needs to change.
-    function allCheckedOrNot() {
-        allBoxes = document.getElementsByClassName("sectionRoleCheckBox");
-        var allow = true;
-        $.each(allBoxes, function (i, val) {
-            if (!this.checked) {
-                allow = false;
-            }
-        });
-
-        if (allow === true) {
-            document.getElementById("selectAllUsers").checked = true;
-        }
-        else {
-            document.getElementById("selectAllUsers").checked = false;
-        }
-    }
-
-</script>
 
 
 @* Hides anything that doesn't match search filter *@
@@ -620,10 +202,21 @@
 
     foreach (RosterController.UsersBySection usersBySection in ViewBag.UsersBySections)
     {
-        <div class="sectionDiv">
-
-        <h3 style="display:inline;">@Helpers.DisplaySection(usersBySection.SectionNumber)
-        </h3>
+        <div class="sectionDiv" section="@usersBySection.SectionNumber">
+        
+        @if (usersBySection.SectionNumber == "-1")
+        {
+            <h3 style="display:inline;">Multiple Section Users</h3>
+        }
+        else if(usersBySection.SectionNumber == "-2")
+        {
+            <h3 style="display:inline;">Teaching Personell</h3>
+        }
+        else
+        {
+            <h3 style="display:inline;">@Helpers.DisplaySection(usersBySection.SectionNumber)
+            </h3>
+        }
     <input type="checkbox" title="Check this box to select / deselect all users in this section" id="sectionCheck" class="sectionCheckBox" onchange="sectionCheckChange(this)" section="@usersBySection.SectionNumber" style="width: 40px; height: 20px;" />
 
         @if (firstSection)
@@ -758,12 +351,12 @@
                                                <a title="Re-enroll as student" href="@Url.Action("ChangeWithdrawnToStudentRole", "Roster", new { userProfileID = user.ID })">@Helpers.EnrollButton()</a>
                                            }
 
-                                            @if (user.UserName != null)
+                                            @if (user.UserName != null && ViewBag.CurrentUser.ID != user.ID) 
                                             {
                                                 <a title="Mail This User" href="@Url.Action("CreateUserProfileId", "Mail", new { id = user.ID })">@Helpers.MailButton()</a>                                            
                                             }
                                             
-                                            @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                                            @if (ViewBag.ActiveCourse.AbstractRole.CanModify && ViewBag.CurrentUser.ID != user.ID)
                                             {
                                                 <a title="Modify This User" href="@Url.Action("Edit", "Roster", new { userProfileID = user.ID })">@Helpers.EditButton()</a>
                                                 <form action="@Url.Action("Delete")"
@@ -794,6 +387,15 @@
                                     <span class="roster_name">@Helpers.DisplayFullNameOrPending(user)</span>
                                     <data id="userID" studentID="@user.ID"></data>
                                     <br />
+                                    @if (usersBySection.SectionNumber == "-1") //if multiple section user, show current sections
+                                    {
+                                        <span id="SectionList">Sections: </span>
+                                    }
+                                    @*else if (usersBySection.SectionNumber == "-2")
+                                    {
+                                        <span id="SectionList">All Sections</span>
+                                    }*@
+                                    
                                     <input id="moveStudentBox" type="checkbox" style="visibility:hidden;" class="moveThisUser" />
                                     </li>                            
                             }

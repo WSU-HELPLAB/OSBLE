@@ -17,6 +17,7 @@ using OSBLE.Models.HomePage; //yc: added for notifcations
 using OSBLE.Utility;
 using System.Net.Mail;
 using OSBLEPlus.Logic.Utility;
+using System.Web.Script.Serialization;
 
 namespace OSBLE.Controllers
 {
@@ -777,7 +778,7 @@ namespace OSBLE.Controllers
                     if (pendingUser != null && pendingUser.UserProfile != null)
                     {
                         return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " has been enrolled into this course. Please note that this course has an ongoing team-based assignment, and you will need to manually add " + pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " to a team." });    
-                    }
+                }
                     else //case: pendingUser and/or UserProfile are null, so it must be just the role changing.
                     {
                         return RedirectToAction("Index", "Roster", new { notice = "1 user role has been changed. Please note that this course has an ongoing team-based assignment, and you will need to manually add the student to a team." });    
@@ -786,8 +787,8 @@ namespace OSBLE.Controllers
 
                 if (pendingUser != null && pendingUser.UserProfile != null)
                 {
-                    return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " has been enrolled into this course." });
-                }
+                return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " has been enrolled into this course." });
+            }
                 else //case: pendingUser and/or UserProfile are null, so it must be just the role changing.
                 {
                     return RedirectToAction("Index", "Roster", new { notice = "1 user role has been changed for this course." });    
@@ -1259,8 +1260,9 @@ namespace OSBLE.Controllers
         //takes a list of ids
         //converts them to ints
         //changes the users with those ids to have the passed in section
-        
-        public bool EditSections(List<int> ids, int section, int courseID)
+        //if the section is -1 it means the user is in multiple sections
+        //if the user is in section -2 it means the user is in all sections
+        public bool EditSections(List<int> ids, int section, string sectionList, int courseID)
         {
             foreach (int id in ids)
             {
@@ -1270,7 +1272,29 @@ namespace OSBLE.Controllers
                                    && c.AbstractCourseID == courseID
                                    select c).FirstOrDefault();
 
+                if (CurrentUser.ID == temp.UserProfileID)
+                    continue;
+
+                if ((section == -1 || section == -2) && ((temp.AbstractRole.Name != "Instructor") && (temp.AbstractRole.Name != "TA")) )
+                {
+                    continue; //if the destination is multi sections and you're trying to move a student, block the move
+                }
+
+                if (temp.AbstractRole.Name == "Instructor") // if they're an instructor, they can only be in all sections
+                {
+                    temp.Section = -2;
+                    temp.MultiSection = "all";
+                }
+
+                    //if not an instructor
+                else
+                {
                 temp.Section = section;
+                    if (section == -2) //if you're moving them to all sections
+                        temp.MultiSection = "all";
+                    else
+                     temp.MultiSection = String.Copy(sectionList);
+                }
             }
 
                 db.SaveChanges();
@@ -1289,6 +1313,12 @@ namespace OSBLE.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    if (courseUser.AbstractRoleID == 1) //force the all sections constraint on professors
+                        courseUser.Section = -2;
+
+                    if (courseUser.AbstractRoleID == 3 && courseUser.Section < 0) //if students are being editted, don't allow them to be in section -1 or -2
+                        courseUser.Section = 0;
+
                     db.Entry(courseUser).State = EntityState.Modified;
                     db.SaveChanges();
 
@@ -1882,7 +1912,37 @@ namespace OSBLE.Controllers
             {
                 return View("Index");
             }
+        }
             
+        /// <summary>
+        /// This will take a list of Course User IDs and return the list of multiSection strings associated with those users in order
+        /// </summary>
+        /// <param name="studentID">This is a list of courseUser IDs</param>
+        /// <returns>
+        /// List of multiSection strings
+        /// </returns>
+        public string GetMultiSections(List<int> studentIDs)
+        {
+            List<string> multiSections = new List<string>();
+
+            
+            //this will go in order of the list passed in
+            foreach (int id in studentIDs)
+            {
+                CourseUser temp = (from stu in db.CourseUsers
+                                   where stu.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                                   stu.UserProfileID == id
+                                   select stu).FirstOrDefault();
+
+                multiSections.Add(temp.MultiSection);
+        }
+
+             
+            if (multiSections.Count == 0)
+                return null;
+            string output = new JavaScriptSerializer().Serialize(multiSections);
+            return output;
+           
         }
 
         /// <summary>
@@ -1919,6 +1979,45 @@ namespace OSBLE.Controllers
 
 
             return RedirectToAction("Index", "Roster", new { notice = "Whitelisted users have been sent an invintation to join the course" });
+        }
+
+
+        /// <summary>
+        /// This function enforces that all instructors are in section -2 and students are in section 0 or greater
+        /// </summary>
+        /// <returns>
+        /// false if no users were updated
+        /// true if users were updated and the page needs to be reloaded
+        /// </returns>
+        public bool SweepRoster()
+        {
+            bool flag = false;
+            var users = (from c in db.CourseUsers
+                         where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                         c.AbstractRoleID == 1 || c.AbstractRoleID == 3
+                         select c);
+
+            foreach (CourseUser cu in users)
+            {
+                //if user is an instructor, make sure they're section -2
+                if (cu.AbstractRoleID == 1 && cu.Section != -2)
+                {
+                    cu.Section = -2;
+                    flag = true;
+                }
+
+                // if user is a student make sure they're in a non-negative section
+                if (cu.AbstractRoleID == 3 && cu.Section < 0)
+                {
+                    cu.Section = 0;
+                    flag = true;
+                }
+            }
+
+            if (flag)
+                db.SaveChanges();
+
+            return flag;
         }
     }
 }

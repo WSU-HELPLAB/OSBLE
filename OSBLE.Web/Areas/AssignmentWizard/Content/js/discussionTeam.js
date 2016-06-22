@@ -53,17 +53,41 @@ function documentReady() {
 }
 
 function teamSortableComplete(event, ui) {
-
+    debugger;
     var OrigLIElement = ui.item.context;
     var myDataId = $(OrigLIElement).attr('data-id');
     var list = $(OrigLIElement).parent().contents();
     var ULElement = $(this);
+    var ElementSection = $(OrigLIElement).attr("section");
+    
+    var multiSections;
+    
+
+    var IsStudent;
+    if ($(OrigLIElement).hasClass("Student")) {
+        IsStudent = true;
+    }
+    else {
+        IsStudent = false;
+    }
+
+
+    if (ElementSection === "-1") { //if user has multi sections, grab them.
+        multiSections = $(ULElement).find("input");
+        multiSections = multiSections[0].getAttribute("value").split(",");
+    }
 
     if(typeof myDataId != 'undefined')
     {
         var counter = 0;
+
+        //Go through the team where item was dropped and look for repeats
+        //myDataId is the id of the element you just dragged
+        //also make sure the section is correct
         $.each($(this).find('[data-id=\"' + myDataId + '\"]'), function () {
             counter++;
+            var flag = false;
+
             if(counter > 1)
             {
                 var parentDiv = $(ULElement).parent().find('.TeamNameTextBox');
@@ -71,14 +95,40 @@ function teamSortableComplete(event, ui) {
                 var duplicateMemberName = $(OrigLIElement).attr('text');
                 alreadyOnTeamError($(this).text(), teamName);
                 $(this).remove();
-                
-                
+                return true; //iterate through next cycle of loop
             }
+
+            //if not student and no cross-section teams allowed
+            if (!IsStudent && !document.getElementById('allow_cross_section').checked) {
+                if (ElementSection == -1) {
+                    $.each($(ULElement).find('.ui-state-default'), function (x, newVal) {
+                        if ($.inArray($(this).attr("section"), multiSections) != -1) {
+                            flag = true;
+                        }
+                    });
+                }
+
+                else if (ElementSection >= 0) {
+                    var TeamMembers = $(ULElement).find('.ui-state-default');
+                    if (TeamMembers.length > 0) {
+                        flag = true;
+                    }
+                    else {
+                        if (TeamMembers[0].getAttribute("section") === ElementSection) {
+                            flag = true;
+                        }
+                    }
+                }
+                if (!flag) {
+                    displayError("You must checkmark 'Allow Cross_Section teams' to have teams with members across sections.");
+                    $(this).remove();
+                }
+            }  
         });
     }
 
     var parentid = $($(OrigLIElement).parent().parent()).attr("id");
-    if (!document.getElementById('allow_cross_section').checked && parentid != "AvailableStudentList") //if no cross teams are allowed, check for adding a team member to a different section
+    if (!document.getElementById('allow_cross_section').checked && parentid != "AvailableStudentList" && IsStudent) //if no cross teams are allowed, check for adding a team member to a different section
     {
         if (list.length > 1) //make sure there is one other student in the team, or it doesn't matter
         {
@@ -88,18 +138,18 @@ function teamSortableComplete(event, ui) {
             }
 
             var FirstTeamMembAttr = $(firstTeamMember).attr("section");
-            var ElementSection = $(OrigLIElement).attr("section");
 
-            if (!(FirstTeamMembAttr === ElementSection)) {
-                alert("You must checkmark 'Allow Cross_Section teams' to have teams with members across sections.");
-                var availables = document.getElementById("AvailableStudent");
-                availables.appendChild($(OrigLIElement).context);
-                //dragElement.remove();
-                //re add drag element to where it was.....
+            if (ElementSection >= 0) {
+                if (!(FirstTeamMembAttr === ElementSection)) {
+                    displayError("You must checkmark 'Allow Cross_Section teams' to have teams with members across sections.");
+                    var availables = document.getElementById("AvailableStudent");
+                    availables.appendChild($(OrigLIElement).context);
+                    //dragElement.remove();
+                    //re add drag element to where it was.....
+                }
             }
         }
     }
-
 }
 
 function hideErrors() {
@@ -483,7 +533,6 @@ function removeFromTeam(element) {
     if($(liElement).hasClass('Student'))
     {
         $(liElement).slideUp('slow', removeStudentFromTeamComplete);
-        
     }
     else
     {

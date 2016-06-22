@@ -5,6 +5,7 @@
     [AbstractRoleID]   INT NOT NULL,
     [Section]          INT NOT NULL,
     [Hidden]           BIT NOT NULL,
+    [MultiSection] VARCHAR(50) NULL, 
     CONSTRAINT [PK_dbo.CourseUsers] PRIMARY KEY CLUSTERED ([ID] ASC),
     CONSTRAINT [FK_dbo.CourseUsers_dbo.AbstractCourses_AbstractCourseID] FOREIGN KEY ([AbstractCourseID]) REFERENCES [dbo].[AbstractCourses] ([ID]),
     CONSTRAINT [FK_dbo.CourseUsers_dbo.AbstractRoles_AbstractRoleID] FOREIGN KEY ([AbstractRoleID]) REFERENCES [dbo].[AbstractRoles] ([ID]),
