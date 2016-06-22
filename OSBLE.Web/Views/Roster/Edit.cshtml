@@ -50,6 +50,7 @@
         <div class="editor-field">
             @Html.DropDownList("AbstractRoleID")
             @Html.ValidationMessageFor(model => model.AbstractRoleID)
+            <input type="hidden" name="OldAbstractRoleId" value="@ViewBag.OldAbstractRoleID"/>
         </div>
 
         <div class="editor-label">
@@ -64,7 +65,6 @@
         <p>
             <input type="submit" value="Save User" />
         </p>
-
 }
 
 <div>
