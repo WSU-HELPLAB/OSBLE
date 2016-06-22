@@ -102,7 +102,7 @@ else
             if (cu.AbstractRoleID != (int)CourseRole.CourseRoles.Withdrawn)
             {
                 string studentDisplayName = cu.DisplayName((int)CourseRole.CourseRoles.Instructor);
-                <li id="cu_@(cu.ID)" section="section_@cu.Section" class="ui-state-default Student" style="list-style-type:none">
+                <li id="cu_@(cu.ID)" section="@cu.Section" class="ui-state-default Student" style="list-style-type:none">
                     @studentDisplayName
                     <br />
                     Section: @cu.Section
@@ -127,10 +127,32 @@ else
                 {
                     string modDisplayName = cu.DisplayNameWithRole((int)CourseRole.CourseRoles.Instructor);
 
-                    <li data-id="cu_@(cu.ID)" id="cu_@(cu.ID)" section="section_@cu.Section" class="ui-state-default Moderator">
+                    <li data-id="cu_@(cu.ID)" id="cu_@(cu.ID)" section="@cu.Section" class="ui-state-default Moderator">
                         @modDisplayName
                         <br />
-                        Section: @cu.Section
+                        @if (cu.Section == -2)
+                        {
+                            <text>Sections: All Sections</text>
+                        }
+                            
+                        else if (cu.Section == -1)
+                        {
+                            List<string> multiSections = cu.MultiSection.Split(',').ToList();
+                            
+                            <text>Sections: 
+                            
+                            @cu.MultiSection.Substring(0, cu.MultiSection.Length - 1)
+                            
+                            </text>
+
+                            <input type="hidden" id="MultiSection" value="@cu.MultiSection.Substring(0, cu.MultiSection.Length - 1)" />
+                        }
+
+                        else
+                        {
+                            <text>Section: @cu.Section</text>
+                        }
+                        
                         <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @modDisplayName" title="remove @modDisplayName" onclick="removeFromTeam(this)" />
                     </li>
                 }
@@ -169,10 +191,31 @@ else
                             displayName = member.CourseUser.DisplayName((int)CourseRole.CourseRoles.Instructor);
                             roleClass = "Student";
                         }
-                        <li id="cu_@(member.CourseUserID)" data-id="cu_@(member.CourseUserID)" section="section_@member.CourseUser.Section" class="ui-state-default @roleClass">
+                        <li id="cu_@(member.CourseUserID)" data-id="cu_@(member.CourseUserID)" section="@member.CourseUser.Section" class="ui-state-default @roleClass">
                             @displayName
                             <br />
-                            Section: @member.CourseUser.Section
+                            @if (member.CourseUser.Section == -2)
+                            {
+                                <text>Sections: All Sections</text>
+                            }
+
+                            else if (member.CourseUser.Section == -1)
+                            {
+                                List<string> multiSections = member.CourseUser.MultiSection.Split(',').ToList();
+
+                                <text>Sections:
+
+                                    @member.CourseUser.MultiSection.Substring(0, member.CourseUser.MultiSection.Length - 1)
+
+                                </text>
+                                
+                                <input type="hidden" id="MultiSection" value="@member.CourseUser.MultiSection.Substring(0, member.CourseUser.MultiSection.Length - 1)" />
+                            }
+
+                            else
+                            {
+                                <text>Section: @member.CourseUser.Section</text>
+                            }
                             <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @displayName" title="remove @displayName" onclick="removeFromTeam(this)" />
                         </li>
                     }

@@ -1203,6 +1203,7 @@
     <Content Include="Scripts\osble.courses.js" />
     <Content Include="Scripts\osble.js" />
     <Content Include="Scripts\osble.teacher_activity.js" />
+    <Content Include="Scripts\RosterScripts.js" />
     <Content Include="Scripts\Silverlight.js" />
     <Content Include="Scripts\time.js" />
     <Content Include="Scripts\_references.js" />

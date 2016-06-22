@@ -393,7 +393,7 @@ namespace OSBLE.Controllers
                 cu.AbstractCourseID = course.ID;
                 cu.UserProfileID = CurrentUser.ID;
                 cu.AbstractRoleID = (int)CourseRole.CourseRoles.Instructor;
-
+                cu.Section = -2;
 
                 db.CourseUsers.Add(cu);
                 db.SaveChanges();

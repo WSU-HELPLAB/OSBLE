@@ -32,8 +32,17 @@ namespace OSBLE.Models.Courses
 
         public virtual AbstractRole AbstractRole { get; set; }
 
+        //section -2 indicates all sections
+        //section -1 indiciates user is in multiple sections
+        //otherwise the user is in an individual section that is specified by 'section'
         [Required]
         public int Section { get; set; }
+
+        //this will be null or 'all' unless the user is in section -1
+        //then this string will be a comma separated list
+        //for example: 1,2,4,  <-- that would be a user who is
+        //listed as section -1, but really in sections 1, 2, and 4
+        public string MultiSection { get; set; }
 
         public bool Hidden { get; set; }
 
@@ -59,6 +68,7 @@ namespace OSBLE.Models.Courses
             this.ID = copyUser.ID;
             this.Section = copyUser.Section;
             this.UserProfileID = copyUser.UserProfileID;
+            this.MultiSection =  String.Copy(copyUser.MultiSection);
         }
 
         [Obsolete("Use non-obsolete DisplayName() method")]

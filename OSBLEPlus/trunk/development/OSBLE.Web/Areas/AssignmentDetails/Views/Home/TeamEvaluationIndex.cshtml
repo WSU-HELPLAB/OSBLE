@@ -34,7 +34,8 @@
 {
     @if (Model.Client.AbstractRole.CanGrade)
     {
-
+        CourseUser currentUser = ViewBag.ActiveCourseUser;        
+        
         //If preceding assignment team was a discussion, we want to use discussion teams for the team evaluation
 
         List<IAssignmentTeam> teams = null;
@@ -60,8 +61,68 @@
                 sections.Add(tm.CourseUser.Section);
             }
         }
+        //populate cross section teams
+        List<string> multiSections = new List<string>();
+        
+        //create a list of the multiSections 
+        multiSections = currentUser.MultiSection.Split(',').ToList(); 
 
         HashSet<IAssignmentTeam> CrossSectionTeam = new HashSet<IAssignmentTeam>();
+
+        foreach (IAssignmentTeam assignmentTeam in teams)
+        {
+            //Make sure all team members are on the same section.
+            int temp;
+            bool flagCheck;
+            bool sectionFlag;
+            temp = assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.Section;
+            flagCheck = false;
+            sectionFlag = false;
+            
+            if (currentUser.Section == -2) //if user in all section, always display users
+            {
+                sectionFlag = true;
+            }
+            
+            //populate cross section            
+            foreach (TeamMember member in assignmentTeam.Team.TeamMembers) //make sure all team members are on the same team.
+            {
+               
+                //if the current user is a multi section user (not all section)
+                if (currentUser.Section == -1)
+                {
+                    int isInList = multiSections.IndexOf(member.CourseUser.Section.ToString());
+                    if (isInList != -1) //if this user's multisection contains this users' section
+                    {
+                        sectionFlag = true;
+                    }
+                }
+                
+                    //if the current user is a single section user
+                else if (currentUser.Section >= 0) //if TA or Instructor is a single section user, check if one of the team members is in their section
+                {
+                    if (member.CourseUser.Section == currentUser.Section)
+                    {
+                        sectionFlag = true;
+                    }
+                }
+                
+                //if the teammate we're looking at doesn't have the same section as all others, it's a cross section team
+                if (member.CourseUser.Section != temp)
+                {
+                    flagCheck = true;
+                    break;
+                }
+            }
+
+            if (flagCheck && sectionFlag) //If the team is cross section and the current user has one member of the team in their section, add it to the list off Cross Sections
+            {
+                CrossSectionTeam.Add(assignmentTeam);
+                continue;
+            }
+        }
+        
+        //end population of cross section teams
 
         //this bool is to determine whether or not there needs to be a row with a section header.
         bool sectionBool = false;
@@ -75,17 +136,32 @@
         if (sections.Count > 1)
         {
             showSections = true;
-        }        
+        }
         
         foreach (int section in sections)
         {
             // For TAs, we only want the TA to see students in the section they are in
-            CourseUser currentUser = ViewBag.ActiveCourseUser;
+            
             if (currentUser != null)
             {
-                if (currentUser.AbstractRole.Name == "TA" && currentUser.Section != section)
+                if (currentUser.AbstractRole.Name == "TA") //see if the user is a TA
                 {
-                    continue;
+                    if (currentUser.Section >= 0) //check if the user is a multi-section user or not
+                    {
+                        if (section != currentUser.Section) //if not, make sure they are in this section before displaying the grades
+                        {
+                            continue;
+                        }
+                    }
+
+                    else if (currentUser.Section == -1)
+                    {
+                        int isInList = multiSections.IndexOf(section.ToString());
+                        if (isInList == -1) //if this user's multisection does not contain this section
+                        {
+                            continue;
+                        }
+                    }
                 }
             }
             
@@ -95,29 +171,29 @@
             //a row for each user.
             foreach (IAssignmentTeam assignmentTeam in teams)
             {
-                if (assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.Section != section)
-                {
-                    continue;
-                }
 
-                //Make sure all team members are on the same section.
+                //Make sure all team members are on the same team.
                 int temp;
                 bool flagCheck;
                 temp = assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.Section;
                 flagCheck = false;
 
-                foreach (TeamMember member in assignmentTeam.Team.TeamMembers) //make sure all team members are on the same team.
+                foreach (TeamMember tm in assignmentTeam.Team.TeamMembers)
                 {
-                    if (member.CourseUser.Section != temp)
+                    if (tm.CourseUser.Section != temp)
                     {
                         flagCheck = true;
                         break;
                     }
                 }
 
-                if (flagCheck) //If the team is cross section, add it to the list off Cross Sections
+                if (flagCheck)
                 {
-                    CrossSectionTeam.Add(assignmentTeam);
+                    continue;
+                }
+                
+                if (assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.Section != section)
+                {
                     continue;
                 }
 
