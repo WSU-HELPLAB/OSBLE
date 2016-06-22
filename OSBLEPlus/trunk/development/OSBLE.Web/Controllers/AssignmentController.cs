@@ -302,6 +302,25 @@ namespace OSBLE.Controllers
                                                       e.Evaluator.AbstractRole.CanGrade
                                                       select e).ToList();
 
+                // For TAs, get rid of evaluations not within their section
+                for (int i = 0; i < evaluations.Count; i++)
+                {
+                    bool inSection = false;
+                    foreach(TeamMember member in evaluations[i].Recipient.TeamMembers) // Must find at least one team member in TA's section to let TA see this team
+                    {
+                        if (member.CourseUser.Section == ActiveCourseUser.Section)
+                        {
+                            inSection = true;
+                            break;
+                        }
+                    }
+                    if (!inSection)
+                    {
+                        evaluations.RemoveAt(i);
+                        i--;
+                    }
+                }
+
                 foreach (RubricEvaluation re in evaluations)
                 {
                     re.IsPublished = true;
@@ -570,7 +589,7 @@ namespace OSBLE.Controllers
         /// </summary>
         /// <param name="assignmentID">assignment ID</param>
         /// <returns></returns>
-        [CanModifyCourse]
+        [CanGradeCourse]
         public ActionResult ExportAssignmentGrades(int assignmentID)
         {
             //find all students for current course
@@ -578,6 +597,17 @@ namespace OSBLE.Controllers
                                          where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
                                          c.AbstractRoleID == (int)CourseRole.CourseRoles.Student
                                          select c).ToList();
+
+            // For TAs, make get rid of any student that isn't in the TA's section.
+            for(int i = 0; i < students.Count; i++)
+            {
+                if (students[i].Section != ActiveCourseUser.Section)
+                {
+                    students.RemoveAt(i);
+                    i--;
+                }
+            }
+
             //key-value pair for names-grades
             Dictionary<string, string> grades = new Dictionary<string, string>();
             //seed dictionary with student last, first names

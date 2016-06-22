@@ -774,10 +774,24 @@ namespace OSBLE.Controllers
                 //if there is at least one assignmnet in the course that has teams/is team based
                 if (thisCourse != null && thisCourse.Assignments.Count(a => a.HasTeams) > 0)
                 {
-                    return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " has been enrolled into this course. Please note that this course has an ongoing team-based assignment, and you will need to manually add " +pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " to a team." });
+                    if (pendingUser != null && pendingUser.UserProfile != null)
+                    {
+                        return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " has been enrolled into this course. Please note that this course has an ongoing team-based assignment, and you will need to manually add " + pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " to a team." });    
+                    }
+                    else //case: pendingUser and/or UserProfile are null, so it must be just the role changing.
+                    {
+                        return RedirectToAction("Index", "Roster", new { notice = "1 user role has been changed. Please note that this course has an ongoing team-based assignment, and you will need to manually add the student to a team." });    
+                    }
                 }
 
-                return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " has been enrolled into this course." });
+                if (pendingUser != null && pendingUser.UserProfile != null)
+                {
+                    return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " has been enrolled into this course." });
+                }
+                else //case: pendingUser and/or UserProfile are null, so it must be just the role changing.
+                {
+                    return RedirectToAction("Index", "Roster", new { notice = "1 user role has been changed for this course." });    
+                }
             }
             else if (pendingUser.AbstractRoleID == (int)CommunityRole.OSBLERoles.Pending)
             {
@@ -1225,6 +1239,7 @@ namespace OSBLE.Controllers
         public ActionResult Edit(int userProfileID)
         {
             CourseUser CourseUser = getCourseUser(userProfileID);
+            ViewBag.OldAbstractRoleID = CourseUser.AbstractRoleID;
             if (CanModifyOwnLink(CourseUser))
             {
                 ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", CourseUser.UserProfileID);
@@ -1268,20 +1283,39 @@ namespace OSBLE.Controllers
 
         [HttpPost]
         [CanModifyCourse]
-        public ActionResult Edit(CourseUser CourseUser)
+        public ActionResult Edit(CourseUser courseUser)
         {
-            if (CanModifyOwnLink(CourseUser))
+            if (CanModifyOwnLink(courseUser))
             {
                 if (ModelState.IsValid)
                 {
-                    db.Entry(CourseUser).State = EntityState.Modified;
+                    db.Entry(courseUser).State = EntityState.Modified;
                     db.SaveChanges();
+
+                    // Check to see if CourseUser's ROLE has changed from not student to student
+                    int oldRoleId = -1, newRoleId = -1;
+                    Int32.TryParse(Request.Form["OldAbstractRoleId"], out oldRoleId);
+                    Int32.TryParse(Request.Form["AbstractRoleID"], out newRoleId);
+                    if (oldRoleId != -1 && newRoleId != -1) //we successfully got both ID values
+                    {
+                        //The user role is changing from not student (e.g. TA/Instructor) to student role
+                        if (oldRoleId != (int)CourseRole.CourseRoles.Student && newRoleId == (int)CourseRole.CourseRoles.Student)
+                        {
+                            // If so, make pending so we can approve pending to workaround issue of user not being added to the assignments                            
+                            courseUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending;
+                            db.Entry(courseUser).State = EntityState.Modified;
+                            db.SaveChanges();
+                            ApprovePending(courseUser.UserProfileID, courseUser.AbstractRoleID);
+                            addNewStudentToTeams(courseUser);
+                        }
+                    }
+
                     return RedirectToAction("Index");
                 }
-                ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", CourseUser.UserProfileID);
-                ViewBag.AbstractCourse = new SelectList(db.Courses, "ID", "Prefix", CourseUser.AbstractCourseID);
-                ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name", CourseUser.AbstractRoleID);
-                return View(CourseUser);
+                ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", courseUser.UserProfileID);
+                ViewBag.AbstractCourse = new SelectList(db.Courses, "ID", "Prefix", courseUser.AbstractCourseID);
+                ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name", courseUser.AbstractRoleID);
+                return View(courseUser);
             }
             return RedirectToAction("Index");
         }
@@ -1550,12 +1584,37 @@ namespace OSBLE.Controllers
 
                 foreach (Assignment a in assignments)
                 {
+                    bool present = false;
+                    // First lets make sure the user isn't already in a team for this assignment
+                    foreach(AssignmentTeam aTeam in a.AssignmentTeams)
+                    {
+                        foreach (TeamMember member in aTeam.Team.TeamMembers)
+                        {
+                            if (member.CourseUserID == courseUser.ID)
+                            {
+                                // If so, raise the present flag
+                                present = true;
+                                break;
+                            }
+                        }
+
+                        if (present) break; // If present, exit loop and skip this assignment
+                    }
+
+                    if (present) continue;
+
                     TeamMember userMember = new TeamMember()
                     {
                         CourseUserID = courseUser.ID
                     };
 
                     Team team = new Team();
+
+                    if (courseUser.UserProfile == null)
+                    {
+                        courseUser.UserProfile = db.UserProfiles.Where(up => up.ID == courseUser.UserProfileID).FirstOrDefault();
+                    }
+
                     team.Name = courseUser.UserProfile.LastName + "," + courseUser.UserProfile.FirstName;
                     team.TeamMembers.Add(userMember);
 

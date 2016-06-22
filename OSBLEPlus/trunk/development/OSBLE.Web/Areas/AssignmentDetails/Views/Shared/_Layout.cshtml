@@ -32,13 +32,44 @@
         $('#changeAssignment').change(function () {
             var assignmentNumber = $('#changeAssignment').val();
             window.location.replace("/AssignmentDetails/" + assignmentNumber);
-
         });
 
         $("[id^='annotateId']").click(function (data) {
             var idString = $(this).prop("class");
             forceRefreshAnnotateDialog(idString);
         });
+
+        var rowCount = 0;
+        var publishedCount = 0;
+        var draftCount = 0;
+        $(".NormalRow").each(function () {
+            rowCount++;
+            var string = $(this).find("td").text();
+            if (string.startsWith("Saved as Draft")) { draftCount++; }
+            else if (string.startsWith("Not Graded")) { /* Do nothing here, just easier than trying to parse a double in for the next condition*/ }
+            else { publishedCount++; }
+        });
+        $(".AltRow").each(function () {
+            rowCount++;
+            var string = $(this).find("td").text();
+            if (string.startsWith("Saved as Draft")) { draftCount++; }
+            else if (string.startsWith("Not Graded")) { /* Do nothing here, just easier than trying to parse a double in for the next condition*/ }
+            else { publishedCount++; }
+        });
+
+        var publishedString = publishedCount + " of " + rowCount + " rubrics have been published";
+        var draftString = $(".GradingProgress #draftString").html();
+        if (draftString != null) // If there was a draftString
+        {
+            var index = 0;
+            while (draftString.charAt(index) != 'r')   // Delete the number at the beginning of it
+                index++;
+
+            draftString = draftString.substring(index, draftString.length);
+            $(".GradingProgress #draftString").html(draftCount + " " + draftString);
+        }
+        
+        $(".GradingProgress #publishedString").html(publishedString);
     });
 
     function forceRefreshAnnotateDialog(idString) {

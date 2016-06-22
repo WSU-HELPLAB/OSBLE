@@ -28,11 +28,35 @@
   List<CourseUser> cuList = ViewBag.ObserverCU;
 
   List<AssignmentTeam> atList = new List<AssignmentTeam>();
+  CourseUser activeCourseUser = ViewBag.ActiveCourseUser;
 
     if (null != Model.TeamList)
     {
         atList = (from t in @Model.TeamList as IEnumerable<AssignmentTeam>
-                  select t).Reverse().ToList();
+                  select t).Reverse().ToList(); 
+
+        if (activeCourseUser != null && activeCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
+        {
+            // If current user is a TA, remove any AssignmentTeams that aren't in the TA's section
+            for (int i = 0; i < atList.Count; i++)
+            {
+                // Loop through team members and make sure at least one member is in TA's section
+                bool inSection = false;
+                foreach (TeamMember member in atList[i].Team.TeamMembers)
+                {
+                    if (member.CourseUser.Section == activeCourseUser.Section)
+                    {
+                        inSection = true;
+                        break;
+                    }
+                }
+                if (!inSection) // If team has no member in TA's section, get rid of it!
+                {
+                    atList.RemoveAt(i);
+                    i--;
+                }
+            }
+        }
     }
 }
 <script type="text/javascript">
@@ -244,8 +268,8 @@
                               int prevUserId;
                               int userCount;
                               AssignmentTeam at;
-
-                              //We reversed the list so the last person is our first person
+                              
+                              // We reversed the list so the last person is our first person
                               if (atList.LastOrDefault().TeamID == @Model.SelectedTeam.TeamID)
                               {
                                   prevUserId = atList.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID;
@@ -262,8 +286,24 @@
                     <td style="padding:0;margin:0;border:0">
                         <input type="button" value="<" onclick="switchEvalButton(@Model.SelectedAssignment.ID, @prevUserId);" style="margin:0" />
                         <select id="@selectedTeam" name="@selectedTeam" style="margin:0">
-                            @{foreach (AssignmentTeam team in Model.TeamList)
+                            @{
+                              foreach (AssignmentTeam team in Model.TeamList)
                               {
+                                  // (TAs only) Before we do anything with this team, make sure at least one person in the team is in the TA's section
+                                  if (activeCourseUser != null && activeCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
+                                  {
+                                      bool inSection = false;
+                                      foreach (TeamMember member in team.Team.TeamMembers)
+                                      {
+                                          if (member.CourseUser.Section == activeCourseUser.Section)
+                                          {
+                                              inSection = true;
+                                              break;
+                                          }
+                                      }
+                                      if (!inSection) { continue; }
+                                  }
+                                  
                                   string optionTextPublished = "<option style=\"background:#43D58C;\" value=\"{0}\" {1}>{2}</option>";
                                   string optionTextDraft = "<option style=\"background:#9AFF9A;\" value=\"{0}\" {1}>{2}</option>";
                                   string optionText = "<option value=\"{0}\" {1}>{2}</option>";
@@ -287,17 +327,17 @@
                                           {
                                               if (re.IsPublished == true)
                                               {
-                                @Html.Raw(String.Format(optionTextPublished, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.Name));
+                                                @Html.Raw(String.Format(optionTextPublished, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.Name));
                                               }
                                               else
                                               {
-                                @Html.Raw(String.Format(optionTextDraft, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.Name));
+                                                @Html.Raw(String.Format(optionTextDraft, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.Name));
                                               }
 
                                           }
                                           else
                                           {
-                                @Html.Raw(String.Format(optionText, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.Name));
+                                            @Html.Raw(String.Format(optionText, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.Name));
                                           }
                                       }
                                       else
@@ -307,16 +347,16 @@
                                           {
                                               if (re.IsPublished == true)
                                               {
-                                @Html.Raw(String.Format(optionTextPublished, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole)));
+                                                @Html.Raw(String.Format(optionTextPublished, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole)));
                                               }
                                               else
                                               {
-                                @Html.Raw(String.Format(optionTextDraft, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole)));
+                                                @Html.Raw(String.Format(optionTextDraft, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole)));
                                               }
                                           }
                                           else
                                           {
-                                @Html.Raw(String.Format(optionText, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole)));
+                                            @Html.Raw(String.Format(optionText, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole)));
                                           }
                                       }
                                   }
@@ -330,6 +370,29 @@
 
                               atList = (from t in @Model.TeamList as IEnumerable<AssignmentTeam>
                                         select t).ToList();
+
+                              if (activeCourseUser != null && activeCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
+                              {
+                                  // If current user is a TA, remove any AssignmentTeams that aren't in the TA's section
+                                  for (int i = 0; i < atList.Count; i++)
+                                  {
+                                      // Loop through team members and make sure at least one member is in TA's section
+                                      bool inSection = false;
+                                      foreach (TeamMember member in atList[i].Team.TeamMembers)
+                                      {
+                                          if (member.CourseUser.Section == activeCourseUser.Section)
+                                          {
+                                              inSection = true;
+                                              break;
+                                          }
+                                      }
+                                      if (!inSection) // If team has no member in TA's section, get rid of it!
+                                      {
+                                          atList.RemoveAt(i);
+                                          i--;
+                                      }
+                                  }
+                              }
 
                               if (atList.LastOrDefault().TeamID == @Model.SelectedTeam.TeamID)
                               {

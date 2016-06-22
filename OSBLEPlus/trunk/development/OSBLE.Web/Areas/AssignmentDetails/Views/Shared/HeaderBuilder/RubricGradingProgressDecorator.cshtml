@@ -10,16 +10,25 @@
     int AssignmentID = dataModel.GradingProgress.AssignmentID;
 }
 
-<tr>
+<tr class="GradingProgress">
 <th>Grading Progress:</th>
-    <td>
+    <td id="publishedString">
         @publishedString
-        <br/>
+    </td>
         @if (showDraftString)
         {
-            @:@draftString&nbsp @Html.ActionLink("Publish All","PublishAllRubrics","Assignment",new { area = "", assignmentId = AssignmentID }, new { })
+            @:<td id="draftString">
+                @:@draftString&nbsp @Html.ActionLink("Publish All","PublishAllRubrics","Assignment",new { area = "", assignmentId = AssignmentID }, new { })
+            @:</td>
         }
-        <br/>
+    <td>
         @Html.ActionLink("Export grades to CSV", "ExportAssignmentGrades", "Assignment",new { area = "", assignmentId = AssignmentID }, new { })
     </td>
 </tr>
+
+<style media="screen" type="text/css">
+    .GradingProgress td {
+    padding: 20px 40px;
+    display: block;
+    }
+</style>
