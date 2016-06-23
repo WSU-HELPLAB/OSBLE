@@ -2,6 +2,28 @@
 
 //Called when the document has finished loading and is safe to make DOM calls
 function documentReady() {
+    //check if any of the teams are cross section
+    //if so, check the allow cross section team box by default
+    var flag = false;
+    $.each($.find('.TeamSortable'), function (i, val) {
+        var TeamMembers = $(this).find('.Student');
+        if (TeamMembers.length > 0) {
+            var firstSection = $(TeamMembers[0]).attr("section");
+            for (x = 1; x < TeamMembers.length; x++) {
+                if (firstSection != $(TeamMembers[x]).attr("section"))
+                    flag = true;
+            }
+        }
+    });
+
+    if (flag === true) {
+        var crossSectionButton = $.find("#allow_cross_section");
+        crossSectionButton[0].checked = true;
+        document.getElementById("studentsPerTeam").innerHTML = 'Create a configuration with at least <input type="text" id="AutoGenByStudentTextBox"  /> students per team' +
+       '<button type="button" id="AutoGenByStudentButton" onclick="generateTeamsByNumberOfStudents()">Go</button>'
+        document.getElementById("teamPerCourse").innerHTML = 'Create a configuration with <input type="text" id="AutoGenByteamTextBox" size="3" /> total teams' +
+       '<button type="button" id="AutoGenByTeamButton" onclick="generateTeamsByNumberOfTeams()">Go</button>'
+    }
 
     //radio button event
     $('input[name=teamRadio]').change(function () {
@@ -99,24 +121,24 @@ function teamSortableComplete(event, ui) {
 
             //if not student and no cross-section teams allowed
             if (!IsStudent && !document.getElementById('allow_cross_section').checked) {
+
+                //if the user is multi section
                 if (ElementSection == -1) {
-                    $.each($(ULElement).find('.ui-state-default'), function (x, newVal) {
+                    flag = false;
+                    $.each($(ULElement).find('.Student'), function (x, student) {
                         if ($.inArray($(this).attr("section"), multiSections) != -1) {
                             flag = true;
                         }
                     });
                 }
 
+                //if the user is single section
                 else if (ElementSection >= 0) {
-                    var TeamMembers = $(ULElement).find('.ui-state-default');
-                    if (TeamMembers.length > 0) {
-                        flag = true;
-                    }
-                    else {
-                        if (TeamMembers[0].getAttribute("section") === ElementSection) {
-                            flag = true;
-                        }
-                    }
+                    flag = true;
+                    $.each($(ULElement).find('.Student'), function (x, student) {
+                        if (ElementSection != $(student).attr("section"))
+                            flag = false;
+                    });
                 }
                 if (!flag) {
                     displayError("You must checkmark 'Allow Cross_Section teams' to have teams with members across sections.");
@@ -476,6 +498,8 @@ function generateTeamsByNumberOfStudents() {
 
 //Auto generates a team configuration based on the number of teams entered inside the
 //AutoGenByteamTextBox text box
+
+//TODO::::: make a copy of the moderator before moving them to the list. code works.
 function generateTeamsByNumberOfTeams() {
     var totalTeams = $("#AutoGenByteamTextBox").val();
     if (totalTeams == undefined || totalTeams == 0) {
@@ -574,4 +598,96 @@ function hideTeamComplete() {
     $("#AvailableStudent").append(jQuery(this).find("li"));
     $("#AvailableStudent").find(':hidden').not('img').slideDown('slow');
     $(this).remove();
+}
+
+
+function AddModeratorsTAs() {
+    
+    //go through and remove all moderators
+    $.each($.find('.TeamSortable'), function (i, val) {
+        $.each( $(this).find('.ui-state-default'), function (j, val2){
+            if ($(this).hasClass('Moderator')) {
+                $(this).remove();
+            }
+        });
+    });
+
+    //foreach moderator
+    $.each($.find('.Moderator'), function (i, mod) {
+        var multiSections; //grab their multisections if they're in multiple sections
+        if ($(mod).attr("section") === "-1") { //if user has multi sections, grab them.
+            multiSections = $(mod).find("input");
+            multiSections = multiSections[0].getAttribute("value").split(",");
+        }
+        else{ //if single section, don't worry about it
+            multiSections = "";
+        }
+
+        
+        //for each team, see if moderator can be in this section
+        $.each($.find('.TeamSortable'), function (j, team) {
+            var flag = false;
+
+            //if mod is in all sections
+            if ($(mod).attr("section") === "-2")
+                flag = true;
+
+            //if mod is not in all sections
+            else{
+                //if cross sections are not allowed
+                if ($.find("#allow_cross_section")[0].checked === false) {
+
+                    //if you find one student in this 
+                    flag = false;
+
+                    //for each student in team
+                    $.each($(team).find(".Student"), function (k, student) {
+
+                        //if the moderator is multiSection
+                        if ($(mod).attr("section") === "-1") {
+                            //if the students section is in the moderators multisection
+                            if ($.inArray($(student).attr("section"), multiSections) != -1) {
+                                flag = true;
+                            }
+                        }
+                            //if the moderator is not multi section
+                        else{
+                            if ($(mod).attr("section") === $(student).attr("section"))
+                                flag = true;
+                        }
+
+                    });
+                }
+
+                //if cross sections are allowed, add all TAs to all teams
+                else {
+
+                    //if you find any students not in these sections, don't allow the adding.
+                    flag = true;
+
+                    //$.each($(team).find(".Student"), function (k, student) {
+                    //    //if the moderator is multiSection
+                    //    if ($(mod).attr("section") === "-1") {
+                    //        //if the students section is in the moderators multisection
+                    //        if ($.inArray($(student).attr("section"), multiSections) === -1) {
+                    //            flag = false;
+                    //        }
+                    //    }
+                    //        //if the moderator is not multi section
+                    //    else {
+                    //        if ($(mod).attr("section") != $(student).attr("section"))
+                    //            flag = false;
+                    //    }
+
+                    //});
+                }
+            }
+            
+            //if the flag is true, add the moderator to the team.
+            if (flag === true) {
+                var cloneMod = $.clone(mod);
+                $(team).append(cloneMod);
+            }
+        });
+    });
 }

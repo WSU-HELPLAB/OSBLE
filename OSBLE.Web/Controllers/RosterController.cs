@@ -1264,36 +1264,38 @@ namespace OSBLE.Controllers
         //if the user is in section -2 it means the user is in all sections
         public bool EditSections(List<int> ids, int section, string sectionList, int courseID)
         {
+
             foreach (int id in ids)
             {
 
-                CourseUser temp = (from c in db.CourseUsers
+                CourseUser cu = (from c in db.CourseUsers
                                    where c.UserProfileID == id
                                    && c.AbstractCourseID == courseID
                                    select c).FirstOrDefault();
 
-                if (CurrentUser.ID == temp.UserProfileID)
+                if (CurrentUser.ID == cu.UserProfileID)
                     continue;
 
-                if ((section == -1 || section == -2) && ((temp.AbstractRole.Name != "Instructor") && (temp.AbstractRole.Name != "TA")) )
+                if ((section == -1 || section == -2) && ((cu.AbstractRole.Name != "Instructor") && (cu.AbstractRole.Name != "TA") && (cu.AbstractRole.Name != "Moderator") && (cu.AbstractRole.Name != "Observer")))
                 {
+                    cu.Section = 0;
                     continue; //if the destination is multi sections and you're trying to move a student, block the move
                 }
 
-                if (temp.AbstractRole.Name == "Instructor") // if they're an instructor, they can only be in all sections
+                if (cu.AbstractRole.Name == "Instructor") // if they're an instructor, they can only be in all sections
                 {
-                    temp.Section = -2;
-                    temp.MultiSection = "all";
+                    cu.Section = -2;
+                    cu.MultiSection = "all";
                 }
 
                     //if not an instructor
                 else
                 {
-                temp.Section = section;
+                    cu.Section = section;
                     if (section == -2) //if you're moving them to all sections
-                        temp.MultiSection = "all";
+                        cu.MultiSection = "all";
                     else
-                     temp.MultiSection = String.Copy(sectionList);
+                     cu.MultiSection = String.Copy(sectionList);
                 }
             }
 
