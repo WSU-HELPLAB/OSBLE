@@ -4,6 +4,7 @@
 @{
     dynamic dataModel = Model;
     IAssignmentTeam currentTeam = dataModel.AssignmentTeam as IAssignmentTeam;       
+    Deliverable deliverable = currentTeam.Assignment.Deliverables.Where(d => d.DeliverableType == DeliverableType.PDF).FirstOrDefault();    
 }
 <td>
     @if (currentTeam is AssignmentTeam)
@@ -20,8 +21,12 @@
             </time>
             string currentTeamId = "annotate_" + currentTeam.AssignmentID+ "_" + currentTeam.TeamID;
             string currentId = "annotateId_" + currentTeam.TeamID;
-            <a href="#" title="Note: -ALL- previous annotations for this document will be lost!" id="@currentId"  class="@currentTeamId">@Helpers.Refresh()</a>
-            <div id="dialog-confirm"></div>
+            
+            if (null != deliverable && currentTeam.Assignment.IsAnnotatable) //only show the refresh icon if it is a annotatable PDF. 
+            {
+                <a href="#" title="Note: -ALL- previous annotations for this document will be lost!" id="@currentId"  class="@currentTeamId">@Helpers.Refresh()</a>
+                <div id="dialog-confirm"></div>    
+            }            
         }
         else
         {
