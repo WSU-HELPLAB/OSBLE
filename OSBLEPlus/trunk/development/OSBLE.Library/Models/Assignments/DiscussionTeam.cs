@@ -45,7 +45,7 @@ namespace OSBLE.Models.Assignments
 
             foreach (TeamMember tm in potentialMembers)
             {
-                if(!returnValHelper.ContainsKey(tm.CourseUserID))
+                if( tm.CourseUser != null && !returnValHelper.ContainsKey(tm.CourseUserID))
                 {
                     returnValHelper.Add(tm.CourseUserID, tm);
                 }

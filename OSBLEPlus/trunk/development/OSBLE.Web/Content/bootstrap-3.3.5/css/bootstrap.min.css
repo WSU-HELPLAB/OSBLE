@@ -4475,3 +4475,10 @@ td.visible-print,th.visible-print {
 	    display:none!important
     }
 }
+
+@media (min-width:850px) {
+	#multipleSelectedAction {
+	    display: none;
+	    max-width: 500px;
+    }
+}

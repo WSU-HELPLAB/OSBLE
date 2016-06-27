@@ -129,6 +129,10 @@
         foreach (int section in sectionList)
         {
             // For TAs, we only want the TA to see students in the section they are in
+
+            if (section < 0){
+                continue;
+            }
             
             if (currentUser != null)
             {

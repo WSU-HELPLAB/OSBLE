@@ -77,8 +77,6 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                                       orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
                                       select cu).ToList();
 
-
-
             List<CourseUser> allUsers = new List<CourseUser>();
 
             foreach (CourseUser cUser in users)
@@ -97,12 +95,15 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 if (team.Team.TeamMembers.Count == 1)
                 {
                     CourseUser onlyMember = team.Team.TeamMembers.FirstOrDefault().CourseUser;
-                    string defaultName = onlyMember.UserProfile.FirstName + " " + onlyMember.UserProfile.LastName;
-                    if (team.Team.Name == defaultName)
-                    {
-                        //don't want to remove them from UnassignedUser, rather, we want to remove them from the team list
+                    if (onlyMember == null)
                         continue;
-                    }
+
+                    string defaultName = onlyMember.UserProfile.FirstName + " " + onlyMember.UserProfile.LastName;
+                        if (team.Team.Name == defaultName)
+                        {
+                            //don't want to remove them from UnassignedUser, rather, we want to remove them from the team list
+                            continue;
+                        }
                 }
 
                 foreach (TeamMember member in team.Team.TeamMembers)
@@ -115,7 +116,6 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     member.CourseUser = user;
                 }
                 teamsToDisplay.Add(team);
-
             }
 
             //pull previous team configurations

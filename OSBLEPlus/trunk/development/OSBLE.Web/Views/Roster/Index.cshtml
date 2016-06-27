@@ -12,12 +12,13 @@
     .disabled {
         color: #999;
     }
+
+    .ui-dialog {
+         position: fixed; 
+         right: 0; 
+    }
 </style>
 
-@*<link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/prettify.css")" />
-<link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/style.css")" />
-<script type="text/javascript" src="@Url.Content("~/Scripts/prettify.js")"></script>
-<script type="text/javascript" src="@Url.Content("~/Scripts/jquery.multiselect.js")"></script>*@
 <script type="text/javascript" src="@Url.Content("~/Scripts/RosterScripts.js")"></script>
     
 <script type="text/javascript">
@@ -34,10 +35,73 @@
     });    
 </script>
 
+<div id="multipleSelectedAction">
+    <!--Multiple selected Users actions-->
+    <h3 id="multipleActionHeader"><br />Student Actions<br /></h3>
+    <h4 style="color:black;">Click on multiple users at once to perform actions on all selected users.</h4>
+    <h4>Select all users: <input type="checkbox" title="Check this box to select / deselect all users" onchange="selectAll(this)" id="selectAllUsers" style="width: 40px; height: 20px;"> </h4>
+
+    <h4>Selected User Actions:</h4>
+    <text>Move to section: <br />(Ctrl Click to select multiple)</text>
+    
+    <select multiple id="sectionSelection" style="color:black;">
+        <option value="-2">All Sections</option>
+        <option value="0">0</option>
+        @{
+            string count = "1";
+            bool flag = true;
+            foreach (RosterController.UsersBySection usersBySection in ViewBag.UsersBySections)
+            {
+                if (usersBySection.SectionNumber != "0" && usersBySection.SectionNumber != "-1" && usersBySection.SectionNumber != "-2")
+                {
+                    <option value="@usersBySection.SectionNumber">@usersBySection.SectionNumber</option>
+                    if (count == usersBySection.SectionNumber)
+                    {
+                        count = (Int32.Parse(usersBySection.SectionNumber) + 1).ToString(); //alwasy set count to the highest number
+                    }
+                }
+            }
+            <option value="@count">New Section (@count)</option>
+        }
+    </select>
+    <input type="button" id="moverButton" onclick="moveUsers()" value="Move" />
+    <br />
+    <br />
+    @using (Html.BeginForm("CreateUserProfileIds", "Mail", FormMethod.Post, new { id = "emailForm", style = "display: inline;" }))
+    {
+        <input type="hidden" name="emailIDList" id="emailIDList" value="" />
+        <text>Mail: </text>
+        <a title="Mail Selected Users" onclick="massMail()">@Helpers.MailButton()</a>
+    }
+
+    @using (Html.BeginForm("ChangeStudentsToWithdrawnRole", "Roster", FormMethod.Post, new { id = "withdrawForm", style = "display: inline;" }))
+    {
+        <input type="hidden" name="withdrawIDList" id="withdrawIDList" value="" />
+        <text> | Withdraw: </text>
+        <a title="Withdraw selected students" onclick="massWithdraw()">@Helpers.WithdrawButton()</a>
+    }
+
+    @using (Html.BeginForm("ChangeWithdrawnUsersToStudentRole", "Roster", FormMethod.Post, new { id = "enrollForm", style = "display: inline;" }))
+    {
+        <input type="hidden" name="enrollIDList" id="enrollIDList" value="" />
+        <text> | Enroll: </text>
+        <a title="Enroll selected users" onclick="massEnroll()">@Helpers.EnrollButton()</a>
+    }
+
+    @using (Html.BeginForm("removeSelectedUsers", "Roster", FormMethod.Post, new { id = "removeForm", style = "display: inline;" }))
+    {
+        <input type="hidden" name="removeIDList" id="removeIDList" value="" />
+        <text> | Remove withdrawn: </text>
+        <a title="Remove selected students" onclick="massRemove()">@Helpers.DeleteButton()</a>
+    }
+    <br />
+    <br />
+</div>
 
 
-<h2>
-    Roster</h2>
+
+
+<h2> Roster</h2>
 <h4>@ViewBag.Notice</h4>
 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
 {
@@ -82,66 +146,13 @@
     <input type="text" id="roster_find" />
 
 </div>
-    <div id="multipleSelectedAction" style="max-width: 500px;" > <!--Multiple selected Users actions-->
-    <h3 id="multipleActionHeader"><br />Multiple selected student actions<br /></h3>
-    <h4 style="color:black;">Click on users to select them</h4>
-    <h4>Select all users: <input type="checkbox" title="Check this box to select / deselect all users" onchange="selectAll(this)" id="selectAllUsers" style="width: 40px; height: 20px;"> </h4>
-   
-    <h4>Selected User Actions:</h4>
-    <text>Move to section: </text>
-    <select multiple id="sectionSelection" style="color:black;">
-        <option value="-2">All Sections</option>
-        <option value="0">0</option>
-        @{
-            string count = "1";
-            bool flag = true;
-            foreach (RosterController.UsersBySection usersBySection in ViewBag.UsersBySections)
-            {
-                if (usersBySection.SectionNumber != "0" && usersBySection.SectionNumber != "-1" && usersBySection.SectionNumber != "-2")
-                {
-                    <option value="@usersBySection.SectionNumber">@usersBySection.SectionNumber</option>
-                    if (count == usersBySection.SectionNumber)
-                    {
-                        count = (Int32.Parse(usersBySection.SectionNumber) + 1).ToString(); //alwasy set count to the highest number
-                    }
-                }
-            }
-            <option value="@count">New Section (@count)</option>
-        }
-    </select>
-    <input type="button" id="moverButton" onclick="moveUsers()" value="Move" />
-    <br />
-    <br />
-    @using (Html.BeginForm("CreateUserProfileIds", "Mail", FormMethod.Post, new { id = "emailForm", style = "display: inline;"}))
-    {
-        <input type="hidden" name="emailIDList" id="emailIDList" value="" />
-        <text>Mail: </text>
-        <a title="Mail Selected Users" onclick="massMail()">@Helpers.MailButton()</a>       
-    }
 
-    @using (Html.BeginForm("ChangeStudentsToWithdrawnRole", "Roster", FormMethod.Post, new { id = "withdrawForm", style = "display: inline;"}))
-    {
-        <input type="hidden" name="withdrawIDList" id="withdrawIDList" value="" />
-        <text> | Withdraw: </text>
-        <a title="Withdraw selected students" onclick="massWithdraw()">@Helpers.WithdrawButton()</a>
-    }
+    <div>
+        
+        
+        <br />
+    </div>
 
-    @using (Html.BeginForm("ChangeWithdrawnUsersToStudentRole", "Roster", FormMethod.Post, new { id = "enrollForm", style = "display: inline;" }))
-    {
-        <input type="hidden" name="enrollIDList" id="enrollIDList" value="" />
-        <text> | Enroll: </text>
-        <a title="Enroll selected users" onclick="massEnroll()">@Helpers.EnrollButton()</a>
-    }
-
-    @using (Html.BeginForm("removeSelectedUsers", "Roster", FormMethod.Post, new { id = "removeForm", style = "display: inline;" }))
-    {
-        <input type="hidden" name="removeIDList" id="removeIDList" value="" />
-        <text> | Remove withdrawn: </text>
-        <a title="Remove selected students" onclick="massRemove()">@Helpers.DeleteButton()</a>
-    }
-    <br />
-    <br />
-</div>
 
 
 @* Hides anything that doesn't match search filter *@
@@ -198,11 +209,11 @@
 
 @{  
     bool whitelistFlag = true;
-    bool firstSection = true;
 
     foreach (RosterController.UsersBySection usersBySection in ViewBag.UsersBySections)
     {
         <div class="sectionDiv" section="@usersBySection.SectionNumber">
+            
         
         @if (usersBySection.SectionNumber == "-1")
         {
@@ -217,14 +228,13 @@
             <h3 style="display:inline;">@Helpers.DisplaySection(usersBySection.SectionNumber)
             </h3>
         }
+            
     <input type="checkbox" title="Check this box to select / deselect all users in this section" id="sectionCheck" class="sectionCheckBox" onchange="sectionCheckChange(this)" section="@usersBySection.SectionNumber" style="width: 40px; height: 20px;" />
-
-        @if (firstSection)
-        {
-            @*<h4>   Select All users: <input type="checkbox" title="Check this box to select / deselect all users" onchange="selectAll(this)" id="selectAllUsers" style="width: 40px; height: 20px;"> </h4>
-             <br />*@
-            firstSection = false;
-        }
+    
+    @if (usersBySection.SectionNumber == "-2")
+    {
+        <h2 id="SelectHelper" style="display:inline;">Click on users to perform actions on them</h2>
+    }
 
         @* Button Pills used to simplify navigation on mobile devices (only visible when width < 850px)*@
         <div class="btn-group btn-group-justified roster_pills">
@@ -281,8 +291,8 @@
 
                                                 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                                                 {
-                                                    <a title="Modify This User" href="@Url.Action("EditWTUser", "Roster", new { wtuID = WTuser.ID })">@Helpers.EditButton()</a>
-                                                    <a title="Delete This User" href="@Url.Action("DeleteWTUser", "Roster", new { wtuID = WTuser.ID })">@Helpers.DeleteButton()</a>
+                                                    <a title="Change Role / Inspect User" href="@Url.Action("EditWTUser", "Roster", new { wtuID = WTuser.ID })">@Helpers.EditButton()</a>
+                                                    @*<a title="Delete This User" href="@Url.Action("DeleteWTUser", "Roster", new { wtuID = WTuser.ID })">@Helpers.DeleteButton()</a>*@
                                                 }
                                             </div>
                                             @* Whitelisted users do not have an osble account and therefore cannot have a profile picture yet! *@
@@ -297,8 +307,8 @@
                                             <div class="user_controls">
                                                 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                                                 {
-                                                    <a title="Modify This User" href="@Url.Action("EditWTUser", "Roster", new { wtuID = WTuser.ID })">@Helpers.EditButton()</a>
-                                                    <a title="Delete This User" href="@Url.Action("DeleteWTUser", "Roster", new { wtuID = WTuser.ID })">@Helpers.DeleteButton()</a>
+                                                    <a title="Change Role / Inspect User" href="@Url.Action("EditWTUser", "Roster", new { wtuID = WTuser.ID })">@Helpers.EditButton()</a>
+                                                    @*<a title="Delete This User" href="@Url.Action("DeleteWTUser", "Roster", new { wtuID = WTuser.ID })">@Helpers.DeleteButton()</a>*@
                                                 }
                                             </div>
                                             @* Whitelisted users do not have an osble account and therefore cannot have a profile picture yet! *@
@@ -348,18 +358,18 @@
 
                                            @if (userByRole.RoleName == "Withdrawn" && ViewBag.ActiveCourse.AbstractRole.CanModify)
                                            {
-                                               <a title="Re-enroll as student" href="@Url.Action("ChangeWithdrawnToStudentRole", "Roster", new { userProfileID = user.ID })">@Helpers.EnrollButton()</a>
+                                               @*<a title="Re-enroll as student" href="@Url.Action("ChangeWithdrawnToStudentRole", "Roster", new { userProfileID = user.ID })">@Helpers.EnrollButton()</a>*@
                                            }
 
                                             @if (user.UserName != null && ViewBag.CurrentUser.ID != user.ID) 
                                             {
-                                                <a title="Mail This User" href="@Url.Action("CreateUserProfileId", "Mail", new { id = user.ID })">@Helpers.MailButton()</a>                                            
+                                                @*<a title="Mail This User" href="@Url.Action("CreateUserProfileId", "Mail", new { id = user.ID })">@Helpers.MailButton()</a>*@                                            
                                             }
                                             
                                             @if (ViewBag.ActiveCourse.AbstractRole.CanModify && ViewBag.CurrentUser.ID != user.ID)
                                             {
-                                                <a title="Modify This User" href="@Url.Action("Edit", "Roster", new { userProfileID = user.ID })">@Helpers.EditButton()</a>
-                                                <form action="@Url.Action("Delete")"
+                                                <a title="Change Role / Inspect User" href="@Url.Action("Edit", "Roster", new { userProfileID = user.ID })">@Helpers.EditButton()</a>
+                                                @*<form action="@Url.Action("Delete")"
                                     style="display: inline;"
                                     data-ajax="true"
                                     data-ajax-success="$('#user_item_@(user.ID)').hide('highlight',{},'slow',function(){
@@ -374,11 +384,11 @@
                                     method="post">
                                                 <input type="hidden" name="userProfileID" value="@user.ID" />
                                                 @Helpers.DeleteSubmit("Remove This User")
-                                                </form>
+                                                </form>*@
                                             
                                                if (userByRole.RoleName == "Student")
                                                {
-                                                   <a title="Withdraw student" href="@Url.Action("ChangeStudentToWithdrawnRole", "Roster", new { userProfileID = user.ID })">@Helpers.WithdrawButton()</a>
+                                                   @*<a title="Withdraw student" href="@Url.Action("ChangeStudentToWithdrawnRole", "Roster", new { userProfileID = user.ID })">@Helpers.WithdrawButton()</a>*@
                                                }
                                             }
                                         </div>

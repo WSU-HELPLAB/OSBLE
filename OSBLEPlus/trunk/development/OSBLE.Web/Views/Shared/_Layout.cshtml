@@ -106,6 +106,10 @@
                         </li>
 
                         <li>
+                            <a href="@Url.Action("Index", "Mail", new { area="" })"><span class="glyphicon glyphicon-envelope"></span> Mail (@ViewBag.UnreadMessageCount)</a>
+                        </li>
+
+                        <li>
                             <a href="@Url.Action("Index", "Help", new { area = "" })" title="Help">
                                 <span class="glyphicon glyphicon-question-sign"></span>
                                 <span id="helptext"> Help</span>
