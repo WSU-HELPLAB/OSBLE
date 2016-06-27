@@ -1241,6 +1241,7 @@ namespace OSBLE.Controllers
         {
             CourseUser CourseUser = getCourseUser(userProfileID);
             ViewBag.OldAbstractRoleID = CourseUser.AbstractRoleID;
+            ViewBag.CurrentMultiSection = CourseUser.MultiSection;
             if (CanModifyOwnLink(CourseUser))
             {
                 ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", CourseUser.UserProfileID);
@@ -1321,6 +1322,8 @@ namespace OSBLE.Controllers
                     if (courseUser.AbstractRoleID == 3 && courseUser.Section < 0) //if students are being editted, don't allow them to be in section -1 or -2
                         courseUser.Section = 0;
 
+                    //CurrentMultiSection
+                    courseUser.MultiSection = Request.Form["CurrentMultiSection"];
                     db.Entry(courseUser).State = EntityState.Modified;
                     db.SaveChanges();
 

@@ -6,6 +6,7 @@ var clickCounter = 0;
 //on loading/reloading the page this will execute and populate the variables as needed.
 $(document).ready(function () {
 
+
     //before anything, sweep the roster
     $.ajax({
         url: '/Roster/SweepRoster/',
@@ -22,6 +23,11 @@ $(document).ready(function () {
             }
         }
     })
+
+    if ($(window).width() < 851) {
+        $("#SelectHelper").css("display", "none");
+    }
+    
 
     //first populate the multi section user boxes
     var multiSectionUsers = $("[class=UserLI][section='-1']");
@@ -44,9 +50,7 @@ $(document).ready(function () {
             complete: function (data) {
                 if (data.responseJSON != null) {
                     for (x = 0; x < data.responseJSON.length; x++) {
-
                         for (y = 0; y < multiSectionUsers[x].childNodes.length; y++) {
-
                             if (multiSectionUsers[x].childNodes[y].id == "SectionList") {
                                 multiSectionUsers[x].childNodes[y].innerHTML = "Sections: " + data.responseJSON[x].substring(0, data.responseJSON[x].length - 1);
                                 break;
@@ -63,10 +67,6 @@ $(document).ready(function () {
     $.each(boxes, function (i, val) {
         this.checked = false;
     });
-
-    //$(function () {
-    //    $("#sectionSelection").multiselect();
-    //});
 
     boxes = document.getElementsByClassName("sectionCheckBox");
     $.each(boxes, function (i, val) {
@@ -366,18 +366,29 @@ function grabCheckBoxFromStudentLI(studentLI) {
     return null;
 }
 
+var dialogFlag = true;
 //this changes the styling of the multipleUserActions section
 function showOrHideMultiple() {
     var multipleActionHeader = document.getElementById("multipleSelectedAction");
 
-    if (clickCounter > 1) {
+    if (clickCounter > 0) {
         //TODO:: Display the multiple email, the multiple move, multiple withdraw, multiple KARATE CHOP!
         multipleActionHeader.style.backgroundColor = "#dbdbdb";
+        if (! /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            $("#multipleSelectedAction").dialog();
+            if (dialogFlag == true) {
+                $('#multipleSelectedAction').dialog({ position: { my: 'right bottom', at: 'right bottom', of: window } });
+                dialogFlag = false;
+            }
+        }
     }
 
     else {
         //multipleActionHeader.style = "display: none;";
         multipleActionHeader.style.backgroundColor = "";
+        if (! /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            $("#multipleSelectedAction").dialog('close');
+        }
     }
 }
 
@@ -487,4 +498,8 @@ function allCheckedOrNot() {
     else {
         document.getElementById("selectAllUsers").checked = false;
     }
+}
+
+function openMenu() {
+    $("#multipleSelectedAction").dialog();    
 }

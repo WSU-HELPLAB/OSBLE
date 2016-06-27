@@ -181,7 +181,9 @@ else
             <ul id="team_@(counter)_@(@aTeam.TeamID)" class="TeamSortable">
                 @foreach (TeamMember member in aTeam.Team.TeamMembers)
                 {
-
+                    if (member.CourseUser == null){
+                        continue;
+                    }
                     if (member.CourseUser.AbstractRoleID != (int)CourseRole.CourseRoles.Withdrawn)
                     {
                         if (member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA || member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)

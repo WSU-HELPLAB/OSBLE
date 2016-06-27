@@ -149,7 +149,7 @@ namespace OSBLE.Models
         public static string RosterEmail = "This must be the email address this user registered with for OSBLE.";
         public static string RosterSchoolID = "Input the school/ organization identification number for this user to indicate who is being added to this course.";
         public static string RosterRole = "Select what role this person has for this course. (Instructor, TA, Student, Moderator, and Observer explanations go here.)";
-        public static string RosterSection = "Enter 0 to add this user to all sections.";
+        public static string RosterSection = "Select multiple sections to add user to all selected sections.";
         public static string RosterIdentificationNumber = "This is users identification number given by the school";
 
 
