@@ -72,7 +72,7 @@
                 // Then get the student's name from the id
                 var id = parseInt(idString);
 
-                if (id != NaN) {
+                if (id != NaN) {                    
                     var studentFullName = getUserName(id);
                     if (studentFullName === "") continue; // If the ID doesn't represent a user, don't make a link
 
@@ -98,16 +98,3 @@
 
 }).call(this);
 
-function getUserName(id) {
-    var name = "";
-    $.ajax({
-        url: "/Feed/GetProfileName",
-        data: { id: id },
-        method: "POST",
-        async: false,
-        success: function (data) {
-            name = data.Name;
-        }
-    })
-    return name;
-}

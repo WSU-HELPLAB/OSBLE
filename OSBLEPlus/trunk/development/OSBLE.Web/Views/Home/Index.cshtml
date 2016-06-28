@@ -40,6 +40,19 @@
 </div>
 
 <script type="text/javascript">
+
+    function getUserName(id) {                                   
+        var users = localStorage['UserNames'].split(',');
+        var Ids = localStorage['UserIds'].split(',');
+
+        for (var i = 0; i < users.length; i++) {
+            if (id == Ids[i]) {               
+                return users[i];
+            }
+        }
+        return ""; //we didn't find a match
+    }
+
     function setContent(btnID, divID, subDivID) {
         $(".activeContent").removeClass("activeContent").addClass("unactiveContent");
         $("#" + divID).addClass("activeContent").removeClass("unactiveContent");
