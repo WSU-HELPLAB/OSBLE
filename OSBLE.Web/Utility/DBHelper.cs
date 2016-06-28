@@ -115,6 +115,26 @@ namespace OSBLE.Utility
             return cu;
         }
 
+        public static List<UserProfile> GetUserProfilesForCourse(int courseId)
+        {
+            var currentUsers = new List<UserProfile>();
+            using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                sqlConnection.Open();
+                
+                string query = "SELECT UserProfiles.ID, UserProfiles.FirstName, UserProfiles.LastName " +
+                               "FROM UserProfiles " +
+                               "INNER JOIN CourseUsers " +
+                               "ON UserProfiles.ID = CourseUsers.UserProfileID " +
+                               "WHERE CourseUsers.AbstractCourseID = @courseId ";
+                
+                currentUsers = sqlConnection.Query<UserProfile>(query, new { courseId = courseId }).ToList();
+
+                sqlConnection.Close();
+            }
+            return currentUsers;
+        }
+
         public static AbstractRole GetAbstractRole(int roleID, SqlConnection connection = null)
         {
             if (connection == null)
@@ -1186,6 +1206,61 @@ namespace OSBLE.Utility
             bool? isDeleted = connection.Query<bool?>("SELECT IsDeleted FROM EventLogs WHERE Id = @id", 
                 new { id = postID }).SingleOrDefault();
             return isDeleted.HasValue && isDeleted.Value;
+        }
+
+        public static bool AddHashTags(List<string> hashTags)
+        {
+            // Add each tag in the list to the database (if it doesn't already exist in the database)
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+
+                    string query = "BEGIN IF NOT EXISTS (SELECT Content FROM HashTags WHERE Content = @Content) BEGIN INSERT INTO HashTags values (@Content) END END";
+
+                    // TODO: optimize to run one query inserting all hashtags
+                    foreach (string hashTag in hashTags)
+                    {
+                        sqlConnection.Query<int>(query, new { Content = hashTag });
+                    }
+                    
+                    sqlConnection.Close();
+
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                //TODO: handle exception logging
+                return false; //failure
+            }
+        }
+
+        public static List<string> GetHashTags()
+        {
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+
+                    string query = "";
+
+                    query = "SELECT DISTINCT Content FROM HashTags";
+
+                    List<string> hashTags = sqlConnection.Query<string>(query).ToList();
+
+                    sqlConnection.Close();
+
+                    return hashTags;
+                }
+            }
+            catch (Exception e)
+            {
+                //TODO: handle exception logging
+                return new List<string>(); //failure, return empty list
+            }
         }
 
         #endregion

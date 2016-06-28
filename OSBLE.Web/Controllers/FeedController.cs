@@ -24,6 +24,7 @@ using OSBLEPlus.Logic.Utility.Auth;
 using OSBLEPlus.Logic.Utility.Lookups;
 using OSBLE.Hubs;
 using Microsoft.AspNet.SignalR;
+using System.Text.RegularExpressions;
 
 namespace OSBLE.Controllers
 {
@@ -129,6 +130,11 @@ namespace OSBLE.Controllers
                 ViewBag.IsInstructor = false;
 
             ViewBag.ActiveCourse = DBHelper.GetCourseUserFromProfileAndCourse(ActiveCourseUser.UserProfileID, (int)courseID);
+
+            //setup user list for autocomplete            
+            ViewBag.CurrentCourseUsers = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
+            ViewBag.HashTags = DBHelper.GetHashTags();
+
             return View("Index", "_OSBIDELayout", courseID);
         }
 
@@ -709,6 +715,10 @@ namespace OSBLE.Controllers
                 }
             }
 
+            //setup user list for autocomplete            
+            ViewBag.CurrentCourseUsers = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
+            ViewBag.HashTags = DBHelper.GetHashTags();
+
             ViewBag.RootId = id;
             return View();
         }
@@ -781,7 +791,8 @@ namespace OSBLE.Controllers
                 throw new ArgumentException();
             }
 
-            
+            // Parse text and add any new hashtags to database
+            ParseHashTags(text);
 
             int courseID = ActiveCourseUser.AbstractCourseID;
             FeedPostEvent log = new FeedPostEvent()
@@ -809,6 +820,43 @@ namespace OSBLE.Controllers
             return Json(MakeAggregateFeedItemJsonObject(newPost, false));
         }
 
+        /// <summary>
+        /// Parse given text for hashtags and add new hashtags not in the database to the database
+        /// </summary>
+        /// <param name="text"></param>
+        private void ParseHashTags(string text)
+        {
+            List<string> hashTags = new List<string>();
+            
+            for (int i = 0; i < text.Length; i++)
+            {
+                if (text[i] == '#')
+                {
+                    int startIndex = ++i;
+                    while (i < text.Length && IsAlphaNumericChar(text[i]))
+                        i++;
+                    if (startIndex != i)
+                        hashTags.Add(text.Substring(startIndex, i - startIndex));
+                }
+            }
+
+            DBHelper.AddHashTags(hashTags);
+        }
+
+        /// <summary>
+        /// Returns true if given character is alphanumberic, false if not.
+        /// </summary>
+        /// <param name="character"></param>
+        /// <returns></returns>
+        private bool IsAlphaNumericChar(char character) // This function probably already exists somewhere in .NET, if so just delete
+        {
+            if ((character >= '0' && character <= '9') || (character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z'))
+            {
+                return true;
+            }
+            return false;
+        }
+
         [HttpPost]
         [ValidateInput(false)]
         public JsonResult PostComment(int id, string content)
@@ -818,6 +866,9 @@ namespace OSBLE.Controllers
             {
                 throw new Exception();
             }
+
+            // Parse text and add any new hashtags to database
+            ParseHashTags(content);
 
             // Insert the comment
             bool success = DBHelper.InsertActivityFeedComment(id, CurrentUser.ID, content);
@@ -864,6 +915,55 @@ namespace OSBLE.Controllers
                     {
                         subject = string.Format("OSBLE Plus - {0} posted in {1}", CurrentUser.FullName, DBHelper.GetCourseShortNameFromID(courseID, conn));
                         body = string.Format("{0} made the following post at {1}:\n\n{2}\n\n", CurrentUser.FullName, timePosted.UTCToCourse(courseID), postContent);
+
+                        // We need to parse the body and replace any @id=XXX; with student's actual names.
+                        List<int> nameIndices = new List<int>();
+
+                        for (int i = 0; i < body.Length; i++)
+                        {
+                            // If we find an '@' character, see if it's followed by "id=" then a number then a semicolon
+                            if (body[i] == '@')
+                            {
+                                if (body.Substring(i + 1, 3) == "id=")
+                                {
+                                    // After the '=', make sure there are numbers then a semicolon following it
+                                    int digit = 0, rIndex = 4;
+                                    bool hasDigit = false;
+                                    while (int.TryParse(body.Substring(i + rIndex, 1), out digit))  // Keep reading characters until we hit something that isn't a digit
+                                    {
+                                        hasDigit = true;
+                                        rIndex++;
+                                    }
+                                    if (hasDigit && body[i + rIndex] == ';')
+                                        nameIndices.Add(i); // If the character following the numbers is a semicolon, we know there is a name reference here so record the index
+                                }
+                            }
+                        }
+                        nameIndices.Reverse();
+
+                        foreach (int index in nameIndices) // In reverse order, we need to replace each @... with the students name
+                        {
+                            // First let's get the length of the part we will replace and also record the id
+                            int length = 0, tempIndex = index + 1;
+                            string idString = "";
+                            while (body[tempIndex] != ';') { length++; tempIndex++; idString += body[tempIndex]; }
+
+                            // Get the id= part off the beginning of idString and the ; from the end
+                            idString = idString.Substring(2);
+                            idString = idString.Substring(0, idString.Length - 1);
+
+                            // Then get the student's name from the id
+                            int id; int.TryParse(idString, out id);
+                            if (id != null)
+                            {
+                                UserProfile referencedUser = (from user in db.UserProfiles where user.ID == id select user).FirstOrDefault();
+                                if (referencedUser == null) continue; // It's possible the user no longer exists, or for some reason someone manually entered @id=blahblahblah; into the text field.
+                                string studentFullName = referencedUser.FirstName + referencedUser.LastName;
+
+                                // Now replace the id number in the string with the user name
+                                body = body.Replace(body.Substring(index + 1, length + 1), string.Format("<a href=\"{0}\">{1}</a>", Url.Action("Index", "Profile", new { id = id }, Request.Url.Scheme), studentFullName));
+                            }
+                        }
                     }
                 }
 
@@ -871,9 +971,8 @@ namespace OSBLE.Controllers
                 body += string.Format("<a href=\"{0}\">View and reply to post in OSBLE</a>", Url.Action("Details", "Feed", new { id = sourcePostID }, Request.Url.Scheme));
 
                 //Send the message
-
                 Email.Send(subject, body, emails);
-        }
+            }
 #endif
         }
 

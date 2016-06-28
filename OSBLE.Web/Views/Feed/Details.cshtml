@@ -5,6 +5,7 @@
     ViewBag.Title = string.Format("Details - {0}", rootId);
     UserProfile currentUser = ViewBag.CurrentUser;
     ViewBag.ShowDetails = true;
+    var currentCourseUsers = ViewBag.CurrentCourseUsers;
 }
 @*<script type="text/javascript" src="@Url.Content("~/Scripts/knockout-2.2.1.js")"></script>
 <script type="text/javascript" src="@Url.Content("~/Scripts/ActivityFeed.js")"></script>*@
@@ -18,8 +19,52 @@
     });
 </script>
 
+<script type="text/javascript">
+    /*START Autocomplete block*/
+    //TODO: need to re-build the url/<a/> tags for @@name and #hashtag.
+    var userNames = []
+    var userIds = [];
+
+    //we need to get hashtags from the hashtag table and populate it like names are populated.
+    //we also need to add hashtags to the table if there are no matches so others will see hashtags they've seen already.
+    var hashtags = [];
+    @{
+        if (ViewBag.HashTags != null)
+        {
+            foreach(string hashTag in ViewBag.HashTags)
+            {
+                @:hashtags.push("@hashTag");
+                    }
+        }
+        if (currentCourseUsers != null)
+        {
+            foreach (var userProfile in currentCourseUsers)
+            {
+                @:userNames.push("@userProfile.FirstName" + "@userProfile.LastName");
+                    @:userIds.push("@userProfile.ID");
+                }
+        }
+    }
+
+    localStorage['UserNames'] = userNames;
+    localStorage['UserIds'] = userIds;
+
+    $(document).on("focus", "textarea", function () {
+        $(this).atwho({
+            at: "@@",
+            data: userNames,
+            insertTpl: "@@${name}", //insert template i.e. what is inserted into the textarea
+        });
+
+        $(this).atwho({
+            at: "#",
+            data: hashtags
+        });
+    });
+</script>
+
 <section id="Details" data-bind="foreach: items">
-    @Html.Partial("Feed/_FeedItems");
+    @Html.Partial("Feed/_FeedItems")
 </section>
 
 @*

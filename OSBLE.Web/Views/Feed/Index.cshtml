@@ -30,7 +30,8 @@
                 @* Make new post form *@
                 <form id="feed-post-form" role="form">
                     <div class="form-group">
-                        <textarea id="feed-post-textbox" class="form-control" rows="4" placeholder="Enter new feed post here..."></textarea>
+                        @{ string defaultText = "Enter new feed post here...\nUse @ and # to tag users or topics"; }
+                        <textarea id="feed-post-textbox" class="form-control" rows="4" placeholder="@defaultText"></textarea>
                     </div>
                     <input type="submit" data-bind="click: MakePost" id="btn_post_active" class="btn btn-default" name="post_active" value="Post to @Helpers.CourseTag(ViewBag.ActiveCourse.AbstractCourse)" />
 
