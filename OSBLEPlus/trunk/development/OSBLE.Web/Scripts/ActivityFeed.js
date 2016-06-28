@@ -110,6 +110,16 @@ function FeedItem(data) {
             return;
         }
 
+        var userNames = localStorage['UserNames'].split(',');
+        var userIds = localStorage['UserIds'].split(',');
+
+        // TODO: to boost performance, could add functionality to know which names were used (if any)
+        // Replace all occurrences of @user with @id;
+        for (i = 0; i < userNames.length; i++) {
+            var name = userNames[i], id = "id=" +userIds[i]+ ";";
+            text = text.replace(name, id);
+        }
+
         $.ajax({
             url: "/Feed/PostComment",
             data: { id: self.eventId, content: text },
@@ -217,7 +227,6 @@ function FeedViewModel(userName, userId, current) {
     $.connection.hub.start();
     // *************************************
 
-
     self.MakePost = function () {
         var text = $("#feed-post-textbox").val();
         var emailToClass = $("[name='send_email']").is(':checked');
@@ -225,7 +234,16 @@ function FeedViewModel(userName, userId, current) {
         if (text == "")
             return;
 
-        text = ReplaceNamesWithIDs(text);
+        var userNames = localStorage['UserNames'].split(',');
+        var userIds = localStorage['UserIds'].split(',');
+
+        // TODO: to boost performance, could add functionality to know which names were used (if any)
+        // Replace all occurrences of @user with @id;
+        for (i = 0; i < userNames.length; i++)
+        {
+            var name = userNames[i], id = "id=" + userIds[i] + ";";
+            text = text.replace(name, id);
+        }
 
         // Disable buttons while waiting for server response
         $('#feed-post-textbox').attr('disabled', 'disabled');
@@ -312,9 +330,6 @@ function FeedViewModel(userName, userId, current) {
         self.RequestUpdate();
         return false; // prevent page refresh
     });
-
-    // Initialize @person functionality
-    InitializePostTextbox();
 }
 
 function DetailsViewModel(userName, userId, rootId)
@@ -519,7 +534,7 @@ function HideEditBox(item)
 function ShowReplyBox(item) {
     $("#btn-reply-" + item.eventId).hide();
     $("#feed-reply-" + item.eventId).show('blind');
-    $("#feed-reply-textbox-" + item.eventId).val('');
+    $("#feed-reply-textbox-" + item.eventId).val('');    
 }
 
 function HideReplyBox(item) {
@@ -774,111 +789,43 @@ function HideNewPostBadge(postID)
     $('#feed-item-' + postID + ' .new-post-badge').hide();
 }
 
-var nameIdDict = [];
-function InitializePostTextbox()
-{
-    var textbox = "#feed-post-textbox";
-    var isCompleting = false;
-    var atPosition = 0;
-    var keysTyped = 0;
-    var didSearch = false;
-    nameIdDict = [];
-    
-    $(textbox).on('keypress', function (event) {
-        if (event.key == '@')
-        {
-            // This occurs when someone types the @ symbol into the new post textbox
-            $(textbox).autocomplete("enable");
-            isCompleting = true;
-            keysTyped = 0;
-            atPosition = $(textbox).getSelectionStart();
-        }
-        if (event.key == ' ' || event.key == '.' ||
-            event.key == ',' || event.key == 'Enter')
-        {
-            $(textbox).autocomplete("disable");
-            isCompleting = false;
-        }
-        if (event.key == 'Backspace') {
-            keysTyped--;
-            if (keysTyped <= 0)
-            {
-                $(textbox).autocomplete("disable");
-                isCompleting = false;
-            }
-        }
-        else if ($(textbox).getSelectionStart() != atPosition + keysTyped)
-        {
-            $(textbox).autocomplete("disable");
-            isCompleting = false;
-        }
-        else if (isCompleting)
-        {
-            var textAfterAt = "";
-            if (keysTyped > 0)
-               textAfterAt = $(textbox).val().substr(atPosition + 1, keysTyped - 1) + event.key;
+/*
+//Periodically updates view models for feed items.  Useful for displaying an updated count
+//of comments for a given feed item.
+function getCommentUpdates() {
 
-            //alert("ap=" + atPosition + " kt=" + keysTyped + " text=" + textAfterAt + ".");
+    var ModelIds = Array();
 
-            didSearch = true;
-            $(textbox).autocomplete("search", textAfterAt);
-            keysTyped++;
-        }
+    //request comment updates for all feed items
+    $(".feed-item-single").each(function (index) {
+        var log_id = $(this).attr("data-id");
+        ModelIds.push(log_id);
     });
 
-    $(textbox).autocomplete({
-        source: "/Feed/AutoCompleteNames",
-        select: function (event, ui) {
-            var keyValPair = [ "@" + ui.item.label, "@id=" + ui.item.value ];
-            nameIdDict.push(keyValPair);
+    //make the ajax call
+    $.ajax(
+        {
+            url: "/Feed/GetComments",
+            data: { logIds: JSON.stringify(ModelIds) },
+            dataType: "json",
+            type: "POST",
+            success: updateFeedItemViewModel
+        });
 
-            var textBefore = $(textbox).val().substr(0, atPosition);
-            var endPos = atPosition + 1 + keysTyped;
-            var textAfter = $(textbox).val().substr(endPos, $(textbox).val().length - endPos);
-            ui.item.value = textBefore + "@" + ui.item.label + ' ' + textAfter;
-        },
-        search: function (event, ui) {
-            if (!didSearch)
-            {
-                event.preventDefault();
-            }
-            didSearch = false;
-        },
-        focus: function (event, ui) { return false; },
-        _renderItem: function (ul, item) {
-            return $("<li>")
-            .data("item.autocomplete", item)
-            .append('<a><img src="/user/' + item.value + '/picture?size=25" class="small_profile_picture" alt="Profile Picture" /> ' + item.label + '</a>')
-            .appendTo(ul);
-        }
-    });
-
-    $(textbox).autocomplete("disable");
+    //call ourselves again in 20 seconds
+    setTimeout(getCommentUpdates, 20000)
 }
 
-function ReplaceNamesWithIDs(text)
-{
-    for (i = 0; i < nameIdDict.length; i++) {
-        text = text.replace(nameIdDict[i][0], nameIdDict[i][1]);
+function getRecentFeedItemsSuccess(html) {
+    var trimmed = $.trim(html);
+    if (trimmed.length > 0) {
+        $("#hidden-workspace").append(html);
+        parseDates();
+        if ($("#hidden-workspace").find('.feed-item-single').length > 0) {
+            $("#feed-items").prepend(html);
+        }
+        $("#hidden-workspace").empty();
     }
-    nameIdDict = [];
-    return text;
 }
+*/
 
-jQuery.fn.getSelectionStart = function () {
-    if (this.lengh == 0) return -1;
-    input = this[0];
-
-    var pos = input.value.length;
-
-    if (input.createTextRange) {
-        var r = document.selection.createRange().duplicate();
-        r.moveEnd('character', input.value.length);
-        if (r.text == '')
-            pos = input.value.length;
-        pos = input.value.lastIndexOf(r.text);
-    } else if (typeof (input.selectionStart) != "undefined")
-        pos = input.selectionStart;
-
-    return pos;
-}

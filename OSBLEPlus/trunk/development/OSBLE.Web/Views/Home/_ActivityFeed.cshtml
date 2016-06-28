@@ -69,7 +69,8 @@
             {
                 <div class="form-group">
                     <input id="remChars" name="remainingChars" readonly="readonly" type="text" value="(@ViewBag.MaxActivityFeedLength) Characters left" /><br />
-                    <textarea id="ActivityFeed" class="form-control" name="Content" rows="4" placeholder="Enter new feed post here..."
+                    @{ string defaultText = "Enter new feed post here...\nUse @ and # to tag users or topics"; }
+                    <textarea id="ActivityFeed" class="form-control" name="Content" rows="4" placeholder="@defaultText"
                               onkeyup="RemainingChars();" onkeydown="RemainingChars();"></textarea>
                 </div>
 

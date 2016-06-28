@@ -96,7 +96,8 @@
 
                 @* Reply Form (Hidden by default. Only shows when user clicks reply) *@
                 <form class="feed-reply-form" data-bind="attr: {id: 'feed-reply-' + eventId}">
-                    <textarea class="form-control feed-reply-textbox" placeholder="Say something..." data-bind="attr: {id: 'feed-reply-textbox-' + eventId}"></textarea>
+                    @{ string defaultText = "Say something...\nUse @ and # to tag users or topics"; }
+                    <textarea class="form-control feed-reply-textbox" placeholder="@defaultText" data-bind="attr: {id: 'feed-reply-textbox-' + eventId}"></textarea>
                     <input name="response-submit" class="btn btn-default btn-sm" type="button" value="Post Reply" data-bind="click: AddComment, attr: {id: 'feed-reply-submit-' + eventId}" />
                     <input name="response-cancel" class="btn btn-default btn-sm" type="reset" value="Cancel" data-bind="click: HideReplyBox, attr: {id: 'feed-reply-cancel-' + eventId}" />
                 </form>
@@ -124,4 +125,3 @@
         }
     </article>
 </div>
-

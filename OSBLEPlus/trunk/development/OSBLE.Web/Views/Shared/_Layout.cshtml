@@ -57,6 +57,12 @@
     <script>hljs.initHighlightingOnLoad();</script>
     @* highlight.js code syntax highlighting block*@
 
+    @* autocomplete block *@
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery.atwho.css")" />    
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.caret.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.atwho.js")"></script>    
+    @* autocomplete block end *@
+
         @RenderSection("Header", required: false)
         @RenderSection("SubHeader", required: false)
 

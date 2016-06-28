@@ -44,9 +44,13 @@ namespace OSBLE.Controllers
             if (Request.Params["startPost"] != null)
             {
                 SetupActivityFeed(Convert.ToInt32(Request.Params["startPost"]));
-            }
-
+            }            
+            
             SetupNotifications(); // Individual notifications (mail, grades, etc.)        
+
+            //setup user list for autocomplete            
+            ViewBag.CurrentCourseUsers = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
+            ViewBag.HashTags = DBHelper.GetHashTags();
 
             return View("Index");
         }
