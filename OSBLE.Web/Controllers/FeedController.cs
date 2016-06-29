@@ -1054,7 +1054,11 @@ namespace OSBLE.Controllers
             if (hashtag == null || hashtag == "")
                 return RedirectToAction("Index", "Home");
 
-            ViewBag.Hashtag = hashtag;
+            ViewBag.Hashtag = hashtag;                       
+            ViewBag.HideLoadMore = true;
+            ViewBag.CurrentCourseUsers = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
+            ViewBag.HashTags = DBHelper.GetHashTags();
+
             return View();
         }
 

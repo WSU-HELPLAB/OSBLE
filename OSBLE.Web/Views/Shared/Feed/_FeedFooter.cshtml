@@ -1,7 +1,15 @@
 ﻿@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+
+@{ var hideLoading = ViewBag.HideLoadMore == null ? false : ViewBag.HideLoadMore;}
+
 <section>
+    
+    @if (!hideLoading) //hide for hashtag view
+	{
     <a id="load-old-posts" data-bind="click: LoadMorePosts">Load earlier posts...</a>
     <div id="loadingMoreMsg" class="message">Loading...</div>
+	}
+
 </section>
 <div id="hidden-workspace">
 </div>

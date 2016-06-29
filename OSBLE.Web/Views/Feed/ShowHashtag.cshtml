@@ -10,25 +10,71 @@
     {
         ViewBag.Title = "Posts with #" + ViewBag.Hashtag;
     }
+    var currentCourseUsers = ViewBag.CurrentCourseUsers;
 }
-
+<script type="text/javascript" src="@Url.Content("~/signalr/hubs")"></script>
+@* autocomplete block *@
+<link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery.atwho.css")" />
+<script type="text/javascript" src="@Url.Content("~/Scripts/jquery.caret.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/jquery.atwho.js")"></script>
+@* autocomplete block end *@
 <script type="text/javascript">
     var vm;
     $(document).ready(function() {
         vm = new FeedViewModel("@currentUser.FullName", @currentUser.ID);
         ko.applyBindings(vm);
-        vm.keywords("@ViewBag.Hashtag");
+        vm.ShowHashTagResults("#" + "@ViewBag.Hashtag");
     });
+
+</script>
+<script type="text/javascript">
+        $(document).ready(function () {
+            /*START Autocomplete block*/
+            //TODO: need to re-build the url/<a/> tags for @@name and #hashtag.
+            var userNames = []
+            var userIds = [];
+
+            //we need to get hashtags from the hashtag table and populate it like names are populated.
+            //we also need to add hashtags to the table if there are no matches so others will see hashtags they've seen already.
+            var hashtags = [];
+            @{
+                foreach(string hashTag in ViewBag.HashTags)
+                {
+                    @:hashtags.push("@hashTag");
+                }
+             }
+
+            @foreach (var userProfile in currentCourseUsers)
+             {
+             @:userNames.push("@userProfile.FirstName" + "@userProfile.LastName");
+                         @:userIds.push("@userProfile.ID");
+                         }
+            localStorage['UserNames'] = userNames;
+            localStorage['UserIds'] = userIds;
+
+            $(document).on("focus", "textarea", function () {
+                $(this).atwho({
+                    at: "@@",
+                    data: userNames,
+                    insertTpl: "@@${name}", //insert template i.e. what is inserted into the textarea
+                });
+
+                $(this).atwho({
+                    at: "#",
+                    data: hashtags
+                });
+            });
+        });
 </script>
 
 <h3>Posts with #@ViewBag.Hashtag</h3>
 
-@* This is a message displayed while the feed is loading posts *@
-<div id="loadingMsg" class="message">
-    @Helpers.LoadingSmall() Loading Posts...
-</div>
+    @* This is a message displayed while the feed is loading posts *@
+    <div id="loadingMsg" class="message">
+        @Helpers.LoadingSmall() Loading Posts...
+    </div>
 
-@* Feed is inserted here *@
-<div id="dp_posts" class="panel-group">
-    @Html.Partial("Feed/_Feed")
-</div>
+    @* Feed is inserted here *@
+    <div id="dp_posts" class="panel-group">
+        @Html.Partial("Feed/_Feed")
+    </div>

@@ -317,6 +317,28 @@ function FeedViewModel(userName, userId, current) {
         });
     };
 
+    self.ShowHashTagResults = function (hashtag) {
+        ShowLoading();
+        $.ajax({
+            type: "GET",
+            url: "/Feed/GetFeed",
+            dataType: "json",
+            data: { keywords: hashtag, events: "7,9" }, // 7, 9 are the Ids for FeedPost and LogComment events
+            cache: false,
+            success: function (data, textStatus, jqXHR) {
+                var mappedItems = $.map(data.Feed, function (item) { return new FeedItem(item) });
+                self.items(mappedItems);
+
+                if ($('#load-old-posts').hasClass('disabled')) {
+                    $('#load-old-posts').removeClass('disabled');
+                }
+            },
+            complete: function () {
+                HideLoading();
+            }
+        });
+    };
+
     self.GetPost = function (id) {
         var post = null;
         $.each(self.items(), function (index, value) {

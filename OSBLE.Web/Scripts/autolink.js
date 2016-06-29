@@ -98,3 +98,16 @@
 
 }).call(this);
 
+function getUserName(id) {
+    var name = "";
+    $.ajax({
+        url: "/Feed/GetProfileName",
+        data: { id: id },
+        method: "POST",
+        async: false,
+        success: function (data) {
+            name = data.Name;
+        }
+    })
+    return name;
+}
