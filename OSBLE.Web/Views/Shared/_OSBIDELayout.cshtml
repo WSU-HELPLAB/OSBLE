@@ -104,16 +104,12 @@
     }
 
     <div class="btn-group" id="osbide-nav">
-        <div class="osbide-settings dropdown">
-            <a class="dropdown-toggle btn btn-primary" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-cog"></span></a>
-            <ul class="dropdown-menu">
-                <li><a href="#" title="Zoom In" onclick="increaseZoom(0.05)">Zoom +</a></li>
-                <li><a href="#" title="Zoom Out" onclick="increaseZoom(-0.05)">Zoom -</a></li>
-
-            </ul>
-        </div>
-
-        @Html.Partial("_OSBIDECourses")
+        @Html.Partial("_OSBIDECourses")        
+    </div>
+    <div class="btn-group">
+        <a class="btn btn-primary" href="#"><span class="">Zoom:</span></a>
+        <a class="btn btn-primary" title="Zoom In" href="#"><span class="glyphicon glyphicon-plus" onclick="increaseZoom(0.07)"></span></a>
+        <a class="btn btn-primary" title="Zoom Out" href="#"><span class="glyphicon glyphicon-minus" onclick="increaseZoom(-0.07)"></span></a>
     </div>
 
     <section id="main" data-service-path="@ConfigurationManager.AppSettings["DataServiceUrl"]">
