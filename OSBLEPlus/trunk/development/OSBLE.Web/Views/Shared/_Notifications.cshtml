@@ -91,6 +91,13 @@
                             with a large percent spread</text>
                             break;
                         }
+                    case Notification.Types.UserTag:
+                        {
+                            <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> tagged you in a
+                            @Html.ActionLink("post", "Dispatch", "Notification", new { id = n.ID }, new { })
+                            </text>
+                            break;
+                        }
 
                 }
             </div>

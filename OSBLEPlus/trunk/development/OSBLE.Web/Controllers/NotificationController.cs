@@ -91,6 +91,18 @@ namespace OSBLE.Controllers
                             }
                             db.SaveChanges();
                             return RedirectToAction("Index", "Roster", new { ID = n.ItemID });
+                        case Notification.Types.UserTag:
+                            var UserTagMarkRead = (from d in db.Notifications
+                                                     where d.ID == n.ID && d.RecipientID == ActiveCourseUser.ID
+                                                     select d).ToList();
+                            foreach (var foo in UserTagMarkRead)
+                            {
+                                foo.Read = true;
+                            }
+                            db.SaveChanges();
+                            return RedirectToAction("Details", "Feed", new { id = n.ItemID });
+                        default:
+                            return RedirectToAction("Index", "Home");
                     }
                 }
             }
@@ -208,6 +220,24 @@ namespace OSBLE.Controllers
                 n.RecipientID = courseUser.ID;
                 if (poster != null) n.SenderID = poster.ID;
                 addNotification(n);
+            }
+        }
+
+        public void SendUserTagNotifications(CourseUser sender, int postId, List<CourseUser> recipients)
+        {
+            try
+            {
+                foreach (CourseUser recipient in recipients)
+                {
+                    Notification notification = new Notification();
+                    notification.ItemType = Notification.Types.UserTag;
+                    notification.ItemID = postId;
+                    notification.RecipientID = recipient.ID;
+                    if (sender != null) notification.SenderID = sender.ID;
+                    addNotification(notification);
+                }
+            }
+            catch { // against Dan's better judgement, do nothing!!!!
             }
         }
 
@@ -381,10 +411,11 @@ namespace OSBLE.Controllers
                         
             #if !DEBUG
 
-                if (recipient.UserProfile.EmailAllNotifications && !(recipient.UserProfile.EmailAllActivityPosts && n.ItemType == Notification.Types.Dashboard))
+                if (recipient.UserProfile.EmailAllNotifications && !(recipient.UserProfile.EmailAllActivityPosts && (n.ItemType == Notification.Types.Dashboard || n.ItemType == Notification.Types.UserTag)))
                 {
                     emailNotification(n);
                 }
+
             #endif
         }
 
@@ -517,6 +548,14 @@ namespace OSBLE.Controllers
 
                     action = "view the request to join.";
 
+                    break;
+                case Notification.Types.UserTag:
+                    subject += " - " + sender.FirstName + " " + sender.LastName + " tagged you in a post!";
+                    if (course != null)
+                    {
+                        body = sender.FirstName + " " + sender.LastName + " has tagged you in a post or comment in " + course.Name;
+                        action = "view the post or comment.";
+                    }
                     break;
                 default:
                     subject += "No Email set up for this type of notification";
