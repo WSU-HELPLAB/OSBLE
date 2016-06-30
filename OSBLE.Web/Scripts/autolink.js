@@ -4,6 +4,7 @@
 (function () {
     var autoLink, linkUsernames, linkHashtags,
       __slice = [].slice;
+    var courseUserNames = getUserNames();    
 
     autoLink = function () {
         var k, linkAttributes, option, options, pattern, v;
@@ -55,7 +56,7 @@
                 }
             }
 
-            nameIndices.reverse();
+            nameIndices.reverse();            
 
             for (i = 0; i < nameIndices.length; i++) { // In reverse order, we need to replace each @id=... with the student's link
                 var index = nameIndices[i];
@@ -73,8 +74,10 @@
                 var id = parseInt(idString);
 
                 if (id != NaN) {                    
-                    var studentFullName = getUserName(id);
-                    if (studentFullName === "") continue; // If the ID doesn't represent a user, don't make a link
+                    
+                    studentFullName = courseUserNames[id];
+                    
+                    if (studentFullName === "" || studentFullName === undefined) continue; // If the ID doesn't represent a user, don't make a link
 
                     // Now replace the id number in the string with an html link with the user's full name
                     text = text.replace(text.substr(index, length + 2), "<a href=\"/Profile/Index/" + id + "\">@" + studentFullName + "</a>");
@@ -98,16 +101,20 @@
 
 }).call(this);
 
-function getUserName(id) {
-    var name = "";
+function getUserNames() {
+    var namesAndIds = [];
     $.ajax({
-        url: "/Feed/GetProfileName",
-        data: { id: id },
+        url: "/Feed/GetProfileNames",        
         method: "POST",
         async: false,
-        success: function (data) {
-            name = data.Name;
+        success: function (data) {            
+            namesAndIds = data.userProfiles;
+            for (var k in namesAndIds) { //remove the space in the middle of each name
+                if (namesAndIds.hasOwnProperty(k)) {
+                    namesAndIds[k] = namesAndIds[k].replace(" ", "");
+                }
+            }
         }
     })
-    return name;
+    return namesAndIds;
 }
