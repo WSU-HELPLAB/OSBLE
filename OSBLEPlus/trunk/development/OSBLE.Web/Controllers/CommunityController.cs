@@ -47,8 +47,8 @@ namespace OSBLE.Controllers
                 db.SaveChanges();
 
                 Cache["ActiveCourse"] = community.ID;
-
-                return RedirectToAction("Index");
+                
+                return RedirectToRoute(new { controller = "Home", action = "Index"});
             }
 
             return View(community);

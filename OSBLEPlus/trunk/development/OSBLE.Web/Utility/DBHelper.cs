@@ -240,9 +240,11 @@ namespace OSBLE.Utility
             }
             else
             {
-                var result = connection.Query<dynamic>("SELECT Prefix, Number FROM AbstractCourses WHERE ID = @id", new { id = courseID }).SingleOrDefault();
-                if (result != null)
+                var result = connection.Query<dynamic>("SELECT Prefix, Nickname, Number FROM AbstractCourses WHERE ID = @id", new { id = courseID }).SingleOrDefault();
+                if (!String.IsNullOrEmpty(result.Prefix) && !String.IsNullOrEmpty(result.Number))
                     name = result.Prefix + " " + result.Number;
+                else
+                    name = result.Nickname;
             }
 
             return name;
@@ -338,18 +340,18 @@ namespace OSBLE.Utility
             }
             else
             {
-                var result = connection.Query<dynamic>("SELECT Name, Prefix, Number, Semester, Year, Inactive, Discriminator FROM AbstractCourses WHERE ID = @id",
+                var result = connection.Query<dynamic>("SELECT Name, Prefix, Number, Semester, Year, Inactive, Nickname, Discriminator FROM AbstractCourses WHERE ID = @id",
                     new { id = cu.AbstractCourseID }).SingleOrDefault();
 
                 if (result.Discriminator == "Course")
                     name = string.Format("{0} {1} - {2}, {3}, {4}", result.Prefix, result.Number, result.Name, result.Semester, result.Year);
                 else
-                    name = result.Name; // communities are much simpler
+                    name = string.Format("{0} - {1}", result.Nickname, result.Name);
 
                 // tack role on to the end
                 name += " (" + GetAbstractRoleNameFromID(cu.AbstractRoleID, connection) + ")";
-
-                if (result.Inactive)
+                
+                if (null != result.Inactive && result.Inactive)
                     name += " [INACTIVE]";
             }
             
