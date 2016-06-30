@@ -23,8 +23,18 @@ public static class DateTimeExtensions
         using (var db = new OSBLEContext())
         {
             int offsetVal = -8;
+            
             if(courseID != null)
-                offsetVal = ((Course)db.AbstractCourses.Find(courseID)).TimeZoneOffset;
+            {
+                //get Abstract Course
+                AbstractCourse abstractCourse = db.AbstractCourses.Find(courseID);
+                //check if it's a course or community
+                if (abstractCourse is Course)
+                {
+                    Course course = (Course)abstractCourse;
+                    offsetVal = course.TimeZoneOffset;                    
+                }                
+            }   
 
             TimeZoneInfo tzInfo = GetTimeZone(offsetVal);
 
