@@ -92,7 +92,7 @@
 
     linkHashtags = function () {
         var htPattern = /(^|[\s\n>]|<br\/?>)#([a-z|0-9]+)/gi;
-        return this.replace(htPattern, '$1<a href="/Feed/ShowHashtag?hashtag=$2">#$2</a>');
+        return this.replace(htPattern, '$1<a class="Hashtag" href="/Feed/ShowHashtag?hashtag=$2">#$2</a>');
     }
 
     String.prototype['autoLink'] = autoLink;

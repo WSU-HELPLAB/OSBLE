@@ -2525,3 +2525,11 @@ h2.date-header {
         margin-right: 4px;
     }
 }
+
+.Hashtag {
+    background-color: #DFE5FF;
+    border-radius: 10%;
+    padding: 1px; 
+    width: 10%;
+    height: 10%; 
+}
