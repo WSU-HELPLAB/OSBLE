@@ -1048,6 +1048,19 @@ namespace OSBLE.Controllers
             return Json(new { Name = name });
         }
 
+        [HttpPost]
+        public JsonResult GetProfileNames()
+        {
+            List<UserProfile> userProfiles = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
+            Dictionary<string, string> nameIdPairs = new Dictionary<string, string>();
+
+            foreach (UserProfile userProfile in userProfiles)
+            {
+                nameIdPairs.Add(userProfile.ID.ToString(), userProfile.FullName);
+            }
+            return Json(new { userProfiles = nameIdPairs });
+        }
+
         [HttpGet]
         public ActionResult ShowHashtag(string hashtag)
         {
