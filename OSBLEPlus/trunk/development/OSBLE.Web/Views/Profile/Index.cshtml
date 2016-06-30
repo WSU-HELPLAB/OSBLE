@@ -138,7 +138,7 @@
             {
                 eventIds = new List<int>();
             }
-            
+
             IEnumerable<AggregateFeedItem> items = Model.Feed.Feed.Where(m => m.MostRecentOccurance.Date == date);
             
             <div>
@@ -151,8 +151,10 @@
                             string content = "";
                             DateTime maxDate = afi.MostRecentOccurance;
                             if (afi.FeedItemType == "Feed Post Event")
-                            {
-                                content = afi.Creator.FullName + " made a post";
+                            {                                   
+                                content = string.Format("{0} made a {1}",
+                                afi.Creator.FullName,
+                                Html.ActionLink("post", "Details", "Feed", new { id = afi.Items[0].Event.EventLogId }, new { }));
                             }
                             if (afi.FeedItemType == "Helpful Mark Given Event")
                             {
@@ -162,7 +164,7 @@
                             if (content != "")
                             { 
                                 <li>
-                                    @content
+                                    @Html.Raw(content)
                                     <span class="comments-table-date">
                                         (
                                         <time class="utc-time"
@@ -172,7 +174,7 @@
                                             @maxDate.ToString("hh:mmtt") (UTC)
                                         </time>
                                         )
-                                    </span>.
+                                    </span>
                                 </li>
                             }
                         }
@@ -210,32 +212,36 @@
                         switch (socialLogs.Count)
                         {
                             case 1:
-                                content = string.Format("{0} commented on a post by {1}",
+                                content = string.Format("{0} commented on a {1} by {2}",
                                 socialLogs[0].LogCommentEvent.Sender.FullName,
-                                Html.ActionLink(sourceEvent.Sender.FullName, "Details", "Feed", new { id = logId }, new { }));
+                                Html.ActionLink("post", "Details", "Feed", new { id = logId }, new { }),
+                                sourceEvent.Sender.FullName);
                                 break;
 
                             case 2:
-                                content = string.Format("{0} and {1} commented on a post by {2}",
+                                content = string.Format("{0} and {1} commented on a {2} by {3}",
                                 socialLogs[0].LogCommentEvent.Sender.FullName,
                                 socialLogs[1].LogCommentEvent.Sender.FullName,
-                                Html.ActionLink(sourceEvent.Sender.FullName, "Details", "Feed", new { id = logId }, new { }));
+                                Html.ActionLink("post", "Details", "Feed", new { id = logId }, new { }),
+                                sourceEvent.Sender.FullName);
                                 break;
 
                             case 3:
-                                content = string.Format("{0}, {1}, and {2} commented on a post by {3}",
+                                content = string.Format("{0}, {1}, and {2} commented on a {3} by {4}",
                                 socialLogs[0].LogCommentEvent.Sender.FullName,
                                 socialLogs[1].LogCommentEvent.Sender.FullName,
                                 socialLogs[2].LogCommentEvent.Sender.FullName,
-                                Html.ActionLink(sourceEvent.Sender.FullName, "Details", "Feed", new { id = logId }, new { }));
+                                Html.ActionLink("post", "Details", "Feed", new { id = logId }, new { }),
+                                sourceEvent.Sender.FullName);
                                 break;
 
                             default:
-                                content = string.Format("{0}, {1}, and {2} other(s) commented on a post by {3}",
+                                content = string.Format("{0}, {1}, and {2} other(s) commented on a {3} by {4}",
                                 socialLogs[0].LogCommentEvent.Sender.FullName,
                                 socialLogs[1].LogCommentEvent.Sender.FullName,
                                 socialLogs.Count - 2,
-                                Html.ActionLink(sourceEvent.Sender.FullName, "Details", "Feed", new { id = logId }, new { }));
+                                Html.ActionLink("post", "Details", "Feed", new { id = logId }, new { }),
+                                sourceEvent.Sender.FullName);
                                 break;
                         }
 
@@ -250,7 +256,7 @@
                                 @maxDate.ToString("hh:mmtt") (UTC)
                             </time>
                             )
-                        </span>.
+                        </span>
                     </li>
                     }
                 </ul>
