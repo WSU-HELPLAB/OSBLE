@@ -335,6 +335,16 @@ function FeedViewModel(userName, userId, current) {
             },
             complete: function () {
                 HideLoading();
+                // If the hashtag is within the replies of this post, we want to highlight the "View Replies" Link
+                $("[id^=feed-item-content]").each(function () {
+                    var fullId = $(this).attr("id");
+                    var postId = fullId.split("-").pop();
+                    var postText = this.innerText;
+                    if (!postText.includes(hashtag))
+                    {
+                        $("#expand-comments-" + postId).addClass("Hashtag");
+                    }
+                });
             }
         });
     };

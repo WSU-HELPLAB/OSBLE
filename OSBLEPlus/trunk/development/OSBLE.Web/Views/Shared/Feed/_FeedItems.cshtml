@@ -109,10 +109,10 @@
                         @* View Conversation Link *@
                         <li>
                             <a data-bind="attr: {id: 'expand-comments-' + eventId}, click: expandComments" class="anchor-pointer" >
-                                <span data-bind="attr: {id: 'expand-comments-text-' + eventId}">View</span> Replies (<span data-bind="text: comments().length"></span>)
+                            <span data-bind="attr: {id: 'expand-comments-text-' + eventId}">View</span> Replies (<span data-bind="text: comments().length"></span>)
                             </a>
                         </li>
-                        
+
                         @* Details Link *@
                         <li><a data-bind="attr: {href: @detailsLink}">Details</a></li>
                     }
