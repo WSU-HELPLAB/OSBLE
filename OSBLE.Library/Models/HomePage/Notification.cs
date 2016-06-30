@@ -65,6 +65,7 @@ namespace OSBLE.Models.HomePage
             public const string TeamEvaluationDiscrepancy = "TeamEvaluationDiscrepancy";
             public const string JoinCourseApproval = "JoinCourseApproval";
             public const string JoinCommunityApproval = "JoinCommunityApproval";
+            public const string UserTag = "UserTag";
         }
 
         public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)

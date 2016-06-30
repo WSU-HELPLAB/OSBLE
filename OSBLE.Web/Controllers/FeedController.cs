@@ -15,6 +15,7 @@ using OSBLE.Models.Queries;
 using OSBLE.Models;
 using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
+using OSBLE.Models.HomePage;
 using OSBLE.Utility;
 using OSBLEPlus.Logic.DataAccess.Activities;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
@@ -814,10 +815,75 @@ namespace OSBLE.Controllers
             {
                 emailList.RemoveAll(el => el.Address == ActiveCourseUser.UserProfile.Email);
             }
+
+            // Parse text and create list of tagged users
+            NotifyTaggedUsers(text, logID);
+
             // Send emails to those who want to be notified by email
             SendEmailsToListeners(log.Comment, logID, courseID, DateTime.UtcNow, emailList);
 
             return Json(MakeAggregateFeedItemJsonObject(newPost, false));
+        }
+
+        /// <summary>
+        /// Parses given text for tagged users in the form of "id=XXX;" and notifies them
+        /// </summary>
+        /// <param name="text"></param>
+        private void NotifyTaggedUsers(string text, int postId)
+        {
+            try
+            {
+                List<int> idNumbers = new List<int>();
+
+                for (int i = 0; i < text.Length; i++) 
+                {
+                    // If we find an '@' character, see if it's followed by "id=" then a number then a semicolon
+                    if (text[i] == '@') 
+                    {
+                        if (text.Substring(i + 1, 3) == "id=") 
+                        {
+                            int digit = 0, rIndex = 4; 
+                            bool hasDigit = false;
+                            string idString = "";
+
+                            while (Int32.TryParse(text.Substring(i + rIndex, 1), out digit)) // Keep reading characters until we hit something that isn't a digit
+                            { 
+                                hasDigit = true;
+                                idString += digit.ToString();
+                                rIndex++;
+                            }
+                            if (hasDigit == true && text[i + rIndex] == ';') 
+                            {
+                                idNumbers.Add(Convert.ToInt32(idString)); // If the character following the numbers is a semicolon, we know there is a name reference here so record the id
+                            }
+                        }
+                    }
+                }
+
+                List<CourseUser> taggedUsers = new List<CourseUser>();
+
+                foreach(int id in idNumbers)
+                {
+                    CourseUser user = (from u in db.CourseUsers where u.UserProfileID == id select u).FirstOrDefault();
+
+                    if (user != null) // Skip users that don't / no longer exist
+                    {
+                        taggedUsers.Add(user);
+                    }
+                }
+
+                if (taggedUsers.Count > 0)
+                {
+                    using (NotificationController nc = new NotificationController())
+                    {
+                        nc.SendUserTagNotifications(ActiveCourseUser, postId, taggedUsers);
+                    }
+                }
+            } 
+            catch 
+            {
+                return; // Will return without notifications in failure
+            }
         }
 
         /// <summary>
@@ -879,6 +945,9 @@ namespace OSBLE.Controllers
 
             // Get the new comment list by getting the parent feed item
             FeedItem post = Feeds.Get(id);
+
+            // Notify users of tags
+            NotifyTaggedUsers(content, id);
 
             // Send emails if neccesary
             SendEmailsToListeners(content, id, ActiveCourseUser.AbstractCourseID, DateTime.UtcNow, DBHelper.GetReplyForwardedEmails(id), true);
@@ -1067,7 +1136,7 @@ namespace OSBLE.Controllers
             if (hashtag == null || hashtag == "")
                 return RedirectToAction("Index", "Home");
 
-            ViewBag.Hashtag = hashtag;                       
+            ViewBag.Hashtag = hashtag;
             ViewBag.HideLoadMore = true;
             ViewBag.CurrentCourseUsers = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
             ViewBag.HashTags = DBHelper.GetHashTags();

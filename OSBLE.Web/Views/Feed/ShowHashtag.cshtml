@@ -6,10 +6,6 @@
 @{
     UserProfile currentUser = ViewBag.CurrentUser;
     string defaultEvents = string.Join(",", ActivityFeedQuery.GetSocialEvents().Select(e => (int)e));
-    if (string.IsNullOrEmpty(ViewBag.Title))
-    {
-        ViewBag.Title = "Posts with #" + ViewBag.Hashtag;
-    }
     var currentCourseUsers = ViewBag.CurrentCourseUsers;
 }
 <script type="text/javascript" src="@Url.Content("~/signalr/hubs")"></script>
@@ -67,7 +63,7 @@
         });
 </script>
 
-<h3>Posts with #@ViewBag.Hashtag</h3>
+<h3>Posts and replies containing #@ViewBag.Hashtag</h3>
 
     @* This is a message displayed while the feed is loading posts *@
     <div id="loadingMsg" class="message">
