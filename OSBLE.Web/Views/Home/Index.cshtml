@@ -41,18 +41,6 @@
 
 <script type="text/javascript">
 
-    //function getUserName(id) {                                   
-    //    var users = localStorage['UserNames'].split(',');
-    //    var Ids = localStorage['UserIds'].split(',');
-
-    //    for (var i = 0; i < users.length; i++) {
-    //        if (id == Ids[i]) {               
-    //            return users[i];
-    //        }
-    //    }
-    //    return ""; //we didn't find a match
-    //}
-
     function setContent(btnID, divID, subDivID) {
         $(".activeContent").removeClass("activeContent").addClass("unactiveContent");
         $("#" + divID).addClass("activeContent").removeClass("unactiveContent");
@@ -76,7 +64,7 @@
         });
 
         /*START Autocomplete block*/
-        //TODO: need to re-build the url/<a/> tags for @@name and #hashtag. 
+        //TODO: need to re-build the url/<a/> tags for @@name and #hashtag.
         var userNames = []
         var userIds = [];
 
@@ -84,21 +72,27 @@
         //we also need to add hashtags to the table if there are no matches so others will see hashtags they've seen already.
         var hashtags = [];
         @{
-            foreach(string hashTag in ViewBag.HashTags)
+            if (null != ViewBag.HashTags)
             {
-                @:hashtags.push("@hashTag");
+                foreach(string hashTag in ViewBag.HashTags)
+                {
+                    @:hashtags.push("@hashTag");
+                }
+            }
+            if (null != currentCourseUsers)
+            {
+                foreach (var userProfile in currentCourseUsers)
+                {
+                    @:userNames.push("@userProfile.FirstName" + "@userProfile.LastName");
+                    @:userIds.push("@userProfile.ID");
+                }
             }
         }
 
-        @foreach (var userProfile in currentCourseUsers)
-	    {
-		    @:userNames.push("@userProfile.FirstName" + "@userProfile.LastName"); 
-            @:userIds.push("@userProfile.ID");
-	    }
         localStorage['UserNames'] = userNames;
         localStorage['UserIds'] = userIds;
-     
-        $(document).on("focus", "textarea", function () {            
+
+        $(document).on("focus", "textarea", function () {
             $(this).atwho({
                 at: "@@",
                 data: userNames,
