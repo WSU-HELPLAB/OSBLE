@@ -29,20 +29,20 @@
     //we also need to add hashtags to the table if there are no matches so others will see hashtags they've seen already.
     var hashtags = [];
     @{
-        if (ViewBag.HashTags != null)
+        if (null != ViewBag.HashTags)
         {
             foreach(string hashTag in ViewBag.HashTags)
             {
                 @:hashtags.push("@hashTag");
-                    }
+            }
         }
-        if (currentCourseUsers != null)
+        if (null != currentCourseUsers)
         {
             foreach (var userProfile in currentCourseUsers)
             {
                 @:userNames.push("@userProfile.FirstName" + "@userProfile.LastName");
-                    @:userIds.push("@userProfile.ID");
-                }
+                @:userIds.push("@userProfile.ID");
+            }
         }
     }
 
