@@ -980,6 +980,7 @@
     <Content Include="Content\jquery-ui-1.8.13.custom.css" />
     <Content Include="Content\jquery-ui-timepicker.css" />
     <Content Include="Content\jquery-ui.css" />
+    <Content Include="Content\jquery.atwho.css" />
     <Content Include="Content\jquery.contextMenu.css" />
     <Content Include="Content\navbar.css" />
     <Content Include="Content\themes\base\images\animated-overlay.gif" />
@@ -1167,6 +1168,8 @@
     <Content Include="Scripts\jquery-tooltip.js" />
     <Content Include="Scripts\jquery-ui-1.10.4.js" />
     <Content Include="Scripts\jquery-ui-1.10.4.min.js" />
+    <Content Include="Scripts\jquery.atwho.js" />
+    <Content Include="Scripts\jquery.caret.js" />
     <Content Include="Scripts\jquery.collapse.js" />
     <Content Include="Scripts\jquery.contextMenu.js" />
     <Content Include="Scripts\jquery.cookie.js" />
