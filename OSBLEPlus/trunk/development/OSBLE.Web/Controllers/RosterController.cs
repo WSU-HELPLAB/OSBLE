@@ -1231,6 +1231,57 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " withdrawn students have been removed from the course" });
         }
 
+        /// <summary>
+        /// This is similar to the removeSelectedUsers method. This will remove all selected users for a community (except the current user)
+        /// </summary>
+        /// <returns></returns>
+        [CanModifyCourse]
+        [HttpPost]
+        public ActionResult removeSelectedUsersCommunity()
+        {
+            string temp = Request.Form["removeIDList"];
+            string[] ids;
+            ids = temp.Split(',', ' ');
+            List<UserProfile> studentList = new List<UserProfile>();
+            int parseID;
+
+            List<int> idInts = new List<int>();
+
+            //cast the id to int
+            foreach (string id in ids)
+            {
+                if (Int32.TryParse(id, out parseID))
+                {
+                    idInts.Add(parseID);
+                }
+            }
+
+            //find all withdrawn students for current course
+            List<CourseUser> students = (from c in db.CourseUsers
+                                         where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                                         idInts.Contains(c.UserProfileID) 
+                                         select c).ToList();
+
+            int count = students.Count();
+
+            foreach (CourseUser p in students)
+            {
+                if (p.UserProfileID != ActiveCourseUser.UserProfileID)
+                {
+                    db.CourseUsers.Remove(p);
+                }
+                else
+                {
+                    count--;
+                }
+            }
+
+            db.SaveChanges();
+
+
+            return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " users removed from this community." });
+        }
+
         //Students
         //
 

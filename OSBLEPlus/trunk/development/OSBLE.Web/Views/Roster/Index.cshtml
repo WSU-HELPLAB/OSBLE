@@ -37,62 +37,77 @@
 
 <div id="multipleSelectedAction">
     <!--Multiple selected Users actions-->
-    <h3 id="multipleActionHeader"><br />Student Actions<br /></h3>
+    <h3 id="multipleActionHeader"><br />User Actions<br /></h3>
     <h4 style="color:black;">Click on multiple users at once to perform actions on all selected users.</h4>
     <h4>Select all users: <input type="checkbox" title="Check this box to select / deselect all users" onchange="selectAll(this)" id="selectAllUsers" style="width: 40px; height: 20px;"> </h4>
 
     <h4>Selected User Actions:</h4>
-    <text>Move to section: <br />(Ctrl Click to select multiple)</text>
+    @if (!(ViewBag.ActiveCourse.AbstractCourse is Community)) { 
+        <text>Move to section: <br />(Ctrl Click to select multiple)</text>
     
-    <select multiple id="sectionSelection" style="color:black;">
-        <option value="-2">All Sections</option>
-        <option value="0">0</option>
-        @{
-            string count = "1";
-            bool flag = true;
-            foreach (RosterController.UsersBySection usersBySection in ViewBag.UsersBySections)
-            {
-                if (usersBySection.SectionNumber != "0" && usersBySection.SectionNumber != "-1" && usersBySection.SectionNumber != "-2")
+        <select multiple id="sectionSelection" style="color:black;">
+            <option value="-2">All Sections</option>
+            <option value="0">0</option>
+            @{
+                string count = "1";
+                bool flag = true;
+                foreach (RosterController.UsersBySection usersBySection in ViewBag.UsersBySections)
                 {
-                    <option value="@usersBySection.SectionNumber">@usersBySection.SectionNumber</option>
-                    if (count == usersBySection.SectionNumber)
+                    if (usersBySection.SectionNumber != "0" && usersBySection.SectionNumber != "-1" && usersBySection.SectionNumber != "-2")
                     {
-                        count = (Int32.Parse(usersBySection.SectionNumber) + 1).ToString(); //alwasy set count to the highest number
+                        <option value="@usersBySection.SectionNumber">@usersBySection.SectionNumber</option>
+                        if (count == usersBySection.SectionNumber)
+                        {
+                            count = (Int32.Parse(usersBySection.SectionNumber) + 1).ToString(); //alwasy set count to the highest number
+                        }
                     }
                 }
+                <option value="@count">New Section (@count)</option>
             }
-            <option value="@count">New Section (@count)</option>
-        }
-    </select>
-    <input type="button" id="moverButton" onclick="moveUsers()" value="Move" />
-    <br />
-    <br />
+        </select>
+        <input type="button" id="moverButton" onclick="moveUsers()" value="Move" />
+        <br />
+        <br />
+    }
     @using (Html.BeginForm("CreateUserProfileIds", "Mail", FormMethod.Post, new { id = "emailForm", style = "display: inline;" }))
     {
         <input type="hidden" name="emailIDList" id="emailIDList" value="" />
         <text>Mail: </text>
         <a title="Mail Selected Users" onclick="massMail()">@Helpers.MailButton()</a>
     }
+    @if (!(ViewBag.ActiveCourse.AbstractCourse is Community)) { 
 
-    @using (Html.BeginForm("ChangeStudentsToWithdrawnRole", "Roster", FormMethod.Post, new { id = "withdrawForm", style = "display: inline;" }))
-    {
-        <input type="hidden" name="withdrawIDList" id="withdrawIDList" value="" />
-        <text> | Withdraw: </text>
-        <a title="Withdraw selected students" onclick="massWithdraw()">@Helpers.WithdrawButton()</a>
+        using (Html.BeginForm("ChangeStudentsToWithdrawnRole", "Roster", FormMethod.Post, new { id = "withdrawForm", style = "display: inline;" }))
+        {
+            <input type="hidden" name="withdrawIDList" id="withdrawIDList" value="" />
+            <text> | Withdraw: </text>
+            <a title="Withdraw selected students" onclick="massWithdraw()">@Helpers.WithdrawButton()</a>
+        }
+
+        using (Html.BeginForm("ChangeWithdrawnUsersToStudentRole", "Roster", FormMethod.Post, new { id = "enrollForm", style = "display: inline;" }))
+        {
+            <input type="hidden" name="enrollIDList" id="enrollIDList" value="" />
+            <text> | Enroll: </text>
+            <a title="Enroll selected users" onclick="massEnroll()">@Helpers.EnrollButton()</a>
+        }
+
+        using (Html.BeginForm("removeSelectedUsers", "Roster", FormMethod.Post, new { id = "removeForm", style = "display: inline;" }))
+        {
+            <input type="hidden" name="removeIDList" id="removeIDList" value="" />
+            <text> | Remove withdrawn: </text>
+            <a title="Remove selected students" onclick="massRemove()">@Helpers.DeleteButton()</a>
+        }
     }
-
-    @using (Html.BeginForm("ChangeWithdrawnUsersToStudentRole", "Roster", FormMethod.Post, new { id = "enrollForm", style = "display: inline;" }))
+    else
     {
-        <input type="hidden" name="enrollIDList" id="enrollIDList" value="" />
-        <text> | Enroll: </text>
-        <a title="Enroll selected users" onclick="massEnroll()">@Helpers.EnrollButton()</a>
-    }
+        using (Html.BeginForm("removeSelectedUsersCommunity", "Roster", FormMethod.Post, new { id = "removeForm", style = "display: inline;" }))
+        {
+            <input type="hidden" name="removeIDList" id="removeIDList" value="" />
+            <text> | Remove users: </text>
+            <a title="Remove selected users" onclick="massRemove()">@Helpers.DeleteButton()</a>
+        }
+        //remove community user , check for if you're removing yourself.
 
-    @using (Html.BeginForm("removeSelectedUsers", "Roster", FormMethod.Post, new { id = "removeForm", style = "display: inline;" }))
-    {
-        <input type="hidden" name="removeIDList" id="removeIDList" value="" />
-        <text> | Remove withdrawn: </text>
-        <a title="Remove selected students" onclick="massRemove()">@Helpers.DeleteButton()</a>
     }
     <br />
     <br />
@@ -147,11 +162,11 @@
 
 </div>
 
-    <div>
+<div>
         
         
-        <br />
-    </div>
+    <br />
+</div>
 
 
 
@@ -214,23 +229,29 @@
     {
         <div class="sectionDiv" section="@usersBySection.SectionNumber">
             
-        
-        @if (usersBySection.SectionNumber == "-1")
-        {
-            <h3 style="display:inline;">Multiple Section Users</h3>
-        }
-        else if(usersBySection.SectionNumber == "-2")
-        {
-            <h3 style="display:inline;">Teaching Personnel</h3>
+        @if (!(ViewBag.ActiveCourse.AbstractCourse is Community))
+        { 
+            if (usersBySection.SectionNumber == "-1")
+            {
+                <h3 style="display:inline;">Multiple Section Users</h3>
+            }
+            else if(usersBySection.SectionNumber == "-2")
+            {
+                <h3 style="display:inline;">Teaching Personnel</h3>
+            }
+            else
+            {
+                <h3 style="display:inline;">@Helpers.DisplaySection(usersBySection.SectionNumber)
+                </h3>
+            }
+            
+            
+            <input type="checkbox" title="Check this box to select / deselect all users in this section" id="sectionCheck" class="sectionCheckBox" onchange="sectionCheckChange(this)" section="@usersBySection.SectionNumber" style="width: 40px; height: 20px;" />
         }
         else
         {
-            <h3 style="display:inline;">@Helpers.DisplaySection(usersBySection.SectionNumber)
-            </h3>
+            <input type="checkbox" title="Check this box to select / deselect all users in this section" id="sectionCheck" class="sectionCheckBox" onchange="sectionCheckChange(this)" section="@usersBySection.SectionNumber" style="display: none;" />
         }
-            
-    <input type="checkbox" title="Check this box to select / deselect all users in this section" id="sectionCheck" class="sectionCheckBox" onchange="sectionCheckChange(this)" section="@usersBySection.SectionNumber" style="width: 40px; height: 20px;" />
-    
     @if (usersBySection.SectionNumber == "-2")
     {
         <h2 id="SelectHelper" style="display:inline;">Click on users to perform actions on them</h2>
