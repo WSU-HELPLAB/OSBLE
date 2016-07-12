@@ -63,6 +63,16 @@ namespace OSBLE.Controllers
             return View();
         }
 
+        public ActionResult CreateRubric()
+        {
+            return View();
+        }
+
+        public ActionResult EditRubricOffline()
+        {
+            return View();
+        }
+
         public ActionResult FileUploader()
         {
             return View();

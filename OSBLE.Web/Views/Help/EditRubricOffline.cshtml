@@ -1,0 +1,36 @@
+﻿@{
+    ViewBag.Title = "Editing an Assignment Rubric Offline";
+}
+<h1>Editing an Assignment Rubric Offline</h1>
+<p>
+    <br />To edit the grading rubric for an entire class offline, first navigate to the assignment details page for the desired assignment. Once there, click the "View Rubric" link.
+</p>
+<img src="@Url.Content("~/Content/images/help/editOffline_1.PNG")" alt="view rubric link" />
+<p>
+    <br />This will take you to the rubric view where we can take a look at our current rubric. To download the rubric for editing, click "Download Rubric For Offline Editing".
+</p>
+<img src="@Url.Content("~/Content/images/help/editOffline_2.PNG")" alt="download rubric link" />
+<p>
+    <br />This will download a text file containing grade information for the entire class, including any scores and comments already submitted. For proper formatting, we recommend using WordPad(Windows), TextEdit(Mac), or any office suite to view and edit the file. Your text file will look similar to the following:
+</p>
+<img src="@Url.Content("~/Content/images/help/editOffline_3.PNG")" alt="" />
+<p>
+    <br />As the header states, any line that starts with a triple star (***) cannot be modified, and lines that start with dashes are present only for visual structure. Note that the entire file is for a single assignment, and each student will have their own section where their grades are held. To change the score or add comments, simply remove the "--- INSERT ____ HERE" line and replace it with a score or comment.
+</p>
+<img src="@Url.Content("~/Content/images/help/editOffline_4.PNG")" alt="" />
+<p>
+    <br />With the content filled out, we can now move on to uploading the file. Keep in mind that the rubric does not need to be completely filled out to upload, OSBLE will only import grades and comments that have been filled out. Also note that OSBLE may reject a rubric upload if an improper score increment was used. For example, if "Allow only full-point grades" was selected at creation, a score like 4.5 or 4.75 will not be allowed. Click "Upload Completed Rubric For All Students" to begin the import.
+</p>
+<img src="@Url.Content("~/Content/images/help/editOffline_5.PNG")" alt="" />
+<p>
+    <br />If there were no errors in the text file, you should see the import success page. If you see an error page, read the bullet points and edit your text file, then try uploading again.
+</p>
+<img src="@Url.Content("~/Content/images/help/editOffline_6.PNG")" alt="" />
+<p>
+    <br />Now if you go to Assignment Details, you'll notice the information from the text file has now been entered into OSBLE!
+</p>
+<img src="@Url.Content("~/Content/images/help/editOffline_7.PNG")" alt="" />
+<p>
+    <br />This process can be done multiple times and can also overwrite previously evaluated rubrics.
+    <br /> <br />
+</p>

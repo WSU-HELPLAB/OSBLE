@@ -735,6 +735,13 @@
     <Content Include="Content\images\help\discussion_4.PNG" />
     <Content Include="Content\images\help\discussion_5.PNG" />
     <Content Include="Content\images\help\discussion_6.PNG" />
+    <Content Include="Content\images\help\editOffline_1.PNG" />
+    <Content Include="Content\images\help\editOffline_2.PNG" />
+    <Content Include="Content\images\help\editOffline_3.PNG" />
+    <Content Include="Content\images\help\editOffline_4.PNG" />
+    <Content Include="Content\images\help\editOffline_5.PNG" />
+    <Content Include="Content\images\help\editOffline_6.PNG" />
+    <Content Include="Content\images\help\editOffline_7.PNG" />
     <Content Include="Content\images\help\gradebook_1.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -787,6 +794,15 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\images\help\roster_mobile_1.PNG" />
+    <Content Include="Content\images\help\rubric_1.PNG" />
+    <Content Include="Content\images\help\rubric_2.PNG" />
+    <Content Include="Content\images\help\rubric_3.PNG" />
+    <Content Include="Content\images\help\rubric_4.PNG" />
+    <Content Include="Content\images\help\rubric_5.PNG" />
+    <Content Include="Content\images\help\rubric_6.PNG" />
+    <Content Include="Content\images\help\rubric_7.PNG" />
+    <Content Include="Content\images\help\rubric_8.PNG" />
+    <Content Include="Content\images\help\rubric_9.PNG" />
     <Content Include="Content\images\help\selected_course.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -1419,6 +1435,8 @@
     <Content Include="Views\Rubric\ImportError.cshtml" />
     <Content Include="Views\Rubric\ImportAllFromFile.cshtml" />
     <Content Include="Views\Rubric\ImportSuccess.cshtml" />
+    <Content Include="Views\Help\CreateRubric.cshtml" />
+    <Content Include="Views\Help\EditRubricOffline.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
