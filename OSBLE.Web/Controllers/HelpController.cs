@@ -73,6 +73,11 @@ namespace OSBLE.Controllers
             return View();
         }
 
+        public ActionResult RosterGuide()
+        {
+            return View();
+        }
+
         public ActionResult FileUploader()
         {
             return View();
