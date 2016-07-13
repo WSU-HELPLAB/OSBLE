@@ -763,6 +763,16 @@
     <Content Include="Content\images\help\gradebook_7.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\help\manageRoster_1.png" />
+    <Content Include="Content\images\help\manageRoster_10.PNG" />
+    <Content Include="Content\images\help\manageRoster_2.png" />
+    <Content Include="Content\images\help\manageRoster_3.png" />
+    <Content Include="Content\images\help\manageRoster_4.png" />
+    <Content Include="Content\images\help\manageRoster_5.png" />
+    <Content Include="Content\images\help\manageRoster_6.png" />
+    <Content Include="Content\images\help\manageRoster_7.png" />
+    <Content Include="Content\images\help\manageRoster_8.png" />
+    <Content Include="Content\images\help\manageRoster_9.png" />
     <Content Include="Content\images\help\review_1.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -1437,6 +1447,7 @@
     <Content Include="Views\Rubric\ImportSuccess.cshtml" />
     <Content Include="Views\Help\CreateRubric.cshtml" />
     <Content Include="Views\Help\EditRubricOffline.cshtml" />
+    <Content Include="Views\Help\RosterGuide.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
