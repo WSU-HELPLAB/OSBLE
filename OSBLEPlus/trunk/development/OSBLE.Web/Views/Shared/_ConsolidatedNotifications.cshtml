@@ -80,14 +80,14 @@
                         case Notification.Types.Mail:
                             {
 
-                                <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> sent you a @NotificationLink(n.ID, "message")</text>
+                                <text><em>@n.Sender.DisplayNameFirstLast(ViewBag.ActiveCourse.AbstractRole)</em> sent you a @NotificationLink(n.ID, "message")</text>
                                 break;
 
                             }
                         case Notification.Types.EventApproval:
                             {
 
-                                <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> submitted an @NotificationLink(n.ID, "event for approval")</text>
+                                <text><em>@n.Sender.DisplayNameFirstLast(ViewBag.ActiveCourse.AbstractRole)</em> submitted an @NotificationLink(n.ID, "event for approval")</text>
                                 break;
                             }
                         case Notification.Types.JoinCourseApproval:
