@@ -1,10 +1,13 @@
 ﻿@model OSBLE.Models.ViewModels.RubricViewModel
 @using OSBLE.Models.Courses.Rubrics;
 @using OSBLE.Models.Assignments;
+@using OSBLE.Models.Courses;
 
 @{
     ViewBag.Title = "Rubric Evaluation";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    CourseUser activeCourseUser = ViewBag.ActiveCourseUser;
+    
 }
 
 <script type="text/javascript">
@@ -52,9 +55,14 @@
 </script>
 
 <h2>Rubric Evaluation of @ViewBag.AssignmentName </h2>
-@Html.ActionLink("Download Rubric For Offline Editing", "ExportAllToFile", new { assignID = Model.SelectedAssignment.ID }, new { })
-<br />
-<a href="/Rubric/ImportAllFromFile" onclick="displayImportRubric(event);">Upload Completed Rubric For All Students</a>
+@{
+    if (activeCourseUser.AbstractRoleID != (int)CourseRole.CourseRoles.Student)
+    {
+        @Html.ActionLink("Download Rubric For Offline Editing", "ExportAllToFile", new { assignID = Model.SelectedAssignment.ID }, new { })
+        <br />
+        <a href="/Rubric/ImportAllFromFile" onclick="displayImportRubric(event);">Upload Completed Rubric For All Students</a>
+    }
+}
 <div><br /></div>
 
 <div id='import_all_rubrics_from_csv' title="Import file" style="display:none;">
