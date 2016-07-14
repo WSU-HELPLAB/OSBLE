@@ -816,6 +816,14 @@
     <Content Include="Content\images\help\selected_course.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\help\team_1.PNG" />
+    <Content Include="Content\images\help\team_2.PNG" />
+    <Content Include="Content\images\help\team_3.PNG" />
+    <Content Include="Content\images\help\team_4.PNG" />
+    <Content Include="Content\images\help\team_5.PNG" />
+    <Content Include="Content\images\help\team_6.PNG" />
+    <Content Include="Content\images\help\team_7.PNG" />
+    <Content Include="Content\images\help\team_8.PNG" />
     <Content Include="Content\images\help\uploadfiles_1.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -1448,6 +1456,7 @@
     <Content Include="Views\Help\CreateRubric.cshtml" />
     <Content Include="Views\Help\EditRubricOffline.cshtml" />
     <Content Include="Views\Help\RosterGuide.cshtml" />
+    <Content Include="Views\Help\UsingTeamBuilder.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

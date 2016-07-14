@@ -82,5 +82,10 @@ namespace OSBLE.Controllers
         {
             return View();
         }
+
+        public ActionResult UsingTeamBuilder()
+        {
+            return View();
+        }
     }
 }
