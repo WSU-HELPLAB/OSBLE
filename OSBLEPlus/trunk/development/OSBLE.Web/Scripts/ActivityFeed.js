@@ -100,15 +100,15 @@ function FeedItem(data) {
         // Get text from the textarea
         var text = $('#feed-reply-textbox-' + self.eventId).val();
 
-        // Disable buttons and textbox so the user cannot "spam" replies
-        $("#feed-reply-textbox-" + self.eventId).attr("disabled", "disabled");
-        $("#feed-reply-submit-" + self.eventId).attr("disabled", "disabled");
-        $("#feed-reply-cancel-" + self.eventId).attr("disabled", "disabled");
-
         // Make sure the user submited something
         if (text == "") {
             return;
         }
+
+        // Disable buttons and textbox so the user cannot "spam" replies
+        $("#feed-reply-textbox-" + self.eventId).attr("disabled", "disabled");
+        $("#feed-reply-submit-" + self.eventId).attr("disabled", "disabled");
+        $("#feed-reply-cancel-" + self.eventId).attr("disabled", "disabled");
 
         var userNames = localStorage['UserNames'].split(',');
         var userIds = localStorage['UserIds'].split(',');
