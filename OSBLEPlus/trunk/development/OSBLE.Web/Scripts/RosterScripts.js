@@ -366,6 +366,16 @@ function grabCheckBoxFromStudentLI(studentLI) {
     return null;
 }
 
+var currentMousePos = { x: -1, y: -1 };
+jQuery(function ($) {
+   
+    $(document).mousemove(function (event) {
+        currentMousePos.x = event.pageX;
+        currentMousePos.y = event.pageY;
+    });
+
+});
+
 var dialogFlag = true;
 //this changes the styling of the multipleUserActions section
 function showOrHideMultiple() {
@@ -376,15 +386,19 @@ function showOrHideMultiple() {
         multipleActionHeader.style.backgroundColor = "#dbdbdb";
         if (! /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
             $("#multipleSelectedAction").dialog();
-            if (dialogFlag == true) {
-                $('#multipleSelectedAction').dialog({ position: { my: 'right bottom', at: 'right bottom', of: window } });
+            if (dialogFlag === true) {
+                var x = currentMousePos.x + 220;
+                var y = currentMousePos.y - 100;
+                $("#multipleSelectedAction").dialog("option", "position", [x, y]);
+                $("#multipleSelectedAction").dialog('open');
+                //$('#multipleSelectedAction').dialog({ position: { my: 'right bottom', at: 'right bottom', of: window } });
                 dialogFlag = false;
             }
         }
     }
 
     else {
-        //multipleActionHeader.style = "display: none;";
+        dialogFlag = true;
         multipleActionHeader.style.backgroundColor = "";
         if (! /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
             $("#multipleSelectedAction").dialog('close');
