@@ -80,7 +80,7 @@
                     if (studentFullName === "" || studentFullName === undefined) continue; // If the ID doesn't represent a user, don't make a link
 
                     // Now replace the id number in the string with an html link with the user's full name
-                    text = text.replace(text.substr(index, length + 2), "<a href=\"/Profile/Index/" + id + "\">@" + studentFullName + "</a>");
+                    text = text.replace(text.substr(index, length + 2), "<a href=\"/Profile/Index/" + id + "\" class=\"Mention\">@" + studentFullName + "</a>");
                 }
             }
 
