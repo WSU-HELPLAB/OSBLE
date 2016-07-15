@@ -2528,7 +2528,15 @@ h2.date-header {
 
 .Hashtag {
     background-color: #DFE5FF;
-    border-radius: 10%;
+    border-radius: 20%;
+    padding: 1px; 
+    width: 10%;
+    height: 10%; 
+}
+
+.Mention {
+    background-color: #F1F1F1;
+    /*border-radius: 1%;*/
     padding: 1px; 
     width: 10%;
     height: 10%; 
