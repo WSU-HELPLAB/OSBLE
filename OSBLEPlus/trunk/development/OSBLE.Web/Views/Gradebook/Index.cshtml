@@ -16,11 +16,10 @@
     List<int> globalRowIndicies = ViewBag.GlobalRows;
 }
 
-
     @if (IsInstructorOrTa)
     {
         <!--Upload Gradebook Form-->
-        <form id="upload_gradebook" enctype="multipart/form-data" method="post" action="/Gradebook/UploadGradebook">
+        <form id="upload_gradebook" enctype="multipart/form-data" method="post" action="/Gradebook/UploadGradebook" style="">
             <legend>@ViewBag.LastUploadMessage</legend>
             <input type="file" id="file" name="file"/ onchange="check_extension(this.value)"><br />
             <input id="upload" type="submit" value="Upload" disabled="disabled"/> 
@@ -39,6 +38,19 @@
     
     <h2>@ViewBag.Title </h2>
 
+
+    @if (ViewBag.deleteGradebookAbility)
+    {
+         <form enctype="multipart/form-data" method="post" action="/Gradebook/DeleteAllGradebooks" id="delete_submit">
+              <button style ="float: right; margin-right: 10px" type="submit">Delete All Gradebooks</button> 
+        </form>
+    }
+ 
+    <form enctype="multipart/form-data" method="post" action="/Gradebook/DownloadGradebook">
+        <button style ="float:right; margin-right:10px" type="submit">Download Gradebook</button>
+    </form>
+    <br />
+
     @if (GradeBookExists == false)
     {
         <h3>No Gradebook Uploaded.</h3>
@@ -52,24 +64,33 @@
                 if (tabName == SelectedTab)
                 {
                     liClasses += " GradebookNavActive";
-                    <li class="@liClasses"><text>@tabName</text></li>
+                    if (ViewBag.deleteGradebookAbility)
+                    {
+                        <li class="@liClasses"><text>@tabName</text> @Html.ActionLink(" ", "DeleteSingleGradebook", "Gradebook", new { gradebookName = tabName }, new { @class = "glyphicon glyphicon-trash delete_single_gradebook", @title = "Delete this gradebook"}) </li>    
+                    }
+                    else
+                    {
+                        <li class="@liClasses"><text>@tabName</text> </li>    
+                    }                    
                 }
                 else
                 {
                     string actionLink = Url.Action("Index", "Gradebook", new { area = "", gradebookName = tabName });
                     liClasses += " GradebookNavNotActive";
-                    <li class="@liClasses"><a href="@actionLink">@tabName</a></li>
+                    if (ViewBag.deleteGradebookAbility)
+                    {
+                        <li class="@liClasses"><a href="@actionLink">@tabName</a> @Html.ActionLink(" ", "DeleteSingleGradebook", "Gradebook", new { gradebookName = tabName }, new { @class = "glyphicon glyphicon-trash delete_single_gradebook", @title = "Delete this gradebook" })</li>
+                    }
+                    else
+                    {
+                        <li class="@liClasses"><a href="@actionLink">@tabName</a> </li>    
+                    }
+                    
                 }
             }
         </ul>
         <br />
         <div>
-                @if (DisplaySearch)
-                {
-                    <span>Search by name:</span>
-                    <input id="search"></input>
-                    <br />
-                }
 
                 <!--table here-->
                 <table id="Gradebook">
@@ -158,7 +179,8 @@
     '.csv.csv' : 1
     };
 
-    function check_extension(filename) {
+    function check_extension(filename)
+    {
         var re = /\..+$/;
         var ext = filename.match(re);
         if (hash[ext] ==  1) {
@@ -172,4 +194,45 @@
             return false;
         }
     }
+
+    function areYouSure(selection) {
+        if (selection == "all") {
+            if (confirm("Are you sure you want to delete all gradebooks?") == true) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        else
+        {
+            if (confirm("Are you sure you want to delete the selected gradebook?") == true) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }        
+    }
+
+    $("#delete_submit").submit(function (event) {
+        if (areYouSure("all"))
+        {
+            //do nothing, let it submit.
+        }
+        else
+        {   //prevent post submission
+            event.preventDefault();
+        }        
+    });
+
+    $(".delete_single_gradebook").click(function (event) {
+        if (areYouSure("single")) {
+            //do nothing, let it submit.            
+        }
+        else {   //prevent action            
+            event.preventDefault();
+        }
+    });
+
 </script>
