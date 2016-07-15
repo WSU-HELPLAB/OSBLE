@@ -142,6 +142,7 @@
     <Compile Include="..\..\OSBLE.Library\Models\FileSystem\FileCollection.cs" />
     <Compile Include="..\..\OSBLE.Library\Models\FileSystem\Directories.cs" />
     <Compile Include="..\..\OSBLE.Library\Models\FileSystem\GradebookFilePath.cs" />
+	<Compile Include="..\..\OSBLE.Library\Models\FileSystem\MailAttachmentFilePath.cs" />
     <Compile Include="..\..\OSBLE.Library\Models\HomePage\AbstractDashboard.cs" />
     <Compile Include="..\..\OSBLE.Library\Models\HomePage\DashboardPost.cs" />
     <Compile Include="..\..\OSBLE.Library\Models\HomePage\DashboardReply.cs" />
