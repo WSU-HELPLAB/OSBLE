@@ -401,22 +401,28 @@ namespace OSBLE.Controllers
         /// <param name="n">Notification to be added</param>
         private void addNotification(Notification n)
         {
-            db.Notifications.Add(n);
-            db.SaveChanges();
-         
-            // Find recipient profile and check notification settings
-            CourseUser recipient = (from a in db.CourseUsers
-                                    where a.ID == n.RecipientID
-                                    select a).FirstOrDefault();
-                        
-            #if !DEBUG
+            try
+            {
+                db.Notifications.Add(n);
+                db.SaveChanges();
 
+                // Find recipient profile and check notification settings
+                CourseUser recipient = (from a in db.CourseUsers
+                                        where a.ID == n.RecipientID
+                                        select a).FirstOrDefault();
+
+#if !DEBUG
                 if (recipient.UserProfile.EmailAllNotifications && !(recipient.UserProfile.EmailAllActivityPosts && (n.ItemType == Notification.Types.Dashboard || n.ItemType == Notification.Types.UserTag)))
                 {
                     emailNotification(n);
                 }
-
-            #endif
+#endif
+            }
+            catch (Exception e)
+            {
+                //possibly null sender or recipient
+                //TODO: address why we might get null
+            }
         }
 
         /// <summary>

@@ -1058,7 +1058,7 @@ body#layoutLogOn {
     width: 140px;
 }
 
-.inbox_checkbox_header {
+.inbox_checkbox_header, .inbox_attachments_header {
     background: Silver;
 }
 
