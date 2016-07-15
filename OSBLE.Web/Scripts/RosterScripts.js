@@ -5,8 +5,6 @@ var clickCounter = 0;
 //execute this when button is pressed
 //on loading/reloading the page this will execute and populate the variables as needed.
 $(document).ready(function () {
-
-
     //before anything, sweep the roster
     $.ajax({
         url: '/Roster/SweepRoster/',

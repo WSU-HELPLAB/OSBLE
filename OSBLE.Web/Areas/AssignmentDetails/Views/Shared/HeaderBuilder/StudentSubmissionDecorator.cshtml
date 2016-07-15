@@ -3,6 +3,11 @@
 @model DynamicDictionary
 @{
     dynamic dataModel = Model;
+    var isPluginSubmission = false;
+    if (dataModel.DeliverableType == (int)DeliverableType.PluginSubmission)
+    {
+        isPluginSubmission = true;
+    }
 
     AjaxOptions options = new AjaxOptions()
     {
@@ -21,7 +26,10 @@
     <td>
         @if (dataModel.Submission.hasSubmitted == false)
         {
-            @Ajax.ActionLink("Submit", "Create", "Submission", new { id = dataModel.Submission.assignmentID, area = "" }, options, new object())
+            if (!isPluginSubmission)
+            {
+                @Ajax.ActionLink("Submit", "Create", "Submission", new { id = dataModel.Submission.assignmentID, area = "" }, options, new object())
+            }
         }
         else
         {
@@ -38,7 +46,10 @@
                 
 </li>
             <li>
-                @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = dataModel.Submission.assignmentID, area = "" }, options, new object())  
+                @if (!isPluginSubmission)
+                {
+                    @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = dataModel.Submission.assignmentID, area = "" }, options, new object())  
+                }
             </li>
                @{                   
             

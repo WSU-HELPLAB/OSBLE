@@ -31,6 +31,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
             dynamic header = Builder.BuildHeader(assignment);
             header.Submission = new DynamicDictionary();
             header.IsAnnotatable = new bool();
+            header.DeliverableType = assignment.Deliverables.FirstOrDefault().Type;
 
             DateTime? submissionTime = null;
 
