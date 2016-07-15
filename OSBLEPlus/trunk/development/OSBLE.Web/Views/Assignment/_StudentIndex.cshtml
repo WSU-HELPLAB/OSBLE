@@ -138,8 +138,13 @@
                     {
                         submissionString = "Resubmit";
                     }
-                    @Ajax.ActionLink(submissionString, "Create", "Submission", new { id = assignments[i].ID }, options, new object())
-                    
+
+                    if (assignments[i].Deliverables[0].Type != (int)DeliverableType.PluginSubmission)
+                    {
+                        @Ajax.ActionLink(submissionString, "Create", "Submission", new { id = assignments[i].ID }, options, new object())
+
+                    }
+                    //else do nothing
                 }
                 else if (assignments[i].Type == AssignmentTypes.TeamEvaluation)
                 {
