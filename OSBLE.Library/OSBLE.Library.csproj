@@ -145,6 +145,7 @@
     <Compile Include="Models\ContextBase.cs" />
     <Compile Include="Models\DiscussionAssignment\DiscussionPost.cs" />
     <Compile Include="Models\FileSystem\AssignmentFilePath.cs" />
+    <Compile Include="Models\FileSystem\MailAttachmentFilePath.cs" />
     <Compile Include="Models\FileSystem\OSBLEFile.cs" />
     <Compile Include="Models\FileSystem\OSBLEDirectory.cs" />
     <Compile Include="Models\FileSystem\FileCollection.cs" />

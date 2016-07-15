@@ -173,6 +173,20 @@ namespace OSBLE.Models.FileSystem
             return new GradebookFilePath(path);
         }
 
+        public static MailAttachmentFilePath GetMailAttachment(int courseID, int threadID)
+        {
+            string path = GetDefaultPath();
+            path = System.IO.Path.Combine(path, "Courses", courseID.ToString(), "MailAttachments", threadID.ToString());
+
+            // Make sure the directory exists
+            if (!System.IO.Directory.Exists(path))
+            {
+                System.IO.Directory.CreateDirectory(path);
+            }
+
+            return new MailAttachmentFilePath(path);
+        }
+
         public static OSBLEDirectory GetReview(int courseID, int assignmentID, int authorTeamID, int reviewerTeamID)
         {
             string path = GetDefaultPath();

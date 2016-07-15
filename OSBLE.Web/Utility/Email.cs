@@ -34,6 +34,9 @@ namespace OSBLE.Utility
                     mm.Subject = subject;
                     mm.Body = message;
                     mm.IsBodyHtml = true;
+                    
+                    //TODO: add file attachments!
+                    //add file attachments here
 
                     //bomb's away!
                     mailClient.Send(mm);

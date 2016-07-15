@@ -9,6 +9,10 @@ using OSBLE.Models.Users;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.AbstractCourses.Course;
+using System.Web;
+using System.IO;
+using OSBLE.Models.FileSystem;
+using OSBLEPlus.Logic.Utility;
 
 
 
@@ -39,6 +43,20 @@ namespace OSBLE.Controllers
             ViewBag.BoxHeader = "Inbox";
             List<Mail> mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID && m.DeleteFromInbox == false).ToList();
             OrderMailAndSetViewBag(sortBy, ref mails);
+
+            if (mails.Count() > 0)
+            {
+                List<int> threadIds = new List<int>();
+                foreach (Mail mail in mails)
+                {
+                    MailAttachmentFilePath mfp = Directories.GetMailAttachment(mail.ContextID, mail.ThreadID);
+                    if (mfp.AllFiles().Count() > 0)
+                    {
+                        threadIds.Add(mail.ThreadID);
+                    }
+                }
+                ViewBag.AttachmentThreadIds = threadIds;
+            }
             return View(mails);
         }
 
@@ -47,6 +65,21 @@ namespace OSBLE.Controllers
             ViewBag.BoxHeader = "Outbox";
             List<Mail> mails = db.Mails.Where(m => m.FromUserProfileID == CurrentUser.ID && m.DeleteFromOutbox == false).ToList();
             OrderMailAndSetViewBag(sortBy, ref mails);
+
+            if (mails.Count() > 0)
+            {
+                List<int> threadIds = new List<int>();
+                foreach (Mail mail in mails)
+                {
+                    MailAttachmentFilePath mfp = Directories.GetMailAttachment(mail.ContextID, mail.ThreadID);
+                    if (mfp.AllFiles().Count() > 0)
+                    {
+                        threadIds.Add(mail.ThreadID);
+                    }
+                }
+                ViewBag.AttachmentThreadIds = threadIds;
+            }
+
             return View("Index", mails);
         }
 
@@ -193,8 +226,22 @@ namespace OSBLE.Controllers
 
             ViewBag.Next = next;
             ViewBag.Prev = prev;
-
             ViewBag.AllRecipients = recipients;
+
+            //setup viewbag for attached files
+            MailAttachmentFilePath mfp = Directories.GetMailAttachment(mail.ContextID, mail.ThreadID);
+            if (mfp.AllFiles().Count() > 0)
+            {
+                List<string> attachmentUrls = new List<string>();
+                foreach (string filePath in mfp.AllFiles())
+                {
+                    string attachmentUrl = StringConstants.WebClientRoot + "FileHandler/GetMailAttachment?" + "courseId={0}" + "&threadId={1}" + "&fileName={2}";
+                    attachmentUrl = string.Format(attachmentUrl, mail.ContextID.ToString(), mail.ThreadID.ToString(), Path.GetFileName(filePath));
+                    attachmentUrls.Add(attachmentUrl);
+                }
+                ViewBag.AttachmentUrls = attachmentUrls;
+            }
+
             return View(mail);
         }
 
@@ -279,7 +326,7 @@ namespace OSBLE.Controllers
 
         }
 
-        public void setUpWhiteTableMailViewBags(List<OSBLE.Models.AbstractCourses.Course.WhiteTableUser> InitialRecipients = null )
+        public void setUpWhiteTableMailViewBags(List<OSBLE.Models.AbstractCourses.Course.WhiteTableUser> InitialRecipients = null)
         {
             List<CourseUser> TaAndInstructorList = db.CourseUsers
                     .Where(cu => (cu.AbstractRoleID == (int)CourseRole.CourseRoles.TA || cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor) && cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID)
@@ -345,18 +392,17 @@ namespace OSBLE.Controllers
         }
 
         [HttpPost]
-        public ActionResult Create(Mail mail)
+        public ActionResult Create(Mail mail, IEnumerable<HttpPostedFileBase> files = null)
         {
             if (ModelState.IsValid)
             {
-                
                 string recipient_string = Request.Params["recipientlist"];
                 string[] recipients;
                 string currentCourse = Request.Form["CurrentlySelectedCourse"];    //gets selected FROM courseid
                 string mailReply = Request.Form["mailReply"];
-                if(mailReply == "" || mailReply == null)
+                if (mailReply == "" || mailReply == null)
                 {
-                    mail.ContextID = Convert.ToInt16(currentCourse); 
+                    mail.ContextID = Convert.ToInt16(currentCourse);
                 }
                 // AJ: Keep the ContextID the same if this is a reply to avoid confusion
 
@@ -368,6 +414,8 @@ namespace OSBLE.Controllers
                     int count = 0;
                     int threadID = 0;
                     int dummyOut = 0;
+
+                    bool attachmentsSaved = false;
 
                     foreach (string id in recipients)
                     {
@@ -399,8 +447,23 @@ namespace OSBLE.Controllers
                                 db.SaveChanges();
                             }
 
+                            //now that the message is saved, set up attachments.
+                            //handle file attachments
+                            if (null != files && !attachmentsSaved)
+                            {
+                                foreach (var file in files)
+                                {
+                                    if (null != file && file.ContentLength > 0)
+                                    {
+                                        MailAttachmentFilePath mfp = Directories.GetMailAttachment(mail.ContextID, newMail.ThreadID);
+                                        mfp.AddFile(Path.GetFileName(file.FileName), file.InputStream);
+                                    }
+                                }
+                                attachmentsSaved = true; //we only need to save attachments once for each mail thread
+                            }
+
                             using (NotificationController nc = new NotificationController())
-                            {                                
+                            {
                                 nc.SendMailNotification(newMail);
                             }
                             ++count;
@@ -435,11 +498,11 @@ namespace OSBLE.Controllers
         {
             string temp = Request.Form["emailIDList"];
             string[] ids;
-            ids = temp.Split(',',' ');
+            ids = temp.Split(',', ' ');
             List<UserProfile> recipientList = new List<UserProfile>();
             int parseID;
 
-            List <int> idInts = new List<int> ();
+            List<int> idInts = new List<int>();
 
             foreach (string id in ids)
             {
@@ -458,10 +521,10 @@ namespace OSBLE.Controllers
         public ActionResult CreateWhiteTableUserProfileId(int id)
         {
             var profile = db.WhiteTableUsers.Find(id);
-            List<OSBLE.Models.AbstractCourses.Course.WhiteTableUser> recipientList 
+            List<OSBLE.Models.AbstractCourses.Course.WhiteTableUser> recipientList
                 = new List<Models.AbstractCourses.Course.WhiteTableUser>();
 
-            if(profile != null)
+            if (profile != null)
             {
                 recipientList.Add(profile);
             }
@@ -812,7 +875,7 @@ namespace OSBLE.Controllers
                 if (tag != "")
                     userCourseList.Add(cu.AbstractCourseID + "," + tag);
             }
-            
+
             return Json(userCourseList, JsonRequestBehavior.AllowGet);
         }
 

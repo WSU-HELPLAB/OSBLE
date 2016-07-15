@@ -15,6 +15,7 @@ using OSBLE.Utility;
 using OSBLE.Models.Annotate;
 using OSBLE.Services;
 using OSBLE.Models.FileSystem;
+using System.Web;
 
 namespace OSBLE.Controllers
 {
@@ -85,6 +86,29 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="courseId"></param>
+        /// <param name="threadId"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        [OsbleAuthorize]
+        [RequireActiveCourse]
+        public ActionResult GetMailAttachment(int courseId, int threadId, string fileName)
+        {
+            var course = (from c in db.CourseUsers
+                          where c.UserProfileID == CurrentUser.ID && c.AbstractCourseID == courseId
+                          select c).FirstOrDefault();
+
+            if (course != null)
+            {
+                MailAttachmentFilePath mfp = Directories.GetMailAttachment(courseId, threadId);
+                Stream stream = FileSystem.GetDocumentForRead(mfp.GetPath() + "\\" + fileName);
+                return new FileStreamResult(stream, MimeMapping.GetMimeMapping(fileName)) { FileDownloadName = fileName };                
+            }
+            return RedirectToAction("Index", "Home");
+        }
 
         /// <summary>
         /// Returns all the submissions for the given assignmentId

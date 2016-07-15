@@ -4,7 +4,18 @@
 
 @{
     ViewBag.Title = ViewBag.BoxHeader;
+    List<int> attachmentIds = ViewBag.AttachmentThreadIds;
+    if (null == attachmentIds)
+    {
+        attachmentIds = new List<int>();
+    }
 }
+<style type="text/css">
+    .glyphicon-paperclip:before {
+        content: "📎";
+    }
+</style>
+
 
 
 <h2>@ViewBag.BoxHeader</h2>
@@ -31,7 +42,8 @@
         }
 
         <tr>
-            <th id="checkAll" class="inbox_checkbox_header"><input id="checkAllBox" type="checkbox" /></th>
+            <th style="text-align: center;" id="checkAll" class="inbox_checkbox_header"><input id="checkAllBox" type="checkbox" /></th>
+            <th class="inbox_attachments_header"></th>
             <th class="inbox_time_header">@Html.ActionLink("Date:", method, new { sortBy = ViewBag.DateSortByValue })</th>
             <th class="inbox_context_header">@Html.ActionLink("Context:", method, new { sortBy = ViewBag.ContextSortByValue })</th>
             <th class="inbox_from_header">@Html.ActionLink("From:", method, new { sortBy = ViewBag.FromSortByValue })</th>
@@ -39,12 +51,18 @@
         </tr>
                     }
                 </thead>
+                
                 @foreach (var item in Model)
                 {
-
                     <tr id="mail_item_@(item.ID)" class="@if (!item.Read)
                                                 {<text>inbox_unread</text>}">
-                        <td><input id="@item.ID" class="mailCheckBoxClass" name="mailItem_@(item.ID)" type="checkbox" /></td>
+                        <td style="text-align: center;"><input id="@item.ID" class="mailCheckBoxClass" name="mailItem_@(item.ID)" type="checkbox" /></td>
+                        <td class="inbox_attachments">
+                            @if (attachmentIds.Contains(item.ThreadID))
+                            {
+                                <span class="glyphicon-paperclip" style="text-align: center;"></span>
+                            }
+                        </td>
                         <td class="inbox_time">
                             <time class="utc-time"
                                   style="font-size:small;"
