@@ -78,7 +78,17 @@ else
             {
                 var filename = attachment.Split('=').Last();
                 <li>
-                    <a href="@attachment" download>@filename</a>
+                    <a class="file-header" href="@attachment" title="@filename">
+                        @if (filename.IndexOf('.') > -1) // if path contains '.'
+                        {
+                            <img src="@Helpers.GetIconImgPath(filename.Substring(filename.LastIndexOf('.')).ToLower())" />
+                        }
+                        else
+                        {
+                            <img src="@Helpers.GetIconImgPath("")" />
+                        }
+                        @filename
+                    </a>
                 </li>
             }
         </ul>

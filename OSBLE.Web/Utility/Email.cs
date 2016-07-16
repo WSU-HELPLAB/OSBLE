@@ -35,8 +35,11 @@ namespace OSBLE.Utility
                     mm.Body = message;
                     mm.IsBodyHtml = true;
                     
-                    //TODO: add file attachments!
+                    //TODO: possibly add file attachments!
                     //add file attachments here
+                    //mm.Attachments
+                    //consider adding a reply to for mail items
+                    //mm.ReplyTo
 
                     //bomb's away!
                     mailClient.Send(mm);
