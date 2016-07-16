@@ -14,6 +14,22 @@
             showFromDropdown = true;
         }
     }
+    List<string> attachmentUrls = ViewBag.AttachmentUrls;
+    string forwardedContextId = "";
+    string forwardedThreadId = "";
+    if (null == attachmentUrls)
+    {
+        attachmentUrls = new List<string>();
+    }
+    else
+    {
+        if (attachmentUrls.Count() > 0)
+        {
+            List<string> url = attachmentUrls.First().Split('=').ToList();
+            forwardedContextId = url[1].Split('&').ToList().First();
+            forwardedThreadId = url[2].Split('&').ToList().First();
+        }
+    }
 }
 
 <h2>@ViewBag.MailHeader</h2>
@@ -71,6 +87,42 @@
         @Html.TextAreaFor(model => model.Message, new { @id = "send_mail_textarea" })<br />
         @Html.ValidationMessageFor(model => model.Message)
     </div>
+
+    <!-- forwarded attachments list -->
+    if (null != attachmentUrls && attachmentUrls.Count() > 0)
+    {
+        <div class="attachments">
+            @Html.Label("Forwarded Attachments");
+            <ul>
+                @{bool firstPass = true;}
+                @foreach (string attachment in attachmentUrls)
+                {
+                    var filename = attachment.Split('=').Last();
+                    <li>
+                        <a class="file-header" href="@attachment" title="@filename">
+                            @if (filename.IndexOf('.') > -1) // if path contains '.'
+                            {
+                                <img src="@Helpers.GetIconImgPath(filename.Substring(filename.LastIndexOf('.')).ToLower())" />
+                            }
+                            else
+                            {
+                                <img src="@Helpers.GetIconImgPath("")" />
+                            }
+                            @filename
+                        </a>
+                        @if (firstPass)
+                        {
+                            <input type="hidden" name="forwarded_contextId" value="@forwardedContextId" />
+                            <input type="hidden" name="forwarded_threadId" value="@forwardedThreadId" />
+                            firstPass = false;
+                        }
+                    </li>
+
+                }
+            </ul>
+        </div>
+    }
+
 
     <!--Upload attachment -->
     @Html.Label("Add Attachments: ")

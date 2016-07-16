@@ -228,21 +228,27 @@ namespace OSBLE.Controllers
             ViewBag.Prev = prev;
             ViewBag.AllRecipients = recipients;
 
-            //setup viewbag for attached files
-            MailAttachmentFilePath mfp = Directories.GetMailAttachment(mail.ContextID, mail.ThreadID);
+            //setup viewbag for attached files            
+            ViewBag.AttachmentUrls = GetAttachmentUrls(mail.ContextID, mail.ThreadID);
+
+            return View(mail);
+        }
+
+        private List<string> GetAttachmentUrls(int ContextID, int ThreadID)
+        {
+            MailAttachmentFilePath mfp = Directories.GetMailAttachment(ContextID, ThreadID);
             if (mfp.AllFiles().Count() > 0)
             {
                 List<string> attachmentUrls = new List<string>();
                 foreach (string filePath in mfp.AllFiles())
                 {
                     string attachmentUrl = StringConstants.WebClientRoot + "FileHandler/GetMailAttachment?" + "courseId={0}" + "&threadId={1}" + "&fileName={2}";
-                    attachmentUrl = string.Format(attachmentUrl, mail.ContextID.ToString(), mail.ThreadID.ToString(), Path.GetFileName(filePath));
+                    attachmentUrl = string.Format(attachmentUrl, ContextID.ToString(), ThreadID.ToString(), Path.GetFileName(filePath));
                     attachmentUrls.Add(attachmentUrl);
                 }
-                ViewBag.AttachmentUrls = attachmentUrls;
+                return attachmentUrls;
             }
-
-            return View(mail);
+            return new List<string>();
         }
 
         /// <summary>
@@ -400,6 +406,13 @@ namespace OSBLE.Controllers
                 string[] recipients;
                 string currentCourse = Request.Form["CurrentlySelectedCourse"];    //gets selected FROM courseid
                 string mailReply = Request.Form["mailReply"];
+                string forwardedAttachmentsContextId = Request.Form["forwarded_contextId"]; //get forwarded attachments context id
+                string forwardedAttachmentsThreadId = Request.Form["forwarded_threadId"]; //get forwarded attachments thread id  
+                bool forwardedAttachments = false;
+
+                if (!String.IsNullOrEmpty(forwardedAttachmentsContextId) && !String.IsNullOrEmpty(forwardedAttachmentsThreadId))
+                    forwardedAttachments = true;
+
                 if (mailReply == "" || mailReply == null)
                 {
                     mail.ContextID = Convert.ToInt16(currentCourse);
@@ -449,14 +462,26 @@ namespace OSBLE.Controllers
 
                             //now that the message is saved, set up attachments.
                             //handle file attachments
-                            if (null != files && !attachmentsSaved)
+                            if ((null != files && !attachmentsSaved) || forwardedAttachments)
                             {
-                                foreach (var file in files)
-                                {
-                                    if (null != file && file.ContentLength > 0)
+                                MailAttachmentFilePath mfp = Directories.GetMailAttachment(mail.ContextID, newMail.ThreadID);
+                                if (forwardedAttachments)
+                                {   //we are also adding attachments from the forwarded mail
+                                    MailAttachmentFilePath forwardedMfp = Directories.GetMailAttachment(Int32.Parse(forwardedAttachmentsContextId), Int32.Parse(forwardedAttachmentsThreadId));
+                                    foreach (var item in forwardedMfp.AllFiles())
                                     {
-                                        MailAttachmentFilePath mfp = Directories.GetMailAttachment(mail.ContextID, newMail.ThreadID);
-                                        mfp.AddFile(Path.GetFileName(file.FileName), file.InputStream);
+                                        mfp.AddFile(Path.GetFileName(item), forwardedMfp.OpenFileRead(Path.GetFileName(item)));
+                                    }
+                                }
+
+                                if (null != files && !attachmentsSaved)
+                                {
+                                    foreach (var file in files)
+                                    {
+                                        if (null != file && file.ContentLength > 0)
+                                        {
+                                            mfp.AddFile(Path.GetFileName(file.FileName), file.InputStream);
+                                        }
                                     }
                                 }
                                 attachmentsSaved = true; //we only need to save attachments once for each mail thread
@@ -678,6 +703,9 @@ namespace OSBLE.Controllers
         {
             int forwardto;
             Mail mail = new Mail();
+            int forwardContextId = 0;
+            int forwardThreadId = 0;
+
             List<UserProfile> recipientList = new List<UserProfile>();
             if (Int32.TryParse(Request.Params["forwardTo"], out forwardto) == true)
             {
@@ -696,6 +724,8 @@ namespace OSBLE.Controllers
                                        mail.Posted.UTCToCourse(ActiveCourseUser.AbstractCourseID).ToString() + "\n\n" +
                                        Regex.Replace(mail.Message, "^.*$", "> $&",
                                            RegexOptions.Multiline);
+                        forwardThreadId = mail.ThreadID;
+                        forwardContextId = mail.ContextID;
                     }
                     else
                     {
@@ -705,11 +735,20 @@ namespace OSBLE.Controllers
                                        mail.FromUserProfile.LastName + "\nSent at: " + mail.Posted.ToString() + "\n\n" +
                                        Regex.Replace(mail.Message, "^.*$", "> $&",
                                            RegexOptions.Multiline);
+                        forwardThreadId = mail.ThreadID;
+                        forwardContextId = mail.ContextID;
                     }
                 }
             }
 
             setUpMailViewBags();
+
+            //setup attachment forwarding
+            if (forwardThreadId > 0 && forwardContextId > 0)
+            {
+                ViewBag.AttachmentUrls = GetAttachmentUrls(forwardContextId, forwardThreadId);
+            }
+
             return View("Create", mail);
         }
 

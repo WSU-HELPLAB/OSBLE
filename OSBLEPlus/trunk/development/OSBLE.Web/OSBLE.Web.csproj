@@ -500,6 +500,7 @@
     <Content Include="Content\images\fileextimages\css.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\fileextimages\csv.png" />
     <Content Include="Content\images\fileextimages\dat.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -509,6 +510,7 @@
     <Content Include="Content\images\fileextimages\doc.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\fileextimages\docx.png" />
     <Content Include="Content\images\fileextimages\dotx.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -554,6 +556,7 @@
     <Content Include="Content\images\fileextimages\key.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\fileextimages\link.png" />
     <Content Include="Content\images\fileextimages\mid.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -1192,7 +1195,7 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="Areas\Analytics\Content\jquery.datetimepicker.css" />
-    <None Include="Properties\PublishProfiles\filesystem.pubxml" />
+    <None Include="Properties\PublishProfiles\filesystem.pubxml" />    
     <None Include="Scripts\jquery-2.0.1.intellisense.js" />
     <Content Include="Scripts\highlight.pack.js" />
     <Content Include="Scripts\jquery-2.0.1.js" />
