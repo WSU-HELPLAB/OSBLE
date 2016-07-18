@@ -479,8 +479,10 @@ namespace OSBLE.Controllers
                                     foreach (var file in files)
                                     {
                                         if (null != file && file.ContentLength > 0)
-                                        {
-                                            mfp.AddFile(Path.GetFileName(file.FileName), file.InputStream);
+                                        {                                            
+                                            Regex illegalInFileName = new Regex(@"[\\/:*?""<>|+]");
+                                            string fileName = illegalInFileName.Replace(Path.GetFileName(file.FileName), "");
+                                            mfp.AddFile(fileName, file.InputStream);
                                         }
                                     }
                                 }
