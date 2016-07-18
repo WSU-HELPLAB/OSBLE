@@ -115,11 +115,6 @@ namespace OSBLE.Controllers
             {
                 using (AccountController account = new AccountController())
                 {
-                    if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor)
-                        ViewBag.IsInstructor = true;
-                    else
-                        ViewBag.IsInstructor = false;
-
                     Authentication authenticate = new Authentication();
                     return account.TokenLogin(authenticate.GetAuthenticationKey(), StringConstants.WebClientRoot + "/feed/osbide/");
                 }
