@@ -58,9 +58,9 @@
 @{
     if (activeCourseUser.AbstractRoleID != (int)CourseRole.CourseRoles.Student)
     {
-        @Html.ActionLink("Download Rubric For Offline Editing", "ExportAllToFile", new { assignID = Model.SelectedAssignment.ID }, new { })
+        @Html.ActionLink("Download Rubrics For Offline Editing", "ExportAllToFile", new { assignID = Model.SelectedAssignment.ID }, new { })
         <br />
-        <a href="/Rubric/ImportAllFromFile" onclick="displayImportRubric(event);">Upload Completed Rubric For All Students</a>
+        <a href="/Rubric/ImportAllFromFile" onclick="displayImportRubric(event);">Upload Edited Rubrics</a>
     }
 }
 <div><br /></div>
