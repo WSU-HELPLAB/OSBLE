@@ -597,7 +597,7 @@ namespace OSBLE.Controllers
                 while (true)
                 {
                     DateTime current = StartDate.AddDays(day);
-                    if (current > EndDate) 
+                    if (current > EndDate || day > 365) // Break after we pass the end date or after 1 year (to prevent infinite loop)
                         break;
 
                     foreach (CourseMeeting cm in course.CourseMeetings)
