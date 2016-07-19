@@ -188,6 +188,16 @@
         </Strings>
       </Button>
 
+      <Button guid="guidOSBIDE_OsbideToolsMenuCmdSet" id="cmdidOsbideSubmitAssignmentCommand" priority="0x0100" type="Button">
+        <Parent guid="guidOSBIDE_VSPackageCmdSet" id="MyMenuGroup" />
+        <Icon guid="guidImages" id="upload" />
+        <Strings>
+          <CommandName>cmdidOsbideSubmitAssignmentCommand</CommandName>
+          <ButtonText>Submit Assignment</ButtonText>
+        </Strings>
+      </Button>
+
+
     </Buttons>
 
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
@@ -197,7 +207,7 @@
             bitmap strip containing the bitmaps and then there are the numeric ids of the elements used 
             inside a button definition. An important aspect of this declaration is that the element id 
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
-      <Bitmap guid="guidImages" href="Resources\Images.png" usedList="profile, generic, feed, chat, login, loginActive, documentation, askForHelp, webLink"/>
+      <Bitmap guid="guidImages" href="Resources\Images.png" usedList="profile, generic, feed, chat, login, loginActive, documentation, askForHelp, webLink, upload"/>
 
     </Bitmaps>
 
@@ -230,6 +240,7 @@
       <IDSymbol name="cmdOsbideAskForHelp" value="0x0107" />
     </GuidSymbol>
 
+    
     <GuidSymbol name="guidOSBIDE_OsbideToolsMenuCmdSet" value="{1511c427-ab1b-403a-8f75-e1bcfe3bb987}">
       <IDSymbol name="OsbideToolsMenu" value="0x1020" />
       <IDSymbol name="cmdidOsbideLoginToolWin" value="0x0102" />
@@ -245,7 +256,8 @@
       <IDSymbol name="loginActive" value="6" />
       <IDSymbol name="documentation" value="7" />
       <IDSymbol name="askForHelp" value="8" />
-      <IDSymbol name="webLink" value="9" />      
+      <IDSymbol name="webLink" value="9" />
+      <IDSymbol name="upload" value="10" />
     </GuidSymbol>
   </Symbols>
 
