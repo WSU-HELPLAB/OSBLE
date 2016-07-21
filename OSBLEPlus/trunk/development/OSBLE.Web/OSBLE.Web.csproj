@@ -748,6 +748,7 @@
     <Content Include="Content\images\help\gradebook_1.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\help\gradebook_1TA.PNG" />
     <Content Include="Content\images\help\gradebook_2.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -763,9 +764,13 @@
     <Content Include="Content\images\help\gradebook_6.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\help\gradebook_6TA.PNG" />
     <Content Include="Content\images\help\gradebook_7.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\help\gradebook_7AfterTAEdits.PNG" />
+    <Content Include="Content\images\help\gradebook_7TA.PNG" />
+    <Content Include="Content\images\help\gradebook_9StudentView.PNG" />
     <Content Include="Content\images\help\manageRoster_1.png" />
     <Content Include="Content\images\help\manageRoster_10.PNG" />
     <Content Include="Content\images\help\manageRoster_2.png" />
@@ -1195,7 +1200,7 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="Areas\Analytics\Content\jquery.datetimepicker.css" />
-    <None Include="Properties\PublishProfiles\filesystem.pubxml" />    
+    <None Include="Properties\PublishProfiles\filesystem.pubxml" />
     <None Include="Scripts\jquery-2.0.1.intellisense.js" />
     <Content Include="Scripts\highlight.pack.js" />
     <Content Include="Scripts\jquery-2.0.1.js" />
