@@ -8,6 +8,7 @@ using OSBLEPlus.Logic.Utility;
 using OSBLEPlus.Logic.Utility.Lookups;
 using OSBLE.Models;
 using System.Linq;
+using Dapper;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
@@ -52,6 +53,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
         public bool ShowProfilePicture { get; set; }
         public string DisplayTitle { get; set; }
         public bool HideMail { get; set; }
+        public bool InstructorOnly { get; set; }
 
         public ActivityEvent() // NOTE!! This is required by Dapper ORM
         {
@@ -84,6 +86,32 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
                 HideMail = course.HideMail;
             }
             
+            //set instructor view only
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+                    //get the InstructorOnly value from the db
+                    string query = "SELECT ISNULL(InstructorOnly, 0) FROM EventLogs WHERE Id = @eventLogId;";
+                    bool result = sqlConnection.Query<bool>(query, new { eventLogId = EventLogId }).Single();
+                    if (result)
+	                {
+                        //don't hide if the user is an instructor or if it's their own post
+                        if (currentUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor || SenderId == currentUser.UserProfileID)	                    
+                            InstructorOnly = false;	                    
+                        else                        
+                            InstructorOnly = result;                        
+	                }                    
+                    sqlConnection.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                //TODO: handle exception logging                
+            }
+            
+
             // Graders can delete posts, anyone can delete their own posts
             CanDelete = currentUser.AbstractRole.CanGrade || SenderId == currentUser.UserProfileID;
 

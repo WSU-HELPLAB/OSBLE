@@ -14,6 +14,7 @@ namespace OSBLEPlus.Logic.DomainObjects.Interface
         bool CanDelete { get; set; }
         bool CanMail { get; set; }
         bool HideMail { get; set; }
+        bool InstructorOnly { get; set; }
         bool CanReply { get; set; }
         bool CanEdit { get; set; }
         bool ShowProfilePicture { get; set; }

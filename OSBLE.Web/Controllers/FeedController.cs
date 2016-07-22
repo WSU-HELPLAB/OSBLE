@@ -273,6 +273,7 @@ namespace OSBLE.Controllers
                 EventLogId = comment.EventLogId,
                 CanMail = comment.CanMail,
                 HideMail = comment.HideMail,
+                InstructorOnly = comment.InstructorOnly,
                 CanEdit = comment.CanEdit,
                 CanDelete = comment.CanDelete,
                 CanVote = comment.CanVote,
@@ -315,6 +316,7 @@ namespace OSBLE.Controllers
                 EventDate = item.MostRecentOccurance.Ticks,
                 CanMail = eventLog.CanMail,
                 HideMail = eventLog.HideMail,
+                InstructorOnly = eventLog.InstructorOnly,
                 CanEdit = eventLog.CanEdit,
                 CanDelete = eventLog.CanDelete,
                 CanReply = eventLog.CanReply,
@@ -1152,6 +1154,7 @@ namespace OSBLE.Controllers
                 canEdit = e.CanEdit,
                 canMail = e.CanMail,
                 hideMail = e.HideMail,
+                instructorOnly = e.InstructorOnly,
                 canVote = e.CanVote,
                 showPicture = e.ShowProfilePicture,                
             });

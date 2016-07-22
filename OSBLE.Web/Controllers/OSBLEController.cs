@@ -171,9 +171,7 @@ namespace OSBLE.Controllers
         public OSBLEController()
         {
             ActiveCourseUser = null;
-            Initialize();
-            Course course = db.AbstractCourses.Where(ac => ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
-            ViewBag.HideMail = course.HideMail;
+            Initialize();            
         }
 
         public OSBLEController(OSBLEContext context)

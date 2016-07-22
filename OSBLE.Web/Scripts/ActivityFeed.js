@@ -10,7 +10,7 @@ function FeedItem(data) {
     self.eventLogId = data.EventLogId;
     self.timeString = ko.observable(data.TimeString);
     self.eventDate = data.EventDate;
-    self.options = new FeedItemOptions(data.CanMail, data.CanDelete, data.CanEdit, data.ShowPicture, data.CanVote, data.HideMail);
+    self.options = new FeedItemOptions(data.CanMail, data.CanDelete, data.CanEdit, data.ShowPicture, data.CanVote, data.HideMail, data.InstructorOnly);
     self.show = true;
     self.isComment = self.parentEventId != -1;
     self.isHelpfulMark = data.IsHelpfulMark;
@@ -144,7 +144,7 @@ function FeedItem(data) {
     }
 }
 
-function FeedItemOptions(canMail, canDelete, canEdit, showPicture, canVote, hideMail)
+function FeedItemOptions(canMail, canDelete, canEdit, showPicture, canVote, hideMail, instructorOnly)
 {
     var self = this;
     self.canMail = canMail;
@@ -153,6 +153,7 @@ function FeedItemOptions(canMail, canDelete, canEdit, showPicture, canVote, hide
     self.showPicture = showPicture;
     self.canVote = canVote;
     self.hideMail = hideMail;
+    self.instructorOnly = instructorOnly;
 }
 
 function FeedViewModel(userName, userId, current) {
@@ -498,6 +499,7 @@ function SetPermissions(post)
             post.CanVote = data.canVote;
             post.ShowPicture = data.showPicture;
             post.HideMail = data.hideMail;
+            post.InstructorOnly = data.instructorOnly;
         },
         error: function () {
             post.CanDelete = false;
@@ -506,6 +508,7 @@ function SetPermissions(post)
             post.CanVote = false;
             post.ShowPicture = false;
             post.HideMail = false;
+            post.InstructorOnly = false;
         }
     });
 }
