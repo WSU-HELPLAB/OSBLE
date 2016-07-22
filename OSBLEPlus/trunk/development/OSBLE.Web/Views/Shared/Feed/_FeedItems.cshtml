@@ -47,7 +47,7 @@
                 }
 
                 @* Mail Button *@
-                <div data-bind="if: options.canMail">
+                <div data-bind="if: options.canMail && !options.hideMail">
                     <a title="Mail This User" data-bind="attr: {href: '/Mail/CreateUser/' + senderId + '?component=' + @genericComponent}"><span class="glyphicon glyphicon-envelope"></span></a>
                 </div>
 

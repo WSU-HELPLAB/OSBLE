@@ -21,6 +21,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             ViewBag.AssignmentTypeRadioName = "AssignmentType";
             manager = new AssignmentWizardComponentManager(CurrentUser);
+            Course course = db.AbstractCourses.Where(ac => ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
+            ViewBag.HideMail = course.HideMail;
         }
 
         #region action results

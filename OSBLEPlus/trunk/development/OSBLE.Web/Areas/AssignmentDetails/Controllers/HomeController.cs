@@ -10,6 +10,7 @@ using OSBLE.Areas.AssignmentDetails.ViewModels;
 using OSBLE.Attributes;
 using OSBLE.Models.FileSystem;
 using OSBLE.Utility;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Areas.AssignmentDetails.Controllers
 {
@@ -17,6 +18,9 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
     {
         public ActionResult Index(int assignmentId)
         {
+            Course course = db.AbstractCourses.Where(ac => ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
+            ViewBag.HideMail = course.HideMail;
+
             Assignment assignment = db.Assignments.Find(assignmentId);
 
             //If the assignment does not exist, or the assignment has not been released and the user is a student: kick them out

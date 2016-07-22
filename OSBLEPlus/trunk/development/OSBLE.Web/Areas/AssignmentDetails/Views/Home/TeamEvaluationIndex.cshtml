@@ -6,7 +6,7 @@
 @{
     ViewBag.Title = "Assignment Details";
     DynamicDictionary headerData = Model.HeaderBuilder.BuildHeader(Model.CurrentAssignment);
-    
+
 }
 @section AssignmentDetails
 {
@@ -15,11 +15,10 @@
             Due:
         </th>
         <td>
-            <time 
-                class="utc-time"
-                datetime="@Helpers.DateAsUnixTime(Model.CurrentAssignment.DueDate)" 
-                data-original-date="@Helpers.RawDate(Model.CurrentAssignment.DueDate)" 
-                data-date-format="MM/DD/YYYY hh:mm A">
+            <time class="utc-time"
+                  datetime="@Helpers.DateAsUnixTime(Model.CurrentAssignment.DueDate)"
+                  data-original-date="@Helpers.RawDate(Model.CurrentAssignment.DueDate)"
+                  data-date-format="MM/DD/YYYY hh:mm A">
                 @Model.CurrentAssignment.DueDate.ToShortDateString() @Model.CurrentAssignment.DueDate.ToShortTimeString() (UTC)
             </time>
         </td>
@@ -34,8 +33,8 @@
 {
     @if (Model.Client.AbstractRole.CanGrade)
     {
-        CourseUser currentUser = ViewBag.ActiveCourseUser;        
-        
+        CourseUser currentUser = ViewBag.ActiveCourseUser;
+
         //If preceding assignment team was a discussion, we want to use discussion teams for the team evaluation
 
         List<IAssignmentTeam> teams = null;
@@ -61,11 +60,8 @@
                 sections.Add(tm.CourseUser.Section);
             }
         }
-        //populate cross section teams
-        List<string> multiSections = new List<string>();
-        
-        //create a list of the multiSections 
-        multiSections = currentUser.MultiSection.Split(',').ToList(); 
+        //populate cross section teams //create a list of the multiSections
+        List<string> multiSections = currentUser.MultiSection != null ? currentUser.MultiSection.Split(',').ToList() : new List<string>();
 
         HashSet<IAssignmentTeam> CrossSectionTeam = new HashSet<IAssignmentTeam>();
 
@@ -78,16 +74,16 @@
             temp = assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.Section;
             flagCheck = false;
             sectionFlag = false;
-            
+
             if (currentUser.Section == -2) //if user in all section, always display users
             {
                 sectionFlag = true;
             }
-            
-            //populate cross section            
+
+            //populate cross section
             foreach (TeamMember member in assignmentTeam.Team.TeamMembers) //make sure all team members are on the same team.
             {
-               
+
                 //if the current user is a multi section user (not all section)
                 if (currentUser.Section == -1)
                 {
@@ -97,7 +93,7 @@
                         sectionFlag = true;
                     }
                 }
-                
+
                     //if the current user is a single section user
                 else if (currentUser.Section >= 0) //if TA or Instructor is a single section user, check if one of the team members is in their section
                 {
@@ -106,7 +102,7 @@
                         sectionFlag = true;
                     }
                 }
-                
+
                 //if the teammate we're looking at doesn't have the same section as all others, it's a cross section team
                 if (member.CourseUser.Section != temp)
                 {
@@ -121,27 +117,27 @@
                 continue;
             }
         }
-        
+
         //end population of cross section teams
 
         //this bool is to determine whether or not there needs to be a row with a section header.
         bool sectionBool = false;
-        
+
         //check if all teams are cross section teams.
         bool onlyCross = true;
-        
+
         //only show sections if there are more than 1 section
         bool showSections = false;
-        
+
         if (sections.Count > 1)
         {
             showSections = true;
         }
-        
+
         foreach (int section in sections)
         {
             // For TAs, we only want the TA to see students in the section they are in
-            
+
             if (currentUser != null)
             {
                 if (currentUser.AbstractRole.Name == "TA") //see if the user is a TA
@@ -164,9 +160,9 @@
                     }
                 }
             }
-            
+
             sectionBool = false;
-            
+
             //Going over each Team. Creating a header row for the team. And under the header row, creating a
             //a row for each user.
             foreach (IAssignmentTeam assignmentTeam in teams)
@@ -191,7 +187,7 @@
                 {
                     continue;
                 }
-                
+
                 if (assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.Section != section)
                 {
                     continue;
@@ -217,7 +213,10 @@
 
                             @{string actionLink = Url.Action("CreateTeam", "Mail", new { area = "", teamID = assignmentTeam.Team.ID });
                             }
-                            <a href="@actionLink" title="Email this team">@Helpers.MailButton()</a>
+                            @if (null != ViewBag.HideMail && !ViewBag.HideMail)
+                            {
+                                <a href="@actionLink" title="Email this team">@Helpers.MailButton()</a>
+                            }
                             @assignmentTeam.Team.Name -
                             @Html.ActionLink("View Evaluations", "TeacherTeamEvaluation", "Assignment", new { precedingTeamId = assignmentTeam.TeamID, TeamEvaluationAssignmentId = Model.CurrentAssignment.ID, area = "" }, new { })
                         </th>
@@ -240,7 +239,10 @@
                         <tr>
                             <td>
                                 @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", id = member.CourseUser.UserProfileID });}
-                                <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
+                                @if (null != ViewBag.HideMail && !ViewBag.HideMail)
+                                {
+                                    <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
+                                }
                                 @member.CourseUser.DisplayName(Model.Client.AbstractRoleID, false)
                             </td>
                             @foreach (string view in Model.TableColumnHeaders.Keys)
@@ -274,7 +276,10 @@
 
                         @{string actionLink = Url.Action("CreateTeam", "Mail", new { area = "", teamID = assignmentTeam.Team.ID });
                         }
-                        <a href="@actionLink" title="Email this team">@Helpers.MailButton()</a>
+                        @if (null != ViewBag.HideMail && !ViewBag.HideMail)
+                        {
+                            <a href="@actionLink" title="Email this team">@Helpers.MailButton()</a>
+                        }
                         @assignmentTeam.Team.Name -
                         @Html.ActionLink("View Evaluations", "TeacherTeamEvaluation", "Assignment", new { precedingTeamId = assignmentTeam.TeamID, TeamEvaluationAssignmentId = Model.CurrentAssignment.ID, area = "" }, new { })
                     </th>
@@ -298,7 +303,10 @@
                         <td>
 
                             @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", id = member.CourseUser.UserProfileID });}
-                            <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
+                            @if (null != ViewBag.HideMail && !ViewBag.HideMail)
+                            {
+                                <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
+                            }
                             @member.CourseUser.DisplayName(Model.Client.AbstractRoleID, false)
                         </td>
                         @foreach (string view in Model.TableColumnHeaders.Keys)

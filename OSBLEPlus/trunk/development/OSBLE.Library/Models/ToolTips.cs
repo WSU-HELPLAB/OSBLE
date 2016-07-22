@@ -56,6 +56,7 @@ namespace OSBLE.Models
         public static string CourseStudentReply = "Check this box to allow students to reply to messages posted to the activity feed.";
         public static string CourseStudentEvent = "Check this box to allow students to post items to the course calendar.";
         public static string CourseInstructorEventApproval = "Check this box to require instructor to approve items before they appear on the course calendar.";
+        public static string CourseHideMail = "Check this box to hide the \"Mail\" links for this course. This can be done if you do not wish to use the OSBLE Mail system or wish to temporarily disable direct access to it.";
         public static string CourseInactive = "Check this box to make the course \"inactive.\"  Only instructors and observers can access a course when it is set to inactive.";
         public static string CourseCalendarEvents = "Specify the number of weeks of events to show in the course calendar by default. Events outside this window of time can still be accessed by clicking on the \"Show All Events\" link.";
         public static string CourseGradingScheme = "Using this section, you may define the grading scheme for the course. For each letter grade, you must specify the minimum percentage required to receive that grade.";

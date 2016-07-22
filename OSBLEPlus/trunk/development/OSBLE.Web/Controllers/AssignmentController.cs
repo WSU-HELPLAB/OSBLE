@@ -26,6 +26,8 @@ namespace OSBLE.Controllers
         public AssignmentController()
         {
             ViewBag.CurrentTab = "Assignments";
+            Course course = db.AbstractCourses.Where(ac => ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
+            ViewBag.HideMail = course.HideMail;
         }
 
         [CanModifyCourse]
@@ -154,7 +156,7 @@ namespace OSBLE.Controllers
 
                 ViewBag.TeamEvaluations = teamEvaluations;
                 ViewBag.CourseUser = ActiveCourseUser;
-                ViewBag.SubmissionInfoDictionary = submissionInfo;
+                ViewBag.SubmissionInfoDictionary = submissionInfo;                
             }
             else if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
             {
@@ -241,6 +243,7 @@ namespace OSBLE.Controllers
             ViewBag.Assignments = AllAssignments;
             ViewBag.CurrentDate = DateTime.UtcNow;
             ViewBag.Submitted = false;
+                        
             return View("Index");
         }
 

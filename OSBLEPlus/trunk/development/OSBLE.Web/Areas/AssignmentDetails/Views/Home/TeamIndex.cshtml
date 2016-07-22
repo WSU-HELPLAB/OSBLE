@@ -6,7 +6,7 @@
 @{
     ViewBag.Title = "Assignment Details";
     DynamicDictionary headerData = Model.HeaderBuilder.BuildHeader(Model.CurrentAssignment);
-    
+
 }
 
 @section AssignmentDetails
@@ -16,11 +16,10 @@
             Due:
         </th>
         <td>
-            <time 
-                class="utc-time"
-                datetime="@Helpers.DateAsUnixTime(Model.CurrentAssignment.DueDate)" 
-                data-original-date="@Helpers.RawDate(Model.CurrentAssignment.DueDate)" 
-                data-date-format="MM/DD/YYYY hh:mm A">
+            <time class="utc-time"
+                  datetime="@Helpers.DateAsUnixTime(Model.CurrentAssignment.DueDate)"
+                  data-original-date="@Helpers.RawDate(Model.CurrentAssignment.DueDate)"
+                  data-date-format="MM/DD/YYYY hh:mm A">
                 @Model.CurrentAssignment.DueDate.ToShortDateString() @Model.CurrentAssignment.DueDate.ToShortTimeString() (UTC)
             </time>
         </td>
@@ -37,12 +36,11 @@
     {
         CourseUser currentUser = ViewBag.ActiveCourseUser;
 
-        List<string> multiSections = new List<string>();
-        multiSections = currentUser.MultiSection.Split(',').ToList();
+        List<string> multiSections = currentUser.MultiSection != null ? currentUser.MultiSection.Split(',').ToList() : new List<string>();
 
         HashSet<int> sections = new HashSet<int>(); //This hash set is to get all of the sections for this assignment
         HashSet<IAssignmentTeam> CrossSectionTeam = new HashSet<IAssignmentTeam>();
-        
+
         bool altRow = false;
 
         var teams = from pair in Model.TeamTableBuilders
@@ -67,10 +65,10 @@
 
         //check if all teams are cross section teams.
         bool onlyCross = true;
-        
+
         //only show sections if there are more than 1 section
         bool showSections = false;
-        
+
         if (sections.Count > 1)
         {
             showSections = true;
@@ -128,12 +126,12 @@
                 continue;
             }
         }
-        
+
 
         foreach (int section in sections)
         {
             // For TAs, we only want the TA to see students in the section they are in
-            
+
             if (currentUser != null)
             {
                 if (currentUser.AbstractRole.Name == "TA") //see if the user is a TA
@@ -156,7 +154,7 @@
                     }
                 }
             }
-            
+
             sectionBool = false;
 
             foreach (IAssignmentTeam assignmentTeam in teams)
@@ -192,7 +190,7 @@
                     if ((!sectionBool) && showSections) //if not displayed yet, and sections are allowed to be displayed
                     {
                         <tr class="SectionRow">
-                            <th class="Student" colspan= "1">
+                            <th class="Student" colspan="1">
                                 Section: @Html.Raw(section)
                             </th>
 
@@ -200,23 +198,26 @@
                                 @Html.ActionLink("[Download Section Submissions]", "GetAllSubmissionsForAssignment", "FileHandler", new { assignmentID = Model.CurrentAssignment.ID, downloadSection = section, area = "" }, new { onclick = "create_and_open_downloading_submission_dialog()", style = "text-decoration:none" })
                             </td>
                         </tr>
-        
-                        sectionBool = true;                        
-                    }                
+
+                        sectionBool = true;
+                    }
 
                     <tr class="TeamHeader">
                         <th colspan="6">
                             @{string actionLink = Url.Action("CreateTeam", "Mail", new { area = "", teamID = assignmentTeam.Team.ID });
                             }
-                            <a href="@actionLink" title="Email this team" >@Helpers.MailButton()</a>
+                            @if (null != ViewBag.HideMail && !ViewBag.HideMail)
+                            {
+                                <a href="@actionLink" title="Email this team">@Helpers.MailButton()</a>
+                            }
                             @assignmentTeam.Team.Name
                         </th>
                     </tr>
 
                 }
 
-                if ((!sectionBool) && showSections) //if not displayed yet, and sections are allowed to be displayed 
-                                                    //Must have twice here in case there are only 1 person teams
+                if ((!sectionBool) && showSections) //if not displayed yet, and sections are allowed to be displayed
+                //Must have twice here in case there are only 1 person teams
                 {
                     <tr class="SectionRow">
                         <th class="Student" colspan="1">
@@ -233,33 +234,36 @@
 
                 //if you reach here, the page is displaying at least one team that is not cross section
                 onlyCross = false;
-                    <tr>
-                        <th class="StudentName">
-                            <lu>
-                                @foreach (TeamMember tm in assignmentTeam.Team.TeamMembers.OrderBy(t => t.CourseUser.DisplayName(Model.Client.AbstractRoleID, false)).ToList())
-                                {
-                                    <li id="ReviewsItems">
-                                        @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", id = tm.CourseUser.UserProfileID });
-                                          }
+                <tr>
+                    <th class="StudentName">
+                        <lu>
+                            @foreach (TeamMember tm in assignmentTeam.Team.TeamMembers.OrderBy(t => t.CourseUser.DisplayName(Model.Client.AbstractRoleID, false)).ToList())
+                            {
+                                <li id="ReviewsItems">
+                                    @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", id = tm.CourseUser.UserProfileID });
+                                    }
+                                    @if (null != ViewBag.HideMail && !ViewBag.HideMail)
+                                    {
                                         <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
-                        
-                                        @tm.CourseUser.DisplayName(Model.Client.AbstractRoleID, false)
-                                    </li>
-                                }
-                            </lu>
-                        </th>
-                        @foreach (string view in Model.TableColumnHeaders.Keys)
-                        {
-                            DynamicDictionary tableData = Model.TeamTableBuilders[assignmentTeam].BuildTableForTeam(assignmentTeam);
-                            string viewLocation = string.Format("TableBuilder/{0}", view);
-                            @Html.Partial(viewLocation, tableData);
-                        }
-                    </tr>
+                                    }
+
+                                    @tm.CourseUser.DisplayName(Model.Client.AbstractRoleID, false)
+                                </li>
+                            }
+                        </lu>
+                    </th>
+                    @foreach (string view in Model.TableColumnHeaders.Keys)
+                    {
+                        DynamicDictionary tableData = Model.TeamTableBuilders[assignmentTeam].BuildTableForTeam(assignmentTeam);
+                        string viewLocation = string.Format("TableBuilder/{0}", view);
+                        @Html.Partial(viewLocation, tableData);
+                    }
+                </tr>
             }
         }
-        
+
         //if the assignment has teams that are cross section
-        if ((CrossSectionTeam.Count > 0) && (! onlyCross))
+        if ((CrossSectionTeam.Count > 0) && (!onlyCross))
         {
             <tr class="SectionRow">
                 <th class="Student" colspan="1">
@@ -272,7 +276,7 @@
         }
 
         foreach (IAssignmentTeam assignmentTeam in CrossSectionTeam)
-        {       
+        {
             //if the team has multiple students
             if (assignmentTeam.Team.TeamMembers.Count() > 1)
             {
@@ -280,11 +284,14 @@
                     <th colspan="6">
                         @{string actionLink = Url.Action("CreateTeam", "Mail", new { area = "", teamID = assignmentTeam.Team.ID });
                         }
-                        <a href="@actionLink" title="Email this team">@Helpers.MailButton()</a>
+                        @if (null != ViewBag.HideMail && !ViewBag.HideMail)
+                        {
+                            <a href="@actionLink" title="Email this team">@Helpers.MailButton()</a>
+                        }
                         @assignmentTeam.Team.Name
                     </th>
 
-                    
+
                 </tr>
 
             }
@@ -296,7 +303,10 @@
                             <li id="ReviewsItems">
                                 @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", id = tm.CourseUser.UserProfileID });
                                 }
-                                <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
+                                @if (null != ViewBag.HideMail && !ViewBag.HideMail)
+                                {
+                                    <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
+                                }
 
                                 @tm.CourseUser.DisplayName(Model.Client.AbstractRoleID, false)
                             </li>
@@ -313,4 +323,4 @@
         }
     }
 }
-} 
+}

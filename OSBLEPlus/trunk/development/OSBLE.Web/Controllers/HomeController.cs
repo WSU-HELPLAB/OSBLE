@@ -51,6 +51,9 @@ namespace OSBLE.Controllers
             //setup user list for autocomplete            
             ViewBag.CurrentCourseUsers = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
             ViewBag.HashTags = DBHelper.GetHashTags();
+            Course course = db.AbstractCourses.Where(ac=>ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
+            ViewBag.HideMail = course.HideMail;
+            Cache["HideMail"] = course.HideMail;
 
             return View("Index");
         }
@@ -384,7 +387,15 @@ namespace OSBLE.Controllers
                 // If current user is not the poster, allow mailing
                 if (posterCu != null && posterCu.UserProfileID != currentCu.UserProfileID)
                 {
-                    post.CanMail = true;
+                    Course course = db.AbstractCourses.Where(ac => ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
+                    if (course.HideMail)
+                    {
+                         post.CanMail = false;
+                    }
+                    else
+                    {
+                        post.CanMail = true;
+                    }                    
                 }
 
                 if (posterCu != null)

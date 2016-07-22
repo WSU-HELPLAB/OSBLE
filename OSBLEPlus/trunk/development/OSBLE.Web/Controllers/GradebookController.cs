@@ -153,6 +153,10 @@ namespace OSBLE.Controllers
                 ViewBag.LastUploadMessage = "Upload Gradebook File";
                 //Generate additional upload fail messages. 
             }
+
+            Course course = db.AbstractCourses.Where(ac => ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
+            ViewBag.HideMail = course.HideMail;
+
             return View();
         }
 

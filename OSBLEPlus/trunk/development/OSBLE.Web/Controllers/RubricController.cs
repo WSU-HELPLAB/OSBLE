@@ -34,6 +34,8 @@ namespace OSBLE.Controllers
             ViewBag.DraftButtonId = "save_as_draft";
             ViewBag.PublishButtonId = "publish_to_student";
             ViewBag.StudentStatusName = "StudentStatus";
+            Course course = db.AbstractCourses.Where(ac => ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
+            ViewBag.HideMail = course.HideMail;
         }
 
         /// <summary>

@@ -184,6 +184,11 @@
             @Html.ValidationMessageFor(model => model.Inactive)
         </div>
 
+		<div class="editor-field">
+            @Html.CheckBoxFor(model => model.HideMail) @Html.LabelFor(model => model.HideMail) 
+            @Helpers.CreateToolTip(ToolTips.CourseHideMail) <br />
+            @Html.ValidationMessageFor(model => model.HideMail)
+        </div>
 
         <br />
         <div class="editor-field">

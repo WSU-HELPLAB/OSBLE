@@ -7,6 +7,7 @@ using System.Web.Security;
 using OSBLE.Attributes;
 using OSBLE.Models.Users;
 using OSBLE.Utility;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Controllers
 {
@@ -21,6 +22,8 @@ namespace OSBLE.Controllers
             : base()
         {
             ViewBag.CurrentTab = "Administration";
+            Course course = db.AbstractCourses.Where(ac => ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
+            ViewBag.HideMail = course.HideMail;
         }
 
         //

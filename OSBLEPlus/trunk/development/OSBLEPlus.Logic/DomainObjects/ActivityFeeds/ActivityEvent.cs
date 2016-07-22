@@ -6,6 +6,8 @@ using OSBLE.Models.Courses;
 using OSBLEPlus.Logic.DomainObjects.Interface;
 using OSBLEPlus.Logic.Utility;
 using OSBLEPlus.Logic.Utility.Lookups;
+using OSBLE.Models;
+using System.Linq;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
@@ -49,6 +51,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
         public bool CanVote { get; set; }
         public bool ShowProfilePicture { get; set; }
         public string DisplayTitle { get; set; }
+        public bool HideMail { get; set; }
 
         public ActivityEvent() // NOTE!! This is required by Dapper ORM
         {
@@ -73,6 +76,13 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 
             // Anyone can mail anyone but themselves (provided they're not anonimous)
             CanMail = !anonymous && SenderId != currentUser.UserProfileID;
+
+            //get course setting for hiding mail
+            using (OSBLEContext db = new OSBLEContext())
+            {
+                Course course = db.AbstractCourses.Where(ac => ac.ID == currentUser.AbstractCourseID).FirstOrDefault() as Course;
+                HideMail = course.HideMail;
+            }
             
             // Graders can delete posts, anyone can delete their own posts
             CanDelete = currentUser.AbstractRole.CanGrade || SenderId == currentUser.UserProfileID;
