@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using OSBLE.Attributes;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Controllers
 {
@@ -15,7 +16,8 @@ namespace OSBLE.Controllers
         // GET: /Help/
         public HelpController() : base()
         {
-            
+            Course course = db.AbstractCourses.Where(ac => ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
+            ViewBag.HideMail = course.HideMail;
         }
 
         public ActionResult Index()

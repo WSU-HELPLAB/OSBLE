@@ -11,6 +11,7 @@ using OSBLE.Controllers;
 using OSBLE.Areas.AssignmentWizard.Models;
 using System.ComponentModel;
 using OSBLE.Attributes;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -114,11 +115,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public WizardBaseController()
         {
             WasUpdateSuccessful = true;
-            SortOrder = 0;
+            SortOrder = 0;            
         }
 
         private void SetUpViewBag()
         {
+            Course course = db.AbstractCourses.Where(ac => ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
+            ViewBag.HideMail = course.HideMail;
+
             ViewBag.Components = manager.SelectedComponents;
             ViewBag.ActiveComponent = manager.ActiveComponent;
             ViewBag.Assignment = Assignment;

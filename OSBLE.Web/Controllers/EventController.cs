@@ -32,6 +32,9 @@ namespace OSBLE.Controllers
 
         public ViewResult Index()
         {
+            Course course = db.AbstractCourses.Where(ac => ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
+            ViewBag.HideMail = course.HideMail;
+
             // Set range for all events
             DateTime StartDate = new DateTime();
             DateTime EndDate = new DateTime();

@@ -24,6 +24,11 @@ namespace OSBLE.Controllers
     [OsbleAuthorize]
     public class CourseController : OSBLEController
     {
+        public CourseController()
+        {
+            Course course = db.AbstractCourses.Where(ac => ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
+            ViewBag.HideMail = course.HideMail;
+        }
         //
         // GET: /Course/
 
@@ -763,6 +768,7 @@ namespace OSBLE.Controllers
 
             Course updateCourse = (Course)ActiveCourseUser.AbstractCourse;
 
+            updateCourse.HideMail = course.HideMail;
             updateCourse.Inactive = course.Inactive;
             updateCourse.AllowDashboardPosts = course.AllowDashboardPosts;
             updateCourse.AllowDashboardReplies = course.AllowDashboardReplies;

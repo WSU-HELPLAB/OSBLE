@@ -40,6 +40,8 @@ namespace OSBLE.Controllers
         public AccountController()
         {
             ViewBag.ReCaptchaPublicKey = getReCaptchaPublicKey();
+            Course course = db.AbstractCourses.Where(ac => ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
+            ViewBag.HideMail = course.HideMail;
         }
 
         //

@@ -73,7 +73,10 @@
         <div class="dp_tools">
             @if (Model.CanMail)
             {
-                <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { id = Model.CourseUser.UserProfileID })"><span class="glyphicon glyphicon-envelope"></span></a>
+                if (null != ViewBag.HideMail && !ViewBag.HideMail)
+                {
+                    <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { id = Model.CourseUser.UserProfileID })"><span class="glyphicon glyphicon-envelope"></span></a>
+                }
             }
             @if (Model.CanDelete)
             {

@@ -21,6 +21,7 @@ using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
 using OSBLEPlus.Logic.Utility.Lookups;
 using OSBLEPlus.Services.Models;
 using Image = System.Drawing.Image;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Controllers
 {
@@ -31,6 +32,9 @@ namespace OSBLE.Controllers
         [OsbleAuthorize]
         public ActionResult Index(int? id, int timestamp = -1)
         {
+            Course course = db.AbstractCourses.Where(ac => ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
+            ViewBag.HideMail = course.HideMail;
+
             try
             {
                 var query = new ActivityFeedQuery(ActiveCourseUser.AbstractCourseID);

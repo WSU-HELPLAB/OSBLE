@@ -11,7 +11,6 @@
 @section AssignmentDetails
 {
     <!--No need to pust due date here like other Indexes, as its covered in partial views as InitialFinalPostDueDate-->
-
     @foreach (string view in Model.HeaderViews)
     {
         string viewLocation = string.Format("HeaderBuilder/{0}", view);
@@ -59,7 +58,7 @@
 
         //only show sections if there are more than 1 section
         bool showSections = false;
-        
+
         if (sections.Count > 1)
         {
             showSections = true;
@@ -67,11 +66,8 @@
 
         CourseUser currentUser = ViewBag.ActiveCourseUser;
 
-        //populate cross section teams
-        List<string> multiSections = new List<string>();
-
-        //create a list of the multiSections 
-        multiSections = currentUser.MultiSection.Split(',').ToList();
+        //populate cross section teams //create a list of the multiSections
+        List<string> multiSections = currentUser.MultiSection != null ? currentUser.MultiSection.Split(',').ToList() : new List<string>();
 
         //populate cross section teams
         foreach (DiscussionTeam discussionTeam in teams)
@@ -123,17 +119,18 @@
                 CrossSectionTeam.Add(discussionTeam);
             }
         }
-        
+
         //after populating the cross section teams
-        
+
         foreach (int section in sectionList)
         {
             // For TAs, we only want the TA to see students in the section they are in
 
-            if (section < 0){
+            if (section < 0)
+            {
                 continue;
             }
-            
+
             if (currentUser != null)
             {
                 if (currentUser.AbstractRole.Name == "TA") //see if the user is a TA
@@ -156,7 +153,7 @@
                     }
                 }
             }
-            
+
             sectionBool = false;
 
             foreach (DiscussionTeam assignmentTeam in teams)
@@ -196,7 +193,7 @@
                     </tr>
                     sectionBool = true;
                 }
-                
+
                 //if you reach here, the page is displaying at least one team that is not cross section
                 onlyCross = false;
 
@@ -209,7 +206,10 @@
 
                             @{string actionLink = Url.Action("CreateTeam", "Mail", new { area = "", teamID = assignmentTeam.Team.ID });
                             }
-                            <a href="@actionLink" title="Email this team" >@Helpers.MailButton()</a>
+                            @if (null != ViewBag.HideMail && !ViewBag.HideMail)
+                            {
+                                <a href="@actionLink" title="Email this team">@Helpers.MailButton()</a>
+                            }
                             @assignmentTeam.Team.Name -
                             @(Html.ActionLink("View Discussion",
                                 "TeacherIndex", "DiscussionAssignment",
@@ -237,7 +237,7 @@
                                          area = ""
                                      }, new { })
                                  }
-                                 
+
                             @if (assignmentTeam.Assignment.PreceedingAssignment != null)
                             {
                                 if (assignmentTeam.Assignment.PreceedingAssignment.Type == AssignmentTypes.CriticalReview)
@@ -274,7 +274,7 @@
                 foreach (TeamMember member in allTeamMembers)
                 {
                     //TODO: handle case of multiple teams. we may not have to handle this since users can only be on one discussion team
-                    //We are figuring out which INDIVIDUAL assignment team this rubric is tied to so we can display the current 
+                    //We are figuring out which INDIVIDUAL assignment team this rubric is tied to so we can display the current
                     //individual user's rubric grade/draft state
                     List<TeamMember> userTeams = member.CourseUser.TeamMemberships.Where(tm => tm.Team.UsedAsAssignmentTeam.Any()).ToList(); //get teams used in an assignment
                     TeamMember tMember = new TeamMember(); //this needs to be a list if we have a case of a user on multiple teams. (wont happen?)
@@ -303,7 +303,10 @@
                         <td>
                             @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", id = member.CourseUser.UserProfileID });
                             }
-                            <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
+                            @if (null != ViewBag.HideMail && !ViewBag.HideMail)
+                            {
+                                <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
+                            }
                             @if (member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA || member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
                             {
                                 @:<span class="TitleText">@member.CourseUser.DisplayNameWithRole(Model.Client.AbstractRoleID, false)</span>
@@ -327,11 +330,11 @@
                 }
             }
         }
-        
-        
+
+
         //if the assignment has teams that are cross section
         if (CrossSectionTeam.Count > 0 && (!onlyCross))
-        {            
+        {
             <tr class="SectionRow">
                 <th class="Student" colspan="6">
                     Cross Section Teams:
@@ -349,7 +352,10 @@
 
                         @{string actionLink = Url.Action("CreateTeam", "Mail", new { area = "", teamID = assignmentTeam.Team.ID });
                         }
-                        <a href="@actionLink" title="Email this team">@Helpers.MailButton()</a>
+                        @if (null != ViewBag.HideMail && !ViewBag.HideMail)
+                        {
+                            <a href="@actionLink" title="Email this team">@Helpers.MailButton()</a>
+                        }
                         @assignmentTeam.Team.Name -
                         @(Html.ActionLink("View Discussion",
                                 "TeacherIndex", "DiscussionAssignment",
@@ -443,7 +449,10 @@
                     <td>
                         @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", id = member.CourseUser.UserProfileID });
                         }
-                        <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
+                        @if (null != ViewBag.HideMail && !ViewBag.HideMail)
+                        {
+                            <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
+                        }
                         @if (member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA || member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
                         {
                             @:<span class="TitleText">@member.CourseUser.DisplayNameWithRole(Model.Client.AbstractRoleID, false)</span>

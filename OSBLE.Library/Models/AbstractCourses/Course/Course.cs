@@ -55,6 +55,9 @@ namespace OSBLE.Models.Courses
         [DataType(DataType.Date)]
         public DateTime EndDate { get; set; }
 
+        [Display(Name = "Hide the OSBLE Mail icons for this course")]
+        public bool HideMail { get; set; }
+
         // Default Late Policy
 
         [Required]
@@ -112,6 +115,8 @@ namespace OSBLE.Models.Courses
 
             StartDate = DateTime.UtcNow.Date;
             EndDate = DateTime.UtcNow.Date.AddDays(112); // Add 16 weeks.
+            
+            HideMail = false;
         }
 
         /// <summary>
@@ -141,6 +146,7 @@ namespace OSBLE.Models.Courses
             this.StartDate = copyCourse.StartDate;
             this.Year = copyCourse.Year;
             this.TimeZoneOffset = copyCourse.TimeZoneOffset;
+            this.HideMail = copyCourse.HideMail;
         }
 
     }

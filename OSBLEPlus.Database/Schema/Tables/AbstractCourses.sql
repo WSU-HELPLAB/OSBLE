@@ -25,6 +25,7 @@
     [Description1]                             NVARCHAR (100) NULL,
     [Nickname]                                 NVARCHAR (10)  NULL,
     [Discriminator]                            NVARCHAR (128) NOT NULL,
+    [HideMail]								   BIT			  NULL, 
     CONSTRAINT [PK_dbo.AbstractCourses] PRIMARY KEY CLUSTERED ([ID] ASC)
 );
 

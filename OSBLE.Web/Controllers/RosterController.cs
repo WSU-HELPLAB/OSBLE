@@ -32,6 +32,9 @@ namespace OSBLE.Controllers
         {
             ViewBag.CurrentTab = "Users";
             ViewBag.ActiveCourseUser = ActiveCourseUser;
+            
+            Course course = db.AbstractCourses.Where(ac => ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
+            ViewBag.HideMail = course.HideMail;
         }
 
         public class RosterEntry

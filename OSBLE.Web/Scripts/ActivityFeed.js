@@ -10,7 +10,7 @@ function FeedItem(data) {
     self.eventLogId = data.EventLogId;
     self.timeString = ko.observable(data.TimeString);
     self.eventDate = data.EventDate;
-    self.options = new FeedItemOptions(data.CanMail, data.CanDelete, data.CanEdit, data.ShowPicture, data.CanVote);
+    self.options = new FeedItemOptions(data.CanMail, data.CanDelete, data.CanEdit, data.ShowPicture, data.CanVote, data.HideMail);
     self.show = true;
     self.isComment = self.parentEventId != -1;
     self.isHelpfulMark = data.IsHelpfulMark;
@@ -144,7 +144,7 @@ function FeedItem(data) {
     }
 }
 
-function FeedItemOptions(canMail, canDelete, canEdit, showPicture, canVote)
+function FeedItemOptions(canMail, canDelete, canEdit, showPicture, canVote, hideMail)
 {
     var self = this;
     self.canMail = canMail;
@@ -152,6 +152,7 @@ function FeedItemOptions(canMail, canDelete, canEdit, showPicture, canVote)
     self.canEdit = canEdit;
     self.showPicture = showPicture;
     self.canVote = canVote;
+    self.hideMail = hideMail;
 }
 
 function FeedViewModel(userName, userId, current) {
@@ -496,6 +497,7 @@ function SetPermissions(post)
             post.CanMail = data.canMail;
             post.CanVote = data.canVote;
             post.ShowPicture = data.showPicture;
+            post.HideMail = data.hideMail;
         },
         error: function () {
             post.CanDelete = false;
@@ -503,6 +505,7 @@ function SetPermissions(post)
             post.CanMail = false;
             post.CanVote = false;
             post.ShowPicture = false;
+            post.HideMail = false;
         }
     });
 }
