@@ -12,7 +12,7 @@
     detailsLink += "+'?component='+" + genericComponent;
 }
 
-<div data-bind="if: show"> @* prevents deleted items from displaying *@
+<div data-bind="if: show && !options.instructorOnly"> @* prevents deleted items from displaying *@
     <article data-bind="attr: { id: 'feed-item-' + eventId }, data: {id: eventId}" class="dp_post panel panel-default">
 
         @* Header Content *@
