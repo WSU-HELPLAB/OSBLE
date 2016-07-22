@@ -236,6 +236,13 @@ namespace OSBLE.Controllers
                 file.InputStream.Position = 0;
                 Stream s = file.InputStream;
                 List<string> headers = getRosterHeaders(s);
+
+                if(headers.Count() == 0)
+                {
+                    ViewBag.Error = "OSBLE was unable to import the selected file. Check the formatting of your roster's header to ensure  that all rows have the same number of columns.";
+                    return View("RosterError");
+                }
+
                 file.InputStream.Seek(0, 0);
 
                 string guessedSection = null;
@@ -1506,11 +1513,23 @@ namespace OSBLE.Controllers
 
         private List<string> getRosterHeaders(Stream roster)
         {
+
             StreamReader sr = new StreamReader(roster);
             CachedCsvReader csvReader = new CachedCsvReader(sr, true);
 
-            return csvReader.GetFieldHeaders().ToList();
+            List<string> getFieldHeaders = new List<string>(); 
+
+            try
+            {
+                getFieldHeaders = csvReader.GetFieldHeaders().ToList();
+            }
+            catch(Exception)
+            {
+            }
+
+            return getFieldHeaders;
         }
+
 
         private List<RosterEntry> parseRoster(Stream roster, string idNumberColumnName, string sectionColumnName, string nameColumnName, string name2ColumnName, string emailColumn)
         {
