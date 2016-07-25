@@ -3,6 +3,7 @@
 @using OSBLE.Areas.AssignmentWizard.ViewModels;
 @model Assignment
 @{
+    int defaultPointSpread = 5;
     bool hasRubric = Model.HasRubric;
     RubricSelectionViewModel rubricSelection = ViewBag.rubricSelection;
     bool EvalsExist = ViewBag.EvalsExist;
@@ -189,30 +190,20 @@ ul.RubricList
                         int n = 0;
                         foreach (Level level in ViewBag.levels)
                         {
+                            if (level.PointSpread == 0) { level.PointSpread = defaultPointSpread; }
+                            
                             <th class="Level">
                                 <ul class="RubricList">
                                     <li>
                                         <img src="/Content/images/delete_up.png" alt="Delete Column" onclick="openConfirmEditWindow(3, 'dataTable',this.parentNode.parentNode.parentNode.cellIndex)" />
                                     </li>
                                     <li>Level Point Spread
-                                        <select class="SpreadInput" name="rubric:@n:S" onclick="openConfirmEditSpreadWindow()">
-                                            @for (int i = 1; i <= 10; i++)
-                                            {
-                                                if (i == level.PointSpread)
-                                                {
-                                                    <option selected="true" value="@i">@i</option>
-                                                }
-                                                else
-                                                {
-                                                    <option value="@i">@i</option>
-                                                }
-                                            }
-                                        </select>
+                                        <input class="SpreadInput" name="rubric:@n:S" value="@level.PointSpread" type="text" style="width:40px; text-align:center; border-radius:10%" />
                                     </li>
                                     <li>Level Title<input class="Input" name="rubric:@n:L" type="text" value="@level.LevelTitle"/></li>
                                 </ul>
                             </th>
-                                            n++;
+                            n++;
                         }
                     }
                 </tr>
@@ -307,7 +298,7 @@ The current rubric will be replaced with a new one and all progress will be lost
 <input name="CriticalEditStatus" id="CriticalEditStatus" type="hidden" value="False"/>
 <input id="EvalsExistStatus" type="hidden" value="@EvalsExist" />
 <input id="LevelSpreadEditStatus" type="hidden" value="False" />
-<script type="text/javascript" src="@Url.Content("~/AssignmentWizard/Content/js/jquery.path.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Areas/AssignmentWizard/Content/js/jquery.path.js")"></script>
 <script type="text/javascript" language="javascript">
     $("#confirmEditSpreadWindow").dialog({
         modal: true,
@@ -331,7 +322,7 @@ The current rubric will be replaced with a new one and all progress will be lost
         var evalsExist = $("#EvalsExistStatus").val();
         var levelEditsConfirmed = $("#LevelSpreadEditStatus").val();
         if (evalsExist == "True" && levelEditsConfirmed == "False") {
-            //If there exist evaluations and edits have not been confirmed yet, then open confirmation dialog 
+            //If there exist evaluations and edits have not been confirmed yet, then open confirmation dialog
             $("#confirmEditSpreadWindow").dialog("open");
         }
     }
@@ -357,7 +348,7 @@ The current rubric will be replaced with a new one and all progress will be lost
     //controlValue represents which function to call after the modalbox's callback function
     //the value willbe 0 for "addRow", 1 for "addColumn", 2 for "deleteRow", 3 for "deleteColumn", 4 for "moveRowUp", and 5 for "moveRowDown"
     //In addition, parameters to be routed to the functions being called need to be saved.
-    controlValue = 0;   
+    controlValue = 0;
     tableIdValue = 0;
     indexValue = 0;
     function openConfirmEditWindow(controlInput,tableIdInput, indexInput ){
@@ -371,7 +362,7 @@ The current rubric will be replaced with a new one and all progress will be lost
 
 
         if (evalsExist == "True" && editsConfirmed == "False") {
-            //If there exist evaluations and edits have not been confirmed yet, then open confirmation dialog 
+            //If there exist evaluations and edits have not been confirmed yet, then open confirmation dialog
             $("#confirmEditWindow").dialog("open");
         }
         else {
@@ -405,7 +396,7 @@ The current rubric will be replaced with a new one and all progress will be lost
         else if (controlValue == 5) {
             moveRowDown(tableIdValue, indexValue)
         }
-        
+
     }
 
     function editConfirmed() {
@@ -414,7 +405,7 @@ The current rubric will be replaced with a new one and all progress will be lost
         var editsConfirmed = $("#CriticalEditStatus").val();
     }
 
-   function hideConfirmEditWindow() {
+    function hideConfirmEditWindow() {
         $("#confirmEditWindow").dialog('close');
     }
 
@@ -445,7 +436,7 @@ The current rubric will be replaced with a new one and all progress will be lost
     }
 
     function addRow(tableID) {
-        
+
         var table = document.getElementById(tableID);
 
         var rowCount = table.rows.length;
@@ -466,7 +457,7 @@ The current rubric will be replaced with a new one and all progress will be lost
             $(newRow.cells[i]).find(".Input").attr('value', "");
             $(newRow.cells[i]).find(".Input").text("");
         }
-        
+
     }
 
     function addColumn(tableID) {
@@ -499,7 +490,7 @@ The current rubric will be replaced with a new one and all progress will be lost
             table.rows[i].appendChild(element);
             element.innerHTML = table.rows[i].cells[columnCount - 1].innerHTML;
 
-            //get name of previous element ( in the form X:Y) and increment X to create a unique 
+            //get name of previous element ( in the form X:Y) and increment X to create a unique
             //name for the corresponding element in the new column
             var name = $(table.rows[i].cells[columnCount - 1]).find('.Input').attr("name");
             var spl = name.split(':');
@@ -515,7 +506,7 @@ The current rubric will be replaced with a new one and all progress will be lost
                 spl = name.split(':');
                 $(element).find('.SpreadInput').attr("name", spl[0] + ":" + (parseInt(spl[1]) + 1) + ":" + spl[2]);
             }
-        }    
+        }
     }
 
     function deleteColumn(tableID, columnIndex) {
@@ -660,6 +651,31 @@ The current rubric will be replaced with a new one and all progress will be lost
             });
         }
     }
+
+    function isIntKey(e) {
+        var charCode = (e.which) ? e.which : e.keyCode;
+        if (charCode < 48 || charCode > 57)  return false;
+        return true;
+    }
+
+    $('.rubric').on('change', '.SpreadInput', function () {
+        var value = parseInt($(this).val());
+
+        if (isNaN(value)) {
+            $(this).val(@defaultPointSpread);
+            return;
+        }
+
+        $(this).val(value); // Values like 50fjaklsdsdf actually pass the parseInt, but value will just be 50, so set the value just in case
+        if (value === 0) $(this).val(1);    // Prevent 0.
+        return;
+    });
+
+    $('.rubric').on('keypress', '.SpreadInput', function (e) {
+        var charCode = (e.which) ? e.which : e.keyCode;
+        if (charCode < 48 || charCode > 57) return false;
+        return true;
+    });
 
 </script>
 
