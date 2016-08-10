@@ -51,12 +51,7 @@ namespace OSBLE.Controllers
             //setup user list for autocomplete            
             ViewBag.CurrentCourseUsers = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
             ViewBag.HashTags = DBHelper.GetHashTags();
-            Course course = db.AbstractCourses.Where(ac=>ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
-            if (null != course)
-            {
-                ViewBag.HideMail = course.HideMail;
-                Cache["HideMail"] = course.HideMail;
-            }                        
+            ViewBag.HideMail = OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID);                      
 
             return View("Index");
         }
@@ -391,7 +386,7 @@ namespace OSBLE.Controllers
                 if (posterCu != null && posterCu.UserProfileID != currentCu.UserProfileID)
                 {
                     Course course = db.AbstractCourses.Where(ac => ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
-                    if (course.HideMail)
+                    if (null != course && course.HideMail)
                     {
                          post.CanMail = false;
                     }

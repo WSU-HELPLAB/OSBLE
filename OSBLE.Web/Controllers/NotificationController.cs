@@ -20,8 +20,7 @@ namespace OSBLE.Controllers
         // GET: /Notification/
         public ActionResult Index()
         {
-            Course course = db.AbstractCourses.Where(ac => ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
-            ViewBag.HideMail = course.HideMail;
+            ViewBag.HideMail = OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID); 
                            
             ViewBag.Notifications = db.Notifications.Where(n => (n.RecipientID == ActiveCourseUser.ID)).OrderByDescending(n => n.Posted).ToList();
             return View();

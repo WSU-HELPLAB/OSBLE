@@ -32,8 +32,7 @@ namespace OSBLE.Controllers
         [OsbleAuthorize]
         public ActionResult Index(int? id, int timestamp = -1)
         {
-            Course course = db.AbstractCourses.Where(ac => ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
-            ViewBag.HideMail = course.HideMail;
+            ViewBag.HideMail = OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID); 
 
             try
             {

@@ -14,6 +14,15 @@
         course = (Model as DashboardReply).Parent.CourseUser.AbstractCourse;
     }
 
+    bool HideMail = true;
+    if (null == ViewBag.HideMail)
+    {
+        HideMail = OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ViewBag.ActiveCourseUser.AbstractCourseID);
+    }
+    else
+    {
+        HideMail = ViewBag.HideMail;
+    }
 }
 
 <script type="text/javascript">
@@ -73,7 +82,7 @@
         <div class="dp_tools">
             @if (Model.CanMail)
             {
-                if (null != ViewBag.HideMail && !ViewBag.HideMail)
+                if (!HideMail)
                 {
                     <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { id = Model.CourseUser.UserProfileID })"><span class="glyphicon glyphicon-envelope"></span></a>
                 }

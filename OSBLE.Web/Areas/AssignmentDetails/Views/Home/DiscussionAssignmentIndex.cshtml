@@ -6,7 +6,15 @@
 @{
     ViewBag.Title = "Assignment Details";
     DynamicDictionary headerData = Model.HeaderBuilder.BuildHeader(Model.CurrentAssignment);
-
+    bool HideMail = true;
+    if (null == ViewBag.HideMail)
+    {
+        HideMail = OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ViewBag.ActiveCourseUser.AbstractCourseID);
+    }
+    else
+    {
+        HideMail = ViewBag.HideMail;
+    }
 }
 @section AssignmentDetails
 {
@@ -206,7 +214,7 @@
 
                             @{string actionLink = Url.Action("CreateTeam", "Mail", new { area = "", teamID = assignmentTeam.Team.ID });
                             }
-                            @if (null != ViewBag.HideMail && !ViewBag.HideMail)
+                            @if (!HideMail)
                             {
                                 <a href="@actionLink" title="Email this team">@Helpers.MailButton()</a>
                             }
