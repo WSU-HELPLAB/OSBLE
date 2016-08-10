@@ -395,6 +395,11 @@ namespace OSBLE.Controllers
                             existingUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
 
                             newRoster.Add(existingUser);
+
+                            //add section if a section column exists
+                            if (sectionColumn != "")
+                                existingUser.Section = entry.Section;                            
+
                             createCourseUser(existingUser);
                             rosterCount++;
                             //email the user notifying them that they have been added to this course 
