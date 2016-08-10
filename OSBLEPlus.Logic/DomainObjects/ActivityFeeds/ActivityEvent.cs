@@ -9,6 +9,7 @@ using OSBLEPlus.Logic.Utility.Lookups;
 using OSBLE.Models;
 using System.Linq;
 using Dapper;
+using System.Collections.Generic;
 
 namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 {
@@ -53,7 +54,8 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
         public bool ShowProfilePicture { get; set; }
         public string DisplayTitle { get; set; }
         public bool HideMail { get; set; }
-        public bool InstructorOnly { get; set; }
+        public string EventVisibilityGroups { get; set; }
+        public string EventVisibleTo { get; set; }
 
         public ActivityEvent() // NOTE!! This is required by Dapper ORM
         {
@@ -80,37 +82,77 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             CanMail = !anonymous && SenderId != currentUser.UserProfileID;
 
             //get course setting for hiding mail
-            using (OSBLEContext db = new OSBLEContext())
-            {
-                Course course = db.AbstractCourses.Where(ac => ac.ID == currentUser.AbstractCourseID).FirstOrDefault() as Course;
-                HideMail = course.HideMail;
-            }
-            
-            //set instructor view only
             try
             {
                 using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
                 {
-                    sqlConnection.Open();
-                    //get the InstructorOnly value from the db
-                    string query = "SELECT ISNULL(InstructorOnly, 0) FROM EventLogs WHERE Id = @eventLogId;";
-                    bool result = sqlConnection.Query<bool>(query, new { eventLogId = EventLogId }).Single();
-                    if (result)
-	                {
-                        //don't hide if the user is an instructor or if it's their own post
-                        if (currentUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor || SenderId == currentUser.UserProfileID)	                    
-                            InstructorOnly = false;	                    
-                        else                        
-                            InstructorOnly = result;                        
-	                }                    
+                    sqlConnection.Open();                    
+                    string query = "SELECT * FROM AbstractCourses WHERE ID = @abstractCourseId;";
+                    Course result = sqlConnection.Query<Course>(query, new { abstractCourseId = currentUser.AbstractCourseID }).Single();
+                    
+                    if (null == result)
+                    {
+                        HideMail = false;
+                    }
+                    else
+                    {
+                        HideMail = result.HideMail;
+                    }
+
                     sqlConnection.Close();
                 }
             }
             catch (Exception e)
             {
                 //TODO: handle exception logging                
+                HideMail = false;
+            }
+
+            //set EventVisibilityGroups 
+            try
+            {   
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+                    //get the EventVisibilityGroups value from the db
+                    string query = "SELECT ISNULL(EventVisibilityGroups, '') FROM EventLogs WHERE Id = @eventLogId;";
+                    string result = sqlConnection.Query<string>(query, new { eventLogId = EventLogId }).Single();
+                    if (result.Length > 0)
+                        EventVisibilityGroups = result;
+                    else
+                        EventVisibilityGroups = "";
+	                
+                    sqlConnection.Close();                    
+                }
+            }
+            catch (Exception e)
+            {                
+                //TODO: handle exception logging                
+                EventVisibilityGroups = "";
             }
             
+            //setup event visibility
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();                    
+                    string query = "SELECT ISNULL(EventVisibleTo, '') FROM EventLogs WHERE Id = @eventLogId;";
+                    string result = sqlConnection.Query<string>(query, new { eventLogId = EventLogId }).Single();
+                    
+                    if (result.Length > 0)
+                        EventVisibleTo = result;                    
+                    else                    
+                        EventVisibleTo = "";
+                    
+                    sqlConnection.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                //TODO: handle exception logging
+                EventVisibleTo = "";
+            }
 
             // Graders can delete posts, anyone can delete their own posts
             CanDelete = currentUser.AbstractRole.CanGrade || SenderId == currentUser.UserProfileID;

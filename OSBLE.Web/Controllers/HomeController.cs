@@ -52,8 +52,11 @@ namespace OSBLE.Controllers
             ViewBag.CurrentCourseUsers = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
             ViewBag.HashTags = DBHelper.GetHashTags();
             Course course = db.AbstractCourses.Where(ac=>ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
-            ViewBag.HideMail = course.HideMail;
-            Cache["HideMail"] = course.HideMail;
+            if (null != course)
+            {
+                ViewBag.HideMail = course.HideMail;
+                Cache["HideMail"] = course.HideMail;
+            }                        
 
             return View("Index");
         }
