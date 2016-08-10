@@ -143,14 +143,14 @@
         </Strings>
       </Button>
 
-      <Button guid="guidOSBIDE_VSPackageCmdSet" id="cmdidCommunityTool" priority="0x0100" type="Button">
+      <!--<Button guid="guidOSBIDE_VSPackageCmdSet" id="cmdidCommunityTool" priority="0x0100" type="Button">
         <Parent guid="guidOSBIDE_VSPackageCmdSet" id="MyMenuGroup" />        
         <Icon guid="guidImages" id="generic" />
         <Strings>
           <CommandName>cmdidCommunityTool</CommandName>
           <ButtonText>OSBLE+ Community</ButtonText>
         </Strings>
-      </Button>
+      </Button>-->
 
       <Button guid="guidOSBIDE_VSPackageCmdSet" id="cmdidOsbideDocumentationTool" priority="0x0100" type="Button">
         <Parent guid="guidOSBIDE_VSPackageCmdSet" id="MyMenuGroup" />

@@ -202,6 +202,83 @@ namespace OSBLE.Utility
             return index;
         }
 
+        public static List<int> GetCourseInstructorIds(int courseId, SqlConnection connection = null)
+        {            
+            List<int> courseInstructorIds = new List<int>();
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    courseInstructorIds = GetCourseInstructorIds(courseId, sqlc);
+                }
+                return courseInstructorIds;
+            }
+
+            courseInstructorIds = connection.Query<int>("SELECT UserProfileID FROM CourseUsers WHERE AbstractRoleID = @abstractRoleId AND AbstractCourseID = @courseId ",
+                new { abstractRoleId = (int) CourseRole.CourseRoles.Instructor , courseId = courseId }).ToList();
+
+            return courseInstructorIds;
+        }
+
+        public static List<int> GetCourseTAIds(int courseId, SqlConnection connection = null)
+        {            
+            List<int> courseTAIds = new List<int>();
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    courseTAIds = GetCourseTAIds(courseId, sqlc);
+                }
+                return courseTAIds;
+            }
+
+            courseTAIds = connection.Query<int>("SELECT UserProfileID FROM CourseUsers WHERE AbstractRoleID = @abstractRoleId AND AbstractCourseID = @courseId ",
+                new { abstractRoleId = (int)CourseRole.CourseRoles.TA, courseId = courseId }).ToList();
+
+            return courseTAIds;
+        }
+
+        public static string GetEventLogVisibilityGroups(int eventLogId, SqlConnection connection = null)
+        {
+            string eventVisibilityGroups = "";
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    eventVisibilityGroups = GetEventLogVisibilityGroups(eventLogId, sqlc);
+                }
+                return eventVisibilityGroups;
+            }
+
+            eventVisibilityGroups = connection.Query<string>("SELECT ISNULL(EventVisibilityGroups, '') FROM EventLogs WHERE Id = @eventLogId ",
+                new { eventLogId = eventLogId }).Single();
+
+            return eventVisibilityGroups;
+        }
+
+        public static Dictionary<int, string> GetMailAddressUserId(List<string> emailAddresses, SqlConnection connection = null)
+        {
+            Dictionary<int, string> UserIdEmailPair = new Dictionary<int, string>();
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    UserIdEmailPair = GetMailAddressUserId(emailAddresses, sqlc);
+                }
+                return UserIdEmailPair;
+            }
+            
+            var result = connection.Query("SELECT ID, UserName FROM UserProfiles WHERE UserName IN @emailAddresses ",
+                new { emailAddresses = emailAddresses }).ToList();
+
+            foreach (var item in result)
+            {
+                UserIdEmailPair.Add(item.ID, item.UserName);
+            }
+
+            return UserIdEmailPair;
+        }
+
         #endregion
 
 
@@ -510,6 +587,17 @@ namespace OSBLE.Utility
                         "INSERT DiscussionPosts (Posted, CourseUserID, Content, AssignmentID, DiscussionTeamID) VALUES (@Posted, @CourseUserID, @Content, @AssignmentID, @DiscussionTeamID)",
                         posts);
             }
+        }
+                
+        public static bool IsCourse(int courseId)
+        {
+            AbstractCourse course = GetAbstractCourse(courseId);
+
+            if (course is Course)
+            {
+                return true;
+            }
+            return false;
         }
         #endregion
 
@@ -1265,6 +1353,6 @@ namespace OSBLE.Utility
             }
         }
 
-        #endregion
+        #endregion        
     }
 }

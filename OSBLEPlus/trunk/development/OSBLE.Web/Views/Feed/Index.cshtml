@@ -3,10 +3,12 @@
 @using OSBLEPlus.Logic.Utility.Lookups
 @using OSBLE.Models.Queries
 @using OSBLE.Models.Users
+@using OSBLE.Utility
 @{
     UserProfile currentUser = ViewBag.CurrentUser;
     string defaultEvents = string.Join(",", ActivityFeedQuery.GetSocialEvents().Select(e => (int)e));
-    if (string.IsNullOrEmpty(ViewBag.Title)) {
+    if (string.IsNullOrEmpty(ViewBag.Title))
+    {
         ViewBag.Title = "Activity Feed";
     }
 }
@@ -19,6 +21,7 @@
         ko.applyBindings(vm);
         vm.RequestUpdate();
     });
+
 </script>
 
 <section data-tab="ActivityFeed">
@@ -35,16 +38,48 @@
                     </div>
                     <input type="submit" data-bind="click: MakePost" id="btn_post_active" class="btn btn-default" name="post_active" value="Post to @Helpers.CourseTag(ViewBag.ActiveCourse.AbstractCourse)" />
 
+                    @{ var isCourse = DBHelper.IsCourse(ViewBag.ActiveCourse.AbstractCourseID); }
+                    
+                    @if (isCourse)
+                    {
+                        @Html.Label("Post Visibility: ", new { id = "visibilty-label" })
+                        
+                        List<SelectListItem> listItems = new List<SelectListItem>();
+                        listItems.Add(new SelectListItem
+                             {
+                                 Text = "Everyone",
+                                 Value = "class",
+                                 Selected = true
+                             });
+                        listItems.Add(new SelectListItem
+                             {
+                                 Text = "Instructors Only",
+                                 Value = "instructors",
+                             });
+                        listItems.Add(new SelectListItem
+                             {
+                                 Text = "TAs Only",
+                                 Value = "tas"
+                             });
+                        listItems.Add(new SelectListItem
+                        {
+                            Text = "Instructors and TAs Only",
+                            Value = "instructors,tas"
+                        });
+                        
+                        @Html.DropDownList("visibility-dropdown", listItems, null, new { @class = "visibility-dropdown" })
+                    }
+
                     @if (ViewBag.IsInstructor)
                     {
-                    @*<input type="submit" id="btn_post_all" class="btn btn-default" name="post_all" value="Post to All Courses I Teach" onclick="return confirm('Post this message to all your taught courses?');" />*@
-                    <label class="checkbox-inline"><input type="checkbox" value="True" name="send_email" /> Email to Class</label>
+                        @*<input type="submit" id="btn_post_all" class="btn btn-default" name="post_all" value="Post to All Courses I Teach" onclick="return confirm('Post this message to all your taught courses?');" />*@
+                        <label class="checkbox-inline"><input type="checkbox" value="True" name="send_email" /> Email to Class</label>
                     }
                     @*
-                    if (ViewBag.IsLeader)
-                    {
-                    <label class="checkbox-inline"><input type="checkbox" value="True" name="send_email" /> Email to Community</label>
-                    }*@
+                        if (ViewBag.IsLeader)
+                        {
+                        <label class="checkbox-inline"><input type="checkbox" value="True" name="send_email" /> Email to Community</label>
+                        }*@
 
                 </form>
             }
@@ -54,7 +89,7 @@
     <div id="filters">
         @Helpers.ToggleButtonHeader("Filters & Search", "#activity-feed-filters", "", false)
         <form role="form" id="activity-feed-filters" style="display: none">
-            
+
             @* Search by Keyword *@
             <div id="keywordSection" class="form-group">
                 <button id="feedSearchIcon" for="feedSearchInput" onclick="vm.RequestUpdate()"><span class="glyphicon glyphicon-search"></span></button>
@@ -69,9 +104,9 @@
                         <label>
                             @Html.CheckBox("event_" + e.ToString(), String.CompareOrdinal(ActivityFeedQuery.GetCookies(e), "True") == 0, new
                             {
-                                id = "event_" + ((int) e).ToString(),
+                                id = "event_" + ((int)e).ToString(),
                                 @class = "event_checkbox",
-                                data_type = ((int) e),
+                                data_type = ((int)e),
                                 onchange = "vm.RequestUpdate()"
                             })
                             @Helpers.GetOptionNameOfEventType(e)
@@ -96,6 +131,8 @@
     </div>
 
 </section>
+
+<div id="visibility-dialog" title="Post Participants:" hidden="hidden"></div>
 
 <script type="text/javascript">
 </script>

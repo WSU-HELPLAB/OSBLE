@@ -108,7 +108,7 @@ namespace OSBLE.Controllers
             }
             else if(ActiveCourseUser != null)
             {
-                courseID = ActiveCourseUser.AbstractCourseID;
+                courseID = ActiveCourseUser.AbstractCourseID;                
             }
 
             if (ActiveCourseUser == null || courseID == null) //may get here using the plugin
@@ -129,7 +129,7 @@ namespace OSBLE.Controllers
 
             //setup user list for autocomplete            
             ViewBag.CurrentCourseUsers = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
-            ViewBag.HashTags = DBHelper.GetHashTags();
+            ViewBag.HashTags = DBHelper.GetHashTags();            
 
             return View("Index", "_OSBIDELayout", courseID);
         }
@@ -145,7 +145,7 @@ namespace OSBLE.Controllers
                 return false;
             }
             return true;
-        }
+        }        
 
         private FeedViewModel GetFeedViewModel()
         {
@@ -273,7 +273,7 @@ namespace OSBLE.Controllers
                 EventLogId = comment.EventLogId,
                 CanMail = comment.CanMail,
                 HideMail = comment.HideMail,
-                InstructorOnly = comment.InstructorOnly,
+                EventVisibilityGroups = comment.EventVisibilityGroups,
                 CanEdit = comment.CanEdit,
                 CanDelete = comment.CanDelete,
                 CanVote = comment.CanVote,
@@ -286,7 +286,8 @@ namespace OSBLE.Controllers
                 //Content = comment.Content,
                 IdString = comment.EventId.ToString(),
                 NumberHelpfulMarks = comment.NumberHelpfulMarks,
-                ActiveCourseUserId = ActiveCourseUser.UserProfileID
+                ActiveCourseUserId = ActiveCourseUser.UserProfileID,
+                EventVisibleTo = comment.EventVisibleTo,
             };
         }
 
@@ -316,7 +317,7 @@ namespace OSBLE.Controllers
                 EventDate = item.MostRecentOccurance.Ticks,
                 CanMail = eventLog.CanMail,
                 HideMail = eventLog.HideMail,
-                InstructorOnly = eventLog.InstructorOnly,
+                EventVisibilityGroups = eventLog.EventVisibilityGroups,
                 CanEdit = eventLog.CanEdit,
                 CanDelete = eventLog.CanDelete,
                 CanReply = eventLog.CanReply,
@@ -327,7 +328,8 @@ namespace OSBLE.Controllers
                 HTMLContent = PartialView(viewFolder + eventLog.EventType.ToString().Replace(" ", ""), item).Capture(this.ControllerContext),
                 //Content = eventLog.EventType == EventType.FeedPostEvent ? (eventLog as FeedPostEvent).Comment : "",
                 IdString = idString ?? string.Join(",", item.Items.Select(i => i.Event.EventLogId)),
-                ActiveCourseUserId = ActiveCourseUser.UserProfileID
+                ActiveCourseUserId = ActiveCourseUser.UserProfileID,
+                EventVisibleTo = eventLog.EventVisibleTo,
             };
         }
 
@@ -782,7 +784,7 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         [HttpPost]
         [ValidateInput(false)]
-        public JsonResult PostFeedItem(string text, bool emailToClass = false)
+        public JsonResult PostFeedItem(string text, bool emailToClass = false, string postVisibilityGroups = "")
         {
             // We purposefully are not catching exceptions that could be thrown
             // here, because we want this response to fail if there is an error
@@ -794,20 +796,25 @@ namespace OSBLE.Controllers
             // Parse text and add any new hashtags to database
             ParseHashTags(text);
 
+            //parse visibility groups for the db
+            string eventVisibleTo = ParsePostVisibilityGroups(postVisibilityGroups);            
+
             int courseID = ActiveCourseUser.AbstractCourseID;
             FeedPostEvent log = new FeedPostEvent()
                 {
                     SenderId = CurrentUser.ID,
                     Comment = text,
                     CourseId = courseID,
-                    SolutionName = null
+                    SolutionName = null,
+                    EventVisibilityGroups = postVisibilityGroups,
+                    EventVisibleTo = eventVisibleTo,
                 };
 
             int logID = Posts.SaveEvent(log);
             var newPost = new AggregateFeedItem(Feeds.Get(logID));
 
             //get email addresses for users who want to be notified by email
-            var emailList = DBHelper.GetActivityFeedForwardedEmails(courseID, null, emailToClass);
+            List<MailAddress>  emailList = DBHelper.GetActivityFeedForwardedEmails(courseID, null, emailToClass);
             //remove email for current user if they do not want to get their own posts emailed.
             bool emailSelf = ActiveCourseUser.UserProfile.EmailSelfActivityPosts;
             if (!emailSelf)
@@ -815,8 +822,11 @@ namespace OSBLE.Controllers
                 emailList.RemoveAll(el => el.Address == ActiveCourseUser.UserProfile.Email);
             }
 
+            //remove users who do not belong in this post visibility group
+            emailList = RemoveNonVisibilityGroupEmails(emailList, eventVisibleTo);
+
             // Parse text and create list of tagged users
-            NotifyTaggedUsers(text, logID);
+            NotifyTaggedUsers(text, logID, eventVisibleTo);
 
             // Send emails to those who want to be notified by email
             SendEmailsToListeners(log.Comment, logID, courseID, DateTime.UtcNow, emailList);
@@ -824,14 +834,117 @@ namespace OSBLE.Controllers
             return Json(MakeAggregateFeedItemJsonObject(newPost, false));
         }
 
+        private List<MailAddress> RemoveNonVisibilityGroupEmails(List<MailAddress> emailList, string eventVisibleToString)
+        {
+            if (eventVisibleToString == "") //visibility is everyone
+            {
+                return emailList;
+            }
+
+            List<string> emailAddresses = new List<string>();
+            foreach (MailAddress mailAddress in emailList)
+            {
+                emailAddresses.Add(mailAddress.Address);
+            }
+
+            List<int> eventVisibleTo = eventVisibleToString.Split(',').Select(Int32.Parse).ToList();
+            Dictionary<int, string> addressIds = DBHelper.GetMailAddressUserId(emailAddresses);
+            List<MailAddress> eventVisibleMailAddresses = new List<MailAddress>();
+
+            foreach (KeyValuePair<int, string> item in addressIds)
+            {
+                if (eventVisibleTo.Contains(item.Key))
+                {
+                    eventVisibleMailAddresses.Add(emailList.Where(el => el.Address == item.Value).FirstOrDefault());
+                }
+            }
+            return eventVisibleMailAddresses;
+        }
+
+        private string ParsePostVisibilityGroups(string postVisibilityGroups)
+        {
+            if (postVisibilityGroups == "") //no need to go further
+            {
+                return postVisibilityGroups; //legacy: display to everyone
+            }
+
+            List<string> groups = postVisibilityGroups.Split(',').ToList();
+            
+            //case class == everyone
+            if (groups.Contains("class"))
+            {
+                //base case: display to everyone in the class. 
+                //it doesn't matter if instructor and TA are unchecked, we don't allow class but not instructor/TA
+                return ""; 
+            }
+            else
+            {
+                int courseId = ActiveCourseUser.AbstractCourseID;                
+                bool containsInstructors = groups.Contains("instructors");
+                bool containsTAs = groups.Contains("tas");
+                string idList = "";
+
+                //case instructors and tas
+                if (containsInstructors && containsTAs)
+                {   
+                    idList = String.Join(",", DBHelper.GetCourseInstructorIds(courseId));
+                    string TAs = String.Join(",", DBHelper.GetCourseTAIds(courseId));
+                    if (TAs != "")
+	                {
+		                idList = idList + "," + TAs;
+	                }
+                    
+                    if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor || ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA) 
+                    { } //the user is instructor or TA, they are already on the list so don't add their own ID to the list.
+                    else
+                        idList = idList + "," + ActiveCourseUser.UserProfileID; //the user making the post can also see the post!
+                }
+
+                //case just instructors
+                if (containsInstructors && !containsTAs)
+                {
+                    if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor)
+                        idList = String.Join(",", DBHelper.GetCourseInstructorIds(courseId)); //the user an instructor, they are already on the list.
+                    else
+                        idList = String.Join(",", DBHelper.GetCourseInstructorIds(courseId)) + "," + ActiveCourseUser.UserProfileID; //the user making the post can also see the post!;
+                }
+
+                //case just tas
+                if (!containsInstructors && containsTAs)
+                {
+                    if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
+                        idList = String.Join(",", DBHelper.GetCourseTAIds(courseId)); //the user is a TA, they are already on the list.
+                    else
+                        idList = String.Join(",", DBHelper.GetCourseTAIds(courseId)) + "," + ActiveCourseUser.UserProfileID; //the user making the post can also see the post!
+                }
+                
+                //TODO: add support for custom groups here.
+
+                //remove hanging chads ;)
+                if (idList.Length > 0 && idList[0] == ',') //remove initial comma if we somehow ended up with one here...
+                    idList = idList.Remove(0, 1);
+                if (idList.Length > 0 && idList[idList.Length - 1] == ',') //remove hanging comma if we somehow ended up with one here...        
+                    idList = idList.Remove(idList.Length - 1);
+                
+                return idList;
+            }
+            return ""; //legacy: display to everyone
+        }
+
         /// <summary>
         /// Parses given text for tagged users in the form of "id=XXX;" and notifies them
         /// </summary>
         /// <param name="text"></param>
-        private void NotifyTaggedUsers(string text, int postId)
+        private void NotifyTaggedUsers(string text, int postId, string eventVisibleToString = "")
         {
             try
             {
+                List<int> eventVisibleTo = new List<int>();
+                if (eventVisibleToString != "")
+	            {
+                    eventVisibleTo = eventVisibleToString.Split(',').Select(Int32.Parse).ToList();
+	            }                
+
                 List<int> idNumbers = new List<int>();
 
                 for (int i = 0; i < text.Length; i++) 
@@ -862,12 +975,15 @@ namespace OSBLE.Controllers
                 List<CourseUser> taggedUsers = new List<CourseUser>();
 
                 foreach(int id in idNumbers)
-                {
-                    CourseUser user = (from u in db.CourseUsers where u.UserProfileID == id select u).FirstOrDefault();
+                {                    
+                    CourseUser user = db.CourseUsers.Where(cu => cu.UserProfileID == id && cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID).FirstOrDefault();    
 
                     if (user != null) // Skip users that don't / no longer exist
                     {
-                        taggedUsers.Add(user);
+                        if (eventVisibleToString == "" || eventVisibleTo.Contains(user.UserProfileID)) //only add users in an allowed visibility group (or everyone/legacy if "")
+                        {
+                            taggedUsers.Add(user);    
+                        }                        
                     }
                 }
 
@@ -924,7 +1040,7 @@ namespace OSBLE.Controllers
 
         [HttpPost]
         [ValidateInput(false)]
-        public JsonResult PostComment(int id, string content)
+        public JsonResult PostComment(int id, string content, string postVisibilityGroups = "")
         {
             // Check for blank comment
             if (String.IsNullOrWhiteSpace(content))
@@ -945,14 +1061,35 @@ namespace OSBLE.Controllers
             // Get the new comment list by getting the parent feed item
             FeedItem post = Feeds.Get(id);
 
-            // Notify users of tags
-            NotifyTaggedUsers(content, id);
+            //get email addresses for users who want to be notified by email
+            List<MailAddress> emailList = DBHelper.GetReplyForwardedEmails(id);
+            
+            //remove email for current user if they do not want to get their own posts emailed.
+            bool emailSelf = ActiveCourseUser.UserProfile.EmailSelfActivityPosts;
+            if (!emailSelf)
+            {
+                emailList.RemoveAll(el => el.Address == ActiveCourseUser.UserProfile.Email);
+            }
+
+            //parse visibility groups for the db
+            string eventVisibleTo = ParsePostVisibilityGroups(GetPostVisibilityGroups(id));
+
+            //remove users who do not belong in this post visibility group
+            emailList = RemoveNonVisibilityGroupEmails(emailList, eventVisibleTo);
 
             // Send emails if neccesary
-            SendEmailsToListeners(content, id, ActiveCourseUser.AbstractCourseID, DateTime.UtcNow, DBHelper.GetReplyForwardedEmails(id), true);
+            SendEmailsToListeners(content, id, ActiveCourseUser.AbstractCourseID, DateTime.UtcNow, emailList, true);
+
+            // Notify users of tags
+            NotifyTaggedUsers(content, id, eventVisibleTo);
 
             // return the new list of comments in a Json object
             return Json(MakeCommentListJsonObject(post.Comments, id));
+        }
+
+        private string GetPostVisibilityGroups(int eventLogId)
+        {
+            return DBHelper.GetEventLogVisibilityGroups(eventLogId);
         }
 
         /// <summary>
@@ -1154,9 +1291,10 @@ namespace OSBLE.Controllers
                 canEdit = e.CanEdit,
                 canMail = e.CanMail,
                 hideMail = e.HideMail,
-                instructorOnly = e.InstructorOnly,
+                eventVisibilityGroups = e.EventVisibilityGroups,
                 canVote = e.CanVote,
-                showPicture = e.ShowProfilePicture,                
+                showPicture = e.ShowProfilePicture,
+                eventVisibleTo = e.EventVisibleTo,
             });
         }
 

@@ -10,7 +10,7 @@ function FeedItem(data) {
     self.eventLogId = data.EventLogId;
     self.timeString = ko.observable(data.TimeString);
     self.eventDate = data.EventDate;
-    self.options = new FeedItemOptions(data.CanMail, data.CanDelete, data.CanEdit, data.ShowPicture, data.CanVote, data.HideMail, data.InstructorOnly);
+    self.options = new FeedItemOptions(data.CanMail, data.CanDelete, data.CanEdit, data.ShowPicture, data.CanVote, data.HideMail, data.EventVisibilityGroups, data.EventVisibleTo);
     self.show = true;
     self.isComment = self.parentEventId != -1;
     self.isHelpfulMark = data.IsHelpfulMark;
@@ -26,19 +26,19 @@ function FeedItem(data) {
         var commentList = $.map(data.Comments, function (item) { return new FeedItem(item) });
         self.comments(commentList);
     }
-    
+
     /**** Methods ****/
     // Delete: called when user clicks the trashcan icon on a post or comment, uses an ajax call to the 
     // server for delete, after prompting the user to confirm.
     self.Delete = function () {
         $.ajax({
             url: self.isComment ? "/Feed/DeleteLogComment" : "/Feed/DeleteFeedPost",
-            data: {id: self.eventId},
+            data: {id: self.eventId },
             method: "POST",
             beforeSend: function (jqXHR, settings) {
                 // will cancel the request if the user does not ok
-                return confirm(self.isComment ? 
-                    "Are you sure you want to delete this reply?" : 
+                return confirm(self.isComment ?
+                    "Are you sure you want to delete this reply?" :
                     "Are you sure you want to delete this post and all its replies?");
             },
             success: function () {
@@ -59,7 +59,7 @@ function FeedItem(data) {
         $("#feed-edit-cancel-" + self.eventId).attr("disabled", "disabled");
 
         $.ajax({
-            url: self.isComment? "/Feed/EditLogComment" : "/Feed/EditFeedPost",
+            url: self.isComment ? "/Feed/EditLogComment" : "/Feed/EditFeedPost",
             data: { id: self.eventId, newText: text },
             dataType: "json",
             method: "POST",
@@ -116,7 +116,7 @@ function FeedItem(data) {
         // TODO: to boost performance, could add functionality to know which names were used (if any)
         // Replace all occurrences of @user with @id;
         for (i = 0; i < userNames.length; i++) {
-            var name = userNames[i], id = "id=" +userIds[i]+ ";";
+            var name = userNames[i], id = "id=" + userIds[i] + ";";
             text = text.replace(name, id);
         }
 
@@ -128,7 +128,7 @@ function FeedItem(data) {
             success: function (dataList) {
                 PostReplySucceeded(self, dataList);
             },
-            error: function() {
+            error: function () {
                 PostReplyFailed(self);
             }
         });
@@ -144,8 +144,7 @@ function FeedItem(data) {
     }
 }
 
-function FeedItemOptions(canMail, canDelete, canEdit, showPicture, canVote, hideMail, instructorOnly)
-{
+function FeedItemOptions(canMail, canDelete, canEdit, showPicture, canVote, hideMail, eventVisibilityGroups, eventVisibleTo) {
     var self = this;
     self.canMail = canMail;
     self.canDelete = canDelete;
@@ -153,7 +152,8 @@ function FeedItemOptions(canMail, canDelete, canEdit, showPicture, canVote, hide
     self.showPicture = showPicture;
     self.canVote = canVote;
     self.hideMail = hideMail;
-    self.instructorOnly = instructorOnly;
+    self.eventVisibilityGroups = eventVisibilityGroups;
+    self.eventVisibleTo = eventVisibleTo;
 }
 
 function FeedViewModel(userName, userId, current) {
@@ -164,8 +164,7 @@ function FeedViewModel(userName, userId, current) {
     self.keywords = ko.observable("");
     //self.keywords.subscribe(function (newValue) {
     //    self.RequestUpdate();
-    //});
-
+    //});    
 
     // *** AUTO-UPDATE WEB SOCKET STUFF ***
     self.hub = $.connection.activityFeedHub;
@@ -191,7 +190,7 @@ function FeedViewModel(userName, userId, current) {
         if (courseID == GetSelectedCourseID()) {
             SetPermissions(postData);
             self.items.unshift(new FeedItem(postData)); // unshift puts object at beginning of array
-            HighlightNewPost(postData.EventId, postData.SenderId == self.userId);
+            HighlightNewPost(postData.EventId, postData.SenderId == self.userId, self.InEventVisibleToList(postData.EventVisibleTo));
         }
     }
 
@@ -230,19 +229,22 @@ function FeedViewModel(userName, userId, current) {
     // *************************************
 
     self.MakePost = function () {
-        var text = $("#feed-post-textbox").val();
-        var emailToClass = $("[name='send_email']").is(':checked');
 
         if (text == "")
             return;
+
+        //get post visibility checkboxes 
+        var postVisibility = $("#visibility-dropdown").val();
+
+        var text = $("#feed-post-textbox").val();
+        var emailToClass = $("[name='send_email']").is(':checked');
 
         var userNames = localStorage['UserNames'].split(',');
         var userIds = localStorage['UserIds'].split(',');
 
         // TODO: to boost performance, could add functionality to know which names were used (if any)
         // Replace all occurrences of @user with @id;
-        for (i = 0; i < userNames.length; i++)
-        {
+        for (i = 0; i < userNames.length; i++) {
             var name = userNames[i], id = "id=" + userIds[i] + ";";
             text = text.replace(name, id);
         }
@@ -255,7 +257,7 @@ function FeedViewModel(userName, userId, current) {
             type: "POST",
             url: "/Feed/PostFeedItem",
             dataType: "json",
-            data: { text: text, emailToClass: emailToClass },
+            data: { text: text, emailToClass: emailToClass, postVisibilityGroups: postVisibility },
             success: function (data) {
                 MakePostSucceeded(data);
             },
@@ -291,7 +293,7 @@ function FeedViewModel(userName, userId, current) {
             error: function () {
                 ShowError("#feed-footer", "Cannot load posts. Check internet connection.", false);
             },
-            complete: function() {
+            complete: function () {
                 HideMoreLoading();
             }
         });
@@ -313,7 +315,7 @@ function FeedViewModel(userName, userId, current) {
                     $('#load-old-posts').removeClass('disabled');
                 }
             },
-            complete: function() {
+            complete: function () {
                 HideLoading();
             }
         });
@@ -342,8 +344,7 @@ function FeedViewModel(userName, userId, current) {
                     var fullId = $(this).attr("id");
                     var postId = fullId.split("-").pop();
                     var postText = this.innerText;
-                    if (!postText.includes(hashtag))
-                    {
+                    if (!postText.includes(hashtag)) {
                         $("#expand-comments-" + postId).addClass("Hashtag");
                     }
                 });
@@ -360,14 +361,66 @@ function FeedViewModel(userName, userId, current) {
         return post;
     };
 
+    self.InEventVisibleToList = function (eventVisibleToList) {
+
+        //case: legacy or open to all viewers. we get a "" list in the case where the value is null 
+        //or we purposly saved a list as "" so visibility is for everyone
+        if (eventVisibleToList == "") {
+            return true;
+        }
+        //if the list is not empty, make sure the user id is in the list.
+        var idList = eventVisibleToList.split(",");
+
+        for (var i = 0; i < idList.length; i++) {
+            if (idList[i] == self.userId) {
+                return true;
+            }
+        }
+        //if the list is not "" and we did not find an id match, hide the post/reply
+        return false;
+    };
+
+    self.EventVisibilityGroupsPresent = function (visibilityGroups) {
+        if (null != visibilityGroups && visibilityGroups.length > 0) {
+            var groups = visibilityGroups.split(',');
+            if (groups.length == 1) {
+                if (groups[0] == "class") { //default visiblity is class, if this is the only group then don't show the visibility icons
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    };
+
+    self.EventVisibilityGroups = function (visibilityGroups) {
+        if (self.EventVisibilityGroupsPresent(visibilityGroups)) {
+            var groups = visibilityGroups.split(',');
+            var formattedGroupTitles = "Post Visibility: ";
+
+            for (var i = 0; i < groups.length; i++) {
+                if (groups[i] == "class") {
+                    //do nothing
+                }
+                else if (groups[i] == "tas") {
+                    formattedGroupTitles = formattedGroupTitles + groups[i].toUpperCase().substring(0, 2) + "s ";
+                }
+                else if (groups[i] == "instructors") {
+                    formattedGroupTitles = formattedGroupTitles + groups[i].toUpperCase().substring(0, groups[i].length) + " ";
+                }
+            }
+            return formattedGroupTitles;
+        }
+        return "";
+    };
+
     $("#activity-feed-filters").submit(function (e) {
         self.RequestUpdate();
         return false; // prevent page refresh
     });
 }
 
-function DetailsViewModel(userName, userId, rootId)
-{
+function DetailsViewModel(userName, userId, rootId) {
     var self = this;
     self.userName = userName;
     self.userId = userId;
@@ -437,6 +490,59 @@ function DetailsViewModel(userName, userId, rootId)
             }
         });
     };
+
+    self.InEventVisibleToList = function (eventVisibleToList) {
+
+        //case: legacy or open to all viewers. we get a "" list in the case where the value is null 
+        //or we purposly saved a list as "" so visibility is for everyone
+        if (eventVisibleToList == "") {
+            return true;
+        }
+        //if the list is not empty, make sure the user id is in the list.
+        var idList = eventVisibleToList.split(",");
+
+        for (var i = 0; i < idList.length; i++) {
+            if (idList[i] == self.userId) {
+                return true;
+            }
+        }
+        //if the list is not "" and we did not find an id match, hide the post/reply
+        return false;
+    };
+
+    self.EventVisibilityGroupsPresent = function (visibilityGroups) {
+        if (null != visibilityGroups && visibilityGroups.length > 0) {
+            var groups = visibilityGroups.split(',');
+            if (groups.length == 1) {
+                if (groups[0] == "class") { //default visiblity is class, if this is the only group then don't show the visibility icons
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    };
+
+    self.EventVisibilityGroups = function (visibilityGroups) {
+        if (self.EventVisibilityGroupsPresent(visibilityGroups)) {
+            var groups = visibilityGroups.split(',');
+            var formattedGroupTitles = "Post Visibility: ";
+
+            for (var i = 0; i < groups.length; i++) {
+                if (groups[i] == "class") {
+                    //do nothing
+                }
+                else if (groups[i] == "tas") {
+                    formattedGroupTitles = formattedGroupTitles + groups[i].toUpperCase().substring(0, 2) + "s ";
+                }
+                else if (groups[i] == "instructors") {
+                    formattedGroupTitles = formattedGroupTitles + groups[i].toUpperCase().substring(0, groups[i].length) + " ";
+                }
+            }
+            return formattedGroupTitles;
+        }
+        return "";
+    };
 }
 
 function ProfileViewModel(userName, userId, profileUserId) {
@@ -479,8 +585,7 @@ function ProfileViewModel(userName, userId, profileUserId) {
 
 /* Regular JS Functions */
 
-function SetPermissions(post)
-{
+function SetPermissions(post) {
     // don't bother reseting permissions if we were the poster 
     // (only if post, we do need to worry about this with replies)
     if (post.ParentEventId == -1 && post.SenderId == vm.userId)
@@ -499,7 +604,8 @@ function SetPermissions(post)
             post.CanVote = data.canVote;
             post.ShowPicture = data.showPicture;
             post.HideMail = data.hideMail;
-            post.InstructorOnly = data.instructorOnly;
+            post.EventVisibilityGroups = data.eventVisibilityGroups;
+            post.EventVisibleTo = data.eventVisibleTo;
         },
         error: function () {
             post.CanDelete = false;
@@ -508,21 +614,20 @@ function SetPermissions(post)
             post.CanVote = false;
             post.ShowPicture = false;
             post.HideMail = false;
-            post.InstructorOnly = false;
+            post.EventVisibilityGroups = "";
+            post.EventVisibleTo = "";
         }
     });
 }
 
-function CheckEvents(events)
-{
+function CheckEvents(events) {
     var elist = events.split(',');
     $.each(elist, function (index, value) {
         $("#event_" + value).prop("checked", true);
     });
 }
 
-function GetCheckedEvents()
-{
+function GetCheckedEvents() {
     var str = "";
     $('.event_checkbox').each(function (index, value) {
         if (value.checked == true) {
@@ -532,12 +637,11 @@ function GetCheckedEvents()
 
     var length = str.length;
     var stringWithoutComma = str.substr(0, length - 1);
-    
+
     return stringWithoutComma;
 }
 
-function IsEventTypeChecked(eventType)
-{
+function IsEventTypeChecked(eventType) {
     $('.event_checkbox').each(function (index, value) {
         if (value.checked == true && value.data('type') == eventType) {
             return true;
@@ -546,13 +650,11 @@ function IsEventTypeChecked(eventType)
     return false;
 }
 
-function onDeleteSuccess(item)
-{
+function onDeleteSuccess(item) {
     $('#feed-item-' + item.eventId).hide('blind', {}, 'slow', function () { $(this).remove(); });
 }
 
-function ShowEditBox(item)
-{
+function ShowEditBox(item) {
     // populate the box with the correct content
     var text = $("#content-comment-" + item.eventId).text();
     $('#feed-edit-textbox-' + item.eventId).val(text);
@@ -562,8 +664,7 @@ function ShowEditBox(item)
     $('#btn-edit-' + item.eventId).hide('highlight');
 }
 
-function HideEditBox(item)
-{
+function HideEditBox(item) {
     $('#feed-edit-' + item.eventId).hide();
     $('#feed-item-content-' + item.eventId).show('fade');
     $('#btn-edit-' + item.eventId).show('highlight');
@@ -572,7 +673,7 @@ function HideEditBox(item)
 function ShowReplyBox(item) {
     $("#btn-reply-" + item.eventId).hide();
     $("#feed-reply-" + item.eventId).show('blind');
-    $("#feed-reply-textbox-" + item.eventId).val('');    
+    $("#feed-reply-textbox-" + item.eventId).val('');
 }
 
 function HideReplyBox(item) {
@@ -580,8 +681,7 @@ function HideReplyBox(item) {
     $("#feed-reply-" + item.eventId).hide('blind');
 }
 
-function AreRepliesExpanded(itemID)
-{
+function AreRepliesExpanded(itemID) {
     return $("#feed-item-comments-" + itemID).css('display') != 'none';
 }
 
@@ -609,19 +709,20 @@ function expandComments(item) {
     }
 }
 
-function HighlightNewPost(postID, isCurrentUserPost)
-{
+function HighlightNewPost(postID, isCurrentUserPost, userInVisibilityList) {
     // Show a nifty animation for the new post
     $('#feed-item-' + postID).hide().show('easeInBounce');
 
-    if (!isCurrentUserPost) {
+    if (!isCurrentUserPost && userInVisibilityList) {
         ShowNewActivityBadge();
         ShowNewPostBadge(postID);
     }
 }
 
-function MakePostSucceeded(newPost)
-{
+function MakePostSucceeded(newPost) {
+    //reset the post visibility to everyone
+    $('#visibility-dropdown').prop('selectedIndex', 0);
+
     // Clear the textbox
     $('#feed-post-textbox').val('');
 
@@ -633,18 +734,15 @@ function MakePostSucceeded(newPost)
     vm.hub.server.notifyNewPost(newPost);
 }
 
-function MakePostFailed()
-{
+function MakePostFailed() {
     ShowError('#feed-post-form', 'Unable to create post, check internet connection.', false);
 }
 
-function HighlightNewReply(postID)
-{
+function HighlightNewReply(postID) {
     var replies = $("#feed-item-comments-" + postID);
     replies.children().last().hide().show('easeInBounce');
 
-    if (!AreRepliesExpanded(postID))
-    {
+    if (!AreRepliesExpanded(postID)) {
         $("#feed-item-" + postID).addClass("new-replies");
     }
 }
@@ -673,21 +771,17 @@ function PostReplySucceeded(item, dataList) {
     $("#feed-reply-cancel-" + item.eventId).removeAttr("disabled");
 }
 
-function PostReplyFailed(item)
-{
+function PostReplyFailed(item) {
     // Set the error message text and display it for 4 seconds
     ShowError('#feed-reply-' + item.eventId, 'Unable to submit reply. Check internet connection.', true);
 }
 
-function EditSucceeded(item, content, timeString)
-{
+function EditSucceeded(item, content, timeString) {
     //notify everyone that an edit was made
-    if (item.isComment)
-    {
+    if (item.isComment) {
         vm.hub.server.notifyEditReply(item.parentEventId, item.eventId, content, timeString);
     }
-    else
-    {
+    else {
         vm.hub.server.notifyEditPost(item.eventId, content, timeString);
     }
 
@@ -698,19 +792,16 @@ function EditSucceeded(item, content, timeString)
     HideEditBox(item);
 }
 
-function EditFailed(item)
-{
+function EditFailed(item) {
     // Set the error message text and display it for 4 seconds
-    ShowError('#feed-edit-' + item.eventId, 'Unable to edit post. Check internet connection.', true);    
+    ShowError('#feed-edit-' + item.eventId, 'Unable to edit post. Check internet connection.', true);
 }
 
-function MarkHelpfulSucceeded(item, numMarks)
-{
+function MarkHelpfulSucceeded(item, numMarks) {
     vm.hub.server.notifyAddMarkHelpful(item.parentEventId, item.eventId, numMarks);
 }
 
-function LoadOldPosts()
-{
+function LoadOldPosts() {
 
 }
 
@@ -757,8 +848,7 @@ function updateText(id) {
     }
 }
 
-function ShowError(containerID, text, insertAbove)
-{
+function ShowError(containerID, text, insertAbove) {
     var errBox = $("#errMsgPanel");
 
     // Set the text
@@ -775,8 +865,7 @@ function ShowError(containerID, text, insertAbove)
     setTimeout(function () { errBox.hide('fade'); }, 4000);
 }
 
-function ShowLoading()
-{
+function ShowLoading() {
     if ($('#loadingMsg').css('display') != 'none')
         return;
 
@@ -784,8 +873,7 @@ function ShowLoading()
     $('#load-old-posts').hide();
 }
 
-function HideLoading()
-{
+function HideLoading() {
     if ($('#loadingMsg').css('display') == 'none')
         return;
 
@@ -793,39 +881,63 @@ function HideLoading()
     $('#load-old-posts').show();
 }
 
-function ShowMoreLoading()
-{
+function ShowMoreLoading() {
     $('#loadingMoreMsg').show('fade');
     $('#load-old-posts').hide();
 }
 
-function HideMoreLoading()
-{
+function HideMoreLoading() {
     $('#loadingMoreMsg').hide();
     $('#load-old-posts').show();
 }
 
-function ShowNewActivityBadge()
-{
+function ShowNewActivityBadge() {
     //$("#dashboard_middle").addClass("new-activity");
     $(".new-activity-badge").show();
 }
 
-function HideNewActivityBadge()
-{
+function HideNewActivityBadge() {
     //$("#dashboard_middle").removeClass("new-activity");
     $(".new-activity-badge").hide();
 }
 
-function ShowNewPostBadge(postID)
-{
+function ShowNewPostBadge(postID) {
     $('#feed-item-' + postID + ' .new-post-badge').show();
 }
 
-function HideNewPostBadge(postID)
-{
+function HideNewPostBadge(postID) {
     $('#feed-item-' + postID + ' .new-post-badge').hide();
 }
+
+function ShowUserVisibilityDialog(item) {
+    var namesAndIds = [];
+    $.ajax({
+        url: "/Feed/GetProfileNames",
+        method: "POST",
+        async: false,
+        success: function (data) {
+            namesAndIds = data.userProfiles;
+        }
+    })
+
+    var visibleListIds = item.options.eventVisibleTo.split(',');
+    var userNames = new Array();
+    for (var i = 0; i < visibleListIds.length; i++) {
+        userNames.push(namesAndIds[visibleListIds[i]]);
+    }
+    
+    //clear the previous instance of the dialog box
+    $('#visibility-dialog').empty();
+
+    //populate the dialog box
+    $("#visibility-dialog").append("<ul id='visibilityList'></ul>");
+    for (var i = 0; i < userNames.length; i++) {        
+        $("#visibilityList").append("<li>" + userNames[i] + "</li>");
+    }
+    $("#visibility-dialog").dialog(); //now show the dialog box
+}
+
+
 
 /*
 //Periodically updates view models for feed items.  Useful for displaying an updated count

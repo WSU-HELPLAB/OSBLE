@@ -9,11 +9,14 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery.contextMenu.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery-tooltip.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery-ui-1.8.13.custom.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery-ui-timepicker.css")" />
     <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/bootstrap-3.3.5/css/bootstrap.min.css")" />
-    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/Site.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/Site.css")?version=1.2.82" /> @* Update version to cause browsers to reload css file *@    
 
     <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-2.0.1.min.js")"></script>
-    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-ui-1.10.4.min.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.validate.min.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.unobtrusive-ajax.min.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.contextMenu.js")"></script>
@@ -29,8 +32,12 @@
     <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.selectboxes.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-tooltip.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/Content/bootstrap-3.3.5/js/bootstrap.min.js")"></script>
+    <!--jquery-ui under bootstrap... this fixes an issue where dialog box 'X' was not showing-->
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-ui-1.10.4.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/osble.js")?version=1.1"></script>
 
-    <script type="text/javascript" src="@Url.Content("~/Scripts/osble.js")"></script>    
+    <script type="text/javascript" src="@Url.Content("~/Scripts/moment.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/navbar.js")?version=1.8"></script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/time.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/autolink.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/knockout-3.3.0.js")"></script>

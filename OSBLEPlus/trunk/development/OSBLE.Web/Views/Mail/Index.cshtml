@@ -10,13 +10,6 @@
         attachmentIds = new List<int>();
     }
 }
-<style type="text/css">
-    .glyphicon-paperclip:before {
-        content: "📎";
-    }
-</style>
-
-
 
 <h2>@ViewBag.BoxHeader</h2>
 <div id="mail_page">
@@ -60,7 +53,7 @@
                         <td class="inbox_attachments">
                             @if (attachmentIds.Contains(item.ThreadID))
                             {
-                                <span class="glyphicon-paperclip" style="text-align: center;"></span>
+                                <span class="glyphicon glyphicon-paperclip" style="text-align: center;"></span>
                             }
                         </td>
                         <td class="inbox_time">
