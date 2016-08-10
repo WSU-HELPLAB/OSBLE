@@ -17,9 +17,8 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
     public class HomeController : OSBLEController
     {
         public ActionResult Index(int assignmentId)
-        {
-            Course course = db.AbstractCourses.Where(ac => ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
-            ViewBag.HideMail = course.HideMail;
+        {       
+            ViewBag.HideMail = DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID);                      
 
             Assignment assignment = db.Assignments.Find(assignmentId);
 

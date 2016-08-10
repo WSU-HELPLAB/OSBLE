@@ -120,8 +120,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
         private void SetUpViewBag()
         {
-            Course course = db.AbstractCourses.Where(ac => ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
-            ViewBag.HideMail = course.HideMail;
+            ViewBag.HideMail = OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID);  
 
             ViewBag.Components = manager.SelectedComponents;
             ViewBag.ActiveComponent = manager.ActiveComponent;

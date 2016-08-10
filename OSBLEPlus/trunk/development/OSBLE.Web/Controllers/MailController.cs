@@ -24,8 +24,7 @@ namespace OSBLE.Controllers
         public MailController()
         {
             ViewBag.Cache = Cache;
-            Course course = db.AbstractCourses.Where(ac => ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
-            ViewBag.HideMail = course.HideMail;
+            ViewBag.HideMail = OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID); 
         }
 
         public enum MailSort

@@ -16,8 +16,7 @@ namespace OSBLE.Controllers
         // GET: /Help/
         public HelpController() : base()
         {
-            Course course = db.AbstractCourses.Where(ac => ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
-            ViewBag.HideMail = course.HideMail;
+            ViewBag.HideMail = OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID); 
         }
 
         public ActionResult Index()

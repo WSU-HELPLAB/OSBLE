@@ -306,6 +306,18 @@ namespace OSBLE.Utility
             return course;
         }
 
+        public static bool GetAbstractCourseHideMailValue(int courseID, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection()) { return GetAbstractCourseHideMailValue(courseID, sqlc); }
+            }
+
+            bool hideMail = connection.Query<bool>(@"SELECT ISNULL(HideMail, 0) FROM AbstractCourses WHERE ID =  @id", new { id = courseID }).SingleOrDefault();
+
+            return hideMail;
+        }
+
         public static string GetCourseShortNameFromID(int courseID, SqlConnection connection = null)
         {
             string name = "";

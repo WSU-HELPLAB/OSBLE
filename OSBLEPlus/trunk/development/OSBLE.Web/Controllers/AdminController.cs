@@ -22,8 +22,7 @@ namespace OSBLE.Controllers
             : base()
         {
             ViewBag.CurrentTab = "Administration";
-            Course course = db.AbstractCourses.Where(ac => ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
-            ViewBag.HideMail = course.HideMail;
+            ViewBag.HideMail = DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID);  
         }
 
         //

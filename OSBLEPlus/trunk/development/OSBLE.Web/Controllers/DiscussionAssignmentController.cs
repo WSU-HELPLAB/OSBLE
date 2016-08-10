@@ -170,8 +170,7 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         public ActionResult Index(int assignmentId, int discussionTeamId, bool? displayNewPosts = false)
         {
-            Course course = db.AbstractCourses.Where(ac => ac.ID == ActiveCourseUser.AbstractCourseID).FirstOrDefault() as Course;
-            ViewBag.HideMail = course.HideMail;
+            ViewBag.HideMail = OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID); 
 
             Assignment assignment = null;
             DiscussionTeam discussionTeam = null;

@@ -39,7 +39,8 @@ namespace OSBLE.Controllers
 
         public AccountController()
         {
-            ViewBag.ReCaptchaPublicKey = getReCaptchaPublicKey();            
+            ViewBag.ReCaptchaPublicKey = getReCaptchaPublicKey();
+            ViewBag.HideMail = null!= ActiveCourseUser? DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID) : true;  
         }
 
         //
