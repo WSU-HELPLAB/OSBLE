@@ -121,6 +121,14 @@
                 }
             });
 
+            $('#name2_selector > li').click(function () {
+                if (!$(this).hasClass('none_select')) {
+                    $('#name2_column').val($(this).html());
+                } else {
+                    $('#name2_column').val(null);
+                }
+            });
+
         </script>
         <div id="import_roster_tools">
             @using (Html.BeginForm("ApplyRoster", "Roster", FormMethod.Post))
