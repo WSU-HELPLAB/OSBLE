@@ -842,7 +842,10 @@ namespace OSBLE.Controllers
 
             // remove the notification rather than mark it as read, there is a conflict with the 
             // database when we remove the pending user and they aren't associated with the notification anymore.
-            db.Notifications.Remove(n);
+            if (null != n)
+            {
+                db.Notifications.Remove(n);    
+            }            
 
             //remove the kid from the db
             db.CourseUsers.Remove(pendingUser);
@@ -1431,7 +1434,9 @@ namespace OSBLE.Controllers
             string name2 = wtUser.Name2;
             if (wtUser != null)
             {
+                WhiteTable whiteTable = db.WhiteTable.Where(wt => wt.WhiteTableUserID == wtuID).FirstOrDefault();
                 db.WhiteTableUsers.Remove(wtUser);
+                db.WhiteTable.Remove(whiteTable);
                 db.SaveChanges();
             }
 
@@ -1814,8 +1819,8 @@ namespace OSBLE.Controllers
                 //Create userProfile with the new ID
                 WhiteTableUser up = new WhiteTableUser();
                 up.SchoolID = CurrentUser.SchoolID;
-                up.Identification = whitetable.WhiteTableUser.Identification; //courseuser.UserProfile.Identification;
-                up.CourseID = whitetable.WhiteTableUser.CourseID;
+                up.Identification = whitetable.WhiteTableUser.Identification; //courseuser.UserProfile.Identification;                
+                up.CourseID = ActiveCourseUser.AbstractCourseID; //is this used anywhere? previous implementation it was always 0...
                 
 
                 if (whitetable.WhiteTableUser.Name1 != null)
@@ -1840,13 +1845,17 @@ namespace OSBLE.Controllers
                 }
                 db.WhiteTableUsers.Add(up);
                 db.SaveChanges();
-
-                //Set the UserProfileID to point to our new student
-                whitetable.WhiteTableUser = up;
-                whitetable.WhiteTableUserID = up.ID;
-                whitetable.AbstractCourseID = ActiveCourseUser.AbstractCourseID;
-                whitetable.WhiteTableUser.CourseID = ActiveCourseUser.AbstractCourseID;
-                //emailWhiteTableUser(whitetable);
+                                
+                WhiteTable wt = new WhiteTable 
+                { 
+                    WhiteTableUserID = up.ID,
+                    AbstractCourseID = ActiveCourseUser.AbstractCourseID,
+                    Section = whitetable.Section,
+                    Hidden = false
+                };
+                
+                db.WhiteTable.Add(wt);
+                db.SaveChanges();
             }
                 
             
@@ -1864,8 +1873,7 @@ namespace OSBLE.Controllers
                 whitetable.WhiteTableUserID = user.ID;
 
                 db.Entry(whitetable).State = EntityState.Modified;
-                db.SaveChanges();
-                //emailWhiteTableUser(whitetable);
+                db.SaveChanges();                
             }
         }
 

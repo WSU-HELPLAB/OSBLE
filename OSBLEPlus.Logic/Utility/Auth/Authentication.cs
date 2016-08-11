@@ -84,6 +84,9 @@ namespace OSBLEPlus.Logic.Utility.Auth
         /// <returns></returns>
         public UserProfile GetActiveUser(string authToken)
         {
+            if (null == authToken)
+                return null;
+
             try
             {
                 var id = (int)_cache[authToken];
