@@ -682,6 +682,7 @@ namespace OSBLE.Controllers
                         else // Profile does not exist.
                         {
                             db.UserProfiles.Add(profile);
+                            db.SaveChanges();
                         }
 
                         //yc: profile made. Check white table for account information
@@ -691,31 +692,26 @@ namespace OSBLE.Controllers
                         {
                             foreach (WhiteTableUser wtu in whitetableusers)
                             {
-                                //you have gathered all the users  time to add them to courses
-                                //bug found, we need to have section location for now
-                                //seetting them to 0 for now
-                                //we have 
+                                //you have gathered all the users  time to add them to courses                                
                                 CourseUser newUser = new CourseUser();
-                                newUser.UserProfile = profile;
-                                //make pending so we can approve pending to workaround issue of whitelisted user not being added to assignments
-                                newUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending;
+                                newUser.UserProfile = profile;                                
+                                newUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;                                
                                 newUser.AbstractCourseID = wtu.CourseID;
                                 newUser.AbstractCourse = (from c in db.AbstractCourses
                                                           where c.ID == newUser.AbstractCourseID
                                                           select c).FirstOrDefault();
                                 newUser.UserProfileID = profile.ID;
-                                db.CourseUsers.Add(newUser);
-                                db.WhiteTableUsers.Remove(wtu);
+                                                                
+                                WhiteTable whiteTable = db.WhiteTable.Where(wt => wt.WhiteTableUserID == wtu.ID).FirstOrDefault();
+                                newUser.Section = whiteTable.Section;
 
-                                //save changes so we can add to pending
+                                db.CourseUsers.Add(newUser);
+                                db.WhiteTableUsers.Remove(wtu);                                
+                                db.WhiteTable.Remove(whiteTable);                                
                                 db.SaveChanges();
 
-                                //push the user to the student list
-                                using (RosterController rc = new RosterController())
-                                {
-                                    rc.ApprovePending(newUser.UserProfileID, newUser.AbstractCourseID);
-                                }
-
+                                //we need to add the new student to existing assignments
+                                addNewStudentToTeams(newUser);
                             }
                         }
 
@@ -750,6 +746,96 @@ namespace OSBLE.Controllers
 
             // If we got this far, something failed, redisplay form
             return View(model);
+        }
+       
+        /// <summary>
+        /// Duplicate method from roster controller but tailored for whitelist users. Could not use the roster controller
+        /// method without authenticating (was causing an error) so this is the workaround until this code can be refactored.
+        /// 
+        /// puts the newly whitelisted user onto current assignment teams (including individual assignments)
+        /// </summary>
+        /// <param name="courseUser"></param>
+        private void addNewStudentToTeams(CourseUser courseUser)
+        {
+            if (courseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student)
+            {
+                //Handle the case of whitelisted users
+                //(a user wont be logged on here so ActiveCourseUser should be null)
+                //If we already have assignments in the course, we need to add the new student into these assignments
+                int currentCourseId = courseUser.AbstractCourseID;
+
+                List<Assignment> assignments = (from a in db.Assignments
+                                                where a.CourseID == currentCourseId
+                                                select a).ToList();
+
+                foreach (Assignment a in assignments)
+                {
+                    bool present = false;
+                    // First lets make sure the user isn't already in a team for this assignment
+                    foreach (AssignmentTeam aTeam in a.AssignmentTeams)
+                    {
+                        foreach (TeamMember member in aTeam.Team.TeamMembers)
+                        {
+                            if (member.CourseUserID == courseUser.ID)
+                            {
+                                // If so, raise the present flag
+                                present = true;
+                                break;
+                            }
+                        }
+
+                        if (present) break; // If present, exit loop and skip this assignment
+                    }
+
+                    if (present) continue;
+
+                    TeamMember userMember = new TeamMember()
+                    {
+                        CourseUserID = courseUser.ID
+                    };
+
+                    Team team = new Team();
+
+                    if (courseUser.UserProfile == null)
+                    {
+                        courseUser.UserProfile = db.UserProfiles.Where(up => up.ID == courseUser.UserProfileID).FirstOrDefault();
+                    }
+
+                    team.Name = courseUser.UserProfile.LastName + "," + courseUser.UserProfile.FirstName;
+                    team.TeamMembers.Add(userMember);
+
+                    db.Teams.Add(team);
+                    db.SaveChanges();
+
+                    AssignmentTeam assignmentTeam = new AssignmentTeam()
+                    {
+                        AssignmentID = a.ID,
+                        Team = team,
+                        TeamID = team.ID
+                    };
+
+                    db.AssignmentTeams.Add(assignmentTeam);
+                    db.SaveChanges();
+
+                    //If the assignment is a discussion assignment they must be on a discussion team.
+                    if (a.Type == AssignmentTypes.DiscussionAssignment || a.Type == AssignmentTypes.CriticalReviewDiscussion)
+                    {
+                        DiscussionTeam dt = new DiscussionTeam();
+                        dt.AssignmentID = a.ID;
+                        dt.TeamID = assignmentTeam.TeamID;
+                        a.DiscussionTeams.Add(dt);
+
+                        //If the assignment is a CRD, the discussion team must also have an author team\
+                        //Since this CRD will already be completely invalid for use (as its a CRD with only 1 member..) 
+                        //we will do a small hack and have them be the author team and review team.
+                        if (a.Type == AssignmentTypes.CriticalReviewDiscussion)
+                        {
+                            dt.AuthorTeamID = assignmentTeam.TeamID;
+                        }
+                        db.SaveChanges();
+                    }
+                }
+            }
         }
 
         //
