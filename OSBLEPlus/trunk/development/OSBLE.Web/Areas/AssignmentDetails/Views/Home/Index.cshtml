@@ -48,8 +48,8 @@
 
         CourseUser currentUser = ViewBag.ActiveCourseUser;
 
-        var teams = from pair in Model.TeamTableBuilders
-                    orderby pair.Key.Team.TeamMembers.FirstOrDefault().CourseUser.Section ascending
+        var teams = from pair in Model.TeamTableBuilders                    
+                    orderby pair.Key.Team.TeamMembers.Count() == 0 ? 0 : pair.Key.Team.TeamMembers.FirstOrDefault().CourseUser.Section ascending
                     select pair.Key;
 
         HashSet<int> sections = new HashSet<int>(); //This hash set is to get all of the sections for this assignment
@@ -63,7 +63,7 @@
         }
 
         teams = from pair in Model.TeamTableBuilders
-                orderby pair.Key.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(Model.Client.AbstractRoleID, false) ascending
+                orderby pair.Key.Team.TeamMembers.Count() == 0 ? pair.Key.Team.Name : pair.Key.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(Model.Client.AbstractRoleID, false) ascending
                 select pair.Key;
 
 
@@ -116,6 +116,11 @@
 
             foreach (IAssignmentTeam assignmentTeam in teams)
             {
+                if (assignmentTeam.Team.TeamMembers.Count() == 0)
+                {                    
+                    continue;
+                }
+                
                 if (assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.Section != section) //check if this student belongs in this section.
                 {
                     continue;

@@ -260,7 +260,15 @@ namespace OSBLE.Controllers
             }
             else
             {
-                viewModel.TeamList = assignment.AssignmentTeams.OrderBy(l => l.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName).ThenBy(f => f.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.FirstName).ToList();
+                var tempAssignmentTeams =  new List<AssignmentTeam> (assignment.AssignmentTeams);
+                foreach (var team in tempAssignmentTeams)
+                {
+                    if (team.Team.TeamMembers.Count() == 0)
+                    {
+                        assignment.AssignmentTeams.Remove(team);
+                    }
+                }
+                viewModel.TeamList = assignment.AssignmentTeams.OrderBy(l => l.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName).ThenBy(f => f.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.FirstName).ToList();                
             }
 
             viewModel.AssignmentList = rubricAssignmentList;
