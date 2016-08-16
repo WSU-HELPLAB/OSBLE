@@ -415,6 +415,15 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     case AssignmentTypes.Basic:
                     case AssignmentTypes.CriticalReview:
                         teams = assignment.AssignmentTeams.Cast<IAssignmentTeam>().ToList();
+                        List<IAssignmentTeam> teamsTemp = new List<IAssignmentTeam>(teams);
+                        foreach (var team in teams)
+                        {
+                            if (team.Team.TeamMembers.Count() == 0)
+                            {
+                                teamsTemp.Remove(team);
+                            }
+                        }
+                        teams = teamsTemp;
                         break;
 
                     case AssignmentTypes.CriticalReviewDiscussion:
