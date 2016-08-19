@@ -148,7 +148,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                 {
                     try
                     {
-                        ActivityEvent e = eventLogs.Single(x => x.EventLogId == log.EventLogId);
+                        ActivityEvent e = eventLogs.SingleOrDefault(x => x.EventLogId == log.EventLogId);
                         if (e == null) continue;
                         
                         log.SenderId = e.SenderId;
@@ -224,7 +224,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                 {
                     try
                     {
-                        var e = eventLogs.Single(x => x.EventLogId == log.EventLogId);
+                        var e = eventLogs.SingleOrDefault(x => x.EventLogId == log.EventLogId);
                         if (e == null) continue;
 
                         log.SenderId = e.SenderId;
@@ -342,15 +342,26 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
 
             if (evt == null) return null;
 
+            LogCommentEvent logComment = evt.LogComment;
+
+            if (logComment == null)
+            {
+                var connection = new SqlConnection(StringConstants.ConnectionString);
+
+                string query = "SELECT * FROM LogCommentEvents WHERE Id = @logCommentEventId ";
+
+                logComment = connection.Query<LogCommentEvent>(query, new { logCommentEventId = evt.LogCommentEventId }).SingleOrDefault();
+            }
+
             return new HelpfulMarkGivenEvent()
             {
                 EventId = evt.EventId,
                 EventLogId = evt.EventLogId,
-                SenderId = evt.Sender.IUserId,
+                SenderId = evt.Sender == null ? eventLog.SenderId : evt.Sender.IUserId,
                 Sender = GetUser(userDictionary, users, eventLog.SenderId),
                 SolutionName = evt.SolutionName,
                 LogCommentEventId = evt.LogCommentEventId,
-                LogComment = evt.LogComment
+                LogComment = evt.LogComment == null ? logComment : evt.LogComment               
             };
         }
 
