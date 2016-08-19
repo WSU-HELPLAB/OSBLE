@@ -5,7 +5,10 @@
     bool HideMail = true;
     if (null == ViewBag.HideMail)
     {
-        HideMail = OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ViewBag.ActiveCourseUser.AbstractCourseID);
+        if (null != ViewBag.ActiveCourseUser)
+        {
+            HideMail = OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ViewBag.ActiveCourseUser.AbstractCourseID);    
+        }   //else do nothing        
     }
     else
     {

@@ -32,7 +32,17 @@ namespace OSBLE.Controllers
         [OsbleAuthorize]
         public ActionResult Index(int? id, int timestamp = -1)
         {
-            ViewBag.HideMail = OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID); 
+            if (null != ActiveCourseUser)
+            {
+                ViewBag.HideMail = OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID);
+            }
+            else
+            {
+                ViewBag.HideMail = true;
+                ViewBag.errorMessage = "No user information yet available. Please sign up for a course first.";
+                ViewBag.errorName = "No Courses";
+                return View("Error");
+            } 
 
             try
             {
