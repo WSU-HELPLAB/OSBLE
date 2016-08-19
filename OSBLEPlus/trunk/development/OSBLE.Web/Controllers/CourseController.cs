@@ -26,7 +26,14 @@ namespace OSBLE.Controllers
     {
         public CourseController()
         {
-            ViewBag.HideMail = OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID); 
+            if (null != ActiveCourseUser)
+            {
+                ViewBag.HideMail = OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID);  
+            }
+            else
+            {
+                ViewBag.HideMail = true;
+            }            
         }
         //
         // GET: /Course/

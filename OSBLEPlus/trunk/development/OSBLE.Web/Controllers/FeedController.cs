@@ -1263,6 +1263,10 @@ namespace OSBLE.Controllers
         [HttpPost]
         public JsonResult GetProfileNames()
         {
+            if (ActiveCourseUser == null) //new user with no active courses
+            {
+                return Json(new { userProfiles = new Dictionary<string, string>() });
+            }
             List<UserProfile> userProfiles = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
             Dictionary<string, string> nameIdPairs = new Dictionary<string, string>();
 
