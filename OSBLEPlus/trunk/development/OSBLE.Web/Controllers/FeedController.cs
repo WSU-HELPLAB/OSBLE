@@ -186,14 +186,21 @@ namespace OSBLE.Controllers
             //.OrderByDescending(i => i.Event.EventDate).ToList();
             List<AggregateFeedItem> aggregateFeed = AggregateFeedItem.FromFeedItems(feedItems);
 
-            try
+            if (aggregateFeed.Count() > 0)
             {
-                vm.LastPollDate = aggregateFeed.Select(a => a.MostRecentOccurance).Max();
+                try
+                {
+                    vm.LastPollDate = aggregateFeed.Select(a => a.MostRecentOccurance).Max();
+                }
+                catch (Exception)
+                {
+                    vm.LastPollDate = DateTime.MinValue.AddDays(2);
+                }
             }
-            catch (Exception)
+            else
             {
                 vm.LastPollDate = DateTime.MinValue.AddDays(2);
-            }
+            }           
 
             vm.Feed = aggregateFeed;
             vm.EventFilterOptions = ActivityFeedQuery.GetNecessaryEvents().OrderBy(e => e.ToString()).ToList();

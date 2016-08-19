@@ -447,6 +447,23 @@ namespace OSBLE.Utility
             return name;
         }
 
+        public static string GetUserFirstNameFromEventLogId(int eventLogId, SqlConnection connection = null)
+        {
+            string name = "";
+
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection()) { name = GetUserFirstNameFromEventLogId(eventLogId, sqlc); }
+            }
+            else
+            {
+                string result = connection.Query<string>("SELECT ISNULL(FirstName, 'OSBLE USER') FROM UserProfiles WHERE ID = (SELECT SenderId FROM EventLogs WHERE Id = @eventLogId)",
+                    new { eventLogId = eventLogId }).SingleOrDefault();
+                return result;                
+            }
+            return name;
+        }
+
         public static string GetAbstractRoleNameFromID(int ID, SqlConnection connection = null)
         {
             string name = "";
@@ -1196,8 +1213,12 @@ namespace OSBLE.Utility
                 // nested try catch for when commenting on a post that has a NULL courseID
                 try
                 {
-                    courseID = connection.Query<int>("SELECT CourseId FROM EventLogs WHERE Id = @id",
+                    courseID = connection.Query<int>("SELECT ISNULL(CourseId, 0) FROM EventLogs WHERE Id = @id",
                         new {id = logID}).SingleOrDefault();
+                    if (courseID == 0)
+                    {
+                        courseID = null;
+                    }
                 }
                 catch
                 {
