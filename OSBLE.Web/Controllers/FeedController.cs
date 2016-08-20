@@ -1117,11 +1117,40 @@ namespace OSBLE.Controllers
                     if (isReply)
                     {
                         FeedPostEvent originalPost = DBHelper.GetFeedPostEvent(sourcePostID, conn);
+
+                        string originalPostComment = "";
+
+                        if (null == originalPost) //ask for help event
+                        {
+                            AskForHelpEvent afhe = DBHelper.GetAskForHelpEvent(sourcePostID, conn);
+                            if (afhe != null)
+	                        {
+                                originalPostComment = afhe.UserComment;
+	                        }
+                            else
+                            {
+                                ExceptionEvent ee = DBHelper.GetExceptionEvent(sourcePostID, conn);
+                                if (ee != null)
+	                            {
+		                            originalPostComment = ee.ExceptionDescription;
+	                            }
+                                else
+                                {
+                                    originalPostComment = "(See post in OSBLE for full details)";
+                                }
+                            }
+                            
+                        }
+                        else
+                        {
+                            originalPostComment = originalPost.Comment;
+                        }
+
                         UserProfile originalPoster = DBHelper.GetFeedItemSender(sourcePostID, conn);
 
                         subject = string.Format("OSBLE Plus - {0} replied to a post in {1}", CurrentUser.FullName, DBHelper.GetCourseShortNameFromID(courseID, conn));
                         body = string.Format("{0} replied to a post by {1} at {2}:\n\n{3}\n-----------------------\nOriginal Post:\n{4}\n\n",
-                            CurrentUser.FullName, originalPoster.FullName, timePosted.UTCToCourse(courseID), postContent, originalPost.Comment);
+                            CurrentUser.FullName, originalPoster.FullName, timePosted.UTCToCourse(courseID), postContent, originalPostComment);
                     }
                     else
                     {

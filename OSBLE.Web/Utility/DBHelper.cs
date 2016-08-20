@@ -680,6 +680,52 @@ namespace OSBLE.Utility
             return evt;
         }
 
+        public static AskForHelpEvent GetAskForHelpEvent(int eventId, SqlConnection connection = null)
+        {
+            AskForHelpEvent evt = null;
+
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    evt = GetAskForHelpEvent(eventId, sqlc);
+                }
+
+                return evt;
+            }
+
+            evt = connection.Query<AskForHelpEvent>("SELECT * " +
+                                      "FROM AskForHelpEvents e " +
+                                      "WHERE e.EventLogId = @EventId ",
+                    new { EventId = eventId }
+                    ).FirstOrDefault();
+
+            return evt;
+        }
+
+        public static ExceptionEvent GetExceptionEvent(int eventId, SqlConnection connection = null)
+        {
+            ExceptionEvent evt = null;
+
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    evt = GetExceptionEvent(eventId, sqlc);
+                }
+
+                return evt;
+            }
+
+            evt = connection.Query<ExceptionEvent>("SELECT * " +
+                                      "FROM ExceptionEvents e " +
+                                      "WHERE e.EventLogId = @EventId ",
+                    new { EventId = eventId }
+                    ).FirstOrDefault();
+
+            return evt;
+        }
+
         public static FeedPostEvent GetFeedPostEvent(int eventId, SqlConnection connection = null)
         {
             FeedPostEvent evt = null;
