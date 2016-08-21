@@ -101,10 +101,10 @@
     $(function () {
         $('#Number').prop('disabled', true);
         $('#submitSearch').prop('disabled', true);
-        $('#Course').change(function () {
+        $('#Course').change(function () { 
             $('#Number').prop('disabled', false);
             $('#submitSearch').prop('disabled', false);
-            $.getJSON('/Course/CourseNumber/' + $('#Course').val(), function (data) {
+            $.getJSON('/Course/CourseNumber?id="' + $('#Course').val() + '"', function (data) {
                 var items = '<option>Search All</option>';
                 var prefix = new Array();               
                 $.each(data, function (i, Number) {
