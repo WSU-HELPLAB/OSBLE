@@ -5,7 +5,7 @@
     string path;
     int stateIndex = 0;
     int courseID = 0;
-    
+
     //special case for root
     if (name == "/" || !ViewData.ContainsKey("path"))
     {
@@ -19,17 +19,20 @@
         stateIndex = (int)ViewData["stateIndex"];
         courseID = (int)ViewData["courseID"];
     }
-    
+
     bool canUploadTo = false, canDelete = false;
-    
-    string temp = Model.GetAttribute("can_upload_to");    
-    if (null != temp && "true" == temp.ToLower()) 
+
+    string temp = Model.GetAttribute("can_upload_to");
+    if (null != temp && "true" == temp.ToLower())
     { canUploadTo = true; }
-    
+
     temp = Model.GetAttribute("can_delete");
-    if (null != temp && "true" == temp.ToLower()) 
+    if (null != temp && "true" == temp.ToLower())
     { canDelete = true; }
 
+    bool pathHasIndex = false;
+    string target = "";
+    string download = "download";
 }
 
 @if (Model.Name == "folder")
@@ -66,8 +69,8 @@
                     @name
                 </a>
 
-                @if (canUploadTo || canDelete) 
-                { 
+                @if (canUploadTo || canDelete)
+                {
                     <div class="file-controls dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-option-vertical"></span></a>
                         <ul class="dropdown-menu dropdown-menu-right">
@@ -81,7 +84,7 @@
                                 <li><a href="#" title="Rename this folder" onclick="cfm_RenameFolderIconClicked(@stateIndex)"><span class="glyphicon glyphicon-pencil"></span> Rename Folder</a></li>
                                 <li><a href="#" title="Delete this folder" onclick="cfm_DeleteFolderIconClicked(@stateIndex)"><span class="glyphicon glyphicon-trash"></span> Delete Folder</a></li>
                             }
-                            </ul>
+                        </ul>
                     </div>
                 }
             </div>
@@ -91,7 +94,7 @@
         <div class="folder-content">
             @* Do Sub-folders first *@
             @{ int childIndex = stateIndex + 1; }
-            @foreach (System.Xml.XmlElement child in Model.ChildNodes) 
+            @foreach (System.Xml.XmlElement child in Model.ChildNodes)
             {
                 if (child.Name == "folder")
                 {
@@ -134,10 +137,21 @@ else // Files
     </script>
 
     <div class="file" data-path="/FileHandler/CourseDocument?courseId=@courseID&filePath=@path" id="file_@stateIndex" data-state_index="@stateIndex">
+        @if (path.IndexOf('.') > -1) // if path contains '.'
+        {
+            pathHasIndex = true;
+            //is it a .link? add target="_blank"
+            var extension = path.Substring(path.LastIndexOf('.'));
+            if (extension == ".link")
+            {
+                target = "_blank";
+                download = "";
+            }        
+        }
 
-        <a class="file-header" href="/FileHandler/CourseDocument?courseId=@courseID&filePath=@path" title="@name">
-            @if (path.IndexOf('.') > -1) // if path contains '.'
-            { 
+        <a class="file-header" href="/FileHandler/CourseDocument?courseId=@courseID&filePath=@path" title="@name" target="@target" @download>
+            @if (pathHasIndex)
+            {
                 <img src="@Helpers.GetIconImgPath(path.Substring(path.LastIndexOf('.')))" />
             }
             else
@@ -146,7 +160,7 @@ else // Files
             }
             @name
         </a>
-        
+
         <div class="file-controls dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-option-vertical"></span></a>
             <ul class="dropdown-menu dropdown-menu-right">
@@ -165,8 +179,7 @@ else // Files
 {
     <script type="text/javascript">
         $(document).ready(function () {
-            $('.folder-name-link').click(function (event)
-            {
+            $('.folder-name-link').click(function (event) {
                 var folder = $(event.target).parents('.folder').first();
                 cfm_expand_collapse(folder.data("state_index"));
             });
