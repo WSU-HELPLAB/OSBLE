@@ -277,7 +277,7 @@ namespace OSBLE.Controllers
                 new MenuItem("Assignments", "Assignment", "Index", false, false, false, false, true, false, false, false),
                 new MenuItem("Assessments", "Committee", "Index", false, false, false, false, true, false, true, true),
                 new MenuItem("Grades", "Gradebook", "Index", false, false, false, false, true, false, false),
-                new MenuItem("Users", "Roster", "Index", true, false, false, false, false, false, true),
+                new MenuItem("Users", "Roster", "Index", false, true, false, false, false, false, true),
                 new MenuItem("Course Settings", "Course", "Edit", true, true, true, false, true, false, false, false),
                 new MenuItem("Community Settings", "Community", "Edit", true, true, true, false, false, true, false,
                     false),
