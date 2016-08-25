@@ -99,7 +99,8 @@ namespace OSBLE.Controllers
             }
         }
         // GET: /Roster/
-        [CanModifyCourse]
+        //[CanModifyCourse]
+        [CanGradeCourse]
         public ActionResult Index()
         {
             //Get all users for the current class
