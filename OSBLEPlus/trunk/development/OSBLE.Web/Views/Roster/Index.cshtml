@@ -314,7 +314,7 @@
                                                 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                                                 {
                                                     <a title="Change Role / Inspect User" href="@Url.Action("EditWTUser", "Roster", new { wtuID = WTuser.ID })">@Helpers.EditButton()</a>
-                                                    @*<a title="Delete This User" href="@Url.Action("DeleteWTUser", "Roster", new { wtuID = WTuser.ID })">@Helpers.DeleteButton()</a>*@
+                                                    <a title="Delete This User" href="@Url.Action("DeleteWTUser", "Roster", new { wtuID = WTuser.ID })">@Helpers.DeleteButton()</a>
                                                 }
                                             </div>
                                             @* Whitelisted users do not have an osble account and therefore cannot have a profile picture yet! *@
