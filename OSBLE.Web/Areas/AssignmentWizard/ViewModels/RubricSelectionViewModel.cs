@@ -59,31 +59,38 @@ namespace OSBLE.Areas.AssignmentWizard.ViewModels
            
             foreach (Assignment assignment in course.Assignments)
             {
-                if (assignment.HasRubric)
+                try
                 {
-                    rubricViewModel.Add(new RubricViewModel(
-                        assignment.Rubric.Description,
-                        assignment.AssignmentName,
-                        assignment.ID,
-                        assignment.RubricID,
-                        assignment.StudentRubricID,
-                        assignment.Rubric.EnableHalfStep,
-                        assignment.Rubric.EnableQuarterStep
-                        ));
-                }
+                    if (assignment.HasRubric)
+                    {
+                        rubricViewModel.Add(new RubricViewModel(
+                            assignment.Rubric.Description,
+                            assignment.AssignmentName,
+                            assignment.ID,
+                            assignment.RubricID,
+                            assignment.StudentRubricID,
+                            assignment.Rubric.EnableHalfStep,
+                            assignment.Rubric.EnableQuarterStep
+                            ));
+                    }
 
-                if (assignment.HasStudentRubric)
-                {
-                    rubricViewModel.Add(new RubricViewModel(
-                        assignment.StudentRubric.Description,
-                        assignment.AssignmentName,
-                        assignment.ID,
-                        assignment.RubricID,
-                        assignment.StudentRubricID,
-                        assignment.Rubric.EnableHalfStep,
-                        assignment.Rubric.EnableQuarterStep
-                        ));
+                    if (assignment.HasStudentRubric)
+                    {
+                        rubricViewModel.Add(new RubricViewModel(
+                            assignment.StudentRubric.Description,
+                            assignment.AssignmentName,
+                            assignment.ID,
+                            assignment.RubricID,
+                            assignment.StudentRubricID,
+                            assignment.Rubric.EnableHalfStep,
+                            assignment.Rubric.EnableQuarterStep
+                            ));
+                    }
                 }
+                catch (Exception e)
+                {
+                     //TODO: handle this exception.                   
+                }                
             }
 
             CourseName = course.Name;
