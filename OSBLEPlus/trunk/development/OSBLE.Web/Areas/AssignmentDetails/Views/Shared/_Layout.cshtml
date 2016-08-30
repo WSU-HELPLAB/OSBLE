@@ -45,15 +45,15 @@
         $(".NormalRow").each(function () {
             rowCount++;
             var string = $(this).find("td").text();
-            if (string.startsWith("Saved as Draft")) { draftCount++; }
-            else if (string.startsWith("Not Graded")) { /* Do nothing here, just easier than trying to parse a double in for the next condition*/ }
+            if (string.includes("Saved as Draft")) { draftCount++; }
+            else if (string.includes("Not Graded")) { /* Do nothing here, just easier than trying to parse a double in for the next condition*/ }
             else { publishedCount++; }
         });
         $(".AltRow").each(function () {
             rowCount++;
             var string = $(this).find("td").text();
-            if (string.startsWith("Saved as Draft")) { draftCount++; }
-            else if (string.startsWith("Not Graded")) { /* Do nothing here, just easier than trying to parse a double in for the next condition*/ }
+            if (string.includes("Saved as Draft")) { draftCount++; }
+            else if (string.includes("Not Graded")) { /* Do nothing here, just easier than trying to parse a double in for the next condition*/ }
             else { publishedCount++; }
         });
 
