@@ -121,7 +121,7 @@ namespace OSBLE.Services
             GradebookController gc = new GradebookController();
             try
             {
-                serviceResult = gc.UploadGradebookZip(zipData, gfp);
+                serviceResult = gc.UploadGradebookZip(zipData, gfp, courseUser);
             }
             catch (Exception)
             {

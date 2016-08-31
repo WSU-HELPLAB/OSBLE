@@ -165,7 +165,7 @@ namespace OSBLE.Controllers
             return View();
         }
 
-        public int UploadGradebookZip(byte[] zipData, GradebookFilePath gfp)
+        public int UploadGradebookZip(byte[] zipData, GradebookFilePath gfp, CourseUser uploadingCourseUser = null)
         {
             //Declare a variable that will keep track of how many files failed to load. 
             int filesFailedToLoadCount = 0;
@@ -226,7 +226,7 @@ namespace OSBLE.Controllers
                 }
 
                 //process gradebooks
-                filesFailedToLoadCount += ProcessGradebookChanges(gfp, newGradebook);
+                filesFailedToLoadCount += ProcessGradebookChanges(gfp, newGradebook, uploadingCourseUser);
             }
             return filesFailedToLoadCount;
         }
@@ -237,9 +237,11 @@ namespace OSBLE.Controllers
         /// <param name="gfp">contains information related to the gradebook filepath</param>
         /// <param name="newGradebookDictionary">a dictionary containing a key 'filename.extension' and a list of strings representing a CSV row</param>
         /// <returns>returns an int indicating success or failure: 0 success, any positive integer will indicate a failure</returns>
-        private int ProcessGradebookChanges(GradebookFilePath gfp, Dictionary<string, List<string>> newGradebookDictionary)
+        private int ProcessGradebookChanges(GradebookFilePath gfp, Dictionary<string, List<string>> newGradebookDictionary, CourseUser uploadingCourseUser = null)
         {
             Dictionary<string, List<string>> mergedGradebooks = new Dictionary<string, List<string>>(); //to store all gradebooks for the course
+            //handle case where user is uploading from the Excel plugin
+            int userRole = ActiveCourseUser == null ? uploadingCourseUser.AbstractRoleID : ActiveCourseUser.AbstractRoleID;
 
             //first process gradebooks that already exist
             foreach (var existingGradebook in gfp.AllFiles())
@@ -338,9 +340,9 @@ namespace OSBLE.Controllers
                     bool isTAUploading = false;
                     List<string> permittedSections = new List<string>();
                     int indexOfSection = -1;
-
+                                        
                     //If the user is a TA...
-                    if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
+                    if (userRole == (int)CourseRole.CourseRoles.TA)
                     {
                         permittedSections = GetPermittedSections(); //Get all permitted sections the TA is allowed to edit. 
                         isTAUploading = true; //Set the isTAUploading 
@@ -435,9 +437,9 @@ namespace OSBLE.Controllers
                     //Regardless... nothing to do here, move along!
                 }
             }
-
+                        
             //now just add gradebooks that are in newGradebooks but not oldGradebooks
-            if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor) //only instructors can add new gradebooks
+            if (userRole == (int)CourseRole.CourseRoles.Instructor) //only instructors can add new gradebooks
             {
                 List<string> currentGradebookFilenames = new List<string>();
                 foreach (var file in gfp.AllFiles())
