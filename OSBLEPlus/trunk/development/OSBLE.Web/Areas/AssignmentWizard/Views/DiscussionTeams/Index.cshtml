@@ -9,7 +9,7 @@
     List<IAssignmentTeam> teams = ViewBag.Teams;
     List<CourseUser> allUsers = ViewBag.AllUsers;
     List<Assignment> previousTeamAssignments = ViewBag.PreviousTeamAssignments;
-    ViewBag.ComponentName = "Discussion Team Settings";
+    ViewBag.ComponentName = "Discussion Team Settings";     
     HashSet<int> sections = new HashSet<int>();
 }
 
@@ -108,11 +108,11 @@ else
                 <li id="cu_@(cu.ID)" section="@cu.Section" class="ui-state-default Student" style="list-style-type:none">
                     @studentDisplayName
                     <br />
-                    Section: @cu.Section
+                    <text class="sectionText">Section: @cu.Section</text>
                     <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @studentDisplayName" title="remove @studentDisplayName" onclick="removeFromTeam(this)" />
                 </li>
 
-                 <li style="hidden"
+                 <li style="display:none;"
                  @sections.Add(cu.Section) ; />
             }
         }
@@ -288,10 +288,13 @@ else
         '<button type="button" id="AutoGenByStudentButton" onclick="generateTeamsByNumberOfStudents()">Go</button>'
             document.getElementById("teamPerCourse").innerHTML = 'Create a configuration with <input type="text" id="AutoGenByteamTextBox" size="3" /> total teams' +
         '<button type="button" id="AutoGenByTeamButton" onclick="generateTeamsByNumberOfTeams()">Go</button>'
+
+
+            //hide the sections from the user if there is only one section
+            $.each($(".sectionText"), function (index, value) {
+                this.style = "display:none;";
+            });
         }
-
-
-
     });
 
 
