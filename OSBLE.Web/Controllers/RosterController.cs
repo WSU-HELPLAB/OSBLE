@@ -1357,6 +1357,11 @@ namespace OSBLE.Controllers
                     cu.Section = -2;
                     cu.MultiSection = "all";
                 }
+                else if ((cu.AbstractRole.Name == "TA") && (ActiveCourseUser.Section != -2)) // if the current user is not in all sections, don't let them edit TAs
+                {
+                    continue;
+                }
+               
 
                     //if not an instructor
                 else
