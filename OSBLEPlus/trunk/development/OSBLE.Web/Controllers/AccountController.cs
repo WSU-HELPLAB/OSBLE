@@ -298,8 +298,8 @@ namespace OSBLE.Controllers
             }
 
             if (changeEmailSucceeded)
-            {
-                return RedirectToAction("Profile");
+            {   
+                return RedirectToAction("LogOff");
             }
             else if (!validEmail)
             {
