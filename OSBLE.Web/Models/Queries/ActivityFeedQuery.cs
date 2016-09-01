@@ -107,8 +107,8 @@ namespace OSBLE.Models.Queries
                 EventType.FeedPostEvent,
                 EventType.AskForHelpEvent,
                 //EventType.LogCommentEvent,
-                //EventType.HelpfulMarkGivenEvent,
-                EventType.SubmitEvent,
+                EventType.HelpfulMarkGivenEvent,
+                //EventType.SubmitEvent,
             };
         }
 
