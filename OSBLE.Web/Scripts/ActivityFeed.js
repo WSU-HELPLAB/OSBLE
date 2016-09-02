@@ -180,6 +180,7 @@ function FeedViewModel(userName, userId, current) {
             post.comments(commentList);
 
             HighlightNewReply(postID);
+            TitlebarNotification();
 
             if (post.SenderId != self.userId)
                 ShowNewActivityBadge();
@@ -716,6 +717,7 @@ function HighlightNewPost(postID, isCurrentUserPost, userInVisibilityList) {
     if (!isCurrentUserPost && userInVisibilityList) {
         ShowNewActivityBadge();
         ShowNewPostBadge(postID);
+        TitlebarNotification();
     }
 }
 
@@ -937,7 +939,11 @@ function ShowUserVisibilityDialog(item) {
     $("#visibility-dialog").dialog(); //now show the dialog box
 }
 
-
+function TitlebarNotification() {
+    $.titleAlert("New Feed Post!", {
+        interval: 750
+    });
+}
 
 /*
 //Periodically updates view models for feed items.  Useful for displaying an updated count
