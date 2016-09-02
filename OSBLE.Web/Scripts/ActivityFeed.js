@@ -737,7 +737,11 @@ function MakePostSucceeded(newPost) {
 }
 
 function MakePostFailed() {
-    ShowError('#feed-post-form', 'Unable to create post, check internet connection.', false);
+    ShowError('#feed-post-form', 'Unable to create post. Post textbox contains no text.', false);
+
+    // re-enable posting
+    $('#feed-post-textbox').removeAttr('disabled');
+    $('#btn_post_active').removeAttr('disabled');
 }
 
 function HighlightNewReply(postID) {
