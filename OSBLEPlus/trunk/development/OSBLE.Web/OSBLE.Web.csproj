@@ -1219,6 +1219,7 @@
     <Content Include="Scripts\jquery.selectboxes.js" />
     <Content Include="Scripts\jquery.signalR-2.2.0.js" />
     <Content Include="Scripts\jquery.signalR-2.2.0.min.js" />
+    <Content Include="Scripts\jquery.titlealert.js" />
     <Content Include="Scripts\jquery.tmpl.min.js" />
     <Content Include="Scripts\jquery.ui.position.js" />
     <Content Include="Scripts\jquery.ui.timepicker.js" />
