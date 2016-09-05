@@ -256,6 +256,24 @@ namespace OSBLE.Utility
             return eventVisibilityGroups;
         }
 
+        public static string GetEventLogVisibleToList(int eventLogId, SqlConnection connection = null)
+        {
+            string eventVisibleList = "";
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    eventVisibleList = GetEventLogVisibleToList(eventLogId, sqlc);
+                }
+                return eventVisibleList;
+            }
+
+            eventVisibleList = connection.Query<string>("SELECT ISNULL(EventVisibleTo, '') FROM EventLogs WHERE Id = @eventLogId ",
+                new { eventLogId = eventLogId }).Single();
+
+            return eventVisibleList;
+        }
+
         public static Dictionary<int, string> GetMailAddressUserId(List<string> emailAddresses, SqlConnection connection = null)
         {
             Dictionary<int, string> UserIdEmailPair = new Dictionary<int, string>();
