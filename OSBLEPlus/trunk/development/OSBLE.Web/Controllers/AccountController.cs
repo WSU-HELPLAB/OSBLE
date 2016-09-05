@@ -323,6 +323,12 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult UpdateUserFullName(string firstName, string lastName)
         {
+            if (firstName.Length > 50 || lastName.Length > 50)
+            {
+                ModelState.AddModelError("ChangeName", "First/Last names are restricted to 50 characaters maximum.");
+                return View("Profile");
+            }
+
             bool changeNameSucceeded = false;
 
             if (!String.IsNullOrEmpty(firstName) && !String.IsNullOrEmpty(lastName))
@@ -865,10 +871,20 @@ namespace OSBLE.Controllers
                     UserProfile currentUser = db.UserProfiles.Find(OsbleAuthentication.CurrentUser.ID);
                     if (currentUser != null)
                     {
-                        currentUser.Password = UserProfile.GetPasswordHash(model.NewPassword);
-                        db.Entry(currentUser).State = EntityState.Modified;
-                        db.SaveChanges();
-                        changePasswordSucceeded = true;
+                        string oldPasswordHash = db.UserProfiles.Where(up => up.ID == ActiveCourseUser.UserProfileID).FirstOrDefault().Password;
+
+                        if (UserProfile.GetPasswordHash(model.OldPassword) == oldPasswordHash)
+                        {
+                            currentUser.Password = UserProfile.GetPasswordHash(model.NewPassword);
+
+                            db.Entry(currentUser).State = EntityState.Modified;
+                            db.SaveChanges();
+                            changePasswordSucceeded = true;    
+                        }
+                        else
+                        {                            
+                            changePasswordSucceeded = false;                            
+                        }                        
                     }
                     else
                     {
