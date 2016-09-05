@@ -420,10 +420,11 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         [HttpPost]
         public ActionResult DeleteFeedPost(int id)
-        {
-            UserProfile current = DBHelper.GetUserProfile(ActiveCourseUser.UserProfileID);// dp = db.DashboardPosts.Find(id);
+        {            
+            //we need to make sure the user is either a grader (TA/Instructor) or they are deleting their own post!
+            ActivityEvent feedPostEvent = DBHelper.GetActivityEvent(id);
 
-            if ((current.IUserId == ActiveCourseUser.UserProfileID) || (ActiveCourseUser.AbstractRole.CanGrade))
+            if ((feedPostEvent.SenderId == ActiveCourseUser.UserProfileID) || (ActiveCourseUser.AbstractRole.CanGrade))
             {
                 DBHelper.DeleteFeedPostEvent(id);
             }
