@@ -53,8 +53,8 @@ namespace OSBLE.Controllers
                     }
                     Response.Redirect(url);
 
-                    //this will never be reached, but the function requires an actionresult to be returned
-                    return Json("");
+                    //this will never be reached, but the function requires an actionresult to be returned                    
+                    return new EmptyResult();
                 }
                 else
                 {
