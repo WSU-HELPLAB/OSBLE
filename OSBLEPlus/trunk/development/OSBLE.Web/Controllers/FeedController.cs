@@ -444,9 +444,10 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult DeleteLogComment(int id)
         {
-            UserProfile current = DBHelper.GetUserProfile(ActiveCourseUser.UserProfileID);// dp = db.DashboardPosts.Find(id);
+            //we need to make sure the user is either a grader (TA/Instructor) or they are deleting their own reply!
+            ActivityEvent logCommentEvent = DBHelper.GetActivityEvent(id);
 
-            if ((current.IUserId == ActiveCourseUser.UserProfileID) || (ActiveCourseUser.AbstractRole.CanGrade))
+            if ((logCommentEvent.SenderId == ActiveCourseUser.UserProfileID) || (ActiveCourseUser.AbstractRole.CanGrade))
             {
                 DBHelper.DeleteLogComment(id);
             }
@@ -462,9 +463,10 @@ namespace OSBLE.Controllers
         [ValidateInput(false)]
         public JsonResult EditFeedPost(int id, string newText, bool details = false)
         {
-            // do checking, make sure non-authorized users cannot edit posts
-            UserProfile current = CurrentUser ?? DBHelper.GetUserProfile(ActiveCourseUser.UserProfileID);
-            if ((current.IUserId == ActiveCourseUser.UserProfileID) || (ActiveCourseUser.AbstractRole.CanGrade))
+            //we need to make sure the user is either a grader (TA/Instructor) or they are deleting their own post!
+            ActivityEvent feedPostEvent = DBHelper.GetActivityEvent(id);
+
+            if ((feedPostEvent.SenderId == ActiveCourseUser.UserProfileID) || (ActiveCourseUser.AbstractRole.CanGrade))
             {
                 using (SqlConnection conn = DBHelper.GetNewConnection())
                 {
@@ -495,8 +497,10 @@ namespace OSBLE.Controllers
         {
             // do checking, make sure non-authorized users cannot edit posts
 
-            UserProfile current = CurrentUser; //DBHelper.GetUserProfile(ActiveCourseUser.UserProfileID);
-            if ((current.IUserId == ActiveCourseUser.UserProfileID) || (ActiveCourseUser.AbstractRole.CanGrade))
+            //we need to make sure the user is either a grader (TA/Instructor) or they are deleting their own reply!
+            ActivityEvent logCommentEvent = DBHelper.GetActivityEvent(id);
+
+            if ((logCommentEvent.SenderId == ActiveCourseUser.UserProfileID) || (ActiveCourseUser.AbstractRole.CanGrade))
             {
                 using (SqlConnection conn = DBHelper.GetNewConnection())
                 {
