@@ -229,6 +229,7 @@
     <Build Include="Schema\Stored Procedures\Activiities\GetActivityFeedsBasic.sql" />
     <Build Include="Schema\Stored Procedures\Profiles\GetAssignmentTeam.sql" />
     <Build Include="Schema\Stored Procedures\Activiities\GetActivityFeedById.sql" />
+    <Build Include="Schema\Tables\OSBLEActivityEvents_1.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Post-Deployment\Script.PostDeployment.sql" />

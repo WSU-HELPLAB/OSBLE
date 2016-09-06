@@ -133,5 +133,8 @@
             @RenderBody()
         </div>
     </section>
+
+    @{ string enableLogging = ConfigurationManager.AppSettings["EnableActivityLogging"];}
+    <input type="hidden" id="enableLogging" value="@enableLogging" />
 </body>
 </html>

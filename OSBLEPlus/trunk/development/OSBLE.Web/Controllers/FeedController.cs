@@ -26,6 +26,7 @@ using OSBLEPlus.Logic.Utility.Lookups;
 using OSBLE.Hubs;
 using Microsoft.AspNet.SignalR;
 using System.Text.RegularExpressions;
+using System.Configuration;
 
 namespace OSBLE.Controllers
 {
@@ -1346,6 +1347,20 @@ namespace OSBLE.Controllers
             ViewBag.CurrentCourseUsers = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
             ViewBag.HashTags = DBHelper.GetHashTags();
 
+            string enableLogging = ConfigurationManager.AppSettings["EnableActivityLogging"];
+            if (enableLogging == "true") //only log if logging is enabled
+            {
+                try
+                {
+                    string authToken = Request.Cookies["AuthKey"].Value.Split('=').Last();
+                    LogActivityEvent(authToken, "ClickHashtag", hashtag, "Hashtag", ActiveCourseUser.AbstractCourseID);
+                }
+                catch (Exception)
+                {
+                    //do nothing for now                    
+                }
+            }
+
             return View();
         }
 
@@ -1438,13 +1453,94 @@ namespace OSBLE.Controllers
 
             foreach (string id in idList)
             {
-                if (Int32.Parse(id) == userProfileId)
+                if (id != "" && Int32.Parse(id) == userProfileId)
                 {
                     return true;
                 }
             }
             //if the list is not "" and we did not find an id match, hide the post/reply
             return false;
+        }
+
+        [HttpPost]
+        public HttpResponseMessage LogActivityEvent(string authToken, string eventAction, string eventData, string eventDataDescription, int courseId = 0)
+        {
+            try
+            {
+                if (courseId == 0 && ActiveCourseUser != null)
+                {
+                    courseId = ActiveCourseUser.AbstractCourseID;
+                }
+
+                var auth = new Authentication();
+                if (!auth.IsValidKey(authToken) || courseId == 0)
+                    return new HttpResponseMessage { StatusCode = HttpStatusCode.Forbidden };
+
+                ActivityEvent log = new ActivityEvent();
+
+                log.SenderId = auth.GetActiveUserId(authToken);
+                if (courseId != 0)
+                    log.CourseId = courseId;
+                log.EventTypeId = 12; //OSBLEActivityEvent
+                DateTime timestamp = DateTime.UtcNow;
+
+                //save log
+                SqlConnection connection = new SqlConnection(StringConstants.ConnectionString);
+                var result = connection.Query<int>("INSERT INTO EventLogs (EventTypeId, EventDate, DateReceived, SenderId, CourseId)" +
+                                                   "OUTPUT INSERTED.Id " +
+                                                   "VALUES (@eventTypeId, @eventDate, @eventDate, @senderId, @courseId)",
+                    new { eventTypeId = log.EventTypeId, eventDate = timestamp, senderId = log.SenderId, courseId = log.CourseId }).SingleOrDefault();
+
+                if (result > 0)
+                {
+                    result = connection.Query<int>("INSERT INTO OSBLEActivityEvents (EventLogId, EventAction, EventData, EventDataDescription)" +
+                                                   "OUTPUT INSERTED.Id " +
+                                                   "VALUES (@eventLogId, @eventAction, @eventData, @eventDataDescription)",
+                    new { eventLogId = result, eventAction = eventAction, eventData = eventData, eventDataDescription = eventDataDescription }).SingleOrDefault();
+                }
+                else //event did not save to the database
+                {
+                    return new HttpResponseMessage
+                    {
+                        StatusCode = HttpStatusCode.InternalServerError,
+                        Content = new StringContent(result.ToString())
+                    };
+                }
+
+                return new HttpResponseMessage
+                {
+                    StatusCode = result > 0 ? HttpStatusCode.OK : HttpStatusCode.InternalServerError,
+                    Content = new StringContent(result.ToString())
+                };
+            }
+            catch (Exception e)
+            {
+                return new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Content = new StringContent(e.Message)
+                };
+            }            
+        }
+
+        public ActionResult Profile(int id)
+        {
+            string enableLogging = ConfigurationManager.AppSettings["EnableActivityLogging"];
+            
+            if (enableLogging == "true") //only log if logging is enabled
+            {
+                try
+                {
+                    string authToken = Request.Cookies["AuthKey"].Value.Split('=').Last();
+                    LogActivityEvent(authToken, "ClickMention", id.ToString(), "MentionUserProfileId", ActiveCourseUser.AbstractCourseID);
+                }
+                catch (Exception)
+                {
+                    //do nothing for now                    
+                }                
+            }
+            //redirect to the profile page of the user
+            return RedirectToAction("Index", "Profile", new { id = id});
         }
     }
 }
