@@ -85,7 +85,7 @@
 
     @RenderSection("Header", required: false)
     @RenderSection("SubHeader", required: false)
-
+        
 </head>
 <body>
 
@@ -156,5 +156,7 @@
             @RenderBody()
         </div>
     </section>
+    @{ string enableLogging = ConfigurationManager.AppSettings["EnableActivityLogging"];}
+    <input type="hidden" id="enableLogging" value="@enableLogging" />
 </body>
 </html>

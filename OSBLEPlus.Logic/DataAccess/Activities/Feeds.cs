@@ -54,7 +54,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                     foreach (string name in possibleNames)
                     {
                         string partialName = "%" + name + "%";
-                        int id = connection.Query<int>(nameSql, new {name = partialName}).SingleOrDefault();
+                        int id = connection.Query<int>(nameSql, new {name = partialName}).Take(1).SingleOrDefault();
 
                         if (id > 0 && !possibleNameIds.Contains(id))
                         {

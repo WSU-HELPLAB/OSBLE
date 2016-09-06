@@ -416,6 +416,18 @@ function FeedViewModel(userName, userId, current) {
     };
 
     $("#activity-feed-filters").submit(function (e) {
+                
+        if ($("#enableLogging").val() == "true") {
+            var checkedEventsList = "";
+            $(".event_checkbox").each(function () {
+                if (this.checked) {
+                    checkedEventsList += this.name + " ";
+                }                
+            });
+
+            LogActivityEvent("KeywordSearch", $("#feedSearchInput").val(), "Keywords for FilterOptions: " + checkedEventsList);
+        }
+
         self.RequestUpdate();
         return false; // prevent page refresh
     });
@@ -675,6 +687,10 @@ function ShowReplyBox(item) {
     $("#btn-reply-" + item.eventId).hide();
     $("#feed-reply-" + item.eventId).show('blind');
     $("#feed-reply-textbox-" + item.eventId).val('');
+
+    if ($("#enableLogging").val() == "true") {
+        LogActivityEvent("InitiateReply", item.eventId, "EventLogId");
+    }
 }
 
 function HideReplyBox(item) {
@@ -695,6 +711,10 @@ function expandComments(item) {
         $(replies).show('blind');
         $(commentsTextSpan).text("Hide");
         $(post).removeClass("new-replies");
+
+        if ($("#enableLogging").val() == "true") {
+            LogActivityEvent("ExpandCommentsClick", item.eventId, "EventLogId");
+        }
     }
     else {
         var height = (window.innerHeight > 0) ? window.innerHeight : screen.height;
@@ -947,6 +967,31 @@ function TitlebarNotification() {
     $.titleAlert("New Feed Post!", {
         interval: 750
     });
+}
+
+function LogActivityEvent(eventAction, eventData, eventDataDescription) {
+
+    var authKey = $.cookie('AuthKey').split("=")[1];
+    var courseId = $("#data-course-link").attr("data-course-id");    
+
+    $.ajax({
+        url: "/Feed/LogActivityEvent",
+        data: { authToken: authKey, eventAction: eventAction, eventData: eventData, eventDataDescription: eventDataDescription, courseId: courseId },
+        type: "POST",
+        success: function (dataList) {
+            //
+        },
+        error: function () {
+            //
+        }
+    });
+}
+
+function LogDetailsActivity(item) {    
+    if ($("#enableLogging").val() == "true") {
+        LogActivityEvent("ViewDetails", item.eventId, "EventLogId");
+    }
+    return true;
 }
 
 /*
