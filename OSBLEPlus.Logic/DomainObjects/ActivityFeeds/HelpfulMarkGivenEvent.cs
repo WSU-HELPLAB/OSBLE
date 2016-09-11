@@ -27,7 +27,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             {
                 CommandText = string.Format(@"
 DECLARE {0} INT
-INSERT INTO dbo.EventLogs (EventTypeId, EventDate, SenderId, CourseId) VALUES (@EventTypeId, @EventDate, @SenderId, @CourseId)
+INSERT INTO dbo.EventLogs (EventTypeId, EventDate, SenderId, CourseId, EventVisibilityGroups, EventVisibleTo) VALUES (@EventTypeId, @EventDate, @SenderId, @CourseId, @EventVisibilityGroups, @EventVisibleTo)
 SELECT {0}=SCOPE_IDENTITY()
 INSERT INTO dbo.HelpfulMarkGivenEvents (EventLogId, LogCommentEventId, EventDate, SolutionName)
 VALUES ({0}, @LogCommentEventId, @EventDate, @SolutionName)
@@ -38,6 +38,8 @@ SELECT {0}", StringConstants.SqlHelperLogIdVar)
             cmd.Parameters.AddWithValue("SenderId", SenderId);
             if (CourseId.HasValue) cmd.Parameters.AddWithValue("CourseId", CourseId.Value);
             else cmd.Parameters.AddWithValue("CourseId", DBNull.Value);
+            cmd.Parameters.AddWithValue("EventVisibilityGroups", EventVisibilityGroups);
+            cmd.Parameters.AddWithValue("EventVisibleTo", EventVisibleTo);
             cmd.Parameters.AddWithValue("LogCommentEventId", LogCommentEventId);
             cmd.Parameters.AddWithValue("SolutionName", SolutionName);
 
