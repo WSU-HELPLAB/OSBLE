@@ -1023,6 +1023,14 @@ namespace OSBLE.Utility
             int sourceLogId = connection.Query<int>("SELECT SourceEventLogId " +
                                                     "From LogCommentEvents " +
                                                     "WHERE EventLogId = @eventId", new { eventId = eventLogId }).FirstOrDefault();
+            // get the Source Event Log visibility groups
+            string sourceLogEventVisibilityGroups = connection.Query<string>("SELECT ISNULL(EventVisibilityGroups, '') " +
+                                                    "From EventLogs " +
+                                                    "WHERE Id = @eventId", new { eventId = sourceLogId }).FirstOrDefault();
+            // get the Source Event Log visible to list
+            string sourceLogEventVisibleTo = connection.Query<string>("SELECT ISNULL(EventVisibleTo, '') " +
+                                                    "From EventLogs " +
+                                                    "WHERE Id = @eventId", new { eventId = sourceLogId }).FirstOrDefault();
 
             // get the Source Event Course ID
             int? sourceCourseId = null;
@@ -1069,7 +1077,9 @@ namespace OSBLE.Utility
                     {
                         LogCommentEventId = logId,
                         SenderId = markerId,
-                        SolutionName = ""
+                        SolutionName = "",
+                        EventVisibilityGroups = sourceLogEventVisibilityGroups,
+                        EventVisibleTo = sourceLogEventVisibleTo
                     };
                 }
                 else
@@ -1079,7 +1089,9 @@ namespace OSBLE.Utility
                         LogCommentEventId = logId,
                         SenderId = markerId,
                         CourseId = sourceCourseId,
-                        SolutionName = ""
+                        SolutionName = "",
+                        EventVisibilityGroups = sourceLogEventVisibilityGroups,
+                        EventVisibleTo = sourceLogEventVisibleTo
                     };
                 }
 
