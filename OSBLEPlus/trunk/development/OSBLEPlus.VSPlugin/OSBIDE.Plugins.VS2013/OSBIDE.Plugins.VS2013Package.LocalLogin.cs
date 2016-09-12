@@ -200,7 +200,7 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
 
         private void web_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
-            MessageBox.Show("Your version of OSBLE+ is out of date.  Installation of the latest version will now begin.");
+            MessageBox.Show("Your version of the OSBLE+ Visual Studio plugin is out of date.  Installation of the latest version will now begin.");
             try
             {
                 Process.Start(StringConstants.LocalUpdatePath);
