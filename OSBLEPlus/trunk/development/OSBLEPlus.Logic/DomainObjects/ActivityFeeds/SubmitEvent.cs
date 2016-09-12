@@ -137,6 +137,27 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
                         }
 
                     }
+                    else
+                    {
+                        foreach (string vcxprojFile in vcxprojFiles)
+                        {
+                            var name = Path.GetDirectoryName(vcxprojFile);
+                            if (name == null) continue;
+                            string directoryName = "";
+                            string fileName = vcxprojFile.Split('\\').Last();
+
+                            if (!vcxprojFile.Contains(rootPath))
+                            {
+                                List<string> fileParts = vcxprojFile.Split('\\').ToList();
+                                directoryName = fileParts.Count() >= 2 ? fileParts[fileParts.Count() - 2] : ""; //last is the filename, we want the directory
+                            }
+                            else
+                            {
+                                directoryName = name.Replace(rootPath, string.Empty);
+                            }
+                            zip.AddFile(vcxprojFile, directoryName); //we don't have to parse this because there should be no relative paths
+                        }
+                    }
                 }
                 catch (Exception e)
                 {
