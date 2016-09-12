@@ -78,6 +78,15 @@ namespace OSBLE.Controllers
 
             try
             {
+                if (ActiveCourseUser.AbstractRole.CanGrade)
+                {
+                    ViewBag.CanGrade = true;
+                }
+                else
+                {
+                    ViewBag.CanGrade = false;
+                }
+
                 if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor)
                     ViewBag.IsInstructor = true;
                 else
@@ -119,6 +128,15 @@ namespace OSBLE.Controllers
                     Authentication authenticate = new Authentication();
                     return account.TokenLogin(authenticate.GetAuthenticationKey(), StringConstants.WebClientRoot + "/feed/osbide/");
                 }
+            }
+
+            if (ActiveCourseUser.AbstractRole.CanGrade)
+            {
+                ViewBag.CanGrade = true;
+            }
+            else
+            {
+                ViewBag.CanGrade = false;
             }
 
             if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor)
@@ -908,6 +926,7 @@ namespace OSBLE.Controllers
                 int courseId = ActiveCourseUser.AbstractCourseID;
                 bool containsInstructors = groups.Contains("instructors");
                 bool containsTAs = groups.Contains("tas");
+                bool containsSection = groups.Contains("section");
                 string idList = "";
 
                 //case instructors and tas
@@ -942,6 +961,12 @@ namespace OSBLE.Controllers
                         idList = String.Join(",", DBHelper.GetCourseTAIds(courseId)); //the user is a TA, they are already on the list.
                     else
                         idList = String.Join(",", DBHelper.GetCourseTAIds(courseId)) + "," + ActiveCourseUser.UserProfileID; //the user making the post can also see the post!
+                }                
+
+                //case: section
+                if (containsSection)
+                {
+                    idList = String.Join(",", DBHelper.GetCourseSectionUserProfileIds(courseId, ActiveCourseUser.Section));
                 }
 
                 //TODO: add support for custom groups here.

@@ -238,6 +238,39 @@ namespace OSBLE.Utility
             return courseTAIds;
         }
 
+        public static List<int> GetCourseSectionUserProfileIds(int courseId, int section, SqlConnection connection = null)
+        {
+            List<int> courseSectionUserProfileIds = new List<int>();
+
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    courseSectionUserProfileIds = GetCourseSectionUserProfileIds(courseId, section, sqlc);
+                }
+                return courseSectionUserProfileIds;
+            }
+
+            string query = @"SELECT UserProfileID FROM CourseUsers WHERE AbstractCourseID = @courseId AND Section IN (@section, -2) 
+                             SELECT UserProfileID, MultiSection FROM CourseUsers WHERE AbstractCourseID = @courseId AND Section = -1 ";
+            List<string> multiSection = new List<string>();
+
+            using (var multi = connection.QueryMultiple(query, new {courseId = courseId, section = section}))
+            {
+                courseSectionUserProfileIds = multi.Read<int>().ToList();
+                var sectionList = multi.Read<dynamic>().ToList();
+
+                foreach (dynamic result in sectionList)
+                {
+                    if (result.MultiSection.Contains(section.ToString()))
+                    {
+                        courseSectionUserProfileIds.Add(result.UserProfileID);                                                   
+                    }
+                }               
+            }      
+            return courseSectionUserProfileIds;
+        }
+
         public static string GetEventLogVisibilityGroups(int eventLogId, SqlConnection connection = null)
         {
             string eventVisibilityGroups = "";

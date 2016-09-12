@@ -20,6 +20,19 @@
         vm = new FeedViewModel("@currentUser.FullName", @currentUser.ID);
         ko.applyBindings(vm);
         vm.RequestUpdate();
+
+        $("#visibility-dropdown").on("change", function () {
+            if ($("#visibility-dropdown option:selected").text() != "Everyone") {
+                $("#btn_post_active").val("Post to: " + $("#visibility-dropdown option:selected").text());
+                $("#email_post").text("Email to: " + $("#visibility-dropdown option:selected").text());
+            }
+            else
+            {
+                $("#btn_post_active").val("Post to " + $("#data-course-link").text());
+                $("#email_post").text("Email to Class");
+            }           
+        });
+
     });
 
 </script>
@@ -51,6 +64,23 @@
                                  Value = "class",
                                  Selected = true
                              });
+                        if (ViewBag.CanGrade)
+	                    {
+		                    listItems.Add(new SelectListItem
+                            {
+                                Text = "My Section(s)",
+                                Value = "section"
+                            });
+	                    }
+                        else
+                        {
+                            listItems.Add(new SelectListItem
+                            {
+                                Text = "My Section",
+                                Value = "section"
+                            });
+                        } 
+                        
                         listItems.Add(new SelectListItem
                              {
                                  Text = "Instructors Only",
@@ -60,7 +90,7 @@
                              {
                                  Text = "TAs Only",
                                  Value = "tas"
-                             });
+                             });                        
                         listItems.Add(new SelectListItem
                         {
                             Text = "Instructors and TAs Only",
@@ -70,10 +100,10 @@
                         @Html.DropDownList("visibility-dropdown", listItems, null, new { @class = "visibility-dropdown" })
                     }
 
-                    @if (ViewBag.IsInstructor)
+                    @if (ViewBag.IsInstructor || ViewBag.CanGrade)
                     {
                         @*<input type="submit" id="btn_post_all" class="btn btn-default" name="post_all" value="Post to All Courses I Teach" onclick="return confirm('Post this message to all your taught courses?');" />*@
-                        <label class="checkbox-inline"><input type="checkbox" value="True" name="send_email" /> Email to Class</label>
+                        <label class="checkbox-inline"><input type="checkbox" value="True" name="send_email" /><span id="email_post">Email to Class</span></label>
                     }
                     @*
                         if (ViewBag.IsLeader)
