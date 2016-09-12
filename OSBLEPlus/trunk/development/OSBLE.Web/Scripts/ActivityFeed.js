@@ -409,6 +409,9 @@ function FeedViewModel(userName, userId, current) {
                 else if (groups[i] == "instructors") {
                     formattedGroupTitles = formattedGroupTitles + groups[i].toUpperCase().substring(0, groups[i].length) + " ";
                 }
+                else {
+                    formattedGroupTitles = formattedGroupTitles + groups[i].toUpperCase().substring(0, groups[i].length) + " ";
+                }
             }
             return formattedGroupTitles;
         }
@@ -744,6 +747,8 @@ function HighlightNewPost(postID, isCurrentUserPost, userInVisibilityList) {
 function MakePostSucceeded(newPost) {
     //reset the post visibility to everyone
     $('#visibility-dropdown').prop('selectedIndex', 0);
+    $("#btn_post_active").val("Post to " + $("#data-course-link").text());
+    $("#email_post").text("Email to Class");
 
     // Clear the textbox
     $('#feed-post-textbox').val('');

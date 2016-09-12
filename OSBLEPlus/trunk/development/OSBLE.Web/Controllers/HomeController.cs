@@ -108,6 +108,15 @@ namespace OSBLE.Controllers
             // Single course mode. Only display posts for the active course.
             List<int> viewedCourses = DashboardSingleCourseMode ? new List<int> { ActiveCourseUser.AbstractCourseID } : currentCourses.Where(cu => !cu.Hidden).Select(cu => cu.AbstractCourseID).ToList();
 
+            if (ActiveCourseUser.AbstractRole.CanGrade)
+            {
+                ViewBag.CanGrade = true;
+            }
+            else
+            {
+                ViewBag.CanGrade = false;
+            }
+
             if (ActiveCourseUser.AbstractCourse is Course && ActiveCourseUser.AbstractRole.CanModify)
             {
                 ViewBag.IsInstructor = true;
