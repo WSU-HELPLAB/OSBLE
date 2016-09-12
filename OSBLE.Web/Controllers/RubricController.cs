@@ -82,7 +82,7 @@ namespace OSBLE.Controllers
                 }
                 if (Request.Form.AllKeys.Contains(critCommentKey))
                 {
-                    critEval.Comment = Request.Form[critCommentKey].ToString();
+                    critEval.Comment = Request.Unvalidated.Form[critCommentKey].ToString();
                 }
             }
 
@@ -108,7 +108,9 @@ namespace OSBLE.Controllers
             string globalCommentKey = ViewBag.GlobalCommentId;
             if (Request.Form.AllKeys.Contains(globalCommentKey))
             {
-                viewModel.Evaluation.GlobalComment = Request.Form[globalCommentKey].ToString();
+                //TODO: add code to decode on view
+                //viewModel.Evaluation.GlobalComment = HttpUtility.HtmlEncode(Request.Unvalidated.Form[globalCommentKey].ToString());
+                viewModel.Evaluation.GlobalComment = Request.Unvalidated.Form[globalCommentKey].ToString();
             }
 
             return viewModel;
