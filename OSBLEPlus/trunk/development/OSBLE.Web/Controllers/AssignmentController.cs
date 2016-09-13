@@ -600,22 +600,45 @@ namespace OSBLE.Controllers
                                          c.AbstractRoleID == (int)CourseRole.CourseRoles.Student
                                          select c).ToList();
 
-            // For TAs, make get rid of any student that isn't in the TA's section.
-            for(int i = 0; i < students.Count; i++)
+            if (ActiveCourseUser.Section != -2) //instructors or all sections users can download all student grades
             {
-                if (students[i].Section != ActiveCourseUser.Section)
+                List<int> sections = new List<int>(); //need to keep track of multiple sections.
+
+                if (ActiveCourseUser.Section == -1) //multiple sections
                 {
-                    students.RemoveAt(i);
-                    i--;
+                    List<string> idList = ActiveCourseUser.MultiSection.Split(',').ToList();
+                    foreach (string id in idList)
+	                {
+		                int section;
+
+                        if (Int32.TryParse(id, out section))
+                        {
+                            sections.Add(section);
+                        }
+	                }
                 }
-            }
+                else
+                {
+                    sections.Add(ActiveCourseUser.Section);
+                }
+
+                // For TAs, make rid of any student that isn't in the TA's section.
+                for (int i = 0; i < students.Count; i++)
+                {
+                    if (!sections.Contains(students[i].Section))
+                    {
+                        students.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }  
 
             //key-value pair for names-grades
             Dictionary<string, string> grades = new Dictionary<string, string>();
             //seed dictionary with student last, first names
             foreach (CourseUser student in students)
             {
-                grades.Add(student.DisplayName(), "");
+                grades.Add(student.UserProfile.FullName, "");
             }
             //get graded rubrics
             List<RubricEvaluation> rubricEvaluations = null;
@@ -631,12 +654,15 @@ namespace OSBLE.Controllers
                     //we need to go through teams to handle team assignments. this works for individuals because an individual is a team of 1
                     foreach (var teamMember in rubricEvaluation.Recipient.TeamMembers)
                     {
-                        rubricStudentName= teamMember.CourseUser.UserProfile.LastAndFirst();
+                        rubricStudentName= teamMember.CourseUser.UserProfile.FullName;
                         
                         if (rubricEvaluation.IsPublished)
                         {
                             //update value to match key
-                            grades[rubricStudentName] = RubricEvaluation.GetGradeAsDouble(rubricEvaluation.ID).ToString();    
+                            if (grades.ContainsKey(rubricStudentName))
+                            {
+                                grades[rubricStudentName] = RubricEvaluation.GetGradeAsDouble(rubricEvaluation.ID).ToString();        
+                            }
                         }
                     }
                 }
