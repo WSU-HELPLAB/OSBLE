@@ -53,6 +53,23 @@ $(function () {
         if (noDeliverables())
             preventSubmit(e);
     });
+
+    $("#new_deliverable_type").on('change', function () {
+        if ($("#new_deliverable_type :selected").text() == "PluginSubmission (.zip)") {
+            $("#plugin_submission_validation").prop('hidden', false);
+            $("#plugin_submission_validation_div").addClass("disabled");
+        }
+        else
+        {
+            $("#plugin_submission_validation").prop('hidden', true);
+            $("#plugin_submission_validation_div").addClass("disabled");
+        }
+    });
+
+    if ($("#new_deliverable_type :selected").text() == "PluginSubmission (.zip)") {
+        $("#plugin_submission_validation").prop('hidden', false);
+        $("#plugin_submission_validation_div").addClass("disabled");
+    }
 });
 
 function clearValidation() {
