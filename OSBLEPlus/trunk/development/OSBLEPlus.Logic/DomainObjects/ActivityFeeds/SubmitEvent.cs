@@ -31,6 +31,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
                 return null;
 
             var stream = new MemoryStream();
+            int copyCount = 0; //use to rename duplicate files
 
             using (var zip = new ZipFile())
             {
@@ -59,12 +60,13 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
                 {
                     if (file.Contains("$$$")) //used $$$ as a delimiter to keep track of the external project file path
                     {
-                        relativePathFiles.Add(file);
+                        relativePathFiles.Add(file);                            
                     }
                 }
 
                 //temporarily remove the relative path files from the main files list -- will process next
                 files = files.Except(relativePathFiles).ToList();
+                files = files.Distinct(StringComparer.CurrentCultureIgnoreCase).ToList(); //just in case there are somehow dupes in this list...
 
                 foreach (var file in files)
                 {
@@ -86,7 +88,30 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
                     {
                         directoryName = name.Replace(rootPath, string.Empty);
                     }
-                    zip.AddFile(file, directoryName);
+
+                    try
+                    {
+                        bool fileExists = zip.EntryFileNames.Contains(directoryName + "\\" + file.Split('\\').Last());
+                        zip.AddFile(file, directoryName);
+                    }
+                    catch (Exception ex)
+                    {   //todo: handle error                        
+                        if (ex is ArgumentException)
+                        {
+                            try
+                            {
+                                copyCount++;
+                                zip.AddFile(file).FileName = directoryName + "\\ERROR_DuplicateSourceFiles\\" + 
+                                                             Path.GetFileNameWithoutExtension(file) + " - Copy (" + copyCount + ")" + 
+                                                             Path.GetExtension(file);
+                                WriteErrorLog(ex, rootPath, filePathVariables(files, SolutionName, relativePathFiles, vcxprojFiles));
+                            }
+                            catch (Exception ex2)
+                            {
+                                WriteErrorLog(ex2, rootPath, filePathVariables(files, SolutionName, relativePathFiles, vcxprojFiles));                                 
+                            }
+                        }
+                    }                    
                 }
 
                 try //enclose this portion in a try catch just in case something goes wrong... we want to submit as normal if so
@@ -112,7 +137,29 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
                             {
                                 directoryName = filePath.Replace(rootPath, string.Empty);
                             }
-                            zip.AddFile(fileName, directoryName);
+                            
+                            try
+                            {
+                                zip.AddFile(fileName, directoryName);
+                            }
+                            catch (Exception ex)
+                            {   //todo: handle error                        
+                                if (ex is ArgumentException)
+                                {
+                                    try
+                                    {
+                                        copyCount++;
+                                        zip.AddFile(fileName).FileName = directoryName + "\\ERROR_DuplicateSourceFiles\\" + 
+                                                                         Path.GetFileNameWithoutExtension(fileName) + " - Copy (" + copyCount + ")" + 
+                                                                         Path.GetExtension(fileName);
+                                        WriteErrorLog(ex, rootPath, filePathVariables(files, SolutionName, relativePathFiles, vcxprojFiles));
+                                    }
+                                    catch (Exception ex2)
+                                    {
+                                        WriteErrorLog(ex2, rootPath, filePathVariables(files, SolutionName, relativePathFiles, vcxprojFiles)); 
+                                    }
+                                }
+                            }    
                         }
 
                         //We need to parse and modify the vcxproj file to make the relative path files referenced correctly in the submission
@@ -133,7 +180,15 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
                             {
                                 directoryName = name.Replace(rootPath, string.Empty);
                             }
-                            zip.AddEntry(directoryName + "\\" + fileName, System.Text.Encoding.UTF8.GetBytes(String.Join("\n", ParseVcxproj(vcxprojFile)))); //rebuilds the vcxproj file from parsed string
+
+                            try
+                            {
+                                zip.AddEntry(directoryName + "\\" + fileName, System.Text.Encoding.UTF8.GetBytes(String.Join("\n", ParseVcxproj(vcxprojFile)))); //rebuilds the vcxproj file from parsed string
+                            }
+                            catch (Exception ex)
+                            {
+                                WriteErrorLog(ex, rootPath, filePathVariables(files, SolutionName, relativePathFiles, vcxprojFiles));
+                            }
                         }
 
                     }
@@ -155,24 +210,61 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
                             {
                                 directoryName = name.Replace(rootPath, string.Empty);
                             }
-                            zip.AddFile(vcxprojFile, directoryName); //we don't have to parse this because there should be no relative paths
+                            
+                            try
+                            {
+                                zip.AddFile(vcxprojFile, directoryName); //we don't have to parse this because there should be no relative paths
+                            }
+                            catch (Exception ex)
+                            {   //todo: handle error                        
+                                if (ex is ArgumentException)
+                                {
+                                    try
+                                    {
+                                        copyCount++;
+                                        zip.AddFile(vcxprojFile).FileName = directoryName + "\\ERROR_DuplicateSourceFiles\\" + 
+                                                                            Path.GetFileNameWithoutExtension(vcxprojFile) + " - Copy (" + copyCount + ")" + 
+                                                                            Path.GetExtension(vcxprojFile);
+                                        WriteErrorLog(ex, rootPath, filePathVariables(files, SolutionName, relativePathFiles, vcxprojFiles));
+                                    }
+                                    catch (Exception ex2)
+                                    {
+                                        WriteErrorLog(ex2, rootPath, filePathVariables(files, SolutionName, relativePathFiles, vcxprojFiles));
+                                    }
+                                }
+                            }    
                         }
                     }
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    //TODO: handle errors
+                    WriteErrorLog(ex, rootPath, filePathVariables(files, SolutionName, relativePathFiles, vcxprojFiles));
                 }
 
-                //need to parse the sln here before adding it to the zip. need to adjust referenced projects (if any)
-                //rebuilds the sln file from parsed string to remove project relative paths
-                zip.AddEntry(SolutionName.Split('\\').Last(), System.Text.Encoding.UTF8.GetBytes(String.Join("\n", ParseSolutionForRelativePaths(SolutionName))));
+                try
+                {
+                    //need to parse the sln here before adding it to the zip. need to adjust referenced projects (if any)
+                    //rebuilds the sln file from parsed string to remove project relative paths
+                    zip.AddEntry(SolutionName.Split('\\').Last(), System.Text.Encoding.UTF8.GetBytes(String.Join("\n", ParseSolutionForRelativePaths(SolutionName))));
+                }
+                catch (Exception ex)
+                {
+                    WriteErrorLog(ex, rootPath, filePathVariables(files, SolutionName, relativePathFiles, vcxprojFiles));
+                }
 
-                zip.Save(stream);
-                stream.Position = 0;
+                try
+                {
+                    zip.Save(stream);
+                    stream.Position = 0;
 
-                SolutionData = stream.ToArray();
-                return SolutionData;
+                    SolutionData = stream.ToArray();
+                    return SolutionData;
+                }
+                catch (Exception ex)
+                {
+                    WriteErrorLog(ex, rootPath, filePathVariables(files, SolutionName, relativePathFiles, vcxprojFiles));
+                    return null;
+                }
             }
         }
 
@@ -392,6 +484,39 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             while ((newUrl = Uri.UnescapeDataString(url)) != url)
                 url = newUrl;
             return newUrl;
+        }
+
+        private static void WriteErrorLog(Exception ex, string filePath, Dictionary<string, List<string>> fileList)
+        {
+            using (StreamWriter writer = new StreamWriter(filePath + "\\OSBLEPluginErrorLog.txt", true))
+            {
+                writer.WriteLine("Message :" + ex.Message + Environment.NewLine + "StackTrace :" + ex.StackTrace +
+                   "" + Environment.NewLine + "Date :" + DateTime.Now.ToString());
+
+                foreach (var pair in fileList)
+                {
+                    writer.WriteLine(Environment.NewLine + pair.Key);
+                    foreach (string item in pair.Value)
+                    {
+                        writer.WriteLine(item);
+                    }
+                }
+                writer.WriteLine(Environment.NewLine + "-----------------------------------------------------------------------------" + Environment.NewLine);
+            }
+        }
+
+        private Dictionary<string, List<string>> filePathVariables(List<string> files, string solutionName, List<string> relativePathFiles, List<string> vcxprojFiles)
+        {
+            Dictionary<string, List<string>> filePaths = new Dictionary<string, List<string>>();
+
+            filePaths.Add("files", files.ToList());
+            List<string> solutions = new List<string>();
+            solutions.Add(solutionName);
+            filePaths.Add("solutionNames", solutions);
+            filePaths.Add("relativePathFiles", relativePathFiles.ToList());
+            filePaths.Add("vcxprojFiles", vcxprojFiles.ToList());
+
+            return filePaths;
         }
 
         public override SqlCommand GetInsertCommand()
