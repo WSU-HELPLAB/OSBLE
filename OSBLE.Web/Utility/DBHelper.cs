@@ -1496,5 +1496,33 @@ namespace OSBLE.Utility
         }
 
         #endregion        
+            
+        /*** Assignments *******************************************************************************************/
+        #region Assignments
+        public static string GetAssignmentName(int assignmentId = 0, SqlConnection connection = null)
+        {
+            if (assignmentId == 0)
+            {
+                return "";
+            }
+
+            string assignmentName = "";
+
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection()) 
+                {
+                    assignmentName = GetAssignmentName(assignmentId, sqlc); 
+                }
+                return assignmentName;
+            }
+
+            assignmentName = connection.Query<string>("SELECT ISNULL(AssignmentName, '') FROM Assignments WHERE ID = @assignmentId",
+                new { assignmentId = assignmentId }).SingleOrDefault();
+
+            return assignmentName;
+        }
+
+        #endregion
     }
 }
