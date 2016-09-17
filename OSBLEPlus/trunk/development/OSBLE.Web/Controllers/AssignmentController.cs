@@ -305,23 +305,36 @@ namespace OSBLE.Controllers
                                                       select e).ToList();
 
                 // For TAs, get rid of evaluations not within their section
-                for (int i = 0; i < evaluations.Count; i++)
+                if (ActiveCourseUser.AbstractRoleID == (int) CourseRole.CourseRoles.TA)
                 {
-                    bool inSection = false;
-                    foreach(TeamMember member in evaluations[i].Recipient.TeamMembers) // Must find at least one team member in TA's section to let TA see this team
+                    List<string> sectionIds = new List<string>();
+                    if (ActiveCourseUser.Section < 0)
                     {
-                        if (member.CourseUser.Section == ActiveCourseUser.Section)
+                        sectionIds.AddRange(ActiveCourseUser.MultiSection.Split(',').ToList());                        
+                    }
+                    else
+                    {
+                        sectionIds.Add(ActiveCourseUser.Section.ToString());
+                    }
+
+                    for (int i = 0; i < evaluations.Count; i++)
+                    {
+                        bool inSection = false;
+                        foreach (TeamMember member in evaluations[i].Recipient.TeamMembers) // Must find at least one team member in TA's section to let TA see this team
                         {
-                            inSection = true;
-                            break;
+                            if (sectionIds.Contains(member.CourseUser.Section.ToString()))
+                            {
+                                inSection = true;
+                                break;
+                            }
                         }
-                    }
-                    if (!inSection)
-                    {
-                        evaluations.RemoveAt(i);
-                        i--;
-                    }
-                }
+                        if (!inSection)
+                        {
+                            evaluations.RemoveAt(i);
+                            i--;
+                        }
+                    }   
+                }                
 
                 foreach (RubricEvaluation re in evaluations)
                 {

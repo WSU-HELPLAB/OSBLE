@@ -191,9 +191,19 @@ namespace OSBLE.Controllers
             RubricViewModel viewModel = new RubricViewModel();
 
             // For TAs, make sure they are allowed to view this student!
-            if (ActiveCourseUser.AbstractRole.Name == "TA")
+            if (ActiveCourseUser.AbstractRoleID == (int) CourseRole.CourseRoles.TA)
             {
-                if (ActiveCourseUser.Section != cu.Section)
+                List<string> sectionIds = new List<string>();
+                if (ActiveCourseUser.Section < 0)
+                {
+                    sectionIds.AddRange(ActiveCourseUser.MultiSection.Split(',').ToList());
+                }
+                else
+                {
+                    sectionIds.Add(ActiveCourseUser.Section.ToString());
+                }
+
+                if (!sectionIds.Contains(cu.Section.ToString()))
                 {
                     return viewModel;
                 }
