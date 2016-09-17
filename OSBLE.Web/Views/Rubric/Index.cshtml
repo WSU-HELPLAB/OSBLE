@@ -30,13 +30,23 @@
   List<AssignmentTeam> atList = new List<AssignmentTeam>();
   CourseUser activeCourseUser = ViewBag.ActiveCourseUser;
 
+  List<string> sectionIds = new List<string>();
+  if (activeCourseUser.Section < 0)
+  {
+      sectionIds.AddRange(activeCourseUser.MultiSection.Split(',').ToList());
+  }
+  else
+  {
+      sectionIds.Add(activeCourseUser.Section.ToString());
+  }
+  
     if (null != Model.TeamList)
     {
         atList = (from t in @Model.TeamList as IEnumerable<AssignmentTeam>
                   select t).Reverse().ToList(); 
 
         if (activeCourseUser != null && activeCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
-        {
+        {            
             // If current user is a TA, remove any AssignmentTeams that aren't in the TA's section
             for (int i = 0; i < atList.Count; i++)
             {
@@ -44,7 +54,7 @@
                 bool inSection = false;
                 foreach (TeamMember member in atList[i].Team.TeamMembers)
                 {
-                    if (member.CourseUser.Section == activeCourseUser.Section)
+                    if (sectionIds.Contains(member.CourseUser.Section.ToString()))
                     {
                         inSection = true;
                         break;
@@ -264,23 +274,23 @@
                         Student/Team:
                     </th>
                 
-                        @{
-                              int prevUserId;
-                              int userCount;
-                              AssignmentTeam at;
-                              
-                              // We reversed the list so the last person is our first person
-                              if (atList.LastOrDefault().TeamID == @Model.SelectedTeam.TeamID)
-                              {
-                                  prevUserId = atList.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID;
-                                  userCount = 1;
-                              }
-                              else
-                              {
-                                  at = atList.SkipWhile(item => item.TeamID != @Model.SelectedTeam.TeamID).Skip(1).FirstOrDefault();
-                                  prevUserId = at.Team.TeamMembers.FirstOrDefault().CourseUserID;
-                                  userCount = atList.Count() - (atList.IndexOf(at) - 1);
-                              }
+                        @{                            
+                            int prevUserId;
+                            int userCount;
+                            AssignmentTeam at;                            
+                            
+                            // We reversed the list so the last person is our first person
+                            if (atList.LastOrDefault().TeamID == @Model.SelectedTeam.TeamID)
+                            {
+                                prevUserId = atList.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID;
+                                userCount = 1;
+                            }
+                            else
+                            {
+                                at = atList.SkipWhile(item => item.TeamID != @Model.SelectedTeam.TeamID).Skip(1).FirstOrDefault();
+                                prevUserId = at.Team.TeamMembers.FirstOrDefault().CourseUserID;
+                                userCount = atList.Count() - (atList.IndexOf(at) - 1);
+                            }                            
                         }
                 
                     <td style="padding:0;margin:0;border:0">
@@ -295,7 +305,7 @@
                                       bool inSection = false;
                                       foreach (TeamMember member in team.Team.TeamMembers)
                                       {
-                                          if (member.CourseUser.Section == activeCourseUser.Section)
+                                          if (sectionIds.Contains(member.CourseUser.Section.ToString()))
                                           {
                                               inSection = true;
                                               break;
@@ -380,7 +390,7 @@
                                       bool inSection = false;
                                       foreach (TeamMember member in atList[i].Team.TeamMembers)
                                       {
-                                          if (member.CourseUser.Section == activeCourseUser.Section)
+                                          if (sectionIds.Contains(member.CourseUser.Section.ToString()))
                                           {
                                               inSection = true;
                                               break;
