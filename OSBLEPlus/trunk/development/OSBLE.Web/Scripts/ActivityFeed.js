@@ -382,7 +382,7 @@ function FeedViewModel(userName, userId, current) {
 
         //case: legacy or open to all viewers. we get a "" list in the case where the value is null 
         //or we purposly saved a list as "" so visibility is for everyone
-        if (eventVisibleToList == "") {
+        if (eventVisibleToList == "" || eventVisibleToList === undefined) {
             return true;
         }
         //if the list is not empty, make sure the user id is in the list.
