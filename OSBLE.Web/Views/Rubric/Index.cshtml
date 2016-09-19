@@ -31,7 +31,7 @@
   CourseUser activeCourseUser = ViewBag.ActiveCourseUser;
 
   List<string> sectionIds = new List<string>();
-  if (activeCourseUser.Section < 0)
+  if (activeCourseUser.Section == -1)
   {
       sectionIds.AddRange(activeCourseUser.MultiSection.Split(',').ToList());
   }
