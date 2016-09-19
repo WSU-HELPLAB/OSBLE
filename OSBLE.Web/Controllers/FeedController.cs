@@ -654,6 +654,13 @@ namespace OSBLE.Controllers
         [HttpGet]
         public JsonResult MarkHelpfulComment(int eventLogToMark, int markerId)
         {
+            int logToMarkSenderId = DBHelper.GetActivityEvent(eventLogToMark).SenderId;
+
+            if (ActiveCourseUser != null && logToMarkSenderId == markerId)
+            {
+                markerId = ActiveCourseUser.UserProfileID;
+            }
+
             using (SqlConnection sqlc = DBHelper.GetNewConnection())
             {
                 int helpfulMarks = DBHelper.MarkLogCommentHelpful(eventLogToMark, markerId, sqlc);
