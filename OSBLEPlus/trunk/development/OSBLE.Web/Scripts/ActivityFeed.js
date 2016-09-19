@@ -19,6 +19,7 @@ function FeedItem(data) {
     self.numberHelpfulMarks = ko.observable(data.NumberHelpfulMarks);
     self.idString = data.IdString; // used for items with multiple ids
     self.activeCourseUserId = data.ActiveCourseUserId;
+    self.eventType = data.EventType;
 
     // load Comments
     self.comments = ko.observableArray([]);
@@ -188,7 +189,22 @@ function FeedViewModel(userName, userId, current) {
     };
 
     self.hub.client.addNewPost = function (courseID, postData) {
-        if (courseID == GetSelectedCourseID()) {
+        //make sure the event is allowed by the filter
+        var eventTypeCookie = $.cookie('FilterCookie');
+        var cookieFilters = eventTypeCookie.split('&');
+        var filterAllowsEvent = false;
+
+        for (var i = 0; i < cookieFilters.length; i++) {
+            var filters = cookieFilters[i].split('=');
+            if (filters.length > 1 && filters[0] == postData.EventType) {
+                if (filters[1] == "True"){
+                    filterAllowsEvent = true;
+                    break;
+                }
+            }
+        }
+
+        if (courseID == GetSelectedCourseID() && filterAllowsEvent) {
             SetPermissions(postData);
             self.items.unshift(new FeedItem(postData)); // unshift puts object at beginning of array
             HighlightNewPost(postData.EventId, postData.SenderId == self.userId, self.InEventVisibleToList(postData.EventVisibleTo));
@@ -758,7 +774,8 @@ function MakePostSucceeded(newPost) {
     $('#btn_post_active').removeAttr('disabled');
 
     // notify others about the new post
-    vm.hub.server.notifyNewPost(newPost);
+    //last two parameters are not used by posts, just VS Plugin events... apparently hub doesn't like optional parameters
+    vm.hub.server.notifyNewPost(newPost, "", 0);
 }
 
 function MakePostFailed() {

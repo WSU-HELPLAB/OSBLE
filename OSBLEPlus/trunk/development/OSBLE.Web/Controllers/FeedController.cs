@@ -27,6 +27,9 @@ using OSBLE.Hubs;
 using Microsoft.AspNet.SignalR;
 using System.Text.RegularExpressions;
 using System.Configuration;
+using System.Web.UI;
+using System.IO;
+using OSBLEPlus.Services.Controllers;
 
 namespace OSBLE.Controllers
 {
@@ -279,8 +282,12 @@ namespace OSBLE.Controllers
             return Json(1);
         }
 
-        private string GetDisplayTimeString(DateTime time)
+        private string GetDisplayTimeString(DateTime time, CourseUser courseUser = null)
         {
+            if (courseUser != null)
+            {
+                return time.UTCToCourse(courseUser.AbstractCourseID).ToShortDateString() + " " + time.UTCToCourse(courseUser.AbstractCourseID).ToShortTimeString();
+            }
             return time.UTCToCourse(ActiveCourseUser.AbstractCourseID).ToShortDateString() + " " + time.UTCToCourse(ActiveCourseUser.AbstractCourseID).ToShortTimeString();
         }
 
@@ -317,12 +324,18 @@ namespace OSBLE.Controllers
             };
         }
 
-        private object MakeAggregateFeedItemJsonObject(AggregateFeedItem item, bool details)
+        public object MakeAggregateFeedItemJsonObject(AggregateFeedItem item, bool details, int userProfileId = 0, int courseId = 0)
         {
-            var eventLog = item.Items[0].Event;
-            eventLog.SetPrivileges(ActiveCourseUser);
+            CourseUser courseUser = null;
+            if (userProfileId != 0 && courseId != 0)
+            {
+                courseUser = DBHelper.GetCourseUserFromProfileAndCourse(userProfileId, courseId);
+            }
 
-            var comments = MakeCommentListJsonObject(item.Comments, eventLog.EventLogId);
+            var eventLog = item.Items[0].Event;
+            eventLog.SetPrivileges(ActiveCourseUser ?? courseUser);
+
+            var comments = MakeCommentListJsonObject(item.Comments, eventLog.EventLogId, ActiveCourseUser != null ? ActiveCourseUser.UserProfileID : userProfileId);
             string viewFolder = details ? "Details/_" : "Feed/_";
             string idString = null;
 
@@ -332,6 +345,19 @@ namespace OSBLE.Controllers
                 idString = DBHelper.GetHelpfulMarkFeedSourceId(eventLog.EventLogId).ToString();
             }
 
+            string htmlContent = PartialView(viewFolder + eventLog.EventType.ToString().Replace(" ", ""), item).Capture(this.ControllerContext);
+            
+            if (String.IsNullOrEmpty(htmlContent))
+            {
+                try
+                {
+                    htmlContent = BuildEventHtmlContent(eventLog);                    
+                }
+                catch (Exception)
+                {
+                    htmlContent = "Error loading content. Please refresh the page.";
+                }                
+            }
 
             return new
             {
@@ -339,7 +365,7 @@ namespace OSBLE.Controllers
                 ParentEventId = -1,
                 SenderName = eventLog.DisplayTitle,
                 SenderId = item.Creator.ID,
-                TimeString = GetDisplayTimeString(item.MostRecentOccurance),
+                TimeString = GetDisplayTimeString(item.MostRecentOccurance, courseUser),
                 EventDate = item.MostRecentOccurance.Ticks,
                 CanMail = eventLog.CanMail,
                 HideMail = eventLog.HideMail,
@@ -351,15 +377,86 @@ namespace OSBLE.Controllers
                 HighlightMark = false,
                 ShowPicture = eventLog.ShowProfilePicture,
                 Comments = comments,
-                HTMLContent = PartialView(viewFolder + eventLog.EventType.ToString().Replace(" ", ""), item).Capture(this.ControllerContext),
+                HTMLContent = htmlContent,
                 //Content = eventLog.EventType == EventType.FeedPostEvent ? (eventLog as FeedPostEvent).Comment : "",
                 IdString = idString ?? string.Join(",", item.Items.Select(i => i.Event.EventLogId)),
-                ActiveCourseUserId = ActiveCourseUser.UserProfileID,
+                ActiveCourseUserId = courseUser == null ? ActiveCourseUser.UserProfileID : courseUser.UserProfileID,
                 EventVisibleTo = eventLog.EventVisibleTo,
+                EventType = eventLog.EventType.ToString(),
             };
         }
 
-        private object MakeCommentListJsonObject(IEnumerable<LogCommentEvent> comments, int parentLogID)
+        private string BuildEventHtmlContent(IActivityEvent eventLog)
+        {
+            string htmlContent = "";
+            if (eventLog.EventType == EventType.AskForHelpEvent)
+            {
+                StringWriter stringWriter = new StringWriter();
+                using (HtmlTextWriter writer = new HtmlTextWriter(stringWriter))
+                {
+                    // Write a DIV with encoded text.
+                    writer.AddAttribute(HtmlTextWriterAttribute.Class, "non-user-text");
+                    writer.RenderBeginTag(HtmlTextWriterTag.Span);
+                    writer.RenderBeginTag(HtmlTextWriterTag.Em);
+                    writer.WriteEncodedText(DBHelper.GetUserFirstNameFromEventLogId(eventLog.EventLogId));
+                    writer.RenderEndTag();
+                    writer.WriteEncodedText(" asked the following question: ");
+                    writer.RenderEndTag();
+                    writer.WriteBreak();
+                    writer.AddAttribute(HtmlTextWriterAttribute.Class, "user-text");
+                    writer.RenderBeginTag(HtmlTextWriterTag.Span);
+                    writer.WriteEncodedText(((AskForHelpEvent)(eventLog)).UserComment);
+                    writer.RenderEndTag();
+                    writer.WriteBreak();
+                    writer.AddAttribute(HtmlTextWriterAttribute.Class, "non-user-text");
+                    writer.RenderBeginTag(HtmlTextWriterTag.Span);
+                    writer.WriteEncodedText("Click the ");
+                    writer.RenderBeginTag(HtmlTextWriterTag.Em);
+                    writer.WriteEncodedText("\"Details\"");
+                    writer.RenderEndTag();
+                    writer.WriteEncodedText(" link below to see code details.");
+                    writer.RenderEndTag();
+                    writer.WriteBreak();
+                    htmlContent = stringWriter.ToString();
+                }
+            }
+            else if (eventLog.EventType == EventType.SubmitEvent)
+            {
+                StringWriter stringWriter = new StringWriter();
+                using (HtmlTextWriter writer = new HtmlTextWriter(stringWriter))
+                {
+                    // Write a DIV with encoded text.
+                    writer.AddAttribute(HtmlTextWriterAttribute.Class, "non-user-text");
+                    writer.RenderBeginTag(HtmlTextWriterTag.Span);
+                    writer.RenderBeginTag(HtmlTextWriterTag.Em);
+                    writer.WriteEncodedText(DBHelper.GetUserFirstNameFromEventLogId(eventLog.EventLogId));
+                    writer.RenderEndTag();                    
+                    writer.WriteEncodedText(" submitted ");
+
+                    writer.AddAttribute(HtmlTextWriterAttribute.Href, "\\AssignmentDetails\\" + ((SubmitEvent)eventLog).AssignmentId.ToString());
+                    writer.RenderBeginTag(HtmlTextWriterTag.A);
+                    string output = DBHelper.GetAssignmentName(((SubmitEvent) eventLog).AssignmentId) + ": ";
+                    writer.Write(output);
+                    writer.RenderEndTag(); //A
+                    
+                    writer.RenderEndTag();
+                    writer.AddAttribute(HtmlTextWriterAttribute.Class, "non-user-text");
+                    writer.RenderBeginTag(HtmlTextWriterTag.Span);
+                    output = "\"" + eventLog.SolutionName.Split('\\').Last().Split('.').First() + "\"";
+                    writer.WriteEncodedText(output);
+                    writer.RenderEndTag();
+                    writer.WriteBreak();
+                    htmlContent = stringWriter.ToString();
+                }
+            }
+            else
+            {
+                htmlContent = ((AskForHelpEvent)(eventLog)).UserComment;
+            }
+            return htmlContent;
+        }
+
+        private object MakeCommentListJsonObject(IEnumerable<LogCommentEvent> comments, int parentLogID, int userProfileId = 0)
         {
             var obj = new List<dynamic>();
 
@@ -371,7 +468,8 @@ namespace OSBLE.Controllers
             using (SqlConnection sql = DBHelper.GetNewConnection())
             {
                 Dictionary<int, bool> logCommentMarkedByCurrentUser =
-                    DBHelper.DictionaryOfMarkedLogs(ActiveCourseUser.UserProfileID, commentIds, sql);
+                DBHelper.DictionaryOfMarkedLogs(ActiveCourseUser == null ? userProfileId : ActiveCourseUser.UserProfileID, commentIds, sql);
+
                 foreach (LogCommentEvent e in comments)
                 {
                     obj.Add(MakeLogCommentJsonObject(e, logCommentMarkedByCurrentUser, sql));
@@ -1392,7 +1490,25 @@ namespace OSBLE.Controllers
         public JsonResult GetPermissions(int eventId)
         {
             ActivityEvent e = DBHelper.GetActivityEvent(eventId);
-            e.SetPrivileges(ActiveCourseUser);
+
+            if (ActiveCourseUser == null)
+            {
+                return Json(new
+                {
+                    canDelete = false,
+                    canEdit = false,
+                    canMail = false,
+                    hideMail = true,
+                    eventVisibilityGroups = "",
+                    canVote = false,
+                    showPicture = false,
+                    eventVisibleTo = "",
+                });
+            }
+            else
+            {
+                e.SetPrivileges(ActiveCourseUser);
+            }
 
             return Json(new
             {

@@ -73,8 +73,10 @@ namespace OSBLEPlus.Services.Controllers
             if (!auth.IsValidKey(request.AuthToken))
                 return new HttpResponseMessage { StatusCode = HttpStatusCode.Forbidden };
 
+            bool eventSenderNotNull = false;
+
             if (request.SubmitEvent.Sender == null)
-            {
+            {                
                 var sender = auth.GetActiveUser(request.AuthToken);
                 request.SubmitEvent.SenderId = sender.IUserId;
                 request.SubmitEvent.Sender = new User
@@ -83,10 +85,27 @@ namespace OSBLEPlus.Services.Controllers
                     FirstName = sender.FirstName,
                     LastName = sender.LastName
                 };
+                eventSenderNotNull = true;
             }
 
             var content = Posts.SaveEvent(request.SubmitEvent).ToString();
             Posts.SaveToFileSystem(request.SubmitEvent);
+
+            try //don't want hub notification to break post
+            {
+                //push the event to the hub
+                if (eventSenderNotNull)
+                {
+                    using (EventCollectionController ecc = new EventCollectionController())
+                    {
+                        ecc.NotifyHub(int.Parse(content), request.SubmitEvent.SenderId, request.SubmitEvent.EventType.ToString(), request.SubmitEvent.CourseId ?? 0);
+                    }
+                }   
+            }
+            catch (Exception)
+            {
+                //ignore for now
+            }                     
 
             return new HttpResponseMessage
             {
