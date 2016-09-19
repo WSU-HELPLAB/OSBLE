@@ -76,6 +76,21 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 
         public void SetPrivileges(CourseUser currentUser)
         {
+            if (currentUser == null) 
+            {
+                HideMail = false;
+                EventVisibilityGroups = "";
+                EventVisibleTo = "";
+                CanMail = false;
+                CanDelete = false;
+                CanEdit = false;
+                CanReply = false;
+                CanVote = false;
+                ShowProfilePicture = false;
+                DisplayTitle = "CourseUser";
+                return;
+            } 
+
             bool anonymous = currentUser.AbstractRole.Anonymized;
 
             // Anyone can mail anyone but themselves (provided they're not anonimous)

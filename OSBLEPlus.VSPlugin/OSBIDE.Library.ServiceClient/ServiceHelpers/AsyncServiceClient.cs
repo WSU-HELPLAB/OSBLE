@@ -190,7 +190,18 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
                 var task = client.PostAsXmlAsync("api/eventcollection/post", request);
                 await task;
 
-                return JsonConvert.DeserializeObject<int>(task.Result.Content.ReadAsStringAsync().Result);
+                try 
+	            {	        
+		            var result = JsonConvert.DeserializeObject<int>(task.Result.Content.ReadAsStringAsync().Result);
+                    return result;
+	            }
+	            catch (Exception)
+	            {
+                    return 0;
+	            }
+
+                
+                 
             }
         }
 
@@ -198,10 +209,16 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
         {
             using (var client = GetClient())
             {
-                var task = client.PostAsJsonAsync("api/userprofiles/submitlocalerrorlog", request);
-                await task;
-
-                return task.Result.StatusCode == HttpStatusCode.OK;
+                try
+                {
+                    var task = client.PostAsJsonAsync("api/userprofiles/submitlocalerrorlog", request);
+                    await task;
+                    return task.Result.StatusCode == HttpStatusCode.OK;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
             }
         }
     }

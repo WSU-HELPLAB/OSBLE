@@ -10,6 +10,11 @@ public static class ActionResultExtensions
 {
     public static string Capture(this ActionResult result, ControllerContext controllerContext)
     {
+        if (controllerContext == null)
+        {
+            return "";
+        }
+
         using (var capture = new ResponseCapture(controllerContext.RequestContext.HttpContext.Response))
         {
             result.ExecuteResult(controllerContext);

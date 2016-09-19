@@ -596,6 +596,39 @@ namespace OSBLE.Utility
             return utcTime.UTCToCourse(abstractCourseId);
         }
 
+        public static List<int> GetActiveCourseIds(int userProfileId)
+        {
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+
+                    string query = "";
+
+                    //we're getting all active course Ids because ask for help events are visible in all courses
+                    query = "SELECT DISTINCT ISNULL(ac.ID, 0) " +
+                                "FROM AbstractCourses ac " +
+                                "INNER JOIN CourseUsers cu " +
+                                "ON ac.ID = cu.AbstractCourseID " +
+                                "WHERE GETDATE() < ac.EndDate " +
+                                "AND ac.Inactive = 0 " +
+                                "AND cu.UserProfileID = @userProfileId";
+
+                    List<int> activeCourseIds = sqlConnection.Query<int>(query, new { userProfileId = userProfileId }).ToList();
+
+                    sqlConnection.Close();
+
+                    return activeCourseIds;
+                }
+            }
+            catch (Exception e)
+            {
+                //TODO: handle exception logging
+                return new List<int>(); //failure, return empty list
+            }
+        }
+
         #endregion
 
 
@@ -1300,6 +1333,46 @@ namespace OSBLE.Utility
             return comments;
         }
 
+        public static bool LastSubmitGreaterThanMinutesInterval(int eventLogId, int minutes, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection()) { return LastSubmitGreaterThanMinutesInterval(eventLogId, minutes, sqlc); }
+            }
+
+            bool greaterThanInterval = false;
+
+            try
+            {
+                DateTime newSubmissionTimestamp = connection.Query<DateTime>("SELECT EventDate FROM EventLogs WHERE Id = @eventLogId ",
+                                                                    new { eventLogId = eventLogId }).Single();
+
+                DateTime mostRecentSubmissionTimestamp = connection.Query<DateTime>("SELECT TOP 1 EventDate " +
+                                                                                        "FROM EventLogs " +
+                                                                                        "WHERE EventTypeId = 11 " + //11 is submit event
+                                                                                        "AND SenderId = (SELECT SenderId " +
+                                                                                                        "FROM EventLogs " +
+                                                                                                        "WHERE Id = @eventLogId) " +
+                                                                                        "AND CourseId = (SELECT CourseId " +
+                                                                                                        "FROM EventLogs " +
+                                                                                                        "WHERE Id = @eventLogId) " +
+                                                                                        "AND Id != @eventLogId " +
+                                                                                        "ORDER BY Id DESC ",
+                                                                        new { eventLogId = eventLogId }).Single();
+
+                TimeSpan difference = newSubmissionTimestamp - mostRecentSubmissionTimestamp;
+                if (difference.Minutes > minutes)
+                {
+                    greaterThanInterval = true;
+                }
+                return greaterThanInterval;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
         #endregion
 
 
@@ -1524,5 +1597,7 @@ namespace OSBLE.Utility
         }
 
         #endregion
+
+
     }
 }
