@@ -194,7 +194,7 @@ namespace OSBLE.Controllers
             if (ActiveCourseUser.AbstractRoleID == (int) CourseRole.CourseRoles.TA)
             {
                 List<string> sectionIds = new List<string>();
-                if (ActiveCourseUser.Section < 0)
+                if (ActiveCourseUser.Section == -1)
                 {
                     sectionIds.AddRange(ActiveCourseUser.MultiSection.Split(',').ToList());
                 }
