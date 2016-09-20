@@ -65,7 +65,7 @@ namespace OSBLEPlus.Services.Controllers
 
             return new HttpResponseMessage
             {
-                StatusCode = result > 0 ? HttpStatusCode.InternalServerError : HttpStatusCode.OK,
+                StatusCode = result > 0 ? HttpStatusCode.OK : HttpStatusCode.InternalServerError,
                 Content = new StringContent(result.ToString())
             };
         }
@@ -103,6 +103,7 @@ namespace OSBLEPlus.Services.Controllers
 
             hub.Invoke("ForwardPluginEventToFeed");
 
+            connection.Stop();
         }
     }
 }
