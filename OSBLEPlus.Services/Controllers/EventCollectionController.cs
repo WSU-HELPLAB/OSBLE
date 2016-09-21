@@ -60,8 +60,12 @@ namespace OSBLEPlus.Services.Controllers
             log.SenderId = auth.GetActiveUserId(request.AuthToken);
             var result = Posts.SaveEvent(log);
 
-            //post to feed hub here.
-            NotifyHub(result, log.SenderId, log.EventType.ToString(), log.CourseId ?? 0);
+            //For now we're only pushing these events to the hub
+            if (log.EventType.ToString() == "AskForHelpEvent" || log.EventType.ToString() == "SubmitEvent")
+            {
+                //post to feed hub here.
+                NotifyHub(result, log.SenderId, log.EventType.ToString(), log.CourseId ?? 0);
+            }
 
             return new HttpResponseMessage
             {

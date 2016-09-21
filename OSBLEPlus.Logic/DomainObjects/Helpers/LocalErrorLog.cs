@@ -43,15 +43,20 @@ namespace OSBLEPlus.Logic.DomainObjects.Helpers
 DECLARE {0} INT
 INSERT INTO dbo.LocalErrorLogs ([SenderId],[LogDate],[Content]) VALUES (@SenderId, @LogDate, @Content)
 SELECT {0}=SCOPE_IDENTITY()
-INSERT INTO dbo.SubmitEvents (EventLogId, EventDate, SolutionName, AssignmentId)
-VALUES ({0}, @EventDate, @SolutionName, @AssignmentId)
+
 SELECT {0}", StringConstants.SqlHelperLogIdVar)
+
+                /*
+                 INSERT INTO dbo.SubmitEvents (EventLogId, EventDate, SolutionName, AssignmentId)
+     VALUES ({0}, @EventDate, @SolutionName, @AssignmentId)
+                 */
             };
-
-            cmd.Parameters.AddWithValue("SenderId", SenderId);
-            cmd.Parameters.AddWithValue("LogDate", LogDate);
-            cmd.Parameters.AddWithValue("Content", Content);
-
+            cmd.Parameters.AddWithValue("@SenderId", SenderId);
+            cmd.Parameters.AddWithValue("@LogDate", LogDate);
+            cmd.Parameters.AddWithValue("@Content", Content);
+            //cmd.Parameters.AddWithValue("@EventDate", LogDate);
+            //cmd.Parameters.AddWithValue("@SolutionName", "error.txt");
+            //cmd.Parameters.AddWithValue("@AssignmentId", 0);            
             return cmd;
         }
     }
