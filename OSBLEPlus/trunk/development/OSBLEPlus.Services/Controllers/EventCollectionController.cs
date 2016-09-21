@@ -63,8 +63,8 @@ namespace OSBLEPlus.Services.Controllers
             //For now we're only pushing these events to the hub
             if (log.EventType.ToString() == "AskForHelpEvent" || log.EventType.ToString() == "SubmitEvent")
             {
-                //post to feed hub here.
-                NotifyHub(result, log.SenderId, log.EventType.ToString(), log.CourseId ?? 0);
+            //post to feed hub here.
+            NotifyHub(result, log.SenderId, log.EventType.ToString(), log.CourseId ?? 0);
             }
 
             return new HttpResponseMessage
@@ -107,6 +107,7 @@ namespace OSBLEPlus.Services.Controllers
 
             hub.Invoke("ForwardPluginEventToFeed");
 
+            //stop the connection after the message has been forwarded.            
             connection.Stop();
         }
     }
