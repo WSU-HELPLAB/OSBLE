@@ -144,11 +144,18 @@
                 <td style="padding-left: 20px">
                     @if (assignments[i].HasRubric && !(isFutureAssignment || isDraftAssignment))
                     {
-                    
-                        if(assignments[i].AssignmentTeams.Count > 0)
+
+                        if (assignments[i].AssignmentTeams.Count > 0)
                         {
-                            @: @assignments[i].GetPublishedCount() of @assignments[i].AssignmentTeams.Count published.&nbsp @Html.ActionLink("Grade Now", "Index", "Rubric", new { assignmentId = assignments[i].ID, cuId = assignments[i].AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID }, new { })<br />
-                        }                            
+                            if (null != assignments[i].AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault())
+                            {
+                                @: @assignments[i].GetPublishedCount() of @assignments[i].AssignmentTeams.Count published.&nbsp @Html.ActionLink("Grade Now", "Index", "Rubric", new { assignmentId = assignments[i].ID, cuId = assignments[i].AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID }, new { })<br />
+                            }
+                            else
+                            {
+                                @: @assignments[i].GetPublishedCount() of @assignments[i].AssignmentTeams.Count published.&nbsp <br />
+                            }
+                        }
                             @: @assignments[i].GetSavedAsDraftCount() saved as draft.&nbsp @Html.ActionLink("Publish All", "PublishAllRubrics", "Assignment", new { area = "", assignmentId = assignments[i].ID }, new { })
                     
                     }
