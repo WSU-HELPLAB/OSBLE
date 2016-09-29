@@ -68,6 +68,12 @@
     <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.signalR-2.2.0.min.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/ActivityFeed.js")"></script>
 
+    @*datatable scripts*@
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.dataTables.js")"></script>    
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery.dataTables.css")" /> 
+    @*declaring global Table_Data here so it's available for the entire gb function*@
+    <script type="text/javascript"> var Table_Data; </script>
+
     @* titlebar alert *@
     <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.titlealert.js")"></script>
 

@@ -916,6 +916,11 @@
     <Content Include="Content\images\search_up.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\sort_asc.png" />
+    <Content Include="Content\images\sort_asc_disabled.png" />
+    <Content Include="Content\images\sort_both.png" />
+    <Content Include="Content\images\sort_desc.png" />
+    <Content Include="Content\images\sort_desc_disabled.png" />
     <Content Include="Content\images\thumbs_up.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -1024,6 +1029,7 @@
     <Content Include="Content\jquery-ui.css" />
     <Content Include="Content\jquery.atwho.css" />
     <Content Include="Content\jquery.contextMenu.css" />
+    <Content Include="Content\jquery.dataTables.css" />
     <Content Include="Content\navbar.css" />
     <Content Include="Content\themes\base\images\animated-overlay.gif" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
@@ -1215,6 +1221,7 @@
     <Content Include="Scripts\jquery.collapse.js" />
     <Content Include="Scripts\jquery.contextMenu.js" />
     <Content Include="Scripts\jquery.cookie.js" />
+    <Content Include="Scripts\jquery.dataTables.js" />
     <Content Include="Scripts\jquery.easing.js" />
     <Content Include="Scripts\jquery.selectboxes.js" />
     <Content Include="Scripts\jquery.signalR-2.2.0.js" />

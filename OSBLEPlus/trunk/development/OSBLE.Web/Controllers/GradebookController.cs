@@ -16,6 +16,7 @@ using System.Threading;
 using OSBLE.Utility;
 using FileCacheHelper = OSBLEPlus.Logic.Utility.FileCacheHelper;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace OSBLE.Controllers
 {
@@ -242,6 +243,7 @@ namespace OSBLE.Controllers
             Dictionary<string, List<string>> mergedGradebooks = new Dictionary<string, List<string>>(); //to store all gradebooks for the course
             //handle case where user is uploading from the Excel plugin
             int userRole = ActiveCourseUser == null ? uploadingCourseUser.AbstractRoleID : ActiveCourseUser.AbstractRoleID;
+            int userProfileId = ActiveCourseUser == null ? uploadingCourseUser.UserProfileID : ActiveCourseUser.UserProfileID;
 
             //first process gradebooks that already exist
             foreach (var existingGradebook in gfp.AllFiles())
@@ -267,19 +269,30 @@ namespace OSBLE.Controllers
 
                     if (newGradebookGlobalRows.Count() != oldGradebookGlobalRows.Count()) //ERROR: gradebooks have a different number of global rows!
                     {
+                        throw new Exception("GlobalRow Column Mismatch (newColumn count does not match old column count): newValue:" + String.Join(",", newGradebookGlobalRows) + 
+                                                        ", oldValue: " + String.Join(",", oldGradebookGlobalRows) +
+                                                        ", newCount: " + newGradebookGlobalRows.Count() + 
+                                                        ", oldCount: " + oldGradebookGlobalRows.Count() + 
+                                                        ", gradebook: " + existingGradebook);
                         return 1; //exit processing and add 1 to the filesFailedToLoadCount                        
                     }
 
                     //check if the indices of the global rows match
                     foreach (int index in newGradebookGlobalRows)
                         if (!oldGradebookGlobalRows.Contains(index)) //if each index is not found exit
+                        {
+                            throw new Exception("GlobalRow Column Mismatch (oldGradebookGlobalRows does not contain this index): newIndex:" +
+                                                        index + ", gradebook: " + existingGradebook);
                             return 1; //exit processing and add 1 to the filesFailedToLoadCount
+                        }
+                            
 
                     //now split the rows to columns to check if they match. we know the number of global rows and index numbers match.
                     foreach (int index in newGradebookGlobalRows)
-                    {
-                        List<string> newGradebookColumns = newGradebook[index].Split(',').ToList();
-                        List<string> oldGradebookColumns = oldGradebook[index].Split(',').ToList();
+                    {   
+                        //need to split but account for columns with a comma in them
+                        List<string> newGradebookColumns = Regex.Split(newGradebook[index], ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)").ToList();
+                        List<string> oldGradebookColumns = Regex.Split(oldGradebook[index], ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)").ToList();
 
                         if (newGradebookColumns.Count() != oldGradebookColumns.Count()) //column count doesn't match! check if it's just empty columns
                         {
@@ -296,9 +309,16 @@ namespace OSBLE.Controllers
                                 for (int i = newGradebookColumns.Count(); i > newGradebookColumns.Count() - rowDiffABS; i--)
                                 {
                                     if (newGradebookColumns[i - 1] == "")
+                                    {
                                         newGradebookColumns.RemoveAt(i - 1);
+                                    }                                        
                                     else
+                                    {
+                                        throw new Exception("GlobalRow Column Mismatch (column counts do not match): newCount:" +
+                                                        newGradebookColumns.Count() + ", oldCount: " + oldGradebookColumns.Count() + 
+                                                        ", column: " + i + ", gradebook: " + existingGradebook);
                                         return 1; //error: exit processing and add 1 to the filesFailedToLoadCount 
+                                    }                                        
 
                                     if (newGradebookColumns.Count() == oldGradebookColumns.Count())
                                         break;
@@ -309,9 +329,16 @@ namespace OSBLE.Controllers
                                 for (int i = oldGradebookColumns.Count(); i > oldGradebookColumns.Count() - rowDiffABS; i--)
                                 {
                                     if (oldGradebookColumns[i - 1] == "")
+                                    {
                                         oldGradebookColumns.RemoveAt(i - 1);
+                                    }                                        
                                     else
+                                    {
+                                        throw new Exception("GlobalRow Column Mismatch (column counts do not match): newCount:" +
+                                                        newGradebookColumns.Count() + ", oldCount: " + oldGradebookColumns.Count() +
+                                                        ", column: " + i + ", gradebook: " + existingGradebook);
                                         return 1; //error: exit processing and add 1 to the filesFailedToLoadCount 
+                                    }                                        
 
                                     if (newGradebookColumns.Count() == oldGradebookColumns.Count())
                                         break;
@@ -323,12 +350,45 @@ namespace OSBLE.Controllers
                         {
                             for (int i = 0; i < newGradebookColumns.Count(); i++)
                             {
-                                if (newGradebookColumns[i] != oldGradebookColumns[i])
+                                if (newGradebookColumns[i].Trim() != oldGradebookColumns[i].Trim())
+                                {
+                                    //handle random case where a # which is hidden on the main page is in the csv
+                                    if ((newGradebookColumns[i].Trim() == "" && oldGradebookColumns[i].Trim() == "#") 
+                                        || "#" + newGradebookColumns[i].Trim() == oldGradebookColumns[i].Trim()
+                                        || newGradebookColumns[i].Trim() + "#" == oldGradebookColumns[i].Trim())
+                                    {
+                                        continue;
+                                    }
+
+                                    //handle case where a ! which is hidden on the main page is in the csv (hidden rows students)
+                                    if ((newGradebookColumns[i].Trim() == "" && oldGradebookColumns[i].Trim() == "!")
+                                        || "!" + newGradebookColumns[i].Trim() == oldGradebookColumns[i].Trim()
+                                        || newGradebookColumns[i].Trim() + "!" == oldGradebookColumns[i].Trim())
+                                    {
+                                        continue;
+                                    }
+
+                                    //TODO: need to handle this case somehow as it will cause the update to fail due to a different number of columns being submitted
+                                    //handle case where a !! which is hidden on the main page is in the csv (hidden rows for everyone)
+                                    //if ((newGradebookColumns[i].Trim() == "" && oldGradebookColumns[i].Trim() == "!!")
+                                    //    || "!!" + newGradebookColumns[i].Trim() == oldGradebookColumns[i].Trim()
+                                    //    || newGradebookColumns[i].Trim() + "!!" == oldGradebookColumns[i].Trim())
+                                    //{
+                                    //    continue;
+                                    //}
+
+                                    throw new Exception("GlobalRow Column Mismatch (newColumn does not match old column): newValue:" +
+                                                        newGradebookColumns[i].Trim() + ", oldValue: " + oldGradebookColumns[i].Trim() +
+                                                        ", column: " + i + ", gradebook: " + existingGradebook);
                                     return 1; //one of the column cells doesn't match! exit and increment filesFailedToLoadCount
+                                }                                    
                             }
                         }
                         else
                         {
+                            throw new Exception("GlobalRow Column Mismatch (newColumn count does not match old column count): newValue:" +
+                                                        newGradebook[index] + ", oldValue: " + oldGradebook[index] +
+                                                        ", row: " + index + ", gradebook: " + existingGradebook);
                             return 1; //there are a different number of columns! exit and increment filesFailedToLoadCount
                         }
                     }
@@ -367,11 +427,11 @@ namespace OSBLE.Controllers
                                 break;
 
                             //see if we can match the current row ID column value
-                            if (!IsGlobalRow(newRow) && !IsGlobalRow(oldRow) && newRow.Split(',').ToList().First() == oldRow.Split(',').ToList().First()) //we found a matching row
+                            if (!IsGlobalRow(newRow) && !IsGlobalRow(oldRow) && Regex.Split(newRow, ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)").ToList().First() == Regex.Split(oldRow, ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)").ToList().First()) //we found a matching row
                             {
                                 if (isTAUploading)
                                 {
-                                    List<string> columns = newRow.Split(',').ToList(); // we need to get the index of the column with section values in it.
+                                    List<string> columns = Regex.Split(newRow, ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)").ToList(); // we need to get the index of the column with section values in it.
                                     int section;
                                     bool idParsed = Int32.TryParse(columns[indexOfSection], out section);
 
@@ -399,8 +459,8 @@ namespace OSBLE.Controllers
                         if (!rowMatch && !IsGlobalRow(newRow))
                         {
                             if (isTAUploading)
-                            {
-                                List<string> columns = newRow.Split(',').ToList(); // we need to get the index of the column with section values in it.
+                            {                                
+                                List<string> columns = Regex.Split(newRow, ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)").ToList(); // we need to get the index of the column with section values in it.
                                 if (columns.Count() > indexOfSection) //we can't possibly have a section column here if the index is out of range!
                                 {
                                     int section;
@@ -457,7 +517,7 @@ namespace OSBLE.Controllers
             }
 
             //mergedGradebooks now contains all gradebooks (old and new merged, including appending new rows and adding gradebooks not previously in the directory) 
-            return WriteGradebooksToFile(gfp, mergedGradebooks);
+            return WriteGradebooksToFile(gfp, mergedGradebooks, userProfileId);
         }
 
         /// <summary>
@@ -469,7 +529,7 @@ namespace OSBLE.Controllers
         {
             if (row.ToLower().Contains("section"))
             {
-                List<string> columns = row.Split(',').ToList(); // we need to get the index of the column with section values in it.                         
+                List<string> columns = Regex.Split(row, ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)").ToList(); // we need to get the index of the column with section values in it.                         
 
                 foreach (string cell in columns)
                     if (cell.ToLower().Contains("section"))
@@ -484,58 +544,178 @@ namespace OSBLE.Controllers
         /// <param name="gfp">contains information related to the gradebook filepath</param>
         /// <param name="mergedGradebooks">a dictionary containing a key 'filename.extension' and a list of strings representing a CSV row</param>
         /// <returns>returns an int indicating success or failure: 0 success, any positive integer will indicate a failure</returns>
-        private int WriteGradebooksToFile(GradebookFilePath gfp, Dictionary<string, List<string>> mergedGradebooks)
+        private int WriteGradebooksToFile(GradebookFilePath gfp, Dictionary<string, List<string>> mergedGradebooks, int userProfileId)
         {
-            string directory = gfp.GetPath().ToString();
-            bool allGradebooksWritten = true;
-            List<string> gradebookNames = new List<string>();
-
-            foreach (KeyValuePair<string, List<string>> entry in mergedGradebooks)
+            try //enclosing the entire thing in a try catch so we can remove the lock if it crashes for any reason.
             {
-                StreamWriter CSVStreamWriter = null; //create here so we can close it if we hit an exception anywhere in this method
-                try
-                {
-                    //Construct the path for the new empty CSV file
-                    string newCSVFile = directory + "\\" + "temp_" + entry.Key;
-                    //Create the new empty CSV file 
-                    CreateEmptyCSV(newCSVFile);
-                    //Create an instance of the writer for the empty CSV file. 
-                    CSVStreamWriter = new StreamWriter(newCSVFile);
-                    CSVStreamWriter.WriteLine(String.Join("\n", entry.Value));
-                    //Close the stream writer. 
-                    CSVStreamWriter.Close();
-                    gradebookNames.Add(entry.Key); //keep track of new files written so we can remove and rename
-                }
-                catch (Exception)
-                {
-                    if (CSVStreamWriter != null) //close if not null!
-                        CSVStreamWriter.Close();
-                    //remove temp files
-                    CleanTemporaryFiles(gfp);
-                    allGradebooksWritten = false;
-                }
-            }
+                //check for file lock
+                bool fileLocked = CheckFileLock(gfp);
 
-            if (allGradebooksWritten)
-            {
-                try
+                if (!fileLocked)
                 {
-                    //remove old gradebooks and rename temp gradebooks
-                    foreach (string gradebook in gradebookNames)
+                    //create file lock
+                    CreateFileLock(gfp);
+                }
+                else
+                {
+                    int retryFileLock = 20; //wait 10 seconds trying every half second
+                    while (retryFileLock != 0)
                     {
-                        gfp.DeleteFile(directory + "\\" + gradebook);
-                        gfp.RenameFile("temp_" + gradebook, gradebook);
+                        retryFileLock--;
+                        fileLocked = CheckFileLock(gfp);
+                        if (!fileLocked)
+                        {
+                            break;
+                        }
+                        Thread.Sleep(500);
+                    }
+
+                    if (!fileLocked)
+                    {
+                        //we waited for someone else to unlock, now create file lock so we can continue
+                        CreateFileLock(gfp);
+                    }
+                    else
+                    {
+                        //the file never became 'unlocked'
+                        throw new Exception("Gradebook File Lock Timed out.");
+                        return 1;
                     }
                 }
-                catch (Exception exception)
+
+                string directory = gfp.GetPath().ToString();
+                bool allGradebooksWritten = true;
+                List<string> gradebookNames = new List<string>();
+
+                foreach (KeyValuePair<string, List<string>> entry in mergedGradebooks)
                 {
-                    //remove temp files
-                    CleanTemporaryFiles(gfp);
-                    return 1; //error! exit and increment filesFailedToLoadCount
+                    StreamWriter CSVStreamWriter = null; //create here so we can close it if we hit an exception anywhere in this method
+                    try
+                    {
+                        //Construct the path for the new empty CSV file
+                        string newCSVFile = directory + "\\" + "temp_" + entry.Key;
+                        //Create the new empty CSV file 
+                        CreateEmptyCSV(newCSVFile);
+                        //Create an instance of the writer for the empty CSV file. 
+                        CSVStreamWriter = new StreamWriter(newCSVFile);
+                        CSVStreamWriter.WriteLine(String.Join("\n", entry.Value));
+                        //Close the stream writer. 
+                        CSVStreamWriter.Close();
+                        gradebookNames.Add(entry.Key); //keep track of new files written so we can remove and rename
+                    }
+                    catch (Exception)
+                    {
+                        if (CSVStreamWriter != null) //close if not null!
+                            CSVStreamWriter.Close();
+                        //remove temp files
+                        CleanTemporaryFiles(gfp);
+                        allGradebooksWritten = false;
+                    }
                 }
-                return 0; //success!
+
+                if (allGradebooksWritten)
+                {
+                    try
+                    {
+                        //create backup directory if one doesn't already exist
+                        Directory.CreateDirectory(directory + "Archive");
+                        //remove old gradebooks and rename temp gradebooks
+                        foreach (string gradebook in gradebookNames)
+                        {
+                            try
+                            {
+                                //Move the file to the course gradebook archive zip
+                                //TODO: need to handle cleaning house: a maximum number/age of archives
+                                if (System.IO.File.Exists(directory + "\\" + gradebook))
+                                {
+                                    //System.IO.File.Move(directory + "\\" + gradebook, directory + "Archive\\" + gradebook.Split('.').ToList().First() + "-userProfileId-" + userProfileId + "-date-" + DateTime.UtcNow.ToString("MM-dd-yyyy-HH-mm-ss") + ".csv");
+                                    if (System.IO.File.Exists(directory + "Archive\\GradebookArchive.zip")) //archive exists, just add it
+                                    {
+                                        using (ZipFile zip = ZipFile.Read(directory + "Archive\\GradebookArchive.zip"))
+                                        {
+                                            zip.AddFile(directory + "\\" + gradebook).FileName = gradebook.Split('.').ToList().First() + "-userProfileId-" + userProfileId + "-date-" + DateTime.UtcNow.ToString("MM-dd-yyyy-HH-mm-ss") + ".csv";
+                                            zip.Save();
+                                        }
+                                    }
+                                    else //archive doesn't exist, create it.
+                                    {
+                                        using (ZipFile zip = new ZipFile())
+                                        {
+                                            zip.AddFile(directory + "\\" + gradebook).FileName = gradebook.Split('.').ToList().First() + "-userProfileId-" + userProfileId + "-date-" + DateTime.UtcNow.ToString("MM-dd-yyyy-HH-mm-ss") + ".csv";
+                                            zip.Save(directory + "Archive\\GradebookArchive.zip");
+                                        }
+                                    }
+                                    gfp.DeleteFile(directory + "\\" + gradebook); //delete the old file                               
+                                }
+                                gfp.RenameFile("temp_" + gradebook, gradebook); //rename the newly updated file
+                            }
+                            catch (Exception exception)
+                            {
+                                //remove temp files
+                                CleanTemporaryFiles(gfp);
+                                //remove file lock
+                                RemoveFileLock(gfp);
+                                throw exception;
+                                return 1;
+                            }
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        //remove temp files
+                        CleanTemporaryFiles(gfp);
+
+                        throw new Exception("Failed to archive or rename gradebook: " + String.Join(",", gradebookNames), exception);
+
+                        //remove file lock
+                        RemoveFileLock(gfp);
+
+                        return 1; //error! exit and increment filesFailedToLoadCount
+                    }
+                    //remove file lock
+                    RemoveFileLock(gfp);
+
+                    return 0; //success!
+                }
+                throw new Exception("Did not successfully write all gradebooks: " + String.Join(",", gradebookNames));
+
+                //remove temp files
+                CleanTemporaryFiles(gfp);
+                //remove file lock
+                RemoveFileLock(gfp);
+
+                return 1; //error! exit and increment filesFailedToLoadCount
             }
-            return 1; //error! exit and increment filesFailedToLoadCount
+            catch (Exception exception) //clean up and throw exception
+            {
+                //remove temp files
+                CleanTemporaryFiles(gfp);
+                //remove file lock
+                RemoveFileLock(gfp);
+                throw new Exception("WriteGradebooksToFile() failsafe...", exception);
+                return 1; //error! exit and increment filesFailedToLoadCount
+            }            
+        }
+
+        private void RemoveFileLock(GradebookFilePath gfp)
+        {
+            if (System.IO.File.Exists(gfp.GetPath() + "Lock\\gb.lock"))
+            {
+                System.IO.File.Delete(gfp.GetPath() + "Lock\\gb.lock");
+            }
+        }
+
+        private void CreateFileLock(GradebookFilePath gfp)
+        {
+            Directory.CreateDirectory(gfp.GetPath() + "Lock");
+
+            TextWriter tw = new StreamWriter(gfp.GetPath() + "Lock\\gb.lock", true);            
+            tw.Close();
+        }
+
+        private bool CheckFileLock(GradebookFilePath gfp)
+        {
+            return System.IO.File.Exists(gfp.GetPath() + "Lock\\gb.lock");
         }
 
         /// <summary>
@@ -550,7 +730,7 @@ namespace OSBLE.Controllers
                 {
                     string fileName = file.Split('\\').ToList().Last();
                     if (fileName.StartsWith("temp_"))
-                    {
+                    {                        
                         gfp.DeleteFile(gfp.GetPath() + "\\" + fileName);
                     }
                 }
@@ -573,7 +753,7 @@ namespace OSBLE.Controllers
             //break the merged gradebook into its rows and columns
             foreach (string row in mergedGradebook)
             {
-                gradebook.Add(row.Split(',').ToList());
+                gradebook.Add(Regex.Split(row, ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)").ToList());
             }
 
             int longestGlobalRowLength = 0;
@@ -629,7 +809,7 @@ namespace OSBLE.Controllers
             List<string> processedGradebook = new List<string>(mergedGradebook);
             foreach (string row in mergedGradebook)
             {
-                List<string> rowColumns = row.Split(',').ToList();
+                List<string> rowColumns = Regex.Split(row, ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)").ToList();
                 bool emptyRow = true;
                 foreach (string column in rowColumns)
                 {
@@ -844,7 +1024,7 @@ namespace OSBLE.Controllers
                 {
                     if (row.ToLower().Contains("section")) //global row
                     {
-                        List<string> columns = row.Split(',').ToList(); // we need to get the index of the column with section values in it.                         
+                        List<string> columns = Regex.Split(row, ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)").ToList(); // we need to get the index of the column with section values in it.                         
 
                         foreach (string cell in columns)
                         {
@@ -871,7 +1051,7 @@ namespace OSBLE.Controllers
                     else
                     {
                         // we need to check the index of the column with section values in it to make sure the section matches the TA's section.
-                        List<string> columns = row.Split(',').ToList();
+                        List<string> columns = Regex.Split(row, ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)").ToList();
                         int section;
                         bool idParsed = Int32.TryParse(columns[sectionIndex], out section);
 
@@ -895,6 +1075,42 @@ namespace OSBLE.Controllers
                 noSections.Add("No Sections");
                 return noSections;
             }
+        }
+
+        /// <summary>
+        /// Should take a string which is the entire gradebook in comma seprated with a newline at the end of each row
+        /// </summary>
+        /// <param name="modifiedGradeook"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [CanGradeCourse]
+        public bool UpdateGradebookFromPage(string gradebookName, string modifiedGradeook)
+        {
+            modifiedGradeook = HttpUtility.UrlDecode(modifiedGradeook);
+
+            //Get the GradebookFilePath for current course
+            GradebookFilePath gfp = Models.FileSystem.Directories.GetGradebook(ActiveCourseUser.AbstractCourseID);
+
+            Dictionary<string, List<string>> newGradebook = new Dictionary<string, List<string>>();
+            
+            newGradebook.Add(gradebookName + ".csv", modifiedGradeook.Split('\n').ToList());
+            
+            int filesFailedToLoadCount = 0; //integer used for error message
+            filesFailedToLoadCount += ProcessGradebookChanges(gfp, newGradebook);
+
+            //Generate error message.
+            if (filesFailedToLoadCount > 0)
+            {
+                FileCache Cache = FileCacheHelper.GetCacheInstance(OsbleAuthentication.CurrentUser);
+                if (filesFailedToLoadCount >= 1)
+                {
+                    Cache["UploadErrorMessage"] = filesFailedToLoadCount.ToString() + " file(s) during upload was not of .csv file type or did not match current gradebook format, upload may have failed.";
+                }
+                //we had an error, return false;
+                return false;
+            }
+            //no errors, return true
+            return true;
         }
 
         /// <summary>
