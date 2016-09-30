@@ -4,6 +4,19 @@
 
 @{
     int currentCourseID = ViewBag.ActiveCourseUser.AbstractCourseID;
+    //need to get the course id and names
+    var courseUsers = OSBLE.Utility.DBHelper.GetCoursesFromUserProfileID(ViewBag.ActiveCourseUser.UserProfileID);
+    List<OSBLEPlus.Logic.Utility.Lookups.NameValuePair> courses = new List<OSBLEPlus.Logic.Utility.Lookups.NameValuePair>();
+    
+    foreach (var courseUser in courseUsers)
+    {
+        if (courseUser.AbstractRoleID == (int)OSBLE.Models.Courses.CourseRole.CourseRoles.Instructor)
+        {
+            string courseName = OSBLE.Utility.DBHelper.GetCourseFullNameFromCourseUser(courseUser).Replace("(Instructor)", "").Trim();
+            courseName = courseName.Split('-').ToList().First().Trim() + ", " + courseName.Split(',').ToList().AsEnumerable().Reverse().Skip(1).FirstOrDefault() + " " + courseName.Split(' ').ToList().Last();
+            courses.Add(new OSBLEPlus.Logic.Utility.Lookups.NameValuePair { Value = courseUser.AbstractCourseID, Name = courseName });
+        }
+    } 
 }
 
 @model List<OSBLEPlus.Logic.DomainObjects.Analytics.StudentData>
@@ -11,7 +24,7 @@
 {
     <div id="timeline-options">
         <label for="CourseId">Course:</label>
-        @Html.DropDownList("CourseId", new SelectList(Courses.GetCourses(), "Value", "Name", currentCourseID), new { @class = "form-control", id = "course-id-select" })
+        @Html.DropDownList("CourseId", new SelectList(courses, "Value", "Name", currentCourseID), new { @class = "form-control", id = "course-id-select" })
 
         <div id="time-scale-select">
             <label for="ScaleSetting">Time Scale:</label>
