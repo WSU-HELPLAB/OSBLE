@@ -100,6 +100,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         }
 
         // This is called when the user moves on from this page and chooses to save their progress
+        [ValidateInput(false)] //allows special characters in the assignment description. e.g. #include <stdio.h> 
         [HttpPost]
         public ActionResult Index(Assignment model)
         {
