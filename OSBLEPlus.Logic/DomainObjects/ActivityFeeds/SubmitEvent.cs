@@ -68,6 +68,16 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
                 files = files.Except(relativePathFiles).ToList();
                 files = files.Distinct(StringComparer.CurrentCultureIgnoreCase).ToList(); //just in case there are somehow dupes in this list...
 
+                //now verify each of these files exist before adding to the zip
+                var fileList = files; //new list so we can remove from the original list
+                foreach (var file in fileList)
+                {
+                    if (!File.Exists(file))
+                    {
+                        files.Remove(file);
+                    }
+                }
+
                 foreach (var file in files)
                 {
                     if (file.Split('.').Last() == "vcxproj" || file.Split('.').Last() == "sln")
@@ -91,8 +101,19 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 
                     try
                     {
-                        bool fileExists = zip.EntryFileNames.Contains(directoryName + "\\" + file.Split('\\').Last());
-                        zip.AddFile(file, directoryName);
+                        string parsedFileName = directoryName + "/" + file.Split('\\').Last();
+
+                        if (parsedFileName.Length > 2 || parsedFileName[0] == '\\' && parsedFileName[1] == '\\')
+                        {
+                            parsedFileName = parsedFileName.Remove(0, 1).Replace('\\', '/');
+                        }
+
+                        bool fileExists = zip.EntryFileNames.Contains(parsedFileName);
+
+                        if (!fileExists && File.Exists(file))
+                        {
+                            zip.AddFile(file, directoryName);    
+                        }
                     }
                     catch (Exception ex)
                     {   //todo: handle error                        
@@ -140,7 +161,19 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
                             
                             try
                             {
-                                zip.AddFile(fileName, directoryName);
+                                string parsedFileName = directoryName + "/" + fileName.Split('\\').Last();
+
+                                if (parsedFileName.Length > 2 || parsedFileName[0] == '\\' && parsedFileName[1] == '\\')
+                                {
+                                    parsedFileName = parsedFileName.Remove(0, 1).Replace('\\', '/');
+                                }
+
+                                bool fileExists = zip.EntryFileNames.Contains(parsedFileName);
+
+                                if (!fileExists && File.Exists(fileName)) //make sure the file isn't already in the zip and it exists on the local machine
+                                {
+                                    zip.AddFile(fileName, directoryName);    
+                                }
                             }
                             catch (Exception ex)
                             {   //todo: handle error                        
@@ -183,7 +216,14 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 
                             try
                             {
-                                zip.AddEntry(directoryName + "\\" + fileName, System.Text.Encoding.UTF8.GetBytes(String.Join("\n", ParseVcxproj(vcxprojFile)))); //rebuilds the vcxproj file from parsed string
+                                if (File.Exists(vcxprojFile))
+                                {
+                                    zip.AddEntry(directoryName + "\\" + fileName, System.Text.Encoding.UTF8.GetBytes(String.Join("\n", ParseVcxproj(vcxprojFile)))); //rebuilds the vcxproj file from parsed string    
+                                }
+                                else
+                                {
+                                    WriteErrorLog(new Exception("vcxprojFile not found! (relative paths)"), rootPath, filePathVariables(files, SolutionName, relativePathFiles, vcxprojFiles));
+                                }
                             }
                             catch (Exception ex)
                             {
@@ -213,7 +253,14 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
                             
                             try
                             {
-                                zip.AddFile(vcxprojFile, directoryName); //we don't have to parse this because there should be no relative paths
+                                if (File.Exists(vcxprojFile))
+                                {
+                                    zip.AddFile(vcxprojFile, directoryName); //we don't have to parse this because there should be no relative paths
+                                }
+                                else
+                                {
+                                    WriteErrorLog(new Exception("vcxprojFile not found! (NO relative paths)"), rootPath, filePathVariables(files, SolutionName, relativePathFiles, vcxprojFiles));
+                                }
                             }
                             catch (Exception ex)
                             {   //todo: handle error                        
