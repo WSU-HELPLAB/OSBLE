@@ -867,25 +867,37 @@ namespace OSBLE.Controllers
             {
                 //Add that single section to the empty list of current TA sections they are permitted to edit and upload...
                 currentTASections.Add(courseSection.ToString());
-            }
+            }           
             else
             {
                 //Grab the sections the user is able to edit.
                 string multisection = ActiveCourseUser.MultiSection;
 
-                //Make it into a list that is separated by a comma.
-                List<string> multisectionList = multisection.Split(',').ToList();
-
-                //Remove the last comma at the end of the list...
-                multisectionList.RemoveAt(multisectionList.Count - 1);
-
-                //Add the section into a list as an integer.
-                foreach (string s in multisectionList)
+                if (multisection == "all") //add all course sections
                 {
-                    currentTASections.Add(s);
+                    var allCourseSections = db.CourseUsers.Where(cu => cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID).Select(s => s.Section).ToList().Distinct();
+                    foreach (var section in allCourseSections)
+                    {
+                        if (section != -1 || section != -2 )
+                        {
+                            currentTASections.Add(section.ToString());
+                        }
+                    }                    
+                }
+                else //parse specific sections
+                {
+                    //Get list of sections
+                    List<string> multisectionList = multisection.Split(',').ToList();                    
+                    
+                    foreach (string s in multisectionList)
+                    {
+                        if (s != "") //don't add any empty items
+                        {
+                            currentTASections.Add(s);
+                        }
+                    }
                 }
             }
-
             return currentTASections;
         }
 
