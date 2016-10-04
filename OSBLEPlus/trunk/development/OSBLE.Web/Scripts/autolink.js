@@ -2,20 +2,17 @@
 //Downloaded from: https://github.com/bryanwoods/autolink-js
 
 (function () {
-    var autoLink, linkUsernames, linkHashtags, embedYouTube,
+    var autoLink, linkUsernames, linkHashtags,
       __slice = [].slice;
-    var courseUserNames = getUserNames();    
+    var courseUserNames = getUserNames();
 
     autoLink = function () {
-        var k, linkAttributes, option, options, pattern, v, text;
+        var k, linkAttributes, option, options, pattern, v;
         options = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-        
-        text = this;
-        text = embedYouTube(text);
 
         pattern = /(^|[\s\n>]|<br\/?>)((?:https?|ftp):\/\/[\-A-Z0-9+\u0026\u2019@#\/%?=()~_|!:,.;]*[\-A-Z0-9+\u0026@#\/%=~()_|])/gi;
         if (!(options.length > 0)) {
-            return text.replace(pattern, "$1<a href='$2'>$2</a>").linkUsernames().linkHashtags();
+            return this.replace(pattern, "$1<a href='$2'>$2</a>").linkUsernames().linkHashtags();
         }
         option = options[0];
         linkAttributes = ((function () {
@@ -29,7 +26,7 @@
             }
             return _results;
         })()).join('');
-        return text.replace(pattern, function (match, space, url) {
+        return this.replace(pattern, function (match, space, url) {
             var link;
             link = (typeof option.callback === "function" ? option.callback(url) : void 0) || ("<a href='" + url + "'" + linkAttributes + ">" + url + "</a>");
             return "" + space + link;
@@ -59,7 +56,7 @@
                 }
             }
 
-            nameIndices.reverse();            
+            nameIndices.reverse();
 
             for (i = 0; i < nameIndices.length; i++) { // In reverse order, we need to replace each @id=... with the student's link
                 var index = nameIndices[i];
@@ -76,10 +73,10 @@
                 // Then get the student's name from the id
                 var id = parseInt(idString);
 
-                if (id != NaN) {                    
-                    
+                if (id != NaN) {
+
                     studentFullName = courseUserNames[id];
-                    
+
                     if (studentFullName === "" || studentFullName === undefined) continue; // If the ID doesn't represent a user, don't make a link
 
                     // Now replace the id number in the string with an html link with the user's full name
@@ -98,55 +95,19 @@
         return this.replace(htPattern, '$1<a class="Hashtag" href="/Feed/ShowHashtag?hashtag=$2">#$2</a>');
     }
 
-    embedYouTube = function (text) {
-        var regexG = /(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?/g;
-        var regex = /(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?/;
-        var match = text.match(regexG);
-        
-        if (match) {
-            if (match.length === 1) { // Single link
-                // Get non-global match so we can get the video id
-                match = text.match(regex);
-                var url = match[0], videoId = match[1];
-
-                // First check to see if the match accidentally took the <div> as well
-                if (url.includes("</div>")) url = url.replace("</div>", "");
-
-                return text.replace(url, '<br /><iframe width="360" height="202" src="//www.youtube.com/embed/' + videoId + '" frameborder="0" allowfullscreen></iframe><br />');
-            }
-            else { // Multiple links
-                for (i = 0; i < match.length; i++) {
-                    var url = match[i];
-
-                    // First check to see if the match accidentally took the <div> as well
-                    if (url.includes("</div>")) url = url.replace("</div>", "");
-
-                    // Then get video id by doing another match (non-global) which we know will only have one result.
-                    var videoId = url.match(regex);
-                    videoId = videoId[1];
-
-                    text = text.replace(url, '<br /><iframe width="360" height="202" src="//www.youtube.com/embed/' + videoId + '" frameborder="0" allowfullscreen></iframe><br />');
-                }
-                return text;
-            }
-        }
-        else return text; // If no youtube link found by regex, just return original content
-    }
-
     String.prototype['autoLink'] = autoLink;
     String.prototype['linkUsernames'] = linkUsernames;
     String.prototype['linkHashtags'] = linkHashtags;
-    String.prototype['embedYouTube'] = embedYouTube;
 
 }).call(this);
 
 function getUserNames() {
     var namesAndIds = [];
     $.ajax({
-        url: "/Feed/GetProfileNames",        
+        url: "/Feed/GetProfileNames",
         method: "POST",
         async: false,
-        success: function (data) {            
+        success: function (data) {
             namesAndIds = data.userProfiles;
             for (var k in namesAndIds) { //remove the space in the middle of each name
                 if (namesAndIds.hasOwnProperty(k)) {
