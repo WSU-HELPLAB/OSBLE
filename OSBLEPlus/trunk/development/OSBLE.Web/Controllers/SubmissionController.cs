@@ -69,7 +69,7 @@ namespace OSBLE.Controllers
 
         //
         // POST: /Submission/Create
-
+        
         [HttpPost]
         [CanSubmitAssignments]
         public ActionResult Create(int? id, IEnumerable<HttpPostedFileBase> files, int? authorTeamID = null)
@@ -323,7 +323,10 @@ namespace OSBLE.Controllers
                         do
                         {
                             if (Request != null)
-                                delName = Request.Params["desiredName[" + j + "]"];
+                            {
+                                //delName = Request.Params["desiredName[" + j + "]"];
+                                delName = Request.Unvalidated.Form["desiredName[" + j + "]"];
+                            }                                
                             else //TODO: change this to releveant string
                                 delName = null;
 
@@ -332,7 +335,8 @@ namespace OSBLE.Controllers
                                 string inbrowser;
                                 if (Request != null)
                                 {
-                                    inbrowser = Request.Params["inBrowserText[" + j + "]"];
+                                    //inbrowser = Request.Params["inBrowserText[" + j + "]"];
+                                    inbrowser = Request.Unvalidated.Form["inBrowserText[" + j + "]"];
 
                                     if (inbrowser.Length > 0)
                                     {
