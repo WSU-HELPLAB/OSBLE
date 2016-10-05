@@ -81,10 +81,17 @@
         foreach (DiscussionTeam discussionTeam in teams)
         {
             //Make sure all team members are on the same section.
-            int temp;
+            int temp = -3;
+            try
+            {
+                temp = discussionTeam.Team.TeamMembers.FirstOrDefault().CourseUser.Section;
+            }
+            catch (Exception)
+            {
+                temp = -3;
+            }
             bool flagCheck;
             bool sectionFlag;
-            temp = discussionTeam.Team.TeamMembers.FirstOrDefault().CourseUser.Section;
             flagCheck = false;
             sectionFlag = false;
 
@@ -167,15 +174,23 @@
             foreach (DiscussionTeam assignmentTeam in teams)
             {
 
-                if (assignmentTeam.GetAllTeamMembers()[0].CourseUser.Section != section)
+                if (assignmentTeam.GetAllTeamMembers().Count() > 0 && assignmentTeam.GetAllTeamMembers()[0].CourseUser.Section != section)
                 {
                     continue;
                 }
 
                 //Make sure all team members are on the same section.
-                int temp;
+                int temp = -3;
+                try
+                {
+                    temp = assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.Section;
+                }
+                catch (Exception)
+                {
+                    temp = -3;
+                }
                 bool flagCheck;
-                temp = assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.Section;
+
                 flagCheck = false;
 
                 foreach (TeamMember member in assignmentTeam.Team.TeamMembers) //make sure all team members are on the same team.
