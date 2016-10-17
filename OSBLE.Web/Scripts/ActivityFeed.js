@@ -163,6 +163,18 @@ function FeedViewModel(userName, userId, current) {
     self.userId = userId;
     self.items = ko.observableArray();
     self.keywords = ko.observable("");
+
+    var namesAndIds = [];
+    $.ajax({
+        url: "/Feed/GetProfileNames",
+        method: "POST",
+        async: false,
+        success: function (data) {
+            namesAndIds = data.userProfiles;
+        }
+    })
+
+    self.namesAndIds = namesAndIds;
     //self.keywords.subscribe(function (newValue) {
     //    self.RequestUpdate();
     //});    
@@ -252,6 +264,7 @@ function FeedViewModel(userName, userId, current) {
 
         //get post visibility checkboxes 
         var postVisibility = $("#visibility-dropdown").val();
+        var visibleTo = $('#custom-visibility-selection-id-list').val();
 
         var text = $("#feed-post-textbox").val();
         var emailToClass = $("[name='send_email']").is(':checked');
@@ -274,7 +287,7 @@ function FeedViewModel(userName, userId, current) {
             type: "POST",
             url: "/Feed/PostFeedItem",
             dataType: "json",
-            data: { text: text, emailToClass: emailToClass, postVisibilityGroups: postVisibility },
+            data: { text: text, emailToClass: emailToClass, postVisibilityGroups: postVisibility, eventVisibleTo: visibleTo },
             success: function (data) {
                 MakePostSucceeded(data);
             },
@@ -413,7 +426,7 @@ function FeedViewModel(userName, userId, current) {
     self.EventVisibilityGroups = function (visibilityGroups) {
         if (self.EventVisibilityGroupsPresent(visibilityGroups)) {
             var groups = visibilityGroups.split(',');
-            var formattedGroupTitles = "Post Visibility: ";
+            var formattedGroupTitles = "";
 
             for (var i = 0; i < groups.length; i++) {
                 if (groups[i] == "class") {
@@ -429,9 +442,9 @@ function FeedViewModel(userName, userId, current) {
                     formattedGroupTitles = formattedGroupTitles + groups[i].toUpperCase().substring(0, groups[i].length) + " ";
                 }
             }
-            return formattedGroupTitles;
+            return formattedGroupTitles.trim();
         }
-        return "";
+        return "EVERYONE";
     };
 
     $("#activity-feed-filters").submit(function (e) {
@@ -459,6 +472,17 @@ function DetailsViewModel(userName, userId, rootId) {
     self.rootId = rootId;
     self.items = ko.observableArray([]);
 
+    var namesAndIds = [];
+    $.ajax({
+        url: "/Feed/GetProfileNames",
+        method: "POST",
+        async: false,
+        success: function (data) {
+            namesAndIds = data.userProfiles;
+        }
+    })
+
+    self.namesAndIds = namesAndIds;
 
     // *** AUTO-UPDATE WEB SOCKET STUFF ***
     self.hub = $.connection.activityFeedHub;
@@ -558,7 +582,7 @@ function DetailsViewModel(userName, userId, rootId) {
     self.EventVisibilityGroups = function (visibilityGroups) {
         if (self.EventVisibilityGroupsPresent(visibilityGroups)) {
             var groups = visibilityGroups.split(',');
-            var formattedGroupTitles = "Post Visibility: ";
+            var formattedGroupTitles = "";
 
             for (var i = 0; i < groups.length; i++) {
                 if (groups[i] == "class") {
@@ -570,10 +594,13 @@ function DetailsViewModel(userName, userId, rootId) {
                 else if (groups[i] == "instructors") {
                     formattedGroupTitles = formattedGroupTitles + groups[i].toUpperCase().substring(0, groups[i].length) + " ";
                 }
+                else {
+                    formattedGroupTitles = formattedGroupTitles + groups[i].toUpperCase().substring(0, groups[i].length) + " ";
+                }
             }
-            return formattedGroupTitles;
+            return formattedGroupTitles.trim();
         }
-        return "";
+        return "EVERYONE";
     };
 }
 
@@ -765,6 +792,10 @@ function MakePostSucceeded(newPost) {
     $('#visibility-dropdown').prop('selectedIndex', 0);
     $("#btn_post_active").val("Post to " + $("#data-course-link").text());
     $("#email_post").text("Email to Class");
+    //hide custom visibility
+    $('#custom-visiblity-selection').css('max-height', '0px');
+    //clear last user selection
+    clearSelection();
 
     // Clear the textbox
     $('#feed-post-textbox').val('');
@@ -779,7 +810,19 @@ function MakePostSucceeded(newPost) {
 }
 
 function MakePostFailed() {
-    ShowError('#feed-post-form', 'Unable to create post. Post textbox contains no text.', false);
+    if ($("#visibility-dropdown option:selected").text() == "Selected Users...") {
+        if (0 == updateHiddenUserIdList()) {
+            ShowError('#feed-post-form', 'Unable to create post. No users have been selected for this post. Please select users or change post visiblity.', false);
+        }
+        else
+        {
+            ShowError('#feed-post-form', 'Unable to create post. Post textbox contains no text.', false);
+        }
+    }
+    else
+    {
+        ShowError('#feed-post-form', 'Unable to create post. Post textbox contains no text.', false);
+    }    
 
     // re-enable posting
     $('#feed-post-textbox').removeAttr('disabled');
@@ -971,17 +1014,53 @@ function ShowUserVisibilityDialog(item) {
     var visibleListIds = item.options.eventVisibleTo.split(',');
     var userNames = new Array();
     for (var i = 0; i < visibleListIds.length; i++) {
-        userNames.push(namesAndIds[visibleListIds[i]]);
+        userNames.push([namesAndIds[visibleListIds[i]], visibleListIds[i]]);
     }
     
+    //sort by firstname
+    userNames = userNames.sort(function (a, b) {
+        return a[0] > b[0];
+    });
+
     //clear the previous instance of the dialog box
     $('#visibility-dialog').empty();
 
     //populate the dialog box
-    $("#visibility-dialog").append("<ul id='visibilityList'></ul>");
-    for (var i = 0; i < userNames.length; i++) {        
-        $("#visibilityList").append("<li>" + userNames[i] + "</li>");
+    $("#visibility-dialog").append("<ul class=\"custom-bullet-participants\" id='visibilityList'></ul>" +
+                                    "<input type=\"hidden\" id=\"selected-event-id\" value=\"" + item.eventId + "\"/>" +
+                                    "<input type=\"hidden\" id=\"selected-sender-id\" value=\"" + item.senderId + "\"/>");
+
+    //enable removing users
+    if ($("#current-user-id").val() == $("#selected-sender-id").val())    
+        $("#visibility-dialog").append("<input type=\"hidden\" id=\"is-op\" value=\"true\"/>");    
+    else    
+        $("#visibility-dialog").append("<input type=\"hidden\" id=\"is-op\" value=\"false\"/>");    
+
+    if ($("#is-op").val() === "true" || ($("#can-grade").length > 0 && $("#can-grade").val() == "true")) {
+        for (var i = 0; i < userNames.length; i++) {
+            $("#visibilityList").append("<li class=\"removable-user\" " + " id=\"participant-profile-id-" + userNames[i][1] + "\"> <span class=\"glyphicon glyphicon-remove remove-current\"></span>  <span class=\"glyphicon glyphicon-trash remove-user\"></span> <img class=\"mini-profile-image\" src=\"/user/" + userNames[i][1] + "/Picture?size=16\" alt=\"Profile Image for " + userNames[i][0] + "\" >" + userNames[i][0] + "</li>");
+        }
     }
+    else
+    {
+        for (var i = 0; i < userNames.length; i++) {
+            $("#visibilityList").append("<li " + " id=\"participant-profile-id-" + userNames[i][1] + "\"> <img class=\"mini-profile-image\" src=\"/user/" + userNames[i][1] + "/Picture?size=16\" alt=\"Profile Image for " + userNames[i][0] + "\" >" + userNames[i][0] + "</li>");
+        }
+    }    
+
+    //add more members to the dialog.    
+    $.ajax({
+        url: "/Feed/GetPostVisibilityAddMorePartialView/",
+        data: {},
+        success: function (response) {                           
+            $(response).insertAfter("#visibilityList");
+            
+        },
+            error: function () {
+            //todo: handle error here
+        }    
+    });
+
     $("#visibility-dialog").dialog(); //now show the dialog box
 }
 
@@ -1016,43 +1095,107 @@ function LogDetailsActivity(item) {
     return true;
 }
 
-/*
-//Periodically updates view models for feed items.  Useful for displaying an updated count
-//of comments for a given feed item.
-function getCommentUpdates() {
-
-    var ModelIds = Array();
-
-    //request comment updates for all feed items
-    $(".feed-item-single").each(function (index) {
-        var log_id = $(this).attr("data-id");
-        ModelIds.push(log_id);
-    });
-
-    //make the ajax call
-    $.ajax(
-        {
-            url: "/Feed/GetComments",
-            data: { logIds: JSON.stringify(ModelIds) },
-            dataType: "json",
-            type: "POST",
-            success: updateFeedItemViewModel
-        });
-
-    //call ourselves again in 20 seconds
-    setTimeout(getCommentUpdates, 20000)
-}
-
-function getRecentFeedItemsSuccess(html) {
-    var trimmed = $.trim(html);
-    if (trimmed.length > 0) {
-        $("#hidden-workspace").append(html);
-        parseDates();
-        if ($("#hidden-workspace").find('.feed-item-single').length > 0) {
-            $("#feed-items").prepend(html);
-        }
-        $("#hidden-workspace").empty();
+//feed methods for custom visibility groups
+function toggleCustomGroups(groupVisibility) {
+    if (groupVisibility == 'hide') {
+        $('#custom-visiblity-selection').css('max-height', '0px');
+    }
+    else {
+        $('#custom-visiblity-selection').css('max-height', '1000px');
     }
 }
-*/
+
+function clearSelection() {
+
+    $('div').remove('.recipient');
+    updateHiddenUserIdList();
+    $('#custom-search-clear-selection').css('opacity', '0.65');
+    $('#custom-search-clear-selection').css('cursor', 'not-allowed');
+    $('#custom-visibility-selection-id-list').val($('#current-user-id').val());
+    $('#NoUsers').css('display', 'inline');
+}
+
+function removeUser(id) {
+    $("#selected-user-id-" + id).remove();
+    var usersCount = updateHiddenUserIdList();
+
+    if (usersCount == 0) {
+        $('#custom-search-clear-selection').css('opacity', '0.65');
+        $('#custom-search-clear-selection').css('cursor', 'not-allowed');
+        $('#NoUsers').css('display', 'inline');
+    }
+}
+
+function updateHiddenUserIdList() {
+    var usersCount = 0;
+    var selectedIds = $('#current-user-id').val();
+    $(".recipient").each(function () {
+        var id = $(this).attr('id').split('-');
+        selectedIds += "," + id[id.length - 1];
+        usersCount++;
+    });
+    $('#custom-visibility-selection-id-list').val(selectedIds);
+    return usersCount;
+}
+
+function clearFilter() {
+    $('#custom-user-search-input').val('');
+    $('#custom-search-clear').css('opacity', '0.65');
+    $('#custom-search-clear').css('cursor', 'not-allowed');
+    $('#custom-search-clear').css('padding', '2px 5px 2px 5px');
+    $('.icon-state').css('color', '#aaa');
+}
+
+function buildTitleOutput(eventVisibleTo, namesAndIds) {
+
+    if (eventVisibleTo.length == 0) {
+        return "";
+    }
+
+    var visibleListIds = eventVisibleTo.split(',');
+    var userNames = new Array();
+    for (var i = 0; i < visibleListIds.length; i++) {
+        userNames.push([namesAndIds[visibleListIds[i]], visibleListIds[i]]);
+    }
+
+    //sort by firstname
+    userNames = userNames.sort(function (a, b) {
+        return a[0] > b[0];
+    });
+    
+    var formattedOutput = "";
+
+    for (var i = 0; i < userNames.length; i++) {
+        if (i == 0) {
+            formattedOutput = " - " + userNames[i][0];
+        }
+        else {
+            formattedOutput += ", " + userNames[i][0];
+        }
+    }
+    return formattedOutput;
+}
+
+function detectBrowser() {
+    // Opera 8.0+
+    var isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+    // Firefox 1.0+
+    var isFirefox = typeof InstallTrigger !== 'undefined';
+    // Safari <= 9 "[object HTMLElementConstructor]" 
+    var isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
+    // Internet Explorer 6-11
+    var isIE = /*@cc_on!@*/false || !!document.documentMode;
+    // Edge 20+
+    var isEdge = !isIE && !!window.StyleMedia;
+    // Chrome 1+
+    var isChrome = !!window.chrome && !!window.chrome.webstore;
+    // Blink engine detection
+    var isBlink = (isChrome || isOpera) && !!window.CSS;
+    //alert("opera: " + isOpera + " firefox: " + isFirefox + " safari: " + isSafari + " IE: " + isIE + " edge: " + isEdge + " chrome: " + isChrome + " blink: " + isBlink);
+    //$("#test").append("opera: " + isOpera + " firefox: " + isFirefox + " safari: " + isSafari + " IE: " + isIE + " edge: " + isEdge + " chrome: " + isChrome + " blink: " + isBlink);
+    return isOpera || isFirefox || isSafari || isIE || isEdge || isChrome || isBlink;
+}
+
+//END feed methods for custom visibility groups
+
 

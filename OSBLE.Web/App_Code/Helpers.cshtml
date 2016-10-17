@@ -332,6 +332,39 @@ Also runs content through nl2br to convert newlines to <br /> tags. *@
 
 }
 
+@helper CreateToolTip(string tooltip, string id, string divStyles, string glyphiconSelection, string glyphiconSize)
+{
+    HtmlString output = new HtmlString(tooltip);
+
+    <div class='popup-bubbleInfo' id="@id" style="@divStyles">
+        <span class="popup-trigger glyphicon @glyphiconSelection" style="font-size: @glyphiconSize; color: #074974;"></span>
+        <div class='popup'>
+            <table cellpadding='0px' cellspacing='0px'>
+                <tbody>
+                    <tr>
+                        <td class='topleft'></td>
+                        <td class='top'></td>
+                        <td class='topright'></td>
+                    </tr>
+                    <tr>
+                        <td class='left'></td>
+                        <td class='popup-contents'>
+                            @output
+                        </td>
+                        <td class='right'></td>
+                    </tr>
+                    <tr>
+                        <td class='bottomleft'></td>
+                        <td class='bottom'></td>
+                        <td class='bottomright'></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+}
+
 @helper GetIconImgPath(string ext)
 {
     if (".aac" == ext || ".ai" == ext || ".aiff" == ext || ".avi" == ext ||

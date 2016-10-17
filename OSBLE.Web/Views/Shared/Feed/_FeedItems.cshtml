@@ -67,13 +67,34 @@
             <a class="display_name" data-bind="text: senderName, attr: {href: '/Profile/Index/' + senderId}"></a>
             <span class="feed-item-date" data-bind="text: timeString()"></span>
 
-            @*Post visibility area*@
-            <a title="Post Visibility"
-               data-bind="if: vm.EventVisibilityGroupsPresent(options.eventVisibilityGroups), attr: { title: vm.EventVisibilityGroups(options.eventVisibilityGroups)}, click: ShowUserVisibilityDialog"
-               style="padding-left: 5px; padding-right: 5px;">
-                <span class="glyphicon glyphicon-eye-open"></span>
-            </a>
-
+            @if (!isComment)
+            {
+                @*Post visibility area*@
+                <a 
+                   data-bind="attr: { title: 'Post Visibility: (' + vm.EventVisibilityGroups(options.eventVisibilityGroups) + ')' +  buildTitleOutput(options.eventVisibleTo, vm.namesAndIds) }, click:  (vm.EventVisibilityGroups(options.eventVisibilityGroups) != 'EVERYONE') ? ShowUserVisibilityDialog : '' "
+                   style=" padding-left: 5px; padding-right: 5px;">
+                    <!-- ko switch: options.eventVisibilityGroups -->
+                    <!-- ko case: $default -->
+                    <span class="glyphicon glyphicon-globe"></span>
+                    <!-- /ko -->
+                    <!-- ko case: 'Selected Users' -->
+                    <span data-bind=" " class=" glyphicon glyphicon-user visibility-clickable"></span>
+                    <!-- /ko -->
+                    <!-- ko case: 'instructors' -->
+                    <span class="glyphicon glyphicon-education visibility-clickable"></span>
+                    <!-- /ko -->
+                    <!-- ko case: 'tas' -->
+                    <span class="glyphicon glyphicon-education visibility-clickable"></span>
+                    <!-- /ko -->
+                    <!-- ko case: 'instructors,tas' -->
+                    <span class="glyphicon glyphicon-education visibility-clickable"></span>
+                    <!-- /ko -->
+                    <!-- ko case: 'section' -->
+                    <span class="glyphicon glyphicon-th-list visibility-clickable"></span>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                </a>
+            }
         </div>
 
         @* Body Content *@

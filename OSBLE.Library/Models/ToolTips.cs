@@ -63,9 +63,19 @@ namespace OSBLE.Models
         public static string CourseLatePolicy = "Using this section, you specify the penalties that OSBLE will automatically apply to late assignments.";
 
         public static string CourseSearch = "A list of classes you may request enrollment for. Upon enrollment you will be notified via an email from the course instructor.";
-        public static string CommunitiesSearch = "A list of communities you may request to join. Upon joining you will be notified via an email from the communitie leader.";
+        public static string CommunitiesSearch = "A list of communities you may request to join. Upon joining you will be notified via an email from the communitie leader.";        
         #endregion
 
+        #region FeedToolTips
+
+        public static string VisibilityEveryone = "Your post will be visible to all users in the course.";
+        public static string VisibilitySection = "Your post will be visible to all users in your section (including instructors and TAs).";
+        public static string VisibilityInstructors = "Your post will be visible to only yourself and instructors.";
+        public static string VisibilityTAs = "Your post will be visible to only yourself and TAs.";
+        public static string VisibilityInstructorsAndTAs = "Your post will be visible to only yourself, instructors, and TAs.";
+        public static string VisibilitySelectedUsers = "Your post will be visible to only the selected users.";
+
+        #endregion
 
         #region HomeToolTips
 

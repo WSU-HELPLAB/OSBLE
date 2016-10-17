@@ -94,7 +94,9 @@ namespace OSBLE.Controllers
                     ViewBag.IsInstructor = true;
                 else
                     ViewBag.IsInstructor = false;
-                //FeedViewModel vm = GetFeedViewModel(timestamp, errorType, errorTypeStr, keyword, hash);
+
+                ViewBag.EnableCustomPostVisibility = ConfigurationManager.AppSettings["EnableCustomPostVisibility"]; //<add key="EnableCustomPostVisibility" value="false"/> in web.config
+
                 return PartialView();
             }
             catch (Exception ex)
@@ -152,6 +154,8 @@ namespace OSBLE.Controllers
             //setup user list for autocomplete            
             ViewBag.CurrentCourseUsers = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
             ViewBag.HashTags = DBHelper.GetHashTags();
+
+            ViewBag.EnableCustomPostVisibility = ConfigurationManager.AppSettings["EnableCustomPostVisibility"]; //<add key="EnableCustomPostVisibility" value="false"/> in web.config
 
             return View("Index", "_OSBIDELayout", courseID);
         }
@@ -866,6 +870,18 @@ namespace OSBLE.Controllers
                 }
             }
 
+            if (ActiveCourseUser.AbstractRole.CanGrade)            
+                ViewBag.CanGrade = true;            
+            else            
+                ViewBag.CanGrade = false;            
+
+            if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor)
+                ViewBag.IsInstructor = true;
+            else
+                ViewBag.IsInstructor = false;
+
+            ViewBag.EnableCustomPostVisibility = ConfigurationManager.AppSettings["EnableCustomPostVisibility"]; //<add key="EnableCustomPostVisibility" value="false"/> in web.config
+
             //setup user list for autocomplete            
             ViewBag.CurrentCourseUsers = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
             ViewBag.HashTags = DBHelper.GetHashTags();
@@ -933,7 +949,7 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         [HttpPost]
         [ValidateInput(false)]
-        public JsonResult PostFeedItem(string text, bool emailToClass = false, string postVisibilityGroups = "")
+        public JsonResult PostFeedItem(string text, bool emailToClass = false, string postVisibilityGroups = "", string eventVisibleTo = "")
         {
             // We purposefully are not catching exceptions that could be thrown
             // here, because we want this response to fail if there is an error
@@ -942,11 +958,20 @@ namespace OSBLE.Controllers
                 throw new ArgumentException();
             }
 
+            //the user submitted their post but did not add any users
+            if (postVisibilityGroups == "Selected Users" && eventVisibleTo.Length == 1)
+            {
+                throw new Exception("Poster did not select any users for a custom visiblity post.");
+            }
+
             // Parse text and add any new hashtags to database
             ParseHashTags(text);
 
             //parse visibility groups for the db
-            string eventVisibleTo = ParsePostVisibilityGroups(postVisibilityGroups);
+            if (String.IsNullOrEmpty(eventVisibleTo) || eventVisibleTo.Length == 1)
+            {   //size 1 means the default value, no custom groups.
+                eventVisibleTo = ParsePostVisibilityGroups(postVisibilityGroups);    
+            }            
 
             int courseID = ActiveCourseUser.AbstractCourseID;
             FeedPostEvent log = new FeedPostEvent()
@@ -1085,6 +1110,64 @@ namespace OSBLE.Controllers
                 return idList;
             }
             return ""; //legacy: display to everyone
+        }
+
+        [HttpGet]
+        public ActionResult GetPostVisibilityAddMorePartialView()
+        {
+
+            return PartialView("_PostVisibilityAddMore");
+        }
+
+        [OsbleAuthorize]
+        [HttpPost]
+        public ActionResult ModifyPostVisibility(string addCustomVisibilitySelectionIdList, string eventLogId, string currentUserId = "")
+        {
+            //don't allow changing a visibility group to empty
+            if (String.IsNullOrEmpty(addCustomVisibilitySelectionIdList))
+            {
+                throw new ArgumentException();
+            }
+
+            //get current visibility list
+            int eventLogIdInt;
+            bool logParseSuccess = int.TryParse(eventLogId, out eventLogIdInt);
+            string currentVisibleList = logParseSuccess ? DBHelper.GetEventLogVisibleToList(eventLogIdInt) : "";
+
+            int currentUserIdInt;
+            bool userParseSuccess = int.TryParse(currentUserId, out currentUserIdInt);
+
+            //check that the active user is currently a member of the post and that the active users is the same as the string id we have received
+            bool IsPostMember = userParseSuccess ? (currentUserIdInt == ActiveCourseUser.UserProfileID && currentVisibleList.Contains(currentUserId)) : false;
+            
+            //make db change
+            if (IsPostMember || ActiveCourseUser.AbstractRole.CanGrade)
+            {
+                //user can't remove themself from the post, make sure they are on the list
+                List<string> userIdsString = addCustomVisibilitySelectionIdList.Split(',').ToList();
+                string sanitizedIdList = "";
+                bool ContainsPosterId = false;
+
+                foreach (string id in userIdsString)
+                {
+                    if (id == ActiveCourseUser.UserProfileID.ToString())
+                        ContainsPosterId = true;
+
+                    if (sanitizedIdList == "")
+                        sanitizedIdList = id;
+                    else
+                        sanitizedIdList += "," + id;
+                }
+
+                if (!ContainsPosterId)
+                {
+                    sanitizedIdList += "," + ActiveCourseUser.UserProfileID; //add them back to the list!
+                }
+
+                DBHelper.UpdateEventVisibleToList(Int32.Parse(eventLogId), sanitizedIdList);    
+            }
+            
+            return Redirect(Request.UrlReferrer.ToString()); //return them to the page they came from
         }
 
         /// <summary>

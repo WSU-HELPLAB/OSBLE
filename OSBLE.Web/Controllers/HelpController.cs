@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Mvc;
 using OSBLE.Attributes;
 using OSBLE.Models.Courses;
+using System.Configuration;
 
 namespace OSBLE.Controllers
 {
@@ -27,7 +28,9 @@ namespace OSBLE.Controllers
         }
 
         public ActionResult Index()
-        {            
+        {
+            ViewBag.CanGrade = ActiveCourseUser.AbstractRole.CanGrade;
+            ViewBag.EnableCustomPostVisibility = ConfigurationManager.AppSettings["EnableCustomPostVisibility"]; //<add key="EnableCustomPostVisibility" value="false"/> in web.config
             return View();
         }
 
@@ -95,5 +98,22 @@ namespace OSBLE.Controllers
         {
             return View();
         }
+
+        public ActionResult ActvitiyFeedVisibility()
+        {
+            ViewBag.EnableCustomPostVisibility = ConfigurationManager.AppSettings["EnableCustomPostVisibility"]; //<add key="EnableCustomPostVisibility" value="false"/> in web.config
+            return View();
+        }
+
+        public ActionResult ActvitiyFeedComponents()
+        {            
+            return View();
+        }
+
+        public ActionResult ActvitiyFeedModifyVisibility()
+        {
+            ViewBag.EnableCustomPostVisibility = ConfigurationManager.AppSettings["EnableCustomPostVisibility"]; //<add key="EnableCustomPostVisibility" value="false"/> in web.config
+            return View();
+        }        
     }
 }
