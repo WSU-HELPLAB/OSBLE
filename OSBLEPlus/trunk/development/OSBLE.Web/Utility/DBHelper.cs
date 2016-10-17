@@ -400,6 +400,26 @@ namespace OSBLE.Utility
             return connection.Query<DateTime>("SELECT StartDate FROM AbstractCourses WHERE ID = @id", new { id = courseID }).SingleOrDefault();
         }
 
+        public static IEnumerable<dynamic> GetAllCourseUsersFromCourseId(int courseId, SqlConnection connection = null)
+        {
+            IEnumerable<dynamic> courseUsers = null;
+
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection()) { courseUsers = GetAllCourseUsersFromCourseId(courseId, sqlc); }
+            }
+            else
+            {
+                courseUsers = connection.Query<dynamic>( "SELECT (up.FirstName + ' ' + up.LastName) as 'FullName', up.ID " +
+                                                            "FROM CourseUsers cu " +
+                                                            "INNER JOIN UserProfiles up " +
+                                                            "ON cu.UserProfileID = up.ID " +
+                                                            "WHERE AbstractCourseID = @courseId " +
+                                                            "ORDER BY FullName",
+                                                             new { courseId = courseId });
+            }
+            return courseUsers;
+        }
         public static IEnumerable<CourseUser> GetAllCurrentCourses(int userProfileID, SqlConnection connection = null)
         {
             IEnumerable<CourseUser> currentCourses = null;
@@ -1599,5 +1619,22 @@ namespace OSBLE.Utility
         #endregion
 
 
+
+        internal static void UpdateEventVisibleToList(int eventLogId, string updatedVisibilityList, SqlConnection connection = null)
+        {    
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection()) { UpdateEventVisibleToList(eventLogId, updatedVisibilityList, sqlc); }
+            }
+            else
+            {
+                connection.Query(   "UPDATE EventLogs "  +
+                                    "SET EventVisibleTo = @updatedVisibilityList, EventVisibilityGroups = 'Selected Users' " +
+                                    "WHERE EventLogs.Id = @eventLogId",
+                                    new { eventLogId = eventLogId, updatedVisibilityList = updatedVisibilityList });
+            }
+
+            return;
+        }
     }
 }

@@ -1,0 +1,40 @@
+﻿@{
+    string EnableSelectedUsers = ViewBag.EnableCustomPostVisibility;
+
+    if (EnableSelectedUsers == "true")
+    {
+        ViewBag.Title = "Viewing and Modifying Post Visibility";        
+    }
+    else
+    {
+        ViewBag.Title = "Viewing Post Visibility";        
+    }
+}
+
+@if (EnableSelectedUsers == "true")
+    {
+        <h1>Viewing and Modifying Post Visibility</h1>
+    }
+    else
+    {
+        <h1>Viewing and Post Visibility</h1>
+    }
+
+<h5>On mouseover, the tooltip will display the current post visiblity and list users the post is visible to.</h5>
+<img src="@Url.Content("~/Content/images/help/visibility_18.png")" alt="Post Visibility 18" /><br />
+<h5>Clicking the post visibility icon will bring up a dialog box listing post users.</h5>
+<img src="@Url.Content("~/Content/images/help/visibility_13.png")" alt="Post Visibility 13" /><br />
+@if (EnableSelectedUsers == "true")
+{
+    <h5>If you are the original poster (i.e. you made the post) or you are a TA/Instructor, you will be given the option to add or remove users.</h5>
+    <img src="@Url.Content("~/Content/images/help/visibility_14.png")" alt="Post Visibility 14" /><br />
+    <h5>Use the dropown menu to select users or start typing a users name and select the name to add the user to the post.</h5>
+    <img src="@Url.Content("~/Content/images/help/visibility_15.png")" alt="Post Visibility 15" />
+    <img src="@Url.Content("~/Content/images/help/visibility_17.png")" alt="Post Visibility 17" /><br />  <br />  
+    <h5>Click users in the list to remove them from the post.</h5>
+    <img src="@Url.Content("~/Content/images/help/visibility_16.png")" alt="Post Visibility 16" /><br />
+    <h5>Click <strong>Apply Changes</strong> to add/remove the selected users.</h5>
+    
+}
+
+

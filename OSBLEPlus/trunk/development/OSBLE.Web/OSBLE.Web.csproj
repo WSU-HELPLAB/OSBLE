@@ -781,6 +781,7 @@
     <Content Include="Content\images\help\manageRoster_7.png" />
     <Content Include="Content\images\help\manageRoster_8.png" />
     <Content Include="Content\images\help\manageRoster_9.png" />
+    <Content Include="Content\images\help\post_1.png" />
     <Content Include="Content\images\help\review_1.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -850,6 +851,24 @@
     <Content Include="Content\images\help\uploadfiles_6.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\help\visibility_1.png" />
+    <Content Include="Content\images\help\visibility_10.png" />
+    <Content Include="Content\images\help\visibility_11.png" />
+    <Content Include="Content\images\help\visibility_12.png" />
+    <Content Include="Content\images\help\visibility_13.png" />
+    <Content Include="Content\images\help\visibility_14.png" />
+    <Content Include="Content\images\help\visibility_15.png" />
+    <Content Include="Content\images\help\visibility_16.png" />
+    <Content Include="Content\images\help\visibility_17.png" />
+    <Content Include="Content\images\help\visibility_18.png" />
+    <Content Include="Content\images\help\visibility_2.png" />
+    <Content Include="Content\images\help\visibility_3.png" />
+    <Content Include="Content\images\help\visibility_4.png" />
+    <Content Include="Content\images\help\visibility_5.png" />
+    <Content Include="Content\images\help\visibility_6.png" />
+    <Content Include="Content\images\help\visibility_7.png" />
+    <Content Include="Content\images\help\visibility_8.png" />
+    <Content Include="Content\images\help\visibility_9.png" />
     <Content Include="Content\images\help_top_menu.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -1031,6 +1050,7 @@
     <Content Include="Content\jquery.contextMenu.css" />
     <Content Include="Content\jquery.dataTables.css" />
     <Content Include="Content\navbar.css" />
+    <Content Include="Content\post-visibility.css" />
     <Content Include="Content\themes\base\images\animated-overlay.gif" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
@@ -1240,6 +1260,7 @@
     <Content Include="Scripts\knockout-2.2.1.debug.js" />
     <Content Include="Scripts\knockout-2.2.1.js" />
     <Content Include="Scripts\knockout-3.3.0.js" />
+    <Content Include="Scripts\knockout-switch-case.js" />
     <Content Include="Scripts\MicrosoftAjax.debug.js" />
     <Content Include="Scripts\MicrosoftAjax.js" />
     <Content Include="Scripts\MicrosoftMvcAjax.debug.js" />
@@ -1473,6 +1494,10 @@
     <Content Include="Views\Help\EditRubricOffline.cshtml" />
     <Content Include="Views\Help\RosterGuide.cshtml" />
     <Content Include="Views\Help\UsingTeamBuilder.cshtml" />
+    <Content Include="Views\Feed\_PostVisibilityAddMore.cshtml" />
+    <Content Include="Views\Help\ActvitiyFeedVisibility.cshtml" />
+    <Content Include="Views\Help\ActvitiyFeedComponents.cshtml" />
+    <Content Include="Views\Help\ActvitiyFeedModifyVisibility.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

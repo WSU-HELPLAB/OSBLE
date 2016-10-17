@@ -1,0 +1,73 @@
+﻿@{
+    ViewBag.Title = "Choosing a post visiblity (who can see your post)";
+    string EnableSelectedUsers = ViewBag.EnableCustomPostVisibility;
+}
+<h1>Selecting visiblity of your posts</h1>
+<h2>Post Visibility Defaults</h2>
+<p>
+    <br />By default, posts made on the activity feed will be visible to all users in the class (see image below).
+</p>
+<img src="@Url.Content("~/Content/images/help/visibility_1.png")" alt="default visibility" />
+
+<p>
+    <br/>Users are able to post the the following groups:
+    <ul>
+        <li>
+            Everyone (to the entire class)
+            <br /><img src="@Url.Content("~/Content/images/help/visibility_2.png")" alt="default visibility" />
+        </li>
+        <li>
+            My Section(s) (to all users in your section(s), including TAs and Instructors)
+            <br /><img src="@Url.Content("~/Content/images/help/visibility_3.png")" alt="My Section(s)" />
+        </li>
+        <li>
+            Instructors Only
+            <br /><img src="@Url.Content("~/Content/images/help/visibility_4.png")" alt="Instructors Only" />
+        </li>
+        <li>
+            TAs Only
+            <br /><img src="@Url.Content("~/Content/images/help/visibility_5.png")" alt="TAs Only" />
+        </li>
+        <li>
+            Instructors and TAs Only
+            <br /><img src="@Url.Content("~/Content/images/help/visibility_6.png")" alt="Instructors and TAs Only" />
+        </li>
+        @if (EnableSelectedUsers == "true")
+        {
+        <li>
+            Selected Users
+            <br /><img src="@Url.Content("~/Content/images/help/visibility_7.png")" alt="Selected Users" />
+        </li>
+        }
+        
+    </ul>
+</p>
+
+<hr width="90%">
+
+@if (EnableSelectedUsers == "true")
+{
+    <h2>Custom Visibility Groups: Selecting users...</h2>
+    <ul>
+        <li>
+            Choosing "Selected Users..." from the dropdown will expand the user selection panel.
+            <br /><img src="@Url.Content("~/Content/images/help/visibility_8.png")" alt="select users 1" />
+        </li>
+        <li>
+            Select users via the dropdown menu and click to add...
+            <br /><img src="@Url.Content("~/Content/images/help/visibility_9.png")" alt="select users 2" />
+        </li>
+        <li>
+            
+            <br /><img src="@Url.Content("~/Content/images/help/visibility_10.png")" alt="select users 3" />
+        </li>
+        <li>
+            Select users by name search...
+            <br /><img src="@Url.Content("~/Content/images/help/visibility_11.png")" alt="select users 4" />
+        </li>
+        <li>
+            Hover over a user and click the 'x' to remove an added user from the post visibility...
+            <br /><img src="@Url.Content("~/Content/images/help/visibility_12.png")" alt="select users 5" />
+        </li>
+    </ul>
+}
