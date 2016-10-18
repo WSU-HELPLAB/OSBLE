@@ -967,11 +967,19 @@ namespace OSBLE.Controllers
             // Parse text and add any new hashtags to database
             ParseHashTags(text);
 
-            //parse visibility groups for the db
-            if (String.IsNullOrEmpty(eventVisibleTo) || eventVisibleTo.Length == 1)
-            {   //size 1 means the default value, no custom groups.
-                eventVisibleTo = ParsePostVisibilityGroups(postVisibilityGroups);    
-            }            
+            if (postVisibilityGroups == "class")
+            {
+                eventVisibleTo = ""; //we don't need to parse visibility if the group is 'class'
+            }
+            else
+            {
+                //parse visibility groups for the db
+                if (String.IsNullOrEmpty(eventVisibleTo) || eventVisibleTo.Length == 1)
+                {   //size 1 means the default value, no custom groups.
+                    eventVisibleTo = ParsePostVisibilityGroups(postVisibilityGroups);
+                }
+            }
+                      
 
             int courseID = ActiveCourseUser.AbstractCourseID;
             FeedPostEvent log = new FeedPostEvent()
