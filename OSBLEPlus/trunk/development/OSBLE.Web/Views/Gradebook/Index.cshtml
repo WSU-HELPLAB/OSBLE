@@ -239,7 +239,7 @@ else
                 bool IsGlobalRow = false;
                 if (i == 0)
                 {
-                    rowClass = "HeaderRow";
+                    rowClass = "HeaderRow GlobalRow";
                 }
 
                 if (globalRowIndicies != null && globalRowIndicies.Contains(i))
@@ -248,7 +248,7 @@ else
                     IsGlobalRow = true;
                 }
 
-                if (rowClass.Contains("GlobalRow"))
+                if (rowClass.Contains("GlobalRow") || rowClass.Contains("HeaderRow"))
                 {
                     @:<thead>
                 }
@@ -268,7 +268,7 @@ else
 
                                 if (displayValue.ToLower().Contains("section"))
                                 {
-                                    sectionIndex = 2;
+                                    sectionIndex = j;
                                 }
 
                                 if (displayValue.Length > 0 && (displayValue[0] == '!' || displayValue[0] == '#'))
@@ -301,7 +301,7 @@ else
                             }
                         }
                 </tr>
-                        if (rowClass.Contains("GlobalRow"))
+                        if (rowClass.Contains("GlobalRow") || rowClass.Contains("HeaderRow"))
                         {
                             @:</thead>
                         }
