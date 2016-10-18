@@ -400,6 +400,7 @@ namespace OSBLE.Controllers
                     bool isTAUploading = false;
                     List<string> permittedSections = new List<string>();
                     int indexOfSection = -1;
+                    bool HasMultipleSections = DBHelper.GetCourseSections(ActiveCourseUser.AbstractCourseID).Count() > 1 ? true : false;
                                         
                     //If the user is a TA...
                     if (userRole == (int)CourseRole.CourseRoles.TA)
@@ -429,11 +430,11 @@ namespace OSBLE.Controllers
                             //see if we can match the current row ID column value
                             if (!IsGlobalRow(newRow) && !IsGlobalRow(oldRow) && Regex.Split(newRow, ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)").ToList().First() == Regex.Split(oldRow, ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)").ToList().First()) //we found a matching row
                             {
-                                if (isTAUploading)
+                                if (isTAUploading && HasMultipleSections)
                                 {
                                     List<string> columns = Regex.Split(newRow, ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)").ToList(); // we need to get the index of the column with section values in it.
-                                    int section;
-                                    bool idParsed = Int32.TryParse(columns[indexOfSection], out section);
+                                    int section = -999;
+                                    bool idParsed = indexOfSection > 0 ? Int32.TryParse(columns[indexOfSection], out section) : false;
 
                                     if (idParsed && permittedSections.Contains(section.ToString()))
                                     {   //add replace old row with new row in merged gradebook                                        
@@ -447,7 +448,7 @@ namespace OSBLE.Controllers
                                         break;
                                     }
                                 }
-                                else
+                                else //instructor or there are not multiple sections
                                 {   //add replace old row with new row in merged gradebook
                                     mergedGradebook[oldGradebook.IndexOf(oldRow)] = newRow;
                                     rowMatch = true;
@@ -458,7 +459,7 @@ namespace OSBLE.Controllers
                         //if column doesn't exist and permitted, add row to merged gradebook
                         if (!rowMatch && !IsGlobalRow(newRow))
                         {
-                            if (isTAUploading)
+                            if (isTAUploading && HasMultipleSections)
                             {                                
                                 List<string> columns = Regex.Split(newRow, ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)").ToList(); // we need to get the index of the column with section values in it.
                                 if (columns.Count() > indexOfSection) //we can't possibly have a section column here if the index is out of range!
@@ -472,7 +473,7 @@ namespace OSBLE.Controllers
                                     }
                                 }
                             }
-                            else //Instructor, just add it
+                            else //Instructor or not multiple sections, just add it
                             {
                                 mergedGradebook.Add(newRow); //add the row to the end of the gradebook
                             }
@@ -1346,7 +1347,7 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         private List<List<string>> ParseTATable(List<List<string>> gradebookTable)
         {
-
+            
             //Declare all necessary empty lists.
             List<string> currentTASections = new List<string>();
             List<List<string>> TATable = new List<List<string>>();
@@ -1354,20 +1355,28 @@ namespace OSBLE.Controllers
 
             //Grab all sections that are able to be editted and uploaded by the TA
             currentTASections = GetPermittedSections();
+            //get sections in course
+            bool HasMultipleSections = DBHelper.GetCourseSections(ActiveCourseUser.AbstractCourseID).Count() > 1 ? true : false;
 
             if (gradebookTable.Count > 0)
             {
-                int SectionColumn = Constants.StudentSectionColumnIndex;
+                //find section index
+                int SectionColumn = -1;
+                for (int i = 0; i < gradebookTable.Count; i++)
+                {
+                    SectionColumn = GetSectionIndex(String.Join(",", gradebookTable[i].ToList()));
+                    if (SectionColumn != -1)
+                        break; //found a section column, exit loop!
+                }
 
                 //find which rows should be displayed
                 for (int i = 0; i < gradebookTable.Count; i++)
                 {
 
                     int section = 0;
+                    bool sectionParse = SectionColumn > 0 ? Int32.TryParse(gradebookTable[i][SectionColumn], out section) : false;
 
-                    bool sectionParse = Int32.TryParse(gradebookTable[i][SectionColumn], out section);
-
-                    if (sectionParse && currentTASections.Contains(section.ToString()))
+                    if (!HasMultipleSections || (sectionParse && currentTASections.Contains(section.ToString())))
                     {
                         TATable.Add(gradebookTable[i].ToList());
                     }

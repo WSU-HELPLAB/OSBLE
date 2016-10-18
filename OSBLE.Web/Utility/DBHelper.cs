@@ -271,6 +271,49 @@ namespace OSBLE.Utility
             return courseSectionUserProfileIds;
         }
 
+        public static List<int> GetCourseSections(int courseId, SqlConnection connection = null)
+        {
+            List<int> courseSections = new List<int>();
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    courseSections = GetCourseSections(courseId, sqlc);
+                }
+                return courseSections;
+            }
+
+            var results = connection.Query<dynamic>("SELECT Section, MultiSection FROM CourseUsers WHERE AbstractCourseID = @courseId ",
+                new { courseId = courseId });
+
+            foreach (dynamic result in results)
+            {
+                if (result.Section == -1) //multi-section
+                {
+                    string multisection = result.MultiSection;
+                    List<string> sectionIds = multisection.Split(',').ToList();
+                    if (sectionIds.Count() > 1 && !sectionIds.Equals("all")) //just in case...
+                    {
+                        foreach (string id in sectionIds)
+                        {
+                            int parsedId = 0;
+                            bool parseIdToInt = int.TryParse(id, out parsedId);
+                            if (parseIdToInt) //only add ids that were successfully parsed            
+                                courseSections.Add(parsedId);                            
+                        }
+                    }
+                }
+                else
+                {
+                    if (result.Section != -2) //ignore all section users
+                    {
+                        courseSections.Add(result.Section);
+                    }
+                }
+            }
+            return courseSections.Distinct().ToList(); //return distinct list of sections
+        }
+
         public static string GetEventLogVisibilityGroups(int eventLogId, SqlConnection connection = null)
         {
             string eventVisibilityGroups = "";
