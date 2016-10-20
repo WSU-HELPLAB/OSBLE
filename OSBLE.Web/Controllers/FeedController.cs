@@ -974,8 +974,8 @@ namespace OSBLE.Controllers
             else
             {
                 //parse visibility groups for the db
-                if (String.IsNullOrEmpty(eventVisibleTo) || eventVisibleTo.Length == 1)
-                {   //size 1 means the default value, no custom groups.
+                if (postVisibilityGroups != "Selected Users")
+                {
                     eventVisibleTo = ParsePostVisibilityGroups(postVisibilityGroups);
                 }
             }
