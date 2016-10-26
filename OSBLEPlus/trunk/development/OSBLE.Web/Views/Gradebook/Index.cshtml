@@ -126,7 +126,11 @@
                     @if (ViewBag.CanUpload)
                     {
                         <form enctype="multipart/form-data" method="post" action="/Gradebook/DownloadGradebook">
-                            <button type="submit" class="btn btn-primary glyphicon glyphicon-download-alt"> Download Gradebook</button>
+                            <button type="submit" class="btn btn-primary glyphicon glyphicon-download-alt"> Download Gradebook (Zipped CSVs)</button>
+                        </form>
+                        <br />
+                        <form enctype="multipart/form-data" method="post" action="/Gradebook/DownloadGradebookXLSX">
+                            <button type="submit" class="btn btn-primary glyphicon glyphicon-download-alt"> Download Gradebook (Excel XLSX)</button>
                         </form>
                     }
                 </div>
