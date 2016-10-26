@@ -17,6 +17,7 @@ using OSBLE.Utility;
 using FileCacheHelper = OSBLEPlus.Logic.Utility.FileCacheHelper;
 using System.Text;
 using System.Text.RegularExpressions;
+using ClosedXML.Excel;
 
 namespace OSBLE.Controllers
 {
@@ -400,12 +401,12 @@ namespace OSBLE.Controllers
                     bool isTAUploading = false;
                     List<string> permittedSections = new List<string>();
                     int indexOfSection = -1;
-                    bool HasMultipleSections = DBHelper.GetCourseSections(ActiveCourseUser.AbstractCourseID).Count() > 1 ? true : false;
+                    bool HasMultipleSections = DBHelper.GetCourseSections(ActiveCourseUser == null ? uploadingCourseUser.AbstractCourseID : ActiveCourseUser.AbstractCourseID).Count() > 1 ? true : false;
                                         
                     //If the user is a TA...
                     if (userRole == (int)CourseRole.CourseRoles.TA)
                     {
-                        permittedSections = GetPermittedSections(); //Get all permitted sections the TA is allowed to edit. 
+                        permittedSections = GetPermittedSections(uploadingCourseUser); //Get all permitted sections the TA is allowed to edit. 
                         isTAUploading = true; //Set the isTAUploading 
 
                         //get section index
@@ -834,7 +835,7 @@ namespace OSBLE.Controllers
         /// </summary>
         /// <param name="gradebookRow">a string CSV row</param>
         /// <returns>true if the row starts with a '#'</returns>
-        private bool IsGlobalRow(string gradebookRow)
+        private static bool IsGlobalRow(string gradebookRow)
         {
             if (gradebookRow.Length > 0 && gradebookRow[0] == '#') //# indicates a global row            
                 return true;
@@ -855,10 +856,12 @@ namespace OSBLE.Controllers
         /// Get the permitted sections that the user is able to edit and upload. 
         /// </summary>
         /// <returns>a list of the sections</returns>
-        public List<string> GetPermittedSections()
+        public List<string> GetPermittedSections(CourseUser uploadingCourseUser = null)
         {
+            CourseUser currentUser = ActiveCourseUser == null ? uploadingCourseUser : ActiveCourseUser;
+
             //Grab the section the user is responsible for...
-            int courseSection = ActiveCourseUser.Section;
+            int courseSection = currentUser.Section;
 
             //Create and empty list of sections the TA is responsible for...
             List<string> currentTASections = new List<string>();
@@ -872,11 +875,11 @@ namespace OSBLE.Controllers
             else
             {
                 //Grab the sections the user is able to edit.
-                string multisection = ActiveCourseUser.MultiSection;
+                string multisection = currentUser.MultiSection;
 
                 if (multisection == "all") //add all course sections
                 {
-                    var allCourseSections = db.CourseUsers.Where(cu => cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID).Select(s => s.Section).ToList().Distinct();
+                    var allCourseSections = db.CourseUsers.Where(cu => cu.AbstractCourseID == currentUser.AbstractCourseID).Select(s => s.Section).ToList().Distinct();
                     foreach (var section in allCourseSections)
                     {
                         if (section != -1 || section != -2 )
@@ -985,8 +988,8 @@ namespace OSBLE.Controllers
                         if (String.Equals("No Sections", partialGradebook.FirstOrDefault())) //if no sections, they presumably are in charge of all student grades...
                         {
                             //Add the gradebook to the list of zipped files.
-                            //List<string> gradebook = new List<string>(System.IO.File.ReadAllLines(s));
-                            //zf.AddEntry(s.Split('\\').ToList().Last(), System.Text.Encoding.UTF8.GetBytes(String.Join("\n", gradebook)));
+                            List<string> gradebook = new List<string>(System.IO.File.ReadAllLines(s));
+                            zf.AddEntry(s.Split('\\').ToList().Last(), System.Text.Encoding.UTF8.GetBytes(String.Join("\n", gradebook)));
                         }
                         else
                         {
@@ -1016,7 +1019,7 @@ namespace OSBLE.Controllers
                 return RedirectToAction("Index");
             }
         }
-
+        
         /// <summary>
         /// Generates a partial gradebook (as a list of strings) which contains only rows which the user requesting the gradebook is allowed access to.
         /// </summary>
@@ -1427,5 +1430,201 @@ namespace OSBLE.Controllers
             return TATable;
         }
 
+        /// <summary>
+        /// Download all gradebooks from the gradebook directory in one Excel.xlsx file
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [CanGradeCourse]
+        public ActionResult DownloadGradebookXLSX()
+        {
+            //Grab the name of the course and contactenate it to the gradebook name
+            string workbookName = ActiveCourseUser.AbstractCourse.Name.ToString() + "_Gradebook.xlsx";
+
+            //create the workbook to add each tab as a worksheet to
+            XLWorkbook workbook = new XLWorkbook();
+
+            //Gradebook file path according to who the user is...
+            GradebookFilePath gfp = Directories.GetGradebook(ActiveCourseUser.AbstractCourseID);
+
+            if (gfp.AllFiles().Count() > 0)
+            {
+                //For each string in the gradebook directory...
+                foreach (string s in gfp.AllFiles())
+                {
+                    //If the user is a TA we need to only serve rows with their permitted sections.
+                    if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
+                    {
+                        //Get all permitted sections the TA is allowed to edit. 
+                        List<string> permittedSections = GetPermittedSections();
+                        List<int> permittedSectionUploadInt = new List<int>();
+
+                        foreach (string sectionString in permittedSections)
+                        {
+                            int section;
+                            bool idParsed = Int32.TryParse(sectionString, out section);
+                            if (idParsed)
+                                permittedSectionUploadInt.Add(section);
+                        }
+
+                        //build partial gradebook for TAs - contains only rows for their section
+                        List<string> partialGradebook = GeneratePartialGradebook(s, permittedSectionUploadInt);
+
+                        //TODO: discuss this, should we require TAs to have a section? for now disable downloading of the entire gradebook for this case!
+                        if (String.Equals("No Sections", partialGradebook.FirstOrDefault())) //if no sections, they presumably are in charge of all student grades...
+                        {
+                            //add the gradebook to the xlsx as a worksheet
+                            workbook = ConvertWithClosedXml(workbook, s.Split('\\').ToList().Last().Split('.').First(), ReadCsv(s));
+                        }
+                        else
+                        {
+                            //add the gradebook to the xlsx as a worksheet
+                            workbook = ConvertWithClosedXml(workbook, s.Split('\\').ToList().Last().Split('.').First(), partialGradebook);
+                        }
+                    }
+                    else //instructor... just add the gradebook to the zip
+                    {
+                        //add the gradebook to the xlsx as a worksheet
+                        workbook = ConvertWithClosedXml(workbook, s.Split('\\').ToList().Last().Split('.').First(), ReadCsv(s));
+                    }
+                }
+
+                //save workbook
+                //create a memory stream to save the workbook to
+                MemoryStream stream = new MemoryStream();                
+                workbook.SaveAs(stream);
+                stream.Position = 0;
+
+                return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", workbookName);
+            }
+            else
+            {
+                //TODO: redirect to an appropriate error page
+                return RedirectToAction("Index");
+            }
+        }
+
+        private List<string> ReadCsv(string fileName)
+        {
+            List<string> lines = System.IO.File.ReadAllLines(fileName).ToList(); 
+            return lines;
+        }
+
+        private static XLWorkbook ConvertWithClosedXml(XLWorkbook workbook, string worksheetName, List<string> csvLines)
+        {
+            if (csvLines == null || csvLines.Count() == 0)
+            {
+                return (workbook);
+            }
+
+            int rowCount = 0;
+            int colCount = 0;
+            
+            using (var worksheet = workbook.Worksheets.Add(worksheetName))
+            {
+                rowCount = 1;
+                foreach (string line in csvLines)
+                {
+                    bool globalRow = IsGlobalRow(line);
+                    colCount = 1;
+                    //split line to columns list
+                    List<string> linesColumnSplit = Regex.Split(line, ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)").ToList();
+                    foreach (string col in linesColumnSplit)
+                    {
+                        if (!globalRow && col.Contains("%")) //percent, strip percent and process number
+                        {
+                            string colNumber = col.Replace("%", "");
+                            double pct = 0.0;                            
+                            bool doubleParseSuccess = Double.TryParse(colNumber, out pct); 
+                            var regex = new Regex(@"^-*[0-9,\.]+$");
+
+                            if (doubleParseSuccess && regex.IsMatch(colNumber))
+                            {
+                                worksheet.Cell(rowCount, colCount).Value = pct / 100; //divide by 100 because the input value was a percent
+                                worksheet.Cell(rowCount, colCount).Style.NumberFormat.Format = "0.00%";    
+                            }
+                            else //not an integer or decimal for some reason!
+                            {
+                                worksheet.Cell(rowCount, colCount).Value = TypeConverter.TryConvert(col);  
+                            }                            
+                        }
+                        else
+                        {
+                            if (globalRow) //TODO: need to modify this if/when the gradebook is re-adjusted to handle dynamic global rows.
+                            {   //preserve the exact format of the data, we don't want to convert it or else it will prevent updating
+                                worksheet.Cell(rowCount, colCount).Value = col;
+                                worksheet.Cell(rowCount, colCount).SetDataType(XLCellValues.Text);
+                            }
+                            else
+                            {
+                                worksheet.Cell(rowCount, colCount).Value = TypeConverter.TryConvert(col);   
+                            }
+                        }                        
+                        colCount++;
+                    }
+                    rowCount++;
+                }
+                //adjust column widths... e.g. to prevent 3333333333 from being converted to an exponential representation
+                worksheet.Worksheet.Columns().AdjustToContents();
+            }            
+            return (workbook);
+        }        
+    }
+
+    /// <summary>
+    /// class used to convert cell values to an appropriate numeric value
+    /// </summary>
+    public static class TypeConverter
+    {
+        /// <summary>
+        /// Converts the string cell values into an appropriate numeric, boolean, or date value.
+        /// </summary>
+        /// <param name="value">a single string value</param>
+        /// <returns>a converted object of string, numeric, boolean, or datetime value</returns>
+        public static object TryConvert(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return (string.Empty);
+            }
+
+            int intValue = 0;
+            if (int.TryParse(value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out intValue))
+            {
+                return (intValue);
+            }
+
+            double doubleValue = 0;
+            if (double.TryParse(value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out doubleValue))
+            {
+                return (doubleValue);
+            }
+
+            float floatValue = 0;
+            if (float.TryParse(value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out floatValue))
+            {
+                return (floatValue);
+            }
+
+            long longValue = 0;
+            if (long.TryParse(value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out longValue))
+            {
+                return (longValue);
+            }
+
+            bool boolValue = false;
+            if (bool.TryParse(value, out boolValue))
+            {
+                return (boolValue);
+            }
+
+            DateTime dateTimeValue = DateTime.MinValue;
+            if (DateTime.TryParse(value, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out dateTimeValue))
+            {
+                return (dateTimeValue);
+            }
+
+            return (value);
+        }
     }
 }
