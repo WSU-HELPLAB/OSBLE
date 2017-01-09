@@ -16,6 +16,7 @@
     List<int> globalRowIndicies = ViewBag.GlobalRows;
     int sectionIndex = 1;    
     string helpLink = Url.Action("GradebookHelp", "Gradebook", new { area = "" });
+    int nameIndex = 0;
 }
 <style type="text/css">
     #gb_header > h2 {
@@ -275,6 +276,11 @@ else
                                     sectionIndex = j;
                                 }
 
+                                if (displayValue.ToLower().Contains("name"))
+                                {
+                                    nameIndex = j;
+                                }
+
                                 if (displayValue.Length > 0 && (displayValue[0] == '!' || displayValue[0] == '#'))
                                 {
                                     displayValue = displayValue.Substring(1, displayValue.Length - 1);
@@ -286,10 +292,10 @@ else
                                 }
                                 else
                                 {
-                                    if (j > sectionIndex)
+                                    if (j >= sectionIndex)
                                     {
-                                        if (ViewBag.CanUpload)
-                                        {
+                                        if (ViewBag.CanUpload && j != nameIndex)
+                                        {                                            
                                             <td class="@tdClass"><input type="text" id="@tdId" name="@tdId" value="@displayValue" /></td>
                                         }
                                         else
