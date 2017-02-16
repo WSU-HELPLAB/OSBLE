@@ -66,7 +66,7 @@ namespace OSBLEPlus.Services.Controllers
         public void ProcessActivityEvent(ActivityEvent log)
         {
             switch (log.EventTypeId)
-            {                
+            {
                 case (int)EventType.BuildEvent:
                     BuildEvent(log);
                     break;
@@ -231,7 +231,7 @@ namespace OSBLEPlus.Services.Controllers
                     sqlConnection.Open();
 
                     string countQuery = "SELECT Count(*) as 'Count' FROM EventLogs el INNER JOIN ExceptionEvents ee ON el.Id = ee.EventLogId " +
-                                        "WHERE el.SenderId = @UserProfileId AND el.EventDate >= DATEADD(MINUTE, -@NumberOfMinutes, GETDATE())"; 
+                                        "WHERE el.SenderId = @UserProfileId AND el.EventDate >= DATEADD(MINUTE, -@NumberOfMinutes, GETDATE())";
 
                     var count = sqlConnection.Query<int>(countQuery, new { UserProfileId = userProfileId, NumberOfMinutes = NumberOfMinutesErrorThreshold }).Single();
 
@@ -396,12 +396,39 @@ namespace OSBLEPlus.Services.Controllers
 
                     if (count == 0) //no activity, generate intervention
                     {
-                        SaveIntervention(GenerateMakeAPostIntervention(userProfileId, "MakeAPost", "Idle/No Feed Activity"));
+                        //first check if there is already an 'active' MakeAPost intervention, if so... do not generate!
+                        bool activeMakeAPost = ActiveMakeAPostExists(userProfileId);
+                        if (!activeMakeAPost)
+                        {
+                            SaveIntervention(GenerateMakeAPostIntervention(userProfileId, "MakeAPost", "Idle/No Feed Activity"));    
+                        }                        
                     }
                 }
             }
             catch (Exception e)
             {
+                throw new Exception("CheckIdleThreshold() failed.", e);
+            }
+        }
+
+        private bool ActiveMakeAPostExists(int userProfileId)
+        {
+            try
+            {
+                InterventionItem existingIntervention = GetInterventionFromUserProfileAndType(userProfileId, "MakeAPost");
+
+                if (existingIntervention.Id == -1) 
+                {
+                    return false;  //one doesn't exist, check if we need to create one!
+                }                
+                else
+                { 
+                    return true; //an active MakeAPost intervention already exists!
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("CheckActiveMakeAPost() failed.", e);
             }
         }
 
@@ -538,7 +565,7 @@ namespace OSBLEPlus.Services.Controllers
         {
             CheckNoErrorThreshold(log.SenderId, "EditorActivityEvent");
             CheckIdleThreshold(log.SenderId);
-            CheckInterventionStatus(log.SenderId);            
+            CheckInterventionStatus(log.SenderId);
         }
         private void ExceptionEvent(ActivityEvent log)
         {
@@ -941,15 +968,15 @@ namespace OSBLEPlus.Services.Controllers
 
                     //we're getting all active course Ids because ask for help events are visible in all courses
                     query = "SELECT CodeDocuments.Content FROM CodeDocuments WHERE Id = " + //get the code document from the last save
-	                            "(SELECT DocumentId FROM SaveEvents WHERE EventLogId = " + //use the last saveEvent log id to get the document id
-	                                "(SELECT TOP(1) Id FROM EventLogs WHERE EventTypeId = 10 AND SenderId = @userProfileId ORDER BY EventDate DESC))"; //get the last saveEvent
+                                "(SELECT DocumentId FROM SaveEvents WHERE EventLogId = " + //use the last saveEvent log id to get the document id
+                                    "(SELECT TOP(1) Id FROM EventLogs WHERE EventTypeId = 10 AND SenderId = @userProfileId ORDER BY EventDate DESC))"; //get the last saveEvent
 
                     string result = sqlConnection.Query<string>(query, new { userProfileId = userProfileId }).FirstOrDefault(); //should only return 1 result
 
                     sqlConnection.Close();
 
                     //parse the string into lines
-                    codeDocument = result.Split('\n').ToList();                    
+                    codeDocument = result.Split('\n').ToList();
                 }
             }
             catch (Exception e)
@@ -1034,7 +1061,7 @@ namespace OSBLEPlus.Services.Controllers
                     {
                         query = "SELECT TOP 1 * FROM OSBLEInterventions WHERE UserProfileId = @UserProfileId AND InterventionType = @InterventionType AND IsDismissed = 0 ORDER BY InterventionDateTime DESC";
                     }
-                        
+
                     var result = sqlConnection.Query(query, new { UserProfileId = userProfileId, InterventionType = interventionType }).SingleOrDefault();
 
                     if (result != null)
@@ -1301,8 +1328,8 @@ namespace OSBLEPlus.Services.Controllers
             bool interventionGenerated = ProcessMakeAPostSubmit(submitEvent, submitEvent.SenderId, "OfferHelp");
             if (!interventionGenerated) //only process the MakeAPostAssignmentSubmit if they do not have an early submit suggestion.
             {
-                interventionGenerated = ProcessMakeAPostSubmit(submitEvent, submitEvent.SenderId, "MakeAPostAssignmentSubmit");    
-            }            
+                interventionGenerated = ProcessMakeAPostSubmit(submitEvent, submitEvent.SenderId, "MakeAPostAssignmentSubmit");
+            }
 
             //check if there are 'unanswered' questions.
             CheckForUnansweredPosts(submitEvent.CourseId ?? 0, submitEvent.SenderId, UnansweredQuestionsDaysThreshold, "AssignmentSubmission");
