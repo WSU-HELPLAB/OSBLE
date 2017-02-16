@@ -169,8 +169,7 @@ namespace OSBLEPlus.Services.Controllers
             }
             catch (Exception e)
             {
-                //TODO: handle exception logging
-                //failure
+                throw new Exception("DisableRefreshFlag() failed", e);
             }
         }
 
@@ -257,6 +256,7 @@ namespace OSBLEPlus.Services.Controllers
             {
                 //failure
                 refreshInterventionsRequired = false;
+                throw new Exception("AnalyzeBuildErrorHistory() failed", e);
             }
             return refreshInterventionsRequired;
         }
@@ -311,6 +311,7 @@ namespace OSBLEPlus.Services.Controllers
             {
                 //failure
                 refreshInterventionsRequired = false;
+                throw new Exception("AnalyzeExceptionErrorHistory() failed", e);
             }
             return refreshInterventionsRequired;
         }
@@ -401,8 +402,7 @@ namespace OSBLEPlus.Services.Controllers
                 }
                 catch (Exception e)
                 {
-                    //TODO: handle exception logging
-                    //failure
+                    throw new Exception("CheckForUnansweredPosts() failed", e);
                 }
 
                 if (generateIntervention)
@@ -476,9 +476,8 @@ namespace OSBLEPlus.Services.Controllers
         {
             bool refreshInterventions = false;
             //first check if we need to add a "others offering help" intervention"
-            refreshInterventions = UpdateClassmatesAvailable(userProfileId);
+            refreshInterventions = UpdateClassmatesAvailable(userProfileId);          
             
-            DateTime lastRefresh;
             try
             {
                 using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
@@ -486,7 +485,8 @@ namespace OSBLEPlus.Services.Controllers
                     sqlConnection.Open();
 
                     string query = "SELECT * FROM OSBLEInterventionsStatus WHERE UserProfileId = @UserProfileId ";
-                    string updateQuery = "UPDATE OSBLEInterventionsStatus SET RefreshInterventions = 0 WHERE Id = @Id ";
+                    //we no longer update the refresh status here, just check if we need to refresh
+                    //string updateQuery = "UPDATE OSBLEInterventionsStatus SET RefreshInterventions = 0 WHERE Id = @Id ";
                     string insertQuery = "INSERT INTO OSBLEInterventionsStatus ([UserProfileId],[RefreshInterventions],[LastRefresh]) VALUES (@UserProfileId, '0', @LastRefresh) ";
 
                     var result = sqlConnection.Query(query, new { UserProfileId = userProfileId }).FirstOrDefault();
@@ -499,15 +499,14 @@ namespace OSBLEPlus.Services.Controllers
                     else //insert the user
                     {
                         sqlConnection.Execute(insertQuery, new { UserProfileId = userProfileId, LastRefresh = DateTime.UtcNow });
-                        //not updating refreshInterventions here, we'll rely only on UpdateClassmatesAvailable                       
+                        refreshInterventions = true; //we want to refresh at least once now.
                     }
                     sqlConnection.Close();
                 }
             }
             catch (Exception e)
             {
-                //TODO: handle exception logging
-                //failure
+                throw new Exception("CheckInterventionStatus() failed", e);
             }
             return refreshInterventions;
         }
@@ -545,7 +544,7 @@ namespace OSBLEPlus.Services.Controllers
             }
             catch (Exception e)
             {
-
+                throw new Exception("CheckNoErrorThreshold() failed", e);
             }
 
             if (generateIntervention)
@@ -579,8 +578,7 @@ namespace OSBLEPlus.Services.Controllers
             }
             catch (Exception e)
             {
-                //TODO: handle exception logging
-                //failure
+                throw new Exception("DismissIntervention() failed", e);
             }
             if (isDismissed)
             {
@@ -948,10 +946,10 @@ namespace OSBLEPlus.Services.Controllers
                 }
             }
             catch (Exception e)
-            {
-                //TODO: handle exception logging
-                return new List<int>(); //failure, return empty list
+            {   
+                throw new Exception("GetAllUserCourseIds() failed", e);
             }
+            return new List<int>(); //failure, return empty list
         }
 
         private DateTime GetAssignmentDueDate(int assignmentId)
@@ -1009,9 +1007,8 @@ namespace OSBLEPlus.Services.Controllers
                 }
             }
             catch (Exception e)
-            {
-                //TODO: handle exception logging
-                return codeDocument; //failure, return empty list
+            {                
+                throw new Exception("GetExceptionCodeDocument() failed", e);                
             }
             return codeDocument;
         }
@@ -1179,7 +1176,7 @@ namespace OSBLEPlus.Services.Controllers
             }
             catch (Exception e)
             {
-                throw new Exception("Failed to insert automated interaction", e);
+                throw new Exception("LogInterventionInteraction() Failed to insert automated interaction", e);
             }
         }
 
@@ -1224,6 +1221,7 @@ namespace OSBLEPlus.Services.Controllers
             {
                 //failure
                 refreshInterventionsRequired = false;
+                throw new Exception("ProcessMakeAPostSubmit() Failed", e);
             }
             return refreshInterventionsRequired;
         }
@@ -1293,7 +1291,7 @@ namespace OSBLEPlus.Services.Controllers
                 }
                 catch (Exception e)
                 {
-                    throw new Exception("Failed to insert new intervention", e);
+                    throw new Exception("SaveIntervention() Failed to insert new intervention", e);
                 }
             }
 
@@ -1395,8 +1393,7 @@ namespace OSBLEPlus.Services.Controllers
             }
             catch (Exception e)
             {
-                //TODO: handle exception logging
-                //failure
+                throw new Exception("TriggerInterventionRefresh() Failed", e);
             }
             return updateSuccess;
         }
@@ -1439,7 +1436,7 @@ namespace OSBLEPlus.Services.Controllers
             }
             catch (Exception e)
             {
-                //do nothing for now
+                throw new Exception("UpdateClassmatesAvailable() Failed", e);
             }
             //if so, generate the intervention
             if (generateIntervention)
@@ -1501,8 +1498,7 @@ namespace OSBLEPlus.Services.Controllers
             }
             catch (Exception e)
             {
-                //TODO: handle exception logging
-                //failure
+                throw new Exception("UpdateIntervention() Failed", e);
             }
             return updateSuccess;
         }
