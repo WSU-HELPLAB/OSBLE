@@ -44,12 +44,15 @@ namespace OSBLEPlus.Services.Controllers
         private const int NumberOfDaysIdleThreshold = 1; //number of days to look back without any post/reply/askforhelp activity before generating intervention                
         private const int NumberOfMinutesRefreshThreshold = 1; //threshold in CheckInterventionStatus()
         private const int SubmitAssignmentEarlyTimeThreshold = -1; //dumber of days (negative == early) - threshold in ProcessMakeAPostSubmit()
-        private const int UnansweredQuestionsDaysThreshold = 10; //number of days to look back for unanswered/marked helpful posts         
+        private const int UnansweredQuestionsDaysThreshold = 10; //number of days to look back for unanswered/marked helpful posts     
+        private const int InterventionRefreshThresholdInMinutes = 2; //removing it from stringconstants for now as it will be easier to republish .services when needed...
 
         [HttpGet]
         public int InterventionRefreshThreshold()
         {
-            return int.Parse(StringConstants.InterventionRefreshThreshold);
+            //removing it from stringconstants for now as it will be easier to republish .services when needed...
+            //return int.Parse(StringConstants.InterventionRefreshThreshold);
+            return InterventionRefreshThresholdInMinutes;
         }
 
         [HttpGet]
