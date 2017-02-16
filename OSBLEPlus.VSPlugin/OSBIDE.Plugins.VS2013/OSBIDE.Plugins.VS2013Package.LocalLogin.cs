@@ -43,37 +43,37 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
 
         private async void Login(string userName, string password)
         {            
-            try //configure community window
-            {
-                var task = AsyncServiceClient.CommunityStatus();
-                var result = await task;
-                if(String.Equals("true", result))
-                {
-                    if (_cache.Contains("community"))
-                        _cache["community"] = true;
-                    else
-                        _cache.Add("community", true, DateTime.UtcNow.Date.AddDays(1));
-                }
-                else
-                {
-                    if (_cache.Contains("community"))
-                    {
-                        _cache.Remove("community");
-                        _cache.Add("community", false, DateTime.UtcNow.Date.AddDays(-1));
-                    }
+            //try //configure community window
+            //{
+            //    var task = AsyncServiceClient.CommunityStatus();
+            //    var result = await task;
+            //    if(String.Equals("true", result))
+            //    {
+            //        if (_cache.Contains("community"))
+            //            _cache["community"] = true;
+            //        else
+            //            _cache.Add("community", true, DateTime.UtcNow.Date.AddDays(1));
+            //    }
+            //    else
+            //    {
+            //        if (_cache.Contains("community"))
+            //        {
+            //            _cache.Remove("community");
+            //            _cache.Add("community", false, DateTime.UtcNow.Date.AddDays(-1));
+            //        }
 
-                    else
-                    {
-                        _cache.Add("community", false, DateTime.UtcNow.Date.AddDays(-1));
-                    }
-                    _manager.CloseCommunityWindow();
+            //        else
+            //        {
+            //            _cache.Add("community", false, DateTime.UtcNow.Date.AddDays(-1));
+            //        }
+            //        _manager.CloseCommunityWindow();
                         
-                }
-            }
-            catch (Exception e)
-            {
-                //do nothing for now, keep community disabled
-            }
+            //    }
+            //}
+            //catch (Exception e)
+            //{
+            //    //do nothing for now, keep community disabled
+            //}
 
             try
             {
@@ -83,9 +83,17 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
                 InitStepTwo_LoginCompleted(result);
             }
             catch (Exception e)
-            {
-                var result = MessageBox.Show("The OSBLE+ Visual Studio Plugin is unable to connect to the OSBLE+ server.  If this issue persists, please contact support@osble.org with the error message.\n\nError: " + e.InnerException.ToString(), "Log Into OSBLE+", MessageBoxButton.OK);                
-                _manager.CloseAllWindows();
+            {                
+                try
+                {
+                    //this may crash visual studio, we'll catch it just in case...
+                    _manager.CloseAllWindows();
+                    var result = MessageBox.Show("The OSBLE+ Visual Studio Plugin is unable to connect to the OSBLE+ server.  If this issue persists, please contact support@osble.org with the error message.\n\nError: " + e.InnerException.ToString(), "Log Into OSBLE+", MessageBoxButton.OK);
+                }
+                catch (Exception ex)
+                {
+                    ShowAwesomiumError(ex); // if this crashes it must be missing awesomium
+                }                
             }            
         }        
 
@@ -101,11 +109,19 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
             }
             else
             {
-                _manager.OpenActivityFeedWindow(null,
+                try
+                {
+                    _manager.OpenActivityFeedWindow(null,
                                             StringConstants.WebClientRoot + "/Account/TokenLogin?authToken=" + authKey +
                                             "&destinationUrl=" + StringConstants.WebClientRoot + "/feed/osbide/");
-                if (_cache.Contains("community") && Boolean.Equals(true, _cache["community"]))                
-                    _manager.OpenCommunityWindow();
+                    if (_cache.Contains("community") && Boolean.Equals(true, _cache["community"]))
+                        _manager.OpenCommunityWindow();
+                }
+                catch (Exception ex)
+                {
+                    ShowAwesomiumError(ex);
+                }
+                
             }            
         }
 

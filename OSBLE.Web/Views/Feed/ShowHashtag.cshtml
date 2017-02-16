@@ -6,7 +6,9 @@
 @{
     UserProfile currentUser = ViewBag.CurrentUser;
     string defaultEvents = string.Join(",", ActivityFeedQuery.GetSocialEvents().Select(e => (int)e));
-    var currentCourseUsers = ViewBag.CurrentCourseUsers;
+    var currentCourseUsers = ViewBag.CurrentCourseUsers;   
+    string urlReferrer = Request.UrlReferrer.ToString();
+    bool interventionReferrer = urlReferrer.Contains("Intervention");
 }
 <script type="text/javascript" src="@Url.Content("~/signalr/hubs")"></script>
 @* autocomplete block *@
@@ -68,11 +70,20 @@
                 data: hashtags
             });
         });
+
+        $("#back-to-suggestion").on('click', function(){
+            alert("click");
+        });
     });
-</script>
+</script>        
 
+    @*Back to Suggestion link working inconsistently, disabled for now*@
+    @*@if (interventionReferrer)
+    {
+        <a href="@urlReferrer" class="btn btn-primary"><span class="glyphicon glyphicon-arrow-left intervention-info"></span> Back to Suggestion</a> <br />    
+    }*@
+        
     <h3 style="display: inline-block">Posts and replies containing <span class="Hashtag">#@ViewBag.Hashtag</span></h3>
-
 
     @* This is a message displayed while the feed is loading posts *@
     <div id="loadingMsg" class="message">

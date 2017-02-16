@@ -64,7 +64,7 @@
             VerticalAlignment="Bottom" 
             HorizontalAlignment="Right"
             FontSize="14"
-            Foreground="Red"
+            Foreground="{Binding Path=TextColor}"
             TextWrapping="Wrap"
             Text="{Binding Path=ServerMessage}" 
             />

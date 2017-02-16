@@ -185,7 +185,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />
-    <Content Include="Global.asax" />
+    <Content Include="Global.asax" />    
     <None Include="Properties\PublishProfiles\local debug.pubxml" />
     <None Include="Scripts\jquery-1.6.4-vsdoc.js" />
     <Content Include="Scripts\jquery-1.6.4.js" />
@@ -236,6 +236,7 @@
     <Compile Include="Controllers\EventCollectionController.cs" />
     <Compile Include="Controllers\EventCollectionController.Helper.cs" />
     <Compile Include="Controllers\FeedController.cs" />
+    <Compile Include="Controllers\InterventionController.cs" />
     <Compile Include="Controllers\TimelineController.cs">
       <SubType>Code</SubType>
     </Compile>

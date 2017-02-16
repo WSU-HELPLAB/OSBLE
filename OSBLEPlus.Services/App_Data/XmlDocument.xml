@@ -618,6 +618,31 @@
             <param name="topN">Max amount of posts to return</param>
             <returns>IEnumerable of FeedItem</returns>
         </member>
+        <member name="M:OSBLEPlus.Services.Controllers.InterventionController.AnalyzeBuildErrorHistory(System.Int32,OSBLEPlus.Logic.DomainObjects.ActivityFeeds.BuildEvent)">
+            <summary>
+            Checks the build intervention criteria.
+            1. build failure count  > BuildErrorThreshold within the last NumberOfMinutes
+            2. No build failure interventin within the last NumberOfMinutes
+            3. If build failure within last NumberOfMinutes, dismiss last intervention, create new with most up to date data
+            </summary>
+            <param name="userProfileId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:OSBLEPlus.Services.Controllers.InterventionController.InterventionRequiresRefresh(OSBLE.Models.Intervention.InterventionItem)">
+            <summary>
+            Checks to see if a type of intervention needs the 'latest' data and should be refreshed if one already exists.
+            returning true means the intervention needs to be dismissed and generated again (e.g. it's a build error and there may be new/different errors)
+            returning false means do not dismiss or generate another intervention, leave the one that is still live up.
+            </summary>
+            <param name="existingIntervention"></param>
+            <returns></returns>
+        </member>
+        <member name="M:OSBLEPlus.Services.Controllers.InterventionController.UpdateClassmatesAvailable(System.Int32)">
+            <summary>
+            Checks if other users are offering help in any of this user's courses... if so, generate the others offering help intervention
+            </summary>
+            <param name="userProfileId"></param>
+        </member>
         <!-- Badly formed XML comment ignored for member "M:OSBLEPlus.Services.Controllers.TimelineController.Get(OSBLEPlus.Logic.DomainObjects.Analytics.TimelineCriteria)" -->
         <member name="M:OSBLEPlus.Services.Controllers.UserProfilesController.Login(OSBLEPlus.Logic.DomainObjects.Profiles.APILogin)">
             <summary>

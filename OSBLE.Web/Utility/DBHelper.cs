@@ -561,6 +561,34 @@ namespace OSBLE.Utility
             return name;
         }
 
+        public static string GetCourseFullNameFromCourseId(int courseId, SqlConnection connection = null)
+        {
+            string name = "";
+
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection()) { name = GetCourseFullNameFromCourseId(courseId, sqlc); }
+            }
+            else
+            {
+                var result = connection.Query<dynamic>("SELECT Name, Prefix, Number, Semester, Year, Inactive, Nickname, Discriminator FROM AbstractCourses WHERE ID = @id",
+                    new { id = courseId }).SingleOrDefault();
+
+                if (result.Discriminator == "Course")
+                    name = string.Format("{0} {1} - {2}, {3}, {4}", result.Prefix, result.Number, result.Name, result.Semester, result.Year);
+                else
+                    name = string.Format("{0} - {1}", result.Nickname, result.Name);
+
+                // tack role on to the end
+                //name += " (" + GetAbstractRoleNameFromID(cu.AbstractRoleID, connection) + ")";
+
+                if (null != result.Inactive && result.Inactive)
+                    name += " [INACTIVE]";
+            }
+
+            return name;
+        }
+
         public static string GetUserFirstNameFromEventLogId(int eventLogId, SqlConnection connection = null)
         {
             string name = "";
@@ -675,6 +703,38 @@ namespace OSBLE.Utility
                                 "INNER JOIN CourseUsers cu " +
                                 "ON ac.ID = cu.AbstractCourseID " +
                                 "WHERE GETDATE() < ac.EndDate " +
+                                "AND ac.Inactive = 0 " +
+                                "AND cu.UserProfileID = @userProfileId";
+
+                    List<int> activeCourseIds = sqlConnection.Query<int>(query, new { userProfileId = userProfileId }).ToList();
+
+                    sqlConnection.Close();
+
+                    return activeCourseIds;
+                }
+            }
+            catch (Exception e)
+            {
+                //TODO: handle exception logging
+                return new List<int>(); //failure, return empty list
+            }
+        }
+
+        public static List<int> GetAllUserCourseIds(int userProfileId)
+        {
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+
+                    string query = "";
+
+                    //we're getting all active course Ids because ask for help events are visible in all courses
+                    query = "SELECT DISTINCT ISNULL(ac.ID, 0) " +
+                                "FROM AbstractCourses ac " +
+                                "INNER JOIN CourseUsers cu " +
+                                "ON ac.ID = cu.AbstractCourseID " +                                
                                 "AND ac.Inactive = 0 " +
                                 "AND cu.UserProfileID = @userProfileId";
 

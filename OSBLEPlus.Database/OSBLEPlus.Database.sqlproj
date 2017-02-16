@@ -229,7 +229,11 @@
     <Build Include="Schema\Stored Procedures\Activiities\GetActivityFeedsBasic.sql" />
     <Build Include="Schema\Stored Procedures\Profiles\GetAssignmentTeam.sql" />
     <Build Include="Schema\Stored Procedures\Activiities\GetActivityFeedById.sql" />
-    <Build Include="Schema\Tables\OSBLEActivityEvents_1.sql" />
+    <Build Include="Schema\Tables\OSBLEActivityEvents.sql" />
+    <Build Include="Schema\Tables\OSBLEInterventionInteractions.sql" />
+    <Build Include="Schema\Tables\OSBLEInterventions.sql" />
+    <Build Include="Schema\Tables\UserStatus.sql" />
+    <Build Include="Schema\Tables\OSBLEInterventionsStatus.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Post-Deployment\Script.PostDeployment.sql" />

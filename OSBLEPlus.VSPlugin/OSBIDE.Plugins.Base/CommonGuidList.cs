@@ -20,6 +20,7 @@ namespace OSBIDE.Plugins.Base
         public const string guidOsbideDocumentationTool = "eee1c7ba-00ea-4b22-88d7-6cb17837c3db";
         public const string guidOsbideWebLinkTool = "eee1c7ba-00ea-4b22-88d7-6cb17837c3dc";
         public const string guidOsbideGenericToolWindow = "eee1c7ba-00ea-4b22-88d7-6cb17837c3dd";
+        public const string guidOsbideInterventionWindow = "eee1c7ba-00ea-4b22-88d7-6cb17837ffff";
 
         public static readonly Guid guidOSBIDE_VSPackageCmdSet = new Guid(guidOSBIDE_VSPackageCmdSetString);
         public static readonly Guid guidOSBIDE_ContextMenuCmdSet = new Guid(guidOSBIDE_ContextMenuCmdSetString);

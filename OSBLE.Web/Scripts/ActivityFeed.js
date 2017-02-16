@@ -34,7 +34,7 @@ function FeedItem(data) {
     self.Delete = function () {
         $.ajax({
             url: self.isComment ? "/Feed/DeleteLogComment" : "/Feed/DeleteFeedPost",
-            data: {id: self.eventId },
+            data: { id: self.eventId },
             method: "POST",
             beforeSend: function (jqXHR, settings) {
                 // will cancel the request if the user does not ok
@@ -209,14 +209,29 @@ function FeedViewModel(userName, userId, current) {
         for (var i = 0; i < cookieFilters.length; i++) {
             var filters = cookieFilters[i].split('=');
             if (filters.length > 1 && filters[0] == postData.EventType) {
-                if (filters[1] == "True"){
+                if (filters[1] == "True") {
                     filterAllowsEvent = true;
                     break;
                 }
             }
         }
 
-        if (courseID == GetSelectedCourseID() && filterAllowsEvent) {
+        var courseId = GetSelectedCourseID();
+
+        if (courseId == undefined) {
+            courseId = $("#courseIdVal").val();
+        }
+
+        var privatePage = $("#private-page").val();
+
+        var pushMessage = true;
+
+        if (privatePage == "true" && postData.EventVisibilityGroups == "class") {
+            //only forward messages to users on the private message page if it's not a class message
+            pushMessage = false;
+        }
+
+        if (courseID == courseId && filterAllowsEvent && pushMessage) {
             SetPermissions(postData);
             self.items.unshift(new FeedItem(postData)); // unshift puts object at beginning of array
             HighlightNewPost(postData.EventId, postData.SenderId == self.userId, self.InEventVisibleToList(postData.EventVisibleTo));
@@ -252,8 +267,14 @@ function FeedViewModel(userName, userId, current) {
         }
     }
 
+    var courseId = GetSelectedCourseID();
+
+    if (courseId == undefined) {
+        courseId = $("#courseIdVal").val();
+    }
+
     // Start the connection
-    $.connection.hub.qs = { "userID": self.userId, "courseID": GetSelectedCourseID() };
+    $.connection.hub.qs = { "userID": self.userId, "courseID": courseId };
     $.connection.hub.start();
     // *************************************
 
@@ -308,7 +329,7 @@ function FeedViewModel(userName, userId, current) {
             type: "POST",
             url: "/Feed/GetMorePosts",
             dataType: "json",
-            data: { endDate: lastDate },
+            data: { endDate: lastDate, keywords: self.keywords(), events: GetCheckedEvents() },
             success: function (data) {
                 $.each(data.Feed, function (index, value) {
                     self.items.push(new FeedItem(value));
@@ -357,7 +378,7 @@ function FeedViewModel(userName, userId, current) {
             type: "GET",
             url: "/Feed/GetFeed",
             dataType: "json",
-            data: { keywords: hashtag, events: "7,9" }, // 7, 9 are the Ids for FeedPost and LogComment events
+            data: { keywords: hashtag, events: "1,7,9" }, // 1, 7, 9 are the Ids for AskForHelp, FeedPost, and LogComment events
             cache: false,
             success: function (data, textStatus, jqXHR) {
                 var mappedItems = $.map(data.Feed, function (item) { return new FeedItem(item) });
@@ -380,6 +401,37 @@ function FeedViewModel(userName, userId, current) {
                 });
             }
         });
+    };
+
+    self.GetUnansweredPosts = function (unansweredPostIds) {
+
+        ShowLoading();
+
+        $.ajax({
+            type: "GET",
+            url: "/Feed/GetAggregateFeedFromIDs",
+            dataType: "json",
+            data: { stringIds: unansweredPostIds },
+            cache: false,
+            success: function (data, textStatus, jqXHR) {
+                var mappedItems = $.map(data.Feed, function (item) { return new FeedItem(item) });
+                self.items(mappedItems);
+                //self.items.reverse();
+
+                if ($('#load-old-posts').hasClass('disabled')) {
+                    $('#load-old-posts').removeClass('disabled');
+                }
+            },
+            complete: function () {
+                HideLoading();
+            },
+            error: function (data, textStatus, jqXHR) {
+            }
+        });
+    };
+
+    self.ReverseFeedSortOrder = function () {
+        self.items.reverse();
     };
 
     self.GetPost = function (id) {
@@ -448,13 +500,13 @@ function FeedViewModel(userName, userId, current) {
     };
 
     $("#activity-feed-filters").submit(function (e) {
-                
+
         if ($("#enableLogging").val() == "true") {
             var checkedEventsList = "";
             $(".event_checkbox").each(function () {
                 if (this.checked) {
                     checkedEventsList += this.name + " ";
-                }                
+                }
             });
 
             LogActivityEvent("KeywordSearch", $("#feedSearchInput").val(), "Keywords for FilterOptions: " + checkedEventsList);
@@ -788,10 +840,23 @@ function HighlightNewPost(postID, isCurrentUserPost, userInVisibilityList) {
 }
 
 function MakePostSucceeded(newPost) {
-    //reset the post visibility to everyone
-    $('#visibility-dropdown').prop('selectedIndex', 0);
-    $("#btn_post_active").val("Post to " + $("#data-course-link").text());
-    $("#email_post").text("Email to Class");
+
+
+    //on private messages page
+    var privatePage = $("#private-page").val();
+    if (privatePage != undefined) {
+        $('#visibility-dropdown').prop('selectedIndex', 1); //change it to My Section default
+        $("#btn_post_active").val("Post to: " + $("#visibility-dropdown option:selected").text());
+        $("#email_post").text("Email to: My Section");
+    }
+    else {
+        //reset the post visibility to everyone
+        $('#visibility-dropdown').prop('selectedIndex', 0);
+        $("#btn_post_active").val("Post to " + $("#data-course-link").text());
+        $("#email_post").text("Email to Class");
+    }
+    toggleVisibilityTooltip($("#visibility-dropdown option:selected").val());
+
     //hide custom visibility
     $('#custom-visiblity-selection').css('max-height', '0px');
     //clear last user selection
@@ -805,8 +870,9 @@ function MakePostSucceeded(newPost) {
     $('#btn_post_active').removeAttr('disabled');
 
     // notify others about the new post
-    //last two parameters are not used by posts, just VS Plugin events... apparently hub doesn't like optional parameters
-    vm.hub.server.notifyNewPost(newPost, "", 0);
+    //last THREE parameters are not used by posts here, just VS Plugin events... apparently hub doesn't like optional parameters    
+    vm.hub.server.notifyNewPost(newPost, "", 0, "");
+
 }
 
 function MakePostFailed() {
@@ -814,15 +880,13 @@ function MakePostFailed() {
         if (0 == updateHiddenUserIdList()) {
             ShowError('#feed-post-form', 'Unable to create post. No users have been selected for this post. Please select users or change post visiblity.', false);
         }
-        else
-        {
+        else {
             ShowError('#feed-post-form', 'Unable to create post. Post textbox contains no text.', false);
         }
     }
-    else
-    {
+    else {
         ShowError('#feed-post-form', 'Unable to create post. Post textbox contains no text.', false);
-    }    
+    }
 
     // re-enable posting
     $('#feed-post-textbox').removeAttr('disabled');
@@ -1016,7 +1080,7 @@ function ShowUserVisibilityDialog(item) {
     for (var i = 0; i < visibleListIds.length; i++) {
         userNames.push([namesAndIds[visibleListIds[i]], visibleListIds[i]]);
     }
-    
+
     //sort by firstname
     userNames = userNames.sort(function (a, b) {
         return a[0] > b[0];
@@ -1031,34 +1095,33 @@ function ShowUserVisibilityDialog(item) {
                                     "<input type=\"hidden\" id=\"selected-sender-id\" value=\"" + item.senderId + "\"/>");
 
     //enable removing users
-    if ($("#current-user-id").val() == $("#selected-sender-id").val())    
-        $("#visibility-dialog").append("<input type=\"hidden\" id=\"is-op\" value=\"true\"/>");    
-    else    
-        $("#visibility-dialog").append("<input type=\"hidden\" id=\"is-op\" value=\"false\"/>");    
+    if ($("#current-user-id").val() == $("#selected-sender-id").val())
+        $("#visibility-dialog").append("<input type=\"hidden\" id=\"is-op\" value=\"true\"/>");
+    else
+        $("#visibility-dialog").append("<input type=\"hidden\" id=\"is-op\" value=\"false\"/>");
 
     if ($("#is-op").val() === "true" || ($("#can-grade").length > 0 && $("#can-grade").val() == "true")) {
         for (var i = 0; i < userNames.length; i++) {
             $("#visibilityList").append("<li class=\"removable-user\" " + " id=\"participant-profile-id-" + userNames[i][1] + "\"> <span class=\"glyphicon glyphicon-remove remove-current\"></span>  <span class=\"glyphicon glyphicon-trash remove-user\"></span> <img class=\"mini-profile-image\" src=\"/user/" + userNames[i][1] + "/Picture?size=16\" alt=\"Profile Image for " + userNames[i][0] + "\" >" + userNames[i][0] + "</li>");
         }
     }
-    else
-    {
+    else {
         for (var i = 0; i < userNames.length; i++) {
             $("#visibilityList").append("<li " + " id=\"participant-profile-id-" + userNames[i][1] + "\"> <img class=\"mini-profile-image\" src=\"/user/" + userNames[i][1] + "/Picture?size=16\" alt=\"Profile Image for " + userNames[i][0] + "\" >" + userNames[i][0] + "</li>");
         }
-    }    
+    }
 
     //add more members to the dialog.    
     $.ajax({
         url: "/Feed/GetPostVisibilityAddMorePartialView/",
         data: {},
-        success: function (response) {                           
+        success: function (response) {
             $(response).insertAfter("#visibilityList");
-            
+
         },
-            error: function () {
+        error: function () {
             //todo: handle error here
-        }    
+        }
     });
 
     $("#visibility-dialog").dialog(); //now show the dialog box
@@ -1073,7 +1136,7 @@ function TitlebarNotification() {
 function LogActivityEvent(eventAction, eventData, eventDataDescription) {
 
     var authKey = $.cookie('AuthKey').split("=")[1];
-    var courseId = $("#data-course-link").attr("data-course-id");    
+    var courseId = $("#data-course-link").attr("data-course-id");
 
     $.ajax({
         url: "/Feed/LogActivityEvent",
@@ -1088,7 +1151,7 @@ function LogActivityEvent(eventAction, eventData, eventDataDescription) {
     });
 }
 
-function LogDetailsActivity(item) {    
+function LogDetailsActivity(item) {
     if ($("#enableLogging").val() == "true") {
         LogActivityEvent("ViewDetails", item.eventId, "EventLogId");
     }
@@ -1162,7 +1225,7 @@ function buildTitleOutput(eventVisibleTo, namesAndIds) {
     userNames = userNames.sort(function (a, b) {
         return a[0] > b[0];
     });
-    
+
     var formattedOutput = "";
 
     for (var i = 0; i < userNames.length; i++) {
@@ -1198,4 +1261,13 @@ function detectBrowser() {
 
 //END feed methods for custom visibility groups
 
+function GetPreviousUrl() {
+    return localStorage.getItem('prevUrl');
+}
 
+function ShowBackToSuggestions() {
+    if ($("#suggestion-back-link").length) { //if the link exists
+        $("#suggestion-back-link").attr('href', GetPreviousUrl());
+        $("#suggestion-back-link").css('display', 'inline');
+    }
+}

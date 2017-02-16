@@ -38,7 +38,7 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
 
         public VsEventHandler(IServiceProvider serviceProvider, IEventGenerator osbideEvents)
             : base(serviceProvider, osbideEvents)
-        {
+        {                        
         }
 
         private Command GetCommand(string guid, int id)
@@ -66,12 +66,12 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
 
             //send off to the service client
             NotifyEventCreated(this, new EventCreatedArgs(evt));
-        }
+        }        
 
         public override void SolutionSubmitted(object sender, SubmitAssignmentArgs e)
         {
             base.SolutionSubmitted(sender, e);
-
+            
             var submit = new SubmitEvent
             {
                 AssignmentId = e.AssignmentId,
@@ -204,7 +204,8 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
                 _lastEditorActivityEvent = DateTime.UtcNow;
                 var activity = new EditorActivityEvent
                 {
-                    SolutionName = Path.GetFileName(Dte.Solution.FullName)
+                    SolutionName = Path.GetFileName(Dte.Solution.FullName),
+                    LineChanged = startPoint.Line
                 };
                 NotifyEventCreated(this, new EventCreatedArgs(activity));
             }
@@ -213,7 +214,7 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
         public override void OnExceptionThrown(string exceptionType, string name, int code, string description, ref dbgExceptionAction exceptionAction)
         {
             base.OnExceptionThrown(exceptionType, name, code, description, ref exceptionAction);
-            HandleException(exceptionType, name, code, description, ref exceptionAction);
+            HandleException(exceptionType, name, code, description, ref exceptionAction);            
         }
 
         public override void OnExceptionNotHandled(string exceptionType, string name, int code, string description, ref dbgExceptionAction exceptionAction)
@@ -263,7 +264,7 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             ex.ExceptionDescription = description;
             ex.ExceptionName = name;
             ex.ExceptionType = exceptionType;
-            ex.SolutionName = Dte.Solution.FullName;
+            ex.SolutionName = Dte.Solution.FullName;            
             NotifyEventCreated(this, new EventCreatedArgs(ex));
         }
 
@@ -287,11 +288,11 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
                 int code = int.Parse(data[6], System.Globalization.NumberStyles.HexNumber);
 
                 // TODO: find name/type of exception from code    
-                
+
 
                 EnvDTE.dbgExceptionAction action = dbgExceptionAction.dbgExceptionActionBreak;
                 HandleException("", "", code, "", ref action);
-                
+
             }
         }
 

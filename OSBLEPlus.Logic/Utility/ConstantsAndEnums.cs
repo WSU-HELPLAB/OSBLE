@@ -14,7 +14,8 @@ namespace OSBLEPlus.Logic.Utility
         UserProfile,
         CreateAccount,
         AskTheProfessor,
-        GenericComponent
+        GenericComponent,
+        InterventionDetails,
     };
 
     public enum DebugActions

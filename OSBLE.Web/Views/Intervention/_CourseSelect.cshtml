@@ -1,0 +1,40 @@
+﻿
+@{
+    Dictionary<int, string> CurrentUserCoursesIdCourseName = ViewBag.CurrentUserCoursesIdCourseName ?? new Dictionary<int, string>();
+    int currentCourseId = ViewBag.CurrentCourseId ?? 0;
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#CourseSelect").val(@currentCourseId);
+
+        $("#CourseSelect").on("change", function () {            
+            ChangeCurrentCourse();
+        });
+
+        if ($("#CourseSelect").val() == null) { //if for whatever reason no option is selected, reset to last course on list (should be last added)
+            $("#CourseSelect").val($('#CourseSelect option:last-child').val());
+            ChangeCurrentCourse();
+        }
+    });
+
+    function ChangeCurrentCourse()
+    {
+        $.ajax({
+            url: "/Home/SetCourseID",
+            data: { courseId: $("#CourseSelect").val() },
+            success: function (result) {
+                location.reload();
+            },
+            error: function (result) {
+                //do nothing for now
+            }
+        });
+    }
+</script>
+
+<div>
+    <h4><strong>Current Course: </strong>@Html.DropDownList("CourseSelect", new SelectList(CurrentUserCoursesIdCourseName, "Key", "Value"))</h4>
+    <br />
+</div> 

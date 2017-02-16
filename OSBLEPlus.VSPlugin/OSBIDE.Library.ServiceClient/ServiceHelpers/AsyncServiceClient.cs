@@ -221,5 +221,37 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
                 }
             }
         }
+
+        /// <summary>
+        /// Used to check if there are new interventions ready for the user.
+        /// </summary>
+        /// <returns>returns true/false</returns>
+        public static async Task<string> ProcessIntervention(string authToken)
+        {
+            using (var client = GetClient())
+            {   
+                var task = client.GetStringAsync(string.Format("api/intervention/RefreshInterventions?authToken={0}", authToken));                
+                await task;
+
+                return task.Result.TrimEnd('"').TrimStart('"');
+            }
+        }
+
+        public static async Task<int> GetInterventionRefreshThresholdValue()
+        {
+            try
+            {
+                using (var client = GetClient())
+                {
+                    var task = client.GetStringAsync(string.Format("{0}API/Intervention/InterventionRefreshThreshold", StringConstants.DataServiceRoot));
+                    await task;
+                    return int.Parse(task.Result);
+                }
+            }
+            catch (Exception e)
+            {
+                return 5;
+            }            
+        }
     }
 }

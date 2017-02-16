@@ -42,6 +42,11 @@ namespace OSBIDE.Library.ServiceClient
 
         #endregion
 
+        //used to open the intervention window based on activity results.
+        dynamic _toolWindowManager;
+        //method to open/refresh the window
+        //_toolWindowManager.OpenInterventionWindow();
+
         #region properties
 
         public bool IsCollectingData
@@ -97,8 +102,13 @@ namespace OSBIDE.Library.ServiceClient
 
         #region constructor
 
-        private ServiceClient(EventHandlerBase dteEventHandler, ILogger logger)
+        private ServiceClient(EventHandlerBase dteEventHandler, ILogger logger, dynamic staticToolManager = null)
         {
+            if (staticToolManager != null)
+            {
+                _toolWindowManager = staticToolManager;
+            }
+
             var events = dteEventHandler;
             _logger = logger;
 
@@ -126,9 +136,9 @@ namespace OSBIDE.Library.ServiceClient
         /// <param name="dteEventHandler"></param>
         /// <param name="logger"></param>
         /// <returns></returns>
-        public static ServiceClient GetInstance(EventHandlerBase dteEventHandler, ILogger logger)
+        public static ServiceClient GetInstance(EventHandlerBase dteEventHandler, ILogger logger, dynamic staticToolManager = null)
         {
-            return _instance ?? (_instance = new ServiceClient(dteEventHandler, logger));
+            return _instance ?? (_instance = new ServiceClient(dteEventHandler, logger, staticToolManager));
         }
 
         /// <summary>
@@ -407,7 +417,7 @@ namespace OSBIDE.Library.ServiceClient
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void OsbideEventCreated(object sender, EventCreatedArgs e)
-        {
+        {            
             //create a new event log...
             SendStatus.IsActive = false;
 
@@ -420,14 +430,24 @@ namespace OSBIDE.Library.ServiceClient
                     {
                         try
                         {
-                            SendLogToServer(e.OsbideEvent);
+                            SendLogToServer(e.OsbideEvent);                            
                         }
                         catch (Exception ex)
                         {
-                            _logger.WriteToLog(string.Format("SendToServer Error: {0}", ex.Message), LogPriority.HighPriority);
+                            _logger.WriteToLog(string.Format("SendToServer Error: {0}", ex.Message), LogPriority.HighPriority);                            
                         }
                     }
                     );
+                try //try catch... don't want the plugin to crash if this fails.
+                {                    
+                    //check if we need to refresh the intervention window
+                    CheckInterventionStatus();                    
+                }
+                catch (Exception ex)
+                {
+                    _logger.WriteToLog(string.Format("SendToServer Error: {0}", ex.Message), LogPriority.HighPriority);                    
+                }
+
             }
             else
             {
@@ -528,5 +548,74 @@ namespace OSBIDE.Library.ServiceClient
         }
 
         #endregion
+
+        /// <summary>
+        /// Checks intervention status, if needed, re-opens/refreshes the intervention window
+        /// </summary>
+        /// <param name="caption"></param>
+        private async void CheckInterventionStatus()
+        {
+            try
+            {
+                if (!_cache.Contains("InterventionRefreshThresholdInMinutes"))
+                {
+                    SetupInterventionRefreshThreshold();
+                }
+                else if (int.Parse(_cache["InterventionRefreshThresholdInMinutes"].ToString()) == 5 ||
+                    DateTime.Parse(_cache["LastInterventionRefreshTimeThreshold"].ToString()) >= DateTime.UtcNow.AddHours(-1)) //default value, check if we need to get a different value in the last hour
+                {
+                    SetupInterventionRefreshThreshold();
+                }
+
+                if (_cache.Contains("InterventionRefresh") && _cache.Contains(StringConstants.AuthenticationCacheKey) && _cache.Contains("InterventionRefreshThresholdInMinutes"))
+                {
+                    int refreshThreshold = int.Parse(_cache["InterventionRefreshThresholdInMinutes"].ToString());
+
+                    string lastRefresh = _cache["InterventionRefresh"] as string;
+                    DateTime lastRefreshDT = DateTime.Parse(lastRefresh);
+                    DateTime timeNow = DateTime.UtcNow;
+
+                    TimeSpan difference = (timeNow - lastRefreshDT);
+
+                    if (difference.TotalMinutes >= refreshThreshold) //TODO: check threshold for refreshing
+                    {
+                        string authKey = _cache[StringConstants.AuthenticationCacheKey] as string;
+                        var task = AsyncServiceClient.ProcessIntervention(authKey);
+                        var result = await task;
+                        if (result == "true")
+                        {
+                            _toolWindowManager.OpenInterventionWindow(null, "New Suggestions: " + DateTime.Now.ToShortTimeString()); //datetime now works because it's relative to their system
+                            _cache["InterventionRefresh"] = DateTime.UtcNow.ToString();
+                        }
+                    }
+                    //else do nothing
+                }
+                else //create the cache entry so it can be found for the next check, set it to now minus a day so we will be sure to check intervention status the first time the cache is built
+                {
+                    _cache["InterventionRefresh"] = DateTime.UtcNow.AddDays(-1).ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                //throw new Exception("CheckInterventionStatus()", ex);
+                _logger.WriteToLog(string.Format("CheckInterventionStatus() error: {0}", ex.Message), LogPriority.HighPriority);
+            }
+        }
+
+        private async Task<bool> SetupInterventionRefreshThreshold()
+        {
+            try
+            {
+                var result = AsyncServiceClient.GetInterventionRefreshThresholdValue();
+                _cache["InterventionRefreshThresholdInMinutes"] = await result;
+                _cache["LastInterventionRefreshTimeThreshold"] = DateTime.UtcNow.ToString();
+                return true;
+            }
+            catch (Exception)
+            {
+                _cache["InterventionRefreshThresholdInMinutes"] = 5;
+                return false;
+            }
+        }
     }
 }

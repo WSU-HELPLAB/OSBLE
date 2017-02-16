@@ -7,6 +7,9 @@
     ViewBag.ShowDetails = true;
     var currentCourseUsers = ViewBag.CurrentCourseUsers;
     string EnableCustomPostVisibility = ViewBag.EnableCustomPostVisibility;
+
+    string urlReferrer = Request != null && Request.UrlReferrer != null ? Request.UrlReferrer.ToString() : "";
+    bool interventionReferrer = urlReferrer.Contains("Intervention");    
 }
 
 <script type="text/javascript" src="@Url.Content("~/signalr/hubs")"></script>
@@ -16,7 +19,10 @@
         vm = new DetailsViewModel("@currentUser.FullName", @currentUser.ID, "@rootId");
         ko.applyBindings(vm);
         vm.RequestUpdate();
-    });
+
+        $("#previous-url").val(GetPreviousUrl());        
+        ShowBackToSuggestions();
+    });    
 </script>
 
 <script type="text/javascript">
@@ -62,6 +68,16 @@
         });
     });
 </script>
+
+@*Back to Suggestion link working inconsistently, disabled for now*@
+@*@if (interventionReferrer)
+{
+    <a href="@urlReferrer" class="btn btn-primary"><span class="glyphicon glyphicon-arrow-left intervention-info"></span> Back to Suggestion</a>
+}
+else
+{
+    <a href="@urlReferrer" class="btn btn-primary" id="suggestion-back-link" style="display: none;"><span class="glyphicon glyphicon-arrow-left intervention-info"></span> Back to Suggestion</a>
+}*@ 
 
 <section id="Details" data-bind="foreach: items">
     @Html.Partial("Feed/_FeedItems")

@@ -195,8 +195,18 @@
                 Activity Feed
                 <span class="badge new-activity-badge" style="display: none" data-toggle="tooltip" title="Click to dismiss">New Activity</span>
                 @*<a href="@Url.Action("DownloadDashboardPosts", "Course")" title="Download Activity Feed as csv">@Helpers.UnPublishButton()</a>*@
+                <span style="float:right;">
+                    <a href="/Home/PrivateMessages" style="text-decoration: none;">
+                        <span style="font-size: x-small; vertical-align: middle;">Private Conversations:</span>
+                        <span class="glyphicon glyphicon-comment" title="Private Conversations"></span>
+                    </a>
+                    <a href="/Home/Availability" style="text-decoration: none;">
+                        <span style="font-size: x-small; vertical-align: middle; ">Availability:</span>
+                        <span class="glyphicon glyphicon-flag" title="Availability/Status"></span>
+                    </a>
+                </span>                
             </h3>
-
+            
             <div id="activity_feed">
                 <div id="activity_feed_content" @*class="partialContents" data-url="/Feed/Index"*@>
                     @*<img src="~/Content/images/ajax-loader.gif" /> Loading...*@

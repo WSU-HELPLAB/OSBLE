@@ -1,0 +1,84 @@
+﻿@{
+    var intervention = ViewBag.InterventionFeedbackItem;
+    var isMainPage = ViewBag.MainPage;
+
+
+    string prefix = "<strong>You are providing feedback for the page: </strong> \"";
+    string defaultEndText = "";
+    string defaultValue = "";
+    
+    if (intervention!= null)    
+    {        
+        if (intervention.ContentFirst)
+        {
+            defaultEndText = "<em>" + intervention.Title + "\"</em>";
+        }
+        else
+        {
+            defaultEndText = "<em>" + intervention.Title + "\"</em>";
+        }
+        defaultValue = prefix + defaultEndText;
+    }    
+}
+
+@if (intervention != null)
+{
+
+    <!-- Modal -->
+    <div id="feedback-modal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">OSBLE+ Suggestions Feedback:</h4>
+                </div>
+                <div class="modal-body">
+                    <h5 id="modal-feedback-suggestion-details">
+                        <strong>
+                            You are providing feedback for the
+                            @if (isMainPage)
+                            {
+                                <text>page: </text>
+                            }
+                            else
+                            {
+                                <text>suggestion: </text>
+                            }
+                        </strong>
+                        <em>
+                            "@intervention.Title
+                            @if (!isMainPage)
+                            {
+                                <text>:&nbsp;</text>
+                            }
+                            @if (intervention.ContentFirst)
+                            {
+                                @intervention.ListItemContent <text>&nbsp;</text> @intervention.LinkText<text>"</text>
+                            }
+                            else
+                            {
+                                @intervention.LinkText <text>&nbsp;</text> @intervention.ListItemContent<text>"</text>
+                            }
+                        </em>
+
+                    </h5>
+                    <textarea id="feedback-textarea" placeholder="Please briefly describe how this suggestion/page was helpful or not helpful."></textarea>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="submit-feedback">Submit Feedback</button>
+                    <div>
+                        <span class="right" id="feedback-post-success"></span>
+                        <span class="right" id="feedback-post-error"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <input id="intervention-clicked" type="hidden" value="" style="display:none;" />
+    <input id="default-feedback-prompt" type="hidden" value="@defaultValue" style="display:none;" />
+}
+

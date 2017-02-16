@@ -76,7 +76,7 @@ namespace OSBLEPlus.Services.Controllers
             bool eventSenderNotNull = false;
 
             if (request.SubmitEvent.Sender == null)
-            {                
+            {
                 var sender = auth.GetActiveUser(request.AuthToken);
                 request.SubmitEvent.SenderId = sender.IUserId;
                 request.SubmitEvent.Sender = new User
@@ -100,17 +100,35 @@ namespace OSBLEPlus.Services.Controllers
                     {
                         ecc.NotifyHub(int.Parse(content), request.SubmitEvent.SenderId, request.SubmitEvent.EventType.ToString(), request.SubmitEvent.CourseId ?? 0);
                     }
-                }   
+                }
             }
             catch (Exception)
             {
                 //ignore for now
-            }                     
+            }
+
+            //submit to intervetion controller
+            ProcessLogForIntervention(request);
 
             return new HttpResponseMessage
             {
                 Content = new StringContent(content)
             };
+        }
+
+        private async void ProcessLogForIntervention(SubmissionRequest request)
+        {
+            using (InterventionController intervention = new InterventionController())
+            {
+                intervention.ProcessActivityEvent(
+                    EventCollectionControllerHelper.GetActivityEvent(
+                        new EventPostRequest
+                        {
+                            AuthToken = request.AuthToken,
+                            SubmitEvent = request.SubmitEvent
+                        }
+                    ));
+            }
         }
     }
 }

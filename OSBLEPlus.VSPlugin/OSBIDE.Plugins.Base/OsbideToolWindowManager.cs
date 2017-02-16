@@ -10,6 +10,8 @@ using OSBIDE.Controls.ViewModels;
 using OSBIDE.Controls.Views;
 using OSBLEPlus.Logic.Utility;
 
+using EnvDTE;
+
 namespace OSBIDE.Plugins.Base
 {
     public class OsbideToolWindowManager
@@ -22,9 +24,10 @@ namespace OSBIDE.Plugins.Base
         private readonly BrowserViewModel _communityVm = new BrowserViewModel();
         private readonly BrowserViewModel _activityFeedVm = new BrowserViewModel();
         private readonly BrowserViewModel _activityFeedDetailsVm = new BrowserViewModel();
-        private readonly BrowserViewModel _createAccountVm = new BrowserViewModel();        
+        private readonly BrowserViewModel _createAccountVm = new BrowserViewModel();
         private readonly BrowserViewModel _askTheProfessorVm = new BrowserViewModel();
         private readonly BrowserViewModel _genericWindowVm = new BrowserViewModel();
+        private readonly BrowserViewModel _interventionVm = new BrowserViewModel();
         private static int _detailsToolWindowId;
 
         public OsbideToolWindowManager(FileCache cache, Package vsPackage)
@@ -39,7 +42,8 @@ namespace OSBIDE.Plugins.Base
             _activityFeedDetailsVm.Url = StringConstants.ActivityFeedUrl;
             _createAccountVm.Url = StringConstants.CreateAccountUrl;
             _askTheProfessorVm.Url = StringConstants.AskTheProfessorUrl;
-            _genericWindowVm.Url = StringConstants.ProfileUrl;            
+            _genericWindowVm.Url = StringConstants.ProfileUrl;
+            _interventionVm.Url = StringConstants.InterventionUrl;
         }
 
         public void OpenChatWindow(Package vsPackage = null)
@@ -58,6 +62,47 @@ namespace OSBIDE.Plugins.Base
         {
             _communityVm.AuthKey = _cache[StringConstants.AuthenticationCacheKey] as string;
             OpenToolWindow(new CommunityToolWindow(), _communityVm, vsPackage);
+        }
+
+        public void OpenInterventionWindow(Package vsPackage = null, string caption = "", string customUrl = "")
+        {
+            //need to get the current document the user is focusing on.
+            DTE dte = Package.GetGlobalService(typeof(DTE)) as DTE;
+            var currentDocument = dte.ActiveDocument;
+            var currentWindow = dte.ActiveWindow;
+
+            //open the intervention window
+            _interventionVm.AuthKey = _cache[StringConstants.AuthenticationCacheKey] as string;
+
+            if (customUrl != "")
+                _interventionVm.Url = customUrl;
+            else
+                _interventionVm.Url = string.Format("{0}/Intervention", StringConstants.WebClientRoot);
+
+            OpenToolWindow(new InterventionWindow(customUrl), _interventionVm, vsPackage);
+
+            //make sure the window pops up as expected, make sure it's the osble intervention window
+            if (dte.ActiveWindow != null && dte.ActiveWindow.Caption.Contains("OSBLE+ Suggestions"))
+            {
+                dte.ActiveWindow.AutoHides = false; //make sure the window will appear
+
+                //check for updates and change the title bar caption                
+                if (caption != "")
+                {
+                    dte.ActiveWindow.Caption = "OSBLE+ Suggestions (" + caption + ")";
+                }
+            }
+
+            //make sure the user focus is not stripped away from them... put focus back on the document they were on.
+            if (currentDocument != null) // only activate if there is a current document.
+                currentDocument.Activate();
+            else
+                currentWindow.Activate();
+        }
+
+        public void CloseInterventionWindow(Package vsPackage = null)
+        {
+            CloseToolWindow(new InterventionWindow(), vsPackage);
         }
 
         public void CloseProfileWindow(Package vsPackage = null)
@@ -105,16 +150,16 @@ namespace OSBIDE.Plugins.Base
             if (string.IsNullOrEmpty(url) == false)
             {
                 _activityFeedVm.Url = url;
-            }            
+            }
             OpenToolWindow(new ActivityFeedToolWindow(), _activityFeedVm, vsPackage);
         }
 
         public void RedirectActivityFeedWindow(string url = "")
-        {            
+        {
             if (string.IsNullOrEmpty(url) == false)
             {
                 _activityFeedVm.Url = url;
-            }            
+            }
         }
 
         public void CloseActivityFeedWindow(Package vsPackage = null)
@@ -151,17 +196,24 @@ namespace OSBIDE.Plugins.Base
                 vsPackage = _vsPackage;
             }
             var window = vsPackage.FindToolWindow(pane.GetType(), toolId, true);
+            
             if ((null == window) || (null == window.Frame))
             {
                 throw new NotSupportedException("oops!");
             }
-            ((BrowserView) window.Content).Dispatcher.BeginInvoke(
+
+            ((BrowserView)window.Content).Dispatcher.BeginInvoke(
                 (Action)delegate
                 {
-                    ((BrowserView) window.Content).ViewModel = vm;
+                    ((BrowserView)window.Content).ViewModel = vm;
                 }
                 );
+            
+            //for some reason the above code does not properly update URL if it's been updated in the vm we pass in...
+            ((BrowserView)window.Content).ViewModel.Url = vm.Url;
+
             var windowFrame = (IVsWindowFrame)window.Frame;
+            
             ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
 
@@ -219,7 +271,11 @@ namespace OSBIDE.Plugins.Base
                 case VsComponent.UserProfile:
                     _profileVm.Url = e.Url;
                     uiShell.PostExecCommand(ref commandSet, CommonPkgCmdIDList.cmdidOsbideUserProfileTool, 0, ref inputParameters);
-                    break;                
+                    break;
+                case VsComponent.InterventionDetails:
+                    _interventionVm.Url = e.Url;
+                    uiShell.PostExecCommand(ref commandSet, CommonPkgCmdIDList.cmdidOsbideInterventionTool, 0, ref inputParameters);
+                    break;
                 case VsComponent.GenericComponent:
                     _genericWindowVm.Url = e.Url;
                     uiShell.PostExecCommand(ref commandSet, CommonPkgCmdIDList.cmdidOsbideGenericToolWindow, 0, ref inputParameters);
@@ -235,7 +291,7 @@ namespace OSBIDE.Plugins.Base
             CloseToolWindow(new CreateAccountToolWindow(), vsPackage);
             CloseToolWindow(new GenericOsbideToolWindow(), vsPackage);
             CloseToolWindow(new UserProfileToolWindow(), vsPackage);
-            
+
             if (_cache.Contains("community") && Boolean.Equals(true, _cache["community"]))
                 CloseToolWindow(new CommunityToolWindow(), vsPackage);
         }

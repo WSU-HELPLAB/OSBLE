@@ -46,6 +46,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Awesomium Technologies LLC\Awesomium SDK\1.7.5.1\wrappers\Awesomium.NET\Assemblies\Awesomium.Windows.Controls.dll</HintPath>
     </Reference>
+    <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
     <Reference Include="FileCache.Signed, Version=1.4.0.0, Culture=neutral, PublicKeyToken=7542c4e7f6a4d381, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\FileCache.Signed.1.4.0\lib\FileCache.Signed.dll</HintPath>
@@ -93,6 +96,7 @@
     <Compile Include="GenericOsbideToolWindow.cs" />
     <Compile Include="OsbideToolWindowManager.cs" />
     <Compile Include="CommonPkgCmdID.cs" />
+    <Compile Include="InterventionWindow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserProfileToolWindow.cs" />
   </ItemGroup>

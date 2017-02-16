@@ -48,7 +48,7 @@ namespace OSBLE.Hubs
             Clients.Group(courseID.ToString()).addNewReply(postID, replyList);
         }
 
-        public void NotifyNewPost(object post, string eventType = "", int courseID = 0)
+        public void NotifyNewPost(object post, string eventType = "", int courseID = 0, string authKey = "")
         {
             //TODO: code for exception events
             //if (eventType == "ExceptionEvent") //plugin event, skip validation for now?
@@ -68,9 +68,6 @@ namespace OSBLE.Hubs
             courseID = int.Parse(Context.QueryString["courseID"]);
             int senderId = (int)feedPost.SelectToken("SenderId");
             string senderFullName = (string)feedPost.SelectToken("SenderName");
-            
-            //cookie authkey            
-            string authKey = "";
 
             if (eventType == "AskForHelpEvent") //plugin event, skip validation for now?
             {
@@ -99,7 +96,10 @@ namespace OSBLE.Hubs
 
             try
             {
-                authKey = Context.Request.Cookies["AuthKey"].Value.Split('=').Last();
+                if (authKey == "")
+                {
+                    authKey = Context.Request.Cookies["AuthKey"].Value.Split('=').Last();    
+                }                
             }
             catch (Exception)
             {
@@ -152,11 +152,12 @@ namespace OSBLE.Hubs
             int logId = int.Parse(Context.QueryString["logID"]);
             int userId = int.Parse(Context.QueryString["userID"]);
             string eventType = Context.QueryString["eventType"];
+            string authKey = Context.QueryString["authKey"];
 
             var newPost = new AggregateFeedItem(Feeds.Get(logId));
             using (FeedController feedController = new FeedController())
             {
-                NotifyNewPost(JObject.Parse(JsonConvert.SerializeObject(feedController.MakeAggregateFeedItemJsonObject(newPost, false, userId, courseId))), eventType, courseId); 
+                NotifyNewPost(JObject.Parse(JsonConvert.SerializeObject(feedController.MakeAggregateFeedItemJsonObject(newPost, false, userId, courseId))), eventType, courseId, authKey); 
             }                       
         }
     }

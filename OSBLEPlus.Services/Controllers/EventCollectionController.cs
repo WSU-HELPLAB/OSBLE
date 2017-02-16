@@ -15,6 +15,7 @@ using System.Runtime.Remoting.Contexts;
 using System.Data.SqlClient;
 using Dapper;
 using System;
+using System.Threading.Tasks;
 
 namespace OSBLEPlus.Services.Controllers
 {
@@ -58,6 +59,7 @@ namespace OSBLEPlus.Services.Controllers
 
             var log = EventCollectionControllerHelper.GetActivityEvent(request);
             log.SenderId = auth.GetActiveUserId(request.AuthToken);
+
             var result = Posts.SaveEvent(log);
 
             //For now we're only pushing these events to the hub
@@ -67,6 +69,9 @@ namespace OSBLEPlus.Services.Controllers
             NotifyHub(result, log.SenderId, log.EventType.ToString(), log.CourseId ?? 0);
             }
 
+            //we've processed the log, now process for intervention.
+            ProcessLogForIntervention(log);
+
             return new HttpResponseMessage
             {
                 StatusCode = result > 0 ? HttpStatusCode.OK : HttpStatusCode.InternalServerError,
@@ -74,7 +79,7 @@ namespace OSBLEPlus.Services.Controllers
             };
         }
 
-        public void NotifyHub(int logId, int userId, string eventType, int courseId = 0)
+        public void NotifyHub(int logId, int userId, string eventType, int courseId = 0, string authKey = "")
         {
             if (courseId == 0) //guess course with the most recent activity...
             {   //will need to do this for ask for help/exception events until a courseId is associated with them                
@@ -97,7 +102,7 @@ namespace OSBLEPlus.Services.Controllers
                 }
             }
 
-            var connection = new HubConnection(StringConstants.WebClientRoot, "userID=" + userId + "&courseID=" + courseId + "&logID=" + logId + "&eventType=" + eventType, true);
+            var connection = new HubConnection(StringConstants.WebClientRoot, "userID=" + userId + "&courseID=" + courseId + "&logID=" + logId + "&eventType=" + eventType + "&authKey=" + authKey, true);
             connection.Headers.Add("Host", (new Uri(StringConstants.WebClientRoot)).Host);
             connection.Headers.Add("Origin", StringConstants.WebClientRoot);
 
@@ -109,6 +114,14 @@ namespace OSBLEPlus.Services.Controllers
 
             //stop the connection after the message has been forwarded.            
             connection.Stop();
+        }
+
+        private async void  ProcessLogForIntervention(ActivityEvent log)
+        {
+            using (InterventionController intervention = new InterventionController())
+            { 
+                intervention.ProcessActivityEvent(log);
+            }            
         }
     }
 }
