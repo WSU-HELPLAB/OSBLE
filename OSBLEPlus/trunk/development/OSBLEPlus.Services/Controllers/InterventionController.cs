@@ -55,13 +55,15 @@ namespace OSBLEPlus.Services.Controllers
         [HttpGet]
         public bool InterventionsEnabled()
         {
-            var setting = ConfigurationManager.AppSettings["EnablePluginInterventions"];
-            bool interventionsEnabled = false;
+            //for some reason the appsettings is coming back null...
+            //var setting = ConfigurationManager.AppSettings["EnablePluginInterventions"] ?? "1";
+            //bool interventionsEnabled = false;
 
-            if (Boolean.TryParse(setting, out interventionsEnabled))
-                return interventionsEnabled;
-            else
-                return false;
+            //if (Boolean.TryParse(setting, out interventionsEnabled))
+            //    return interventionsEnabled;
+            //else
+            //    return false;
+            return true;
         }
         public void ProcessActivityEvent(ActivityEvent log)
         {
@@ -126,11 +128,49 @@ namespace OSBLEPlus.Services.Controllers
                 int userProfileId = auth.GetActiveUserId(authToken);
 
                 //now check if the user needs an intervention refreshed.
-                return CheckInterventionStatus(userProfileId);
+                bool refresh = CheckInterventionStatus(userProfileId);
+                if (refresh)
+                {
+                    //disable the refresh flag (changed it to here because this is the only method that actually refreshes the interventions)
+                    DisableRefreshFlag(userProfileId);
+                }
+                return refresh;
             }
             else
             {
                 return false;
+            }
+        }
+
+        private void DisableRefreshFlag(int userProfileId)
+        {
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+
+                    string query = "SELECT * FROM OSBLEInterventionsStatus WHERE UserProfileId = @UserProfileId ";
+                    string updateQuery = "UPDATE OSBLEInterventionsStatus SET RefreshInterventions = 0 WHERE Id = @Id ";
+                    string insertQuery = "INSERT INTO OSBLEInterventionsStatus ([UserProfileId],[RefreshInterventions],[LastRefresh]) VALUES (@UserProfileId, '0', @LastRefresh) ";
+
+                    var result = sqlConnection.Query(query, new { UserProfileId = userProfileId }).FirstOrDefault();
+
+                    if (result != null)                    
+                    {                        
+                        sqlConnection.Execute(updateQuery, new { Id = result.Id });                        
+                    }
+                    else //insert the user
+                    {
+                        sqlConnection.Execute(insertQuery, new { UserProfileId = userProfileId, LastRefresh = DateTime.UtcNow });                        
+                    }
+                    sqlConnection.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                //TODO: handle exception logging
+                //failure
             }
         }
 
@@ -434,10 +474,10 @@ namespace OSBLEPlus.Services.Controllers
 
         private bool CheckInterventionStatus(int userProfileId)
         {
-            //first check if we need to add a "others offering help" intervention"
-            UpdateClassmatesAvailable(userProfileId);
-
             bool refreshInterventions = false;
+            //first check if we need to add a "others offering help" intervention"
+            refreshInterventions = UpdateClassmatesAvailable(userProfileId);
+            
             DateTime lastRefresh;
             try
             {
@@ -451,27 +491,16 @@ namespace OSBLEPlus.Services.Controllers
 
                     var result = sqlConnection.Query(query, new { UserProfileId = userProfileId }).FirstOrDefault();
 
-                    if (result != null)
+                    if (result != null)                    
                     {
-                        refreshInterventions = result.RefreshInterventions;
-                        lastRefresh = result.LastRefresh;
-                        TimeSpan difference = DateTime.UtcNow - lastRefresh;
-
-                        if (refreshInterventions && difference.TotalMinutes > NumberOfMinutesRefreshThreshold) //toggle refresh to false if they are going to get a refresh right now
-                        {
-                            sqlConnection.Execute(updateQuery, new { Id = result.Id });
-                        }
-                        else //to avoid spamming, only return true if the last refresh was pushed within the allowed time.
-                        {
-                            refreshInterventions = false;
-                        }
+                        refreshInterventions = result.RefreshInterventions || refreshInterventions; //we want to refresh if either is true                        
+                        //sqlConnection.Execute(updateQuery, new { Id = result.Id });
                     }
                     else //insert the user
                     {
                         sqlConnection.Execute(insertQuery, new { UserProfileId = userProfileId, LastRefresh = DateTime.UtcNow });
-                        refreshInterventions = false;
+                        //not updating refreshInterventions here, we'll rely only on UpdateClassmatesAvailable                       
                     }
-
                     sqlConnection.Close();
                 }
             }
@@ -1376,7 +1405,7 @@ namespace OSBLEPlus.Services.Controllers
         /// Checks if other users are offering help in any of this user's courses... if so, generate the others offering help intervention
         /// </summary>
         /// <param name="userProfileId"></param>
-        private void UpdateClassmatesAvailable(int userProfileId)
+        private bool UpdateClassmatesAvailable(int userProfileId)
         {
             bool generateIntervention = false;
             //get users's courses
@@ -1417,6 +1446,7 @@ namespace OSBLEPlus.Services.Controllers
             {
                 SaveIntervention(GenerateClassmatesAvailableIntervention(userProfileId));
             }
+            return generateIntervention;
         }
 
         private bool UpdateIntervention(InterventionItem intervention)
