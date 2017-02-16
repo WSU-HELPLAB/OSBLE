@@ -27,14 +27,24 @@ namespace OSBLE.Controllers
             }
         }
 
-        public ActionResult Index()
+        public ActionResult ActvitiyFeedComponents()
         {
-            ViewBag.CanGrade = ActiveCourseUser.AbstractRole.CanGrade;
+            return View();
+        }
+
+        public ActionResult ActvitiyFeedModifyVisibility()
+        {
             ViewBag.EnableCustomPostVisibility = ConfigurationManager.AppSettings["EnableCustomPostVisibility"]; //<add key="EnableCustomPostVisibility" value="false"/> in web.config
             return View();
         }
 
-        public ActionResult CreateCourse()
+        public ActionResult ActvitiyFeedVisibility()
+        {
+            ViewBag.EnableCustomPostVisibility = ConfigurationManager.AppSettings["EnableCustomPostVisibility"]; //<add key="EnableCustomPostVisibility" value="false"/> in web.config
+            return View();
+        }
+
+        public ActionResult AddingOthers()
         {
             return View();
         }
@@ -44,12 +54,17 @@ namespace OSBLE.Controllers
             return View();
         }
 
-        public ActionResult AddingOthers()
+        public ActionResult AddWebLinks()
         {
             return View();
         }
 
         public ActionResult CreateBasicAssignment()
+        {
+            return View();
+        }
+
+        public ActionResult CreateCourse()
         {
             return View();
         }
@@ -64,16 +79,6 @@ namespace OSBLE.Controllers
             return View();
         }
 
-        public ActionResult AddWebLinks()
-        {
-            return View();
-        }
-
-        public ActionResult Gradebook()
-        {
-            return View();
-        }
-
         public ActionResult CreateRubric()
         {
             return View();
@@ -84,36 +89,48 @@ namespace OSBLE.Controllers
             return View();
         }
 
-        public ActionResult RosterGuide()
-        {
-            return View();
-        }
-
         public ActionResult FileUploader()
         {
             return View();
         }
 
+        public ActionResult Gradebook()
+        {
+            return View();
+        }
+
+        public ActionResult Index()
+        {
+            ViewBag.CanGrade = ActiveCourseUser.AbstractRole.CanGrade;
+            ViewBag.EnableCustomPostVisibility = ConfigurationManager.AppSettings["EnableCustomPostVisibility"]; //<add key="EnableCustomPostVisibility" value="false"/> in web.config
+            return View();
+        }
+        public ActionResult PrivateConversations()
+        {
+            return View();
+        }
+        public ActionResult RosterGuide()
+        {
+            return View();
+        }
+
+        public ActionResult SuggestionsDashboard()
+        {
+            return View();
+        }
+
+        public ActionResult UserStatus()
+        {
+            return View();
+        }
         public ActionResult UsingTeamBuilder()
         {
             return View();
         }
 
-        public ActionResult ActvitiyFeedVisibility()
+        public ActionResult VisualStudioSuggestionsOverview()
         {
-            ViewBag.EnableCustomPostVisibility = ConfigurationManager.AppSettings["EnableCustomPostVisibility"]; //<add key="EnableCustomPostVisibility" value="false"/> in web.config
             return View();
         }
-
-        public ActionResult ActvitiyFeedComponents()
-        {            
-            return View();
-        }
-
-        public ActionResult ActvitiyFeedModifyVisibility()
-        {
-            ViewBag.EnableCustomPostVisibility = ConfigurationManager.AppSettings["EnableCustomPostVisibility"]; //<add key="EnableCustomPostVisibility" value="false"/> in web.config
-            return View();
-        }        
     }
 }

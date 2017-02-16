@@ -20,7 +20,8 @@ namespace OSBLEPlus.Logic.Utility
             get
             {
 #if DEBUG
-                return "http://localhost/";                                     
+                return "http://192.168.1.58/";                                     
+                //return "http://demo.plus.osble.org/";                                     
 #else
 
                 return "https://plus.osble.org/";
@@ -33,7 +34,8 @@ namespace OSBLEPlus.Logic.Utility
             get
             {
 #if DEBUG
-                return "http://localhost/plusservices/";
+                return "http://192.168.1.58/plusservices/";
+                //return "http://demo.plus.osble.org/plusservices/";                                     
 #else
                 return "https://plus.osble.org/plusservices/";                
 #endif
@@ -73,6 +75,16 @@ namespace OSBLEPlus.Logic.Utility
         public static string WhatsNewUrl
         {
             get { return string.Format("{0}/WhatsNew", WebClientRoot); }
+        }
+
+        public static string InterventionUrl
+        {
+            get { return string.Format("{0}/Intervention", WebClientRoot); }
+        }
+
+        public static string InterventionRefreshThreshold
+        {
+            get { return ConfigurationManager.AppSettings["InterventionRefreshThreshold"] ?? "5"; }
         }
 
         public static string UpdateUrl

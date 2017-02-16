@@ -11,7 +11,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
     [Serializable]
     public sealed class BuildEvent : ActivityEvent
     {
-        
+
         public IList<BuildEventErrorListItem> ErrorItems { get; set; }
 
         public IList<BuildEventBreakPoint> Breakpoints { get; set; }
@@ -127,6 +127,32 @@ VALUES (@EColumn{1}{2},@ELine{1}{2},@EFile{1}{2},@EProject{1}{2},@EDescription{1
 VALUES ({1},{2})", Environment.NewLine, StringConstants.SqlHelperEventIdVar, StringConstants.SqlHelperIdVar);
                     sql.AppendFormat(@"{0}INSERT INTO dbo.CodeDocumentErrorListItems([CodeFileId],[ErrorListItemId])
 VALUES ({1},{2})", Environment.NewLine, StringConstants.SqlHelperDocIdVar, StringConstants.SqlHelperIdVar);
+                }
+
+                //for some solution scenarios it seems the above does not catch all error list items...
+                if (errIdx == 0 && doc.ErrorItems.Count() > 0)
+                {
+                    foreach (var error in doc.ErrorItems)
+                    {
+                        errIdx++;
+                        
+                        // sql statement for inserting a current documnet error
+                        sql.AppendFormat(@"{0}INSERT INTO dbo.ErrorListItems([Column],[Line],[File],[Project],[Description])
+VALUES (@EColumn{1}{2},@ELine{1}{2},@EFile{1}{2},@EProject{1}{2},@EDescription{1}{2})", Environment.NewLine, docIdx, errIdx);
+                        // sql command params for inserting currrent documnet error
+                        cmd.Parameters.AddWithValue(string.Format("EColumn{0}{1}", docIdx, errIdx), error.ErrorListItem.Column);
+                        cmd.Parameters.AddWithValue(string.Format("ELine{0}{1}", docIdx, errIdx), error.ErrorListItem.Line);
+                        cmd.Parameters.AddWithValue(string.Format("EFile{0}{1}", docIdx, errIdx), error.ErrorListItem.File);
+                        cmd.Parameters.AddWithValue(string.Format("EProject{0}{1}", docIdx, errIdx), error.ErrorListItem.Project);
+                        cmd.Parameters.AddWithValue(string.Format("EDescription{0}{1}", docIdx, errIdx), error.ErrorListItem.Description);
+
+                        // sql statement for inserting linking table records
+                        sql.AppendFormat(@"{0}SELECT {1}=SCOPE_IDENTITY()", Environment.NewLine, StringConstants.SqlHelperIdVar);
+                        sql.AppendFormat(@"{0}INSERT INTO dbo.BuildEventErrorListItems([BuildEventId],[ErrorListItemId])
+VALUES ({1},{2})", Environment.NewLine, StringConstants.SqlHelperEventIdVar, StringConstants.SqlHelperIdVar);
+                        sql.AppendFormat(@"{0}INSERT INTO dbo.CodeDocumentErrorListItems([CodeFileId],[ErrorListItemId])
+VALUES ({1},{2})", Environment.NewLine, StringConstants.SqlHelperDocIdVar, StringConstants.SqlHelperIdVar);
+                    }                   
                 }
 
                 foreach (var item in from breakPoint in Breakpoints where breakPoint.BreakPoint != null select breakPoint.BreakPoint)

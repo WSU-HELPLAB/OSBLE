@@ -313,6 +313,7 @@
     <Compile Include="Controllers\HelpController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\iCalendarController.cs" />
+    <Compile Include="Controllers\InterventionController.cs" />
     <Compile Include="Controllers\MailController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\OpenIdController.cs" />
@@ -693,6 +694,7 @@
     <Content Include="Content\images\helplab_logo.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\help\activity-feed-addition-highlighted.png" />
     <Content Include="Content\images\help\add_ta_1.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -702,6 +704,8 @@
     <Content Include="Content\images\help\add_ta_3.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\help\availability-details-highlighted.png" />
+    <Content Include="Content\images\help\availability-users.png" />
     <Content Include="Content\images\help\basic_1.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -745,6 +749,7 @@
     <Content Include="Content\images\help\discussion_4.PNG" />
     <Content Include="Content\images\help\discussion_5.PNG" />
     <Content Include="Content\images\help\discussion_6.PNG" />
+    <Content Include="Content\images\help\dismissed-suggestions-highlighted.png" />
     <Content Include="Content\images\help\editOffline_1.PNG" />
     <Content Include="Content\images\help\editOffline_2.PNG" />
     <Content Include="Content\images\help\editOffline_3.PNG" />
@@ -789,6 +794,7 @@
     <Content Include="Content\images\help\manageRoster_8.png" />
     <Content Include="Content\images\help\manageRoster_9.png" />
     <Content Include="Content\images\help\post_1.png" />
+    <Content Include="Content\images\help\private-conversations-highlighted.png" />
     <Content Include="Content\images\help\review_1.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -832,6 +838,8 @@
     <Content Include="Content\images\help\selected_course.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\help\suggestions-dashboard-all-highlighted.png" />
+    <Content Include="Content\images\help\suggestions-general-highlighted.png" />
     <Content Include="Content\images\help\team_1.PNG" />
     <Content Include="Content\images\help\team_2.PNG" />
     <Content Include="Content\images\help\team_3.PNG" />
@@ -876,6 +884,8 @@
     <Content Include="Content\images\help\visibility_7.png" />
     <Content Include="Content\images\help\visibility_8.png" />
     <Content Include="Content\images\help\visibility_9.png" />
+    <Content Include="Content\images\help\visual-studio-suggestion-components.png" />
+    <Content Include="Content\images\help\visual-studio-suggestion-main-window.png" />
     <Content Include="Content\images\help_top_menu.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -1025,9 +1035,11 @@
     <Content Include="Content\images\ui-icons_2e83ff_256x240.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\ui-icons_444444_256x240.png" />
     <Content Include="Content\images\ui-icons_454545_256x240.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\ui-icons_555555_256x240.png" />
     <Content Include="Content\images\ui-icons_888888_256x240.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -1056,7 +1068,9 @@
     <Content Include="Content\jquery.atwho.css" />
     <Content Include="Content\jquery.contextMenu.css" />
     <Content Include="Content\jquery.dataTables.css" />
+    <Content Include="Content\jquery.timepicker.css" />
     <Content Include="Content\navbar.css" />
+    <Content Include="Content\interventions.css" />
     <Content Include="Content\post-visibility.css" />
     <Content Include="Content\themes\base\images\animated-overlay.gif" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
@@ -1236,6 +1250,7 @@
     <None Include="Properties\PublishProfiles\filesystem.pubxml" />
     <None Include="Scripts\jquery-2.0.1.intellisense.js" />
     <Content Include="Scripts\highlight.pack.js" />
+    <Content Include="Scripts\Interventions.js" />
     <Content Include="Scripts\jquery-2.0.1.js" />
     <Content Include="Scripts\jquery-2.0.1.min.js" />
     <Content Include="Scripts\jquery-2.0.1.min.map" />
@@ -1253,6 +1268,7 @@
     <Content Include="Scripts\jquery.selectboxes.js" />
     <Content Include="Scripts\jquery.signalR-2.2.0.js" />
     <Content Include="Scripts\jquery.signalR-2.2.0.min.js" />
+    <Content Include="Scripts\jquery.timepicker.js" />
     <Content Include="Scripts\jquery.titlealert.js" />
     <Content Include="Scripts\jquery.tmpl.min.js" />
     <Content Include="Scripts\jquery.ui.position.js" />
@@ -1501,10 +1517,34 @@
     <Content Include="Views\Help\EditRubricOffline.cshtml" />
     <Content Include="Views\Help\RosterGuide.cshtml" />
     <Content Include="Views\Help\UsingTeamBuilder.cshtml" />
+    <Content Include="Views\Intervention\_Intervention.cshtml" />
+    <Content Include="Views\Intervention\_BuildFailure.cshtml" />
     <Content Include="Views\Feed\_PostVisibilityAddMore.cshtml" />
     <Content Include="Views\Help\ActvitiyFeedVisibility.cshtml" />
     <Content Include="Views\Help\ActvitiyFeedComponents.cshtml" />
     <Content Include="Views\Help\ActvitiyFeedModifyVisibility.cshtml" />
+    <Content Include="Views\Intervention\_RuntimeError.cshtml" />
+    <Content Include="Views\Intervention\_ClassmatesAvailable.cshtml" />
+    <Content Include="Views\Intervention\_OfferHelp.cshtml" />
+    <Content Include="Views\Intervention\_AskForHelp.cshtml" />
+    <Content Include="Views\Intervention\_MakeAPost.cshtml" />
+    <Content Include="Views\Intervention\_AvailableDetails.cshtml" />
+    <Content Include="Views\Intervention\_UnansweredQuestions.cshtml" />
+    <Content Include="Views\Intervention\_MakeAPostAssignmentSubmit.cshtml" />
+    <Content Include="Views\Shared\_UserHashtagTagScript.cshtml" />
+    <Content Include="Views\Intervention\_SuggestionFeedbackModal.cshtml" />
+    <Content Include="Views\Intervention\_UserFeedbackPrompt.cshtml" />
+    <Content Include="Views\Intervention\_UserFeedback.cshtml" />
+    <Content Include="Views\Intervention\_Availability.cshtml" />
+    <Content Include="Views\Intervention\_DismissedInterventions.cshtml" />
+    <Content Include="Views\Intervention\_PrivateMessages.cshtml" />
+    <Content Include="Views\Intervention\_FeedPostArea.cshtml" />
+    <Content Include="Views\Intervention\_CourseSelect.cshtml" />
+    <Content Include="Views\Intervention\_UnansweredQuestionsAlternate.cshtml" />
+    <Content Include="Views\Help\PrivateConversations.cshtml" />
+    <Content Include="Views\Help\UserStatus.cshtml" />
+    <Content Include="Views\Help\SuggestionsDashboard.cshtml" />
+    <Content Include="Views\Help\VisualStudioSuggestionsOverview.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -8,6 +8,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
     [Serializable]
     public sealed class EditorActivityEvent : ActivityEvent
     {
+        public int LineChanged { get; set; }
         public EditorActivityEvent()
         {
             EventTypeId = (int)EventType.EditorActivityEvent;
@@ -27,8 +28,8 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 DECLARE {0} INT
 INSERT INTO dbo.EventLogs (EventTypeId, EventDate, SenderId, CourseId) VALUES (@EventTypeId, @EventDate, @SenderId, @CourseId)
 SELECT {0}=SCOPE_IDENTITY()
-INSERT INTO dbo.EditorActivityEvents (EventLogId, EventDate, SolutionName)
-VALUES ({0}, @EventDate, @SolutionName)
+INSERT INTO dbo.EditorActivityEvents (EventLogId, EventDate, SolutionName, Line)
+VALUES ({0}, @EventDate, @SolutionName, @Line)
 SELECT {0}", StringConstants.SqlHelperLogIdVar)
             };
             cmd.Parameters.AddWithValue("EventTypeId", EventTypeId);
@@ -37,6 +38,7 @@ SELECT {0}", StringConstants.SqlHelperLogIdVar)
             if (CourseId.HasValue) cmd.Parameters.AddWithValue("CourseId", CourseId.Value);
             else cmd.Parameters.AddWithValue("CourseId", DBNull.Value);
             cmd.Parameters.AddWithValue("SolutionName", SolutionName);
+            cmd.Parameters.AddWithValue("Line", LineChanged);
 
             return cmd;
         }

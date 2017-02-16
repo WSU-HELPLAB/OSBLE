@@ -157,6 +157,14 @@
     <Compile Include="Models\HomePage\Event.cs" />
     <Compile Include="Models\HomePage\Notification.cs" />
     <Compile Include="Models\IModelBuilderExtender.cs" />
+    <Compile Include="Models\Intervention\AvailableDetailsViewModel.cs" />
+    <Compile Include="Models\Intervention\MakeAPostViewModel.cs" />
+    <Compile Include="Models\Intervention\ClassmatesAvailableViewModel.cs" />
+    <Compile Include="Models\Intervention\InterventionItem.cs" />
+    <Compile Include="Models\Intervention\InterventionsList.cs" />
+    <Compile Include="Models\Intervention\InterventionTypes.cs" />
+    <Compile Include="Models\Intervention\UnansweredQuestionsViewModel.cs" />
+    <Compile Include="Models\Intervention\UserStatus.cs" />
     <Compile Include="Models\OSBLECommunity\OSBLECommunityGrid.cs" />
     <Compile Include="Models\OSBLEContext.cs" />
     <Compile Include="Models\School.cs" />

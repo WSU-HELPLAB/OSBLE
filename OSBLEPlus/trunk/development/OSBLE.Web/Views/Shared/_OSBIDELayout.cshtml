@@ -5,6 +5,9 @@
 @{
     var currentCourseUsers = ViewBag.CurrentCourseUsers;
     string EnableCustomPostVisibility = ViewBag.EnableCustomPostVisibility;
+
+    string urlReferrer = Request != null && Request.UrlReferrer != null ? Request.UrlReferrer.ToString() : "";
+    bool interventionReferrer = urlReferrer.Contains("Intervention");
 }
 
 <!DOCTYPE html>
@@ -52,6 +55,12 @@
         function increaseZoom(amount) {
             var zoom = Number($("body").css('zoom'));
             $("body").css('zoom', zoom + amount);
+            //set zoom level in local storage
+            localStorage.setItem('lastZoomLevelFeed', getZoomLevel());
+        }
+
+        function getZoomLevel() {
+            return $("body").css('zoom');
         }
     </script>
 
@@ -69,7 +78,27 @@
 </head>
 <body style="zoom: 0.75">
     <script type="text/javascript">
-    $(document).ready(function () {
+        $(document).ready(function () {
+
+            //get the last saved zoom if possible
+            var lastZoomLevel = localStorage.getItem("lastZoomLevelFeed");
+            if (lastZoomLevel === null) { //if there is not a zoom level in history, save the current zoom level (1.0 more than likely)
+                localStorage.setItem('lastZoomLevelFeed', getZoomLevel());
+            }
+            else { //set the zoom level to the last remembered level
+                $("body").css('zoom', lastZoomLevel);
+            }
+
+        //ShowBackToSuggestions inconsistently working... disabling for now
+        //$("#previous-url").val(GetPreviousUrl());        
+        //ShowBackToSuggestions();
+
+        //if ($("#suggestion-back-link").length) {
+        //    if (window.location.href.indexOf("auth") == -1) { //activity feed tab
+        //        $("#suggestion-back-link").css("display", "none");
+        //    }
+        //}        
+
         /*START Autocomplete block*/
         //TODO: need to re-build the url/<a/> tags for @@name and #hashtag.
         var userNames = []
@@ -112,8 +141,7 @@
             });
         });
     });
-    </script>
-
+    </script>    
     @* Forward/Back buttons if desired *@
     @if (!string.IsNullOrEmpty(ViewBag.ForwardURL))
     {
@@ -124,6 +152,18 @@
         <a href="@ViewBag.BackURL" id="osbide_forward" class="osbide_nav_btn"><span class="glyphicon glyphicon-arrow-left"></span></a>
     }
 
+    @*Back to Suggestion link working inconsistently, disabled for now*@
+    @*@if (interventionReferrer)
+    {
+        <a href="@urlReferrer" class="btn btn-primary"><span class="glyphicon glyphicon-arrow-left intervention-info"></span> Back to Suggestion</a>
+    }   
+    else
+    {
+        <a href="@urlReferrer" class="btn btn-primary" id="suggestion-back-link" style="display: none;"><span class="glyphicon glyphicon-arrow-left intervention-info"></span> Back to Suggestion</a>
+    }*@ 
+
+    <h1 id="test"></h1>
+
     <div class="btn-group" id="osbide-nav">
         @Html.Partial("_OSBIDECourses")        
     </div>
@@ -132,7 +172,7 @@
         <a class="btn btn-primary" title="Zoom In" href="#"><span class="glyphicon glyphicon-plus" onclick="increaseZoom(0.07)"></span></a>
         <a class="btn btn-primary" title="Zoom Out" href="#"><span class="glyphicon glyphicon-minus" onclick="increaseZoom(-0.07)"></span></a>
     </div>
-
+    
     <section id="main" data-service-path="@ConfigurationManager.AppSettings["DataServiceUrl"]">
         <div class="container-fluid osbide-container" id="main_container">
             @RenderBody()
@@ -141,5 +181,6 @@
 
     @{ string enableLogging = ConfigurationManager.AppSettings["EnableActivityLogging"];}
     <input type="hidden" id="enableLogging" value="@enableLogging" />
+    <input type="hidden" id="previous-url" value="" />
 </body>
 </html>

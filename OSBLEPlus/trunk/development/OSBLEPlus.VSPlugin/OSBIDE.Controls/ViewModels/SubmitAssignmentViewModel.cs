@@ -99,10 +99,13 @@ namespace OSBIDE.Controls.ViewModels
             if (confirmation > 0)
             {
                 ServerMessage = "Your assignment was successfully submitted.  Your confirmation number is: \"" + confirmation + "\".";
+                SelectedAssignment = -1; //added to prevent spam clicking of the submit button. User now has to manually re-select assignment to submit again.
+                TextColor = "Green";
             }
             else
-            {
+            {                
                 ServerMessage = "Transmission error.  If the problem persists, please contact your course instructor.";
+                TextColor = "Red";
             }
 
             GetLastAssignmentSubmitDateAsync(SelectedAssignment, _authToken);
@@ -131,6 +134,19 @@ namespace OSBIDE.Controls.ViewModels
             {
                 _serverMessage = value;
                 OnPropertyChanged("ServerMessage");
+            }
+        }
+        private string _textColor = "Red";
+        public string TextColor
+        {
+            get
+            {
+                return _textColor;
+            }
+            set
+            {
+                _textColor = value;
+                OnPropertyChanged("TextColor");
             }
         }
 

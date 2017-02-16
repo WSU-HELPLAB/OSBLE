@@ -197,6 +197,15 @@
         </Strings>
       </Button>
 
+      <Button guid="guidOSBIDE_VSPackageCmdSet" id="cmdOsbideIntervention" priority="0x0100" type="Button">
+        <Parent guid="guidOSBIDE_VSPackageCmdSet" id="MyMenuGroup" />
+        <Icon guid="guidImages" id="askForHelp" />
+        <Strings>
+          <CommandName>cmdOsbideIntervention</CommandName>
+          <ButtonText>OSBLE+ Suggestions Dashboard</ButtonText>
+        </Strings>
+      </Button>
+
 
     </Buttons>
 
@@ -233,6 +242,7 @@
       <IDSymbol name="cmdidOsbideDocumentationTool" value="0x10C"/>
       <IDSymbol name="cmdidOsbideWebLinkTool" value="0x10D"/>
       <IDSymbol name="cmdidOsbideGenericToolWindow" value="0x10E"/>
+      <IDSymbol name="cmdOsbideIntervention" value="0x111"/>
     </GuidSymbol>
 
     <GuidSymbol name="guidOSBIDE_ContextMenuCmdSet" value="{eee1c7ba-00ea-4b22-88d7-6cb17837c3d8}">
@@ -240,7 +250,10 @@
       <IDSymbol name="cmdOsbideAskForHelp" value="0x0107" />
     </GuidSymbol>
 
-    
+    <GuidSymbol name="InterventionWindow" value="{eee1c7ba-00ea-4b22-88d7-6cb17837ffff}">
+      <IDSymbol name="MyContextMenuGroup" value="0x1020" />
+    </GuidSymbol>
+
     <GuidSymbol name="guidOSBIDE_OsbideToolsMenuCmdSet" value="{1511c427-ab1b-403a-8f75-e1bcfe3bb987}">
       <IDSymbol name="OsbideToolsMenu" value="0x1020" />
       <IDSymbol name="cmdidOsbideLoginToolWin" value="0x0102" />
@@ -256,7 +269,7 @@
       <IDSymbol name="loginActive" value="6" />
       <IDSymbol name="documentation" value="7" />
       <IDSymbol name="askForHelp" value="8" />
-      <IDSymbol name="webLink" value="9" />
+      <IDSymbol name="webLink" value="9" />      
       <IDSymbol name="upload" value="10" />
     </GuidSymbol>
   </Symbols>

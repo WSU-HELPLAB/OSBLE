@@ -434,10 +434,13 @@ namespace OSBLE.Controllers
                                 if (isTAUploading && HasMultipleSections)
                                 {
                                     List<string> columns = Regex.Split(newRow, ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)").ToList(); // we need to get the index of the column with section values in it.
+                                    List<string> columnsOld = Regex.Split(oldRow, ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)").ToList(); // we need to get the index of the column with section values in it.
                                     int section = -999;
+                                    int sectionOld = -999;
                                     bool idParsed = indexOfSection > 0 ? Int32.TryParse(columns[indexOfSection], out section) : false;
+                                    bool idParsedOld = indexOfSection > 0 ? Int32.TryParse(columnsOld[indexOfSection], out sectionOld) : false;
 
-                                    if (idParsed && permittedSections.Contains(section.ToString()))
+                                    if (idParsed && idParsedOld && permittedSections.Contains(sectionOld.ToString())) // check if the old row has their section value... this allows a TA to move a student OUT of their section.
                                     {   //add replace old row with new row in merged gradebook                                        
                                         mergedGradebook[oldGradebook.IndexOf(oldRow)] = newRow;
                                         rowMatch = true;

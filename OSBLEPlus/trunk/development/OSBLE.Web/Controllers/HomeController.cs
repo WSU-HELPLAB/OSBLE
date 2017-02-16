@@ -19,6 +19,8 @@ using OSBLEPlus.Logic.Utility.Lookups;
 using OSBLEPlus.Services.Controllers;
 using OSBLEPlus.Logic.DataAccess.Activities;
 using OSBLEPlus.Logic.DomainObjects.Interface;
+using OSBLE.Models.Intervention;
+using System.Configuration;
 
 namespace OSBLE.Controllers
 {
@@ -84,6 +86,15 @@ namespace OSBLE.Controllers
         {
             SetupActivityFeed();
             return PartialView("_ActivityFeed");
+        }
+
+        public ActionResult PrivateMessages()
+        {
+            return RedirectToAction("PrivateMessages", "Intervention");            
+        }
+        public ActionResult Availability()
+        {
+            return RedirectToAction("Availability", "Intervention");
         }
 
         [HttpGet]

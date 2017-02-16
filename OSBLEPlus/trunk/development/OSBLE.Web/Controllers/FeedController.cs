@@ -350,17 +350,17 @@ namespace OSBLE.Controllers
             }
 
             string htmlContent = PartialView(viewFolder + eventLog.EventType.ToString().Replace(" ", ""), item).Capture(this.ControllerContext);
-            
+
             if (String.IsNullOrEmpty(htmlContent))
             {
                 try
                 {
-                    htmlContent = BuildEventHtmlContent(eventLog);                    
+                    htmlContent = BuildEventHtmlContent(eventLog);
                 }
                 catch (Exception)
                 {
                     htmlContent = "Error loading content. Please refresh the page.";
-                }                
+                }
             }
 
             return new
@@ -434,15 +434,15 @@ namespace OSBLE.Controllers
                     writer.RenderBeginTag(HtmlTextWriterTag.Span);
                     writer.RenderBeginTag(HtmlTextWriterTag.Em);
                     writer.WriteEncodedText(DBHelper.GetUserFirstNameFromEventLogId(eventLog.EventLogId));
-                    writer.RenderEndTag();                    
+                    writer.RenderEndTag();
                     writer.WriteEncodedText(" submitted ");
 
                     writer.AddAttribute(HtmlTextWriterAttribute.Href, "\\AssignmentDetails\\" + ((SubmitEvent)eventLog).AssignmentId.ToString());
                     writer.RenderBeginTag(HtmlTextWriterTag.A);
-                    string output = DBHelper.GetAssignmentName(((SubmitEvent) eventLog).AssignmentId) + ": ";
+                    string output = DBHelper.GetAssignmentName(((SubmitEvent)eventLog).AssignmentId) + ": ";
                     writer.Write(output);
                     writer.RenderEndTag(); //A
-                    
+
                     writer.RenderEndTag();
                     writer.AddAttribute(HtmlTextWriterAttribute.Class, "non-user-text");
                     writer.RenderBeginTag(HtmlTextWriterTag.Span);
@@ -455,7 +455,7 @@ namespace OSBLE.Controllers
             }
             else
             {
-                htmlContent = ((AskForHelpEvent)(eventLog)).UserComment;
+                htmlContent = ((FeedPostEvent)(eventLog)).Comment;
             }
             return htmlContent;
         }
@@ -483,7 +483,7 @@ namespace OSBLE.Controllers
             return obj;
         }
 
-        private JsonResult GetJsonFromViewModel(FeedViewModel vm)
+        public JsonResult GetJsonFromViewModel(FeedViewModel vm)
         {
             var obj = new { Feed = new List<dynamic>(), HasLastPost = vm.Feed.Count < _activityFeedQuery.MaxQuerySize };
             foreach (AggregateFeedItem item in vm.Feed)
@@ -765,8 +765,26 @@ namespace OSBLE.Controllers
         }*/
 
         [HttpPost]
-        public JsonResult GetMorePosts(long endDate)
+        public JsonResult GetMorePosts(long endDate, string keywords = null, string events = null)
         {
+            /****************************************************************************/
+            //don't forget about filters!
+            // Set filters
+            if (!string.IsNullOrWhiteSpace(keywords))
+                _activityFeedQuery.CommentFilter = keywords;
+
+            if (events != null)
+            {
+                var eventList = events.Replace(" ", "").Split(',').Where(s => s != "");
+                var listOfEvents = eventList.Select(s => (EventType)int.Parse(s)).ToList();
+
+                // update cookies if someone changed their list of selected events
+                ActivityFeedQuery.FilterCookies(listOfEvents);
+
+                _activityFeedQuery.UpdateEventSelectors(listOfEvents);
+            }
+            /****************************************************************************/
+
             // store the current End date so we can restore it later
             DateTime temp = _activityFeedQuery.EndDate;
 
@@ -870,10 +888,10 @@ namespace OSBLE.Controllers
                 }
             }
 
-            if (ActiveCourseUser.AbstractRole.CanGrade)            
-                ViewBag.CanGrade = true;            
-            else            
-                ViewBag.CanGrade = false;            
+            if (ActiveCourseUser.AbstractRole.CanGrade)
+                ViewBag.CanGrade = true;
+            else
+                ViewBag.CanGrade = false;
 
             if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor)
                 ViewBag.IsInstructor = true;
@@ -949,7 +967,7 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         [HttpPost]
         [ValidateInput(false)]
-        public JsonResult PostFeedItem(string text, bool emailToClass = false, string postVisibilityGroups = "", string eventVisibleTo = "")
+        public JsonResult PostFeedItem(string text, bool emailToClass = false, string postVisibilityGroups = "", string eventVisibleTo = "", bool notifyHub = false)
         {
             // We purposefully are not catching exceptions that could be thrown
             // here, because we want this response to fail if there is an error
@@ -979,7 +997,7 @@ namespace OSBLE.Controllers
                     eventVisibleTo = ParsePostVisibilityGroups(postVisibilityGroups);
                 }
             }
-                      
+
 
             int courseID = ActiveCourseUser.AbstractCourseID;
             FeedPostEvent log = new FeedPostEvent()
@@ -1012,6 +1030,23 @@ namespace OSBLE.Controllers
 
             // Send emails to those who want to be notified by email
             SendEmailsToListeners(log.Comment, logID, courseID, DateTime.UtcNow, emailList);
+
+            //push message to hub listeners if needed (post source from outside of the feed e.g. intervention windows)
+            if (notifyHub)
+            {
+                try
+                {
+                    using (InterventionController ic = new InterventionController())
+                    {
+                        string authKey = Request.Cookies["AuthKey"].Value.Split('=').Last();
+                        ic.NotifyHub(logID, log.SenderId, "FeedPostEvent", log.CourseId ?? 0, authKey);
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("Failed trying to notify hub in FeedController PostFeedItem()", e);
+                }
+            }
 
             return Json(MakeAggregateFeedItemJsonObject(newPost, false));
         }
@@ -1099,7 +1134,7 @@ namespace OSBLE.Controllers
                         idList = String.Join(",", DBHelper.GetCourseTAIds(courseId)); //the user is a TA, they are already on the list.
                     else
                         idList = String.Join(",", DBHelper.GetCourseTAIds(courseId)) + "," + ActiveCourseUser.UserProfileID; //the user making the post can also see the post!
-                }                
+                }
 
                 //case: section
                 if (containsSection)
@@ -1147,7 +1182,7 @@ namespace OSBLE.Controllers
 
             //check that the active user is currently a member of the post and that the active users is the same as the string id we have received
             bool IsPostMember = userParseSuccess ? (currentUserIdInt == ActiveCourseUser.UserProfileID && currentVisibleList.Contains(currentUserId)) : false;
-            
+
             //make db change
             if (IsPostMember || ActiveCourseUser.AbstractRole.CanGrade)
             {
@@ -1172,9 +1207,9 @@ namespace OSBLE.Controllers
                     sanitizedIdList += "," + ActiveCourseUser.UserProfileID; //add them back to the list!
                 }
 
-                DBHelper.UpdateEventVisibleToList(Int32.Parse(eventLogId), sanitizedIdList);    
+                DBHelper.UpdateEventVisibleToList(Int32.Parse(eventLogId), sanitizedIdList);
             }
-            
+
             return Redirect(Request.UrlReferrer.ToString()); //return them to the page they came from
         }
 
@@ -1252,7 +1287,7 @@ namespace OSBLE.Controllers
         /// Parse given text for hashtags and add new hashtags not in the database to the database
         /// </summary>
         /// <param name="text"></param>
-        private void ParseHashTags(string text)
+        public static void ParseHashTags(string text)
         {
             List<string> hashTags = new List<string>();
 
@@ -1276,7 +1311,7 @@ namespace OSBLE.Controllers
         /// </summary>
         /// <param name="character"></param>
         /// <returns></returns>
-        private bool IsAlphaNumericChar(char character) // This function probably already exists somewhere in .NET, if so just delete
+        private static bool IsAlphaNumericChar(char character) // This function probably already exists somewhere in .NET, if so just delete
         {
             if ((character >= '0' && character <= '9') || (character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z'))
             {
@@ -1509,7 +1544,7 @@ namespace OSBLE.Controllers
             query.CourseFilter = new Course() { ID = query.CourseFilter.ID };
         }
 
-        private List<FeedItem> GetFeedItemsFromIDs(IEnumerable<int> ids)
+        public List<FeedItem> GetFeedItemsFromIDs(IEnumerable<int> ids)
         {
             List<FeedItem> items = new List<FeedItem>();
 
@@ -1519,6 +1554,28 @@ namespace OSBLE.Controllers
             }
 
             return items;
+        }
+
+        [HttpGet]
+        public JsonResult GetAggregateFeedFromIDs(string stringIds)
+        {
+            FeedViewModel vm = GetFeedViewModel();
+
+            List<int> ids = new List<int>();
+
+            if (stringIds != "")
+            {
+                //parse comma separated id list e.g. "1,2,3"
+                ids = stringIds.Split(',').Select(Int32.Parse).ToList();
+            }
+
+            List<FeedItem> feedItems = GetFeedItemsFromIDs(ids);
+            vm.Feed = AggregateFeedItem.FromFeedItems(feedItems);
+
+            vm.SelectedCourseId = ActiveCourseUser.AbstractCourseID;
+            vm.SingleUserId = ActiveCourseUser.UserProfileID;
+
+            return GetJsonFromViewModel(vm);
         }
 
         [HttpPost]
@@ -1552,9 +1609,27 @@ namespace OSBLE.Controllers
 
             foreach (UserProfile userProfile in userProfiles)
             {
-                nameIdPairs.Add(userProfile.ID.ToString(), userProfile.FullName);
+                if (!nameIdPairs.ContainsKey(userProfile.ID.ToString()))
+                {
+                    nameIdPairs.Add(userProfile.ID.ToString(), userProfile.FullName);    
+                }                
             }
             return Json(new { userProfiles = nameIdPairs });
+        }
+
+        public static Dictionary<string, string> GetProfileNames(int courseId)
+        {
+            List<UserProfile> userProfiles = DBHelper.GetUserProfilesForCourse(courseId);
+            Dictionary<string, string> nameIdPairs = new Dictionary<string, string>();
+
+            foreach (UserProfile userProfile in userProfiles)
+            {
+                if (!nameIdPairs.ContainsKey(userProfile.ID.ToString()))
+                {
+                    nameIdPairs.Add(userProfile.ID.ToString(), userProfile.FullName);
+                }
+            }
+            return nameIdPairs;
         }
 
         [HttpGet]
@@ -1759,13 +1834,13 @@ namespace OSBLE.Controllers
                     StatusCode = HttpStatusCode.InternalServerError,
                     Content = new StringContent(e.Message)
                 };
-            }            
+            }
         }
 
         public ActionResult Profile(int id)
         {
             string enableLogging = ConfigurationManager.AppSettings["EnableActivityLogging"];
-            
+
             if (enableLogging == "true") //only log if logging is enabled
             {
                 try
@@ -1776,10 +1851,10 @@ namespace OSBLE.Controllers
                 catch (Exception)
                 {
                     //do nothing for now                    
-                }                
+                }
             }
             //redirect to the profile page of the user
-            return RedirectToAction("Index", "Profile", new { id = id});
+            return RedirectToAction("Index", "Profile", new { id = id });
         }
     }
 }

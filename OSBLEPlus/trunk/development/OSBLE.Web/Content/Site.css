@@ -2295,7 +2295,11 @@ div.pagedocname {
 }
 
 .user-text {
-    white-space: pre-wrap;
+    white-space: pre-wrap;    
+}
+
+pre {
+    margin-top: 10px;
 }
 
 /* Activity Feed Filters */

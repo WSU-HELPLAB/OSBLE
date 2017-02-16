@@ -90,6 +90,11 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
                 var genericWindow = new MenuCommand(ShowGenericToolWindow, genericId);
                 mcs.AddCommand(genericWindow);
 
+                // Intervention Window
+                var interventionId = new CommandID(CommonGuidList.guidOSBIDE_VSPackageCmdSet, (int)CommonPkgCmdIDList.cmdidOsbideInterventionTool);
+                var interventionWindow = new MenuCommand(ShowInterventionTool, interventionId);
+                mcs.AddCommand(interventionWindow);
+
                 //submit assignment command
                 var submitCommand = new CommandID(CommonGuidList.guidOSBIDE_OsbideToolsMenuCmdSet, (int)CommonPkgCmdIDList.cmdidOsbideSubmitAssignmentCommand);
                 var submitMenuItem = new MenuCommand(SubmitAssignmentCallback, submitCommand);

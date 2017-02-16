@@ -20,9 +20,10 @@ using OSBIDE.Library.ServiceClient;
 using OSBIDE.Library.ServiceClient.ServiceHelpers;
 using OSBIDE.Plugins.Base;
 using OSBLEPlus.Logic.Utility.Logging;
+using OSBLEPlus.Logic.Utility;
 
 namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
-{
+{   
     /// <summary>
     /// This is the class that implements the package exposed by this assembly.
     ///
@@ -47,6 +48,17 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
     [ProvideToolWindow(typeof(ChatToolWindow), Style = VsDockStyle.MDI)]
     [ProvideToolWindow(typeof(UserProfileToolWindow), Style = VsDockStyle.MDI)]
     [ProvideToolWindow(typeof(CommunityToolWindow), Style = VsDockStyle.MDI)]
+
+    //Configure the Intervention tool window
+    [ProvideToolWindow(typeof(InterventionWindow),
+                            Orientation = ToolWindowOrientation.Bottom, //linked below the solution explorer
+                            Style = VsDockStyle.Linked,
+                            Window = Microsoft.VisualStudio.Shell.Interop.ToolWindowGuids80.SolutionExplorer,
+                            MultiInstances = false,
+                            Transient = true, //true to disable the window from popping up on the next start (unless we want it to)
+                            DockedWidth = 300,
+                            DockedHeight = 300)]
+
     [ProvideToolWindow(typeof(CreateAccountToolWindow), Style = VsDockStyle.MDI)]
     [ProvideToolWindow(typeof(GenericOsbideToolWindow), Style = VsDockStyle.MDI)]
     [ProvideAutoLoad(UIContextGuids80.NoSolution)]
@@ -60,6 +72,10 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
         private VsEventHandler _eventHandler;
         private ServiceClient _client;
         private OsbideToolWindowManager _manager;
+        
+        //static to allow visibility for custom events class
+        public static OsbideToolWindowManager _staticManager;        
+
         private CommandBarEvents _osbideErrorListEvent;
 
         private string _userName;
@@ -96,11 +112,15 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
 
             InitAndEncryptLocalLogin();
 
-            SetupServiceClient();
-            UpdateServiceConnectionStatus();
-
             //set up tool window manager
             _manager = new OsbideToolWindowManager(_cache, this);
+
+            //create a static instance of the tool window manager so we can open/refresh the toolwindow from elsewhere            
+            _staticManager = _manager;
+
+            //_staticManager is required for opening/refreshing the intervention tool window
+            SetupServiceClient(_staticManager);
+            UpdateServiceConnectionStatus();
 
             //display a user notification if we don't have any user on file
             if (_userName == null || _userPassword == null)
@@ -194,7 +214,7 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
             {
                 _errorLogger.WriteToLog("Awesomium Error: " + ex.Message, LogPriority.HighPriority);
             }
-            MessageBox.Show("It appears as though your system is missing prerequisite components necessary for the OSBLE+ Visual Studio Plugin to operate properly.  Until this is resolved, you will not be able to access certain OSBLE+ components within Visual Studio.  You can download the prerequisite files and obtain support by visiting http://osble.codeplex.com.", "OSBLE+", MessageBoxButton.OK);
+            MessageBox.Show("It appears as though your system is missing the required prerequisite components necessary for the OSBLE+ Visual Studio Plugin to operate properly.  Until this is resolved, certain OSBLE+ components within Visual Studio may not function or will be available.  Please download and install the required prerequisite files via the 'Downloads' link at http://osble.codeplex.com.", "OSBLE+", MessageBoxButton.OK);
         }
     }
 }

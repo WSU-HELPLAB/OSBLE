@@ -61,6 +61,26 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
             OpenActivityFeedWindow();
         }
 
+        public void ShowInterventionTool(object sender, EventArgs e)
+        {
+            var cacheItem = _cache[StringConstants.AuthenticationCacheKey];
+            if (cacheItem != null && string.IsNullOrEmpty(cacheItem.ToString()) == false)
+            {   
+                try
+                {
+                    _manager.OpenInterventionWindow();
+                }
+                catch (Exception ex)
+                {                    
+                    ShowAwesomiumError(ex);
+                }
+            }
+            else
+            {
+                MessageBox.Show("You must be logged into OSBLE+ in order to access this window.");
+            }
+        }
+
         private void ShowActivityFeedDetailsTool(object sender, EventArgs e)
         {
             var cacheItem = _cache[StringConstants.AuthenticationCacheKey];
@@ -291,6 +311,8 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
                 _manager.CloseProfileWindow();
                 if (_cache.Contains("community") && Boolean.Equals(true, _cache["community"])) 
                     _manager.CloseCommunityWindow();
+
+                _manager.CloseInterventionWindow();
 
                 MessageBox.Show("You have been logged out of OSBLE+.");
             }
