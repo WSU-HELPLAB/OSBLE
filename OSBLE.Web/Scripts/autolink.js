@@ -2,17 +2,23 @@
 //Downloaded from: https://github.com/bryanwoods/autolink-js
 
 (function () {
-    var autoLink, linkUsernames, linkHashtags,
+    var autoLink, linkUsernames, linkHashtags, embedYouTube,
       __slice = [].slice;
     var courseUserNames = getUserNames();
 
     autoLink = function () {
-        var k, linkAttributes, option, options, pattern, v;
+        var k, linkAttributes, option, options, pattern, v, text;
         options = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+
+        text = this;
+
+        if (detectBrowser()) { //only do this if we can detect the browser... this returns false from the VS Plugin and we want to prevent doing this as it breaks the feed on the plugin
+            text = embedYouTube(text);
+        }        
 
         pattern = /(^|[\s\n>]|<br\/?>)((?:https?|ftp):\/\/[\-A-Z0-9+\u0026\u2019@#\/%?=()~_|!:,.;]*[\-A-Z0-9+\u0026@#\/%=~()_|])/gi;
         if (!(options.length > 0)) {
-            return this.replace(pattern, "$1<a href='$2'>$2</a>").linkUsernames().linkHashtags();
+            return text.replace(pattern, "$1<a href='$2'>$2</a>").linkUsernames().linkHashtags();
         }
         option = options[0];
         linkAttributes = ((function () {
@@ -26,7 +32,7 @@
             }
             return _results;
         })()).join('');
-        return this.replace(pattern, function (match, space, url) {
+        return text.replace(pattern, function (match, space, url) {
             var link;
             link = (typeof option.callback === "function" ? option.callback(url) : void 0) || ("<a href='" + url + "'" + linkAttributes + ">" + url + "</a>");
             return "" + space + link;
@@ -95,9 +101,45 @@
         return this.replace(htPattern, '$1<a class="Hashtag" href="/Feed/ShowHashtag?hashtag=$2">#$2</a>');
     }
 
+    embedYouTube = function (text) {
+        var regexG = /(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?/g;
+        var regex = /(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?/;
+        var match = text.match(regexG);
+
+        if (match) {
+            if (match.length === 1) { // Single link
+                // Get non-global match so we can get the video id
+                match = text.match(regex);
+                var url = match[0], videoId = match[1];
+
+                // First check to see if the match accidentally took the <div> as well
+                if (url.includes("</div>")) url = url.replace("</div>", "");
+
+                return text.replace(url, '<br /><iframe width="360" height="202" src="//www.youtube.com/embed/' + videoId + '" frameborder="0" allowfullscreen></iframe><br />');
+            }
+            else { // Multiple links
+                for (i = 0; i < match.length; i++) {
+                    var url = match[i];
+
+                    // First check to see if the match accidentally took the <div> as well
+                    if (url.includes("</div>")) url = url.replace("</div>", "");
+
+                    // Then get video id by doing another match (non-global) which we know will only have one result.
+                    var videoId = url.match(regex);
+                    videoId = videoId[1];
+
+                    text = text.replace(url, '<br /><iframe width="360" height="202" src="//www.youtube.com/embed/' + videoId + '" frameborder="0" allowfullscreen></iframe><br />');
+                }
+                return text;
+            }
+        }
+        else return text; // If no youtube link found by regex, just return original content
+    }
+
     String.prototype['autoLink'] = autoLink;
     String.prototype['linkUsernames'] = linkUsernames;
     String.prototype['linkHashtags'] = linkHashtags;
+    String.prototype['embedYouTube'] = embedYouTube;
 
 }).call(this);
 
