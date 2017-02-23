@@ -346,7 +346,7 @@ namespace OSBLE.Controllers
                 {
                     if (InterventionRequiresRefresh(existingIntervention)) //check for certain types that need to be refreshed if they exist e.g. build/runtime errors need the latest info while unanswered questions wont.
                     {
-                        dismissSuccess = DismissIntervention(existingIntervention.Id);    
+                        dismissSuccess = DismissIntervention(existingIntervention.Id, true);   
                     }     
                     //else leave dismissSuccess as false so we wont save...
                 }
@@ -1001,7 +1001,7 @@ namespace OSBLE.Controllers
                             //if not, dismiss
                             if (!usersStillAvailable)
                             {
-                                dismissedIntervention = DismissIntervention(interventionResult.Id);
+                                dismissedIntervention = DismissIntervention(interventionResult.Id, true);
                             }
                         }
 
@@ -1073,7 +1073,7 @@ namespace OSBLE.Controllers
                     }
                     else //dismiss any duplicates and remove from the display list
                     {
-                        DismissIntervention(duplicate.Id);
+                        DismissIntervention(duplicate.Id, true);
                         vm.InterventionItemList.Remove(duplicate);
                     }
                 }
