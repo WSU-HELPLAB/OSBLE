@@ -11,6 +11,7 @@ using OSBIDE.Controls.Views;
 using OSBLEPlus.Logic.Utility;
 
 using EnvDTE;
+using OSBLEPlus.Logic.Utility.Logging;
 
 namespace OSBIDE.Plugins.Base
 {
@@ -29,6 +30,7 @@ namespace OSBIDE.Plugins.Base
         private readonly BrowserViewModel _genericWindowVm = new BrowserViewModel();
         private readonly BrowserViewModel _interventionVm = new BrowserViewModel();
         private static int _detailsToolWindowId;
+        private readonly ILogger _logger;
 
         public OsbideToolWindowManager(FileCache cache, Package vsPackage)
         {
@@ -78,26 +80,52 @@ namespace OSBIDE.Plugins.Base
                 _interventionVm.Url = customUrl;
             else
                 _interventionVm.Url = string.Format("{0}/Intervention", StringConstants.WebClientRoot);
-
-            OpenToolWindow(new InterventionWindow(customUrl), _interventionVm, vsPackage);
+            try
+            {
+                OpenToolWindow(new InterventionWindow(customUrl), _interventionVm, vsPackage);
+            }
+            catch (Exception ex)
+            {
+                _logger.WriteToLog(string.Format("OpenToolWindow(): method: {0}: error: {1}", "OpenInterventionWindow", ex.Message), LogPriority.HighPriority);
+            }            
 
             //make sure the window pops up as expected, make sure it's the osble intervention window
             if (dte.ActiveWindow != null && dte.ActiveWindow.Caption.Contains("OSBLE+ Suggestions"))
             {
-                dte.ActiveWindow.AutoHides = false; //make sure the window will appear
-
-                //check for updates and change the title bar caption                
-                if (caption != "")
+                try
                 {
-                    dte.ActiveWindow.Caption = "OSBLE+ Suggestions (" + caption + ")";
+                    dte.ActiveWindow.AutoHides = false; //make sure the window will appear
+                }
+                catch (Exception ex)
+                {
+                    _logger.WriteToLog(string.Format("dte.ActiveWindow.AutoHides: method: {0}: error: {1}", "OpenInterventionWindow", ex.Message), LogPriority.HighPriority);
+                }
+
+                try
+                {
+                    //check for updates and change the title bar caption                
+                    if (caption != "")
+                    {
+                        dte.ActiveWindow.Caption = "OSBLE+ Suggestions (" + caption + ")";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.WriteToLog(string.Format("dte.ActiveWindow.Caption: method: {0}: error: {1}", "OpenInterventionWindow", ex.Message), LogPriority.HighPriority);
                 }
             }
-
-            //make sure the user focus is not stripped away from them... put focus back on the document they were on.
-            if (currentDocument != null) // only activate if there is a current document.
-                currentDocument.Activate();
-            else
-                currentWindow.Activate();
+            try
+            {
+                //make sure the user focus is not stripped away from them... put focus back on the document they were on.
+                if (currentDocument != null) // only activate if there is a current document.
+                    currentDocument.Activate();
+                else
+                    currentWindow.Activate();
+            }
+            catch (Exception ex)
+            {
+                _logger.WriteToLog(string.Format("dcurrentDocument/Window.Activate();: method: {0}: error: {1}", "OpenInterventionWindow", ex.Message), LogPriority.HighPriority);
+            }            
         }
 
         public void CloseInterventionWindow(Package vsPackage = null)

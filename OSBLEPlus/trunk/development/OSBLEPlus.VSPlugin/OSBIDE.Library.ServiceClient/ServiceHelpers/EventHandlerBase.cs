@@ -56,7 +56,7 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
         private SelectionEvents selectionEvents = null;
         private SolutionEvents solutionEvents = null;
         private ProjectItemsEvents solutionItemsEvents = null;
-        private TextEditorEvents textEditorEvents = null;
+        private TextEditorEvents textEditorEvents = null;              
 
         protected EventLogWatcher eventLogWatcher = null;
 
@@ -72,7 +72,7 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             //attach osbide requests
             _osbideEvents = osbideEvents;
             _osbideEvents.SolutionSubmitRequest += SolutionSubmitted;
-            _osbideEvents.SubmitEventRequested += SubmitEventRequested;
+            _osbideEvents.SubmitEventRequested += SubmitEventRequested;            
 
             //save references to dte events
             buildEvents = Dte.Events.BuildEvents;
@@ -87,7 +87,7 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             solutionEvents = Dte.Events.SolutionEvents;
             solutionItemsEvents = Dte.Events.SolutionItemsEvents;
             textEditorEvents = Dte.Events.TextEditorEvents;
-
+            
             //attach osbide requests
             //var osbideEventGenerator = osbideEvents;
             //osbideEventGenerator.SolutionSubmitRequest += SolutionSubmitted;
@@ -210,26 +210,28 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
 
         //solution event handlers
         public virtual void SolutionBeforeClosing() { }
+
+        //Moved this code to VsEventHandler so we can use this event for triggering the intervention window
         public virtual void SolutionOpened()
         {
             //Load exception handling on each project open.  Note that I'm only
             //loading C related groups as loading the entire collection takes
             //a very (10+ minute) long time to load.
-            var debugger = (EnvDTE90.Debugger3)Dte.Debugger;
-            string[] exceptionGroups = { "C++ Exceptions", "Win32 Exceptions", "Native Run-Time Checks" };
+            //var debugger = (EnvDTE90.Debugger3)Dte.Debugger;
+            //string[] exceptionGroups = { "C++ Exceptions", "Win32 Exceptions", "Native Run-Time Checks" };
 
-            if (debugger == null || debugger.ExceptionGroups == null) return;
+            //if (debugger == null || debugger.ExceptionGroups == null) return;
 
-            foreach (EnvDTE90.ExceptionSettings settings in debugger.ExceptionGroups)
-            {
-                var settingsName = settings.Name;
-                if (!exceptionGroups.Contains(settingsName)) continue;
+            //foreach (EnvDTE90.ExceptionSettings settings in debugger.ExceptionGroups)
+            //{
+            //    var settingsName = settings.Name;
+            //    if (!exceptionGroups.Contains(settingsName)) continue;
 
-                foreach (EnvDTE90.ExceptionSetting setting in settings)
-                {
-                    settings.SetBreakWhenThrown(true, setting);
-                }
-            }
+            //    foreach (EnvDTE90.ExceptionSetting setting in settings)
+            //    {
+            //        settings.SetBreakWhenThrown(true, setting);
+            //    }
+            //}
         }
         public virtual void ProjectAdded(Project project) { }
         public virtual void SolutionRenamed(string oldName) { }

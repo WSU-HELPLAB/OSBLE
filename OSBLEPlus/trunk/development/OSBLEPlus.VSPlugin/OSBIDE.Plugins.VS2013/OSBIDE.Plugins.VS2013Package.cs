@@ -55,7 +55,7 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
                             Style = VsDockStyle.Linked,
                             Window = Microsoft.VisualStudio.Shell.Interop.ToolWindowGuids80.SolutionExplorer,
                             MultiInstances = false,
-                            Transient = true, //true to disable the window from popping up on the next start (unless we want it to)
+                            Transient = false, //true to disable the window from popping up on the next start (unless we want it to)
                             DockedWidth = 300,
                             DockedHeight = 300)]
 

@@ -10,8 +10,8 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
     public sealed partial class OsbidePluginsVs2013Package
     {
         private void SetupServiceClient(OsbideToolWindowManager staticToolManager = null)
-        {
-            _eventHandler = new VsEventHandler(this, EventGenerator.GetInstance());
+        {            
+            _eventHandler = new VsEventHandler(this, EventGenerator.GetInstance(), staticToolManager); //need the toolManager to open the intervention window
             _client = ServiceClient.GetInstance(_eventHandler, _errorLogger, staticToolManager);
             _client.PropertyChanged += ServiceClientPropertyChanged;
             _client.ReceivedNewSocialActivity += ServiceClientReceivedSocialUpdate;

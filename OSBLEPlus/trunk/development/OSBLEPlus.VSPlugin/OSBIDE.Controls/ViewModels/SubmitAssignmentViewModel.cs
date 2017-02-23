@@ -10,6 +10,7 @@ using OSBLE.Interfaces;
 using OSBLE.Models.Assignments;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
 using OSBLEPlus.Logic.Utility;
+using System.Runtime.Caching;
 
 namespace OSBIDE.Controls.ViewModels
 {
@@ -17,6 +18,7 @@ namespace OSBIDE.Controls.ViewModels
     {
         private readonly string _authToken;
         private readonly SubmitEvent _submitEvent;
+        private readonly ObjectCache _cache = new FileCache(StringConstants.LocalCacheDirectory, new ObjectBinder());
 
         public SubmitAssignmentViewModel(string userName, string authToken, SubmitEvent submitEvent)
         {
@@ -95,12 +97,20 @@ namespace OSBIDE.Controls.ViewModels
         }
 
         void SubmitAssignmentCompleted(int confirmation)
-        {
+        {   
             if (confirmation > 0)
             {
                 ServerMessage = "Your assignment was successfully submitted.  Your confirmation number is: \"" + confirmation + "\".";
                 SelectedAssignment = -1; //added to prevent spam clicking of the submit button. User now has to manually re-select assignment to submit again.
                 TextColor = "Green";
+                try
+                {
+                    _cache["LastSubmitTime"] = DateTime.Now.ToString();                    
+                }
+                catch (Exception e)
+                {
+                    //TODO: Handle exception
+                }
             }
             else
             {                

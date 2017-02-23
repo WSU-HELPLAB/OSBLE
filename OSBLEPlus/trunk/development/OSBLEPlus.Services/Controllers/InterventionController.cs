@@ -44,8 +44,8 @@ namespace OSBLEPlus.Services.Controllers
         private const int NumberOfDaysIdleThreshold = 1; //number of days to look back without any post/reply/askforhelp activity before generating intervention                
         private const int NumberOfMinutesRefreshThreshold = 1; //threshold in CheckInterventionStatus()
         private const int SubmitAssignmentEarlyTimeThreshold = -1; //dumber of days (negative == early) - threshold in ProcessMakeAPostSubmit()
-        private const int UnansweredQuestionsDaysThreshold = 10; //number of days to look back for unanswered/marked helpful posts     
-        private const int InterventionRefreshThresholdInMinutes = 2; //removing it from stringconstants for now as it will be easier to republish .services when needed...
+        private const int UnansweredQuestionsDaysThreshold = 10; //number of days to look back for unanswered/marked helpful posts         
+        private const int InterventionRefreshThresholdInMinutes = 10; //removing it from stringconstants for now as it will be easier to republish .services when needed...
 
         [HttpGet]
         public int InterventionRefreshThreshold()
@@ -159,13 +159,13 @@ namespace OSBLEPlus.Services.Controllers
 
                     var result = sqlConnection.Query(query, new { UserProfileId = userProfileId }).FirstOrDefault();
 
-                    if (result != null)                    
-                    {                        
-                        sqlConnection.Execute(updateQuery, new { Id = result.Id });                        
+                    if (result != null)
+                    {
+                        sqlConnection.Execute(updateQuery, new { Id = result.Id });
                     }
                     else //insert the user
                     {
-                        sqlConnection.Execute(insertQuery, new { UserProfileId = userProfileId, LastRefresh = DateTime.UtcNow });                        
+                        sqlConnection.Execute(insertQuery, new { UserProfileId = userProfileId, LastRefresh = DateTime.UtcNow });
                     }
                     sqlConnection.Close();
                 }
@@ -443,8 +443,8 @@ namespace OSBLEPlus.Services.Controllers
                         bool activeMakeAPost = ActiveMakeAPostExists(userProfileId);
                         if (!activeMakeAPost)
                         {
-                            SaveIntervention(GenerateMakeAPostIntervention(userProfileId, "MakeAPost", "Idle/No Feed Activity"));    
-                        }                        
+                            SaveIntervention(GenerateMakeAPostIntervention(userProfileId, "MakeAPost", "Idle/No Feed Activity"));
+                        }
                     }
                 }
             }
@@ -460,12 +460,12 @@ namespace OSBLEPlus.Services.Controllers
             {
                 InterventionItem existingIntervention = GetInterventionFromUserProfileAndType(userProfileId, "MakeAPost");
 
-                if (existingIntervention.Id == -1) 
+                if (existingIntervention.Id == -1)
                 {
                     return false;  //one doesn't exist, check if we need to create one!
-                }                
+                }
                 else
-                { 
+                {
                     return true; //an active MakeAPost intervention already exists!
                 }
             }
@@ -479,8 +479,8 @@ namespace OSBLEPlus.Services.Controllers
         {
             bool refreshInterventions = false;
             //first check if we need to add a "others offering help" intervention"
-            refreshInterventions = UpdateClassmatesAvailable(userProfileId);          
-            
+            refreshInterventions = UpdateClassmatesAvailable(userProfileId);
+
             try
             {
                 using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
@@ -494,7 +494,7 @@ namespace OSBLEPlus.Services.Controllers
 
                     var result = sqlConnection.Query(query, new { UserProfileId = userProfileId }).FirstOrDefault();
 
-                    if (result != null)                    
+                    if (result != null)
                     {
                         refreshInterventions = result.RefreshInterventions || refreshInterventions; //we want to refresh if either is true                        
                         //sqlConnection.Execute(updateQuery, new { Id = result.Id });
@@ -949,7 +949,7 @@ namespace OSBLEPlus.Services.Controllers
                 }
             }
             catch (Exception e)
-            {   
+            {
                 throw new Exception("GetAllUserCourseIds() failed", e);
             }
             return new List<int>(); //failure, return empty list
@@ -1010,8 +1010,8 @@ namespace OSBLEPlus.Services.Controllers
                 }
             }
             catch (Exception e)
-            {                
-                throw new Exception("GetExceptionCodeDocument() failed", e);                
+            {
+                throw new Exception("GetExceptionCodeDocument() failed", e);
             }
             return codeDocument;
         }
