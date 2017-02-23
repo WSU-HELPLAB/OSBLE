@@ -237,6 +237,17 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             }
         }
 
+        public static async Task<string> InterventionsEnabled()
+        {
+            using (var client = GetClient())
+            {
+                var task = client.GetStringAsync("api/intervention/InterventionsEnabled");
+                await task;
+
+                return task.Result.TrimEnd('"').TrimStart('"');
+            }
+        }
+
         public static async Task<int> GetInterventionRefreshThresholdValue()
         {
             try
