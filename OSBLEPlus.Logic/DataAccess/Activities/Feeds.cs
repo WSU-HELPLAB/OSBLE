@@ -138,10 +138,9 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                 var helpMark = multiResults.Read<HelpfulMarkGivenEvent>().ToList();     //10
                 var logComments = multiResults.Read<LogCommentEvent>().ToList();        //11
                 var saves = multiResults.Read<SaveEvent>().ToList();                    //12
-                var submits = multiResults.Read<SubmitEvent>().ToList();                //13
+                var submits = multiResults.Read<SubmitEvent>().ToList();                //13                
 
                 // associate logComments with senderId
-
                 List<LogCommentEvent> nonDeletedLogComments = new List<LogCommentEvent>();
                 //List<ActivityEvent> eventLogs = eventLogsTemp.Distinct(new ActivityEventEqualityComparer()).ToList();
                 foreach (LogCommentEvent log in logComments)
@@ -357,6 +356,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
             {
                 EventId = evt.EventId,
                 EventLogId = evt.EventLogId,
+                EventDate = evt.EventDate,
                 SenderId = evt.Sender == null ? eventLog.SenderId : evt.Sender.IUserId,
                 Sender = GetUser(userDictionary, users, eventLog.SenderId),
                 SolutionName = evt.SolutionName,
@@ -520,7 +520,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                 SenderId = eventLog.SenderId,
                 Sender = GetUser(userDictionary, users, eventLog.SenderId),
                 SolutionName = evt.SolutionName,
-                Comment = evt.Comment,
+                Comment = evt.Comment,                
             };
         }
 
