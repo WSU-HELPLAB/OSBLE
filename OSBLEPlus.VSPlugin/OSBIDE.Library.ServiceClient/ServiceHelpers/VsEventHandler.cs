@@ -439,100 +439,108 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
         /// <param name="caption"></param>        
         private async Task<bool> CheckInterventionRefreshStatus(string interventionTrigger = "")
         {
-            //first check if interventions are enabled
-            bool interventionsEnabled = false;
-            if (!_cache.Contains("InterventionsEnabled"))
+            try
             {
-                interventionsEnabled = await InterventionsEnabled();
-            }
-            else
-            {
-                try
+                //first check if interventions are enabled
+                bool interventionsEnabled = false;
+                if (!_cache.Contains("InterventionsEnabled"))
                 {
-                    DateTime CheckThreshold = DateTime.Now.AddHours(-1);
-                    DateTime LastRefreshTime = DateTime.Parse(_cache["InterventionsEnabledRefreshedTime"].ToString());
-                    if (_cache["InterventionsEnabled"].ToString() == "false" && LastRefreshTime < CheckThreshold) //check again if the last refresh was over an hour ago
-                    {
-                        interventionsEnabled = await InterventionsEnabled();
-                    }
-                    else
-                    {
-                        if (_cache["InterventionsEnabled"].ToString() == "true")
-                        {
-                            interventionsEnabled = true;
-                        }
-                    }
+                    interventionsEnabled = await InterventionsEnabled();
                 }
-                catch (Exception ex)
+                else
                 {
-                    _logger.WriteToLog(string.Format("LastRefreshTime check: {0}: error: {1}", "CheckInterventionRefreshStatus", ex.Message), LogPriority.HighPriority);
-                }
-            }
-
-            //process if interventions are enabled
-            if (interventionsEnabled)
-            {
-                bool overrideRefresh = OverrideRefreshStatus(interventionTrigger);
-
-                try
-                {
-                    //now setup refresh threshold
-                    if (!_cache.Contains("InterventionRefreshThresholdInMinutes"))
+                    try
                     {
-                        await SetupInterventionRefreshThreshold();
-                    }
-                    else
-                    {
-                        int interventionRefreshThresholdInMinutes = int.Parse(_cache["InterventionRefreshThresholdInMinutes"].ToString());
                         DateTime CheckThreshold = DateTime.Now.AddHours(-1);
-                        DateTime LastRefreshTime = DateTime.Parse(_cache["LastInterventionRefreshTimeThreshold"].ToString());
-
-                        if (interventionRefreshThresholdInMinutes == 5 || LastRefreshTime < CheckThreshold) //default value or check again if the last refresh was over an hour ago
+                        DateTime LastRefreshTime = DateTime.Parse(_cache["InterventionsEnabledRefreshedTime"].ToString());
+                        if (_cache["InterventionsEnabled"].ToString() == "false" && LastRefreshTime < CheckThreshold) //check again if the last refresh was over an hour ago
                         {
-                            await SetupInterventionRefreshThreshold();
+                            interventionsEnabled = await InterventionsEnabled();
                         }
-                    }
-
-                    //now see if we need to refresh
-                    if (_cache.Contains("InterventionRefresh") && _cache.Contains(StringConstants.AuthenticationCacheKey) && _cache.Contains("InterventionRefreshThresholdInMinutes"))
-                    {
-                        int refreshThreshold = int.Parse(_cache["InterventionRefreshThresholdInMinutes"].ToString());
-
-                        string lastRefresh = _cache["InterventionRefresh"] as string;
-                        DateTime lastRefreshDT = DateTime.Parse(lastRefresh);
-                        DateTime timeNow = DateTime.Now;
-
-                        TimeSpan difference = (timeNow - lastRefreshDT);
-
-                        if (difference.TotalMinutes >= refreshThreshold || overrideRefresh) //TODO: check threshold for refreshing
+                        else
                         {
-                            string authKey = _cache[StringConstants.AuthenticationCacheKey] as string;
-                            var task = AsyncServiceClient.ProcessIntervention(authKey);
-                            var result = await task;
-                            if (result == "true" || overrideRefresh)
-                            {                                
-                                _cache["InterventionRefresh"] = DateTime.Now.ToString();
-                                return true;
+                            if (_cache["InterventionsEnabled"].ToString() == "true")
+                            {
+                                interventionsEnabled = true;
                             }
                         }
-                        //else do nothing
                     }
-                    else //create the cache entry so it can be found for the next check, set it to now minus a day so we will be sure to check intervention status the first time the cache is built
+                    catch (Exception ex)
                     {
-                        _cache["InterventionRefresh"] = DateTime.Now.AddDays(-1).ToString();
-
-                        //set up the refresh threshold if we, somehow, don't have it already set by this point...
-                        if (!_cache.Contains("InterventionRefreshThresholdInMinutes"))
-                            await SetupInterventionRefreshThreshold();
-
-                        return false;
+                        _logger.WriteToLog(string.Format("LastRefreshTime check: {0}: error: {1}", "CheckInterventionRefreshStatus", ex.Message), LogPriority.HighPriority);
                     }
                 }
-                catch (Exception ex)
+
+                //process if interventions are enabled
+                if (interventionsEnabled)
                 {
-                    _logger.WriteToLog(string.Format("CheckInterventionRefreshStatus() error: {0}", ex.Message), LogPriority.HighPriority);
+                    bool overrideRefresh = OverrideRefreshStatus(interventionTrigger);
+
+                    try
+                    {
+                        //now setup refresh threshold
+                        if (!_cache.Contains("InterventionRefreshThresholdInMinutes"))
+                        {
+                            await SetupInterventionRefreshThreshold();
+                        }
+                        else
+                        {
+                            int interventionRefreshThresholdInMinutes = int.Parse(_cache["InterventionRefreshThresholdInMinutes"].ToString());
+                            DateTime CheckThreshold = DateTime.Now.AddHours(-1);
+                            DateTime LastRefreshTime = DateTime.Parse(_cache["LastInterventionRefreshTimeThreshold"].ToString());
+
+                            if (interventionRefreshThresholdInMinutes == 5 || LastRefreshTime < CheckThreshold) //default value or check again if the last refresh was over an hour ago
+                            {
+                                await SetupInterventionRefreshThreshold();
+                            }
+                        }
+
+                        //now see if we need to refresh
+                        if (_cache.Contains("InterventionRefresh") && _cache.Contains(StringConstants.AuthenticationCacheKey) && _cache.Contains("InterventionRefreshThresholdInMinutes"))
+                        {
+                            int refreshThreshold = int.Parse(_cache["InterventionRefreshThresholdInMinutes"].ToString());
+
+                            string lastRefresh = _cache["InterventionRefresh"] as string;
+                            DateTime lastRefreshDT = DateTime.Parse(lastRefresh);
+                            DateTime timeNow = DateTime.Now;
+
+                            TimeSpan difference = (timeNow - lastRefreshDT);
+
+                            if (difference.TotalMinutes >= refreshThreshold || overrideRefresh) //TODO: check threshold for refreshing
+                            {
+                                string authKey = _cache[StringConstants.AuthenticationCacheKey] as string;
+                                var task = AsyncServiceClient.ProcessIntervention(authKey);
+                                var result = await task;
+                                if (result == "true" || overrideRefresh)
+                                {
+                                    _cache["InterventionRefresh"] = DateTime.Now.ToString();
+                                    return true;
+                                }
+                            }
+                            //else do nothing
+                        }
+                        else //create the cache entry so it can be found for the next check, set it to now minus a day so we will be sure to check intervention status the first time the cache is built
+                        {
+                            _cache["InterventionRefresh"] = DateTime.Now.AddDays(-1).ToString();
+
+                            //set up the refresh threshold if we, somehow, don't have it already set by this point...
+                            if (!_cache.Contains("InterventionRefreshThresholdInMinutes"))
+                                await SetupInterventionRefreshThreshold();
+
+                            return false;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.WriteToLog(string.Format("CheckInterventionRefreshStatus() error: {0}", ex.Message), LogPriority.HighPriority);
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                _logger.WriteToLog(string.Format("CheckInterventionRefreshStatus() catch-all error: {0}", ex.Message), LogPriority.HighPriority);
+            }
+            
             return false;
         }
 
@@ -545,9 +553,10 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
                 _cache["LastInterventionRefreshTimeThreshold"] = DateTime.Now.ToString();
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 _cache["InterventionRefreshThresholdInMinutes"] = 5;
+                _logger.WriteToLog(string.Format("SetupInterventionRefreshThreshold() error: {0}", ex.Message), LogPriority.HighPriority);
                 return false;
             }
         }
@@ -564,47 +573,56 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
                 else
                     return false;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.WriteToLog(string.Format("InterventionsEnabled() error: {0}", ex.Message), LogPriority.HighPriority);
                 return false;
             }
         }
 
         private bool OverrideRefreshStatus(string interventionTrigger)
         {
-            switch (interventionTrigger)
+            try
             {
-                case "SolutionOpened":
-                    return true;
-                    break;
-                default:
-                    bool openWindow = false;
-                    try
-                    {
-                        //if they just submitted we want to go ahead and refresh
-                        if (_cache.Contains("LastSubmitTime"))
+                switch (interventionTrigger)
+                {
+                    case "SolutionOpened":
+                        return true;
+                        break;
+                    default:
+                        bool openWindow = false;
+                        try
                         {
-                            //process
-                            string lastSubmit = _cache["LastSubmitTime"] as string;
-                            DateTime lastSubmitDateTime = DateTime.Parse(lastSubmit);
-
-                            TimeSpan difference = (DateTime.Now - lastSubmitDateTime);
-
-                            if (Math.Abs(difference.TotalMinutes) <= 10) //If they submitted within the last 10 minutes go ahead and refresh
+                            //if they just submitted we want to go ahead and refresh
+                            if (_cache.Contains("LastSubmitTime"))
                             {
-                                openWindow = true;
-                                _cache["LastSubmitTime"] = DateTime.Now.AddDays(-1).ToString(); //change the last submit so we don't do this again on the next event
+                                //process
+                                string lastSubmit = _cache["LastSubmitTime"] as string;
+                                DateTime lastSubmitDateTime = DateTime.Parse(lastSubmit);
+
+                                TimeSpan difference = (DateTime.Now - lastSubmitDateTime);
+
+                                if (Math.Abs(difference.TotalMinutes) <= 10) //If they submitted within the last 10 minutes go ahead and refresh
+                                {
+                                    openWindow = true;
+                                    _cache["LastSubmitTime"] = DateTime.Now.AddDays(-1).ToString(); //change the last submit so we don't do this again on the next event
+                                }
                             }
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.WriteToLog(string.Format("OverrideRefreshStatus() error: {0}", ex.Message), LogPriority.HighPriority);
-                    }
-                    
-                    return openWindow;
-                    break;
+                        catch (Exception ex)
+                        {
+                            _logger.WriteToLog(string.Format("OverrideRefreshStatus() error: {0}", ex.Message), LogPriority.HighPriority);
+                        }
+
+                        return openWindow;
+                        break;
+                }
             }
+            catch (Exception ex)
+            {
+                _logger.WriteToLog(string.Format("OverrideRefreshStatus() error: {0}", ex.Message), LogPriority.HighPriority);
+                return false;
+            }            
         }
         #endregion
     }
