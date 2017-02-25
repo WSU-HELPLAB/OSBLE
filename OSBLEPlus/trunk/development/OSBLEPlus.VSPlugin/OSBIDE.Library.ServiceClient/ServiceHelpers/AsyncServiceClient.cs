@@ -228,24 +228,39 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
         /// <returns>returns true/false</returns>
         public static async Task<string> ProcessIntervention(string authToken)
         {
-            using (var client = GetClient())
-            {   
-                var task = client.GetStringAsync(string.Format("api/intervention/RefreshInterventions?authToken={0}", authToken));                
-                await task;
+            try
+            {
+                using (var client = GetClient())
+                {
+                    var task = client.GetStringAsync(string.Format("api/intervention/RefreshInterventions?authToken={0}", authToken));
+                    await task;
 
-                return task.Result.TrimEnd('"').TrimStart('"');
+                    return task.Result.TrimEnd('"').TrimStart('"');
+                }
             }
+            catch (Exception)
+            {
+                return "false";
+            }
+            
         }
 
         public static async Task<string> InterventionsEnabled()
         {
-            using (var client = GetClient())
+            try
             {
-                var task = client.GetStringAsync("api/intervention/InterventionsEnabled");
-                await task;
+                using (var client = GetClient())
+                {
+                    var task = client.GetStringAsync("api/intervention/InterventionsEnabled");
+                    await task;
 
-                return task.Result.TrimEnd('"').TrimStart('"');
+                    return task.Result.TrimEnd('"').TrimStart('"');
+                }
             }
+            catch (Exception)
+            {
+                return "false";
+            }            
         }
 
         public static async Task<int> GetInterventionRefreshThresholdValue()
