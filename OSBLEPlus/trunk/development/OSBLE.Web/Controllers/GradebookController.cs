@@ -59,8 +59,14 @@ namespace OSBLE.Controllers
             }
         }
 
+        [OsbleAuthorize]
         public ActionResult Index(string gradebookName = null)
         {
+            if (ActiveCourseUser == null) //user is not logged in
+            {
+                return RedirectToRoute(new { controller = "Home", action = "Index", area = "" });
+            }
+
             //Get the GradebookFilePath for current course
             GradebookFilePath gfp = Models.FileSystem.Directories.GetGradebook(ActiveCourseUser.AbstractCourseID);
 

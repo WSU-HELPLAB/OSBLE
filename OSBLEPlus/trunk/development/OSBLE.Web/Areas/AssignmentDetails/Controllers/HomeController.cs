@@ -17,8 +17,12 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
     public class HomeController : OSBLEController
     {
         public ActionResult Index(int assignmentId)
-        {       
-            ViewBag.HideMail = DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID);                      
+        {   
+            if (ActiveCourseUser == null) //user is not logged in
+            {
+                return RedirectToRoute(new { controller = "Home", action = "Index", area = "" });
+            }
+            ViewBag.HideMail = ActiveCourseUser != null ? DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID) : false;
 
             Assignment assignment = db.Assignments.Find(assignmentId);
 
