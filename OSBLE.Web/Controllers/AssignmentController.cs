@@ -26,7 +26,7 @@ namespace OSBLE.Controllers
         public AssignmentController()
         {
             ViewBag.CurrentTab = "Assignments";
-            ViewBag.HideMail = OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID);  
+            ViewBag.HideMail = ActiveCourseUser != null ? OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID): false;  
         }
 
         [CanModifyCourse]
@@ -50,8 +50,7 @@ namespace OSBLE.Controllers
         }
 
         //
-        // GET: /Assignment/
-
+        // GET: /Assignment/        
         public ActionResult Index(int? id)
         {
             //did the user just submit something?  If so, set up view to notify user
