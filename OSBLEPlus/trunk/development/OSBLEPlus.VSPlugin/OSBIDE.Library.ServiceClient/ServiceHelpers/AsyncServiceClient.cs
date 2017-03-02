@@ -187,21 +187,21 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
         {
             using (var client = GetClient())
             {
-                var task = client.PostAsXmlAsync("api/eventcollection/post", request);
-                await task;
+                try
+                {
+                    var task = client.PostAsXmlAsync("api/eventcollection/post", request);
+                    await task;
 
-                try 
-	            {	        
-		            var result = JsonConvert.DeserializeObject<int>(task.Result.Content.ReadAsStringAsync().Result);
+                    var result = JsonConvert.DeserializeObject<int>(task.Result.Content.ReadAsStringAsync().Result);
                     return result;
-	            }
-	            catch (Exception)
-	            {
+                }
+                catch (Exception)
+                {
                     return 0;
-	            }
+                }
 
-                
-                 
+
+
             }
         }
 
@@ -242,7 +242,7 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             {
                 return "false";
             }
-            
+
         }
 
         public static async Task<string> InterventionsEnabled()
@@ -260,7 +260,7 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             catch (Exception)
             {
                 return "false";
-            }            
+            }
         }
 
         public static async Task<int> GetInterventionRefreshThresholdValue()
@@ -277,7 +277,7 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             catch (Exception e)
             {
                 return 5;
-            }            
+            }
         }
     }
 }

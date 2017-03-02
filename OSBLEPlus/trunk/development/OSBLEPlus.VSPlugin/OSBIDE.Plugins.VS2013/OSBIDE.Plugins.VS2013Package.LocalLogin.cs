@@ -114,12 +114,23 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
                     _manager.OpenActivityFeedWindow(null,
                                             StringConstants.WebClientRoot + "/Account/TokenLogin?authToken=" + authKey +
                                             "&destinationUrl=" + StringConstants.WebClientRoot + "/feed/osbide/");
-                    if (_cache.Contains("community") && Boolean.Equals(true, _cache["community"]))
-                        _manager.OpenCommunityWindow();
+                    //if (_cache.Contains("community") && Boolean.Equals(true, _cache["community"]))
+                    //    _manager.OpenCommunityWindow();
                 }
                 catch (Exception ex)
                 {
                     ShowAwesomiumError(ex);
+                }
+
+                //try to open the suggestions window
+                try
+                {
+                    _manager.OpenInterventionWindow();
+                }
+                catch (Exception ex)
+                {
+                    //write to the log file
+                    _errorLogger.WriteToLog(string.Format("Open Suggestions window error: {0}", ex.Message), LogPriority.HighPriority);                    
                 }
                 
             }            

@@ -46,7 +46,7 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
         //_toolWindowManager.OpenInterventionWindow();
 
         //use this to make sure we process the intervention after the last event was logged.
-        private const int intervention_processing_delay_ms = 0;
+        private const int intervention_processing_delay_ms = 2000;
         private readonly ObjectCache _cache = new FileCache(StringConstants.LocalCacheDirectory, new ObjectBinder());
         private readonly ILogger _logger;
 
@@ -89,33 +89,40 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
         //Moved into VsEventHnlder.cs from EventHanlderBase so it would have access to the intervention window triggering
         public override void SolutionOpened()
         {
-            //Load exception handling on each project open.  Note that I'm only
-            //loading C related groups as loading the entire collection takes
-            //a very (10+ minute) long time to load.
-            var debugger = (EnvDTE90.Debugger3)Dte.Debugger;
-            string[] exceptionGroups = { "C++ Exceptions", "Win32 Exceptions", "Native Run-Time Checks" };
-
-            if (debugger == null || debugger.ExceptionGroups == null) return;
-
-            foreach (EnvDTE90.ExceptionSettings settings in debugger.ExceptionGroups)
-            {
-                var settingsName = settings.Name;
-                if (!exceptionGroups.Contains(settingsName)) continue;
-
-                foreach (EnvDTE90.ExceptionSetting setting in settings)
-                {
-                    settings.SetBreakWhenThrown(true, setting);
-                }
-            }
-
             try
             {
-                CheckInterventionStatus("SolutionOpened");
+                //Load exception handling on each project open.  Note that I'm only
+                //loading C related groups as loading the entire collection takes
+                //a very (10+ minute) long time to load.
+                var debugger = (EnvDTE90.Debugger3)Dte.Debugger;
+                string[] exceptionGroups = { "C++ Exceptions", "Win32 Exceptions", "Native Run-Time Checks" };
+
+                if (debugger == null || debugger.ExceptionGroups == null) return;
+
+                foreach (EnvDTE90.ExceptionSettings settings in debugger.ExceptionGroups)
+                {
+                    var settingsName = settings.Name;
+                    if (!exceptionGroups.Contains(settingsName)) continue;
+
+                    foreach (EnvDTE90.ExceptionSetting setting in settings)
+                    {
+                        settings.SetBreakWhenThrown(true, setting);
+                    }
+                }
             }
             catch (Exception ex)
             {
-                _logger.WriteToLog(string.Format("CheckInterventionStatus(): method: {0}: error: {1}", "SolutionOpened", ex.Message), LogPriority.HighPriority);
-            }
+                _logger.WriteToLog(string.Format("SolutionOpened(): method: {0}: error: {1}", "crashed while loading exception handling portion", ex.Message), LogPriority.HighPriority);
+            }           
+
+            //try
+            //{
+            //    CheckInterventionStatus("SolutionOpened");
+            //}
+            //catch (Exception ex)
+            //{
+            //    _logger.WriteToLog(string.Format("CheckInterventionStatus(): method: {0}: error: {1}", "SolutionOpened", ex.Message), LogPriority.HighPriority);
+            //}
         }
 
         public override void SolutionSubmitted(object sender, SubmitAssignmentArgs e)
@@ -412,13 +419,36 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
 
         private async void OpenInterventionWindow(string caption = "", string customUrl = "")
         {
-            await DelayCheck();
-            _toolWindowManager.OpenInterventionWindow(null, caption, customUrl);
+            try
+            {
+                await DelayCheck();
+            }
+            catch (Exception ex)
+            {
+                _logger.WriteToLog(string.Format("OpenInterventionWindow() DelayCheck(): method: {0}: error: {1}", caption, ex.Message), LogPriority.HighPriority);                
+            }
+            try
+            {
+                _toolWindowManager.OpenInterventionWindow(null, caption, customUrl);
+            }
+            catch (Exception ex)
+            {
+                _logger.WriteToLog(string.Format("OpenInterventionWindow() _toolWindowManager.OpenInterventionWindow(): method: {0}: error: {1}", caption, ex.Message), LogPriority.HighPriority);                
+            }            
         }
 
         private async void CheckInterventionStatus(string caption = "")
         {
-            bool processIntervention = await CheckInterventionRefreshStatus(caption);
+            bool processIntervention = false;
+            try
+            {
+                processIntervention = await CheckInterventionRefreshStatus(caption);
+            }
+            catch (Exception ex)
+            {
+                processIntervention = false;
+                _logger.WriteToLog(string.Format("CheckInterventionStatus() CheckInterventionRefreshStatus(): method: {0}: error: {1}", caption, ex.Message), LogPriority.HighPriority);
+            }
 
             if (processIntervention)
             {
