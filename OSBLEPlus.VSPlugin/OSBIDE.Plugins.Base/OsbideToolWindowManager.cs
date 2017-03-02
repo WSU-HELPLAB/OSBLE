@@ -68,64 +68,71 @@ namespace OSBIDE.Plugins.Base
 
         public void OpenInterventionWindow(Package vsPackage = null, string caption = "", string customUrl = "")
         {
-            //need to get the current document the user is focusing on.
-            DTE dte = Package.GetGlobalService(typeof(DTE)) as DTE;
-            var currentDocument = dte.ActiveDocument;
-            var currentWindow = dte.ActiveWindow;
-
-            //open the intervention window
-            _interventionVm.AuthKey = _cache[StringConstants.AuthenticationCacheKey] as string;
-
-            if (customUrl != "")
-                _interventionVm.Url = customUrl;
-            else
-                _interventionVm.Url = string.Format("{0}/Intervention", StringConstants.WebClientRoot);
             try
             {
-                OpenToolWindow(new InterventionWindow(customUrl), _interventionVm, vsPackage);
-            }
-            catch (Exception ex)
-            {
-                _logger.WriteToLog(string.Format("OpenToolWindow(): method: {0}: error: {1}", "OpenInterventionWindow", ex.Message), LogPriority.HighPriority);
-            }            
+                //need to get the current document the user is focusing on.
+                DTE dte = Package.GetGlobalService(typeof(DTE)) as DTE;
+                var currentDocument = dte.ActiveDocument;
+                var currentWindow = dte.ActiveWindow;
 
-            //make sure the window pops up as expected, make sure it's the osble intervention window
-            if (dte.ActiveWindow != null && dte.ActiveWindow.Caption.Contains("OSBLE+ Suggestions"))
-            {
+                //open the intervention window
+                _interventionVm.AuthKey = _cache[StringConstants.AuthenticationCacheKey] as string;
+
+                if (customUrl != "")
+                    _interventionVm.Url = customUrl;
+                else
+                    _interventionVm.Url = string.Format("{0}/Intervention", StringConstants.WebClientRoot);
                 try
                 {
-                    dte.ActiveWindow.AutoHides = false; //make sure the window will appear
+                    OpenToolWindow(new InterventionWindow(customUrl), _interventionVm, vsPackage);
                 }
                 catch (Exception ex)
                 {
-                    _logger.WriteToLog(string.Format("dte.ActiveWindow.AutoHides: method: {0}: error: {1}", "OpenInterventionWindow", ex.Message), LogPriority.HighPriority);
+                    _logger.WriteToLog(string.Format("OpenToolWindow(): method: {0}: error: {1}", "OpenInterventionWindow", ex.Message), LogPriority.HighPriority);
                 }
 
-                try
+                //make sure the window pops up as expected, make sure it's the osble intervention window
+                if (dte.ActiveWindow != null && dte.ActiveWindow.Caption.Contains("OSBLE+ Suggestions"))
                 {
-                    //check for updates and change the title bar caption                
-                    if (caption != "")
+                    try
                     {
-                        dte.ActiveWindow.Caption = "OSBLE+ Suggestions (" + caption + ")";
+                        dte.ActiveWindow.AutoHides = false; //make sure the window will appear
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.WriteToLog(string.Format("dte.ActiveWindow.AutoHides: method: {0}: error: {1}", "OpenInterventionWindow", ex.Message), LogPriority.HighPriority);
+                    }
+
+                    try
+                    {
+                        //check for updates and change the title bar caption                
+                        if (caption != "")
+                        {
+                            dte.ActiveWindow.Caption = "OSBLE+ Suggestions (" + caption + ")";
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.WriteToLog(string.Format("dte.ActiveWindow.Caption: method: {0}: error: {1}", "OpenInterventionWindow", ex.Message), LogPriority.HighPriority);
                     }
                 }
+                try
+                {
+                    //make sure the user focus is not stripped away from them... put focus back on the document they were on.
+                    if (currentDocument != null) // only activate if there is a current document.
+                        currentDocument.Activate();
+                    else
+                        currentWindow.Activate();
+                }
                 catch (Exception ex)
                 {
-                    _logger.WriteToLog(string.Format("dte.ActiveWindow.Caption: method: {0}: error: {1}", "OpenInterventionWindow", ex.Message), LogPriority.HighPriority);
+                    _logger.WriteToLog(string.Format("dcurrentDocument/Window.Activate();: method: {0}: error: {1}", "OpenInterventionWindow", ex.Message), LogPriority.HighPriority);
                 }
             }
-            try
+            catch (Exception e)
             {
-                //make sure the user focus is not stripped away from them... put focus back on the document they were on.
-                if (currentDocument != null) // only activate if there is a current document.
-                    currentDocument.Activate();
-                else
-                    currentWindow.Activate();
+                _logger.WriteToLog(string.Format("OpenInterventionWindow catch-all: method: {0}: error: {1}", caption, e.Message), LogPriority.HighPriority);
             }
-            catch (Exception ex)
-            {
-                _logger.WriteToLog(string.Format("dcurrentDocument/Window.Activate();: method: {0}: error: {1}", "OpenInterventionWindow", ex.Message), LogPriority.HighPriority);
-            }            
         }
 
         public void CloseInterventionWindow(Package vsPackage = null)
@@ -219,30 +226,37 @@ namespace OSBIDE.Plugins.Base
 
         private void OpenToolWindow(ToolWindowPane pane, BrowserViewModel vm, Package vsPackage, int toolId = 0)
         {
-            if (vsPackage == null)
+            try
             {
-                vsPackage = _vsPackage;
-            }
-            var window = vsPackage.FindToolWindow(pane.GetType(), toolId, true);
-            
-            if ((null == window) || (null == window.Frame))
-            {
-                throw new NotSupportedException("oops!");
-            }
-
-            ((BrowserView)window.Content).Dispatcher.BeginInvoke(
-                (Action)delegate
+                if (vsPackage == null)
                 {
-                    ((BrowserView)window.Content).ViewModel = vm;
+                    vsPackage = _vsPackage;
                 }
-                );
-            
-            //for some reason the above code does not properly update URL if it's been updated in the vm we pass in...
-            ((BrowserView)window.Content).ViewModel.Url = vm.Url;
+                var window = vsPackage.FindToolWindow(pane.GetType(), toolId, true);
 
-            var windowFrame = (IVsWindowFrame)window.Frame;
-            
-            ErrorHandler.ThrowOnFailure(windowFrame.Show());
+                if ((null == window) || (null == window.Frame))
+                {
+                    throw new NotSupportedException("oops!");
+                }
+
+                ((BrowserView)window.Content).Dispatcher.BeginInvoke(
+                    (Action)delegate
+                    {
+                        ((BrowserView)window.Content).ViewModel = vm;
+                    }
+                    );
+
+                //for some reason the above code does not properly update URL if it's been updated in the vm we pass in...
+                ((BrowserView)window.Content).ViewModel.Url = vm.Url;
+
+                var windowFrame = (IVsWindowFrame)window.Frame;
+
+                ErrorHandler.ThrowOnFailure(windowFrame.Show());
+            }
+            catch (Exception e)
+            {
+                _logger.WriteToLog(string.Format("OpenToolWindow catch-all: method: {0}: error: {1}", "OpenToolWindowGeneric", e.Message), LogPriority.HighPriority);
+            }
         }
 
         private void CloseToolWindow(ToolWindowPane pane, Package vsPackage, int toolID = 0)
@@ -258,7 +272,7 @@ namespace OSBIDE.Plugins.Base
                 return;
             }
 
-            var windowFrame = (IVsWindowFrame) window.Frame;
+            var windowFrame = (IVsWindowFrame)window.Frame;
             windowFrame.CloseFrame((uint)__FRAMECLOSE.FRAMECLOSE_NoSave);
         }
 

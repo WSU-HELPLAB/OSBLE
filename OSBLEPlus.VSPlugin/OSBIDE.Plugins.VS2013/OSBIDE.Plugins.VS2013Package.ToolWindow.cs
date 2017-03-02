@@ -71,8 +71,8 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
                     _manager.OpenInterventionWindow();
                 }
                 catch (Exception ex)
-                {                    
-                    ShowAwesomiumError(ex);
+                {
+                    _errorLogger.WriteToLog(string.Format("ShowInterventionTool() _manager.OpenInterventionWindow() error: {0}", ex.Message), LogPriority.HighPriority);
                 }
             }
             else
@@ -284,8 +284,20 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
                     }
                     MessageBox.Show("Welcome to OSBLE+!");
                     _manager.OpenActivityFeedWindow();
-                    if (_cache.Contains("community") && Boolean.Equals(true, _cache["community"]))
-                        _manager.OpenCommunityWindow();
+                    //if (_cache.Contains("community") && Boolean.Equals(true, _cache["community"]))
+                    //    _manager.OpenCommunityWindow();
+
+                    //try to open the suggestions window
+                    try
+                    {
+                        _manager.OpenInterventionWindow();
+                    }
+                    catch (Exception ex)
+                    {
+                        //write to the log file
+                        _errorLogger.WriteToLog(string.Format("Open Suggestions window on login error: {0}", ex.Message), LogPriority.HighPriority);
+                    }
+
                 }
                 else
                 {
