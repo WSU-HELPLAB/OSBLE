@@ -83,7 +83,7 @@
 
 </head>
 
-<body>
+<body class="intervention-body">
     <div>
         <div class="panel panel-primary">
             <div class="panel-heading intervention-heading">
@@ -92,12 +92,12 @@
                         <span class="glyphicon glyphicon-circle-arrow-left"></span>
                         <span class="glyphicon glyphicon-dashboard"></span>
                     </a>
-                </span> 
+                </span>
                 Availability Details
             </div>
             <div class="panel-body">
                 @Html.Partial("_UserFeedbackPrompt", new ViewDataDictionary { { "interventionId", Model.Intervention.Id} })
-                @Html.Partial("_CourseSelect")             
+                @Html.Partial("_CourseSelect")
 
                 <h4>Other users currently available:</h4>
 
@@ -196,6 +196,7 @@
                 <div>
                     <button class="btn btn-primary right" id="post-selected">Post Question<br /> to Selected Classmates</button>
                     <button class="btn btn-primary right" id="post-class-feed">Post Question<br /> to Class</button>
+                    <button class="btn btn-default right" id="post-class-feed-anon"><span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span> Post Question<br /> to Class (Anonymously)</button>
                     <span class="right" id="post-result"></span>
                     <span class="right" id="post-success"></span>
                     <span class="right" id="post-error"></span>

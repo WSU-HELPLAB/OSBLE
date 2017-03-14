@@ -28,7 +28,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             {
                 CommandText = string.Format(@"
 DECLARE {0} INT
-INSERT INTO dbo.EventLogs (EventTypeId, EventDate, SenderId, CourseId) VALUES (@EventTypeId, @EventDate, @SenderId, @CourseId)
+INSERT INTO dbo.EventLogs (EventTypeId, EventDate, SenderId, CourseId, Isanonymous) VALUES (@EventTypeId, @EventDate, @SenderId, @CourseId, @IsAnonymous)
 SELECT {0}=SCOPE_IDENTITY()
 INSERT INTO dbo.AskForHelpEvents (EventLogId, EventDate, SolutionName, Code, UserComment)
 VALUES ({0}, @EventDate, @SolutionName, @Code, @UserComment)
@@ -42,7 +42,7 @@ SELECT {0}", StringConstants.SqlHelperLogIdVar)
             cmd.Parameters.AddWithValue("SolutionName", SolutionName);
             cmd.Parameters.AddWithValue("Code", Code);
             cmd.Parameters.AddWithValue("UserComment", UserComment);
-
+            cmd.Parameters.AddWithValue("IsAnonymous", IsAnonymous);
             return cmd;
         }
     }

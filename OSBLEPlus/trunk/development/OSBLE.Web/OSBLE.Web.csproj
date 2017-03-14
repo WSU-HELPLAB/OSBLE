@@ -1545,6 +1545,12 @@
     <Content Include="Views\Help\UserStatus.cshtml" />
     <Content Include="Views\Help\SuggestionsDashboard.cshtml" />
     <Content Include="Views\Help\VisualStudioSuggestionsOverview.cshtml" />
+    <Content Include="Views\Intervention\_EmbeddedSuggestionsWindow.cshtml" />
+    <Content Include="Views\Intervention\DismissedInterventions.cshtml" />
+    <Content Include="Views\Intervention\UserFeedback.cshtml" />
+    <Content Include="Views\Intervention\_InterventionList.cshtml" />
+    <Content Include="Views\Intervention\UnansweredQuestions.cshtml" />
+    <Content Include="Views\Intervention\SuggestionsSettings.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

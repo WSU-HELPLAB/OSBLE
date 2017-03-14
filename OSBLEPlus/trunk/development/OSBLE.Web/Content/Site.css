@@ -2320,7 +2320,7 @@ pre {
     background-color: #f3f3f3;
     border-radius: 5px;
     border: 1px solid #eee;
-    margin-bottom: 15px;
+    margin-bottom: 5px;
 }
 
 .feed-edit {
@@ -2344,7 +2344,7 @@ pre {
 }
 
 #dp_posts {
-    margin-top: 25px;
+    margin-top: 10px;
 }
 
 #feed-footer {

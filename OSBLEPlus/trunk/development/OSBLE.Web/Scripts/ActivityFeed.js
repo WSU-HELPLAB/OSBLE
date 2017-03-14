@@ -10,7 +10,7 @@ function FeedItem(data) {
     self.eventLogId = data.EventLogId;
     self.timeString = ko.observable(data.TimeString);
     self.eventDate = data.EventDate;
-    self.options = new FeedItemOptions(data.CanMail, data.CanDelete, data.CanEdit, data.ShowPicture, data.CanVote, data.HideMail, data.EventVisibilityGroups, data.EventVisibleTo);
+    self.options = new FeedItemOptions(data.CanMail, data.CanDelete, data.CanEdit, data.ShowPicture, data.CanVote, data.HideMail, data.EventVisibilityGroups, data.EventVisibleTo, data.IsAnonymous);
     self.show = true;
     self.isComment = self.parentEventId != -1;
     self.isHelpfulMark = data.IsHelpfulMark;
@@ -98,6 +98,9 @@ function FeedItem(data) {
         if (self.isComment)
             return;
 
+        //make anonymous post
+        var makeAnonymous = $("[name='make_reply_anonymous_" + self.eventId + "']").is(':checked');
+
         // Get text from the textarea
         var text = $('#feed-reply-textbox-' + self.eventId).val();
 
@@ -123,7 +126,7 @@ function FeedItem(data) {
 
         $.ajax({
             url: "/Feed/PostComment",
-            data: { id: self.eventId, content: text },
+            data: { id: self.eventId, content: text, isAnonymous : makeAnonymous },
             dataType: "json",
             method: "POST",
             success: function (dataList) {
@@ -145,7 +148,7 @@ function FeedItem(data) {
     }
 }
 
-function FeedItemOptions(canMail, canDelete, canEdit, showPicture, canVote, hideMail, eventVisibilityGroups, eventVisibleTo) {
+function FeedItemOptions(canMail, canDelete, canEdit, showPicture, canVote, hideMail, eventVisibilityGroups, eventVisibleTo, isAnonymous) {
     var self = this;
     self.canMail = canMail;
     self.canDelete = canDelete;
@@ -155,6 +158,7 @@ function FeedItemOptions(canMail, canDelete, canEdit, showPicture, canVote, hide
     self.hideMail = hideMail;
     self.eventVisibilityGroups = eventVisibilityGroups;
     self.eventVisibleTo = eventVisibleTo;
+    self.isAnonymous = isAnonymous;
 }
 
 function FeedViewModel(userName, userId, current) {
@@ -182,6 +186,21 @@ function FeedViewModel(userName, userId, current) {
     // *** AUTO-UPDATE WEB SOCKET STUFF ***
     self.hub = $.connection.activityFeedHub;
 
+    self.hub.client.notifyNewSuggestion = function (userProfileId) {
+        //process new suggestion        
+        if (userProfileId == self.userId) { //only update if this notification is relevant to the current user
+            //TODO: we should do this by dynamically removing the no longer present and adding only the new ones...
+            //clear the old suggestions
+            $("#dashboard-items").empty();
+            //populate the new suggestions
+            PopulateSuggestionList();
+            //notify the user
+            TitlebarNotification("New Suggestions!");
+            NotifyNewSuggestions();
+        }
+        //else do nothing
+    };
+
     self.hub.client.addNewReply = function (postID, dataList) {
         // Add the reply to the page
         var post = self.GetPost(postID);
@@ -193,7 +212,7 @@ function FeedViewModel(userName, userId, current) {
             post.comments(commentList);
 
             HighlightNewReply(postID);
-            TitlebarNotification();
+            TitlebarNotification("New Feed Reply!");
 
             if (post.SenderId != self.userId)
                 ShowNewActivityBadge();
@@ -232,6 +251,12 @@ function FeedViewModel(userName, userId, current) {
         }
 
         if (courseID == courseId && filterAllowsEvent && pushMessage) {
+            if (postData.IsAnonymous) {
+                postData.SenderId = postData.AnonSenderId;
+                postData.ShowPicture = postData.AnonShowPicture;
+                postData.HideMail = postData.AnonHideMail;
+                postData.ActiveCourseUserId = postData.AnonActiveCourseUserId;
+            }
             SetPermissions(postData);
             self.items.unshift(new FeedItem(postData)); // unshift puts object at beginning of array
             HighlightNewPost(postData.EventId, postData.SenderId == self.userId, self.InEventVisibleToList(postData.EventVisibleTo));
@@ -290,6 +315,9 @@ function FeedViewModel(userName, userId, current) {
         var text = $("#feed-post-textbox").val();
         var emailToClass = $("[name='send_email']").is(':checked');
 
+        //make anonymous post
+        var makeAnonymous = $("[name='make_anonymous']").is(':checked');
+
         var userNames = localStorage['UserNames'].split(',');
         var userIds = localStorage['UserIds'].split(',');
 
@@ -308,7 +336,7 @@ function FeedViewModel(userName, userId, current) {
             type: "POST",
             url: "/Feed/PostFeedItem",
             dataType: "json",
-            data: { text: text, emailToClass: emailToClass, postVisibilityGroups: postVisibility, eventVisibleTo: visibleTo },
+            data: { text: text, emailToClass: emailToClass, postVisibilityGroups: postVisibility, eventVisibleTo: visibleTo, isAnonymous: makeAnonymous },
             success: function (data) {
                 MakePostSucceeded(data);
             },
@@ -717,6 +745,7 @@ function SetPermissions(post) {
             post.HideMail = data.hideMail;
             post.EventVisibilityGroups = data.eventVisibilityGroups;
             post.EventVisibleTo = data.eventVisibleTo;
+            post.IsAnonymous = data.isAnonymous;
         },
         error: function () {
             post.CanDelete = false;
@@ -727,8 +756,12 @@ function SetPermissions(post) {
             post.HideMail = false;
             post.EventVisibilityGroups = "";
             post.EventVisibleTo = "";
+            post.IsAnonymous = false;
         }
     });
+    if (post.IsAnonymous) {
+        post.SenderId = 0;
+    }
 }
 
 function CheckEvents(events) {
@@ -835,7 +868,7 @@ function HighlightNewPost(postID, isCurrentUserPost, userInVisibilityList) {
     if (!isCurrentUserPost && userInVisibilityList) {
         ShowNewActivityBadge();
         ShowNewPostBadge(postID);
-        TitlebarNotification();
+        TitlebarNotification("New Feed Post!");
     }
 }
 
@@ -867,12 +900,23 @@ function MakePostSucceeded(newPost) {
 
     // re-enable posting
     $('#feed-post-textbox').removeAttr('disabled');
-    $('#btn_post_active').removeAttr('disabled');
+    $('#btn_post_active').removeAttr('disabled');    
+
+    newPost = ConfigureAnonymousSettings(newPost);
 
     // notify others about the new post
     //last THREE parameters are not used by posts here, just VS Plugin events... apparently hub doesn't like optional parameters    
     vm.hub.server.notifyNewPost(newPost, "", 0, "");
+}
 
+function ConfigureAnonymousSettings(post) {
+    if (post.IsAnonymous) {        
+        post.AnonSenderId = 0;
+        post.AnonShowPicture = false;
+        post.AnonHideMail = true;
+        post.AnonActiveCourseUserId = 0;
+    }
+    return post;
 }
 
 function MakePostFailed() {
@@ -1127,9 +1171,11 @@ function ShowUserVisibilityDialog(item) {
     $("#visibility-dialog").dialog(); //now show the dialog box
 }
 
-function TitlebarNotification() {
-    $.titleAlert("New Feed Post!", {
-        interval: 750
+function TitlebarNotification(message) {
+    $.titleAlert(message, {
+        interval: 750,
+        duration: 15000,
+        stopOnFocus: true
     });
 }
 

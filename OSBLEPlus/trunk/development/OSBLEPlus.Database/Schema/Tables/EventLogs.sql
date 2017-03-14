@@ -9,6 +9,7 @@
 	[IsDeleted]	   BIT,
     [EventVisibilityGroups] VARCHAR(3000) NULL, 
     [EventVisibleTo] VARCHAR(3000) NULL, 
+    [IsAnonymous] BIT NULL, 
     CONSTRAINT [PK_EventLogs_Id] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_EventLogs_EventTypes] FOREIGN KEY ([EventTypeId]) REFERENCES [dbo].[EventTypes] ([EventTypeId]),
     CONSTRAINT [FK_EventLogs_UserProfiles] FOREIGN KEY ([SenderId]) REFERENCES [dbo].[UserProfiles] ([ID]),

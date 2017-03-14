@@ -31,6 +31,7 @@ namespace OSBIDE.Library.ServiceClient
 
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
         public event EventHandler ReceivedNewSocialActivity = delegate { };
+        public event EventHandler InterventionUpdate = delegate { };
 
         private readonly ILogger _logger;
 
@@ -417,7 +418,14 @@ namespace OSBIDE.Library.ServiceClient
         /// <param name="sender"></param>
         /// <param name="e"></param>        
         private void OsbideEventCreated(object sender, EventCreatedArgs e)
-        {            
+        {
+            //TODO: move this to the proper location and check status first (refactor)
+            //notify client of new social activity
+            //if (InterventionUpdate != null)
+            //{
+            //    InterventionUpdate(this, EventArgs.Empty);
+            //}
+
             //create a new event log...
             SendStatus.IsActive = false;
 

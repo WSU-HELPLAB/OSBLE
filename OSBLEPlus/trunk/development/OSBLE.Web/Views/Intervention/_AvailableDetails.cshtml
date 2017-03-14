@@ -82,13 +82,21 @@
 
 </head>
 
-<body>
+<body class="intervention-body">
     <div>
         <div class="panel panel-primary">
-            <div class="panel-heading intervention-heading">Availability Details</div>
+            <div class="panel-heading intervention-heading">
+                <span class="left">
+                    <a href="/" style="color: #FFFFFF; text-decoration: none;">
+                        <span class="glyphicon glyphicon-circle-arrow-left"></span>
+                        <span class="glyphicon glyphicon-dashboard"></span>
+                    </a>
+                </span>
+                Availability Details
+            </div>
             <div class="panel-body">
                 @Html.Partial("_UserFeedbackPrompt", new ViewDataDictionary { { "interventionId", Model.Intervention.Id } })
-                
+
                 @Html.Partial("_CourseSelect")
 
                 <h4>Other users currently available:</h4>
@@ -140,7 +148,7 @@
                 <div>
                     <h5>Status Message:</h5>
                     @if (Model.CurrentUserStatus != null && String.IsNullOrEmpty(Model.CurrentUserStatus.StatusMessage))
-                    {                        
+                    {
                         <input type="text" id="status-message-placeholder" placeholder="Add a status message here! (optional)" />
                     }
                     else
@@ -156,8 +164,8 @@
                             <button type="button" class="btn" data-color="primary" id="availability-check">You're available</button>
                             <input type="checkbox" class="hidden" checked="checked" />
                         </span>
-                    </div>                    
-                    <div id="availability-text" class="hidden">                        
+                    </div>
+                    <div id="availability-text" class="hidden">
                         <h5>Until: </h5>
                         <div style="clear:both;">
                             <div class="left">
@@ -170,7 +178,7 @@
                                 <input class="timepicker" value="@availableUntil" /><input type="hidden" value="" id="chosen-time" />
                             </div>
                         </div>
-                    </div>                    
+                    </div>
                 </div>
                 <div style="clear:both;" id="status-update-message"><span><em>(Updating your status will let other users know that you are open to answer questions related to the current course assignments and activities)</em></span></div>
 
@@ -188,6 +196,7 @@
                 <div>
                     <button class="btn btn-primary right" id="post-selected">Post Question<br /> to Selected Classmates</button>
                     <button class="btn btn-primary right" id="post-class-feed">Post Question<br /> to Class</button>
+                    <button class="btn btn-default right" id="post-class-feed-anon"><span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span> Post Question<br /> to Class (Anonymously)</button>
                     <span class="right" id="post-result"></span>
                     <span class="right" id="post-success"></span>
                     <span class="right" id="post-error"></span>
@@ -197,7 +206,7 @@
     </div>
     <input id="cupid" type="hidden" value="@currentUserProfileId" />
     <input id="cu-name" type="hidden" value="@currentUser" />
-    <input id="iid" type="hidden" value="@Model.Intervention.Id" />   
-    @Html.Partial("_SuggestionFeedbackModal")     
+    <input id="iid" type="hidden" value="@Model.Intervention.Id" />
+    @Html.Partial("_SuggestionFeedbackModal")
 </body>
 </html>

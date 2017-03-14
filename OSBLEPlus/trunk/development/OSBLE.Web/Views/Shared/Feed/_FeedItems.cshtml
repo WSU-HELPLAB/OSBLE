@@ -129,6 +129,7 @@
                     <textarea class="form-control feed-reply-textbox" placeholder="@defaultText" data-bind="attr: {id: 'feed-reply-textbox-' + eventId}"></textarea>
                     <input name="response-submit" class="btn btn-default btn-sm" type="button" value="Post Reply" data-bind="click: AddComment, attr: {id: 'feed-reply-submit-' + eventId}" />
                     <input name="response-cancel" class="btn btn-default btn-sm" type="reset" value="Cancel" data-bind="click: HideReplyBox, attr: {id: 'feed-reply-cancel-' + eventId}" />
+                    <label class="checkbox-inline"><input type="checkbox" value="True" data-bind="attr: {name: 'make_reply_anonymous_' + eventId}" /><span data-bind="attr: {id: 'make_reply_anonymous_' + eventId}">Make Reply Anonymous</span></label>
                 </form>
 
                 @* Footer Links *@

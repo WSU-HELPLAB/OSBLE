@@ -39,7 +39,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             : this()
         {
             Items.Add(item);
-            
+
             // for now Pretty name will be EventName
             PrettyName = item.Event.EventName;
             FeedItemType = item.Event.EventName;
@@ -137,7 +137,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
                 {
                     currentAggregate.Items.Add(item);
                     currentAggregate.Comments = currentAggregate.Comments.Union(item.Comments).ToList();
-                    //currentAggregate.HelpfulMarks += item.HelpfulComments;
+                    //currentAggregate.HelpfulMarks += item.HelpfulComments;                   
                 }
                 else
                 {
@@ -154,6 +154,43 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
                 previousItem = item;
             }
 
+            foreach (var item in aggregateItems)
+            {
+                if (item.Items.First().Event.IsAnonymous != null ? item.Items.First().Event.IsAnonymous : false)
+                {
+                    item.Items.First().Event.SenderId = 0;
+                    item.Creator.ID = 0;
+                    item.Items.First().Event.ShowProfilePicture = false;
+                    item.Items.First().Event.HideMail = true;
+                    item.Items.First().Event.CanMail = false;
+                    item.Items.First().Event.Sender = new UserProfile
+                    {
+                        ID = 0,
+                        FirstName = "Anonymous ",
+                        LastName = item.Items.First().Event.EventId.ToString(),
+                    };
+                    item.Items.First().Event.DisplayTitle = "Anonymous " + item.Items.First().Event.EventId.ToString();
+                }
+
+                foreach (var comment in item.Comments)
+                {
+                    if (comment.IsAnonymous != null ? comment.IsAnonymous : false)
+                    {
+                        comment.SenderId = 0;
+                        //item.Creator.ID = 0;                        
+                        comment.ShowProfilePicture = false;
+                        comment.HideMail = true;
+                        comment.CanMail = false;
+                        comment.Sender = new UserProfile
+                        {
+                            ID = 0,
+                            FirstName = "Anonymous ",
+                            LastName = comment.EventId.ToString(),
+                        };
+                        comment.DisplayTitle = "Anonymous " + item.Items.First().Event.EventId.ToString();
+                    }
+                }
+            }
 
             return aggregateItems;
         }

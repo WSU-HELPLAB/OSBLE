@@ -65,12 +65,16 @@ namespace OSBLEPlus.Services.Controllers
             //For now we're only pushing these events to the hub
             if (log.EventType.ToString() == "AskForHelpEvent" || log.EventType.ToString() == "SubmitEvent")
             {
-            //post to feed hub here.
-            NotifyHub(result, log.SenderId, log.EventType.ToString(), log.CourseId ?? 0);
+                //post to feed hub here.
+                NotifyHub(result, log.SenderId, log.EventType.ToString(), log.CourseId ?? 0);
             }
 
             //we've processed the log, now process for intervention.
             ProcessLogForIntervention(log);
+
+
+            //push suggestion changes (it will only do so if suggestions need refreshing)
+            NotifyNewSuggestion(log.SenderId, log.CourseId ?? 0, request.AuthToken);
 
             return new HttpResponseMessage
             {
@@ -94,7 +98,7 @@ namespace OSBLEPlus.Services.Controllers
                                     "ORDER BY EventDate DESC) " +
                                     ", 0) AS CourseId ";
 
-                    var result =  sqlConnection.Query(query, new { senderId = userId }).AsList();
+                    var result = sqlConnection.Query(query, new { senderId = userId }).AsList();
 
                     courseId = result[0].CourseId;
 
@@ -107,7 +111,7 @@ namespace OSBLEPlus.Services.Controllers
             connection.Headers.Add("Origin", StringConstants.WebClientRoot);
 
             IHubProxy hub = connection.CreateHubProxy("ActivityFeedHub");
-            
+
             connection.Start().Wait();
 
             hub.Invoke("ForwardPluginEventToFeed");
@@ -116,12 +120,59 @@ namespace OSBLEPlus.Services.Controllers
             connection.Stop();
         }
 
-        private async void  ProcessLogForIntervention(ActivityEvent log)
+        private async void ProcessLogForIntervention(ActivityEvent log)
         {
             using (InterventionController intervention = new InterventionController())
-            { 
+            {
                 intervention.ProcessActivityEvent(log);
-            }            
+            }
+        }
+
+        public void NotifyNewSuggestion(int userId, int courseId = 0, string authKey = "")
+        {
+            bool refreshSuggestion = false;
+            if (!String.IsNullOrEmpty(authKey))
+            {
+                InterventionController ic = new InterventionController();
+                refreshSuggestion = ic.RefreshInterventionsOnDashboard(authKey);
+            }
+
+            if (refreshSuggestion)
+            {
+                if (courseId == 0) //guess course with the most recent activity...
+                {   //will need to do this for ask for help/exception events until a courseId is associated with them                
+                    using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                    {
+                        sqlConnection.Open();
+                        string query = "SELECT ISNULL( " +
+                                        "(SELECT TOP 1 CourseId " +
+                                        "FROM EventLogs " +
+                                        "WHERE SenderId = @senderId " +
+                                        "AND CourseId IS NOT NULL " +
+                                        "ORDER BY EventDate DESC) " +
+                                        ", 0) AS CourseId ";
+
+                        var result = sqlConnection.Query(query, new { senderId = userId }).AsList();
+
+                        courseId = result[0].CourseId;
+
+                        sqlConnection.Close();
+                    }
+                }
+
+                var connection = new HubConnection(StringConstants.WebClientRoot, "userID=" + userId + "&courseID=" + courseId + "&authKey=" + authKey, true);
+                connection.Headers.Add("Host", (new Uri(StringConstants.WebClientRoot)).Host);
+                connection.Headers.Add("Origin", StringConstants.WebClientRoot);
+
+                IHubProxy hub = connection.CreateHubProxy("ActivityFeedHub");
+
+                connection.Start().Wait();
+
+                hub.Invoke("NotifyNewSuggestion");
+
+                //stop the connection after the message has been forwarded.            
+                connection.Stop();
+            }
         }
     }
 }

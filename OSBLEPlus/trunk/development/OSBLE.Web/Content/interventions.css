@@ -1,4 +1,4 @@
-﻿body {
+﻿.intervention-body {
     width: 95%;
     margin-left: auto;
     margin-right: auto;
@@ -20,6 +20,15 @@
     text-align: center;
     font-size: 1.2em;    
     vertical-align: middle;
+}
+
+#post-to-class-anon:hover, #post-class-feed-anon:hover {
+  background-color: #4d565f !important;
+}
+
+#post-to-class-anon, #post-class-feed-anon {
+    background-color: #6d7984;
+    color: white;
 }
 
 .left {

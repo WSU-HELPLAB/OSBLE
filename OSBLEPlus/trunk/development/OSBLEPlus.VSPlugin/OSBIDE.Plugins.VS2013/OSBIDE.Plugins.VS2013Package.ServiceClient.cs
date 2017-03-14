@@ -15,6 +15,7 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
             _client = ServiceClient.GetInstance(_eventHandler, _errorLogger, staticToolManager);
             _client.PropertyChanged += ServiceClientPropertyChanged;
             _client.ReceivedNewSocialActivity += ServiceClientReceivedSocialUpdate;
+            _client.InterventionUpdate += InterventionReceivedUpdate;
         }
         void ServiceClientPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -24,6 +25,11 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
         void ServiceClientReceivedSocialUpdate(object sender, EventArgs e)
         {
             ToggleProfileImage(true);
+        }
+
+        void InterventionReceivedUpdate(object sender, EventArgs e)
+        {
+            OpenToolWindow();
         }
     }
 }

@@ -84,10 +84,18 @@
 
 </head>
 
-<body>
+<body class="intervention-body">
     <div>
         <div class="panel panel-primary">
-            <div class="panel-heading intervention-heading">Help out your classmates!</div>
+            <div class="panel-heading intervention-heading">
+                <span class="left">
+                    <a href="/" style="color: #FFFFFF; text-decoration: none;">
+                        <span class="glyphicon glyphicon-circle-arrow-left"></span>
+                        <span class="glyphicon glyphicon-dashboard"></span>
+                    </a>
+                </span>
+                Help out your classmates!
+            </div>
             <div class="panel-body">
                 @Html.Partial("_UserFeedbackPrompt", new ViewDataDictionary { { "interventionId", Model.Intervention.Id } })
                 @Html.Partial("_CourseSelect")
@@ -160,14 +168,14 @@
                     <span class="right" id="update-post-result-error"></span>
                     <span class="right" id="post-result"></span>
                     <span class="right" id="post-success"></span>
-                    <span class="right" id="post-error"></span>                    
-                    
+                    <span class="right" id="post-error"></span>
+
                 </div>
             </div>
         </div>
     </div>
     <input id="iid" type="hidden" value="@Model.Intervention.Id" />
     @Html.Partial("_SuggestionFeedbackModal")
-    
+
 </body>
 </html>

@@ -279,5 +279,22 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
                 return 5;
             }
         }
+
+        public static async Task<int> GetUserSetInterventionRefreshThresholdValue(string authToken)
+        {
+            try
+            {
+                using (var client = GetClient())
+                {
+                    var task = client.GetStringAsync(string.Format("api/intervention/GetUserSetInterventionRefreshThreshold?authToken={0}", authToken));                    
+                    await task;
+                    return int.Parse(task.Result);
+                }
+            }
+            catch (Exception e)
+            {
+                return 5;
+            }
+        }
     }
 }

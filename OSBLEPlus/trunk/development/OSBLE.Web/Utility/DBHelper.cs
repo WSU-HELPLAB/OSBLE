@@ -70,7 +70,7 @@ namespace OSBLE.Utility
             }
         }
 
-        public static void SetUserProfileImage(int id, byte[] pic,  SqlConnection connection = null)
+        public static void SetUserProfileImage(int id, byte[] pic, SqlConnection connection = null)
         {
             if (connection == null)
             {
@@ -121,13 +121,13 @@ namespace OSBLE.Utility
             using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
             {
                 sqlConnection.Open();
-                
+
                 string query = "SELECT UserProfiles.ID, UserProfiles.FirstName, UserProfiles.LastName " +
                                "FROM UserProfiles " +
                                "INNER JOIN CourseUsers " +
                                "ON UserProfiles.ID = CourseUsers.UserProfileID " +
                                "WHERE CourseUsers.AbstractCourseID = @courseId ";
-                
+
                 currentUsers = sqlConnection.Query<UserProfile>(query, new { courseId = courseId }).ToList();
 
                 sqlConnection.Close();
@@ -144,7 +144,7 @@ namespace OSBLE.Utility
 
             string discriminator = connection.Query<string>("SELECT Discriminator FROM AbstractRoles WHERE ID = @id", new { id = roleID }).Single();
             AbstractRole role = null;
-            switch(discriminator)
+            switch (discriminator)
             {
                 case "CourseRole":
                     role = connection.Query<CourseRole>("SELECT * FROM AbstractRoles WHERE ID = @id", new { id = roleID }).Single();
@@ -179,7 +179,7 @@ namespace OSBLE.Utility
             }
 
             profile = connection.Query<UserProfile>("SELECT * FROM UserProfiles WHERE UserName = @UserName",
-                new {UserName = userName}).SingleOrDefault();
+                new { UserName = userName }).SingleOrDefault();
 
             return profile;
         }
@@ -203,7 +203,7 @@ namespace OSBLE.Utility
         }
 
         public static List<int> GetCourseInstructorIds(int courseId, SqlConnection connection = null)
-        {            
+        {
             List<int> courseInstructorIds = new List<int>();
             if (connection == null)
             {
@@ -215,13 +215,13 @@ namespace OSBLE.Utility
             }
 
             courseInstructorIds = connection.Query<int>("SELECT UserProfileID FROM CourseUsers WHERE AbstractRoleID = @abstractRoleId AND AbstractCourseID = @courseId ",
-                new { abstractRoleId = (int) CourseRole.CourseRoles.Instructor , courseId = courseId }).ToList();
+                new { abstractRoleId = (int)CourseRole.CourseRoles.Instructor, courseId = courseId }).ToList();
 
             return courseInstructorIds;
         }
 
         public static List<int> GetCourseTAIds(int courseId, SqlConnection connection = null)
-        {            
+        {
             List<int> courseTAIds = new List<int>();
             if (connection == null)
             {
@@ -255,7 +255,7 @@ namespace OSBLE.Utility
                              SELECT UserProfileID, MultiSection FROM CourseUsers WHERE AbstractCourseID = @courseId AND Section = -1 ";
             List<string> multiSection = new List<string>();
 
-            using (var multi = connection.QueryMultiple(query, new {courseId = courseId, section = section}))
+            using (var multi = connection.QueryMultiple(query, new { courseId = courseId, section = section }))
             {
                 courseSectionUserProfileIds = multi.Read<int>().ToList();
                 var sectionList = multi.Read<dynamic>().ToList();
@@ -264,10 +264,10 @@ namespace OSBLE.Utility
                 {
                     if (result.MultiSection.Contains(section.ToString()))
                     {
-                        courseSectionUserProfileIds.Add(result.UserProfileID);                                                   
+                        courseSectionUserProfileIds.Add(result.UserProfileID);
                     }
-                }               
-            }      
+                }
+            }
             return courseSectionUserProfileIds;
         }
 
@@ -299,7 +299,7 @@ namespace OSBLE.Utility
                             int parsedId = 0;
                             bool parseIdToInt = int.TryParse(id, out parsedId);
                             if (parseIdToInt) //only add ids that were successfully parsed            
-                                courseSections.Add(parsedId);                            
+                                courseSections.Add(parsedId);
                         }
                     }
                 }
@@ -361,7 +361,7 @@ namespace OSBLE.Utility
                 }
                 return UserIdEmailPair;
             }
-            
+
             var result = connection.Query("SELECT ID, UserName FROM UserProfiles WHERE UserName IN @emailAddresses ",
                 new { emailAddresses = emailAddresses }).ToList();
 
@@ -387,7 +387,7 @@ namespace OSBLE.Utility
 
             string discriminator = connection.Query<string>(@"SELECT Discriminator FROM AbstractCourses WHERE ID = @id", new { id = courseID }).SingleOrDefault();
             AbstractCourse course = null;
-            switch(discriminator)
+            switch (discriminator)
             {
                 case "Course":
                     course = connection.Query<Course>(@"SELECT * FROM AbstractCourses WHERE ID = @id", new { id = courseID }).SingleOrDefault();
@@ -453,7 +453,7 @@ namespace OSBLE.Utility
             }
             else
             {
-                courseUsers = connection.Query<dynamic>( "SELECT (up.FirstName + ' ' + up.LastName) as 'FullName', up.ID " +
+                courseUsers = connection.Query<dynamic>("SELECT (up.FirstName + ' ' + up.LastName) as 'FullName', up.ID " +
                                                             "FROM CourseUsers cu " +
                                                             "INNER JOIN UserProfiles up " +
                                                             "ON cu.UserProfileID = up.ID " +
@@ -516,7 +516,7 @@ namespace OSBLE.Utility
             }
             else
             {
-                IEnumerable<int> roleIDs = GetRoleIDsFromDiscriminator("CommunityRole",connection);
+                IEnumerable<int> roleIDs = GetRoleIDsFromDiscriminator("CommunityRole", connection);
                 communities = connection.Query<CourseUser>(
                     "SELECT * " +
                     "FROM CourseUsers cusers " +
@@ -553,11 +553,11 @@ namespace OSBLE.Utility
 
                 // tack role on to the end
                 name += " (" + GetAbstractRoleNameFromID(cu.AbstractRoleID, connection) + ")";
-                
+
                 if (null != result.Inactive && result.Inactive)
                     name += " [INACTIVE]";
             }
-            
+
             return name;
         }
 
@@ -601,7 +601,7 @@ namespace OSBLE.Utility
             {
                 string result = connection.Query<string>("SELECT ISNULL(FirstName, 'OSBLE USER') FROM UserProfiles WHERE ID = (SELECT SenderId FROM EventLogs WHERE Id = @eventLogId)",
                     new { eventLogId = eventLogId }).SingleOrDefault();
-                return result;                
+                return result;
             }
             return name;
         }
@@ -652,8 +652,8 @@ namespace OSBLE.Utility
 
             Assignment a = connection.Query<Assignment>("SELECT * " +
                                                         "FROM Assignments " +
-                                                        "WHERE ID = @assignmentId", new {assignmentId}).FirstOrDefault();
-            
+                                                        "WHERE ID = @assignmentId", new { assignmentId }).FirstOrDefault();
+
             // if assignment is not found, or the current course user is not in the class, return false
             if (a == null || a.CourseID != abstractCourseId) return false;
 
@@ -734,7 +734,7 @@ namespace OSBLE.Utility
                     query = "SELECT DISTINCT ISNULL(ac.ID, 0) " +
                                 "FROM AbstractCourses ac " +
                                 "INNER JOIN CourseUsers cu " +
-                                "ON ac.ID = cu.AbstractCourseID " +                                
+                                "ON ac.ID = cu.AbstractCourseID " +
                                 "AND ac.Inactive = 0 " +
                                 "AND cu.UserProfileID = @userProfileId";
 
@@ -824,7 +824,7 @@ namespace OSBLE.Utility
                         posts);
             }
         }
-                
+
         public static bool IsCourse(int courseId)
         {
             AbstractCourse course = GetAbstractCourse(courseId);
@@ -874,14 +874,14 @@ namespace OSBLE.Utility
                 {
                     evt = GetActivityEvent(eventId, sqlc);
                 }
- 
+
                 return evt;
             }
 
-            evt = connection.Query<ActivityEvent>("SELECT Id AS EventLogId, EventTypeId, EventDate, DateReceived, SenderId, CourseId, SolutionName, IsDeleted " +
+            evt = connection.Query<ActivityEvent>("SELECT Id AS EventLogId, EventTypeId, EventDate, DateReceived, SenderId, CourseId, SolutionName, IsDeleted, IsAnonymous " +
                                                   "FROM EventLogs e " +
                                                   "WHERE e.Id = @EventId ",
-                new {EventId = eventId}
+                new { EventId = eventId }
                 ).FirstOrDefault();
 
             return evt;
@@ -1028,7 +1028,7 @@ namespace OSBLE.Utility
             {
                 logIds.AddRange(connection.Query<int>("SELECT Id " +
                                                       "FROM LogCommentEvents " +
-                                                      "WHERE EventLogId = @id", new{id}).ToList());
+                                                      "WHERE EventLogId = @id", new { id }).ToList());
             }
 
             List<int> helpfulMarkLogIds = new List<int>();
@@ -1038,16 +1038,16 @@ namespace OSBLE.Utility
             {
                 helpfulMarkLogIds.AddRange(connection.Query<int>("SELECT EventLogId " +
                                                                  "FROM HelpfulMarkGivenEvents " +
-                                                                 "WHERE LogCommentEventId = @id", new{id}).ToList());
+                                                                 "WHERE LogCommentEventId = @id", new { id }).ToList());
             }
 
             // need to get all logIds from comments then markhelpful delete as well
-            
-                          //connection.Query<int>("SELECT EventLogId " +
-                          //"FROM HelpfulMarkGivenEvents " +
-                          //"WHERE LogCommentEventId = @logIds", logIds).ToList();
 
-            
+            //connection.Query<int>("SELECT EventLogId " +
+            //"FROM HelpfulMarkGivenEvents " +
+            //"WHERE LogCommentEventId = @logIds", logIds).ToList();
+
+
             if (comments.Count > 0)
             {
                 // soft delete eventlogs associated with LogComments
@@ -1055,7 +1055,7 @@ namespace OSBLE.Utility
                                    "SET IsDeleted = 1" +
                                    "WHERE Id = @EventLogId", comments);
             }
-            
+
             // soft delete eventlog for feedpost
             connection.Execute("UPDATE EventLogs " +
                    "SET IsDeleted = 1 " +
@@ -1066,7 +1066,7 @@ namespace OSBLE.Utility
             {
                 connection.Execute("UPDATE EventLogs " +
                                   "SET IsDeleted = 1 " +
-                                  "WHERE Id = @EventLogId", new { EventLogId = id });               
+                                  "WHERE Id = @EventLogId", new { EventLogId = id });
             }
 
         }
@@ -1086,13 +1086,13 @@ namespace OSBLE.Utility
             LogCommentEvent l = GetSingularLogComment(eventId, connection);
             int logId = connection.Query<int>("Select Id " +
                                            "FROM LogCommentEvents " +
-                                           "WHERE EventLogId = @eventId", new {eventId}).SingleOrDefault();
+                                           "WHERE EventLogId = @eventId", new { eventId }).SingleOrDefault();
 
-            List<int> helpfulMarkLogIds = 
+            List<int> helpfulMarkLogIds =
                 connection.Query<int>("SELECT EventLogId " +
                                       "FROM HelpfulMarkGivenEvents " +
                                       "WHERE LogCommentEventId = @logId", new { logId }).ToList();
-                
+
 
             // soft delete eventlog
             if (l != null)
@@ -1103,7 +1103,7 @@ namespace OSBLE.Utility
 
                 connection.Execute("UPDATE EventLogs " +
                                    "SET IsDeleted = 1 " +
-                                   "WHERE Id = @helpfulMarkLogIds", new {helpfulMarkLogIds});
+                                   "WHERE Id = @helpfulMarkLogIds", new { helpfulMarkLogIds });
             }
         }
 
@@ -1122,7 +1122,7 @@ namespace OSBLE.Utility
             FeedPostEvent fpe = GetFeedPostEvent(eventId);
 
             // make sure the event exists and the text was changed
-            if (fpe != null && fpe.Comment != newText) 
+            if (fpe != null && fpe.Comment != newText)
             {
                 connection.Execute("UPDATE FeedPostEvents " +
                                    "SET Comment = @Comment " +
@@ -1151,7 +1151,7 @@ namespace OSBLE.Utility
             {
                 connection.Execute("UPDATE LogCommentEvents " +
                                    "SET Content = @Content " +
-                                   "WHERE EventLogId = @EventLogId ", new {Content = newText, EventLogId = eventId});
+                                   "WHERE EventLogId = @EventLogId ", new { Content = newText, EventLogId = eventId });
             }
         }
 
@@ -1200,7 +1200,7 @@ namespace OSBLE.Utility
 
             int logSenderId = connection.Query<int>("SELECT SenderId " +
                                                     "FROM EventLogs " +
-                                                    "WHERE Id = @logCommentId ", new {logCommentId = logId}).FirstOrDefault();
+                                                    "WHERE Id = @logCommentId ", new { logCommentId = logId }).FirstOrDefault();
 
             // do not allow user to possibly mark their own comment as helpful
             if (logSenderId == markerId)
@@ -1228,7 +1228,7 @@ namespace OSBLE.Utility
             {
                 sourceCourseId = connection.Query<int>("SELECT CourseId " +
                                                        "FROM EventLogs " +
-                                                       "WHERE Id = @SourceEventId", new {SourceEventId = sourceLogId}).FirstOrDefault();
+                                                       "WHERE Id = @SourceEventId", new { SourceEventId = sourceLogId }).FirstOrDefault();
             }
             catch (NullReferenceException ex)
             {
@@ -1236,20 +1236,20 @@ namespace OSBLE.Utility
             }
 
             List<ActivityEvent> eventLogs =
-                connection.Query<ActivityEvent>("SELECT Id AS EventLogId, EventTypeId AS EventId, EventDate, DateReceived, SenderId, CourseId, SolutionName, IsDeleted " + 
+                connection.Query<ActivityEvent>("SELECT Id AS EventLogId, EventTypeId AS EventId, EventDate, DateReceived, SenderId, CourseId, SolutionName, IsDeleted " +
                                                 "FROM EventLogs " +
-                                                "WHERE Id IN @logId", new {logId = helpfulMarkEventIds}).ToList();
+                                                "WHERE Id IN @logId", new { logId = helpfulMarkEventIds }).ToList();
 
 
 
             ActivityEvent senderEvent = eventLogs.Find(x => x.SenderId == markerId);
-            
-            
+
+
             // user clicked again, remove the MarkHelpfulCommentEvent
             if (senderEvent != null)
             {
                 connection.Execute("DELETE FROM HelpfulMarkGivenEvents " +
-                                   "WHERE EventLogId = @senderEventId", new {senderEventId = senderEvent.EventLogId});
+                                   "WHERE EventLogId = @senderEventId", new { senderEventId = senderEvent.EventLogId });
 
                 connection.Execute("DELETE FROM EventLogs " +
                    "WHERE Id = @senderEventId", new { senderEventId = senderEvent.EventLogId });
@@ -1294,7 +1294,7 @@ namespace OSBLE.Utility
                     return helpfulMarkEventIds.Count + 1;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return helpfulMarkEventIds.Count;
             }
@@ -1309,12 +1309,12 @@ namespace OSBLE.Utility
                     return GetHelpfulMarkFeedSourceId(helpfulMarkId, sqlc);
                 }
             }
-            
+
             return connection.Query<int>("SELECT SourceEventLogId " +
                                          "FROM LogCommentEvents " +
                                          "WHERE Id = (SELECT LogCommentEventId " +
                                          "FROM HelpfulMarkGivenEvents " +
-                                         "WHERE EventLogId = @helpfulMarkId)", new {helpfulMarkId}).SingleOrDefault();
+                                         "WHERE EventLogId = @helpfulMarkId)", new { helpfulMarkId }).SingleOrDefault();
         }
 
         public static bool UserMarkedLog(int userId, int logCommentId, SqlConnection connection = null)
@@ -1360,9 +1360,9 @@ namespace OSBLE.Utility
             // find the log id
             List<int> logIds = connection.Query<int>("SELECT Id " +
                                                      "FROM LogCommentEvents " +
-                                                     "WHERE EventLogId IN @logCommentIds", new {logCommentIds}).ToList();
+                                                     "WHERE EventLogId IN @logCommentIds", new { logCommentIds }).ToList();
 
-            
+
             foreach (int logId in logIds)
             {
                 // find eventlogids
@@ -1421,10 +1421,10 @@ namespace OSBLE.Utility
                     return GetLogCommentEventsFromEventLogIds(ids, activityEvents, sqlc);
                 }
             }
-            
+
             LogCommentEvent l = new LogCommentEvent();
 
-            
+
             return connection.Query<LogCommentEvent>("SELECT * " +
                                                   "FROM LogCommentEvents " +
                                                   "WHERE EventLogId IN @ids", new { ids }).ToList();
@@ -1439,9 +1439,9 @@ namespace OSBLE.Utility
                     return GetUserFeedFromId(userId, sqlc);
                 }
             }
-            
+
             // AddEventTypeIdes here as necessary using the syntax below if you want addition events
-            return GetActivityEventsFromId(userId, connection).ToList().Select(i=>i.EventLogId).ToList();
+            return GetActivityEventsFromId(userId, connection).ToList().Select(i => i.EventLogId).ToList();
         }
 
         public static IEnumerable<LogCommentEvent> GetCommentsForUserID(int userID, SqlConnection connection = null)
@@ -1501,12 +1501,12 @@ namespace OSBLE.Utility
 
         /*** Activity Feed *************************************************************************************************/
         #region ActivityFeed
-        public static bool InsertActivityFeedComment(int logID, int senderID, string text, SqlConnection connection = null)
+        public static bool InsertActivityFeedComment(int logID, int senderID, string text, SqlConnection connection = null, bool isAnonymous = false)
         {
             if (connection == null)
             {
                 bool result = false;
-                using (SqlConnection sqlc = GetNewConnection()) { result = InsertActivityFeedComment(logID, senderID, text, sqlc); }
+                using (SqlConnection sqlc = GetNewConnection()) { result = InsertActivityFeedComment(logID, senderID, text, sqlc, isAnonymous); }
                 return result;
             }
 
@@ -1519,7 +1519,7 @@ namespace OSBLE.Utility
                 try
                 {
                     courseID = connection.Query<int>("SELECT ISNULL(CourseId, 0) FROM EventLogs WHERE Id = @id",
-                        new {id = logID}).SingleOrDefault();
+                        new { id = logID }).SingleOrDefault();
                     if (courseID == 0)
                     {
                         courseID = null;
@@ -1529,7 +1529,7 @@ namespace OSBLE.Utility
                 {
                     courseID = null;
                 }
-                    
+
 
                 LogCommentEvent e = new LogCommentEvent(DateTime.UtcNow)
                 {
@@ -1538,7 +1538,8 @@ namespace OSBLE.Utility
                     SolutionName = "",
                     SenderId = senderID,
                     CourseId = courseID,
-                    SourceEvent = GetActivityEvent(logID, connection)
+                    SourceEvent = GetActivityEvent(logID, connection),
+                    IsAnonymous = isAnonymous,
                 };
                 using (var cmd = e.GetInsertCommand())
                 {
@@ -1548,7 +1549,7 @@ namespace OSBLE.Utility
 
                     connection.Open();
                     cmd.ExecuteScalar();
-                    connection.Close();
+                    connection.Close();                    
                 }
                 return true;
             }
@@ -1567,7 +1568,7 @@ namespace OSBLE.Utility
 
             string query = "";
 
-            if(emailToClass) //email to all course users
+            if (emailToClass) //email to all course users
             {
                 query = "SELECT DISTINCT u.* FROM UserProfiles u INNER JOIN CourseUsers c ON u.ID = c.UserProfileID WHERE c.AbstractCourseID = @id ";
             }
@@ -1607,20 +1608,25 @@ namespace OSBLE.Utility
             return addresses;
         }
 
-        public static UserProfile GetFeedItemSender(int postID, SqlConnection connection = null)
+        public static UserProfile GetFeedItemSender(int postID, SqlConnection connection = null, bool isAnonymous = false)
         {
             if (connection == null)
             {
-                using (SqlConnection sqlc = GetNewConnection()) { return GetFeedItemSender(postID, sqlc); }
+                using (SqlConnection sqlc = GetNewConnection()) { return GetFeedItemSender(postID, sqlc, isAnonymous); }
             }
 
             UserProfile sender = connection.Query<UserProfile>(
-                "SELECT u.* " +
-                "FROM UserProfiles u " +
-                "JOIN EventLogs e ON u.ID = e.SenderId " +
-                "WHERE e.Id = @id",
-                new { id = postID }).SingleOrDefault();
+            "SELECT u.* " +
+            "FROM UserProfiles u " +
+            "JOIN EventLogs e ON u.ID = e.SenderId " +
+            "WHERE e.Id = @id",
+            new { id = postID }).SingleOrDefault();
 
+            if (isAnonymous)
+            {
+                sender.FirstName = "Anonymous";
+                sender.LastName = "User";
+            }
             return sender;
         }
 
@@ -1631,7 +1637,7 @@ namespace OSBLE.Utility
                 using (SqlConnection sqlc = GetNewConnection()) { return IsEventDeleted(postID, sqlc); }
             }
 
-            bool? isDeleted = connection.Query<bool?>("SELECT IsDeleted FROM EventLogs WHERE Id = @id", 
+            bool? isDeleted = connection.Query<bool?>("SELECT IsDeleted FROM EventLogs WHERE Id = @id",
                 new { id = postID }).SingleOrDefault();
             return isDeleted.HasValue && isDeleted.Value;
         }
@@ -1652,7 +1658,7 @@ namespace OSBLE.Utility
                     {
                         sqlConnection.Query<int>(query, new { Content = hashTag });
                     }
-                    
+
                     sqlConnection.Close();
 
                     return true;
@@ -1691,8 +1697,8 @@ namespace OSBLE.Utility
             }
         }
 
-        #endregion        
-            
+        #endregion
+
         /*** Assignments *******************************************************************************************/
         #region Assignments
         public static string GetAssignmentName(int assignmentId = 0, SqlConnection connection = null)
@@ -1706,9 +1712,9 @@ namespace OSBLE.Utility
 
             if (connection == null)
             {
-                using (SqlConnection sqlc = GetNewConnection()) 
+                using (SqlConnection sqlc = GetNewConnection())
                 {
-                    assignmentName = GetAssignmentName(assignmentId, sqlc); 
+                    assignmentName = GetAssignmentName(assignmentId, sqlc);
                 }
                 return assignmentName;
             }
@@ -1724,20 +1730,49 @@ namespace OSBLE.Utility
 
 
         internal static void UpdateEventVisibleToList(int eventLogId, string updatedVisibilityList, SqlConnection connection = null)
-        {    
+        {
             if (connection == null)
             {
                 using (SqlConnection sqlc = GetNewConnection()) { UpdateEventVisibleToList(eventLogId, updatedVisibilityList, sqlc); }
             }
             else
             {
-                connection.Query(   "UPDATE EventLogs "  +
+                connection.Query("UPDATE EventLogs " +
                                     "SET EventVisibleTo = @updatedVisibilityList, EventVisibilityGroups = 'Selected Users' " +
                                     "WHERE EventLogs.Id = @eventLogId",
                                     new { eventLogId = eventLogId, updatedVisibilityList = updatedVisibilityList });
             }
 
             return;
+        }
+
+        internal static bool InterventionEnabledForCourse(int courseId)
+        {
+            bool interventionsEnabled = false;
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+
+                    string query = "SELECT * FROM OSBLEInterventionsCourses WHERE CourseId = @CourseId ";
+
+                    var result = sqlConnection.Query(query, new { CourseId = courseId }).SingleOrDefault();
+
+                    if (result != null)
+                    {
+                        interventionsEnabled = result.InterventionsEnabled;
+                    }
+
+                    sqlConnection.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+            return interventionsEnabled;
         }
     }
 }

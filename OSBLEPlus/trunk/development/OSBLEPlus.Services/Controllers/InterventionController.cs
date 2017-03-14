@@ -56,16 +56,21 @@ namespace OSBLEPlus.Services.Controllers
         }
 
         [HttpGet]
+        public int GetUserSetInterventionRefreshThreshold(string authToken)
+        {
+            //need to check the database for this users's interventions and return true if there are new interventions since the last processing.
+            var auth = new Authentication();
+            if (!auth.IsValidKey(authToken))
+                return InterventionRefreshThresholdInMinutes;
+
+            int userProfileId = auth.GetActiveUserId(authToken);
+
+            return UserSetRefreshThreshold(userProfileId);
+        }
+
+        [HttpGet]
         public bool InterventionsEnabled()
         {
-            //for some reason the appsettings is coming back null...
-            //var setting = ConfigurationManager.AppSettings["EnablePluginInterventions"] ?? "1";
-            //bool interventionsEnabled = false;
-
-            //if (Boolean.TryParse(setting, out interventionsEnabled))
-            //    return interventionsEnabled;
-            //else
-            //    return false;
             return true;
         }
         public void ProcessActivityEvent(ActivityEvent log)
@@ -130,6 +135,17 @@ namespace OSBLEPlus.Services.Controllers
 
                 int userProfileId = auth.GetActiveUserId(authToken);
 
+                //first check if the user has disabled in-IDE interventions
+                if (!UserEnabledInterventions(userProfileId))
+                {
+                    return false;
+                }
+
+                if (!UserRefreshThesholdMet(userProfileId))
+                {
+                    return false;
+                } //go ahead and continue checking. if the threshold is not met we don't want to refresh
+
                 //now check if the user needs an intervention refreshed.
                 bool refresh = CheckInterventionStatus(userProfileId);
                 if (refresh)
@@ -142,6 +158,145 @@ namespace OSBLEPlus.Services.Controllers
             else
             {
                 return false;
+            }
+        }
+
+        public bool RefreshInterventionsOnDashboard(string authToken)
+        {
+            if (InterventionsEnabled())
+            {
+                //need to check the database for this users's interventions and return true if there are new interventions since the last processing.
+                var auth = new Authentication();
+                if (!auth.IsValidKey(authToken))
+                    return false;
+
+                int userProfileId = auth.GetActiveUserId(authToken);
+
+                ////first check if the user has disabled in-IDE interventions
+                //if (!UserEnabledInterventions(userProfileId))
+                //{
+                //    return false;
+                //}
+
+                if (!UserRefreshThesholdMet(userProfileId))
+                {
+                    return false;
+                } //go ahead and continue checking. if the threshold is not met we don't want to refresh
+
+                //now check if the user needs an intervention refreshed.
+                bool refresh = CheckInterventionStatus(userProfileId);
+                if (refresh)
+                {
+                    //disable the refresh flag (changed it to here because this is the only method that actually refreshes the interventions)
+                    DisableRefreshFlag(userProfileId);
+                }
+                return refresh;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private bool UserRefreshThesholdMet(int userProfileId)
+        {
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+
+                    string query = "SELECT * FROM OSBLEInterventionsStatus WHERE UserProfileId = @UserProfileId ";
+
+                    var result = sqlConnection.Query(query, new { UserProfileId = userProfileId }).SingleOrDefault();
+
+                    sqlConnection.Close();
+
+                    if (result != null)
+                    {
+                        DateTime lastRefreshDT = result.LastRefresh;
+                        DateTime timeNow = DateTime.UtcNow;
+
+                        TimeSpan difference = (timeNow - lastRefreshDT);
+
+                        if (difference.TotalMinutes >= UserSetRefreshThreshold(userProfileId)) //TODO: check threshold for refreshing
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("UserRefreshThesholdMet() Failed", e);
+            }
+        }
+
+        private bool UserEnabledInterventions(int userProfileId)
+        {
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+
+                    string query = "SELECT * FROM OSBLEInterventionSettings WHERE UserProfileId = @UserProfileId ";
+
+                    var result = sqlConnection.Query(query, new { UserProfileId = userProfileId }).SingleOrDefault();
+
+                    sqlConnection.Close();
+
+                    if (result != null)
+                    {
+                        return result.ShowInIDESuggestions;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("UserEnabledInterventions() Failed", e);
+            }
+        }
+
+        private int UserSetRefreshThreshold(int userProfileId)
+        {
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+
+                    string query = "SELECT * FROM OSBLEInterventionSettings WHERE UserProfileId = @UserProfileId ";
+
+                    var result = sqlConnection.Query(query, new { UserProfileId = userProfileId }).SingleOrDefault();
+
+                    sqlConnection.Close();
+
+                    if (result != null)
+                    {
+                        return result.RefreshThreshold;
+                    }
+                    else
+                    {
+                        return InterventionRefreshThresholdInMinutes;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("UserSetRefreshThreshold() Failed", e);
             }
         }
 

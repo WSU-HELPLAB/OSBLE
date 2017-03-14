@@ -243,6 +243,23 @@ namespace OSBLE.Controllers
             return PartialView("_DismissedInterventions", vm);
         }
 
+        public ActionResult DismissedInterventionsLayout(int userId = 0)
+        {
+            LogInterventionInteraction("DismissedInterventionsLayout() page loaded");
+
+            if (userId == 0)
+            {
+                userId = ActiveCourseUser.UserProfileID;
+            }
+
+            //Get all interventions for the current user
+            InterventionsList vm = BuildInterventionsViewModel(userId, true);
+
+            BuildFeedbackItemViewBag(0, "View Dismissed Suggestions");
+
+            return View("DismissedInterventions", vm);
+        }
+
         [HttpPost]
         public bool DismissIntervention(int interventionId, bool autoDismiss = false)
         {
@@ -583,9 +600,32 @@ namespace OSBLE.Controllers
             return PartialView("_OfferHelp", vm);
         }
 
+        [HttpGet]
+        [OsbleAuthorize]
+        public ActionResult PopulateSuggestionList()
+        {
+            //check if we need to generate a 'ClassmatesAvailable' intervention first. try catch in case this breaks
+            try
+            {
+                bool generateIntervention = CheckIfOtherUsersAreAvailable(ActiveCourseUser.UserProfileID, ActiveCourseUser.AbstractCourseID);
+                if (generateIntervention)
+                {
+                    SaveIntervention(GenerateClassmatesAvailableIntervention(ActiveCourseUser.UserProfileID));
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Failed to CheckIfOtherUsersAreAvailable in Index()", e);
+            }
+            //Get all interventions for the current user
+            InterventionsList vm = BuildInterventionsViewModel(ActiveCourseUser.UserProfileID);
+
+            return PartialView("_InterventionList", vm);
+        }
+
         [HttpPost]
         [ValidateInput(false)]
-        public bool PostToActivityFeed(string postContent, string codeSnippet)
+        public bool PostToActivityFeed(string postContent, string codeSnippet, bool isAnonymous = false)
         {
             // Parse text and add any new hashtags to database
             FeedController.ParseHashTags(postContent);
@@ -610,6 +650,7 @@ namespace OSBLE.Controllers
             post.Code = codeSnippet;
             post.UserComment = postContent;
             post.SolutionName = "";
+            post.IsAnonymous = isAnonymous;
 
             int result = Posts.SaveEvent(post);
 
@@ -682,6 +723,75 @@ namespace OSBLE.Controllers
             return PartialView("_RuntimeError", GetInterventionDetails(interventionId));
         }
 
+        public ActionResult SuggestionsSettings()
+        {
+            int userProfileId = ActiveCourseUser.UserProfileID;
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+
+                    string query = "SELECT * FROM OSBLEInterventionSettings WHERE UserProfileId = @UserProfileId ";
+
+                    var results = sqlConnection.Query(query, new { UserProfileId = userProfileId }).SingleOrDefault();
+                    ViewBag.ShowSuggestionsWindow = results.ShowInIDESuggestions;
+                    ViewBag.RefreshThreshold = results.RefreshThreshold;
+                    sqlConnection.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error in SuggestionsSettings()", e);
+            }
+
+            BuildFeedbackItemViewBag(0, "OSBLE+ Suggestions Dashboard Settings");
+
+            return View();
+        }
+
+        [HttpPost]
+        [OsbleAuthorize]
+        public ActionResult UpdateSuggestionsSettings(bool enableSuggestionsIDE, int refreshThreshold)
+        {
+            int userProfileId = ActiveCourseUser.UserProfileID;
+            bool updateSuccess = false;
+            
+            //enable/disable in-IDE suggestions
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+
+                    string query = "SELECT * FROM OSBLEInterventionSettings WHERE UserProfileId = @UserProfileId ";
+                    string updateQuery = "UPDATE OSBLEInterventionSettings SET [ShowInIDESuggestions] = @ShowInIDESuggestions, [RefreshThreshold] = @RefreshThreshold WHERE UserProfileId = @UserProfileId ";
+                    string insertQuery = "INSERT INTO OSBLEInterventionSettings ([UserProfileId], [ShowInIDESuggestions], [RefreshThreshold]) VALUES( @UserProfileId, @ShowInIDESuggestions, @RefreshThreshold) ";
+
+                    var results = sqlConnection.Query(query, new { UserProfileId = userProfileId });
+                    
+                    if (results.Count() == 0) //insert
+                    {
+                        updateSuccess = sqlConnection.Execute(insertQuery, new { UserProfileId = userProfileId, ShowInIDESuggestions = enableSuggestionsIDE, RefreshThreshold = refreshThreshold }) != 0;
+                        LogInterventionInteraction("UpdateSuggestionsSettings", -10, 0, "enableSuggestionsIDEBefore: Default Settings", "enableSuggestionsIDEAfter: " + enableSuggestionsIDE.ToString() + " refreshThresholdAfter: " + refreshThreshold.ToString(), "ReferrerUrl: " + GetUrlReferrer());
+                    }
+                    else //update
+                    {
+                        updateSuccess = sqlConnection.Execute(updateQuery, new { UserProfileId = userProfileId, ShowInIDESuggestions = enableSuggestionsIDE, RefreshThreshold = refreshThreshold }) != 0;
+                        LogInterventionInteraction("UpdateSuggestionsSettings", -10, 0, "enableSuggestionsIDEBefore: " + results.First().ShowInIDESuggestions.ToString() + " refreshThresholdBefore: " + results.First().RefreshThreshold.ToString(), "enableSuggestionsIDEAfter: " + enableSuggestionsIDE.ToString() + " refreshThresholdAfter: " + refreshThreshold.ToString(), "ReferrerUrl: " + GetUrlReferrer());
+                    }
+
+                    sqlConnection.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error in UpdateSuggestionsSettings()", e);
+            }
+
+            return View("SuggestionsSettings");
+        }
+
         public void SetupTaggingViewBag()
         {
             //setup user list for autocomplete            
@@ -725,6 +835,33 @@ namespace OSBLE.Controllers
             LogInterventionInteraction("UnansweredQuestions() page loaded", interventionId, 0, "", "", "EventLogIds: " + vm.UnansweredPostIds + " ReferrerUrl: " + GetUrlReferrer());
 
             return PartialView("_UnansweredQuestions", vm);
+        }
+
+        public ActionResult UnansweredQuestionsLayout()
+        {
+            UnansweredQuestionsViewModel vm = new UnansweredQuestionsViewModel();
+            vm.UnansweredPostIds = GetUnansweredFeedPosts(ActiveCourseUser.AbstractCourseID, 14); //default 2 weeks back
+            vm.Intervention = new InterventionItem();
+            vm.Intervention.Id = -5; //id for this page, used to keep track of feedback
+
+            //Load the ViewBag
+            ViewBag.CurrentCourseId = ActiveCourseUser.AbstractCourseID;
+            //CurrentUser
+            ViewBag.CurrentUserProfileId = ActiveCourseUser.UserProfileID;
+            ViewBag.CurrentUserFullName = ActiveCourseUser.UserProfile.FullName;
+            //CourseUsers
+            ViewBag.CurrentCourseUsers = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
+            //Hashtags
+            ViewBag.HashTags = DBHelper.GetHashTags();
+
+            ViewBag.HideLoadMore = true;
+
+            BuildCourseSelectViewBag();
+            BuildFeedbackItemViewBag(0, "Unanswered Questions");
+
+            LogInterventionInteraction("UnansweredQuestionsLayout() page loaded", vm.Intervention.Id, 0, "", "", "EventLogIds: " + vm.UnansweredPostIds + " ReferrerUrl: " + GetUrlReferrer());
+
+            return PartialView("UnansweredQuestions", vm);
         }
 
         public ActionResult UnansweredQuestionsAlternate(int interventionId)
@@ -922,6 +1059,12 @@ namespace OSBLE.Controllers
             LogInterventionInteraction("UserFeedback() page loaded");
 
             return PartialView("_UserFeedback");
+        }
+        public ActionResult UserFeedbackLayout()
+        {
+            LogInterventionInteraction("UserFeedbackLayout() page loaded");
+
+            return View("UserFeedback");
         }
 
         public void BuildCourseSelectViewBag()
@@ -1274,6 +1417,12 @@ namespace OSBLE.Controllers
                     break;
                 case -4:
                     return "private-messages";
+                    break;
+                case -5:
+                    return "unanswered-questions-dashboard";
+                    break;
+                case -6:
+                    return "suggestions-settings";
                     break;
                 default:
                     return "user-feedback";
