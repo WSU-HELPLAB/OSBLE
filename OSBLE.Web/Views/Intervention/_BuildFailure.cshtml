@@ -29,16 +29,24 @@
 
 </head>
 
-<body>
-    <div>        
+<body class="intervention-body">
+    <div>
         <div class="panel panel-primary">
-            <div class="panel-heading intervention-heading">Ask a Question!</div>
+            <div class="panel-heading intervention-heading">
+                <span class="left">
+                    <a href="/" style="color: #FFFFFF; text-decoration: none;">
+                        <span class="glyphicon glyphicon-circle-arrow-left"></span>
+                        <span class="glyphicon glyphicon-dashboard"></span>
+                    </a>
+                </span>
+                Ask a Question!
+            </div>
             <div class="panel-body">
                 @Html.Partial("_UserFeedbackPrompt", new ViewDataDictionary { { "interventionId", Model.Id } })
                 @Html.Partial("_CourseSelect")
-                <h4>Your program has build errors. <em>Other classmates'</em> programs also had similar errors recently.</h4>                
-                <h5>Would you like to ask your classmates about this issue?</h5>               
-                                
+                <h4>Your program has build errors. <em>Other classmates'</em> programs also had similar errors recently.</h4>
+                <h5>Would you like to ask your classmates about this issue?</h5>
+
                 <div>
                     <div class="left">
                         <h4>Ask the question: </h4>
@@ -46,7 +54,7 @@
                     <div class=" btn-right">
                         <button class="btn btn-primary clear-default-text">Clear Template Text</button>
                     </div>
-                </div>  
+                </div>
 
                 <div id="question-area">
                     <textarea name="ask-a-question">@Model.InterventionTemplateText</textarea>
@@ -63,13 +71,14 @@
                 <div>
                     <a class="btn btn-primary" href="@activityFeedUrl" role="button" id="view-other-page">View Classmates'<br />Questions</a>
                     <button class="btn btn-primary right" id="post-to-class">Post Question<br /> to Class</button>
+                    <button class="btn btn-default right" id="post-to-class-anon"><span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span> Post Question<br /> to Class (Anonymously)</button>                    
                     <span class="right" id="post-success"></span>
                     <span class="right" id="post-error"></span>
-                </div>                
+                </div>
             </div>
         </div>
     </div>
-    <input id="iid" type="hidden" value="@Model.Id" />   
-    @Html.Partial("_SuggestionFeedbackModal")     
+    <input id="iid" type="hidden" value="@Model.Id" />
+    @Html.Partial("_SuggestionFeedbackModal")
 </body>
 </html>

@@ -32,8 +32,8 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
 
             var sql = string.Format(@"
 DECLARE {0} INT
-INSERT INTO dbo.EventLogs (EventTypeId, EventDate, DateReceived, SolutionName, SenderId, CourseId, EventVisibilityGroups, EventVisibleTo)
-VALUES (@EventTypeId, @EventDate, @DateReceived, @SolutionName, @SenderId, @CourseId, @EventVisibilityGroups, @EventVisibleTo)
+INSERT INTO dbo.EventLogs (EventTypeId, EventDate, DateReceived, SolutionName, SenderId, CourseId, EventVisibilityGroups, EventVisibleTo, IsAnonymous)
+VALUES (@EventTypeId, @EventDate, @DateReceived, @SolutionName, @SenderId, @CourseId, @EventVisibilityGroups, @EventVisibleTo, @IsAnonymous)
 SELECT {0}=SCOPE_IDENTITY()
 INSERT INTO dbo.FeedPostEvents (EventLogId, EventDate, SolutionName, Comment)
 VALUES ({0}, @EventDate, @SolutionName, @Comment)
@@ -49,6 +49,7 @@ SELECT {0}", StringConstants.SqlHelperLogIdVar);
             cmd.Parameters.AddWithValue("@Comment", Comment);
             cmd.Parameters.AddWithValue("@EventVisibilityGroups", EventVisibilityGroups);
             cmd.Parameters.AddWithValue("@EventVisibleTo", EventVisibleTo);
+            cmd.Parameters.AddWithValue("@IsAnonymous", IsAnonymous);
 
             //This is overwriting the sql insert command that this is calling
             //We need to do this insert separately

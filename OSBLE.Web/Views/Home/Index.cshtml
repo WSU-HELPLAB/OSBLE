@@ -9,7 +9,7 @@
     bool hasRootFolderAccess = ViewBag.ActiveCourseUser.AbstractRole.CanModify;
     int courseID = ViewBag.ActiveCourse.AbstractCourse.ID;
     //note: the current query only populates first, last, and ID for these users. change the query in DBHelper.cs to modify what values are available here.
-    var currentCourseUsers = ViewBag.CurrentCourseUsers;
+    var currentCourseUsers = ViewBag.CurrentCourseUsers;    
     
     switch (activeCourseRole)
     {
@@ -196,6 +196,12 @@
                 <span class="badge new-activity-badge" style="display: none" data-toggle="tooltip" title="Click to dismiss">New Activity</span>
                 @*<a href="@Url.Action("DownloadDashboardPosts", "Course")" title="Download Activity Feed as csv">@Helpers.UnPublishButton()</a>*@
                 <span style="float:right;">
+                    @*For instructor/ta show unanswered questions link*@
+                    <a href="/Intervention/UnansweredQuestionsLayout" style="text-decoration: none;">
+                        <span style="font-size: x-small; vertical-align: middle;">Unanswered Posts:</span>
+                        <span class="glyphicon glyphicon-exclamation-sign" title="Unanswered Posts"></span>
+                    </a>
+
                     <a href="/Home/PrivateMessages" style="text-decoration: none;">
                         <span style="font-size: x-small; vertical-align: middle;">Private Conversations:</span>
                         <span class="glyphicon glyphicon-comment" title="Private Conversations"></span>

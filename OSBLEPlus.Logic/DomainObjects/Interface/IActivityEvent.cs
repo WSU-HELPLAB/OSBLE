@@ -1,5 +1,6 @@
 ﻿using System.Data.SqlClient;
 using OSBLE.Models.Courses;
+using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
 
 namespace OSBLEPlus.Logic.DomainObjects.Interface
 {
@@ -16,11 +17,12 @@ namespace OSBLEPlus.Logic.DomainObjects.Interface
         bool HideMail { get; set; }
         string EventVisibilityGroups { get; set; }
         string EventVisibleTo { get; set; }
+        bool IsAnonymous { get; set; }
         bool CanReply { get; set; }
         bool CanEdit { get; set; }
         bool ShowProfilePicture { get; set; }
         string DisplayTitle { get; set; }
 
-        void SetPrivileges(CourseUser currentUser);
+        void SetPrivileges(CourseUser currentUser, ActivityEvent activityEvent = null);
     }
 }

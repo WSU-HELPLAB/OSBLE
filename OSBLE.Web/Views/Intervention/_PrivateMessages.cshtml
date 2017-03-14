@@ -89,7 +89,7 @@
 
     <script type="text/javascript">
         $(document).ready(function () {                
-            
+
             $("#feed-footer").hide();
 
             /*START Autocomplete block*/
@@ -140,7 +140,7 @@
 
 </head>
 
-<body>
+<body class="intervention-body">
     <input type="hidden" id="courseIdVal" value="@ViewBag.CurrentCourseId" />
     <div class="panel panel-primary">
         <div class="panel-heading intervention-heading">
@@ -149,11 +149,11 @@
                     <span class="glyphicon glyphicon-circle-arrow-left"></span>
                     <span class="glyphicon glyphicon-dashboard"></span>
                 </a>
-            </span> 
+            </span>
             Private Conversations
         </div>
-        <div class="panel-body">            
-            @Html.Partial("~/Views/Intervention/_UserFeedbackPrompt.cshtml", new ViewDataDictionary { { "interventionId", Model.Intervention.Id } })            
+        <div class="panel-body">
+            @Html.Partial("~/Views/Intervention/_UserFeedbackPrompt.cshtml", new ViewDataDictionary { { "interventionId", Model.Intervention.Id } })
             <div style="margin-bottom: 10px;">
                 @Html.Partial("~/Views/Intervention/_CourseSelect.cshtml")
             </div>
@@ -161,7 +161,7 @@
             @Html.Partial("~/Views/Intervention/_FeedPostArea.cshtml")
             @*end feed post area*@
 
-            <h4><em>Conversations with custom visibility (for the currently selected course):</em></h4>                   
+            <h4><em>Conversations with custom visibility (for the currently selected course):</em></h4>
 
             @*START Post List Area*@
             @* This is a message displayed while the feed is loading posts *@
@@ -171,12 +171,12 @@
 
             @* Feed is inserted here *@
             <div id="dp_posts" class="panel-group">
-                <div class="panel panel-info" style="text-align: right;">                    
+                <div class="panel panel-info" style="text-align: right;">
                     <div class="panel-heading" style=" padding: 5px;">
                         <span class="intervention-heading"><strong>Sort:</strong></span>
                         <span class="glyphicon glyphicon-sort-by-order intervention-heading" id="reverse-sort-a"></span>
                         <span class="glyphicon glyphicon-sort-by-order-alt intervention-heading" id="reverse-sort-d" style="display: none;"></span>
-                    </div>                    
+                    </div>
                 </div>
                 @Html.Partial("Feed/_Feed")
             </div>

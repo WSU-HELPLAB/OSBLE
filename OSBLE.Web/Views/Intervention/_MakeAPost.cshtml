@@ -28,19 +28,26 @@
     @Html.Partial("_UserHashtagTagScript")
 </head>
 
-<body>
+<body class="intervention-body">
     <div>
-        
         <div class="panel panel-primary">
-            <div class="panel-heading intervention-heading">Let others know what you're doing!</div>
-            <div class="panel-body">               
-                @Html.Partial("_UserFeedbackPrompt", new ViewDataDictionary { { "interventionId", Model.Intervention.Id } })    
+            <div class="panel-heading intervention-heading">
+                <span class="left">
+                    <a href="/" style="color: #FFFFFF; text-decoration: none;">
+                        <span class="glyphicon glyphicon-circle-arrow-left"></span>
+                        <span class="glyphicon glyphicon-dashboard"></span>
+                    </a>
+                </span>
+                Let others know what you're doing!
+            </div>
+            <div class="panel-body">
+                @Html.Partial("_UserFeedbackPrompt", new ViewDataDictionary { { "interventionId", Model.Intervention.Id } })
                 @Html.Partial("_CourseSelect")
-                <h4>Your classmates have recently used these hashtags. Click the hashtags below to see tagged post details or make a new post with your own hashtags!</h4>                                                
+                <h4>Your classmates have recently used these hashtags. Click the hashtags below to see tagged post details or make a new post with your own hashtags!</h4>
 
                 <h4>Popular and Suggested Hashtags: </h4>
                 @{
-                    //if there are no 'popular' hashtags, either make suggestions or say nobody has made any
+    //if there are no 'popular' hashtags, either make suggestions or say nobody has made any
                 }
                 @foreach (string hashtag in Model.PopularHashtags)
                 {
@@ -49,20 +56,21 @@
                 <h4>Make a new post with your own hashtags: </h4>
                 <div id="question-area">
                     <textarea name="ask-a-question" placeholder="@Model.Intervention.InterventionTemplateText"></textarea>
-                    <br />                    
+                    <br />
                 </div>
                 <div>
-                    <a class="btn btn-primary" href="@activityFeedUrl" role="button" id="view-other-page">View All<br />Posts</a>                    
+                    <a class="btn btn-primary" href="@activityFeedUrl" role="button" id="view-other-page">View All<br />Posts</a>
                     <button class="btn btn-primary right" id="post-class-feed">Post Question<br /> to Class</button>
+                    <button class="btn btn-default right" id="post-class-feed-anon"><span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span> Post Question<br /> to Class (Anonymously)</button>
                     <span class="right" id="post-success"></span>
                     <span class="right" id="post-error"></span>
                 </div>
-                                
+
             </div>
         </div>
     </div>
-    <input id="iid" type="hidden" value="@Model.Intervention.Id" />    
+    <input id="iid" type="hidden" value="@Model.Intervention.Id" />
     @Html.Partial("_SuggestionFeedbackModal")
-    
+
 </body>
 </html>

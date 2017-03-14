@@ -578,10 +578,20 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
         {
             try
             {
-                var result = AsyncServiceClient.GetInterventionRefreshThresholdValue();
-                _cache["InterventionRefreshThresholdInMinutes"] = await result;
-                _cache["LastInterventionRefreshTimeThreshold"] = DateTime.Now.ToString();
-                return true;
+                if (_cache.Contains(StringConstants.AuthenticationCacheKey))
+                {
+                    var result = AsyncServiceClient.GetUserSetInterventionRefreshThresholdValue(_cache[StringConstants.AuthenticationCacheKey] as string);
+                    _cache["InterventionRefreshThresholdInMinutes"] = await result;
+                    _cache["LastInterventionRefreshTimeThreshold"] = DateTime.Now.ToString();
+                    return true;
+                }
+                else
+                {
+                    var result = AsyncServiceClient.GetInterventionRefreshThresholdValue();
+                    _cache["InterventionRefreshThresholdInMinutes"] = await result;
+                    _cache["LastInterventionRefreshTimeThreshold"] = DateTime.Now.ToString();
+                    return true;
+                }                
             }
             catch (Exception ex)
             {

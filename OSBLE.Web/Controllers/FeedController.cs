@@ -96,6 +96,9 @@ namespace OSBLE.Controllers
                     ViewBag.IsInstructor = false;
 
                 ViewBag.EnableCustomPostVisibility = ConfigurationManager.AppSettings["EnableCustomPostVisibility"]; //<add key="EnableCustomPostVisibility" value="false"/> in web.config
+                
+                //check if interventions are enabled on this course
+                ViewBag.InterventionsEnabled = DBHelper.InterventionEnabledForCourse(ActiveCourseUser.AbstractCourseID);
 
                 return PartialView();
             }
@@ -157,6 +160,9 @@ namespace OSBLE.Controllers
 
             ViewBag.EnableCustomPostVisibility = ConfigurationManager.AppSettings["EnableCustomPostVisibility"]; //<add key="EnableCustomPostVisibility" value="false"/> in web.config
 
+            //check if interventions are enabled on this course
+            ViewBag.InterventionsEnabled = DBHelper.InterventionEnabledForCourse(ActiveCourseUser.AbstractCourseID);
+
             return View("Index", "_OSBIDELayout", courseID);
         }
 
@@ -186,7 +192,23 @@ namespace OSBLE.Controllers
             {
                 foreach (FeedItem f in returnItems)
                 {
-                    f.Event.Sender = DBHelper.GetUserProfile(f.Event.SenderId, sqlc);
+                    if (f.Event.IsAnonymous)
+                    {
+                        //make anon userprofile
+                        UserProfile anonUserProfile = new UserProfile();
+                        anonUserProfile.ID = f.Event.EventId;
+                        anonUserProfile.FirstName = "Anonymous";
+                        anonUserProfile.LastName = f.Event.EventId.ToString();                       
+
+                        f.Event.Sender = anonUserProfile;
+
+                        f.Event.SenderId = 0;
+                        f.Event.ShowProfilePicture = false;                        
+                    }
+                    else
+                    {
+                        f.Event.Sender = DBHelper.GetUserProfile(f.Event.SenderId, sqlc);
+                    }                    
                 }
             }
 
@@ -227,7 +249,7 @@ namespace OSBLE.Controllers
             {
                 vm.LastPollDate = DateTime.MinValue.AddDays(2);
             }
-
+            
             vm.Feed = aggregateFeed;
             vm.EventFilterOptions = ActivityFeedQuery.GetNecessaryEvents().OrderBy(e => e.ToString()).ToList();
             vm.UserEventFilterOptions = query.ActiveEvents;
@@ -297,7 +319,7 @@ namespace OSBLE.Controllers
 
         private object MakeLogCommentJsonObject(LogCommentEvent comment, Dictionary<int, bool> commentMarkedDictionary, SqlConnection sql = null)
         {
-            comment.SetPrivileges(ActiveCourseUser);
+            comment.SetPrivileges(ActiveCourseUser, (ActivityEvent) comment);
             comment.NumberHelpfulMarks = DBHelper.GetHelpfulMarksLogIds(comment.EventLogId, sql).Count;
             return new
             {
@@ -337,7 +359,7 @@ namespace OSBLE.Controllers
             }
 
             var eventLog = item.Items[0].Event;
-            eventLog.SetPrivileges(ActiveCourseUser ?? courseUser);
+            eventLog.SetPrivileges(ActiveCourseUser ?? courseUser, (ActivityEvent) eventLog);
 
             var comments = MakeCommentListJsonObject(item.Comments, eventLog.EventLogId, ActiveCourseUser != null ? ActiveCourseUser.UserProfileID : userProfileId);
             string viewFolder = details ? "Details/_" : "Feed/_";
@@ -361,6 +383,11 @@ namespace OSBLE.Controllers
                 {
                     htmlContent = "Error loading content. Please refresh the page.";
                 }
+            }
+
+            if (eventLog.IsAnonymous != null ? eventLog.IsAnonymous : false)
+            {
+                eventLog.DisplayTitle = "Anonymous " + eventLog.EventId.ToString();
             }
 
             return new
@@ -387,6 +414,7 @@ namespace OSBLE.Controllers
                 ActiveCourseUserId = courseUser == null ? ActiveCourseUser.UserProfileID : courseUser.UserProfileID,
                 EventVisibleTo = eventLog.EventVisibleTo,
                 EventType = eventLog.EventType.ToString(),
+                IsAnonymous = eventLog.IsAnonymous,
             };
         }
 
@@ -402,7 +430,16 @@ namespace OSBLE.Controllers
                     writer.AddAttribute(HtmlTextWriterAttribute.Class, "non-user-text");
                     writer.RenderBeginTag(HtmlTextWriterTag.Span);
                     writer.RenderBeginTag(HtmlTextWriterTag.Em);
-                    writer.WriteEncodedText(DBHelper.GetUserFirstNameFromEventLogId(eventLog.EventLogId));
+                    
+                    if (eventLog.IsAnonymous)
+                    {
+                        writer.WriteEncodedText("Anonymous");
+                    }
+                    else
+                    {
+                        writer.WriteEncodedText(DBHelper.GetUserFirstNameFromEventLogId(eventLog.EventLogId));
+                    }
+                    
                     writer.RenderEndTag();
                     writer.WriteEncodedText(" asked the following question: ");
                     writer.RenderEndTag();
@@ -957,6 +994,12 @@ namespace OSBLE.Controllers
             FeedDetailsViewModel vm = new FeedDetailsViewModel();
             vm.Ids = id;
             vm.FeedItem = aggregateItems.FirstOrDefault();
+
+            if (vm.FeedItem.IsAnonymous != null ? vm.FeedItem.IsAnonymous : false)
+            {
+                vm.FeedItem.Items.First().Event.SenderId = 0;
+            }
+
             return vm;
         }
 
@@ -967,7 +1010,7 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         [HttpPost]
         [ValidateInput(false)]
-        public JsonResult PostFeedItem(string text, bool emailToClass = false, string postVisibilityGroups = "", string eventVisibleTo = "", bool notifyHub = false)
+        public JsonResult PostFeedItem(string text, bool emailToClass = false, string postVisibilityGroups = "", string eventVisibleTo = "", bool notifyHub = false, bool isAnonymous = false)
         {
             // We purposefully are not catching exceptions that could be thrown
             // here, because we want this response to fail if there is an error
@@ -1008,6 +1051,7 @@ namespace OSBLE.Controllers
                     SolutionName = null,
                     EventVisibilityGroups = postVisibilityGroups,
                     EventVisibleTo = eventVisibleTo,
+                    IsAnonymous = isAnonymous,
                 };
 
             int logID = Posts.SaveEvent(log);
@@ -1029,7 +1073,7 @@ namespace OSBLE.Controllers
             NotifyTaggedUsers(text, logID, eventVisibleTo);
 
             // Send emails to those who want to be notified by email
-            SendEmailsToListeners(log.Comment, logID, courseID, DateTime.UtcNow, emailList);
+            SendEmailsToListeners(log.Comment, logID, courseID, DateTime.UtcNow, emailList, false, isAnonymous);
 
             //push message to hub listeners if needed (post source from outside of the feed e.g. intervention windows)
             if (notifyHub)
@@ -1322,7 +1366,7 @@ namespace OSBLE.Controllers
 
         [HttpPost]
         [ValidateInput(false)]
-        public JsonResult PostComment(int id, string content, string postVisibilityGroups = "")
+        public JsonResult PostComment(int id, string content, string postVisibilityGroups = "", bool isAnonymous = false)
         {
             // Check for blank comment
             if (String.IsNullOrWhiteSpace(content))
@@ -1334,7 +1378,7 @@ namespace OSBLE.Controllers
             ParseHashTags(content);
 
             // Insert the comment
-            bool success = DBHelper.InsertActivityFeedComment(id, CurrentUser.ID, content);
+            bool success = DBHelper.InsertActivityFeedComment(id, CurrentUser.ID, content, null, isAnonymous);
             if (!success)
             {
                 throw new Exception();
@@ -1360,7 +1404,7 @@ namespace OSBLE.Controllers
             emailList = RemoveNonVisibilityGroupEmails(emailList, eventVisibleTo);
 
             // Send emails if neccesary
-            SendEmailsToListeners(content, id, ActiveCourseUser.AbstractCourseID, DateTime.UtcNow, emailList, true);
+            SendEmailsToListeners(content, id, ActiveCourseUser.AbstractCourseID, DateTime.UtcNow, emailList, true, isAnonymous);
 
             // Notify users of tags
             NotifyTaggedUsers(content, id, eventVisibleTo);
@@ -1378,7 +1422,7 @@ namespace OSBLE.Controllers
         /// Sends an email to those who have access to this post and have the
         /// "Send all activity feed posts to my e-mail address" option checked
         /// </summary>
-        private void SendEmailsToListeners(string postContent, int sourcePostID, int courseID, DateTime timePosted, List<MailAddress> emails, bool isReply = false)
+        private void SendEmailsToListeners(string postContent, int sourcePostID, int courseID, DateTime timePosted, List<MailAddress> emails, bool isReply = false, bool isAnonymous = false)
         {
 #if !DEBUG
             // first check to see if we need to email anyone about this post
@@ -1421,22 +1465,27 @@ namespace OSBLE.Controllers
                             originalPostComment = originalPost.Comment;
                         }
 
-                        UserProfile originalPoster = DBHelper.GetFeedItemSender(sourcePostID, conn);
+                        UserProfile originalPoster = DBHelper.GetFeedItemSender(sourcePostID, conn, isAnonymous);
 
-                        subject = string.Format("OSBLE Plus - {0} replied to a post in {1}", CurrentUser.FullName, DBHelper.GetCourseShortNameFromID(courseID, conn));
+                        //we want to sanitize for the current user information if the reply was anonymous
+                        string currentUserFullName = isAnonymous ? "Anonymous User" : CurrentUser.FullName;
+                        
+                        subject = string.Format("OSBLE Plus - {0} replied to a post in {1}", currentUserFullName, DBHelper.GetCourseShortNameFromID(courseID, conn));
                         body = string.Format("{0} replied to a post by {1} at {2}:\n\n{3}\n-----------------------\nOriginal Post:\n{4}\n\n",
-                            CurrentUser.FullName, originalPoster.FullName, timePosted.UTCToCourse(courseID), postContent, originalPostComment);
+                            currentUserFullName, originalPoster.FullName, timePosted.UTCToCourse(courseID), postContent, originalPostComment);
 
                         body = ReplaceMentionWithName(body);
                     }
                     else
                     {
-                        subject = string.Format("OSBLE Plus - {0} posted in {1}", CurrentUser.FullName, DBHelper.GetCourseShortNameFromID(courseID, conn));
-                        body = string.Format("{0} made the following post at {1}:\n\n{2}\n\n", CurrentUser.FullName, timePosted.UTCToCourse(courseID), postContent);
+                        //we want to sanitize for the current user information if the reply was anonymous
+                        string currentUserFullName = isAnonymous ? "Anonymous User" : CurrentUser.FullName;
+
+                        subject = string.Format("OSBLE Plus - {0} posted in {1}", currentUserFullName, DBHelper.GetCourseShortNameFromID(courseID, conn));
+                        body = string.Format("{0} made the following post at {1}:\n\n{2}\n\n", currentUserFullName, timePosted.UTCToCourse(courseID), postContent);
 
                         // We need to parse the body and replace any @id=XXX; with student's actual names.
-                        body = ReplaceMentionWithName(body);
-                        
+                        body = ReplaceMentionWithName(body);                        
                     }
                 }
 
@@ -1676,11 +1725,12 @@ namespace OSBLE.Controllers
                     canVote = false,
                     showPicture = false,
                     eventVisibleTo = "",
+                    isAnonymous = false,
                 });
             }
             else
             {
-                e.SetPrivileges(ActiveCourseUser);
+                e.SetPrivileges(ActiveCourseUser, e);
             }
 
             return Json(new
@@ -1693,6 +1743,7 @@ namespace OSBLE.Controllers
                 canVote = e.CanVote,
                 showPicture = e.ShowProfilePicture,
                 eventVisibleTo = e.EventVisibleTo,
+                isAnonymous = e.IsAnonymous,
             });
         }
 

@@ -39,7 +39,27 @@
     }
 
     $(document).ready(function () {
-        
+        $(".make_anonymous").on("click", function () {
+            if ($("#make_anonymous").is(":checked")) {
+                $('#visibility-dropdown').css('opacity', '0.65');
+                $('#visibility-dropdown').css('cursor', 'not-allowed');
+                $('#visibility-dropdown').css('background-color', '#ffeeee');
+                $('#visibility-dropdown').prop('selectedIndex', 0);
+                $("#btn_post_active").val("Post to " + $("#data-course-link").text());
+                $("#email_post").text("Email to Class");
+                $('#visibility-dropdown').prop("disabled", true);
+                toggleVisibilityTooltip($("#visibility-dropdown option:selected").val());
+                toggleCustomGroups('hide');
+                clearSelection();
+            }
+            else {
+                $('#visibility-dropdown').css('opacity', '1.0');
+                $('#visibility-dropdown').css('cursor', 'default');
+                $('#visibility-dropdown').prop("disabled", false);
+                $('#visibility-dropdown').css('background-color', '#ffffff');
+            }
+        });
+
         //alternate dropdown for use in the plugin. datatable doesn't work in chromium renderer for some reason.
         $("#courseUsersList-plugin").change(function () {
             if ($("#courseUsersList-plugin").prop('selectedIndex') > 0) {
@@ -245,9 +265,11 @@
                 @if (ViewBag.IsInstructor || ViewBag.CanGrade)
                 {
                     @*<input type="submit" id="btn_post_all" class="btn btn-default" name="post_all" value="Post to All Courses I Teach" onclick="return confirm('Post this message to all your taught courses?');" />*@
-                    <label class="checkbox-inline"><input type="checkbox" value="True" name="send_email" /><span id="email_post">Email to: My Section</span></label>
+                    <label class="checkbox-inline"><input type="checkbox" value="True" name="send_email" /><span id="email_post">Email to: My Section</span></label>                    
                     <input type="hidden" id="can-grade" value="true" />
                 }
+                <label class="checkbox-inline"><input type="checkbox" value="True" name="make_anonymous" class="make_anonymous" id="make_anonymous" /><span class="make_anonymous">Post Anonymously</span></label>
+                @Helpers.CreateToolTip(ToolTips.AnonymousPost, "anonymous-post", "display: inline;", "glyphicon-info-sign", "19px")
                 <input type="hidden" id="enable-pm" value="@EnableCustomPostVisibility" />
             </form>
         }

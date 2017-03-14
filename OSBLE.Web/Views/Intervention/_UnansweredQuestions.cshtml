@@ -135,10 +135,18 @@
 
 </head>
 
-<body>
+<body class="intervention-body">
     <input type="hidden" id="courseIdVal" value="@ViewBag.CurrentCourseId" />
     <div class="panel panel-primary">
-        <div class="panel-heading intervention-heading">Help Another Student!</div>
+        <div class="panel-heading intervention-heading">
+            <span class="left">
+                <a href="/" style="color: #FFFFFF; text-decoration: none;">
+                    <span class="glyphicon glyphicon-circle-arrow-left"></span>
+                    <span class="glyphicon glyphicon-dashboard"></span>
+                </a>
+            </span>
+            Help Another Student!
+        </div>
         <div class="panel-body">
             @Html.Partial("_UserFeedbackPrompt", new ViewDataDictionary { { "interventionId", Model.Intervention.Id } })
             @Html.Partial("_CourseSelect")
@@ -169,7 +177,7 @@
             @*END Post List Area*@
 
             <div>
-                <a class="btn btn-primary right" href="@activityFeedUrl" role="button">View All Posts</a>                                                
+                <a class="btn btn-primary right" href="@activityFeedUrl" role="button">View All Posts</a>
             </div>
 
         </div>

@@ -196,6 +196,11 @@
     $("#post-class-feed").on("click", function () {
         PostToClass();
     });
+
+    $("#post-class-feed-anon").on("click", function () {
+        PostToClass(true);
+    });
+
     $("[id^=thumbs-up-feedback], [id^=thumbs-down-feedback]").on("click", function () {
 
         var lastInterventionId = $("#intervention-clicked").val();
@@ -279,7 +284,7 @@
 
     $("#post-to-class").on("click", function () {
 
-        if ($('#post-to-class').hasClass('disabled')) {
+        if ($('#post-to-class-anon').hasClass('disabled') || $('#post-to-class').hasClass('disabled')) {
             //do nothing
         }
         else {
@@ -306,6 +311,52 @@
                             $('#post-to-class').css('opacity', '0.65');
                             $('#post-to-class').css('cursor', 'not-allowed');
                             $('#post-to-class').addClass('disabled');
+                            $('#post-to-class-anon').css('opacity', '0.65');
+                            $('#post-to-class-anon').css('cursor', 'not-allowed');
+                            $('#post-to-class-anon').addClass('disabled');
+                            $("#post-success").text("Question successfully posted to the activity feed!");
+                        }
+                    },
+                    error: function (result) {
+                        $("#post-error").text("There was a problem submitting your post. Post not submitted.");
+                    }
+                });
+            }
+        }
+    });
+
+    $("#post-to-class-anon").on("click", function () {
+        
+        if ($('#post-to-class-anon').hasClass('disabled') || $('#post-to-class').hasClass('disabled')) {
+            //do nothing
+        }
+        else {
+            $("#post-success").text("");
+            $("#post-error").text("");
+
+            var postContent = $("textarea[name='ask-a-question']").val();
+            var codeSnippet = $("#code-edit-box").children()[0].value;
+
+            if (postContent == "") { //they did not post anything
+                $("#post-error").text("Post not submitted. Please enter a message first.");
+            }
+            else //continue processing post
+            {
+                var success = false;
+                //push post to server
+                $.ajax({
+                    url: "/Intervention/PostToActivityFeed",
+                    data: { postContent: postContent, codeSnippet: codeSnippet, isAnonymous: true },
+                    method: "POST",
+                    success: function (result) {
+                        //dismiss if db change successful                        
+                        if (result == "True") {
+                            $('#post-to-class').css('opacity', '0.65');
+                            $('#post-to-class').css('cursor', 'not-allowed');
+                            $('#post-to-class').addClass('disabled');
+                            $('#post-to-class-anon').css('opacity', '0.65');
+                            $('#post-to-class-anon').css('cursor', 'not-allowed');
+                            $('#post-to-class-anon').addClass('disabled');
                             $("#post-success").text("Question successfully posted to the activity feed!");
                         }
                     },
@@ -453,8 +504,8 @@ function GetPreviousUrl() {
     return localStorage.prevUrl;
 }
 
-function PostToClass() {
-    if ($('#post-class-feed').hasClass('disabled')) {
+function PostToClass(isAnonymous) {
+    if ($('#post-class-feed').hasClass('disabled') || $('#post-class-feed-anon').hasClass('disabled')) {
         //do nothing
     }
     else {
@@ -472,16 +523,23 @@ function PostToClass() {
             //push post to server                
             var visibleTo = "";
 
+            if (isAnonymous == undefined) {
+                isAnonymous = false;
+            }            
+
             $.ajax({
                 type: "POST",
                 url: "/Feed/PostFeedItem",
                 dataType: "json",
-                data: { text: postContent, emailToClass: false, postVisibilityGroups: "class", eventVisibleTo: visibleTo, notifyHub: true },
+                data: { text: postContent, emailToClass: false, postVisibilityGroups: "class", eventVisibleTo: visibleTo, notifyHub: true, isAnonymous: isAnonymous },
                 success: function (data) {
                     //disable spam posting
                     $('#post-class-feed').css('opacity', '0.65');
                     $('#post-class-feed').css('cursor', 'not-allowed');
                     $('#post-class-feed').addClass('disabled');
+                    $('#post-class-feed-anon').css('opacity', '0.65');
+                    $('#post-class-feed-anon').css('cursor', 'not-allowed');
+                    $('#post-class-feed-anon').addClass('disabled');
                     $('#update-status-post-class').css('opacity', '0.65');
                     $('#update-status-post-class').css('cursor', 'not-allowed');
                     $('#update-status-post-class').addClass('disabled');

@@ -159,7 +159,19 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
             {
                 profileButton.Picture = (StdPicture)IconConverter.GetIPictureDispFromImage(Resources.profile);
                 profileButton.TooltipText = "View your profile";
+            }            
+        }
+
+        private void OpenToolWindow()
+        {
+            try
+            {
+                _manager.OpenInterventionWindow();
             }
+            catch (Exception)
+            {
+                //TODO: handle error
+            }            
         }
 
         private void UpdateServiceConnectionStatus()

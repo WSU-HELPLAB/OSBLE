@@ -16,6 +16,7 @@
     var courseUsers = DBHelper.GetAllCourseUsersFromCourseId(ViewBag.ActiveCourse.AbstractCourseID);
 
     string EnableCustomPostVisibility = ViewBag.EnableCustomPostVisibility;
+    bool InterventionsEnabled = ViewBag.InterventionsEnabled ?? false;
 }
 
 <script type="text/javascript" src="@Url.Content("~/signalr/hubs")"></script>
@@ -186,11 +187,32 @@
                 e.preventDefault();                
             }
         });
-
+        
+        $(".make_anonymous").on("click", function(){
+            if ( $("#make_anonymous").is(":checked")) {                    
+                $('#visibility-dropdown').css('opacity', '0.65');
+                $('#visibility-dropdown').css('cursor', 'not-allowed');                
+                $('#visibility-dropdown').css('background-color', '#ffeeee'); 
+                $('#visibility-dropdown').prop('selectedIndex', 0);
+                $("#btn_post_active").val("Post to " + $("#data-course-link").text());
+                $("#email_post").text("Email to Class");
+                $('#visibility-dropdown').prop("disabled", true);
+                toggleVisibilityTooltip($("#visibility-dropdown option:selected").val());
+                toggleCustomGroups('hide');
+                clearSelection();
+            }
+            else
+            {                    
+                $('#visibility-dropdown').css('opacity', '1.0');
+                $('#visibility-dropdown').css('cursor', 'default');
+                $('#visibility-dropdown').prop("disabled", false);
+                $('#visibility-dropdown').css('background-color', '#ffffff'); 
+            }
+        });
     });
 </script>
 
-<section data-tab="ActivityFeed">
+<section data-tab="ActivityFeed">    
     <div id="activity_new_post">        
         @if (ViewBag.ActiveCourse.AbstractRole != null)
         {
@@ -276,6 +298,9 @@
                         <label class="checkbox-inline"><input type="checkbox" value="True" name="send_email" /><span id="email_post">Email to Class</span></label>
                         <input type="hidden" id="can-grade" value="true" />
                     }
+                    
+                    <label class="checkbox-inline"><input type="checkbox" value="True" name="make_anonymous" class="make_anonymous" id="make_anonymous" /><span class="make_anonymous">Post Anonymously</span></label>
+                    @Helpers.CreateToolTip(ToolTips.AnonymousPost, "anonymous-post", "display: inline;", "glyphicon-info-sign", "19px")
                     @*
                         if (ViewBag.IsLeader)
                         {
@@ -360,6 +385,11 @@
 
         </form>
     </div>
+    
+    @if (!ViewBag.IsInstructor && !ViewBag.CanGrade && InterventionsEnabled)
+    { 
+        @Html.Partial("~/Views/Intervention/_EmbeddedSuggestionsWindow.cshtml")          
+    }
 
     @* This is a message displayed while the feed is loading posts *@
     <div id="loadingMsg" class="message">
@@ -369,8 +399,8 @@
     @* Feed is inserted here *@
     <div id="dp_posts" class="panel-group">
         @Html.Partial("Feed/_Feed")
-    </div>
-
+    </div>  
+     
 </section>
 
 <div id="visibility-dialog" title="Post Visibility:" hidden="hidden"></div>

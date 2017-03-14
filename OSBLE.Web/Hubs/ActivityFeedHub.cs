@@ -41,10 +41,30 @@ namespace OSBLE.Hubs
             JoinCourse();
             return base.OnConnected();
         }
+        public void NotifyNewSuggestion()
+        {
+            int courseId = int.Parse(Context.QueryString["courseID"]);
+            int userProfileId = int.Parse(Context.QueryString["userID"]);
+            string authKey = Context.QueryString["authKey"];
+
+            // verify user has access to the course
+            var cu = DBHelper.GetCourseUserFromProfileAndCourse(userProfileId, courseId);
+            if (cu == null)
+                return;
+
+            //push the message to all active courses the user is involved in
+            //do this because we want them to see the notification regardless of course they are in.
+            List<int> activeCourses = DBHelper.GetActiveCourseIds(userProfileId);
+            foreach (int id in activeCourses)
+            {
+                Clients.Group(id.ToString()).notifyNewSuggestion(userProfileId);                
+            }
+        }
 
         public void NotifyNewReply(int postID, object replyList)
         {
             int courseID = int.Parse(Context.QueryString["courseID"]);
+
             Clients.Group(courseID.ToString()).addNewReply(postID, replyList);
         }
 
@@ -89,8 +109,8 @@ namespace OSBLE.Hubs
                 //otherwise, don't push out the notification (to avoid submit spamming the feed)
                 if (DBHelper.LastSubmitGreaterThanMinutesInterval(eventLogId, 5))
                 {
-                    Clients.Group(courseID.ToString()).addNewPost(courseID, post);    
-                }                
+                    Clients.Group(courseID.ToString()).addNewPost(courseID, post);
+                }
                 return;
             }
 
@@ -98,8 +118,8 @@ namespace OSBLE.Hubs
             {
                 if (authKey == "")
                 {
-                    authKey = Context.Request.Cookies["AuthKey"].Value.Split('=').Last();    
-                }                
+                    authKey = Context.Request.Cookies["AuthKey"].Value.Split('=').Last();
+                }
             }
             catch (Exception)
             {
@@ -108,7 +128,7 @@ namespace OSBLE.Hubs
 
             Authentication auth = new Authentication();
             bool validAuth = auth.IsValidKey(authKey);
-            
+
             if (!validAuth)
                 return; //will not validate, just exit
 
@@ -121,7 +141,7 @@ namespace OSBLE.Hubs
             if (validAuth && //their cookie authkey has to be valid
                 new[] { verifyPost.SenderId, senderId, authUserProfile.ID }.All(sid => sid == verifyPost.SenderId) && //the sender Id has to match
                 verifyPost.CourseId == courseID && //the course has to match
-                new[] { profile.FullName, senderFullName, authUserProfile.FullName }.All(pfn => pfn == profile.FullName)) //the user full name has to match
+                (new[] { profile.FullName, senderFullName, authUserProfile.FullName }.All(pfn => pfn == profile.FullName)) || senderFullName.Contains("Anonymous")) //the user full name has to match
             {
                 Clients.Group(courseID.ToString()).addNewPost(courseID, post);
             }
@@ -147,18 +167,18 @@ namespace OSBLE.Hubs
         }
 
         public void ForwardPluginEventToFeed()
-        {            
+        {
             int courseId = int.Parse(Context.QueryString["courseID"]);
             int logId = int.Parse(Context.QueryString["logID"]);
             int userId = int.Parse(Context.QueryString["userID"]);
             string eventType = Context.QueryString["eventType"];
-            string authKey = Context.QueryString["authKey"];
+            string authKey = Context.QueryString["authKey"];            
 
             var newPost = new AggregateFeedItem(Feeds.Get(logId));
             using (FeedController feedController = new FeedController())
             {
-                NotifyNewPost(JObject.Parse(JsonConvert.SerializeObject(feedController.MakeAggregateFeedItemJsonObject(newPost, false, userId, courseId))), eventType, courseId, authKey); 
-            }                       
+                NotifyNewPost(JObject.Parse(JsonConvert.SerializeObject(feedController.MakeAggregateFeedItemJsonObject(newPost, false, userId, courseId))), eventType, courseId, authKey);
+            }            
         }
     }
 }

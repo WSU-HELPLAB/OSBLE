@@ -106,14 +106,14 @@
 
 </head>
 
-<body>
+<body class="intervention-body">
 
     <div class="panel panel-primary" id="dashboard">
         <div class="panel-heading intervention-heading-large">
             <span class="glyphicon glyphicon-time" style="margin-right: 10px; margin-bottom: 5px;"></span>
             Dismissed OSBLE+ Suggestions
         </div>
-        <div class="panel-body">               
+        <div class="panel-body">
             <table>
                 <tr>
                     <td style="text-align: justify; padding: 5px;">
@@ -124,7 +124,7 @@
                         @Html.Partial("_UserFeedbackPrompt", new ViewDataDictionary { { "interventionId", -3 } })
                     </td>
                 </tr>
-            </table>        
+            </table>
         </div>
     </div>
 
@@ -135,10 +135,10 @@
             <div class="panel-heading center">
                 <div class="intervention-heading-large">
                     <span class="glyphicon glyphicon-@interventionItem.Icon1 intervention-info"></span><span class="glyphicon glyphicon-@interventionItem.Icon2 intervention-info"></span>
-                </div>                
+                </div>
                 <div class="center  intervention-heading-large">
-                    @interventionItem.Title                    
-                </div>                
+                    @interventionItem.Title
+                </div>
             </div>
             <div class="panel-body">
                 <div class="left">

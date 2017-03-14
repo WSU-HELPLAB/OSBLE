@@ -453,6 +453,32 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
 
             evt.Code = evt.Code.Replace("'", "''");
 
+            //not the best way to do this...
+            //TODO: modify the stored procedure to get the proper/updated data instead of this...
+            //we need to get more information from the event logs table and the stored procedure does not yet get this
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+
+                    string query = "SELECT * FROM EventLogs WHERE Id = @EventLogId ";
+
+                    var result = sqlConnection.Query(query, new { EventLogId = evt.EventLogId }).SingleOrDefault();
+
+                    if (result != null)
+                    {
+                        evt.IsAnonymous = result.IsAnonymous ?? false;
+                    }
+
+                    sqlConnection.Close();
+                }
+            }
+            catch (Exception)
+            {
+                //ignore for now
+            }
+
             return new AskForHelpEvent(evt.EventDate)
             {
                 EventId = evt.EventId,
@@ -461,7 +487,8 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                 Sender = GetUser(userDictionary, users, eventLog.SenderId),
                 Code = evt.Code,
                 SolutionName = evt.SolutionName,
-                UserComment = evt.UserComment
+                UserComment = evt.UserComment,
+                IsAnonymous = evt.IsAnonymous,
             };
         }
 
@@ -513,6 +540,32 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
             var evt = exceptions.SingleOrDefault(y => y.EventLogId == eventLog.EventLogId);
             if (evt == null) return null;
 
+            //not the best way to do this...
+            //TODO: modify the stored procedure to get the proper/updated data instead of this...
+            //we need to get more information from the event logs table and the stored procedure does not yet get this
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+
+                    string query = "SELECT * FROM EventLogs WHERE Id = @EventLogId ";
+
+                    var result = sqlConnection.Query(query, new { EventLogId = evt.EventLogId }).SingleOrDefault();
+
+                    if (result != null)
+                    {
+                        evt.IsAnonymous = result.IsAnonymous ?? false;
+                    }
+
+                    sqlConnection.Close();                    
+                }
+            }
+            catch (Exception)
+            {
+                //ignore for now
+            }
+
             return new FeedPostEvent(evt.EventDate)
             {
                 EventId = evt.EventId,
@@ -520,7 +573,8 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                 SenderId = eventLog.SenderId,
                 Sender = GetUser(userDictionary, users, eventLog.SenderId),
                 SolutionName = evt.SolutionName,
-                Comment = evt.Comment,                
+                Comment = evt.Comment,   
+                IsAnonymous = evt.IsAnonymous,
             };
         }
 
@@ -553,20 +607,71 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
 
             foreach (var c in comments)
             {
-                // fill up each comment event properties not returned by query
-                c.Sender = GetUser(userDictionary, users, c.SenderId);
-                c.SourceEvent = subjectEvent;
-                c.NumberHelpfulMarks = helpMarks.Count(y => y.LogCommentEventId == c.EventId);
-
-                // inflate the comment helpful marks for detail views
-                var commentMarks = helpMarks.Where(y => y.LogCommentEventId == c.EventId).ToList();
-                foreach (var h in commentMarks)
+                //not the best way to do this...
+                //TODO: modify the stored procedure to get the proper/updated data instead of this...
+                //we need to get more information from the event logs table and the stored procedure does not yet get this
+                try
                 {
-                    var helpMarkEventLog = eventLogs.Single(z => z.EventLogId == h.EventLogId);
-                    h.Sender = GetUser(userDictionary, users, helpMarkEventLog.SenderId);
-                    h.LogComment = c;
+                    using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                    {
+                        sqlConnection.Open();
+
+                        string query = "SELECT * FROM EventLogs WHERE Id = @EventLogId ";
+
+                        var result = sqlConnection.Query(query, new { EventLogId = c.EventLogId }).SingleOrDefault();
+
+                        if (result != null)
+                        {                            
+                            c.IsAnonymous = result.IsAnonymous ?? false;
+                        }
+
+                        sqlConnection.Close();
+                    }
                 }
+                catch (Exception)
+                {
+                    //ignore for now
+                }
+
+                if (c.IsAnonymous)
+                {
+                    // fill up each comment event properties not returned by query
+                    c.Sender = new UserProfile
+                    {
+                        ID = 0,
+                        FirstName = "Anonymous ",
+                        LastName = c.EventId.ToString(),
+                    };
+                    c.SourceEvent = subjectEvent;
+                    c.NumberHelpfulMarks = helpMarks.Count(y => y.LogCommentEventId == c.EventId);
+
+                    // inflate the comment helpful marks for detail views
+                    var commentMarks = helpMarks.Where(y => y.LogCommentEventId == c.EventId).ToList();
+                    foreach (var h in commentMarks)
+                    {
+                        var helpMarkEventLog = eventLogs.Single(z => z.EventLogId == h.EventLogId);
+                        h.Sender = GetUser(userDictionary, users, helpMarkEventLog.SenderId);
+                        h.LogComment = c;
+                    }
+                }
+                else
+                {
+                    // fill up each comment event properties not returned by query
+                    c.Sender = GetUser(userDictionary, users, c.SenderId);
+                    c.SourceEvent = subjectEvent;
+                    c.NumberHelpfulMarks = helpMarks.Count(y => y.LogCommentEventId == c.EventId);
+
+                    // inflate the comment helpful marks for detail views
+                    var commentMarks = helpMarks.Where(y => y.LogCommentEventId == c.EventId).ToList();
+                    foreach (var h in commentMarks)
+                    {
+                        var helpMarkEventLog = eventLogs.Single(z => z.EventLogId == h.EventLogId);
+                        h.Sender = GetUser(userDictionary, users, helpMarkEventLog.SenderId);
+                        h.LogComment = c;
+                    }
+                }                
             }
+
             return comments;
         }
 

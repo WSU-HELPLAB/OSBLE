@@ -56,6 +56,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
         public bool HideMail { get; set; }
         public string EventVisibilityGroups { get; set; }
         public string EventVisibleTo { get; set; }
+        public bool IsAnonymous { get; set; }
 
         public ActivityEvent() // NOTE!! This is required by Dapper ORM
         {
@@ -74,7 +75,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
         //    SolutionName = a.SolutionName;
         //}
 
-        public void SetPrivileges(CourseUser currentUser)
+        public void SetPrivileges(CourseUser currentUser, ActivityEvent activityEvent = null)
         {
             if (currentUser == null) 
             {
@@ -92,6 +93,11 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             } 
 
             bool anonymous = currentUser.AbstractRole.Anonymized;
+
+            if (activityEvent != null && activityEvent.IsAnonymous != null ? activityEvent.IsAnonymous : false)
+            {
+                anonymous = true;
+            }
 
             // Anyone can mail anyone but themselves (provided they're not anonimous)
             CanMail = !anonymous && SenderId != currentUser.UserProfileID;
@@ -184,7 +190,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             ShowProfilePicture = !anonymous;
 
             if (Sender != null)
-                DisplayTitle = Sender.DisplayName(currentUser);
+                DisplayTitle = Sender.DisplayName(currentUser);            
         }
     }
 }

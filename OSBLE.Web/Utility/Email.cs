@@ -27,23 +27,29 @@ namespace OSBLE.Utility
 
                 foreach (MailAddress recipient in to)
                 {
-                    MailMessage mm = new MailMessage();
+                    try
+                    {
+                        MailMessage mm = new MailMessage();
 
-                    mm.From = fromAddress;
-                    mm.To.Add(recipient);
-                    mm.Subject = subject;
-                    mm.Body = message;
-                    mm.IsBodyHtml = true;
-                    
-                    //TODO: possibly add file attachments!
-                    //add file attachments here
-                    //mm.Attachments
-                    //consider adding a reply to for mail items
-                    //mm.ReplyTo
+                        mm.From = fromAddress;
+                        mm.To.Add(recipient);
+                        mm.Subject = subject;
+                        mm.Body = message;
+                        mm.IsBodyHtml = true;
 
-                    //bomb's away!
-                    mailClient.Send(mm);
+                        //TODO: possibly add file attachments!
+                        //add file attachments here
+                        //mm.Attachments
+                        //consider adding a reply to for mail items
+                        //mm.ReplyTo
 
+                        //bomb's away!
+                        mailClient.Send(mm);
+                    }
+                    catch (System.Exception ex)
+                    {
+                        throw new System.Exception(string.Format("Failed to send email for recipient: {0} ", recipient.Address.ToString()), ex);
+                    }
                 }
 
                 mailClient.Dispose();
