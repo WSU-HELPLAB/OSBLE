@@ -724,10 +724,11 @@ namespace OSBLE.Controllers
         }
 
         public ActionResult SuggestionsSettings()
-        {
-            int userProfileId = ActiveCourseUser.UserProfileID;
+        {            
             try
             {
+                int userProfileId = ActiveCourseUser.UserProfileID;
+
                 using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
                 {
                     sqlConnection.Open();
@@ -735,8 +736,17 @@ namespace OSBLE.Controllers
                     string query = "SELECT * FROM OSBLEInterventionSettings WHERE UserProfileId = @UserProfileId ";
 
                     var results = sqlConnection.Query(query, new { UserProfileId = userProfileId }).SingleOrDefault();
-                    ViewBag.ShowSuggestionsWindow = results.ShowInIDESuggestions;
-                    ViewBag.RefreshThreshold = results.RefreshThreshold;
+                    if (results != null)
+                    {
+                        ViewBag.ShowSuggestionsWindow = results.ShowInIDESuggestions;
+                        ViewBag.RefreshThreshold = results.RefreshThreshold;
+                    }
+                    else
+                    {
+                        ViewBag.ShowSuggestionsWindow = true;
+                        ViewBag.RefreshThreshold = 10;
+                    }
+                    
                     sqlConnection.Close();
                 }
             }
