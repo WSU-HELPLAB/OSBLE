@@ -303,6 +303,16 @@ function FeedViewModel(userName, userId, current) {
     $.connection.hub.qs = { "userID": self.userId, "courseID": courseId };
     $.connection.hub.start();
     // *************************************
+    
+    self.GetRole = function (id, role) {               
+        
+        if (role == undefined || role == null) {            
+            var divId = "feed-item-" + id;
+            $("#" + divId).find(".display_name").removeAttr("href");
+            return "";
+        }
+        return " (" + role + ") ";
+    }
 
     self.MakePost = function () {
 
@@ -1124,6 +1134,7 @@ function ShowNewPostBadge(postID) {
 function HideNewPostBadge(postID) {
     $('#feed-item-' + postID + ' .new-post-badge').hide();
 }
+
 
 function ShowUserVisibilityDialog(item) {
     var namesAndIds = [];
