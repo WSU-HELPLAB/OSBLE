@@ -626,7 +626,6 @@ function DetailsViewModel(userName, userId, rootId) {
     $.connection.hub.start();
     // *************************************
 
-
     self.RequestUpdate = function () {
         $.ajax({
             type: "POST",
@@ -641,6 +640,16 @@ function DetailsViewModel(userName, userId, rootId) {
             }
         });
     };
+
+    self.GetRole = function (id, role) {
+
+        if (role == undefined || role == null) {
+            var divId = "feed-item-" + id;
+            $("#" + divId).find(".display_name").removeAttr("href");
+            return "";
+        }
+        return " (" + role + ") ";
+    }
 
     self.InEventVisibleToList = function (eventVisibleToList) {
 
