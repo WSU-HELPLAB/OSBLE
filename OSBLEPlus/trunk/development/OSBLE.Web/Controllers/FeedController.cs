@@ -96,7 +96,7 @@ namespace OSBLE.Controllers
                     ViewBag.IsInstructor = false;
 
                 ViewBag.EnableCustomPostVisibility = ConfigurationManager.AppSettings["EnableCustomPostVisibility"]; //<add key="EnableCustomPostVisibility" value="false"/> in web.config
-                
+
                 //check if interventions are enabled on this course
                 ViewBag.InterventionsEnabled = DBHelper.InterventionEnabledForCourse(ActiveCourseUser.AbstractCourseID);
 
@@ -185,7 +185,51 @@ namespace OSBLE.Controllers
 
             FeedViewModel vm = new FeedViewModel();
 
-            List<FeedItem> returnItems = _activityFeedQuery.Execute().ToList();
+            List<FeedItem> initialReturnItems = _activityFeedQuery.Execute().ToList();
+            List<FeedItem> returnItems = new List<FeedItem>();
+
+            // store the current End date so we can restore it later
+            DateTime temp = _activityFeedQuery.EndDate;
+
+            for (int i = 0; i < 10; i++)
+            {
+                //trim any posts the user is not a part of
+                foreach (FeedItem item in initialReturnItems)
+                {
+                    try
+                    {
+                        //filter out any posts that the current user should not be able to see
+                        string eventVisibleToList = DBHelper.GetEventLogVisibleToList(item.Event.EventLogId);
+
+                        if (eventVisibleToList != "" ? InEventVisibleToList(eventVisibleToList, ActiveCourseUser.UserProfileID) : true)
+                        {
+                            returnItems.Add(item);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        //do nothing for now.
+                    }
+                }
+
+                //get more posts if we don't have 20
+                if (returnItems.Count() >= 20)
+                    break; //we have 20, exit... otherwise try to get more posts.  
+
+                if (i != 9) //only clear the list if it's not the last iteration
+                {
+                    _activityFeedQuery.MaxQuerySize += 20;
+                    initialReturnItems = _activityFeedQuery.Execute().ToList();
+                    returnItems = new List<FeedItem>();    
+                }                
+            }
+
+            // restore the original end date and query size
+            _activityFeedQuery.EndDate = temp;
+            _activityFeedQuery.MaxQuerySize = 20;
+
+            //get top 20
+            returnItems = returnItems.Reverse<FeedItem>().Take(20).Reverse().ToList();
 
             // add senders to items
             using (SqlConnection sqlc = DBHelper.GetNewConnection())
@@ -198,17 +242,17 @@ namespace OSBLE.Controllers
                         UserProfile anonUserProfile = new UserProfile();
                         anonUserProfile.ID = f.Event.EventId;
                         anonUserProfile.FirstName = "Anonymous";
-                        anonUserProfile.LastName = f.Event.EventId.ToString();                       
+                        anonUserProfile.LastName = f.Event.EventId.ToString();
 
                         f.Event.Sender = anonUserProfile;
 
                         f.Event.SenderId = 0;
-                        f.Event.ShowProfilePicture = false;                        
+                        f.Event.ShowProfilePicture = false;
                     }
                     else
                     {
                         f.Event.Sender = DBHelper.GetUserProfile(f.Event.SenderId, sqlc);
-                    }                    
+                    }
                 }
             }
 
@@ -249,7 +293,7 @@ namespace OSBLE.Controllers
             {
                 vm.LastPollDate = DateTime.MinValue.AddDays(2);
             }
-            
+
             vm.Feed = aggregateFeed;
             vm.EventFilterOptions = ActivityFeedQuery.GetNecessaryEvents().OrderBy(e => e.ToString()).ToList();
             vm.UserEventFilterOptions = query.ActiveEvents;
@@ -319,7 +363,7 @@ namespace OSBLE.Controllers
 
         private object MakeLogCommentJsonObject(LogCommentEvent comment, Dictionary<int, bool> commentMarkedDictionary, SqlConnection sql = null)
         {
-            comment.SetPrivileges(ActiveCourseUser, (ActivityEvent) comment);
+            comment.SetPrivileges(ActiveCourseUser, (ActivityEvent)comment);
             comment.NumberHelpfulMarks = DBHelper.GetHelpfulMarksLogIds(comment.EventLogId, sql).Count;
             return new
             {
@@ -359,7 +403,7 @@ namespace OSBLE.Controllers
             }
 
             var eventLog = item.Items[0].Event;
-            eventLog.SetPrivileges(ActiveCourseUser ?? courseUser, (ActivityEvent) eventLog);
+            eventLog.SetPrivileges(ActiveCourseUser ?? courseUser, (ActivityEvent)eventLog);
 
             var comments = MakeCommentListJsonObject(item.Comments, eventLog.EventLogId, ActiveCourseUser != null ? ActiveCourseUser.UserProfileID : userProfileId);
             string viewFolder = details ? "Details/_" : "Feed/_";
@@ -415,6 +459,7 @@ namespace OSBLE.Controllers
                 EventVisibleTo = eventLog.EventVisibleTo,
                 EventType = eventLog.EventType.ToString(),
                 IsAnonymous = eventLog.IsAnonymous,
+                Role = DBHelper.GetRoleNameFromCourseAndUserProfileId(ActiveCourseUser.AbstractCourseID, eventLog.SenderId),
             };
         }
 
@@ -430,7 +475,7 @@ namespace OSBLE.Controllers
                     writer.AddAttribute(HtmlTextWriterAttribute.Class, "non-user-text");
                     writer.RenderBeginTag(HtmlTextWriterTag.Span);
                     writer.RenderBeginTag(HtmlTextWriterTag.Em);
-                    
+
                     if (eventLog.IsAnonymous)
                     {
                         writer.WriteEncodedText("Anonymous");
@@ -439,7 +484,7 @@ namespace OSBLE.Controllers
                     {
                         writer.WriteEncodedText(DBHelper.GetUserFirstNameFromEventLogId(eventLog.EventLogId));
                     }
-                    
+
                     writer.RenderEndTag();
                     writer.WriteEncodedText(" asked the following question: ");
                     writer.RenderEndTag();
@@ -525,20 +570,7 @@ namespace OSBLE.Controllers
             var obj = new { Feed = new List<dynamic>(), HasLastPost = vm.Feed.Count < _activityFeedQuery.MaxQuerySize };
             foreach (AggregateFeedItem item in vm.Feed)
             {
-                try
-                {
-                    //filter out any posts that the current user should not be able to see
-                    string eventVisibleToList = DBHelper.GetEventLogVisibleToList(item.Items[0].Event.EventLogId);
-
-                    if (eventVisibleToList != "" ? InEventVisibleToList(eventVisibleToList, ActiveCourseUser.UserProfileID) : true)
-                    {
-                        obj.Feed.Add(MakeAggregateFeedItemJsonObject(item, false));
-                    }
-                }
-                catch (Exception)
-                {
-                    obj.Feed.Add(MakeAggregateFeedItemJsonObject(item, false));
-                }
+                obj.Feed.Add(MakeAggregateFeedItemJsonObject(item, false));
             }
             return Json(obj, JsonRequestBehavior.AllowGet);
         }
@@ -840,10 +872,15 @@ namespace OSBLE.Controllers
             _activityFeedQuery.EndDate = temp;
             _activityFeedQuery.MaxQuerySize--;
 
-            // remove the first item, since it's already in the feed
+            // remove the first item, since it's already in the feed (NOTE; only seems to happen when we are serving the last post, doing so before then loses 1 post on the feed)            
             if (vm.Feed.Count > 0)
-                vm.Feed.RemoveAt(0);
-
+            {
+                bool hasLastPost = vm.Feed.Count < _activityFeedQuery.MaxQuerySize;
+                if (hasLastPost)
+                {
+                    vm.Feed.RemoveAt(0);    
+                }                
+            }
             return GetJsonFromViewModel(vm);
         }
 
@@ -1660,8 +1697,8 @@ namespace OSBLE.Controllers
             {
                 if (!nameIdPairs.ContainsKey(userProfile.ID.ToString()))
                 {
-                    nameIdPairs.Add(userProfile.ID.ToString(), userProfile.FullName);    
-                }                
+                    nameIdPairs.Add(userProfile.ID.ToString(), userProfile.FullName);
+                }
             }
             return Json(new { userProfiles = nameIdPairs });
         }

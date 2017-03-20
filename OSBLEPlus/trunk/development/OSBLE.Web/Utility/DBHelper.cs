@@ -1774,5 +1774,29 @@ namespace OSBLE.Utility
 
             return interventionsEnabled;
         }
+
+        internal static string GetRoleNameFromCourseAndUserProfileId(int courseId, int userProfileId)
+        {
+            string roleName = "User";
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+
+                    string query = "SELECT Name FROM AbstractRoles ar INNER JOIN CourseUsers cu ON ar.ID = cu.AbstractRoleID " +
+                                   "WHERE cu.AbstractCourseID = @CourseId AND cu.UserProfileID = @UserProfileId ";
+
+                    roleName = sqlConnection.Query<string>(query, new { CourseId = courseId, UserProfileId = userProfileId }).SingleOrDefault();                    
+
+                    sqlConnection.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                return "User";
+            }
+            return roleName;
+        }
     }
 }
