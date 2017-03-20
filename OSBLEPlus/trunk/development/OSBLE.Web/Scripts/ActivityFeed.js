@@ -915,7 +915,10 @@ function MakePostSucceeded(newPost) {
 }
 
 function ConfigureAnonymousSettings(post) {
-    if (post.IsAnonymous) {        
+    if (post.IsAnonymous) {
+        post.SenderId = 0;
+        post.ActiveCourseUserId = 0;
+        post.Role = "User";
         post.AnonSenderId = 0;
         post.AnonShowPicture = false;
         post.AnonHideMail = true;
@@ -965,6 +968,15 @@ function PostReplySucceeded(item, dataList) {
     // hide the reply form
     $("#btn-reply-" + item.eventId).show();
     $("#feed-reply-" + item.eventId).hide();
+
+    //clean up anon reply details before pushing to the hub
+    for (var i = 0; i < dataList.length; i++) {
+        if (dataList[i].SenderName.indexOf("Anonymous") != -1) { //match
+            dataList[i].SenderName = "Anonymous User";
+            dataList[i].SenderId = 0;
+            dataList[i].ActiveCourseUserId = 0;
+        }
+    }
 
     // notify everyone that a reply was made
     vm.hub.server.notifyNewReply(item.eventId, dataList);
