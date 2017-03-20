@@ -572,7 +572,20 @@ namespace OSBLE.Controllers
             {
                 obj.Feed.Add(MakeAggregateFeedItemJsonObject(item, false));
             }
-            return Json(obj, JsonRequestBehavior.AllowGet);
+            //return Json(obj, JsonRequestBehavior.AllowGet);
+            return Json(obj, null, null, JsonRequestBehavior.AllowGet);
+        }
+
+        protected override JsonResult Json(object data, string contentType, System.Text.Encoding contentEncoding, JsonRequestBehavior behavior)
+        {
+            return new JsonResult()
+            {
+                Data = data,
+                ContentType = contentType,
+                ContentEncoding = contentEncoding,
+                JsonRequestBehavior = behavior,
+                MaxJsonLength = Int32.MaxValue
+            };
         }
 
         private JsonResult GetJsonFromViewModel(FeedDetailsViewModel vm)
