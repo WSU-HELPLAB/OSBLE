@@ -391,6 +391,7 @@ namespace OSBLE.Controllers
                 NumberHelpfulMarks = comment.NumberHelpfulMarks,
                 ActiveCourseUserId = ActiveCourseUser.UserProfileID,
                 EventVisibleTo = comment.EventVisibleTo,
+                Role = DBHelper.GetRoleNameFromCourseAndUserProfileId(ActiveCourseUser.AbstractCourseID, comment.SenderId),
             };
         }
 
@@ -548,8 +549,6 @@ namespace OSBLE.Controllers
 
             // get all the eventLogIds for the comments passed in
             List<int> commentIds = comments.Select(comment => comment.EventLogId).ToList();
-
-
 
             using (SqlConnection sql = DBHelper.GetNewConnection())
             {
