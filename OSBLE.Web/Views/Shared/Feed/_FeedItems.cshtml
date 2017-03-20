@@ -64,7 +64,14 @@
             </div>
 
             @* Display Name & Date/Time *@
-            <a class="display_name" data-bind="text: senderName, attr: {href: '/Profile/Index/' + senderId}"></a>
+            <!-- ko ifnot: options.isAnonymous -->
+            <a class="display_name" data-bind=" text: senderName, attr: {href: '/Profile/Index/' + senderId}"></a>
+            <span data-bind="text: '(' + role + ')'" style="color: #074974; font-style: italic; font-size: small;"></span>
+            <!-- /ko -->
+            <!-- ko if: options.isAnonymous -->
+            <span class="display_name" style="color: #074974;" data-bind=" text: senderName"></span>            
+            <!-- /ko -->
+            
             <span class="feed-item-date" data-bind="text: timeString()"></span>
 
             @if (!isComment)

@@ -75,7 +75,7 @@ namespace OSBLE.Models
         public static string VisibilityInstructorsAndTAs = "Your post will be visible to only yourself, instructors, and TAs.";
         public static string VisibilitySelectedUsers = "Your post will be visible to only the selected users.";
 
-        public static string AnonymousPost = "Your post will be anonymized by removing your name from public view. NOTE: Checking the anonymous option will reset post visibility to 'Everyone'";
+        public static string AnonymousPost = "Your post will be anonymized by hiding your name from public view. NOTE: Using the anonymous option will force post visibility to 'Everyone'";
 
         #endregion
 

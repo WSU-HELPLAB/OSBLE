@@ -20,6 +20,7 @@ function FeedItem(data) {
     self.idString = data.IdString; // used for items with multiple ids
     self.activeCourseUserId = data.ActiveCourseUserId;
     self.eventType = data.EventType;
+    self.role = data.Role;
 
     // load Comments
     self.comments = ko.observableArray([]);
@@ -359,8 +360,12 @@ function FeedViewModel(userName, userId, current) {
             dataType: "json",
             data: { endDate: lastDate, keywords: self.keywords(), events: GetCheckedEvents() },
             success: function (data) {
-                $.each(data.Feed, function (index, value) {
-                    self.items.push(new FeedItem(value));
+                $.each(data.Feed, function (index, value) {                    
+                    var newFeedItem = new FeedItem(value);
+                    var lastIndex = self.items().length - 1;                    
+                    if (self.items()[lastIndex].eventId != newFeedItem.eventId) { //only push if it's not already on the feed
+                        self.items.push(newFeedItem);
+                    }                    
                 });
                 if (data.HasLastPost) {
                     $('#load-old-posts').addClass('disabled');;
