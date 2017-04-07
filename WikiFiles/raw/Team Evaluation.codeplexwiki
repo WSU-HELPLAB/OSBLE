@@ -1,0 +1,1 @@
+The instructor can specify on the course page whether to be notified when team member evaluations differ by more than X percent.  
