@@ -3,6 +3,7 @@
 	[UserProfileId] [int] NOT NULL,
 	[RefreshInterventions] [bit] NOT NULL,
 	[LastRefresh] [datetime] NULL,
+	[RefreshInterventionsDashboard] BIT NULL,
  CONSTRAINT [PK_OSBLEInterventionsStatus] PRIMARY KEY CLUSTERED 
 (
 	[UserProfileId] ASC
