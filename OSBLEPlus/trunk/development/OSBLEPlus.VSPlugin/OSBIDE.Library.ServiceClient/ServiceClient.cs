@@ -30,8 +30,7 @@ namespace OSBIDE.Library.ServiceClient
         #region instance variables
 
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
-        public event EventHandler ReceivedNewSocialActivity = delegate { };
-        public event EventHandler InterventionUpdate = delegate { };
+        public event EventHandler ReceivedNewSocialActivity = delegate { };        
 
         private readonly ILogger _logger;
 
@@ -42,11 +41,6 @@ namespace OSBIDE.Library.ServiceClient
         private bool _isCollectingDate = true;
 
         #endregion
-
-        //used to open the intervention window based on activity results.
-        dynamic _toolWindowManager;
-        //method to open/refresh the window
-        //_toolWindowManager.OpenInterventionWindow();
 
         #region properties
 
@@ -103,13 +97,8 @@ namespace OSBIDE.Library.ServiceClient
 
         #region constructor
 
-        private ServiceClient(EventHandlerBase dteEventHandler, ILogger logger, dynamic staticToolManager = null)
+        private ServiceClient(EventHandlerBase dteEventHandler, ILogger logger)
         {
-            if (staticToolManager != null)
-            {
-                _toolWindowManager = staticToolManager;
-            }
-
             var events = dteEventHandler;
             _logger = logger;
 
@@ -137,9 +126,9 @@ namespace OSBIDE.Library.ServiceClient
         /// <param name="dteEventHandler"></param>
         /// <param name="logger"></param>
         /// <returns></returns>
-        public static ServiceClient GetInstance(EventHandlerBase dteEventHandler, ILogger logger, dynamic staticToolManager = null)
+        public static ServiceClient GetInstance(EventHandlerBase dteEventHandler, ILogger logger)
         {
-            return _instance ?? (_instance = new ServiceClient(dteEventHandler, logger, staticToolManager));
+            return _instance ?? (_instance = new ServiceClient(dteEventHandler, logger));
         }
 
         /// <summary>
@@ -419,13 +408,6 @@ namespace OSBIDE.Library.ServiceClient
         /// <param name="e"></param>        
         private void OsbideEventCreated(object sender, EventCreatedArgs e)
         {
-            //TODO: move this to the proper location and check status first (refactor)
-            //notify client of new social activity
-            //if (InterventionUpdate != null)
-            //{
-            //    InterventionUpdate(this, EventArgs.Empty);
-            //}
-
             //create a new event log...
             SendStatus.IsActive = false;
 
@@ -445,8 +427,7 @@ namespace OSBIDE.Library.ServiceClient
                             _logger.WriteToLog(string.Format("SendToServer Error: {0}", ex.Message), LogPriority.HighPriority);                            
                         }
                     }
-                    );                
-
+                    );
             }
             else
             {
@@ -546,6 +527,6 @@ namespace OSBIDE.Library.ServiceClient
             return request;
         }
 
-        #endregion        
+        #endregion    
     }
 }

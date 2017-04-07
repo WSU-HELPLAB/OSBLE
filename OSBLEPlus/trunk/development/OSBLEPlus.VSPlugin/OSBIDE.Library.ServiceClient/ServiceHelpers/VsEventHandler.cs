@@ -18,6 +18,8 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
 {
     public class VsEventHandler : EventHandlerBase
     {
+        public event EventHandler InterventionUpdate = delegate { };
+
         /// <summary>
         /// These events constantly fire and are of no use to us.
         /// </summary>
@@ -39,24 +41,13 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             BreakAtFunction = 311,
             EditorClick = 769
         };
-
-        //used to open the intervention window based on activity results.
-        dynamic _toolWindowManager;
-        //method to open/refresh the window
-        //_toolWindowManager.OpenInterventionWindow();
-
-        //use this to make sure we process the intervention after the last event was logged.
-        private const int intervention_processing_delay_ms = 2000;
+        
         private readonly ObjectCache _cache = new FileCache(StringConstants.LocalCacheDirectory, new ObjectBinder());
         private readonly ILogger _logger;
 
-        public VsEventHandler(IServiceProvider serviceProvider, IEventGenerator osbideEvents, dynamic staticToolWindowManager = null)
+        public VsEventHandler(IServiceProvider serviceProvider, IEventGenerator osbideEvents)
             : base(serviceProvider, osbideEvents)
-        {
-            if (staticToolWindowManager != null)
-            {
-                _toolWindowManager = staticToolWindowManager;
-            }
+        {            
         }
 
         private Command GetCommand(string guid, int id)
@@ -86,45 +77,6 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             NotifyEventCreated(this, new EventCreatedArgs(evt));
         }
 
-        //Moved into VsEventHnlder.cs from EventHanlderBase so it would have access to the intervention window triggering
-        public override void SolutionOpened()
-        {
-            try
-            {
-                //Load exception handling on each project open.  Note that I'm only
-                //loading C related groups as loading the entire collection takes
-                //a very (10+ minute) long time to load.
-                var debugger = (EnvDTE90.Debugger3)Dte.Debugger;
-                string[] exceptionGroups = { "C++ Exceptions", "Win32 Exceptions", "Native Run-Time Checks" };
-
-                if (debugger == null || debugger.ExceptionGroups == null) return;
-
-                foreach (EnvDTE90.ExceptionSettings settings in debugger.ExceptionGroups)
-                {
-                    var settingsName = settings.Name;
-                    if (!exceptionGroups.Contains(settingsName)) continue;
-
-                    foreach (EnvDTE90.ExceptionSetting setting in settings)
-                    {
-                        settings.SetBreakWhenThrown(true, setting);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.WriteToLog(string.Format("SolutionOpened(): method: {0}: error: {1}", "crashed while loading exception handling portion", ex.Message), LogPriority.HighPriority);
-            }           
-
-            //try
-            //{
-            //    CheckInterventionStatus("SolutionOpened");
-            //}
-            //catch (Exception ex)
-            //{
-            //    _logger.WriteToLog(string.Format("CheckInterventionStatus(): method: {0}: error: {1}", "SolutionOpened", ex.Message), LogPriority.HighPriority);
-            //}
-        }
-
         public override void SolutionSubmitted(object sender, SubmitAssignmentArgs e)
         {
             base.SolutionSubmitted(sender, e);
@@ -139,17 +91,10 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             //let others know that we have a new event
             NotifyEventCreated(this, new EventCreatedArgs(submit));
 
-            try
-            {
-                CheckInterventionStatus("SolutionSubmitted");
-            }
-            catch (Exception ex)
-            {
-                _logger.WriteToLog(string.Format("CheckInterventionStatus(): method: {0}: error: {1}", "SolutionSubmitted", ex.Message), LogPriority.HighPriority);
-            }
+            CheckInterventionStatus();
         }
 
-        public override void DocumentSaved(Document document)
+        public async override void DocumentSaved(Document document)
         {
             base.DocumentSaved(document);
             var save = new SaveEvent
@@ -161,14 +106,7 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             //let others know that we have a new event
             NotifyEventCreated(this, new EventCreatedArgs(save));
 
-            try
-            {
-                CheckInterventionStatus("DocumentSaved");
-            }
-            catch (Exception ex)
-            {
-                _logger.WriteToLog(string.Format("CheckInterventionStatus(): method: {0}: error: {1}", "DocumentSaved", ex.Message), LogPriority.HighPriority);
-            }
+            CheckInterventionStatus();
         }
 
         public override void OnBuildDone(vsBuildScope scope, vsBuildAction action)
@@ -235,14 +173,7 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             //let others know that we have created a new event
             NotifyEventCreated(this, new EventCreatedArgs(build));
 
-            try
-            {
-                CheckInterventionStatus("OnBuildDone");
-            }
-            catch (Exception ex)
-            {
-                _logger.WriteToLog(string.Format("CheckInterventionStatus(): method: {0}: error: {1}", "OnBuildDone", ex.Message), LogPriority.HighPriority);
-            }
+            CheckInterventionStatus();
         }
 
         public override void GenericCommand_AfterCommandExecute(string guid, int id, object customIn, object customOut)
@@ -270,14 +201,7 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
                         eventLogWatcher.Enabled = true;
                     }
 
-                    try
-                    {
-                        CheckInterventionStatus(oEvent.EventType.ToString());
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.WriteToLog(string.Format("CheckInterventionStatus(): method: {0}: error: {1}", "GenericCommand_AfterCommandExecute", ex.Message), LogPriority.HighPriority);
-                    }
+                    CheckInterventionStatus();
                 }
             }
         }
@@ -302,14 +226,7 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
                 };
                 NotifyEventCreated(this, new EventCreatedArgs(activity));
 
-                try
-                {
-                    CheckInterventionStatus("EditorLineChanged");
-                }
-                catch (Exception ex)
-                {
-                    _logger.WriteToLog(string.Format("CheckInterventionStatus(): method: {0}: error: {1}", "EditorLineChanged", ex.Message), LogPriority.HighPriority);
-                }
+                CheckInterventionStatus();
             }
         }
 
@@ -369,14 +286,7 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             ex.SolutionName = Dte.Solution.FullName;
             NotifyEventCreated(this, new EventCreatedArgs(ex));
 
-            try
-            {
-                CheckInterventionStatus("HandleException");
-            }
-            catch (Exception e)
-            {
-                _logger.WriteToLog(string.Format("CheckInterventionStatus(): method: {0}: error: {1}", "HandleException", e.Message), LogPriority.HighPriority);
-            }
+            CheckInterventionStatus();
         }
 
         public override void NETErrorEventRecordWritten(object sender, System.Diagnostics.Eventing.Reader.EventRecordWrittenEventArgs e)
@@ -398,272 +308,145 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
 
                 int code = int.Parse(data[6], System.Globalization.NumberStyles.HexNumber);
 
-                // TODO: find name/type of exception from code    
-
+                // TODO: find name/type of exception from code 
 
                 EnvDTE.dbgExceptionAction action = dbgExceptionAction.dbgExceptionActionBreak;
                 HandleException("Unknown Exception Type", "Unhandled exception", code, "The program encountered an unhandled run-time exception.", ref action);
-
             }
         }
 
-        #endregion
+        #endregion        
+
+
 
         #region OSBLE+ Suggestions specific code
 
-        //delay check to make sure other events have finished being logged
-        async System.Threading.Tasks.Task DelayCheck()
+        private async void CheckInterventionStatus()
         {
-            await System.Threading.Tasks.Task.Delay(intervention_processing_delay_ms);
-        }
-
-        private async void OpenInterventionWindow(string caption = "", string customUrl = "")
-        {
-            try
-            {
-                await DelayCheck();
+            try //prevent this from crashing the plugin
+            {                
+                if (InterventionUpdate != null)
+                {
+                    if (_cache.Contains("ShowSuggestionsWindow") && _cache["ShowSuggestionsWindow"].ToString() == "True")
+                    {
+                        bool updateInterventionWindow = await UpdateInterventionWindow();
+                        if (updateInterventionWindow) //notify client of new suggestions
+                        {
+                            InterventionUpdate(this, EventArgs.Empty);
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
-                _logger.WriteToLog(string.Format("OpenInterventionWindow() DelayCheck(): method: {0}: error: {1}", caption, ex.Message), LogPriority.HighPriority);                
-            }
-            try
-            {
-                _toolWindowManager.OpenInterventionWindow(null, caption, customUrl);
-            }
-            catch (Exception ex)
-            {
-                _logger.WriteToLog(string.Format("OpenInterventionWindow() _toolWindowManager.OpenInterventionWindow(): method: {0}: error: {1}", caption, ex.Message), LogPriority.HighPriority);                
-            }            
+                _logger.WriteToLog(string.Format("OpenInterventionToolWindow() in VsEventHandler Error: {0}", ex.Message), LogPriority.HighPriority);
+            } 
         }
 
-        private async void CheckInterventionStatus(string caption = "")
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="caption"></param>
+        /// <returns></returns>
+        private async Task<bool> UpdateInterventionWindow(string caption = "")
         {
             bool processIntervention = false;
+
+            //We should not get here with any of these caches not containing the key... but we'll check just in case!
+            if (!_cache.Contains("LastRefreshTime"))
+            {
+                _cache["LastRefreshTime"] = DateTime.Now.ToString(); //default to now
+            }
+
+            if (!_cache.Contains("InterventionRefreshThresholdInMinutes"))
+            {
+                _cache["InterventionRefreshThresholdInMinutes"] = 10;  //default to 10 minutes
+            }
+
+            //check the last time they refreshed
+            DateTime LastRefreshTime = DateTime.Parse(_cache["LastRefreshTime"].ToString());
+            //refresh threshold
+            int RefreshThreshold = int.Parse(_cache["InterventionRefreshThresholdInMinutes"].ToString());
+
             try
             {
-                processIntervention = await CheckInterventionRefreshStatus(caption);
+                processIntervention = await CheckInterventionRefreshStatus(LastRefreshTime, RefreshThreshold, caption);
             }
             catch (Exception ex)
             {
                 processIntervention = false;
-                _logger.WriteToLog(string.Format("CheckInterventionStatus() CheckInterventionRefreshStatus(): method: {0}: error: {1}", caption, ex.Message), LogPriority.HighPriority);
+                _logger.WriteToLog(string.Format("UpdateInterventionWindow(): method: {0}: error: {1}", caption, ex.Message), LogPriority.HighPriority);
             }
 
-            if (processIntervention)
-            {
-                try
-                {
-                    OpenInterventionWindow("New: " + DateTime.Now.ToShortTimeString()); //we are using .Now because the time will be relative to their system
-                }
-                catch (Exception ex)
-                {
-                    _logger.WriteToLog(string.Format("CheckInterventionStatus(): method: {0}: error: {1}", caption, ex.Message), LogPriority.HighPriority);
-                }
-            }
+            return processIntervention;
         }
 
-        /// <summary>
-        /// Checks intervention status, if needed, re-opens/refreshes the intervention window
-        /// </summary>
-        /// <param name="caption"></param>        
-        private async Task<bool> CheckInterventionRefreshStatus(string interventionTrigger = "")
+        private async Task<bool> CheckInterventionRefreshStatus(DateTime lastRefreshTime, int refreshThreshold = 10, string interventionTrigger = "")
         {
             try
             {
-                //first check if interventions are enabled
-                bool interventionsEnabled = false;
-                if (!_cache.Contains("InterventionsEnabled"))
-                {
-                    interventionsEnabled = await InterventionsEnabled();
-                }
-                else
-                {
-                    try
-                    {
-                        DateTime CheckThreshold = DateTime.Now.AddHours(-1);
-                        DateTime LastRefreshTime = DateTime.Parse(_cache["InterventionsEnabledRefreshedTime"].ToString());
-                        if (_cache["InterventionsEnabled"].ToString() == "false" && LastRefreshTime < CheckThreshold) //check again if the last refresh was over an hour ago
-                        {
-                            interventionsEnabled = await InterventionsEnabled();
-                        }
-                        else
-                        {
-                            if (_cache["InterventionsEnabled"].ToString() == "true")
-                            {
-                                interventionsEnabled = true;
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.WriteToLog(string.Format("LastRefreshTime check: {0}: error: {1}", "CheckInterventionRefreshStatus", ex.Message), LogPriority.HighPriority);
-                    }
-                }
-
-                //process if interventions are enabled
-                if (interventionsEnabled)
-                {
-                    bool overrideRefresh = OverrideRefreshStatus(interventionTrigger);
-
-                    try
-                    {
-                        //now setup refresh threshold
-                        if (!_cache.Contains("InterventionRefreshThresholdInMinutes"))
-                        {
-                            await SetupInterventionRefreshThreshold();
-                        }
-                        else
-                        {
-                            int interventionRefreshThresholdInMinutes = int.Parse(_cache["InterventionRefreshThresholdInMinutes"].ToString());
-                            DateTime CheckThreshold = DateTime.Now.AddHours(-1);
-                            DateTime LastRefreshTime = DateTime.Parse(_cache["LastInterventionRefreshTimeThreshold"].ToString());
-
-                            if (interventionRefreshThresholdInMinutes == 5 || LastRefreshTime < CheckThreshold) //default value or check again if the last refresh was over an hour ago
-                            {
-                                await SetupInterventionRefreshThreshold();
-                            }
-                        }
-
-                        //now see if we need to refresh
-                        if (_cache.Contains("InterventionRefresh") && _cache.Contains(StringConstants.AuthenticationCacheKey) && _cache.Contains("InterventionRefreshThresholdInMinutes"))
-                        {
-                            int refreshThreshold = int.Parse(_cache["InterventionRefreshThresholdInMinutes"].ToString());
-
-                            string lastRefresh = _cache["InterventionRefresh"] as string;
-                            DateTime lastRefreshDT = DateTime.Parse(lastRefresh);
-                            DateTime timeNow = DateTime.Now;
-
-                            TimeSpan difference = (timeNow - lastRefreshDT);
-
-                            if (difference.TotalMinutes >= refreshThreshold || overrideRefresh) //TODO: check threshold for refreshing
-                            {
-                                string authKey = _cache[StringConstants.AuthenticationCacheKey] as string;
-                                var task = AsyncServiceClient.ProcessIntervention(authKey);
-                                var result = await task;
-                                if (result == "true" || overrideRefresh)
-                                {
-                                    _cache["InterventionRefresh"] = DateTime.Now.ToString();
-                                    return true;
-                                }
-                            }
-                            //else do nothing
-                        }
-                        else //create the cache entry so it can be found for the next check, set it to now minus a day so we will be sure to check intervention status the first time the cache is built
-                        {
-                            _cache["InterventionRefresh"] = DateTime.Now.AddDays(-1).ToString();
-
-                            //set up the refresh threshold if we, somehow, don't have it already set by this point...
-                            if (!_cache.Contains("InterventionRefreshThresholdInMinutes"))
-                                await SetupInterventionRefreshThreshold();
-
-                            return false;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.WriteToLog(string.Format("CheckInterventionRefreshStatus() error: {0}", ex.Message), LogPriority.HighPriority);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.WriteToLog(string.Format("CheckInterventionRefreshStatus() catch-all error: {0}", ex.Message), LogPriority.HighPriority);
-            }
-            
-            return false;
-        }
-
-        private async Task<bool> SetupInterventionRefreshThreshold()
-        {
-            try
-            {
+                bool overrideRefresh = OverrideRefreshStatus(interventionTrigger);
                 if (_cache.Contains(StringConstants.AuthenticationCacheKey))
                 {
-                    var result = AsyncServiceClient.GetUserSetInterventionRefreshThresholdValue(_cache[StringConstants.AuthenticationCacheKey] as string);
-                    _cache["InterventionRefreshThresholdInMinutes"] = await result;
-                    _cache["LastInterventionRefreshTimeThreshold"] = DateTime.Now.ToString();
-                    return true;
+                    if ((DateTime.Now - lastRefreshTime).TotalMinutes >= refreshThreshold || overrideRefresh)
+                    {
+                        string authKey = _cache[StringConstants.AuthenticationCacheKey] as string;
+                        var task = AsyncServiceClient.ProcessIntervention(authKey);
+                        var result = await task;
+                        if (result == "true" || overrideRefresh)
+                        {
+                            _cache["LastRefreshTime"] = DateTime.Now.ToString();
+                            return true;
+                        }
+                    }
                 }
-                else
-                {
-                    var result = AsyncServiceClient.GetInterventionRefreshThresholdValue();
-                    _cache["InterventionRefreshThresholdInMinutes"] = await result;
-                    _cache["LastInterventionRefreshTimeThreshold"] = DateTime.Now.ToString();
-                    return true;
-                }                
             }
             catch (Exception ex)
             {
-                _cache["InterventionRefreshThresholdInMinutes"] = 5;
-                _logger.WriteToLog(string.Format("SetupInterventionRefreshThreshold() error: {0}", ex.Message), LogPriority.HighPriority);
-                return false;
+                _logger.WriteToLog(string.Format("CheckInterventionRefreshStatus() error: {0}", ex.Message), LogPriority.HighPriority);
             }
-        }
 
-        private async Task<bool> InterventionsEnabled()
-        {
-            try
-            {
-                var task = AsyncServiceClient.InterventionsEnabled();
-                _cache["InterventionsEnabled"] = await task;
-                _cache["InterventionsEnabledRefreshedTime"] = DateTime.Now.ToString();
-                if (task.Result == "true")
-                    return true;
-                else
-                    return false;
-            }
-            catch (Exception ex)
-            {
-                _logger.WriteToLog(string.Format("InterventionsEnabled() error: {0}", ex.Message), LogPriority.HighPriority);
-                return false;
-            }
+            return false;
         }
 
         private bool OverrideRefreshStatus(string interventionTrigger)
         {
+            //removed previous logic but leaving trigger in for now in case we want to add additional override logic.
             try
             {
-                switch (interventionTrigger)
+                bool openWindow = false;
+                try
                 {
-                    case "SolutionOpened":
-                        return true;
-                        break;
-                    default:
-                        bool openWindow = false;
-                        try
+                    //if they just submitted we want to go ahead and refresh
+                    if (_cache.Contains("LastSubmitTime"))
+                    {
+                        //process
+                        string lastSubmit = _cache["LastSubmitTime"] as string;
+                        DateTime lastSubmitDateTime = DateTime.Parse(lastSubmit);
+
+                        TimeSpan difference = (DateTime.Now - lastSubmitDateTime);
+
+                        if (Math.Abs(difference.TotalMinutes) <= 10) //If they submitted within the last 10 minutes go ahead and refresh
                         {
-                            //if they just submitted we want to go ahead and refresh
-                            if (_cache.Contains("LastSubmitTime"))
-                            {
-                                //process
-                                string lastSubmit = _cache["LastSubmitTime"] as string;
-                                DateTime lastSubmitDateTime = DateTime.Parse(lastSubmit);
-
-                                TimeSpan difference = (DateTime.Now - lastSubmitDateTime);
-
-                                if (Math.Abs(difference.TotalMinutes) <= 10) //If they submitted within the last 10 minutes go ahead and refresh
-                                {
-                                    openWindow = true;
-                                    _cache["LastSubmitTime"] = DateTime.Now.AddDays(-1).ToString(); //change the last submit so we don't do this again on the next event
-                                }
-                            }
+                            openWindow = true;
+                            _cache["LastSubmitTime"] = DateTime.Now.AddDays(-1).ToString(); //change the last submit so we don't do this again on the next event
                         }
-                        catch (Exception ex)
-                        {
-                            _logger.WriteToLog(string.Format("OverrideRefreshStatus() error: {0}", ex.Message), LogPriority.HighPriority);
-                        }
-
-                        return openWindow;
-                        break;
+                    }
                 }
+                catch (Exception ex)
+                {
+                    _logger.WriteToLog(string.Format("OverrideRefreshStatus() error: {0}", ex.Message), LogPriority.HighPriority);
+                }
+
+                return openWindow;
             }
             catch (Exception ex)
             {
                 _logger.WriteToLog(string.Format("OverrideRefreshStatus() error: {0}", ex.Message), LogPriority.HighPriority);
                 return false;
-            }            
+            }
         }
         #endregion
+
     }
 }

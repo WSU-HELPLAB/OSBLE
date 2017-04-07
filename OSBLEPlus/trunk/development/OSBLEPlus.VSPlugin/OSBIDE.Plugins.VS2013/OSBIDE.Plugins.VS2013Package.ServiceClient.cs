@@ -9,13 +9,14 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
 {
     public sealed partial class OsbidePluginsVs2013Package
     {
-        private void SetupServiceClient(OsbideToolWindowManager staticToolManager = null)
+        private void SetupServiceClient()
         {            
-            _eventHandler = new VsEventHandler(this, EventGenerator.GetInstance(), staticToolManager); //need the toolManager to open the intervention window
-            _client = ServiceClient.GetInstance(_eventHandler, _errorLogger, staticToolManager);
+            _eventHandler = new VsEventHandler(this, EventGenerator.GetInstance()); //need the toolManager to open the intervention window
+            _eventHandler.InterventionUpdate += InterventionReceivedUpdate;
+
+            _client = ServiceClient.GetInstance(_eventHandler, _errorLogger);
             _client.PropertyChanged += ServiceClientPropertyChanged;
-            _client.ReceivedNewSocialActivity += ServiceClientReceivedSocialUpdate;
-            _client.InterventionUpdate += InterventionReceivedUpdate;
+            _client.ReceivedNewSocialActivity += ServiceClientReceivedSocialUpdate;                        
         }
         void ServiceClientPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -29,7 +30,7 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
 
         void InterventionReceivedUpdate(object sender, EventArgs e)
         {
-            OpenToolWindow();
+            OpenInterventionToolWindow();
         }
     }
 }

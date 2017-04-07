@@ -70,7 +70,7 @@
     <script type="text/javascript" src="@Url.Content("~/Scripts/knockout-3.3.0.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/knockout-switch-case.js")"></script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.signalR-2.2.0.min.js")"></script>
-    <script type="text/javascript" src="@Url.Content("~/Scripts/ActivityFeed.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/ActivityFeed.js")?version=1.01"></script>
 
     @*datatable scripts*@
     <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.dataTables.js")"></script>    
@@ -94,8 +94,8 @@
     @* autocomplete block end *@
 
     @RenderSection("Header", required: false)
-    @RenderSection("SubHeader", required: false)
-        
+    @RenderSection("SubHeader", required: false)        
+   
 </head>
 <body>
 

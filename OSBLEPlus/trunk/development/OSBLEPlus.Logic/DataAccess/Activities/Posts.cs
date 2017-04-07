@@ -66,8 +66,9 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                         OSBLE.Models.FileSystem.Directories.GetAssignmentWithId(submit.CourseId ?? 1
                             , submit.AssignmentId, teamId).AddFile(string.Format("{0}-{1}.zip", submit.Sender.FullName, submitTimestampInCourseTime), zipStream);                        
                     }
-                    catch (ZipException)
+                    catch (ZipException ze)
                     {
+                        throw new Exception("SaveToFileSystem() failure...", ze);
                     }
                 }
             }

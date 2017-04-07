@@ -52,13 +52,7 @@ namespace OSBLE.Hubs
             if (cu == null)
                 return;
 
-            //push the message to all active courses the user is involved in
-            //do this because we want them to see the notification regardless of course they are in.
-            List<int> activeCourses = DBHelper.GetActiveCourseIds(userProfileId);
-            foreach (int id in activeCourses)
-            {
-                Clients.Group(id.ToString()).notifyNewSuggestion(userProfileId);                
-            }
+            Clients.Group(courseId.ToString()).notifyNewSuggestion(userProfileId);
         }
 
         public void NotifyNewReply(int postID, object replyList)

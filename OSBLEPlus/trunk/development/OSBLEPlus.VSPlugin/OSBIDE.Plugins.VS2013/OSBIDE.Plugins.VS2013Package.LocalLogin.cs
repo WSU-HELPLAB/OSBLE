@@ -42,48 +42,36 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
         }
 
         private async void Login(string userName, string password)
-        {            
-            //try //configure community window
-            //{
-            //    var task = AsyncServiceClient.CommunityStatus();
-            //    var result = await task;
-            //    if(String.Equals("true", result))
-            //    {
-            //        if (_cache.Contains("community"))
-            //            _cache["community"] = true;
-            //        else
-            //            _cache.Add("community", true, DateTime.UtcNow.Date.AddDays(1));
-            //    }
-            //    else
-            //    {
-            //        if (_cache.Contains("community"))
-            //        {
-            //            _cache.Remove("community");
-            //            _cache.Add("community", false, DateTime.UtcNow.Date.AddDays(-1));
-            //        }
-
-            //        else
-            //        {
-            //            _cache.Add("community", false, DateTime.UtcNow.Date.AddDays(-1));
-            //        }
-            //        _manager.CloseCommunityWindow();
-                        
-            //    }
-            //}
-            //catch (Exception e)
-            //{
-            //    //do nothing for now, keep community disabled
-            //}
-
+        {
             try
             {
                 var task = AsyncServiceClient.Login(userName, password);
                 var result = await task;
-                Init_BrowserLogin(result);
+
+                //setup intervention window cache
+                bool showInterventionWindow = false;
+                try //we don't want this to cause any issue if it fails...
+                {
+                    var settingsTask = AsyncServiceClient.GetUserInterventionSettings(result); //result is the authkey
+                    var settingsResult = await settingsTask;
+                    showInterventionWindow = settingsResult.ShowInIDE;
+                    //setup cache for intervention settings
+                    _cache["ShowSuggestionsWindow"] = showInterventionWindow.ToString();
+                    //refresh threshold                    
+                    _cache["InterventionRefreshThresholdInMinutes"] = settingsResult.RefreshThreshold;
+                    //set last refresh time as now since we will open the window now if they are seeing interventions
+                    _cache["LastRefreshTime"] = DateTime.Now.ToString();
+                }
+                catch (Exception e)
+                {
+                    _errorLogger.WriteToLog(string.Format("Open Suggestions window error: {0}", e.Message), LogPriority.HighPriority);
+                }
+
+                Init_BrowserLogin(result, showInterventionWindow);
                 InitStepTwo_LoginCompleted(result);
             }
             catch (Exception e)
-            {                
+            {
                 try
                 {
                     //this may crash visual studio, we'll catch it just in case...
@@ -93,12 +81,12 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
                 catch (Exception ex)
                 {
                     ShowAwesomiumError(ex); // if this crashes it must be missing awesomium
-                }                
-            }            
-        }        
+                }
+            }
+        }
 
-        private void Init_BrowserLogin(string authKey) //initialize browser authentication/activecourseuser
-        {      
+        private void Init_BrowserLogin(string authKey, bool showInterventionWindow = false) //initialize browser authentication/activecourseuser
+        {
             if (string.IsNullOrWhiteSpace(authKey))
             {
                 var result = MessageBox.Show("It appears as though your OSBLE+ user name or password has changed since the last time you opened Visual Studio.  Would you like to log back into OSBLE+?", "Log Into OSBLE+", MessageBoxButton.YesNo);
@@ -114,8 +102,6 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
                     _manager.OpenActivityFeedWindow(null,
                                             StringConstants.WebClientRoot + "/Account/TokenLogin?authToken=" + authKey +
                                             "&destinationUrl=" + StringConstants.WebClientRoot + "/feed/osbide/");
-                    //if (_cache.Contains("community") && Boolean.Equals(true, _cache["community"]))
-                    //    _manager.OpenCommunityWindow();
                 }
                 catch (Exception ex)
                 {
@@ -125,15 +111,18 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
                 //try to open the suggestions window
                 try
                 {
-                    _manager.OpenInterventionWindow();
+                    if (showInterventionWindow)
+                    {
+                        _manager.OpenInterventionWindow();
+                    }
                 }
                 catch (Exception ex)
                 {
                     //write to the log file
-                    _errorLogger.WriteToLog(string.Format("Open Suggestions window error: {0}", ex.Message), LogPriority.HighPriority);                    
+                    _errorLogger.WriteToLog(string.Format("Open Suggestions window error: {0}", ex.Message), LogPriority.HighPriority);
                 }
-                
-            }            
+
+            }
         }
 
         private void InitStepTwo_LoginCompleted(string authKey)
