@@ -55,7 +55,7 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
                             Style = VsDockStyle.Linked,
                             Window = Microsoft.VisualStudio.Shell.Interop.ToolWindowGuids80.SolutionExplorer,
                             MultiInstances = false,
-                            Transient = false, //true to disable the window from popping up on the next start (unless we want it to)
+                            Transient = true, //true to disable the window from popping up on the next start (unless we want it to)
                             DockedWidth = 300,
                             DockedHeight = 300)]
 
@@ -115,11 +115,8 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
             //set up tool window manager
             _manager = new OsbideToolWindowManager(_cache, this);
 
-            //create a static instance of the tool window manager so we can open/refresh the toolwindow from elsewhere            
-            _staticManager = _manager;
-
             //_staticManager is required for opening/refreshing the intervention tool window
-            SetupServiceClient(_staticManager);
+            SetupServiceClient();
             UpdateServiceConnectionStatus();
 
             //display a user notification if we don't have any user on file
@@ -162,15 +159,15 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
             }            
         }
 
-        private void OpenToolWindow()
+        private void OpenInterventionToolWindow()
         {
             try
             {
-                _manager.OpenInterventionWindow();
+                _manager.OpenInterventionWindow(null, "New: " + DateTime.Now.ToShortTimeString());
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //TODO: handle error
+                _errorLogger.WriteToLog("OpenInterventionWindow() Error: " + ex.Message, LogPriority.HighPriority);
             }            
         }
 

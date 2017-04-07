@@ -296,5 +296,40 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
                 return 5;
             }
         }
+
+        public static async Task<InterventionSettings> GetUserInterventionSettings(string authToken)
+        {
+            InterventionSettings settings = new InterventionSettings(); 
+            try
+            {
+                using (var client = GetClient())
+                {
+                    var task = client.GetStringAsync(string.Format("api/intervention/GetUserInterventionSettings?authToken={0}", authToken));
+                    await task;
+                    
+                    var result = JsonConvert.DeserializeObject<InterventionSettings>(task.Result);
+
+                    settings.ShowInIDE = result.ShowInIDE;
+                    settings.RefreshThreshold = result.RefreshThreshold;
+
+                    return settings;
+                }
+            }
+            catch (Exception e)
+            {
+                return settings;
+            }
+        }
+    }
+
+    public class InterventionSettings
+    {
+        public InterventionSettings()
+        {
+            ShowInIDE = false;
+            RefreshThreshold = 10;
+        }
+        public bool ShowInIDE { get; set; }
+        public int RefreshThreshold { get; set; }
     }
 }

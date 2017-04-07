@@ -7,17 +7,20 @@
     int RefreshThreshold = ViewBag.RefreshThreshold ?? 10;
 }
 
-<link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/interventions.css")" />
-<script type="text/javascript" src="@Url.Content("~/Scripts/Interventions.js")"></script>
+<link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/interventions.css")?version=1.0" />
+<script type="text/javascript" src="@Url.Content("~/Scripts/Interventions.js")?version=1.01"></script>
 @Html.Partial("_UserFeedbackPrompt", new ViewDataDictionary { { "interventionId", -6 } })
 <div style="float: left;">    
     <h2>Suggestions Settings</h2>
-
-    <p>
+    <em>Note: In-IDE settings will be updated upon logging into the VS Plugin. Please restart Visual Studio after updating IDE specific settings.</em>
+    <h5>IDE Specific Settings</h5>
+    <p style="text-indent: 25px;">
         <input type="checkbox" value="True" id="enable-suggestions-ide" name="ShowSuggestionsWindow" @if (ShowSuggestionsWindow) { <text> checked="checked" </text>     } />
-        <text">Show the OSBLE+ suggestions window in the IDE.</text>
+        <text">Show the OSBLE+ suggestions window in the IDE.</text>        
     </p>
-    <p>
+
+    <h5>Global Settings (IDE and Dashboard)</h5>
+    <p style="text-indent: 12.5px;">        
         @Html.Label("Time before refreshing suggestions: ", new { id = "suggestion-refresh-label" })
         @{
             List<SelectListItem>
@@ -71,7 +74,7 @@
         }
         @Html.DropDownList("refresh-dropdown", listItems, null, new { @class = "refresh-dropdown" })
     </p>
-
+    
     <p>
         <button id="update-settings">Update Settings</button>
         <span id="update-result"></span>
@@ -105,13 +108,13 @@
         //});
         
         $("#refresh-dropdown option[value=@RefreshThreshold]").attr('selected', 'selected');
-
+        @*
         if (!$("#enable-suggestions-ide").is(":checked")) {
             $("#refresh-dropdown").prop("disabled", true);
             $('#refresh-dropdown').css('opacity', '0.65');
             $('#suggestion-refresh-label').css('opacity', '0.65');
             $('#refresh-dropdown').css('cursor', 'not-allowed');
-        }
+        }*@
     });
 
     function SaveSettings() {
@@ -121,11 +124,11 @@
             //dataType: "json",
             method: "POST",
             success: function (result) {
-                $("#update-result").text("Settings updated successfully!");
+                $("#update-result").text("Settings updated successfully!").show().fadeOut(5000, "linear");
                 $("#update-result").css("color", "green");
             },
             error: function (result) {
-                $("#update-result").text("Settings updated failed! Please try again or contact OSBLE support for help.");
+                $("#update-result").text("Settings updated failed! Please try again or contact OSBLE support for help.").show();
                 $("#update-result").css("color", "red");
             }
         });

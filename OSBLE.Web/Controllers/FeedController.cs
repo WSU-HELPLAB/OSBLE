@@ -435,6 +435,16 @@ namespace OSBLE.Controllers
                 eventLog.DisplayTitle = "Anonymous " + eventLog.EventId.ToString();
             }
 
+            if (idString == null)
+            {
+                idString = string.Join(",", item.Items.Select(i => i.Event.EventLogId));
+
+                if (idString == null) //for some reason the above does not always work
+                {
+                    idString = item.Items.First().Event.EventLogId.ToString();
+                }
+            }
+
             return new
             {
                 EventId = eventLog.EventLogId,
@@ -455,12 +465,12 @@ namespace OSBLE.Controllers
                 Comments = comments,
                 HTMLContent = htmlContent,
                 //Content = eventLog.EventType == EventType.FeedPostEvent ? (eventLog as FeedPostEvent).Comment : "",
-                IdString = idString ?? string.Join(",", item.Items.Select(i => i.Event.EventLogId)),
-                ActiveCourseUserId = courseUser == null ? ActiveCourseUser.UserProfileID : courseUser.UserProfileID,
+                IdString = idString,
+                ActiveCourseUserId = ActiveCourseUser != null ? ActiveCourseUser.UserProfileID : userProfileId,
                 EventVisibleTo = eventLog.EventVisibleTo,
                 EventType = eventLog.EventType.ToString(),
                 IsAnonymous = eventLog.IsAnonymous,
-                Role = DBHelper.GetRoleNameFromCourseAndUserProfileId(ActiveCourseUser.AbstractCourseID, eventLog.SenderId),
+                Role = DBHelper.GetRoleNameFromCourseAndUserProfileId(ActiveCourseUser != null ? ActiveCourseUser.AbstractCourseID : courseId, eventLog.SenderId),
             };
         }
 
@@ -1520,8 +1530,8 @@ namespace OSBLE.Controllers
                         string currentUserFullName = isAnonymous ? "Anonymous User" : CurrentUser.FullName;
                         
                         subject = string.Format("OSBLE Plus - {0} replied to a post in {1}", currentUserFullName, DBHelper.GetCourseShortNameFromID(courseID, conn));
-                        body = string.Format("{0} replied to a post by {1} at {2}:\n\n{3}\n-----------------------\nOriginal Post:\n{4}\n\n",
-                            currentUserFullName, originalPoster.FullName, timePosted.UTCToCourse(courseID), postContent, originalPostComment);
+                        body = string.Format("{0} replied to a post{1} at {2}:\n\n{3}\n-----------------------\nOriginal Post:\n{4}\n\n", // by {1} > "" to temporarily handle anon reply
+                            currentUserFullName, "", timePosted.UTCToCourse(courseID), postContent, originalPostComment);
 
                         body = ReplaceMentionWithName(body);
                     }

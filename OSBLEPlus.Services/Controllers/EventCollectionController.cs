@@ -16,6 +16,7 @@ using System.Data.SqlClient;
 using Dapper;
 using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace OSBLEPlus.Services.Controllers
 {
@@ -139,39 +140,48 @@ namespace OSBLEPlus.Services.Controllers
 
             if (refreshSuggestion)
             {
-                if (courseId == 0) //guess course with the most recent activity...
-                {   //will need to do this for ask for help/exception events until a courseId is associated with them                
+                List<int> activeCourseIds = new List<int>(); //push notification to all active courses that have suggestions enabled for this user
+                if (courseId == 0) 
+                {   
                     using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
                     {
                         sqlConnection.Open();
-                        string query = "SELECT ISNULL( " +
-                                        "(SELECT TOP 1 CourseId " +
-                                        "FROM EventLogs " +
-                                        "WHERE SenderId = @senderId " +
-                                        "AND CourseId IS NOT NULL " +
-                                        "ORDER BY EventDate DESC) " +
-                                        ", 0) AS CourseId ";
+                        string query = "SELECT DISTINCT ac.ID FROM AbstractCourses ac " + 
+                                       "INNER JOIN CourseUsers cu " + 
+                                       "ON ac.ID = cu.AbstractCourseID " + 
+                                       "INNER JOIN OSBLEInterventionsCourses oic " +
+                                       "ON ac.ID = oic.CourseId " + 
+                                       "WHERE cu.UserProfileID = @UserProfileId ";
 
-                        var result = sqlConnection.Query(query, new { senderId = userId }).AsList();
+                        var result = sqlConnection.Query(query, new { UserProfileId = userId });
 
-                        courseId = result[0].CourseId;
+                        if (result != null)
+                        {
+                            foreach (var item in result)
+                            {
+                                activeCourseIds.Add(item.ID);
+                            }                            
+                        }                        
 
                         sqlConnection.Close();
                     }
                 }
 
-                var connection = new HubConnection(StringConstants.WebClientRoot, "userID=" + userId + "&courseID=" + courseId + "&authKey=" + authKey, true);
-                connection.Headers.Add("Host", (new Uri(StringConstants.WebClientRoot)).Host);
-                connection.Headers.Add("Origin", StringConstants.WebClientRoot);
+                foreach (int id in activeCourseIds) //send to all 'active' courses with suggestions enabled
+                {
+                    var connection = new HubConnection(StringConstants.WebClientRoot, "userID=" + userId + "&courseID=" + id + "&authKey=" + authKey, true);
+                    connection.Headers.Add("Host", (new Uri(StringConstants.WebClientRoot)).Host);
+                    connection.Headers.Add("Origin", StringConstants.WebClientRoot);
 
-                IHubProxy hub = connection.CreateHubProxy("ActivityFeedHub");
+                    IHubProxy hub = connection.CreateHubProxy("ActivityFeedHub");
 
-                connection.Start().Wait();
+                    connection.Start().Wait();
 
-                hub.Invoke("NotifyNewSuggestion");
+                    hub.Invoke("NotifyNewSuggestion");
 
-                //stop the connection after the message has been forwarded.            
-                connection.Stop();
+                    //stop the connection after the message has been forwarded.            
+                    connection.Stop();
+                }                
             }
         }
     }

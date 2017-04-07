@@ -9,7 +9,7 @@
     string profileUrl = rootUrl + "Profile?component=7";
 }
 
-<script type="text/javascript" src="@Url.Content("~/Scripts/Interventions.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/Interventions.js")?version=1.01"></script>
 
 <script type="text/javascript">   
     
@@ -106,7 +106,7 @@
                 $("#dashboard-items").html(result);
             },
             error: function (result) {
-                alert("failure");
+                //TODO: handle error
             }
         });
     }

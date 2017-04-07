@@ -71,7 +71,10 @@ namespace OSBLEPlus.Services.Controllers
         {
             var auth = new Authentication();
             if (!auth.IsValidKey(request.AuthToken))
+            {
+                throw new Exception("CourseController Post() authentication failure.");
                 return new HttpResponseMessage { StatusCode = HttpStatusCode.Forbidden };
+            }                
 
             bool eventSenderNotNull = false;
 
@@ -102,13 +105,21 @@ namespace OSBLEPlus.Services.Controllers
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                //ignore for now
+                throw new Exception("Failed to notifyHub in CourseController Post method. ", e);
             }
 
             //submit to intervetion controller
-            ProcessLogForIntervention(request);
+            try
+            {
+                ProcessLogForIntervention(request);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("failed to ProcessLogForIntervention(request)", e);
+            }
+            
 
             return new HttpResponseMessage
             {

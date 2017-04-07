@@ -406,7 +406,7 @@ namespace OSBLE.Controllers
                     }
                     catch (Exception e)
                     {
-                        throw new Exception("Failed to insert new intervention", e);
+                        throw new Exception(String.Format("Failed to insert new intervention. UserProfileId: {0}, Trigger: {1}, DateTime: {2}, TemplateText: {3}, SuggestedCode: {4} ", intervention.UserProfileId, intervention.InterventionTrigger, intervention.InterventionDateTime, intervention.InterventionTemplateText, intervention.InterventionSuggestedCode), e);
                     }
                 }
             }
@@ -604,13 +604,52 @@ namespace OSBLE.Controllers
         [OsbleAuthorize]
         public ActionResult PopulateSuggestionList()
         {
+            int courseId = ActiveCourseUser != null ? ActiveCourseUser.AbstractCourseID : 0;
+            int userProfileId = ActiveCourseUser != null ? ActiveCourseUser.UserProfileID : 0;
+
+            if (ActiveCourseUser == null) //try to get the current user and course
+            {
+                try
+                {
+                    string authToken = Request.Cookies["AuthKey"].Value.Split('=').Last();
+                    var auth = new Authentication();
+
+                    if (auth.IsValidKey(authToken))
+                    {
+                        userProfileId = auth.GetActiveUserId(authToken);
+
+                        using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                        {
+                            sqlConnection.Open();
+                            string query = "SELECT ISNULL((SELECT TOP 1 ac.ID FROM AbstractCourses ac INNER JOIN CourseUsers cu ON ac.ID = cu.AbstractCourseID " +
+                                           "INNER JOIN OSBLEInterventionsCourses oic ON ac.ID = oic.CourseId INNER JOIN EventLogs el ON ac.ID = el.CourseId " +
+                                           "WHERE cu.UserProfileID = @UserProfileId ORDER BY EventDate DESC), 0) as CourseId ";
+
+                            var result = sqlConnection.Query(query, new { UserProfileId = userProfileId }).SingleOrDefault();
+
+                            courseId = result.CourseId;
+
+                            sqlConnection.Close();
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("PopulateSuggestionList() ActiveCourseuser is Null and failed to get Ids from authToken", e);
+                }
+            }
+
+            InterventionsList vm = new InterventionsList();
+
+            if (userProfileId > 0 && courseId > 0)
+            {
             //check if we need to generate a 'ClassmatesAvailable' intervention first. try catch in case this breaks
             try
             {
-                bool generateIntervention = CheckIfOtherUsersAreAvailable(ActiveCourseUser.UserProfileID, ActiveCourseUser.AbstractCourseID);
+                    bool generateIntervention = CheckIfOtherUsersAreAvailable(userProfileId, courseId);
                 if (generateIntervention)
                 {
-                    SaveIntervention(GenerateClassmatesAvailableIntervention(ActiveCourseUser.UserProfileID));
+                        SaveIntervention(GenerateClassmatesAvailableIntervention(userProfileId));
                 }
             }
             catch (Exception e)
@@ -618,7 +657,8 @@ namespace OSBLE.Controllers
                 throw new Exception("Failed to CheckIfOtherUsersAreAvailable in Index()", e);
             }
             //Get all interventions for the current user
-            InterventionsList vm = BuildInterventionsViewModel(ActiveCourseUser.UserProfileID);
+                vm = BuildInterventionsViewModel(userProfileId);
+            }
 
             return PartialView("_InterventionList", vm);
         }
@@ -724,7 +764,7 @@ namespace OSBLE.Controllers
         }
 
         public ActionResult SuggestionsSettings()
-        {            
+        {
             try
             {
                 int userProfileId = ActiveCourseUser.UserProfileID;
@@ -738,8 +778,8 @@ namespace OSBLE.Controllers
                     var results = sqlConnection.Query(query, new { UserProfileId = userProfileId }).SingleOrDefault();
                     if (results != null)
                     {
-                        ViewBag.ShowSuggestionsWindow = results.ShowInIDESuggestions;
-                        ViewBag.RefreshThreshold = results.RefreshThreshold;
+                    ViewBag.ShowSuggestionsWindow = results.ShowInIDESuggestions;
+                    ViewBag.RefreshThreshold = results.RefreshThreshold;
                     }
                     else
                     {

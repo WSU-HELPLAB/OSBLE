@@ -110,9 +110,11 @@
 }
 <section id="recent-comments" class="profile-content">
     <h1>Recent Social Activity</h1>
-    @if (Model.SocialActivity.TopLevelLogCount == 0 && Model.Feed.Feed.Count == 0)
+    @*@if (Model.SocialActivity.TopLevelLogCount == 0 && Model.Feed.Feed.Count == 0)*@
+    @if(true)
     {
-        @:No recent activity.
+        @*@:No recent activity.*@
+        @: Page currently under maintenance.
     }
     else
     {

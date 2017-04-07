@@ -12,6 +12,7 @@ using System.Web.Http;
 using Dapper;
 using OSBLEPlus.Logic.Utility;
 using OSBLEPlus.Logic.Utility.Auth;
+using System.Web.Helpers;
 
 namespace OSBLEPlus.Services.Controllers
 {
@@ -31,6 +32,17 @@ namespace OSBLEPlus.Services.Controllers
         public string FileName { get; set; }
         public int Line { get; set; }
         public string ProjectName { get; set; }
+    }
+
+    public class InterventionSettings
+    {
+        public InterventionSettings()
+        {
+            ShowInIDE = false;
+            RefreshThreshold = 10;
+        }
+        public bool ShowInIDE { get; set; }
+        public int RefreshThreshold { get; set; }
     }
 
     public class InterventionController : ApiController
@@ -66,6 +78,57 @@ namespace OSBLEPlus.Services.Controllers
             int userProfileId = auth.GetActiveUserId(authToken);
 
             return UserSetRefreshThreshold(userProfileId);
+        }
+
+        [HttpGet]
+        public InterventionSettings GetUserInterventionSettings(string authToken)
+        {
+            InterventionSettings settings = new InterventionSettings();
+
+            //need to check the database for this users's interventions and return true if there are new interventions since the last processing.
+            var auth = new Authentication();
+            if (!auth.IsValidKey(authToken))
+                return settings; //return default settings
+
+            int userProfileId = auth.GetActiveUserId(authToken);
+
+            settings = GetUserInterventionSettings(userProfileId);
+
+            return settings;
+        }
+
+        private InterventionSettings GetUserInterventionSettings(int userProfileId)
+        {
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+
+                    string query = "SELECT * FROM OSBLEInterventionSettings WHERE UserProfileId = @UserProfileId ";
+
+                    var result = sqlConnection.Query(query, new { UserProfileId = userProfileId }).SingleOrDefault();
+
+                    sqlConnection.Close();
+
+                    if (result != null)
+                    {
+                        InterventionSettings settings = new InterventionSettings();
+                        settings.ShowInIDE = result.ShowInIDESuggestions;
+                        settings.RefreshThreshold = result.RefreshThreshold;
+                        return settings;
+                    }
+                    else
+                    {
+                        return new InterventionSettings();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("GetUserInterventionSettings() Failed", e);
+                return new InterventionSettings();
+            }
         }
 
         [HttpGet]
