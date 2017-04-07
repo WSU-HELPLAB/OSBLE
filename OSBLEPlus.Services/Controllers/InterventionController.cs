@@ -235,23 +235,17 @@ namespace OSBLEPlus.Services.Controllers
 
                 int userProfileId = auth.GetActiveUserId(authToken);
 
-                ////first check if the user has disabled in-IDE interventions
-                //if (!UserEnabledInterventions(userProfileId))
-                //{
-                //    return false;
-                //}
-
                 if (!UserRefreshThesholdMet(userProfileId))
                 {
                     return false;
                 } //go ahead and continue checking. if the threshold is not met we don't want to refresh
 
                 //now check if the user needs an intervention refreshed.
-                bool refresh = CheckInterventionStatus(userProfileId);
+                bool refresh = CheckInterventionStatus(userProfileId, true);
                 if (refresh)
                 {
                     //disable the refresh flag (changed it to here because this is the only method that actually refreshes the interventions)
-                    DisableRefreshFlag(userProfileId);
+                    DisableRefreshFlag(userProfileId, true);
                 }
                 return refresh;
             }
@@ -363,7 +357,7 @@ namespace OSBLEPlus.Services.Controllers
             }
         }
 
-        private void DisableRefreshFlag(int userProfileId)
+        private void DisableRefreshFlag(int userProfileId, bool dashboardRefresh = false)
         {
             try
             {
@@ -372,8 +366,18 @@ namespace OSBLEPlus.Services.Controllers
                     sqlConnection.Open();
 
                     string query = "SELECT * FROM OSBLEInterventionsStatus WHERE UserProfileId = @UserProfileId ";
-                    string updateQuery = "UPDATE OSBLEInterventionsStatus SET RefreshInterventions = 0 WHERE Id = @Id ";
-                    string insertQuery = "INSERT INTO OSBLEInterventionsStatus ([UserProfileId],[RefreshInterventions],[LastRefresh]) VALUES (@UserProfileId, '0', @LastRefresh) ";
+                    string insertQuery = "INSERT INTO OSBLEInterventionsStatus ([UserProfileId],[RefreshInterventions],[LastRefresh],[RefreshInterventionsDashboard]) VALUES (@UserProfileId, '0', @LastRefresh, '0') ";
+                    
+                    string updateQuery = "";                    
+
+                    if (dashboardRefresh) //change update query depending on if this is a dashboard refresh or not
+                    {
+                        updateQuery = "UPDATE OSBLEInterventionsStatus SET RefreshInterventionsDashboard = 0 WHERE Id = @Id ";                        
+                    }
+                    else
+                    {
+                        updateQuery = "UPDATE OSBLEInterventionsStatus SET RefreshInterventions = 0 WHERE Id = @Id ";                        
+                    }
 
                     var result = sqlConnection.Query(query, new { UserProfileId = userProfileId }).FirstOrDefault();
 
@@ -693,7 +697,7 @@ namespace OSBLEPlus.Services.Controllers
             }
         }
 
-        private bool CheckInterventionStatus(int userProfileId)
+        private bool CheckInterventionStatus(int userProfileId, bool dashboardRefresh = false)
         {
             bool refreshInterventions = false;
             //first check if we need to add a "others offering help" intervention"
@@ -705,17 +709,21 @@ namespace OSBLEPlus.Services.Controllers
                 {
                     sqlConnection.Open();
 
-                    string query = "SELECT * FROM OSBLEInterventionsStatus WHERE UserProfileId = @UserProfileId ";
-                    //we no longer update the refresh status here, just check if we need to refresh
-                    //string updateQuery = "UPDATE OSBLEInterventionsStatus SET RefreshInterventions = 0 WHERE Id = @Id ";
-                    string insertQuery = "INSERT INTO OSBLEInterventionsStatus ([UserProfileId],[RefreshInterventions],[LastRefresh]) VALUES (@UserProfileId, '0', @LastRefresh) ";
+                    string query = "SELECT * FROM OSBLEInterventionsStatus WHERE UserProfileId = @UserProfileId ";                    
+                    string insertQuery = "INSERT INTO OSBLEInterventionsStatus ([UserProfileId],[RefreshInterventions],[LastRefresh],[RefreshInterventionsDashboard]) VALUES (@UserProfileId, '0', @LastRefresh, '0') ";
 
                     var result = sqlConnection.Query(query, new { UserProfileId = userProfileId }).FirstOrDefault();
 
                     if (result != null)
                     {
-                        refreshInterventions = result.RefreshInterventions || refreshInterventions; //we want to refresh if either is true                        
-                        //sqlConnection.Execute(updateQuery, new { Id = result.Id });
+                        if (dashboardRefresh)
+                        {
+                            refreshInterventions = result.RefreshInterventionsDashboard || refreshInterventions; //we want to refresh if either is true                           
+                        }
+                        else
+                        {
+                            refreshInterventions = result.RefreshInterventions || refreshInterventions; //we want to refresh if either is true                           
+                        }                        
                     }
                     else //insert the user
                     {
@@ -778,7 +786,7 @@ namespace OSBLEPlus.Services.Controllers
         {
             CheckNoErrorThreshold(log.SenderId, "CutCopyPasteEvent");
             CheckIdleThreshold(log.SenderId);
-            CheckInterventionStatus(log.SenderId);
+            UpdateClassmatesAvailable(log.SenderId);            
         }
 
         private bool DismissIntervention(int interventionId)
@@ -813,7 +821,7 @@ namespace OSBLEPlus.Services.Controllers
         {
             CheckNoErrorThreshold(log.SenderId, "EditorActivityEvent");
             CheckIdleThreshold(log.SenderId);
-            CheckInterventionStatus(log.SenderId);
+            UpdateClassmatesAvailable(log.SenderId);            
         }
         private void ExceptionEvent(ActivityEvent log)
         {
@@ -1595,8 +1603,8 @@ namespace OSBLEPlus.Services.Controllers
                     sqlConnection.Open();
 
                     string query = "SELECT * FROM OSBLEInterventionsStatus WHERE UserProfileId = @UserProfileId ";
-                    string updateQuery = "UPDATE OSBLEInterventionsStatus SET RefreshInterventions = 1, LastRefresh = @LastRefresh WHERE Id = @Id ";
-                    string insertQuery = "INSERT INTO OSBLEInterventionsStatus ([UserProfileId],[RefreshInterventions],[LastRefresh]) VALUES (@UserProfileId, '1', @LastRefresh) ";
+                    string updateQuery = "UPDATE OSBLEInterventionsStatus SET RefreshInterventions = 1, LastRefresh = @LastRefresh, RefreshInterventionsDashboard = 1 WHERE Id = @Id ";
+                    string insertQuery = "INSERT INTO OSBLEInterventionsStatus ([UserProfileId],[RefreshInterventions],[LastRefresh],[RefreshInterventionsDashboard]) VALUES (@UserProfileId, '1', @LastRefresh, '1') ";
 
                     var result = sqlConnection.Query(query, new { UserProfileId = userProfileId }).FirstOrDefault();
 
