@@ -228,7 +228,7 @@ namespace OSBLE.Controllers
 
             //pull a prior evaluation if it exists
             RubricEvaluation eval = (from e in db.RubricEvaluations
-                                     where e.RecipientID == assignmentTeam.TeamID
+                                     where (e.RecipientID == assignmentTeam.TeamID && e.AssignmentID == assignmentId)
                                      select e).FirstOrDefault();
             
             if (eval != null)
