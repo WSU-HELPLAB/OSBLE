@@ -2,7 +2,7 @@
 //Downloaded from: https://github.com/bryanwoods/autolink-js
 
 (function () {
-    var autoLink, linkUsernames, linkHashtags, embedYouTube,
+    var autoLink, linkUsernames, linkHashtags, embedYouTube, formatCode,
       __slice = [].slice;
     var courseUserNames = getUserNames();
 
@@ -14,7 +14,10 @@
 
         if (detectBrowser()) { //only do this if we can detect the browser... this returns false from the VS Plugin and we want to prevent doing this as it breaks the feed on the plugin
             text = embedYouTube(text);
-        }        
+        }
+
+        //format any code
+        text = formatCode(text);
 
         pattern = /(^|[\s\n>]|<br\/?>)((?:https?|ftp):\/\/[\-A-Z0-9+\u0026\u2019@#\/%?=()~_|!:,.;]*[\-A-Z0-9+\u0026@#\/%=~()_|])/gi;
         if (!(options.length > 0)) {
@@ -136,10 +139,49 @@
         else return text; // If no youtube link found by regex, just return original content
     }
 
+    formatCode = function (text) {
+        var re = /\[code\]/g;
+        var indexList = new Array();
+        while ((match = re.exec(text)) != null) {            
+            indexList.push(match.index);
+        }
+
+        var start, middle, end;
+
+        if (indexList.length == 2) {
+            start = text.slice(0, indexList[0]);
+            middle = (text.slice(indexList[0], indexList[1] + 6)).replace(/\[code\]/g, "").trim();
+            end = text.slice(indexList[1] + 6), text.length;            
+           
+            var result = self.hljs.highlightAuto(middle);
+            middle = result.value;
+            text = start + "<pre><code >" + decodeHtml(middle) + "</code></pre>" + end;
+        }
+
+        var re = /```/g;
+        var indexList = new Array();
+        while ((match = re.exec(text)) != null) {
+            indexList.push(match.index);
+        }
+
+        if (indexList.length == 2) {
+            start = text.slice(0, indexList[0]);
+            middle = (text.slice(indexList[0], indexList[1] + 3)).replace(/```/g, "").trim();
+            end = text.slice(indexList[1] + 3), text.length;
+
+            var result = self.hljs.highlightAuto(middle);
+            middle = result.value;
+            text = start + "<pre><code >" + decodeHtml(middle) + "</code></pre>" + end;
+        }
+
+        return text;
+    }
+
     String.prototype['autoLink'] = autoLink;
     String.prototype['linkUsernames'] = linkUsernames;
     String.prototype['linkHashtags'] = linkHashtags;
     String.prototype['embedYouTube'] = embedYouTube;
+    String.prototype['formatCode'] = formatCode;
 
 }).call(this);
 
@@ -159,4 +201,10 @@ function getUserNames() {
         }
     })
     return namesAndIds;
+}
+
+function decodeHtml(html) {
+    var txt = document.createElement("textarea");
+    txt.innerHTML = html;
+    return txt.value;
 }

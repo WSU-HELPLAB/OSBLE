@@ -55,6 +55,8 @@ function FeedItem(data) {
     self.Edit = function () {
         var text = $("#feed-edit-textbox-" + self.eventId).val();
 
+        text = replaceMentionWithId(text);
+
         // disable posting so user can't "spam" post
         $("#feed-edit-textbox-" + self.eventId).attr("disabled", "disabled");
         $("#feed-edit-submit-" + self.eventId).attr("disabled", "disabled");
@@ -115,15 +117,7 @@ function FeedItem(data) {
         $("#feed-reply-submit-" + self.eventId).attr("disabled", "disabled");
         $("#feed-reply-cancel-" + self.eventId).attr("disabled", "disabled");
 
-        var userNames = localStorage['UserNames'].split(',');
-        var userIds = localStorage['UserIds'].split(',');
-
-        // TODO: to boost performance, could add functionality to know which names were used (if any)
-        // Replace all occurrences of @user with @id;
-        for (i = 0; i < userNames.length; i++) {
-            var name = userNames[i], id = "id=" + userIds[i] + ";";
-            text = text.replace(name, id);
-        }
+        text = replaceMentionWithId(text);
 
         $.ajax({
             url: "/Feed/PostComment",
@@ -329,15 +323,7 @@ function FeedViewModel(userName, userId, current) {
         //make anonymous post
         var makeAnonymous = $("[name='make_anonymous']").is(':checked');
 
-        var userNames = localStorage['UserNames'].split(',');
-        var userIds = localStorage['UserIds'].split(',');
-
-        // TODO: to boost performance, could add functionality to know which names were used (if any)
-        // Replace all occurrences of @user with @id;
-        for (i = 0; i < userNames.length; i++) {
-            var name = userNames[i], id = "id=" + userIds[i] + ";";
-            text = text.replace(name, id);
-        }
+        text = replaceMentionWithId(text);
 
         // Disable buttons while waiting for server response
         $('#feed-post-textbox').attr('disabled', 'disabled');
@@ -824,7 +810,7 @@ function onDeleteSuccess(item) {
 
 function ShowEditBox(item) {
     // populate the box with the correct content
-    var text = $("#content-comment-" + item.eventId).text();
+    var text = $("#content-comment-" + item.eventId).text();    
     $('#feed-edit-textbox-' + item.eventId).val(text);
 
     $('#feed-edit-' + item.eventId).show('fade');
@@ -1353,4 +1339,17 @@ function ShowBackToSuggestions() {
         $("#suggestion-back-link").attr('href', GetPreviousUrl());
         $("#suggestion-back-link").css('display', 'inline');
     }
+}
+
+function replaceMentionWithId(text) {
+    var userNames = localStorage['UserNames'].split(',');
+    var userIds = localStorage['UserIds'].split(',');
+
+    // TODO: to boost performance, could add functionality to know which names were used (if any)
+    // Replace all occurrences of @user with @id;
+    for (i = 0; i < userNames.length; i++) {
+        var name = userNames[i], id = "id=" + userIds[i] + ";";
+        text = text.replace(name, id);
+    }
+    return text;
 }
