@@ -303,7 +303,15 @@ namespace OSBLE.Controllers
             {
                 if (assignment.HasDeliverables && assignment.Deliverables[0].DeliverableType == DeliverableType.PDF)
                 {
-                    return RedirectToRoute(new { controller = "PdfCriticalReview", action = "Grade", assignmentID = assignmentId, authorTeamID = teamId, resubmission = resubmission });
+                    if (resubmission)
+                    {
+                        return RedirectToRoute(new { controller = "PdfCriticalReviewHTTPS", action = "Grade", assignmentID = assignmentId, authorTeamID = teamId, resubmission = resubmission });    
+                    }
+                    else
+                    {
+                        return RedirectToRoute(new { controller = "PdfCriticalReview", action = "Grade", assignmentID = assignmentId, authorTeamID = teamId, resubmission = resubmission });
+                    }
+                    
                 }
             }
 
