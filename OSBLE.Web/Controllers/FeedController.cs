@@ -1129,7 +1129,7 @@ namespace OSBLE.Controllers
             emailList = RemoveNonVisibilityGroupEmails(emailList, eventVisibleTo);
 
             // Parse text and create list of tagged users
-            NotifyTaggedUsers(text, logID, eventVisibleTo);
+            NotifyTaggedUsers(text, logID, eventVisibleTo, isAnonymous);
 
             // Send emails to those who want to be notified by email
             SendEmailsToListeners(log.Comment, logID, courseID, DateTime.UtcNow, emailList, false, isAnonymous);
@@ -1320,7 +1320,7 @@ namespace OSBLE.Controllers
         /// Parses given text for tagged users in the form of "id=XXX;" and notifies them
         /// </summary>
         /// <param name="text"></param>
-        private void NotifyTaggedUsers(string text, int postId, string eventVisibleToString = "")
+        private void NotifyTaggedUsers(string text, int postId, string eventVisibleToString = "", bool isAnonymous = false)
         {
             try
             {
@@ -1376,7 +1376,7 @@ namespace OSBLE.Controllers
                 {
                     using (NotificationController nc = new NotificationController())
                     {
-                        nc.SendUserTagNotifications(ActiveCourseUser, postId, taggedUsers);
+                        nc.SendUserTagNotifications(ActiveCourseUser, postId, taggedUsers, isAnonymous);
                     }
                 }
             }
@@ -1466,7 +1466,7 @@ namespace OSBLE.Controllers
             SendEmailsToListeners(content, id, ActiveCourseUser.AbstractCourseID, DateTime.UtcNow, emailList, true, isAnonymous);
 
             // Notify users of tags
-            NotifyTaggedUsers(content, id, eventVisibleTo);
+            NotifyTaggedUsers(content, id, eventVisibleTo, isAnonymous);
 
             // return the new list of comments in a Json object
             return Json(MakeCommentListJsonObject(post.Comments, id));

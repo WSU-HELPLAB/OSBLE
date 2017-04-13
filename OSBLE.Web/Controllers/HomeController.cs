@@ -254,7 +254,21 @@ namespace OSBLE.Controllers
         private void SetupNotifications()
         {
             // Load all unread notifications for the current user to display on the dashboard.
-            ViewBag.Notifications = db.Notifications.Where(n => (n.RecipientID == ActiveCourseUser.ID) && (n.Read == false)).OrderByDescending(n => n.Posted).ToList();
+            var notifications = db.Notifications.Where(n => (n.RecipientID == ActiveCourseUser.ID) && (n.Read == false)).OrderByDescending(n => n.Posted).ToList();
+            
+            //need to rename sender on anonymous posts
+            foreach (var notification in notifications)
+            {                
+                if (notification.Data != null && notification.Data == "IsAnonymous")
+                {
+                    CourseUser anonUser = new CourseUser();
+                    anonUser.UserProfile = new UserProfile();
+                    anonUser.UserProfile.FirstName = "Anonymous";
+                    anonUser.UserProfile.LastName = "User";
+                    notification.Sender = anonUser;
+                }
+            }
+            ViewBag.Notifications = notifications;
         }
 
         public ActionResult Events()

@@ -20,9 +20,25 @@ namespace OSBLE.Controllers
         // GET: /Notification/
         public ActionResult Index()
         {
-            ViewBag.HideMail = OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID); 
-                           
-            ViewBag.Notifications = db.Notifications.Where(n => (n.RecipientID == ActiveCourseUser.ID)).OrderByDescending(n => n.Posted).ToList();
+            ViewBag.HideMail = OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID);
+
+            var notifications = db.Notifications.Where(n => (n.RecipientID == ActiveCourseUser.ID)).OrderByDescending(n => n.Posted).ToList();
+
+            //need to rename sender on anonymous posts
+            foreach (var notification in notifications)
+            {                
+                if (notification.Data != null && notification.Data == "IsAnonymous")
+                {
+                    CourseUser anonUser = new CourseUser();
+                    anonUser.UserProfile = new UserProfile();
+                    anonUser.UserProfile.FirstName = "Anonymous";
+                    anonUser.UserProfile.LastName = "User";
+                    notification.Sender = anonUser;
+                }
+            }
+
+            ViewBag.Notifications = notifications;
+
             return View();
         }
 
@@ -225,7 +241,7 @@ namespace OSBLE.Controllers
             }
         }
 
-        public void SendUserTagNotifications(CourseUser sender, int postId, List<CourseUser> recipients)
+        public void SendUserTagNotifications(CourseUser sender, int postId, List<CourseUser> recipients, bool isAnonymous = false)
         {
             try
             {
@@ -236,6 +252,7 @@ namespace OSBLE.Controllers
                     notification.ItemID = postId;
                     notification.RecipientID = recipient.ID;
                     if (sender != null) notification.SenderID = sender.ID;
+                    if (isAnonymous) notification.Data = "IsAnonymous";
                     addNotification(notification);
                 }
             }
@@ -414,7 +431,7 @@ namespace OSBLE.Controllers
                                         select a).FirstOrDefault();
 
 #if !DEBUG
-                if (recipient.UserProfile.EmailAllNotifications && !(recipient.UserProfile.EmailAllActivityPosts && (n.ItemType == Notification.Types.Dashboard || n.ItemType == Notification.Types.UserTag)))
+                if (recipient.UserProfile.EmailAllNotifications)
                 {
                     emailNotification(n);
                 }
@@ -434,152 +451,168 @@ namespace OSBLE.Controllers
         /// <param name="n">Notification to be emailed</param>
         private void emailNotification(Notification n)
         {
-
-            SmtpClient mailClient = new SmtpClient();
-            mailClient.UseDefaultCredentials = true;
-
-            //this linne causes a break if the course user is not part of any courses
-            if(n.Sender == null)
-                n.Sender = db.CourseUsers.Find(ActiveCourseUser.ID);
-
-            UserProfile sender = db.UserProfiles.Find(n.Sender.UserProfileID);
-            UserProfile recipient = db.UserProfiles.Find(n.Recipient.UserProfileID);
-
-            // this comes back as null, for some reason. //dmo:6/5/2014 does it really? it seems to work??
-            //Abstract course can represent a course or a community 
-            AbstractCourse course = db.AbstractCourses.Where(b => b.ID == n.CourseID).FirstOrDefault();
-            string[] temp;
-            //checking to see if there is no data besides abstractCourseID
-            if(n.Data != null)
+            try
             {
-                temp = n.Data.Split(';');
+                SmtpClient mailClient = new SmtpClient();
+                mailClient.UseDefaultCredentials = true;
+
+                //this line causes a break if the course user is not part of any courses
+                if (n.Sender == null)
+                    n.Sender = db.CourseUsers.Find(ActiveCourseUser.ID);
+
+                UserProfile sender = db.UserProfiles.Find(n.Sender.UserProfileID);
+                UserProfile recipient = db.UserProfiles.Find(n.Recipient.UserProfileID);
+
+                //Abstract course can represent a course or a community 
+                AbstractCourse course = db.AbstractCourses.Where(b => b.ID == n.CourseID).FirstOrDefault();
+                string[] temp;
+                //checking to see if there is no data besides abstractCourseID
+                if (n.Data != null && n.Data != "IsAnonymous")
+                {
+                    temp = n.Data.Split(';');
+                }
+                else
+                {
+                    temp = new string[0];
+                }
+
+                int id;
+
+                if (temp.Length == 1) //data not being used by other mail method, send from selected course
+                {
+                    id = Convert.ToInt16(temp[0]);
+                    course = db.AbstractCourses.Where(b => b.ID == id).FirstOrDefault();
+                }
+
+                string subject = "";
+                if (getCourseNotificationTag(course, n) != "")
+                {
+                    subject = getCourseNotificationTag(course, n); // Email subject prefix
+                }
+
+                string body = "";
+
+                string action = "";
+
+                switch (n.ItemType)
+                {
+                    case Notification.Types.Mail:
+                        Mail m = db.Mails.Find(n.ItemID);
+
+                        subject += " - " + sender.FirstName + " " + sender.LastName;
+
+                        action = "reply to this message";
+                        //yc: m.posted needs to have a converetd time
+
+                        body = sender.FirstName + " " + sender.LastName + " sent this message at " + m.Posted.UTCToCourse(ActiveCourseUser.AbstractCourseID).ToString() + ":\n\n";
+                        body += "Subject: " + m.Subject + "\n\n";
+                        body += m.Message;
+
+                        break;
+                    case Notification.Types.EventApproval:
+                        subject += " - " + sender.FirstName + " " + sender.LastName;
+
+                        body = sender.FirstName + " " + sender.LastName + " has requested your approval of an event posting.";
+
+                        action = "approve/reject this event.";
+
+                        break;
+                    case Notification.Types.Dashboard:
+                        subject += " - " + sender.FirstName + " " + sender.LastName;
+
+                        body = sender.FirstName + " " + sender.LastName + " has posted to an activity feed thread in which you have participated.";
+
+                        action = "view this activity feed thread.";
+
+                        break;
+                    case Notification.Types.FileSubmitted:
+                        subject += " - " + sender.FirstName + " " + sender.LastName;
+
+                        body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
+
+                        action = "view this assignment submission.";
+
+                        break;
+                    case Notification.Types.RubricEvaluationCompleted:
+                        subject += " - " + sender.FirstName + " " + sender.LastName;
+
+                        body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
+
+                        action = "view this assignment submission.";
+
+                        break;
+                    case Notification.Types.InlineReviewCompleted:
+                        subject += " - " + sender.FirstName + " " + sender.LastName;
+
+                        body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
+
+                        action = "view this assignment submission.";
+
+                        break;
+                    case Notification.Types.TeamEvaluationDiscrepancy:
+                        subject += " - " + sender.FirstName + " " + sender.LastName;
+
+                        body = sender.FirstName + " " + sender.LastName + " has submitted a Team Evaluation that has raised a discrepancy flag."; //Can we get name of assignment?
+
+                        action = "view team evaluation discrepancy.";
+
+                        break;
+                    case Notification.Types.JoinCourseApproval:
+                        subject += " - " + sender.FirstName + " " + sender.LastName;
+                        if (course != null)
+                            body = sender.FirstName + " " + sender.LastName + " has submitted a request to join " + course.Name;
+
+                        action = "view the request to join.";
+
+                        break;
+                    case Notification.Types.JoinCommunityApproval:
+                        subject += " - " + sender.FirstName + " " + sender.LastName;
+                        if (course != null)
+                            body = sender.FirstName + " " + sender.LastName + " has submitted a request to join " + course.Name;
+
+                        action = "view the request to join.";
+
+                        break;
+                    case Notification.Types.UserTag:
+                        if (n.Data != null && n.Data == "IsAnonymous")
+                        {
+                            subject += " - An anonymous user tagged you in a post!";
+                            if (course != null)
+                            {
+                                body = "An anonymous user has tagged you in a post or comment in " + course.Name;
+                                action = "view the post or comment.";
+                            }
+                        }
+                        else
+                        {
+                            subject += " - " + sender.FirstName + " " + sender.LastName + " tagged you in a post!";
+                            if (course != null)
+                            {
+                                body = sender.FirstName + " " + sender.LastName + " has tagged you in a post or comment in " + course.Name;
+                                action = "view the post or comment.";
+                            }
+                        }
+                        break;
+                    default:
+                        subject += "No Email set up for this type of notification";
+
+                        body = "No Email set up for this type of notification of type: " + n.ItemType;
+                        break;
+                }
+
+                body += "\n\n---\nDo not reply to this email.\n";
+                string str = getDispatchURL(n.ID);
+                body += string.Format("<br /><br /><a href=\"{0}\">Click this link to {1}</a>", str, action);
+
+                MailAddress to = new MailAddress(recipient.UserName, recipient.DisplayName((int)CourseRole.CourseRoles.Instructor));
+                List<MailAddress> recipients = new List<MailAddress>();
+                recipients.Add(to);
+                Email.Send(subject, body, recipients);
             }
-            else
+            catch (Exception e)
             {
-                temp = new string[0];
+                throw new Exception("emailNotification(Notification n) failed: " + e.Message, e);                   
             }
-            
-            int id;
-            
-            if (temp.Length == 1) //data not being used by other mail method, send from selected course
-            {
-                id = Convert.ToInt16(temp[0]);
-                course = db.AbstractCourses.Where(b => b.ID == id).FirstOrDefault();
-            }
-
-            string subject = "";
-            if(getCourseNotificationTag(course, n) != "")
-            {
-                subject = getCourseNotificationTag(course, n); // Email subject prefix
-                
-            }
-            
-            string body = "";
-
-            string action = "";
-
-            switch (n.ItemType)
-            {
-                case Notification.Types.Mail:
-                    Mail m = db.Mails.Find(n.ItemID);
-
-                    subject += " - " + sender.FirstName + " " + sender.LastName;
-
-                    action = "reply to this message";
-                    //yc: m.posted needs to have a converetd time
-
-                    body = sender.FirstName + " " + sender.LastName + " sent this message at " + m.Posted.UTCToCourse(ActiveCourseUser.AbstractCourseID).ToString() + ":\n\n";
-                    body += "Subject: " + m.Subject + "\n\n";
-                    body += m.Message;
-
-                    break;
-                case Notification.Types.EventApproval:
-                    subject += " - " + sender.FirstName + " " + sender.LastName;
-
-                    body = sender.FirstName + " " + sender.LastName + " has requested your approval of an event posting.";
-
-                    action = "approve/reject this event.";
-
-                    break;
-                case Notification.Types.Dashboard:
-                    subject += " - " + sender.FirstName + " " + sender.LastName;
-
-                    body = sender.FirstName + " " + sender.LastName + " has posted to an activity feed thread in which you have participated.";
-
-                    action = "view this activity feed thread.";
-
-                    break;
-                case Notification.Types.FileSubmitted:
-                    subject += " - " + sender.FirstName + " " + sender.LastName;
-
-                    body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
-
-                    action = "view this assignment submission.";
-
-                    break;
-                case Notification.Types.RubricEvaluationCompleted:
-                    subject += " - " + sender.FirstName + " " + sender.LastName;
-
-                    body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
-
-                    action = "view this assignment submission.";
-
-                    break;
-                case Notification.Types.InlineReviewCompleted:
-                    subject += " - " + sender.FirstName + " " + sender.LastName;
-
-                    body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
-
-                    action = "view this assignment submission.";
-
-                    break;
-                case Notification.Types.TeamEvaluationDiscrepancy:
-                    subject += " - " + sender.FirstName + " " + sender.LastName;
-
-                    body = sender.FirstName + " " + sender.LastName + " has submitted a Team Evaluation that has raised a discrepancy flag."; //Can we get name of assignment?
-
-                    action = "view team evaluation discrepancy.";
-
-                    break;
-                case Notification.Types.JoinCourseApproval:
-                    subject += " - " + sender.FirstName + " " + sender.LastName;
-                    if(course != null)
-                        body = sender.FirstName + " " + sender.LastName + " has submitted a request to join " + course.Name; 
-
-                    action = "view the request to join.";
-
-                    break;
-                case Notification.Types.JoinCommunityApproval:
-                    subject += " - " + sender.FirstName + " " + sender.LastName;
-                    if(course != null)
-                        body = sender.FirstName + " " + sender.LastName + " has submitted a request to join " + course.Name; 
-
-                    action = "view the request to join.";
-
-                    break;
-                case Notification.Types.UserTag:
-                    subject += " - " + sender.FirstName + " " + sender.LastName + " tagged you in a post!";
-                    if (course != null)
-                    {
-                        body = sender.FirstName + " " + sender.LastName + " has tagged you in a post or comment in " + course.Name;
-                        action = "view the post or comment.";
-                    }
-                    break;
-                default:
-                    subject += "No Email set up for this type of notification";
-
-                    body = "No Email set up for this type of notification of type: " + n.ItemType;
-                    break;
-            }
-
-            body += "\n\n---\nDo not reply to this email.\n";
-            string str = getDispatchURL(n.ID);
-            body += string.Format("<br /><br /><a href=\"{0}\">Click this link to {1}</a>", str, action);
-            
-            MailAddress to = new MailAddress(recipient.UserName, recipient.DisplayName((int)CourseRole.CourseRoles.Instructor));
-            List<MailAddress> recipients = new List<MailAddress>();
-            recipients.Add(to);
-            Email.Send(subject, body, recipients);
         }
 
         /// <summary>
