@@ -1451,7 +1451,7 @@ namespace OSBLE.Utility
                 using (SqlConnection sqlc = GetNewConnection()) { return GetCommentsForUserID(userID, sqlc); }
             }
 
-            IEnumerable<LogCommentEvent> comments = connection.Query<LogCommentEvent>("SELECT l.* FROM LogCommentEvents l INNER JOIN EventLogs e ON l.EventLogId = e.Id WHERE e.SenderId = @uid ORDER BY e.EventDate DESC",
+            IEnumerable<LogCommentEvent> comments = connection.Query<LogCommentEvent>("SELECT * FROM LogCommentEvents l INNER JOIN EventLogs e ON l.EventLogId = e.Id WHERE (IsDeleted IS NULL OR IsDeleted = 0) AND e.SenderId = @uid ORDER BY e.EventDate DESC",
                 new { uid = userID });
             return comments;
         }
