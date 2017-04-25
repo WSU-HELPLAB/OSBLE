@@ -1,0 +1,25 @@
+﻿@using OSBLE.Areas.Analytics.Controllers
+@Styles.Render("~/Areas/Analytics/Content/AnalyticsIndex.css")
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.CurrentTab = "Analytics";
+    ViewBag.Title = "Analytics";
+    string currentView = ViewBag.CurrentView ?? "Default";
+}
+
+@* Similar to dashboard pills, except it displays even at higher screen widths *@
+<div id="analytics_menu">
+    <div class="btn-group btn-group-justified" id="analytics_pills">
+        @*@Html.ActionLink("Summary", "Load", "Analytics", new { view = "Default" }, new { @class = currentView == "Default" ? "btn btn-primary" : "btn" })*@
+        @Html.ActionLink("Calendar", "Load", "Analytics", new { view = "Calendar" }, new { @class = currentView == "Calendar" ? "btn btn-primary" : "btn" })
+        @Html.ActionLink("Timeline", "Load", "Analytics", new { view = "Timeline" }, new { @class = currentView == "Timeline" ? "btn btn-primary" : "btn" })
+    </div>   
+</div>
+
+
+<section id="analytics_content" class="row">
+    @{ Html.RenderAction("Index", (string)currentView); }
+</section>
+
+<script type="text/javascript" src="@Url.Content("~/Areas/Analytics/Scripts/AnalyticsIndex.js")"></script>

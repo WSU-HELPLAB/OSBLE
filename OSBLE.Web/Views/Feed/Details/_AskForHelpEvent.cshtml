@@ -1,0 +1,12 @@
+﻿@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+@model AggregateFeedItem
+@{
+    AskForHelpEvent help = Model.Items.First().Event as AskForHelpEvent;
+    string code = HttpUtility.HtmlEncode(help.Code);
+    code = code.Replace("\t", "&nbsp;&nbsp;&nbsp;");
+    
+    //TODO: Add "download code" button
+} 
+<span class="user-text">@help.UserComment</span>
+@* shouldn't need class="cpp" on the code block below, it should autodetect, but put it back if it's not working *@
+<pre><code >@Html.Raw(code)</code></pre>

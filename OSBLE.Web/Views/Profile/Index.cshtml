@@ -1,0 +1,273 @@
+﻿@using System.Diagnostics
+@using System.Text
+@using OSBLE.Models.Users
+@using OSBLE.Models.Queries
+@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+@using OSBLEPlus.Logic.DomainObjects.Interface
+@using OSBLEPlus.Logic.Utility.Lookups
+@using OSBLEPlus.Services.Models
+@using OSBLE.Models.ViewModels
+@using OSBLE.Utility;
+@model ProfileViewModel
+@{
+    ViewBag.Title = Model.User.FullName;
+    UserProfile currentUser = ViewBag.CurrentUser;
+    bool pointsEnabled = ViewBag.PointsEnabled ?? false;
+}
+
+<section data-tab="Profile">
+    <div class="jumbotron" id="profile-page-jumbotron">
+        <div class="left-col">
+            <img src="@Url.Action("Picture", "User", new { id = Model.User.ID, size = 110, area = "" })" title="profile image" alt="profile image" />
+        </div>
+        <div class="right-col">
+            <h1>@Model.User.DisplayName(ViewBag.ActiveCourseUser)</h1>
+            <table>
+                @if(pointsEnabled)
+                { 
+                    <tr>
+                        <td><strong>@* @Model.Score *@</strong> points</td>
+                    </tr>
+                }
+                <tr>
+                    <td><strong>@Model.NumberOfPosts</strong> post(s)</td>
+                </tr>
+                <tr>
+                    <td><strong>@Model.NumberOfComments</strong> comment(s)</td>
+                </tr>
+            </table>
+            @if (currentUser.ID == Model.User.ID)
+            {
+                <a href="@Url.Action("Profile", "Account")" class="btn btn-default">Edit <span class="glyphicon glyphicon-pencil"></span></a>
+            }
+        </div>
+        <div class="clearfix"/>
+    </div>
+</section>
+@if (Model.User.ID == currentUser.ID)
+{
+    int rowCounter = 0;
+    @*<section id="subscriptions" class="profile-content">
+        <h1>My Subscriptions</h1>
+        @if (Model.EventLogSubscriptions.Count() == 0)
+        {
+            @:You don't have any subscriptions.
+        }
+        else
+        {
+            <table id="subscriptions-table">
+                <thead>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th>Author</th>
+                        <th>Event Type</th>
+                        <th>Last Activity Date</th>
+                        <th># Comments</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (AggregateFeedItem item in Model.EventLogSubscriptions)
+                    {
+                        rowCounter++;
+                        string rowClass = "normal-row";
+                        if (rowCounter % 2 == 0)
+                        {
+                            rowClass = "alt-row";
+                        }
+                        var lastComment = (from comment in item.Comments
+                                           orderby comment.EventDate descending
+                                           select comment).FirstOrDefault();
+                        string lastCommentText = "not available";
+                        if (lastComment != null)
+                        {
+                            lastCommentText = lastComment.EventDate.ToString("MM/dd @ hh:mmtt");
+                        }
+
+                        <tr class="@rowClass">
+                            <td>
+                                <img src="@Url.Action("Picture", "Profile", new { id = item.Creator.ID, size = 24 })" height="24" width="24" title="profile image" alt="profile image" />
+                            </td>
+                            <td>
+                                @Html.ActionLink(item.Creator.FullName, "Index", "Profile", new { id = item.Creator.ID }, new { })
+                            </td>
+                            <td>@item.PrettyName</td>
+                            <td>@lastCommentText</td>
+                            <td>@item.Comments.Count</td>
+                            <td>
+                                @Html.ActionLink("View", "Details", "Feed", new { id = item.Items.FirstOrDefault().Event.EventLogId }, new { })
+                                <a style="padding-left:10px;" href="@Url.Action("UnfollowPost", "Feed", new { id = item.Items.FirstOrDefault().Event.EventLogId, returnUrl = Request.Url.AbsoluteUri })">
+                                    <img src="~/Content/icons/unfollow.png" title="unfollow" alt="unfollow" />
+                                </a>
+
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </section>*@
+}
+<section id="recent-comments" class="profile-content">
+    <h1>Recent Social Activity</h1>
+    @*@if (Model.SocialActivity.TopLevelLogCount == 0 && Model.Feed.Feed.Count == 0)*@
+    @if(true)
+    {
+        @*@:No recent activity.*@
+        @: Page currently under maintenance.
+    }
+    else
+    {
+        HashSet<DateTime> dates = new HashSet<DateTime>();
+
+        foreach (AggregateFeedItem item in Model.Feed.Feed)
+        {
+            dates.Add(item.MostRecentOccurance.Date);
+        }
+        foreach (DateTime dt in Model.SocialActivity.ActivityDates)
+        {
+            dates.Add(dt.Date);
+        }
+
+        foreach (DateTime date in dates.OrderByDescending(l => l.Date))
+        {
+            List<int> eventIds;
+            try
+            {
+                eventIds = Model.SocialActivity.GetEventIds(date);
+            }
+            catch
+            {
+                eventIds = new List<int>();
+            }
+
+            IEnumerable<AggregateFeedItem> items = Model.Feed.Feed.Where(m => m.MostRecentOccurance.Date == date);
+            
+            <div>
+                <h2 class="date-header">@date.ToLongDateString()</h2>
+                <ul>
+                    @foreach (AggregateFeedItem afi in items)
+                    {
+                        if (!afi.IsAnonymous)
+                        {
+                            string content = "";
+                            DateTime maxDate = afi.MostRecentOccurance;
+                            if (afi.FeedItemType == "Feed Post Event")
+                            {                                   
+                                content = string.Format("{0} made a {1}",
+                                afi.Creator.FullName,
+                                Html.ActionLink("post", "Details", "Feed", new { id = afi.Items[0].Event.EventLogId }, new { }));
+                            }
+                            if (afi.FeedItemType == "Helpful Mark Given Event")
+                            {
+                                content = afi.Creator.FullName + "marked a comment as helpful";
+                            }
+
+                            if (content != "")
+                            { 
+                                <li>
+                                    @Html.Raw(content)
+                                    <span class="comments-table-date">
+                                        (
+                                        <time class="utc-time"
+                                              datetime="@Helpers.DateAsUnixTime(maxDate)"
+                                              data-original-date="@Helpers.RawDate(maxDate)"
+                                              data-date-format="hh:mm A">
+                                            @maxDate.ToString("hh:mmtt") (UTC)
+                                        </time>
+                                        )
+                                    </span>
+                                </li>
+                            }
+                        }
+                    }
+                    @foreach (int logId in eventIds)
+                    {
+                        List<CommentActivityLog> socialLogs = Model.SocialActivity.GetLogs(date, logId);
+                        DateTime maxDate = socialLogs.Select(s => s.LogCommentEvent.EventDate).Max();
+                        string content = "";
+
+                        //is the user commenting on an anymous event?
+                        var ideEvents = ActivityFeedQuery.GetIdeEvents();
+                        IActivityEvent sourceEvent = socialLogs[0].LogCommentEvent.SourceEvent;
+                        
+                        if (sourceEvent.Sender == null) {
+                            sourceEvent.Sender = DBHelper.GetUserProfile(sourceEvent.SenderId);
+                        }
+                        
+                        if (ideEvents.Contains(sourceEvent.EventType))
+                        {
+                            //Is the user the target of an IDE event?  For example, did someone comment on this user's build event?
+                            //If so, we don't want to show this as it would ruin the anonymity
+                            if (sourceEvent.SenderId == Model.User.ID)
+                            {
+                                //skip this record
+                                continue;
+                            }
+
+                            //otherwise, anonymize the source
+                            sourceEvent.Sender.FirstName = "A student";
+                            sourceEvent.Sender.LastName = "";
+                        }
+
+
+                        switch (socialLogs.Count)
+                        {
+                            case 1:
+                                content = string.Format("{0} commented on a {1} by {2}",
+                                socialLogs[0].LogCommentEvent.Sender.FullName,
+                                Html.ActionLink("post", "Details", "Feed", new { id = logId }, new { }),
+                                sourceEvent.Sender.FullName);
+                                break;
+
+                            case 2:
+                                content = string.Format("{0} and {1} commented on a {2} by {3}",
+                                socialLogs[0].LogCommentEvent.Sender.FullName,
+                                socialLogs[1].LogCommentEvent.Sender.FullName,
+                                Html.ActionLink("post", "Details", "Feed", new { id = logId }, new { }),
+                                sourceEvent.Sender.FullName);
+                                break;
+
+                            case 3:
+                                content = string.Format("{0}, {1}, and {2} commented on a {3} by {4}",
+                                socialLogs[0].LogCommentEvent.Sender.FullName,
+                                socialLogs[1].LogCommentEvent.Sender.FullName,
+                                socialLogs[2].LogCommentEvent.Sender.FullName,
+                                Html.ActionLink("post", "Details", "Feed", new { id = logId }, new { }),
+                                sourceEvent.Sender.FullName);
+                                break;
+
+                            default:
+                                content = string.Format("{0}, {1}, and {2} other(s) commented on a {3} by {4}",
+                                socialLogs[0].LogCommentEvent.Sender.FullName,
+                                socialLogs[1].LogCommentEvent.Sender.FullName,
+                                socialLogs.Count - 2,
+                                Html.ActionLink("post", "Details", "Feed", new { id = logId }, new { }),
+                                sourceEvent.Sender.FullName);
+                                break;
+                        }
+
+                        <li>
+                            @Html.Raw(content)
+                        <span class="comments-table-date">
+                            (
+                            <time class="utc-time"
+                                  datetime="@Helpers.DateAsUnixTime(maxDate)"
+                                  data-original-date="@Helpers.RawDate(maxDate)"
+                                  data-date-format="hh:mm A">
+                                @maxDate.ToString("hh:mmtt") (UTC)
+                            </time>
+                            )
+                        </span>
+                    </li>
+                    }
+                </ul>
+            </div>
+        }
+    }
+</section>
+<section class="profile-content">
+    @*<h1>All Activity</h1>*@
+    @*Html.Partial("Feed/_Feed", Model.Feed)*@
+    
+</section>

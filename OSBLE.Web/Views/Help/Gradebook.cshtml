@@ -1,0 +1,111 @@
+﻿@{
+    ViewBag.Title = "Gradebook";
+}
+<h1>Gradebook</h1>
+<p>
+    OSBLE supports the uploading of CSV-based files as course gradebooks.  
+    This page discusses both how to upload a gradebook to OSBLE and the expected format of the CSV files. 
+    <br /> 
+
+    <ul>
+        <li><a href="#prepare">Preparing CSV file or Zipped CSV files for gradebook upload</a></li>
+        <li><a href="#uploadinggrades">Uploading grades for instructors and teaching assistants</a></li>
+        <li><a href="#download">Downloading Gradebooks</a></li>
+        <li><a href="#expected">Expected gradebook file format</a></li>
+        <li><a href="https://plus.osble.org/Gradebook/GradebookHelp">Using Microsoft Excel Plugin for uploading Gradebooks</a></li>
+
+    </ul>
+
+</p>
+<h1 id="uploading">Uploading a Gradebook to OSBLE</h1>
+<h2 id="prepare"> Preparing CSV file or Zipped CSV files for gradebook upload</h2>
+<p>
+    Gradebook files can either be submitted as a single CSV file or in bulk as a ZIP file.  
+    To begin, open your gradebook as normal.  In this example, we are using Microsoft Excel.
+</p>
+<img src="@Url.Content("~/Content/images/help/gradebook_1.png")" alt="an excel gradebook" style="float:left"/>
+
+<img src="@Url.Content("~/Content/images/help/gradebook_1TA.png")" alt="an excel gradebook" style="float:left; margin-left:15px"/>
+<p>
+   <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+    Our example gradebook contains three worksheets: MainDemo,ExamDemo and ParticipationDemo.  
+     Each worksheet will need to be converted to CSV file. The above two images above show example gradebooks that an instructor who manages several sections would see as well as a teaching assistant who is responsible for Section 1 and 2. To convert to CSV, make sure that the appropriate
+     worksheet is selected and select save as &quot;Other Formats.&quot;
+</p>
+<p>
+    Select &quot;CSV (Comma delimited) (*.csv)&quot; from the &quot;Save as type&quot; dropdown list.
+    Give the CSV file the same name as the corresponding worksheet.
+</p>
+<img src="@Url.Content("~/Content/images/help/gradebook_3.png")" alt="save as -> other formas" />
+
+<p>
+    After exporting all worksheets to CSV, you will need to compile them into a ZIP file.  
+    On Windows systems, this can be accomplished by highlighting all worksheets, right clicking, 
+    selecting Send to -> Compressed (zipped) folder.  This will create a new ZIP file in the same 
+    folder as your CSV files.  Note that creating a ZIP file is only required if your gradebook has 
+    multiple worksheets.  
+</p>
+<img src="@Url.Content("~/Content/images/help/gradebook_5.png")" alt="creating zip files" />
+<p>
+    Having created the ZIP file, it is now time to upload the file to OSBLE.  
+    To begin, click the &quot;Grades&quot; tab near the top of the page.
+</p>
+
+
+<h2 id="uploadinggrades">Uploading Grades for Instructors and Teaching Assistants</h2>
+
+<img src="@Url.Content("~/Content/images/help/gradebook_6.png")" alt="click the grades tab" />
+<img src="@Url.Content("~/Content/images/help/gradebook_6TA.png")" alt="click the grades tab" />
+
+
+<p>
+    On the far right of the page, you will see a button titled &quot;Browse.&quot;  
+    Clicking this button will bring up an &quot;Open File&quot; dialog.  Select the ZIP file created 
+    in the previous step or a single CSV file, click the okay button, and then click the 
+    &quot;Upload&quot; button.  After a moment, the page will refresh with your gradebook data.  
+    Note that each workbook receives its own tab. 
+    <br />
+    <br />
+    <img src="@Url.Content("~/Content/images/help/gradebook_7.png")" alt="a sample gradebook" />
+
+    <br /> 
+    <br />
+    When uploading gradebooks as a TA, only the grades in which the section(s) the TA is responsible for will be changed. However, the same uploading procedure is exactly the same as the instructor procedure. 
+    <br /> <b>Note: It is the responsibility of the TA to ensure that they are following the gradebook format that is set by the instructor. </b>
+    <br /> <br /> When a TA or TAs upload(s) the grades for his or her section(s), the instructor will see all changes reflected in the gradebook with all sections accessible. 
+
+</p>
+<img src="@Url.Content("~/Content/images/help/gradebook_7AfterTAEdits.png")" alt="a sample gradebook" />
+
+
+<img src="@Url.Content("~/Content/images/help/gradebook_7TA.png")" alt="a sample gradebook" style="float:none" />
+
+<h2 id="download">
+    Downloading Gradebooks 
+</h2>
+<p>Both instructors and TAs have the ability to download grades from their respective views. When an instructor downloads gradeboks, it will zip up all .csv files with all changes that have been made
+    by TAs with all sections. On the other hand, TAs will only be able to download grades based on their section and will only have .csv files which contain rows of only students they are responsible for. </p>
+
+<h2 id="expected">Expected Gradebook File Format
+</h2>
+<p>
+    OSBLE expects the first column of any CSV file to contain student ID numbers and the second column 
+    to contain student names.  By default, students will only see the row on which their student ID occurs.  
+    This behavior can be altered by using two special character modifiers.  
+</p>
+<img src="@Url.Content("~/Content/images/help/gradebook_9StudentView.png")" alt="a sample gradebook" style="float:none" />
+
+<p>
+    Including a pound (#) sign on the first cell of a row will allow students to see that row even 
+    when the row does not contain their ID number.  Using the pound sign is often useful for 
+    displaying summary data or the names of assignments as a sort of header row.  
+</p>
+<p>
+    Including an exclamation point (!) in any cell will mark the column in which the exclamation exists 
+    not visible to students regardless of whether or not their ID number occurs on the row.  
+    This is often useful for hiding information such as aggregate data (e.g. grade distributions, etc.) 
+    that you do not want to expose to students.
+</p>
+<p>
+    <b>For instructors</b>: If you plan to edit the order of the columns or add columns, you must download the gradebook and modify it through Microsoft Excel. 
+</p>

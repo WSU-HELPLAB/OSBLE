@@ -1,0 +1,261 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>OSBLEPlus.Database</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{aca340b7-a24a-4f24-b9cb-f15c9d8b1f60}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql120DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>OSBLEPlus.Database</RootNamespace>
+    <AssemblyName>OSBLEPlus.Database</AssemblyName>
+    <ModelCollation>1033, CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="Schema" />
+    <Folder Include="Schema\Functions" />
+    <Folder Include="Schema\Stored Procedures" />
+    <Folder Include="Schema\Tables" />
+    <Folder Include="Pre-Deployment" />
+    <Folder Include="Post-Deployment" />
+    <Folder Include="Post-Deployment\Activity Imports" />
+    <Folder Include="Post-Deployment\Indexes" />
+    <Folder Include="Post-Deployment\Seeds" />
+    <Folder Include="Post-Deployment\Static Data" />
+    <Folder Include="Schema\Stored Procedures\Analytics" />
+    <Folder Include="Schema\Stored Procedures\Profiles" />
+    <Folder Include="Schema\Stored Procedures\Activiities" />
+    <Folder Include="Docs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="Schema\Functions\Split.sql" />
+    <Build Include="Schema\Tables\AbetAssignmentOutcomes.sql" />
+    <Build Include="Schema\Tables\AbetSubmissionTags.sql" />
+    <Build Include="Schema\Tables\AbstractCourses.sql" />
+    <Build Include="Schema\Tables\AbstractDashboards.sql" />
+    <Build Include="Schema\Tables\AbstractRoles.sql" />
+    <Build Include="Schema\Tables\ActivityLogs.sql" />
+    <Build Include="Schema\Tables\AnnotateDocumentReferences.sql" />
+    <Build Include="Schema\Tables\AskForHelpEvents.sql" />
+    <Build Include="Schema\Tables\Assessments.sql" />
+    <Build Include="Schema\Tables\Assignments.sql" />
+    <Build Include="Schema\Tables\AssignmentTeams.sql" />
+    <Build Include="Schema\Tables\AssignmentTypes.sql" />
+    <Build Include="Schema\Tables\BreakPoints.sql" />
+    <Build Include="Schema\Tables\BuildDocuments.sql" />
+    <Build Include="Schema\Tables\BuildErrors.sql" />
+    <Build Include="Schema\Tables\BuildEventBreakPoints.sql" />
+    <Build Include="Schema\Tables\BuildEventErrorListItems.sql" />
+    <Build Include="Schema\Tables\BuildEvents.sql" />
+    <Build Include="Schema\Tables\CellDescriptions.sql" />
+    <Build Include="Schema\Tables\CodeDocumentBreakPoints.sql" />
+    <Build Include="Schema\Tables\CodeDocumentErrorListItems.sql" />
+    <Build Include="Schema\Tables\CodeDocuments.sql" />
+    <Build Include="Schema\Tables\CommentCategories.sql" />
+    <Build Include="Schema\Tables\CommentCategoryConfigurations.sql" />
+    <Build Include="Schema\Tables\CommentCategoryOptions.sql" />
+    <Build Include="Schema\Tables\CourseBreaks.sql" />
+    <Build Include="Schema\Tables\CourseMeetings.sql" />
+    <Build Include="Schema\Tables\CourseRubrics.sql" />
+    <Build Include="Schema\Tables\CourseUsers.sql" />
+    <Build Include="Schema\Tables\Criteria.sql" />
+    <Build Include="Schema\Tables\CriterionEvaluations.sql" />
+    <Build Include="Schema\Tables\CriticalReviewSettings.sql" />
+    <Build Include="Schema\Tables\CutCopyPasteEvents.sql" />
+    <Build Include="Schema\Tables\DebugEvents.sql" />
+    <Build Include="Schema\Tables\Deliverables.sql" />
+    <Build Include="Schema\Tables\DiscussionAssignmentMetaInfoes.sql" />
+    <Build Include="Schema\Tables\DiscussionPosts.sql" />
+    <Build Include="Schema\Tables\DiscussionSettings.sql" />
+    <Build Include="Schema\Tables\DiscussionTeams.sql" />
+    <Build Include="Schema\Tables\EditorActivityEvents.sql" />
+    <Build Include="Schema\Tables\ErrorListItems.sql" />
+    <Build Include="Schema\Tables\ErrorTypes.sql" />
+    <Build Include="Schema\Tables\EventLogs.sql" />
+    <Build Include="Schema\Tables\EventLogSubscriptions.sql" />
+    <Build Include="Schema\Tables\Events.sql" />
+    <Build Include="Schema\Tables\EventTypes.sql" />
+    <Build Include="Schema\Tables\ExceptionEvents.sql" />
+    <Build Include="Schema\Tables\FeedPostEvents.sql" />
+    <Build Include="Schema\Tables\HelpfulMarkGivenEvents.sql" />
+    <Build Include="Schema\Tables\icalEvents.sql" />
+    <Build Include="Schema\Tables\Levels.sql" />
+    <Build Include="Schema\Tables\LogCommentEvents.sql" />
+    <Build Include="Schema\Tables\Mails.sql" />
+    <Build Include="Schema\Tables\Notifications.sql" />
+    <Build Include="Schema\Tables\ProfileImages.sql" />
+    <Build Include="Schema\Tables\ReviewTeams.sql" />
+    <Build Include="Schema\Tables\RubricEvaluations.sql" />
+    <Build Include="Schema\Tables\Rubrics.sql" />
+    <Build Include="Schema\Tables\SaveEvents.sql" />
+    <Build Include="Schema\Tables\Schools.sql" />
+    <Build Include="Schema\Tables\Settings.sql" />
+    <Build Include="Schema\Tables\SubmitEvents.sql" />
+    <Build Include="Schema\Tables\TeamEvaluationComments.sql" />
+    <Build Include="Schema\Tables\TeamEvaluations.sql" />
+    <Build Include="Schema\Tables\TeamEvaluationSettings.sql" />
+    <Build Include="Schema\Tables\TeamMembers.sql" />
+    <Build Include="Schema\Tables\Teams.sql" />
+    <Build Include="Schema\Tables\UserProfiles.sql" />
+    <Build Include="Schema\Tables\WhiteTables.sql" />
+    <Build Include="Schema\Tables\WhiteTableUsers.sql" />
+    <None Include="Post-Deployment\Activity Imports\01_Assignments.sql" />
+    <None Include="Post-Deployment\Activity Imports\02_Course User and Roles.sql" />
+    <None Include="Post-Deployment\Activity Imports\03_Import OSBIDE EventLogs.sql" />
+    <None Include="Post-Deployment\Activity Imports\04_AskForHelpEvents.sql" />
+    <None Include="Post-Deployment\Activity Imports\05_BuildEvents.sql" />
+    <None Include="Post-Deployment\Activity Imports\06_CodeDocuments.sql" />
+    <None Include="Post-Deployment\Activity Imports\07_BuildDocuments.sql" />
+    <None Include="Post-Deployment\Activity Imports\08_BreakPoints.sql" />
+    <None Include="Post-Deployment\Activity Imports\09_BuildEventBreakPoints.sql" />
+    <None Include="Post-Deployment\Activity Imports\10_CodeDocumentBreakPoints.sql" />
+    <None Include="Post-Deployment\Activity Imports\11_ErrorListItems.sql" />
+    <None Include="Post-Deployment\Activity Imports\12_BuildEventErrorListItems.sql" />
+    <None Include="Post-Deployment\Activity Imports\13_CodeDocumentErrorListItems.sql" />
+    <None Include="Post-Deployment\Activity Imports\14_ErrorTypes.sql" />
+    <None Include="Post-Deployment\Activity Imports\15_BuildErrors.sql" />
+    <None Include="Post-Deployment\Activity Imports\16_SaveEvents.sql" />
+    <None Include="Post-Deployment\Activity Imports\17_SubmitEvents.sql" />
+    <None Include="Post-Deployment\Activity Imports\18_CutCopyPasteEvents.sql" />
+    <None Include="Post-Deployment\Activity Imports\19_DebugEvents.sql" />
+    <None Include="Post-Deployment\Activity Imports\20_EditorActivityEvents.sql" />
+    <None Include="Post-Deployment\Activity Imports\21_ExceptionEvents.sql" />
+    <None Include="Post-Deployment\Activity Imports\22_FeedPostEvents.sql" />
+    <None Include="Post-Deployment\Activity Imports\23_LogCommentEvents.sql" />
+    <None Include="Post-Deployment\Activity Imports\24_HelpfulMarkGivenEvents.sql" />
+    <None Include="Post-Deployment\Activity Imports\25_EventLogSubscriptions.sql" />
+    <None Include="Post-Deployment\Indexes\CourseUsers.sql" />
+    <None Include="Post-Deployment\Indexes\Events.sql" />
+    <None Include="Post-Deployment\Seeds\Courses.sql" />
+    <None Include="Post-Deployment\Seeds\CourseUsers.sql" />
+    <None Include="Post-Deployment\Seeds\DependencyEvents.sql" />
+    <None Include="Post-Deployment\Seeds\EventLogs2014Feb1.sql" />
+    <None Include="Post-Deployment\Seeds\EventLogs2014Feb2.sql" />
+    <None Include="Post-Deployment\Seeds\EventLogs2014Feb3.sql" />
+    <None Include="Post-Deployment\Seeds\EventLogs2014Feb4.sql" />
+    <None Include="Post-Deployment\Seeds\EventLogs2014Feb5.sql" />
+    <None Include="Post-Deployment\Seeds\EventLogs2014Feb6.sql" />
+    <None Include="Post-Deployment\Seeds\EventLogs2014Feb7.sql" />
+    <None Include="Post-Deployment\Seeds\EventLogs2014Feb8.sql" />
+    <None Include="Post-Deployment\Seeds\EventLogs2014Feb9.sql" />
+    <None Include="Post-Deployment\Seeds\EventLogs2014Jan1.sql" />
+    <None Include="Post-Deployment\Seeds\EventLogs2014Jan2.sql" />
+    <None Include="Post-Deployment\Seeds\EventLogs2014Jan3.sql" />
+    <None Include="Post-Deployment\Seeds\EventLogs2014Jan4.sql" />
+    <None Include="Post-Deployment\Seeds\EventLogs2014Jan5.sql" />
+    <None Include="Post-Deployment\Seeds\EventLogs2014Jan6.sql" />
+    <None Include="Post-Deployment\Seeds\UserProfiles.sql" />
+    <None Include="Post-Deployment\Static Data\AbstractRoles.sql" />
+    <None Include="Post-Deployment\Static Data\AssignmentTypes.sql" />
+    <None Include="Post-Deployment\Static Data\DebugActions.sql" />
+    <None Include="Post-Deployment\Static Data\EventTypes.sql" />
+    <None Include="Post-Deployment\Static Data\Schools.sql" />
+    <Build Include="Schema\Tables\FeedPostHashtags.sql" />
+    <Build Include="Schema\Tables\HashTags.sql" />
+    <Build Include="Schema\Tables\UserActivities.sql" />
+    <Build Include="Schema\Stored Procedures\Activiities\GetActivityFeeds.sql" />
+    <Build Include="Schema\Stored Procedures\Analytics\GetCalendarMeasuresByDay.sql" />
+    <Build Include="Schema\Stored Procedures\Analytics\GetCalendarMeasuresByHour.sql" />
+    <Build Include="Schema\Stored Procedures\Activiities\InsertPostTags.sql" />
+    <Build Include="Schema\Stored Procedures\Profiles\GetCourses.sql" />
+    <Build Include="Schema\Stored Procedures\Profiles\LogUserTransaction.sql" />
+    <Build Include="Schema\Tables\FeedPostUserSettings.sql" />
+    <Build Include="Schema\Stored Procedures\Profiles\GetCoursesForUser.sql" />
+    <Build Include="Schema\Stored Procedures\Profiles\GetAssignmentsForCourse.sql" />
+    <Build Include="Schema\Stored Procedures\Activiities\GetMostRecentSocialActivityForUser.sql" />
+    <Build Include="Schema\Tables\LocalErrorLogs.sql" />
+    <Build Include="Schema\Tables\PassiveSocialEvents.sql" />
+    <Build Include="Schema\Stored Procedures\Analytics\GetStateMachineEvents.sql" />
+    <Build Include="Schema\Tables\WhatsNewItems.sql" />
+    <Build Include="Schema\Stored Procedures\Activiities\GetMostRecentWhatsNewItem.sql" />
+    <Build Include="Schema\Stored Procedures\Analytics\GetStudentList.sql" />
+    <Build Include="Schema\Stored Procedures\Profiles\GetLastSubmitDateForAssignment.sql" />
+    <Build Include="Schema\Stored Procedures\Activiities\GetActivityFeedsWithCommentSenderLogFilters.sql" />
+    <Build Include="Schema\Stored Procedures\Activiities\GetActivityFeedsWithCommentSenderFilters.sql" />
+    <Build Include="Schema\Stored Procedures\Activiities\GetActivityFeedsWithCommentLogFilters.sql" />
+    <Build Include="Schema\Stored Procedures\Activiities\GetActivityFeedsWithLogFilters.sql" />
+    <Build Include="Schema\Stored Procedures\Activiities\GetActivityFeedsWithSenderFilters.sql" />
+    <Build Include="Schema\Stored Procedures\Activiities\GetActivityFeedsWithSenderLogFilters.sql" />
+    <Build Include="Schema\Stored Procedures\Activiities\GetActivityFeedsWithCommentFilters.sql" />
+    <Build Include="Schema\Stored Procedures\Activiities\GetActivityFeedsBasic.sql" />
+    <Build Include="Schema\Stored Procedures\Profiles\GetAssignmentTeam.sql" />
+    <Build Include="Schema\Stored Procedures\Activiities\GetActivityFeedById.sql" />
+    <Build Include="Schema\Tables\OSBLEActivityEvents.sql" />
+    <Build Include="Schema\Tables\OSBLEInterventionInteractions.sql" />
+    <Build Include="Schema\Tables\OSBLEInterventions.sql" />
+    <Build Include="Schema\Tables\UserStatus.sql" />
+    <Build Include="Schema\Tables\OSBLEInterventionsStatus.sql" />
+    <Build Include="Schema\Tables\OSBLEInterventionSettings.sql" />
+    <Build Include="Schema\Tables\OSBLEInterventionsCourses.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="Post-Deployment\Script.PostDeployment.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="Schema\Tables\FeedPostUserTags.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Docs\AutoDeploy.txt" />
+    <None Include="OSBLEPlus.Database.publish.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Docs\AutoDeploy.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="OSBLEPlus.Database.publish.xml" />
+    <None Include="OSBLEPlus_1.Database.publish.xml" />
+  </ItemGroup>
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>

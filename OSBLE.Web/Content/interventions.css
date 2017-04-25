@@ -1,0 +1,162 @@
+﻿.intervention-body {
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.intervention-heading {
+    text-align: center;
+    font-size: 1.5em;
+}
+
+.intervention-heading-large {
+    text-align: center;
+    font-size: 2em;    
+}
+
+.intervention-heading-large span {
+    text-align: center;
+    font-size: 1.2em;    
+    vertical-align: middle;
+}
+
+#post-to-class-anon:hover, #post-class-feed-anon:hover {
+  background-color: #4d565f !important;
+}
+
+#post-to-class-anon, #post-class-feed-anon {
+    background-color: #6d7984;
+    color: white;
+}
+
+.left {
+    float: left;
+}
+
+.left-text {
+    text-align: left;
+    margin: 5px;
+}
+
+.right {
+    float: right;
+    margin: 5px;
+}
+
+.right-text {
+    text-align: right;
+}
+
+.btn-right {
+    text-align: right;
+    margin-right: 20px;
+}
+
+.center {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.details-reply {
+    margin-top: 5px;
+}
+
+.text-margins {
+    margin-right: 20px;
+}
+
+textarea {
+    width: 100%;
+    text-align: left;
+    min-height: 150px;
+}
+
+#question-area {
+    border: 1px dashed #0094ff;
+    padding: 10px;
+    margin: 10px;
+}
+
+.Hashtag {
+    background-color: #DFE5FF;
+    border-radius: 20%;
+    padding: 1px;
+    width: 10%;
+    height: 10%;
+}
+
+.update-status {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.hover-link-edit {
+    cursor: pointer;
+}
+
+.hover-link-save {
+    cursor: pointer;
+    display: none;
+}
+
+#code-edit-box {
+    display: none;
+}
+
+#status-message-placeholder {
+    margin-bottom: 5px;
+}
+
+#status-update-message {
+    margin-top: 5px;
+}
+
+#update-post-result {
+    padding: 10px;
+    margin: 10px;
+    color: green;
+    font-weight: bold;
+    font-style: oblique;
+    font-size: larger;
+}
+
+#post-success, #feedback-post-success {
+    padding: 10px;
+    margin: 10px;
+    color: green;
+    font-weight: bold;
+    font-style: oblique;
+    font-size: larger;
+}
+
+#post-error, #update-post-result-error, #feedback-post-error {
+    padding: 10px;
+    margin: 10px;
+    color: red;
+    font-weight: bold;
+    font-style: oblique;
+    font-size: larger;
+}
+
+
+ul.available-users-details {
+    list-style-type: none;
+}
+
+.feedback span {    
+    margin-left: 2px;
+    margin-right: 2px;  
+}
+
+.feedback {
+    border: 1px solid #DFE5FF;
+    border-radius: 25px;
+    padding: 5px;    
+}
+
+.feedback a {
+    text-decoration: none; 
+}

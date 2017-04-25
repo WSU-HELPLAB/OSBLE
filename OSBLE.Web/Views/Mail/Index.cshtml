@@ -1,0 +1,176 @@
+﻿@model IEnumerable<OSBLE.Models.Users.Mail>
+@using OSBLE.Models
+@using OSBLE.Models.Courses
+
+@{
+    ViewBag.Title = ViewBag.BoxHeader;
+    List<int> attachmentIds = ViewBag.AttachmentThreadIds;
+    if (null == attachmentIds)
+    {
+        attachmentIds = new List<int>();
+    }
+}
+
+<h2>@ViewBag.BoxHeader</h2>
+<div id="mail_page">
+    @using (Html.BeginForm("Delete", "Mail", new { area = "" }, FormMethod.Post, new { id = "deleteForm" }))
+    {
+
+        <div class="btn-group-vertical" id="mail_menu">
+            <a class="btn btn-primary" href="/Mail/Create">Compose</a>
+            <a class="btn btn-primary" href="/Mail/Index">Inbox</a>
+            <a class="btn btn-primary" href="/Mail/Outbox">Outbox</a>
+            <input id="FormSubmitButton" type="submit" class="btn btn-primary" disabled="disabled" value="Delete" />
+        </div>
+
+        <div class="MailContent">
+
+            <table class="inbox_table">
+                <thead>
+                    @{
+        string method = "OutBox";
+        if (ViewBag.BoxHeader == "Inbox")
+        {
+            method = "Index";
+        }
+
+        <tr>
+            <th style="text-align: center;" id="checkAll" class="inbox_checkbox_header"><input id="checkAllBox" type="checkbox" /></th>
+            <th class="inbox_attachments_header"></th>
+            <th class="inbox_time_header">@Html.ActionLink("Date:", method, new { sortBy = ViewBag.DateSortByValue })</th>
+            <th class="inbox_context_header">@Html.ActionLink("Context:", method, new { sortBy = ViewBag.ContextSortByValue })</th>
+            <th class="inbox_from_header">@Html.ActionLink("From:", method, new { sortBy = ViewBag.FromSortByValue })</th>
+            <th class="inbox_subject_header">@Html.ActionLink("Subject:", method, new { sortBy = ViewBag.SubjectSortByValue })</th>
+        </tr>
+                    }
+                </thead>
+                
+                @foreach (var item in Model)
+                {
+                    <tr id="mail_item_@(item.ID)" class="@if (!item.Read)
+                                                {<text>inbox_unread</text>}">
+                        <td style="text-align: center;"><input id="@item.ID" class="mailCheckBoxClass" name="mailItem_@(item.ID)" type="checkbox" /></td>
+                        <td class="inbox_attachments">
+                            @if (attachmentIds.Contains(item.ThreadID))
+                            {
+                                <span class="glyphicon glyphicon-paperclip" style="text-align: center;"></span>
+                            }
+                        </td>
+                        <td class="inbox_time">
+                            <time class="utc-time"
+                                  style="font-size:small;"
+                                  datetime="@Helpers.DateAsUnixTime(item.Posted)"
+                                  data-original-date="@Helpers.RawDate(item.Posted)"
+                                  data-date-format="MM/DD/YYYY hh:mm A">
+                                @item.Posted.ToShortDateString() @item.Posted.ToShortTimeString() (UTC)
+                            </time>
+                        </td>
+                        <td class="inbox_context">
+                            @if (item.Context != null)
+                            {
+                                if (item.Context is Course)
+                                {
+                                    Course c = item.Context as Course;
+                                    <small>@String.Format("{0} {1}", c.Prefix, c.Number)</small>
+                                }
+                                else if (item.Context is Community)
+                                {
+                                    Community comm = item.Context as Community;
+                                    <small>@comm.Nickname</small>
+                                }
+                            }
+                        </td>
+                        <td class="inbox_from">
+                            @if (ViewBag.BoxHeader == "Inbox")
+                            {
+                                <small>@item.FromUserProfile.FirstName @item.FromUserProfile.LastName</small>
+                            }
+                            else
+                            {
+                                <small>@item.ToUserProfile.FirstName @item.ToUserProfile.LastName</small>
+                            }
+                        </td>
+                        <td class="inbox_subject">
+                            @Html.ActionLink(item.Subject, "View", new { id = item.ID })
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    }
+</div>
+
+<script type="text/javascript">
+    var checkBoxesChecked = 0;
+
+    $(document).ready(function () {
+        //Some browsers keep check boxes checked after navigation that would normally clear them. 
+        //This code handles that scenario gracefully for the checkall checkbox and delete button.
+
+        //handling delete button
+        $('input[class=mailCheckBoxClass]').each(function () {
+            if (document.getElementById(this.id).checked) {
+                checkBoxesChecked++;
+            }
+        });
+        handleDeleteButton();
+
+        //handling checkall button
+        if (document.getElementById('checkAllBox').checked) {
+            $('input[class=mailCheckBoxClass]').each(function () {
+                if (document.getElementById(this.id).checked = false) {
+                    checkBoxesChecked++;
+                    document.getElementById(this.id).checked = true;
+                }
+
+            });
+        }
+    });
+
+    function handleDeleteButton() {
+        if (checkBoxesChecked > 0) {
+            $("#FormSubmitButton").removeAttr("disabled");
+        }
+        else {
+            $("#FormSubmitButton").attr("disabled", "disabled");
+        }
+    }
+
+    $("#checkAllBox").change(function () {
+        if (document.getElementById(this.id).checked) {
+            checkBoxesChecked = 0;
+            $('input[class=mailCheckBoxClass]').each(function () {
+                document.getElementById(this.id).checked = true;
+                checkBoxesChecked++;
+            });
+        }
+        else {
+            $('input[class=mailCheckBoxClass]').each(function () {
+                document.getElementById(this.id).checked = false;
+            });
+            checkBoxesChecked = 0;
+        }
+        handleDeleteButton();
+    });
+
+
+    $(".mailCheckBoxClass").change(function () {
+        if (document.getElementById(this.id).checked) {
+            checkBoxesChecked++;
+        }
+        else {
+            checkBoxesChecked--;
+        }
+        handleDeleteButton();
+    });
+
+    $('#deleteForm').submit(function () {
+        var confirmMessage = "Are you sure you want to permanently delete these " + checkBoxesChecked + " selected mail items?"
+        if (checkBoxesChecked == 1) {
+            confirmMessage = "Are you sure you want to permanently delete this mail item?";
+        }
+        var c = confirm(confirmMessage);
+        return c;
+    });
+
+</script>

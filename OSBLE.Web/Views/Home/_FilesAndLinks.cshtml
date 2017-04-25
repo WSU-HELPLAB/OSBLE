@@ -1,0 +1,203 @@
+﻿@model System.Xml.XmlElement
+
+@{
+    string name = Model.GetAttribute("name");
+    string path;
+    int stateIndex = 0;
+    int courseID = 0;
+
+    //special case for root
+    if (name == "/" || !ViewData.ContainsKey("path"))
+    {
+        path = "";
+        stateIndex = 0;
+        courseID = ViewBag.ActiveCourseID;
+    }
+    else
+    {
+        path = ViewData["path"] + "/" + name;
+        stateIndex = (int)ViewData["stateIndex"];
+        courseID = (int)ViewData["courseID"];
+    }
+
+    bool canUploadTo = false, canDelete = false;
+
+    string temp = Model.GetAttribute("can_upload_to");
+    if (null != temp && "true" == temp.ToLower())
+    { canUploadTo = true; }
+
+    temp = Model.GetAttribute("can_delete");
+    if (null != temp && "true" == temp.ToLower())
+    { canDelete = true; }
+
+    bool pathHasIndex = false;
+    string target = "";
+    string download = "download";
+}
+
+@if (Model.Name == "folder")
+{
+    <script type="text/javascript">
+        // First, create an object to be referenced later by javascript functions
+        var stateIndex = Number(@stateIndex);
+
+        var stateObj = {
+            arrayIndex: stateIndex,
+            allowsDeletion: Boolean(@canDelete.ToString().ToLower()),
+            allowsUploads: Boolean(@canUploadTo.ToString().ToLower()),
+            allowsCollapsing: true, // For now everything can be collapsed
+            controlsVisible: false,
+            expanded: false,
+            fm_div_ID: "divFileManager",
+            isFolder: true,
+            name: '@name',
+            targetFolder: '@path',
+        };
+
+        // Put it in the global array
+        cfm_states[stateIndex] = stateObj;
+    </script>
+
+    <div class="@(name == "/"? "folder folder-root" : "folder folder-collapsed")" id="folder_@stateIndex" data-state_index="@stateIndex">
+
+        @if (name != "/")
+        {
+            <div class="folder-header">
+                <a class="folder-name-link" title="@name">
+                    <span class="expArrow glyphicon glyphicon-triangle-right"></span>
+                    <span class="glyphicon glyphicon-folder-open"></span>&nbsp;
+                    @name
+                </a>
+
+                @if (canUploadTo || canDelete)
+                {
+                    <div class="file-controls dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-option-vertical"></span></a>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            @if (canUploadTo)
+                            {
+                                <li><a href="#" title="Create new sub-folder" onclick="cfm_CreateFolderIconClicked(@stateIndex)"><span class="glyphicon glyphicon-folder-open"></span> Create Sub-folder</a></li>
+                                <li><a href="#" title="Upload a file to this directory" onclick="cfm_AddUploader(@stateIndex)"><span class="glyphicon glyphicon-open-file"></span> Upload File</a></li>
+                            }
+                            @if (canDelete)
+                            {
+                                <li><a href="#" title="Rename this folder" onclick="cfm_RenameFolderIconClicked(@stateIndex)"><span class="glyphicon glyphicon-pencil"></span> Rename Folder</a></li>
+                                <li><a href="#" title="Delete this folder" onclick="cfm_DeleteFolderIconClicked(@stateIndex)"><span class="glyphicon glyphicon-trash"></span> Delete Folder</a></li>
+                            }
+                        </ul>
+                    </div>
+                }
+            </div>
+        }
+
+        @* We recursively call this partial view to create subfolders and files *@
+        <div class="folder-content">
+            @* Do Sub-folders first *@
+            @{ int childIndex = stateIndex + 1; }
+            @foreach (System.Xml.XmlElement child in Model.ChildNodes)
+            {
+                if (child.Name == "folder")
+                {
+                    @Html.Partial("_FilesAndLinks", child, new ViewDataDictionary { { "path", path }, {"stateIndex", childIndex}, {"courseID", courseID} });
+                    childIndex = CountFolderChildern(child, childIndex);
+                }
+            }
+
+            @* Then files *@
+            @foreach (System.Xml.XmlElement child in Model.ChildNodes)
+            {
+                if (child.Name != "folder")
+                {
+                    @Html.Partial("_FilesAndLinks", child, new ViewDataDictionary { { "path", path }, {"stateIndex", childIndex}, {"courseID", courseID} });
+                    childIndex++;
+                }
+            }
+        </div>
+    </div>
+}
+else // Files
+{
+    <script type="text/javascript">
+        // again, we need to make an object for later js functions
+        var stateIndex = Number(@stateIndex);
+
+        var stateObj = {
+            arrayIndex: stateIndex,
+            allowsDeletion: Boolean(@canDelete.ToString().ToLower()),
+            controlsVisible: false,
+            fm_div_ID: "divFileManager",
+            isFolder: false,
+            name: '@name',
+            targetFolder: '@ViewData["path"]',
+            fullPath: '@path',
+        };
+
+        // Put it in the global array
+        cfm_states[stateIndex] = stateObj;
+    </script>
+
+    <div class="file" data-path="/FileHandler/CourseDocument?courseId=@courseID&filePath=@path" id="file_@stateIndex" data-state_index="@stateIndex">
+        @if (path.IndexOf('.') > -1) // if path contains '.'
+        {
+            pathHasIndex = true;
+            //is it a .link? add target="_blank"
+            var extension = path.Substring(path.LastIndexOf('.'));
+            if (extension == ".link")
+            {
+                target = "_blank";
+                download = "";
+            }        
+        }
+
+        <a class="file-header" href="/FileHandler/CourseDocument?courseId=@courseID&filePath=@path" title="@name" target="@target" @download>
+            @if (pathHasIndex)
+            {
+                <img src="@Helpers.GetIconImgPath(path.Substring(path.LastIndexOf('.')))" />
+            }
+            else
+            {
+                <img src="@Helpers.GetIconImgPath("")" />
+            }
+            @name
+        </a>
+
+        <div class="file-controls dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-option-vertical"></span></a>
+            <ul class="dropdown-menu dropdown-menu-right">
+                <li><a href="#" title="Copy Link" onclick="cfm_CopyLinkClicked(@stateIndex)"><span class="glyphicon glyphicon-paperclip"></span> Copy Link</a></li>
+                @if (canDelete)
+                {
+                    <li><a href="#" title="Delete File" onclick="cfm_FileDeleteIconClicked(@stateIndex)"><span class="glyphicon glyphicon-trash"></span>  Delete File</a></li>
+                    <li><a href="#" title="Rename File" onclick="cfm_FileRenameIconClicked(@stateIndex)"><span class="glyphicon glyphicon-pencil"></span> Rename File</a></li>
+                }
+            </ul>
+        </div>
+    </div>
+}
+
+@if (name == "/") // we only need this once
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.folder-name-link').click(function (event) {
+                var folder = $(event.target).parents('.folder').first();
+                cfm_expand_collapse(folder.data("state_index"));
+            });
+        });
+    </script>
+}
+
+@functions {
+    int CountFolderChildern(System.Xml.XmlElement folder, int count)
+    {
+        count++; //Count self
+        foreach (System.Xml.XmlElement e in folder.ChildNodes)
+        {
+            if (e.Name == "folder")
+                count = CountFolderChildern(e, count);
+            else
+                count++;
+        }
+        return count;
+    }
+}

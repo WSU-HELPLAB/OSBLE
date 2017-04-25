@@ -1,0 +1,149 @@
+﻿/* calendar 
+
+#chart {
+  position: relative;
+  width: 100%;
+  padding-bottom: 80%;
+}
+
+svg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+*/
+
+#chart {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 800px;
+}
+
+@media(max-width: 850px)
+{
+    #chart {
+        margin-left: -3%;
+    }
+}
+
+svg {
+    overflow: visible !important;
+}
+
+
+ div[data-wzstep="DataVisualization"] h2
+,div[data-wzstep="DataVisualization"] select {
+     display: inline-block;
+     width: auto;
+ }
+ div[data-wzstep="DataVisualization"] h2 {
+     position: relative;
+     top: 5px;
+ }
+ div[data-wzstep="DataVisualization"] div.category {
+     padding-right: 10px;
+     white-space: nowrap;
+     overflow-x: visible;
+ }
+div[data-wzstep="DataVisualization"] div[data-type="spinner"] img {
+    display: block;
+    padding-top: 100px;
+}
+
+#calendar-view path {
+    stroke-width: 1;
+    fill: none;
+}
+
+.d3-tip {
+    line-height: 1;
+    font-weight: bold;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    border-radius: 2px;
+}
+
+    .d3-tip:after {
+        box-sizing: border-box;
+        display: inline;
+        font-size: 15px;
+        width: 100%;
+        line-height: 1;
+        color: rgba(0, 0, 0, 0.8);
+        content: "\25BC";
+        position: absolute;
+        text-align: center;
+    }
+
+    .d3-tip.n:after {
+        margin: -1px 0 0 0;
+        top: 100%;
+        left: 0;
+    }
+/* hourly */
+#calendar-view .axis path,
+#calendar-view .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+#calendar-view .x.axis path {
+    display: none;
+}
+
+.calendar-section {
+    margin-top: 15px;
+}
+
+.calendar-section h4 {
+    text-align: right;
+    margin-right: 15px;
+}
+
+#hourly a {
+    display: inline-block;
+    position: relative;
+    top: 10px;
+}
+
+#currentMonth {
+    display: inline;
+    margin: 12px;
+}
+
+.calendar-header {
+    text-align: center;
+}
+
+.measure-container {
+    border-left: 10px solid;
+}
+
+.measure-container > label {
+    margin: 0;
+    padding: 2px 0px 2px 5px;
+}
+
+#activities-list {    
+    padding: 5px;
+}
+
+/*styles for calendar month/year datepicekr*/
+
+.ui-datepicker .ui-datepicker-title select {
+        color: black;
+    }
+    .ui-datepicker-trigger {
+        margin-right: 10px;
+        margin-left: -10px;
+        margin-top: -10px;
+    }
+    .ui-datepicker-calendar {
+        display: none;
+    }

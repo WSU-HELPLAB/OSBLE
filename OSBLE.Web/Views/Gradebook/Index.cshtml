@@ -1,0 +1,615 @@
+﻿@{
+    ViewBag.Title = "Gradebook";
+    List<string> TabNames = ViewBag.TabNames;
+    string SelectedTab = ViewBag.SelectedTab;
+    List<List<string>> Table = ViewBag.TableData;
+    bool GradeBookExists = ViewBag.GradeBookExists;
+    bool IsInstructorOrTa = ViewBag.CanUpload;    
+    bool DisplaySearch = false;
+    int NameColumnIndex = -1;
+    List<int> hiddenColumnIndicies = ViewBag.Instructor_ColumnsToHide;
+    if(ViewBag.NameColumnIndex != null)
+    {
+        DisplaySearch = true;
+        NameColumnIndex = ViewBag.NameColumnIndex;
+    }
+    List<int> globalRowIndicies = ViewBag.GlobalRows;
+    int sectionIndex = 1;    
+    string helpLink = Url.Action("GradebookHelp", "Gradebook", new { area = "" });
+    int nameIndex = 0;
+}
+<style type="text/css">
+    #gb_header > h2 {
+        display: inline-block;
+    }
+
+    #gb_header span {
+        margin-left: 10px;
+        color: #074974;
+    }
+
+    #gb_header form {
+        margin-left: 10px;        
+    }
+
+    #processingChanges {
+        display: none;
+    }
+
+    #gbOptions, #gbPlugin {
+        float: right;
+        margin-top: 10px;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+
+    .options {
+        text-align: center;
+        padding: 10px;        
+        border-bottom: 1px solid #e5e5e5;
+        margin-bottom: 10px;
+    }
+
+    .options.uForm {
+        text-align: center;
+        padding: 10px;
+        border-bottom: none;
+    }
+
+    .file {
+        visibility: hidden;
+        position: absolute;
+    }
+
+    #errorMsg, .errorMsg {
+        margin: 10px;
+        color: red;
+    }
+
+    .modal-footer {
+        border-top: none;
+    }
+    
+</style>
+
+<script type="text/javascript">
+    $(document).on('click', '.browse', function () {
+        var file = $(this).parent().parent().parent().find('.file');
+        file.trigger('click');
+    });
+    $(document).on('change', '.file', function () {
+        $(this).parent().find('.form-control').val($(this).val().replace(/C:\\fakepath\\/i, ''));
+    });
+</script>
+
+<div id="gb_header" >
+    <h2>@ViewBag.Title </h2>
+    <span id="successMsg"></span>
+    @* This is a message displayed while items are loading *@
+    <span id="processingChanges">
+        @Helpers.LoadingSmall() Processing Changes...
+    </span>
+    <span id="loadingGradebook">
+        @Helpers.LoadingSmall() Loading Gradebook...
+    </span>
+    @if (IsInstructorOrTa)
+    {
+        <span id="gbPlugin">
+            <a href="~/Content/gradebook.zip" class="btn btn-primary">Download Excel plugin</a>
+            <a style="font-size:small; text-decoration:none" href="@helpLink">Learn More...</a>
+        </span>
+        <button id="gbOptions" class="btn btn-primary" data-toggle="modal" data-target="#gbOptionsModal">Gradebook Options</button>
+    }  
+    <span class="errorMsg">@ViewBag.UploadErrorMsg</span>  
+</div>
+
+<span id="upload_gradebook">@ViewBag.LastUploadMessage</span>
+
+<!-- Modal -->
+<div id="gbOptionsModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Gradebook Options</h4>
+            </div>
+            <div class="modal-body">
+                <div class="options">
+                    @if (ViewBag.deleteGradebookAbility)
+                    {
+                        <form enctype="multipart/form-data" method="post" action="/Gradebook/DeleteAllGradebooks" id="delete_submit">
+                            <button type="submit" class="btn btn-primary glyphicon glyphicon-trash"> Delete All Gradebooks</button>
+                        </form>
+                    }
+                </div>
+                <div class="options">
+                    @if (ViewBag.CanUpload)
+                    {
+                        <form enctype="multipart/form-data" method="post" action="/Gradebook/DownloadGradebook">
+                            <button type="submit" class="btn btn-primary glyphicon glyphicon-download-alt"> Download Gradebook (Zipped CSVs)</button>
+                        </form>
+                        <br />
+                        <form enctype="multipart/form-data" method="post" action="/Gradebook/DownloadGradebookXLSX">
+                            <button type="submit" class="btn btn-primary glyphicon glyphicon-download-alt"> Download Gradebook (Excel XLSX)</button>
+                        </form>
+                    }
+                </div>
+                <div class="options uForm">
+                    <!--Upload Gradebook Form-->
+                    <form id="upload_gradebook" enctype="multipart/form-data" method="post" action="/Gradebook/UploadGradebook">
+                        <div class="form-group">
+                            <input class="file" type="file" id="file" name="file" onchange="check_extension(this.value)" />
+                            <div class="input-group ">
+                                <input type="text" class="form-control input-lg" disabled placeholder="Upload .csv or .zip containing multiple .csv">
+                                <span class="input-group-btn">
+                                    <button class="browse btn btn-primary input-lg" type="button"><i class="glyphicon glyphicon-upload"></i> Upload<br />Gradebook(s)</button>
+                                </span>
+                            </div>
+                            <div>
+                                <span id="errorMsg">@ViewBag.UploadErrorMsg</span>
+                            </div>
+                            <input class="btn btn-primary" id="upload" type="submit" value="Upload Selected Gradebook(s)" disabled="disabled" />
+                        </div>
+                    </form>
+                </div>                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<br />
+
+@if (GradeBookExists == false)
+{
+    <h3>No Gradebook Uploaded.</h3>
+}
+else
+{
+    <ul id="GradebookNav">
+        @foreach (string tabName in TabNames)
+        {
+            string liClasses = "GradebookNavItem";
+            if (tabName == SelectedTab)
+            {
+                liClasses += " GradebookNavActive";
+                if (ViewBag.deleteGradebookAbility)
+                {
+                    <li class="@liClasses"><text>@tabName</text> @Html.ActionLink(" ", "DeleteSingleGradebook", "Gradebook", new { gradebookName = tabName }, new { @class = "glyphicon glyphicon-trash delete_single_gradebook", @title = "Delete this gradebook"}) </li>
+                }
+                else
+                {
+                    <li class="@liClasses"><text>@tabName</text> </li>
+                }
+            }
+            else
+            {
+                string actionLink = Url.Action("Index", "Gradebook", new { area = "", gradebookName = tabName });
+                liClasses += " GradebookNavNotActive";
+                if (ViewBag.deleteGradebookAbility)
+                {
+                    <li class="@liClasses"><a href="@actionLink">@tabName</a> @Html.ActionLink(" ", "DeleteSingleGradebook", "Gradebook", new { gradebookName = tabName }, new { @class = "glyphicon glyphicon-trash delete_single_gradebook", @title = "Delete this gradebook" })</li>
+                }
+                else
+                {
+                    <li class="@liClasses"><a href="@actionLink">@tabName</a> </li>
+                }
+
+            }
+        }
+    </ul>
+    <br />
+    <div>
+
+        <!--table here-->
+        <style type="text/css">
+            #Gradebook input {
+                width: 100%;                
+            }
+
+            #Gradebook th {
+                padding-right: 20px;
+                white-space: nowrap;
+            }
+
+            #Gradebook td {
+                white-space: nowrap;
+            }
+
+            #Gradebook_filter, #Gradebook_paginate, #Gradebook_info, #Gradebook_length, #submit_changes, #loadingMsg {
+                float: left;
+                margin-left: 20px;
+                padding: 10px;
+            }
+
+            input[readonly] {
+                background: none repeat scroll 0 0 transparent;
+                border: medium none !important;
+                color: #000000;
+            }
+
+            .top {
+                vertical-align: middle;
+            }
+        </style>
+
+        <table id="Gradebook">
+            @for (int i = 0; i < Table.Count; i++)
+            {
+                string rowClass = "";
+                bool IsGlobalRow = false;
+                if (i == 0)
+                {
+                    rowClass = "HeaderRow GlobalRow";
+                }
+
+                if (globalRowIndicies != null && globalRowIndicies.Contains(i))
+                {
+                    rowClass += " GlobalRow";
+                    IsGlobalRow = true;
+                }
+
+                if (rowClass.Contains("GlobalRow") || rowClass.Contains("HeaderRow"))
+                {
+                    @:<thead>
+                }
+
+                <tr class="@rowClass">
+
+                    @for (int j = 0; j < Table[i].Count; j++)
+                        {
+                            if (hiddenColumnIndicies == null || hiddenColumnIndicies.Contains(j) == false)
+                            {
+                                string tdId = "";
+                                string tdClass = "";                                
+                                
+                                tdId = "row-" + i + "-col-" + j;
+
+                                string displayValue = Table[i][j];
+
+                                if (displayValue.ToLower().Contains("section"))
+                                {
+                                    sectionIndex = j;
+                                }
+
+                                if (displayValue.ToLower().Contains("name"))
+                                {
+                                    nameIndex = j;
+                                }
+
+                                if (displayValue.Length > 0 && (displayValue[0] == '!' || displayValue[0] == '#'))
+                                {
+                                    displayValue = displayValue.Substring(1, displayValue.Length - 1);
+                                }
+
+                                if (globalRowIndicies.Contains(i) || i == 0)
+                                {
+                                    <th>@displayValue <input type="hidden" id="@tdId" name="@tdId" value="@displayValue" readonly /> </th>
+                                }
+                                else
+                                {
+                                    if (j >= sectionIndex)
+                                    {
+                                        if (ViewBag.CanUpload && j != nameIndex)
+                                        {                                            
+                                            <td class="@tdClass"><input type="text" id="@tdId" name="@tdId" value="@displayValue" /></td>
+                                        }
+                                        else
+                                        {
+                                            <td class="@tdClass">@displayValue</td>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <td class="@tdClass">@displayValue <input type="hidden" id="@tdId" name="@tdId" value="@displayValue" readonly /></td>
+                                    }
+                                }
+                            }
+                        }
+                </tr>
+                        if (rowClass.Contains("GlobalRow") || rowClass.Contains("HeaderRow"))
+                        {
+                            @:</thead>
+                        }
+                    }
+        </table>
+    </div>
+    <div id="submit_changes">
+        @if (ViewBag.CanUpload)
+        {
+            <button id="Gradebook_button" class="btn btn-primary" type="button">Submit Changes</button>
+        }
+    </div>
+    <div><input type="hidden" id="uploader" value="@ViewBag.CanUpload" /></div>
+}
+
+<script type="text/javascript">
+
+    $('#search').keyup(function (event) {
+        if (event.keyCode == 13) {
+            filterTable($('#search').val().toLowerCase());
+        }
+
+    });
+
+    function filterTable(input) {
+        $('.searchableName').each(function () {
+            var parentRow = this.parentElement;
+            if ($(parentRow).hasClass("GlobalRow") == false) {
+                $(parentRow).hide();
+            }
+
+        });
+
+        var selector = ".searchableName[id*=\"" + input + "\"]'";
+        $(selector).each(function () {
+
+            var parentRow = this.parentElement;
+            $(parentRow).show();
+        });
+    }
+
+
+    var hash = {
+        '.csv' : 1,
+        '.zip' : 1,
+        '.zip.zip' : 1, //accept ".zip.zip" and ".csv.csv" because they are valid types, the user just named them with extension as well
+        '.csv.csv' : 1
+    };
+
+    function check_extension(filename)
+    {
+        var re = /\..+$/;
+        var ext = filename.match(re);
+        if (hash[ext] ==  1) {
+            $('#upload').removeAttr("disabled");
+            $("#errorMsg").text("");
+            $(".errorMsg").text("");
+            return true;
+        }
+        else {
+            $("#errorMsg").text("Invalid File Type");
+            $('#upload').attr("disabled", "disabled");
+            return false;
+        }
+    }
+
+    function areYouSure(selection) {
+        if (selection == "all") {
+            if (confirm("Are you sure you want to delete all gradebooks?") == true) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        else
+        {
+            if (confirm("Are you sure you want to delete the selected gradebook?") == true) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    }
+
+    $("#delete_submit").submit(function (event) {
+        if (areYouSure("all"))
+        {
+            //do nothing, let it submit.
+        }
+        else
+        {   //prevent post submission
+            event.preventDefault();
+        }
+    });
+
+    $(".delete_single_gradebook").click(function (event) {
+        if (areYouSure("single")) {
+            //do nothing, let it submit.
+        }
+        else {   //prevent action
+            event.preventDefault();
+        }
+    });
+
+    $(document).ready(function () {        
+        if ($("#uploader").val()) {
+            var table = $('#Gradebook').DataTable({
+                "dom": '<"top"lf>rt<"bottom"ip><"clear">',
+                "lengthMenu": [[10, 20, 50, -1], [10, 20, 50, "All"]],
+                "pageLength": 20
+            });
+                        
+            //get the original data values so we can compare for changes on submit
+            //we only want to submit the rows that have changes
+            Table_Data = table.$('input, select').serialize(); //Table_Data is a global declared on the _Layout.cshtml
+
+            $("#submit_changes").insertAfter("#Gradebook_filter");
+
+            $('#Gradebook_button').click(function () {
+                ShowLoading();
+                process(table);
+            });
+        }
+        HideLoadingGb();
+
+        //prevent entering of ", ', or , into the cells as this can break the gradebook
+        $(document).on('keypress', "input[type=text]", function (e) {
+            var chr = String.fromCharCode(e.which);
+            if ("\"\',".indexOf(chr) < 0)
+                return true;
+            else
+                return false;
+        });       
+    });
+
+    function process(table) {
+        var data = table.$('input, select').serialize();
+        submitGradebookChanges(data);
+    }
+
+    function submitGradebookChanges(data) {
+
+        var originalValues = Table_Data.split('&');
+        var values = data.split('&');        
+        var currentRow = "";    //new
+        var modifiedGradebook = new Array();
+        var globalRowCount = 0;
+
+        //need to get global rows
+        $(".GlobalRow").each(function () {
+            var globalRow = "#";
+            $(this).find('th').each(function () {
+                globalRow += $(this).text().trim() + ",";
+            });
+            //trim last comma
+            globalRow = globalRow.replace(/,(?=[^,]*$)/, '');
+            modifiedGradebook.push(globalRow);
+            globalRowCount++;
+        });
+
+        //go through each cell and rebuild table rows.
+        for (var i = 0; i < values.length; i++) {
+
+            var nextRow = -1;
+
+            if (i + 1 < values.length) {
+                nextRow = values[i + 1].split('=')[0].split('-')[1];
+            }
+            else {
+                nextRow = -1; //there is no next row
+            }
+
+            //possible new values
+            var cell = values[i].split('='); //row-#-col-#
+            var rowcol = cell[0].split('-'); //row-#-col-# so we want [1] and [3]
+            var row = rowcol[1];
+            var col = rowcol[3];
+            var cellValue = cell[1]; //{row-#-col-#, value} so we want [1]
+
+            //need to enclose an cell with a comma in quotes
+            if (cellValue.indexOf("%2C") > -1) {
+                cellValue = "\"" + cellValue + "\"";
+            }
+
+            if (nextRow != row) { //the end of this row, terminate and push to the array                
+                currentRow += cellValue;
+                var originalRow = BuildRow(row, originalValues);
+
+                if (originalRow != currentRow) { //push the row if there have been changes
+                    modifiedGradebook.push(currentRow);
+                }
+                currentRow = ""; //start next row
+            }
+            else {                
+                currentRow += cellValue + ",";
+            }
+        }
+
+        var rowsUpdated = modifiedGradebook.length - globalRowCount;
+
+        if (rowsUpdated == 0) { //no data changed...
+            $("#successMsg").text("[No Rows Updated. No Changes Detected.]");
+            HideLoading();
+            return;
+        }
+
+        var gradebook = modifiedGradebook.join('\n');
+        var gradebookname = $(".GradebookNavItem.GradebookNavActive").text().trim();
+
+        $.ajax({
+            url: "/Gradebook/UpdateGradebookFromPage",
+            data: { gradebookName: gradebookname, modifiedGradeook: gradebook },
+            method: "POST",
+            success: function (data) {                
+                HideLoading();
+                if (data == "True") {                    
+                    $("#successMsg").text("[Updated " + rowsUpdated + " Row(s)!]");                    
+                }
+                else
+                {
+                    $("#successMsg").text("[Row Update Failed! (CODE:" + Date.now() + ")]");
+                }
+            },
+            error: function (data) {                
+                HideLoading();
+                //using date.now to look up error on the event log on the server
+                //TODO: implement better error output message for user
+                $("#successMsg").text("[Row Update Failed! (CODE:" + Date.now() + ")]");
+            }
+        });
+    }
+
+    //need this to build the specific row from the original data to compare changes
+    //this has to be done because once the data is chagned it is serialized in a different order
+    function BuildRow(rowNum, tableData) {
+        var o_currentRow = "";  //original
+        //go through each cell and rebuild table rows.
+        for (var i = 0; i < tableData.length; i++) {
+
+            var currentRow = tableData[i].split('=')[0].split('-')[1];
+            if (currentRow != rowNum) { //we're only interested in the rowNum
+                continue;
+            }
+
+            var nextRow = -1;
+            if (i + 1 < tableData.length) {
+                nextRow = tableData[i + 1].split('=')[0].split('-')[1];
+            }
+            else {
+                nextRow = -1; //there is no next row
+            }
+
+            //original values
+            var o_cell = tableData[i].split('='); //row-#-col-#
+            var o_rowcol = o_cell[0].split('-'); //row-#-col-# so we want [1] and [3]
+            var o_row = o_rowcol[1];
+            var o_col = o_rowcol[3];
+            var o_cellValue = o_cell[1]; //{row-#-col-#, value} so we want [1]
+
+            //need to enclose an cell with a comma in quotes
+            if (o_cellValue.indexOf("%2C") > -1) {
+                o_cellValue = "\"" + o_cellValue + "\"";
+            }
+
+            if (nextRow != o_row) { //the end of this row, terminate and push to the array
+                o_currentRow += o_cellValue;
+                return o_currentRow;                
+            }
+            else {
+                o_currentRow += o_cellValue + ",";                
+            }
+        }
+    }
+
+    function ShowLoading() {
+        if ($('#processingChanges').css('display') != 'none')
+            return;
+        $('#processingChanges').show('fade');
+    }
+
+    function HideLoading() {
+        if ($('#processingChanges').css('display') == 'none')
+            return;
+        $('#processingChanges').hide('fade');
+    }
+
+    function ShowLoadingGb() {
+        if ($('#loadingGradebook').css('display') != 'none')
+            return;
+        $('#loadingGradebook').show('fade');
+    }
+
+    function HideLoadingGb() {
+        if ($('#loadingGradebook').css('display') == 'none')
+            return;
+        $('#loadingGradebook').hide('fade');
+    }
+
+</script>

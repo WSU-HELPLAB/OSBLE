@@ -1,0 +1,204 @@
+.navbar-default {
+  background-color: #0b4874;
+  border-color: #003052;
+  margin-bottom: 10px;
+  border-radius: 0 !important;
+}
+.navbar-default .navbar-brand {
+  color: #e4e4e4;
+}
+.navbar-default .navbar-brand:hover, .navbar-default .navbar-brand:focus {
+  color: #ffffff;
+}
+.navbar-default .navbar-text {
+  color: #e4e4e4;
+}
+.navbar-default .navbar-nav > li > a {
+  color: #e4e4e4;
+}
+.navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
+  color: #ffffff;
+}
+.navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .active > a:focus {
+  color: #ffffff;
+  background-color: #003052;
+}
+.navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:hover, .navbar-default .navbar-nav > .open > a:focus {
+  color: #ffffff;
+  background-color: #003052;
+}
+.navbar-default .navbar-toggle {
+  border-color: #003052;
+}
+.navbar-default .navbar-toggle:hover, .navbar-default .navbar-toggle:focus {
+  background-color: #003052;
+}
+.navbar-default .navbar-toggle .icon-bar {
+  background-color: #e4e4e4;
+}
+.navbar-default .navbar-collapse,
+.navbar-default .navbar-form {
+  border-color: #e4e4e4;
+}
+.navbar-default .navbar-link {
+  color: #e4e4e4;
+}
+.navbar-default .navbar-link:hover {
+  color: #ffffff;
+}
+.navbar .nav > li {
+    z-index: 10000;
+}
+
+#course_label {
+    display: none;
+    font-size: 18px;
+    color: #e4e4e4;
+    float: right;
+    margin-right: 10px;
+    margin-top: 15px;
+}
+
+#MoreDrop {
+    display:none;
+}
+
+@media (max-width: 850px) {
+  .navbar-default .navbar-nav .open .dropdown-menu > li > a {
+    color: #e4e4e4;
+  }
+  .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover, .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {
+    color: #ffffff;
+    background-color: transparent;
+  }
+  .navbar-default .navbar-nav .open .dropdown-menu > .active > a, .navbar-default .navbar-nav .open .dropdown-menu > .active > a:hover, .navbar-default .navbar-nav .open .dropdown-menu > .active > a:focus {
+    color: #ffffff;
+    background-color: #003052;
+  }
+  .navbar-default .navbar-nav .open .dropdown-menu > li.dropdown-header {
+      color: #d4d4d4;
+      padding-left: 15px;
+  }
+  .navbar-default .navbar-header, .navbar-default .navbar-collapse {
+      margin-left: -15px;
+      margin-right: -15px;
+  }
+}
+
+
+#logo	{
+	margin-top: 6px;
+	margin-right: 10px;
+	margin-left: 6px;
+}
+
+#helptext {
+	display: inline;
+}
+
+#profile_pic {
+    display: inline;
+    height: 30px;
+    width: 30px;
+    margin-right: 3px;
+    margin-top: -10px;
+    margin-bottom: -10px;
+}
+
+.messages {
+    display: inline;
+    font-size: 10px;
+    background-color: #e4e4e4;
+    color: #0b4874;
+    padding-bottom: 1px;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 1px;
+    margin-left: 3px;
+}
+
+a:hover .messages, .open .messages {
+    background-color: white;
+}
+
+#profile_selector {
+    max-height: 50px;
+}
+
+
+/* This is for getting the navbar to collapse at the propper size */
+@media (max-width: 850px) {
+
+    #MoreDrop {
+        display: none;
+    }
+    #course_label {
+        display: block;
+    }
+
+    .navbar-header {
+        float: none;
+    }
+    .navbar-toggle {
+       	display: block;
+    }
+    .navbar-collapse {
+        border-top: 1px solid transparent;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    .navbar-collapse.collapse {
+        display: none!important;
+    }
+    .navbar-nav {
+        float: none!important;
+        margin: 7.5px -15px;
+    }
+    .navbar-nav>li {
+        float: none;
+    }
+    .navbar-nav>li>a {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+    .navbar-text {
+       	float: none;
+        margin: 15px 0;
+    }
+    .navbar-right .dropdown-menu {
+	    left:0;
+    }
+    .navbar-nav .open .dropdown-menu {
+	    position:static;float:none;width:auto;margin-top:0;background-color:transparent;border:0;-webkit-box-shadow:none;box-shadow:none
+    }
+    .navbar-nav .open .dropdown-menu .dropdown-header,.navbar-nav .open .dropdown-menu>li>a {
+	    padding:5px 15px 5px 25px
+    }
+    .navbar-nav .open .dropdown-menu>li>a {
+	    line-height:20px
+    }
+    .navbar-nav .open .dropdown-menu>li>a:focus,.navbar-nav .open .dropdown-menu>li>a:hover {
+	    background-image:none
+    }
+
+
+    /* since 3.1.0 */
+    .navbar-collapse.collapse.in { 
+        display: block!important;
+    }
+    .collapsing {
+        overflow: hidden!important;
+    }
+	#helptext {
+		display: inline;
+	}
+    #profile_pic {
+        display: none;
+    }
+}
+    
+@media(max-width: 350px)
+{
+    #course_label {
+        display:none;
+    }
+}

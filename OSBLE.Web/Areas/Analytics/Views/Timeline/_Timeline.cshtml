@@ -1,0 +1,52 @@
+﻿@using OSBLEPlus.Logic.Utility
+@Styles.Render("~/Areas/Analytics/Content/bootstrap-datetimepicker.min.css")
+@Styles.Render("~/Areas/Analytics/Content/Timeline.css")
+@model List<OSBLEPlus.Logic.DomainObjects.Analytics.StudentData>
+
+<div class="col-sm-4 options_view">
+    @Helpers.ToggleButtonHeader("Options", "#options_content", "cb-options")
+    <div id="options_content">
+        @Html.Partial("_TimelineOptions")
+        <div class="clearfix">@* ensures that the parent container extends to the proper height *@</div>  
+    </div>
+</div>
+
+<div class="col-sm-8 analytic-view">
+
+    <div>
+        <a href="javascript:" id="redraw-btn" class="btn btn-primary">Refresh</a>
+    </div>
+
+    <div data-type="chart-area">
+        <div class="row" id="chartBody">
+            <table>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+    <div data-type="spinner">
+        <img src="@Url.Content("~/Areas/Analytics/Content/loading.gif")" class="spinner-img" />
+    </div>
+    <div id="no_data" class="panel panel-info">
+        <div class="panel-heading">
+            No Data. Try changing options and clicking Refresh.
+        </div>
+    </div>
+
+
+    @Html.Partial("~/Areas/Analytics/Views/Timeline/DataVisualizationLegend.cshtml")
+    @Html.Partial("~/Areas/Analytics/Views/Timeline/DataVisualizationLegendDetails.cshtml")
+</div>
+
+
+<script type="text/javascript" src="@Url.Content("~/Areas/Analytics/Scripts/d3.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Areas/Analytics/Scripts/bullet.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Areas/Analytics/Scripts/data-visualization.js")?version=1.1"></script>
+<script type="text/javascript" src="@Url.Content("~/Areas/Analytics/Scripts/bootstrap-datetimepicker.min.js")"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        DataVisualization.Init();
+        Chart.Draw();
+    });
+</script>

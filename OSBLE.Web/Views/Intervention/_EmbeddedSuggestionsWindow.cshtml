@@ -1,0 +1,269 @@
+﻿@{
+    string rootUrl = OSBLEPlus.Logic.Utility.StringConstants.WebClientRoot;
+    string feedbackUrl = rootUrl + "Intervention/UserFeedbackLayout?component=7";
+    string availabilityUrl = rootUrl + "Intervention/Availability?component=7";
+    string dismissedInterventionsUrl = rootUrl + "Intervention/DismissedInterventionsLayout?component=7";
+    string privateMesagesUrl = rootUrl + "Intervention/PrivateMessages?component=7";
+    string helpUrl = rootUrl + "Help?component=7";
+    string settingsUrl = rootUrl + "Intervention/SuggestionsSettings?component=7";
+    string profileUrl = rootUrl + "Profile?component=7";
+}
+
+<script type="text/javascript" src="@Url.Content("~/Scripts/Interventions.js")?version=1.01"></script>
+
+<script type="text/javascript">   
+    
+    $(document).ready(function () {       
+
+        if (!detectBrowser()) {
+            //show the private conversations and availability links
+            $(".ide-only").css("display", "inline");
+        }
+
+        PopulateSuggestionList();
+
+        $(".dismiss-intervention").on('click', function () {
+            var id = $(this).parent().parent().attr('id');
+            var interventionId = id.split("-");
+            interventionId = interventionId[1];
+
+            //dismiss in the database
+            $.ajax({
+                url: "/Intervention/DismissIntervention",
+                data: { interventionId: interventionId },
+                //dataType: "json",
+                method: "POST",
+                success: function (result) {
+                    //dismiss if db change successful
+                    if (result == "True") {
+                        $("#" + id).fadeOut(300);
+                    }
+                },
+                error: function (result) {
+                }
+            });
+        });
+
+        CheckForNewSuggestions();
+
+        //get the last saved zoom if possible
+        var lastZoomLevel = localStorage.getItem("lastZoomLevel");
+        if (lastZoomLevel === null) { //if there is not a zoom level in history, save the current zoom level (1.0 more than likely)
+            localStorage.setItem('lastZoomLevel', getZoomLevel());
+        }
+        else { //set the zoom level to the last remembered level
+            $("body").css('zoom', lastZoomLevel);
+        }
+
+        $(document).click(function () {
+            $("#new-suggestions").hide('fade');
+            //$("#new-suggestions-time").text("");
+            $("#dashboard-panel-heading").stop();
+        });
+
+        $(window).focus(function () {
+            $("#new-suggestions").hide('fade');
+            //$("#new-suggestions-time").text("");
+            $("#dashboard-panel-heading").stop();
+        });
+
+        $("#options-down").on("click", function () {
+            $("#options-down").css("display", "none");
+            $("#options-up").css("display", "inline");
+            $("#suggestions-content").slideToggle(500, function () {
+                $("#suggestions-content").is(":visible") ? "Collapse" : "Expand";
+                $("#suggestions-content").css("width", "100%");
+            });
+        });
+
+        $("#options-up").on("click", function () {
+            $("#options-down").css("display", "inline");
+            $("#options-up").css("display", "none");
+            $("#suggestions-content").slideToggle(500, function () {
+                $("#suggestions-content").is(":visible") ? "Collapse" : "Expand";
+                $("#suggestions-content").css("width", "100%");
+            });
+        });
+    });
+
+    function increaseZoom(amount) {
+        var zoom = Number($("body").css('zoom'));
+        $("body").css('zoom', zoom + amount);
+        //set zoom level in local storage
+        localStorage.setItem('lastZoomLevel', getZoomLevel());
+    }
+
+    function getZoomLevel() {
+        return $("body").css('zoom');
+    }
+
+    function PopulateSuggestionList() {
+        $.ajax({
+            url: "/Intervention/PopulateSuggestionList",
+            dataType: "html",
+            method: "GET",
+            success: function (result) {
+                $("#dashboard-items").html(result);
+            },
+            error: function (result) {
+                //TODO: handle error
+            }
+        });
+    }
+
+    function CheckForNewSuggestions() {
+        var ids = "";
+
+        $("[id^=intervention-]").each(function () {
+            var id = $(this).prop('id').split('-')[1];
+            ids += id + ",";
+        });
+
+        ids = ids.substring(0, ids.length - 1); //remove the last comma
+        var notifyChange = false;
+        var lastSuggestionIds = localStorage.getItem("lastSuggestionIds");
+
+        //use local storage to detect page refreshes and show visual indicator of new items
+        if (lastSuggestionIds === null) { //It doesn't exist, create it.
+            localStorage.setItem('lastSuggestionIds', ids);
+            notifyChange = true;
+        }
+        else { //it exists, check for refresh
+            var idsArray = ids.split(',');
+            var lastIdsArray = lastSuggestionIds.split(',');
+            var newIds = $(idsArray).not(lastIdsArray).get(); //check if there are new Ids in the list since the last refresh
+
+            if (newIds.length > 0) { //there's a change, visually notify the user
+                notifyChange = true;
+            }
+            localStorage.setItem('lastSuggestionIds', ids); //update the storage to the current id list
+        }
+
+        if (notifyChange) {
+            //NotifyNewSuggestions();
+        }
+    }
+
+    function NotifyNewSuggestions() {
+        if ($("#suggestions-dashboard").length > 0) { //only attempt if suggestions dashboard id exists
+
+            $("#new-suggestions-time").text(" (Updated: " + TimeNow() + ")");
+            $("#new-suggestions").show('fade');
+
+            for (var i = 0; i < 5; i++) {
+                $("#dashboard-panel-heading")
+                    .animate({ backgroundColor: "#074974" }, 800)
+                    .animate({ backgroundColor: "#999" }, 800)
+                    .animate({ backgroundColor: "#337ab7" }, 800);
+            }
+        }
+    }
+
+    function TimeNow() {
+        var date = new Date();
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        var ampm = hours >= 12 ? 'pm' : 'am';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // the hour '0' should be '12'
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        var strTime = hours + ':' + minutes + ' ' + ampm;
+        return strTime;
+    }
+
+</script>
+
+
+
+<style type="text/css">
+    .suggestions-icons {
+        color: white;
+        margin-left: 5px;
+        margin-right: 5px;
+    }
+
+    .suggestions-icons-collapse {
+        color: gray;
+        margin-left: 5px;
+    }
+
+    #dashboard-panel-heading {
+        padding-right: 8px;
+        background-color: #0a69a9;
+        overflow: hidden;
+    }
+
+    #suggestions-content {
+        padding: 0px;
+    }
+
+    .suggestion-title, .suggestion-body {
+        padding: 5px;
+    }
+
+    #suggestions-links {
+        float: right;
+    }   
+
+    #suggestions-dashboard {
+        margin-bottom: 5px;
+    }
+</style>
+
+<style>
+    /*double @@ because razor interprets a single as razor code.*/
+    @@media(max-width: 420px) {
+        #suggestions-left {
+            float: left;
+        }
+
+        #suggestions-right {
+            float: right;
+        }
+
+        #suggestions-links {
+            float: none;
+            width: 100%;
+            margin-top: 2px;
+        }
+
+        #dismiss-left {
+            margin-left: 0px;
+        }
+
+        #private-messages-left {
+            margin-left: 0px;
+        }
+    }
+</style>
+
+<div class="panel panel-primary" id="suggestions-dashboard">
+    <div class="panel-heading" id="dashboard-panel-heading">        
+        <span class="glyphicon glyphicon-dashboard"></span>
+        OSBLE+ Suggestions
+        
+        <span class="glyphicon glyphicon-bell" id="new-suggestions" style="display: none; color: white;"></span><span id="new-suggestions-time"></span>        
+
+        <div id="suggestions-links">
+            <span id="suggestions-left">
+                <a href="@privateMesagesUrl" data-toggle="tooltip" title="Private Conversations" class="suggestions-icons ide-only" id="private-messages-left" style="display: none;"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span></a>
+                <a href="@availabilityUrl" data-toggle="tooltip" title="Availability Details" class="suggestions-icons ide-only" style="display: none;"><span class="glyphicon glyphicon-flag" aria-hidden="true"></span></a>
+                <a href="@dismissedInterventionsUrl" data-toggle="tooltip" title="View Dismissed Suggestions" class="suggestions-icons" id="dismiss-left"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></a>
+                <a href="@profileUrl" id="profile-url" data-toggle="tooltip" title="My Profile" class="suggestions-icons"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
+                <a href="@feedbackUrl" data-toggle="tooltip" title="Feedback" class="suggestions-icons"><span class="glyphicon glyphicon-scale" aria-hidden="true"></span></a>
+                <a href="@helpUrl" id="help-url" data-toggle="tooltip" title="Help" class="suggestions-icons"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></a>
+                <a href="@settingsUrl" id="settings-url" data-toggle="tooltip" title="Settings" class="suggestions-icons"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span></a>
+            </span>
+            <span id="suggestions-right">
+                <a href="#" id="options-down" data-toggle="tooltip" title="Show Suggestions" class="suggestions-icons-collapse" style="color: white;">Show <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span></a>
+                <a href="#" id="options-up" data-toggle="tooltip" title="Hide Suggestions" style="display: none; color: white;" class="suggestions-icons-collapse">Hide <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span></a>
+            </span>            
+        </div>
+    </div>
+    <div class="panel-body" id="suggestions-content" style="display: none;">
+    @*<div class="panel-body" id="suggestions-content" style="display: inline;">*@
+        <div class="center" id="dashboard-items">
+
+        </div>
+    </div>
+</div>   

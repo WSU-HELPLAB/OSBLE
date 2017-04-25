@@ -1,0 +1,30 @@
+﻿@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+@using OSBLE.Utility;
+
+@model AggregateFeedItem
+
+@{    
+    string assignmentName = "";
+    int assignmentId = 0;
+    try
+    {
+        assignmentId = ((SubmitEvent)Model.Items.First().Event).AssignmentId;
+        if (assignmentId != 0)
+        {
+            assignmentName = DBHelper.GetAssignmentName(assignmentId);    
+        }        
+    }
+    catch (Exception)
+    {        
+       //do nothing
+    }   
+}
+
+<span class="non-user-text">
+    <em>@Model.Creator.FirstName</em> submitted 
+    @if (assignmentId != 0)
+    {
+         @Html.ActionLink(assignmentName + ":", "Index", "Home", new { area = "AssignmentDetails", assignmentId = assignmentId }, null)     
+    }
+    &quot;@Path.GetFileNameWithoutExtension(Model.Items.First().Event.SolutionName)&quot;.
+</span>

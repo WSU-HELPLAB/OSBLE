@@ -1,0 +1,76 @@
+﻿@model OSBLE.Models.Intervention.MakeAPostViewModel
+
+@{
+    var activityFeedUrl = OSBLEPlus.Logic.Utility.StringConstants.WebClientRoot + "Feed/OSBIDE?component=7";
+}
+
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>OSBLE+ Suggestion</title>
+
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/bootstrap-3.3.5/css/bootstrap.min.css")" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-2.0.1.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/bootstrap-3.3.5/js/bootstrap.min.js")"></script>
+
+    @* highlight.js code syntax highlighting block*@
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/themes/highlight/vs.css")" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/highlight.pack.js")"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    @* highlight.js code syntax highlighting block*@
+
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/interventions.css")?version=1.0" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/Interventions.js")?version=1.01"></script>
+    
+    @Html.Partial("_UserHashtagTagScript")
+</head>
+
+<body class="intervention-body">
+    <div>
+        <div class="panel panel-primary">
+            <div class="panel-heading intervention-heading">
+                <span class="left">
+                    <a href="/" style="color: #FFFFFF; text-decoration: none;">
+                        <span class="glyphicon glyphicon-circle-arrow-left"></span>
+                        <span class="glyphicon glyphicon-dashboard"></span>
+                    </a>
+                </span>
+                Let others know what you're doing!
+            </div>
+            <div class="panel-body">
+                @Html.Partial("_UserFeedbackPrompt", new ViewDataDictionary { { "interventionId", Model.Intervention.Id } })
+                @Html.Partial("_CourseSelect")
+                <h4>Your classmates have recently used these hashtags. Click the hashtags below to see tagged post details or make a new post with your own hashtags!</h4>
+
+                <h4>Popular and Suggested Hashtags: </h4>
+                @{
+    //if there are no 'popular' hashtags, either make suggestions or say nobody has made any
+                }
+                @foreach (string hashtag in Model.PopularHashtags)
+                {
+                    <a class="Hashtag" href="/Feed/ShowHashtag?hashtag=@hashtag">#@hashtag</a><text>, </text>
+                }
+                <h4>Make a new post with your own hashtags: </h4>
+                <div id="question-area">
+                    <textarea name="ask-a-question" placeholder="@Model.Intervention.InterventionTemplateText"></textarea>
+                    <br />
+                </div>
+                <div>
+                    <a class="btn btn-primary" href="@activityFeedUrl" role="button" id="view-other-page">View All<br />Posts</a>
+                    <button class="btn btn-primary right" id="post-class-feed">Post Question<br /> to Class</button>
+                    <button class="btn btn-default right" id="post-class-feed-anon"><span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span> Post Question<br /> to Class (Anonymously)</button>
+                    <span class="right" id="post-success"></span>
+                    <span class="right" id="post-error"></span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <input id="iid" type="hidden" value="@Model.Intervention.Id" />
+    @Html.Partial("_SuggestionFeedbackModal")
+
+</body>
+</html>

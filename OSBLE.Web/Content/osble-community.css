@@ -1,0 +1,196 @@
+﻿body {
+    text-align: center;
+}
+
+#community-banner {
+    background: #074974;
+    border-bottom: 2px solid #000000;
+    color: white;
+    text-align: center;
+    position: relative;
+    top: 50%;
+    padding-top: 5px;
+}
+/*Banner*/
+div.col-md-12 {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.nav > li > a {
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: 10px;
+}
+
+    .nav > li > a, .nav > li > a:link, .nav > li > a:visited, .nav > li > a:active {
+        color: white;
+    }
+
+.c-table {
+    max-width: 600px;
+}
+
+.right-cell-ok {
+    background-color: #009933;
+    text-align: center;
+    height: 100%;
+    border-bottom-style: inset;
+    padding: 5px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px #000000;
+}
+
+.right-cell-goal {
+    background-color: #ff5c33;
+    text-align: center;
+    height: 100%;
+    border-bottom-style: inset;
+    padding: 5px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px #000000;
+}
+
+.right-cell-attn {
+    background-color: #0c79c0;
+    text-align: center;
+    height: 100%;
+    border-bottom-style: inset;
+    padding: 5px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px #000000;
+}
+
+.chart-div {
+    display: inline-block;
+    margin: 0 auto;
+}
+
+.list-group-item.active {
+    background-color: #074974;
+}
+
+.panel-primary > .panel-heading {
+    background-color: #074974;
+}
+
+.btn-group-vertical > .btn-group:after, .btn-group-vertical > .btn-group:before, .btn-toolbar:after, .btn-toolbar:before, .clearfix:after, .clearfix:before, .container-fluid:after, .container-fluid:before, .container:after, .container:before, .dl-horizontal dd:after, .dl-horizontal dd:before, .form-horizontal .form-group:after, .form-horizontal .form-group:before, .modal-footer:after, .modal-footer:before, .nav:after, .nav:before, .navbar-collapse:after, .navbar-collapse:before, .navbar-header:after, .navbar-header:before, .navbar:after, .navbar:before, .pager:after, .pager:before, .panel-body:after, .panel-body:before, .row:after, .row:before {
+    display: inline;
+}
+
+.panel-heading:hover {
+    background-color: #337ab7;
+}
+
+.online-header {
+    text-align: center;
+}
+
+.profile_image {
+    text-align: right;
+}
+
+.profile_mail {
+    text-align: left;
+}
+
+.panel-body-left, .panel-body-center, .panel-body-right {
+    display: inline-block;
+    padding-left: 10px;
+    padding-right: 10px;
+    text-align: center;
+}
+
+.panel-body-left, .panel-body-right {
+    width: 20%;    
+}
+
+.panel-body-center {
+    width: 50%;
+}
+
+.recent-activity {
+    padding: 10px;
+    border-bottom: inset;
+}
+
+.activity-header {
+    padding-top: 0;
+    padding-bottom: 0;
+    font-style: italic;
+    font-weight: bold;
+}
+
+.recent-activity-header {
+    text-align: center;
+}
+
+.activity-panel-body-left, .activity-panel-body-center, .activity-panel-body-right {
+    display: inline-block;
+    padding: 5px;
+}
+
+.activity-panel-body-left, .activity-panel-body-center {
+    width: 35%;
+    border-bottom: inset;
+}
+
+.activity-panel-body-right {
+    width: 20%;
+    border-bottom: inset;
+}
+
+.goals-panel-body-left, .goals-panel-body-center, .goals-panel-body-right {
+    display: inline-block;
+}
+
+.goals-panel-body-left {
+    width: 20%;
+    border-right: inset;
+}
+
+.goals-panel-body-center {
+    width: 50%;
+    border-right: inset;
+}
+
+.goals-panel-body-right {
+    width: 25%;
+}
+
+@media handheld, only screen and (max-width: 2200px)
+    {
+     #slider {
+         width: 200px;
+         padding: 5px;
+         margin: 5px;
+     }
+    }
+    @media handheld, only screen and (max-width: 1200px) 
+    {
+     /* Styles */
+    }
+    @media handheld, only screen and (max-width: 1024px) 
+    {
+    /* Styles */    
+    }
+    @media handheld, only screen and (max-width: 767px) {
+     /* Styles */
+     #slider {
+         width: 90%;
+         margin-left: auto;
+         margin-right: auto;
+     }
+    }
+    @media handheld, only screen and (max-width: 600px) {
+     /* Styles */
+    }
+    @media handheld, only screen and (max-width: 500px) {
+     /* Styles */
+    }
+    @media screen and (-webkit-min-device-pixel-ratio:0) {
+    /* Styles */
+    }

@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+  <Metadata>
+    <Identity Id="0420ae42-1200-452b-ae2c-fb51c149ca03" Version="1.2.0.5" Language="en-US" Publisher="Washington State University" />
+    <DisplayName>OSBLE+ Plugin for Visual Studio</DisplayName>
+    <Description xml:space="preserve">This is an open-source plugin for Visual Studio that aims to increase the understanding of how interactions within an IDE are related to academic performance. OSBLE has been developed by members of the Human-centered Environments for Learning and Programming (HELP) Lab (http://helplab.org) in the School of Electrical Engineering and Computer Science at Washington State University.</Description>
+    <MoreInfo>http://osble.codeplex.com</MoreInfo>
+    <License>plugin_license.txt</License>
+    <GettingStartedGuide>http://osble.codeplex.com/documentation</GettingStartedGuide>
+    <Icon>logo.png</Icon>
+  </Metadata>
+  <Installation InstalledByMsi="false">
+    <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[12.0,]" />
+  </Installation>
+  <Dependencies>
+    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+    <Dependency Id="Microsoft.VisualStudio.MPF.12.0" DisplayName="Visual Studio MPF 12.0" d:Source="Installed" Version="[12.0,13.0)" />
+  </Dependencies>
+  <Assets>
+    <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+  </Assets>
+</PackageManifest>

@@ -1,0 +1,616 @@
+﻿@model OSBLE.Models.ViewModels.RubricViewModel
+@using OSBLE.Models.Courses.Rubrics;
+@using OSBLE.Models.Assignments;
+@using OSBLE.Models.Users;
+@using OSBLE.Models.Courses;
+@{ViewBag.Title = "Rubric Evaluation";
+  int maxLevelScore = (from c in Model.Rubric.Levels
+                       select c.PointSpread).Sum();
+  double totalRubricPoints = (from c in Model.Rubric.Criteria
+                              select c.Weight).Sum();
+  bool student = Model.Student;
+
+  string critInputPrefix = ViewBag.CritInputPrefix;
+  string critSliderPrefix = ViewBag.CritSliderPrefix;
+  string critCommentPrefix = ViewBag.CritCommentPrefix;
+  string selectedAssignment = ViewBag.AssignmentSelectId;
+  string selectedTeam = ViewBag.TeamSelectId;
+  string draftButton = ViewBag.DraftButtonId;
+  string publishButton = ViewBag.PublishButtonId;
+  string gradeId = "grade";
+  int sliderTableLength = 880;
+  int textInputLength = 25;
+  int sliderTableCellWidth = (sliderTableLength / maxLevelScore) - textInputLength;
+
+  DateTime? publishTime = Model.Evaluation.DatePublished;
+
+  Boolean editable = ViewBag.isEditable;
+  List<CourseUser> cuList = ViewBag.ObserverCU;
+
+  List<AssignmentTeam> atList = new List<AssignmentTeam>();
+  CourseUser activeCourseUser = ViewBag.ActiveCourseUser;
+
+  List<string> sectionIds = new List<string>();
+  if (activeCourseUser.Section == -1)
+  {
+      sectionIds.AddRange(activeCourseUser.MultiSection.Split(',').ToList());
+  }
+  else
+  {
+      sectionIds.Add(activeCourseUser.Section.ToString());
+  }
+  
+    if (null != Model.TeamList)
+    {
+        atList = (from t in @Model.TeamList as IEnumerable<AssignmentTeam>
+                  select t).Reverse().ToList(); 
+
+        if (activeCourseUser != null && activeCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
+        {            
+            // If current user is a TA, remove any AssignmentTeams that aren't in the TA's section
+            for (int i = 0; i < atList.Count; i++)
+            {
+                // Loop through team members and make sure at least one member is in TA's section
+                bool inSection = false;
+                foreach (TeamMember member in atList[i].Team.TeamMembers)
+                {
+                    if (sectionIds.Contains(member.CourseUser.Section.ToString()))
+                    {
+                        inSection = true;
+                        break;
+                    }
+                }
+                if (!inSection) // If team has no member in TA's section, get rid of it!
+                {
+                    atList.RemoveAt(i);
+                    i--;
+                }
+            }
+        }
+    }
+}
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var height = parseFloat($(window).height());
+        height = height - 275;
+        $("#internalScrollID").height(height + "px");
+
+        var width = parseFloat($(window).width());
+        width = width - 20;
+        $("#rubric_evaluator").width(width + "px");
+        $("#internalScrollID").width(width + "px");
+        width = width - 70;
+        $(".criterion_div").width(width + "px");
+
+
+        $(window).bind('resize', resizeWindow);
+
+        function resizeWindow(e) {
+            var height = parseFloat($(window).height());
+            height = height - 275;
+            $("#internalScrollID").height(height + "px");
+
+            var width = parseFloat($(window).width());
+            if (width > 1000) {
+                width = width - 20;
+                $("#rubric_evaluator").width(width + "px");
+                $("#internalScrollID").width(width + "px");
+                width = width - 70;
+                $(".criterion_div").width(width + "px");
+            }
+
+        }
+    });
+
+    function create_and_open_downloading_submission_dialog() {
+
+        //create the div that we will then make into a dialog
+
+        $('body').append(
+       '<div id="downloading_submission_dialog" title="Download Submission"> \
+        <p>Please wait while we prepare your download.</p> \
+        </div>');
+
+        //make the div we just created into a dialog box
+
+        $('#downloading_submission_dialog').dialog({
+            modal: false,
+            autoOpen: true,
+            resizable: true,
+            width: 350,
+            height: 300,
+            closeOnEscape: true,
+            close: remove_downloading_submission_dialog,
+            buttons: { "OK": remove_downloading_submission_dialog }
+        });
+
+        $('#downloading_submission_dialog').dialog('open');
+
+        return false;
+
+    }
+
+    function remove_downloading_submission_dialog() {
+
+        //change the dialog back into a normal div (that is what destroy does although it does not destroy the div)
+        $('#downloading_submission_dialog').dialog("destroy");
+
+        //then remove the div
+        $('#downloading_submission_dialog').remove();
+    }
+
+    function switchEvaluation() {
+        var assignmentID = $('#@selectedAssignment').val();
+        var teamID = $('#@selectedTeam').val();
+        window.location.replace("/Rubric?assignmentId=" + assignmentID + "&cuId=" + teamID);
+    }
+
+    function switchEvalButton(aId, cId) {
+        window.location.replace("/Rubric?assignmentId=" + aId + "&cuId=" + cId);
+    }
+
+    function updateGrade() {
+        var grade = 0.0;
+        @{foreach (Criterion crit in Model.Rubric.Criteria)
+          {
+              string targetId = String.Format("\"#{0}_{1}\"", critInputPrefix, crit.ID);
+              //@Html.Raw("\tgrade += $(" + targetId + ").val() / " + Convert.ToDouble(maxLevelScore) + " * " + crit.Weight / totalRubricPoints + ";\n")
+              @Html.Raw("\tgrade += $(" + targetId + ").val() / " + Convert.ToDouble(maxLevelScore) + " * " + crit.Weight / totalRubricPoints + ";\n")
+          }
+        }
+        $('#@gradeId').html(Math.round(grade * 100) + "%");
+    }
+
+    //updates individual sliders with new values
+    function updateSlider(event, ui) {
+        var pieces = event.target.id.split('_');
+        var target = pieces[2];
+        var targetId = "#@(critInputPrefix)_" + target;
+        $(targetId).val(ui.value);
+        updateGrade();
+    }
+
+    function displayImportRubric(e) {
+        e.preventDefault();
+        $("#import_rubric_from_csv").dialog({
+            modal: true,
+            resizable: false,
+            width: 500,
+            height: 225,
+            closeOnEscape: false
+        });
+    }
+</script>
+<style type="text/css">
+    .dashboard
+    {
+        float: left;
+    }
+
+    .dashboard table th
+    {
+        text-align: left;
+    }
+
+    .dashboard table th, .dashboard table th
+    {
+        padding: 4px;
+    }
+
+    #rubric_evaluator
+    {
+        width: 1200px;
+    }
+
+    .disabledButton
+    {
+        opacity: .4;
+    }
+</style>
+
+
+
+<div id='import_rubric_from_csv'  title="Import file" style="display:none;">Upload a text file containing this student's rubric:<br /><br />
+    @using (Html.BeginForm("ImportIndividualFromFile", "Rubric",  FormMethod.Post, 
+        new { enctype = "multipart/form-data", assignment = Model.SelectedAssignment.AssignmentName}))
+    {
+        <input type="file" id="file" name="file" size="2" accept=".txt" required="required"/>
+        <input type="submit" value="Begin Import Process..." />
+    }
+</div>
+
+<div id="rubric_evaluator">
+    @{
+        ViewBag.CurrentRubricStudentName = Model.Evaluation.Recipient.DisplayName(ViewBag.ActiveCourse.AbstractRole);
+    }
+    <h1>Rubric Evaluation of @Model.SelectedAssignment.AssignmentName for @ViewBag.CurrentRubricStudentName
+    
+    @{  // Record Assignment and Student info for validation and redirection in RubricController and ImportError.cshtml
+        Session["AssignmentName"] = Model.SelectedAssignment.AssignmentName;
+        Session["AssignmentId"] = Model.SelectedAssignment.ID;
+        Session["StudentName"] = ViewBag.CurrentRubricStudentName;
+        Session["CuId"] = @Model.Evaluation.Recipient.TeamMembers.FirstOrDefault().CourseUserID;
+    }
+
+    @if (!student)
+    {
+        if (Model.Evaluation.Recipient.TeamMembers.Count > 1)
+        {
+            List<dynamic> names = Model.Evaluation.Recipient.TeamMembers.Select(tm => tm.CourseUser.UserProfile.DisplayName(ViewBag.ActiveCourse.AbstractRoleID)).ToList();
+            <text>(@string.Join("; ", names.ToArray()))</text>
+        }
+    }
+    </h1>
+    <div class="dashboard">
+            @if (!student)
+            {
+            <table style="border-collapse: collapse; border-spacing: 0;">
+
+                <tr>
+                    <th>
+                        Assignments:
+                    </th>
+                    <td>
+                        <select id="@selectedAssignment" name="@selectedAssignment">
+                            @{foreach (Assignment assignment in Model.AssignmentList)
+                              {
+                                  string optionText = "<option value=\"{0}\" {1}>{2}</option>";
+                                  string selectedValue = "";
+                                  if (assignment.ID == Model.SelectedAssignment.ID)
+                                  {
+                                      selectedValue = "selected=\"selected\"";
+                                  }
+                                @Html.Raw(String.Format(optionText, assignment.ID, selectedValue, assignment.AssignmentName));
+                              }
+                            }
+                        </select>
+                    </td>
+                </tr>
+                </table>
+                <table>
+                <tr>
+                    <th>
+                        Student/Team:
+                    </th>
+                
+                        @{                            
+                            int prevUserId;
+                            int userCount;
+                            AssignmentTeam at;                            
+                            
+                            // We reversed the list so the last person is our first person
+                            if (atList.LastOrDefault().TeamID == @Model.SelectedTeam.TeamID)
+                            {
+                                prevUserId = atList.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID;
+                                userCount = 1;
+                            }
+                            else
+                            {
+                                at = atList.SkipWhile(item => item.TeamID != @Model.SelectedTeam.TeamID).Skip(1).FirstOrDefault();
+                                prevUserId = at.Team.TeamMembers.FirstOrDefault().CourseUserID;
+                                userCount = atList.Count() - (atList.IndexOf(at) - 1);
+                            }                            
+                        }
+                
+                    <td style="padding:0;margin:0;border:0">
+                        <input type="button" value="<" onclick="switchEvalButton(@Model.SelectedAssignment.ID, @prevUserId);" style="margin:0" />
+                        <select id="@selectedTeam" name="@selectedTeam" style="margin:0">
+                            @{
+                              foreach (AssignmentTeam team in Model.TeamList)
+                              {
+                                  // (TAs only) Before we do anything with this team, make sure at least one person in the team is in the TA's section
+                                  if (activeCourseUser != null && activeCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
+                                  {
+                                      bool inSection = false;
+                                      foreach (TeamMember member in team.Team.TeamMembers)
+                                      {
+                                          if (sectionIds.Contains(member.CourseUser.Section.ToString()))
+                                          {
+                                              inSection = true;
+                                              break;
+                                          }
+                                      }
+                                      if (!inSection) { continue; }
+                                  }
+                                  
+                                  string optionTextPublished = "<option style=\"background:#43D58C;\" value=\"{0}\" {1}>{2}</option>";
+                                  string optionTextDraft = "<option style=\"background:#9AFF9A;\" value=\"{0}\" {1}>{2}</option>";
+                                  string optionText = "<option value=\"{0}\" {1}>{2}</option>";
+
+                                  string selectedValue = "";
+                                  if (team.TeamID == Model.SelectedTeam.TeamID)
+                                  {
+                                      selectedValue = "selected=\"selected\"";
+                                  }
+
+                                  RubricEvaluation re = (from r in Model.RubricEvaluationList as IEnumerable<RubricEvaluation>
+                                                         where r.RecipientID == team.TeamID
+                                                         select r).FirstOrDefault();
+
+                                  if (editable == true)
+                                  {
+                                      if (team.Assignment.HasTeams)
+                                      {
+
+                                          if (re != null)
+                                          {
+                                              if (re.IsPublished == true)
+                                              {
+                                                @Html.Raw(String.Format(optionTextPublished, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.Name));
+                                              }
+                                              else
+                                              {
+                                                @Html.Raw(String.Format(optionTextDraft, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.Name));
+                                              }
+
+                                          }
+                                          else
+                                          {
+                                            @Html.Raw(String.Format(optionText, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.Name));
+                                          }
+                                      }
+                                      else
+                                      {
+
+                                          if (re != null)
+                                          {
+                                              if (re.IsPublished == true)
+                                              {
+                                                @Html.Raw(String.Format(optionTextPublished, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole)));
+                                              }
+                                              else
+                                              {
+                                                @Html.Raw(String.Format(optionTextDraft, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole)));
+                                              }
+                                          }
+                                          else
+                                          {
+                                            @Html.Raw(String.Format(optionText, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole)));
+                                          }
+                                      }
+                                  }
+                                  else
+                                  {
+                                      string name = "Anonymous " + @cuList.IndexOf(team.Team.TeamMembers.FirstOrDefault().CourseUser);
+                                @Html.Raw(String.Format(optionText, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, name));
+                                  }
+                              }
+                              int userId;
+
+                              atList = (from t in @Model.TeamList as IEnumerable<AssignmentTeam>
+                                        select t).ToList();
+
+                              if (activeCourseUser != null && activeCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
+                              {
+                                  // If current user is a TA, remove any AssignmentTeams that aren't in the TA's section
+                                  for (int i = 0; i < atList.Count; i++)
+                                  {
+                                      // Loop through team members and make sure at least one member is in TA's section
+                                      bool inSection = false;
+                                      foreach (TeamMember member in atList[i].Team.TeamMembers)
+                                      {
+                                          if (sectionIds.Contains(member.CourseUser.Section.ToString()))
+                                          {
+                                              inSection = true;
+                                              break;
+                                          }
+                                      }
+                                      if (!inSection) // If team has no member in TA's section, get rid of it!
+                                      {
+                                          atList.RemoveAt(i);
+                                          i--;
+                                      }
+                                  }
+                              }
+
+                              if (atList.LastOrDefault().TeamID == @Model.SelectedTeam.TeamID)
+                              {
+                                  userId = atList.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID;
+                              }
+                              else
+                              {
+                                  userId = atList.SkipWhile(item => item.TeamID != @Model.SelectedTeam.TeamID).Skip(1).FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID;
+                              }
+                    
+                            <input type="button" value=">" onclick="switchEvalButton(@Model.SelectedAssignment.ID, @userId);"/>
+                        }
+                        </select>
+                    </td>
+                    <td style="text-align: center">
+                        @userCount/@atList.Count()
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @{string redirectUrl = "../AssignmentDetails/" + Model.SelectedAssignment.ID;}
+                        <a href="@redirectUrl">Back to Assignment Details</a>
+                    </td>
+                </tr>
+            
+                </table>
+            } @* End instructor only components *@
+                
+            <table>
+            <tr>
+                @if (Model.SelectedAssignment.HasDeliverables)
+                {
+
+                    if (Model.SelectedTeam.GetSubmissionTime() != null)
+                    {
+                        string downloadText = "Download submission files";
+                        if (Model.SelectedAssignment.Deliverables.First().DeliverableType == DeliverableType.PDF)
+                        {
+                            downloadText = "View and annotate PDF submission";
+                        }
+                        <td>
+                            @Html.ActionLink(downloadText, "GetSubmissionZip", "FileHandler", new {assignmentID = Model.SelectedAssignment.ID, teamID = Model.SelectedTeam.TeamID}, new {onclick = "create_and_open_downloading_submission_dialog()"})
+                        </td>
+                    }
+                    else
+                    {
+                        string downloadText = "No Submissions";
+                        <td>
+                            <a href="#">@downloadText</a>
+                        </td>
+                    }
+                }
+                @if (Model.SelectedAssignment.HasCommentCategories)
+                {
+                    <td>
+                        @Html.ActionLink("View/Edit Inline Comments", "InlineReview", "Assignment", new { assignmentID = Model.SelectedAssignment.ID, teamID = Model.SelectedTeam.TeamID }, new { style = "padding-left: 25px;" })
+                    </td>
+                }
+                @if (Model.SelectedAssignment.AssignmentTypeID == 3)
+                {
+                    int cuid = Model.Evaluation.Recipient.TeamMembers.FirstOrDefault().CourseUserID;
+                    // find user in which team
+
+                    
+                    if (Model.DiscussionTeamList != null)
+                     {
+                         int teamId = -1;
+
+                         foreach (DiscussionTeam dt in Model.DiscussionTeamList)
+                         {
+                             if (dt.Team.TeamMembers.Any(s => s.CourseUserID == cuid))
+                             {
+                                 teamId = dt.ID;
+                                 break;
+                             }
+                         }
+                         <td>
+                             @(Html.ActionLink("View " + Model.Evaluation.Recipient.Name + "'s discussion contributions", "TeacherIndex", "DiscussionAssignment", new { assignmentId = Model.SelectedAssignment.ID, courseUserId = cuid, discussionTeamID = teamId, highlightValueString = "PostsAndReplies" }, new { }))
+                         </td>
+                     }
+                     // one discussion among the whole class
+                     else
+                     {
+                        <td>
+                            @(Html.ActionLink("View " + Model.Evaluation.Recipient.Name + "'s discussion contributions", "TeacherIndex", "DiscussionAssignment", new { assignmentId = Model.SelectedAssignment.ID, courseUserId = cuid, discussionTeamID = Model.SelectedAssignment.AssignmentTeams.IndexOf(Model.SelectedTeam) + 1, highlightValueString = "PostsAndReplies" }, new { }))
+                        </td>
+                     }
+
+                }
+            </tr>
+                
+        </table>
+    </div>
+    @using (Html.BeginForm("Index", "Rubric", FormMethod.Post, new { id = "rubric_form" }))
+    {
+        <table style="float: right">
+            <tr>
+                <td></td>
+                <td></td>
+                <th style="text-align:right">
+                    Grade:
+                </th>
+                <td id="@gradeId" style="text-align:right;" >
+                    0%
+                </td>
+            </tr>
+            @if (publishTime.HasValue)
+            {
+                if (Model.Evaluation.IsPublished == true)
+                {
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <th style="text-align:right">Published:</th>
+                    <td style="text-align:right">
+                         <time 
+                class="utc-time"
+                datetime="@Helpers.DateAsUnixTime(publishTime.Value)" 
+                data-original-date="@Helpers.RawDate(publishTime.Value)" 
+                data-date-format="MM/DD/YYYY hh:mm A">
+                        @publishTime.Value.ToShortDateString() @publishTime.Value.ToShortTimeString()
+                             </time>
+                    </td>
+                </tr>
+                }
+                else
+                {
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <th style="text-align:right">Draft:</th>
+                    <td style="text-align:right">
+                        <time 
+                class="utc-time"
+                datetime="@Helpers.DateAsUnixTime(publishTime.Value)" 
+                data-original-date="@Helpers.RawDate(publishTime.Value)" 
+                data-date-format="MM/DD/YYYY hh:mm A">
+                            @publishTime.Value.ToShortDateString() @publishTime.Value.ToShortTimeString()
+                        </time>
+                    </td>
+                </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <th style="text-align:right">Published:</th>
+                    <td style="text-align:right">
+                         Not Published
+                    </td>
+                </tr>
+            }
+            <tr>
+
+                @{
+                    string rubricUserName = "Export " + @Model.Evaluation.Recipient.DisplayName(ViewBag.ActiveCourse.AbstractRole) + "'s Rubric";
+                    Session["StudentName"] = @Model.Evaluation.Recipient.DisplayName(ViewBag.ActiveCourse.AbstractRole);
+                    Session["CuId"] = @Model.Evaluation.Recipient.TeamMembers.FirstOrDefault().CourseUserID;
+                }
+                <td style="padding-right:10px;">
+                    @Html.ActionLink(rubricUserName, "ExportIndividualToFile", new { teamID = Model.Evaluation.Recipient.ID, assignID = Model.SelectedAssignment.ID }, new { })
+                </td>
+                <td style="padding-right:10px; padding-left:10px;">
+                    <a href="" onclick="displayImportRubric(event);">Import @Model.Evaluation.Recipient.DisplayName(ViewBag.ActiveCourse.AbstractRole)'s Rubric</a>
+                </td>
+
+
+                @if (Model.Evaluation.IsPublished == true || editable == false)
+                {
+                    <td>
+                        <input disabled="disabled" type="submit" name="@draftButton" value="Save as Draft" class="disabledButton"/>
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        <input type="submit" name="@draftButton" value="Save as Draft" />
+                    </td>
+                }
+                @if (editable == true)
+                {
+                    <td>
+                        <input type="submit" name="@publishButton" value="Publish" />
+                    </td>
+                }
+            </tr>
+        </table>
+        <br />
+        <br />
+        <br />
+        <br />
+        <div id="internalScrollID" style="width: 1200px; overflow: auto;">
+            @Html.Partial("_Display", Model)
+        </div>
+        <input type="hidden" name="@ViewBag.AssignmentId" value="@Model.SelectedAssignment.ID" />
+        <input type="hidden" name="@ViewBag.CourseUserId" value="@Model.SelectedTeam.Team.TeamMembers.FirstOrDefault().CourseUserID" />
+        <input type="hidden" name="@ViewBag.TeamId" value="@Model.SelectedTeam.TeamID" />
+            
+        //AC: For some reason, doing a direct render of Model.Student results in the value
+        //    "value."  As such, I'm using this IF statement as a workaround
+        string statusValue = "false";
+        if (Model.Student == true)
+        {
+            statusValue = "true";
+        }
+        
+        <input type="hidden" name="@ViewBag.StudentStatusName" value="@statusValue"/>
+    }
+</div>

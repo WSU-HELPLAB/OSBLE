@@ -1,0 +1,42 @@
+﻿@using OSBLE.Models.Assignments;
+@model Assignment
+@Html.HiddenFor(m => m.ID)
+
+@if (0 == ViewBag.DepartmentsList.Count)
+{
+    @Html.Raw("(Please contact your system administrator to have them enter department names for ABET assessment)");
+    return;
+}
+
+<script>
+    var currentABETDIVShown = null;
+    function departmentChanged() {
+        // Hide the old set of options
+        if (null != currentABETDIVShown) {
+            document.getElementById(currentABETDIVShown).style.display = "none";
+        }
+
+        // Find the DIV with the same ID as the department name and show it
+        var dept = document.getElementById("slctABETDepartment").value;
+        document.getElementById(dept).style.display = "inline";
+        currentABETDIVShown = dept;
+    }
+</script>
+
+<!-- Add the options for ABET department -->
+Please select the department for ABET assessment:
+<select id="slctABETDepartment" name="slctABETDepartment" onchange="departmentChanged();">
+    @{
+        foreach(string str in ViewBag.DepartmentsList)
+        {
+            <option value="@str">@str</option>
+        }
+    }
+</select>
+
+<br /><br />
+Select the ABET outcomes that are addressed in this assignment:<br />
+@Html.Raw(ViewBag.OptionsDIVsHTML)
+<script>
+    departmentChanged();
+</script>

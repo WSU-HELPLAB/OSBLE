@@ -1,0 +1,294 @@
+﻿@model OSBLE.Models.Intervention.InterventionsList
+
+@{
+    string rootUrl = OSBLEPlus.Logic.Utility.StringConstants.WebClientRoot;
+    string feedbackUrl = rootUrl + "Intervention/UserFeedback?component=7";
+    string availabilityUrl = rootUrl + "Intervention/Availability?component=7";
+    string dismissedInterventionsUrl = rootUrl + "Intervention/DismissedInterventions?component=7";
+    string privateMesagesUrl = rootUrl + "Intervention/PrivateMessages?component=7";
+    string helpUrl = rootUrl + "Help?component=7";
+    string profileUrl = rootUrl + "Profile?component=7";
+    string settingsUrl = rootUrl + "Intervention/SuggestionsSettings?component=7";
+}
+
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>OSBLE+ Suggestions</title>
+
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/bootstrap-3.3.5/css/bootstrap.min.css")" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-2.0.1.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/bootstrap-3.3.5/js/bootstrap.min.js")"></script>
+
+    @* highlight.js code syntax highlighting block*@
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/themes/highlight/vs.css")" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/highlight.pack.js")"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    @* highlight.js code syntax highlighting block*@
+
+    <script type="text/javascript" src="@Url.Content("~/Scripts/Interventions.js")?version=1.01"></script>
+
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery-ui-1.8.13.custom.css")" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-ui-1.10.4.min.js")"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $(".dismiss-intervention").on('click', function () {
+                var id = $(this).parent().parent().attr('id');
+                var interventionId = id.split("-");
+                interventionId = interventionId[1];
+                //dismiss in the database
+
+                $.ajax({
+                    url: "/Intervention/DismissIntervention",
+                    data: { interventionId: interventionId },
+                    //dataType: "json",
+                    method: "POST",
+                    success: function (result) {
+                        //dismiss if db change successful
+                        if (result == "True") {
+                            $("#" + id).fadeOut(300);
+                        }
+                    },
+                    error: function (result) {
+                    }
+                });
+            });
+
+            var ids = "";
+
+            $("[id^=intervention-]").each(function () {
+                var id = $(this).prop('id').split('-')[1];
+                ids += id + ",";
+            });
+
+            ids = ids.substring(0, ids.length - 1); //remove the last comma
+            var notifyChange = false;
+            var lastSuggestionIds = localStorage.getItem("lastSuggestionIds");
+
+            //use local storage to detect page refreshes and show visual indicator of new items
+            if (lastSuggestionIds === null) { //It doesn't exist, create it.
+                localStorage.setItem('lastSuggestionIds', ids);
+                notifyChange = true;
+            }
+            else { //it exists, check for refresh
+                var idsArray = ids.split(',');
+                var lastIdsArray = lastSuggestionIds.split(',');
+                var newIds = $(idsArray).not(lastIdsArray).get(); //check if there are new Ids in the list since the last refresh
+
+                if (newIds.length > 0) { //there's a change, visually notify the user
+                    notifyChange = true;
+                }
+                localStorage.setItem('lastSuggestionIds', ids); //update the storage to the current id list
+            }
+
+            if (notifyChange) {
+                $("#new-suggestions").show('fade');
+                for (var i = 0; i < 10; i++) {
+                    $("#dashboard-panel-heading")
+                        .animate({ backgroundColor: "#074974" }, 800)
+                        .animate({ backgroundColor: "#999" }, 800)
+                        .animate({ backgroundColor: "#337ab7" }, 800);
+                }
+            }
+
+            //get the last saved zoom if possible
+            var lastZoomLevel = localStorage.getItem("lastZoomLevel");
+            if (lastZoomLevel === null) { //if there is not a zoom level in history, save the current zoom level (1.0 more than likely)
+                localStorage.setItem('lastZoomLevel', getZoomLevel());
+            }
+            else { //set the zoom level to the last remembered level
+                $("body").css('zoom', lastZoomLevel);
+            }
+
+            $(document).click(function () {
+                $("#new-suggestions").hide('fade');
+                $("#dashboard-panel-heading").stop();
+            });
+
+            $(window).focus(function () {
+                $("#new-suggestions").hide('fade');
+                $("#dashboard-panel-heading").stop();
+            });
+
+            $("#options-down").on("click", function () {
+                $("#options-down").css("display", "none");
+                $("#options-up").css("display", "inline");
+                $("#dashoard-footer").slideToggle(500, function () {
+                    $("#dashoard-footer").is(":visible") ? "Collapse" : "Expand";
+                });
+            });
+
+            $("#options-up").on("click", function () {
+                $("#options-down").css("display", "inline");
+                $("#options-up").css("display", "none");
+                $("#dashoard-footer").slideToggle(500, function () {
+                    $("#dashoard-footer").is(":visible") ? "Collapse" : "Expand";
+                });
+            });
+        });
+
+        function increaseZoom(amount) {
+            var zoom = Number($("body").css('zoom'));
+            $("body").css('zoom', zoom + amount);
+            //set zoom level in local storage
+            localStorage.setItem('lastZoomLevel', getZoomLevel());
+        }
+
+        function getZoomLevel() {
+            return $("body").css('zoom');
+        }
+
+    </script>
+
+    <style type="text/css">
+        body {
+            width: 230px;
+            margin-right: auto;
+            margin-left: auto;
+            margin-top: 2px;
+        }
+
+        .panel-heading {
+            padding: 2px;
+            text-align: center;
+        }
+
+        .left {
+            float: left;
+        }
+
+        .right {
+            float: right;
+        }
+
+        .center {
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .panel-body {
+            padding: 5px;
+        }
+
+        .dismiss-intervention {
+            float: right;
+            margin-right: 5px;
+            cursor: pointer;
+        }
+
+        .intervention-info {
+            float: left;
+            margin-left: 5px;
+        }
+
+        .panel.panel-primary {
+            margin-bottom: 5px;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted black;
+        }
+
+            .tooltip .tooltiptext {
+                visibility: hidden;
+                width: 120px;
+                background-color: black;
+                color: #fff;
+                text-align: center;
+                border-radius: 6px;
+                padding: 5px 0;
+                /* Position the tooltip */
+                position: absolute;
+                z-index: 1;
+                top: -5px;
+                right: 105%;
+            }
+
+            .tooltip:hover .tooltiptext {
+                visibility: visible;
+            }
+
+        #dashboard-items span {
+            font-size: larger;
+            margin-left: 5px;
+            margin-right: 5px;
+        }
+
+        #options-down, #options-up {
+            color: gray;
+        }
+
+        .brackets {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="panel panel-primary" id="dashboard">
+        <div class="panel-heading" id="dashboard-panel-heading">
+            <span class="glyphicon glyphicon-bell" id="new-suggestions" style="display: none; color: white;"></span>
+            Suggestions Dashboard
+            <span class="glyphicon glyphicon-dashboard"></span>
+            @*<a href="#" data-toggle="tooltip" title="New Suggestions"><span class="badge" style="font-size: x-small; margin-bottom: 3px;">7</span></a>*@
+        </div>
+        <div class="panel-body">
+            <div class="center" id="dashboard-items">
+                <a href="@privateMesagesUrl" data-toggle="tooltip" title="Private Conversations"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span></a>
+                <a href="@availabilityUrl" data-toggle="tooltip" title="Availability Details"><span class="glyphicon glyphicon-flag" aria-hidden="true"></span></a>
+                <a href="@dismissedInterventionsUrl" data-toggle="tooltip" title="View Dismissed Suggestions"><span class="glyphicon glyphicon-time" aria-hidden="true"></span></a>
+                <a href="@profileUrl" id="profile-url" data-toggle="tooltip" title="My Profile"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
+                <a href="@feedbackUrl" data-toggle="tooltip" title="Feedback"><span class="glyphicon glyphicon-scale" aria-hidden="true"></span></a>
+                <a href="@helpUrl" id="help-url" data-toggle="tooltip" title="Help"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></a>
+                @*<a href="#" data-toggle="tooltip" title="Settings"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span></a>*@
+                <a href="#" id="options-down" data-toggle="tooltip" title="Options"><span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span></a>
+                <a href="#" id="options-up" data-toggle="tooltip" title="Options" style="display: none;"><span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span></a>
+            </div>
+        </div>
+        <div id="dashoard-footer" class="panel-footer" style="text-align: right; display: none;">
+            <a href="@settingsUrl" id="settings-url" data-toggle="tooltip" title="Settings" class="suggestions-icons left" style="font-size: x-large;"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span></a>
+            <span class="">Zoom:</span>
+            <div class="btn-group">
+                <a class="btn btn-primary" title="Zoom In" href="#"><span class="glyphicon glyphicon-plus" onclick="increaseZoom(0.07)"></span></a>
+                <a class="btn btn-primary" title="Zoom Out" href="#"><span class="glyphicon glyphicon-minus" onclick="increaseZoom(-0.07)"></span></a>
+            </div>
+        </div>
+    </div>
+
+    @foreach (var interventionItem in Model.InterventionItemList) //Populate Suggestion window with interventions.
+    {
+        @* TEMPLATE ASK FOR HELP*@
+        <div class="panel panel-primary" id="intervention-@interventionItem.Id">
+            <div class="panel-heading" style="background-color: #81add4;">
+                <span class="glyphicon glyphicon-@interventionItem.Icon1 intervention-info"></span><span class="glyphicon glyphicon-@interventionItem.Icon2 intervention-info"></span>
+                @interventionItem.Title
+                <span class="glyphicon glyphicon-remove dismiss-intervention" data-toggle="tooltip" title="Dismiss Suggestion"></span>
+            </div>
+            <div class="panel-body">
+                <div class="left">
+                    @if (interventionItem.ContentFirst)
+                    {
+                        @interventionItem.ListItemContent <span class="brackets">&lt;&lt;</span> <a href="@interventionItem.Link">@interventionItem.LinkText</a>  <span class="brackets">&gt;&gt;</span>
+                    }
+                    else
+                    {
+                        <span class="brackets">&lt;&lt;</span> <a href="@interventionItem.Link">@interventionItem.LinkText</a>  <span class="brackets">&gt;&gt;</span> @interventionItem.ListItemContent
+                    }
+                </div>
+            </div>
+        </div>
+        @* END TEMPLATE *@
+    }
+</body>
+</html>

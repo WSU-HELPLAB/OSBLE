@@ -1,0 +1,7 @@
+﻿@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+@model AggregateFeedItem
+@{
+    FeedPostEvent comment = Model.Items.First().Event as FeedPostEvent;
+} 
+@* Spacing is very important, all spacing is preserved (including newlines) *@
+<div class="user-text" id="content-comment-@comment.EventLogId">@comment.Comment</div>

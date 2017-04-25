@@ -1,0 +1,175 @@
+﻿@model OSBLE.Models.Users.Mail
+@using OSBLE.Models
+@using OSBLE.Models.Users
+
+@{
+    ViewBag.Title = "Mail";
+    string confirmMessage = "Are you sure you want to permanently delete this mail item?";
+    List<string> attachmentUrls = ViewBag.AttachmentUrls;
+    if (null == attachmentUrls)
+    {
+        attachmentUrls = new List<string>();
+    }
+}
+
+<style type="text/css">
+    form {
+        float: left;
+    }
+</style>
+
+@if (attachmentUrls.Count() > 0)
+{
+    <h2>Subject:  @Model.Subject (files attached)</h2>
+}
+else
+{
+    <h2>Subject:  @Model.Subject</h2>
+}
+
+
+<p>
+    <b>Sent:</b> <time class="utc-time"
+                       datetime="@Helpers.DateAsUnixTime(@Model.Posted)"
+                       data-original-date="@Helpers.RawDate(@Model.Posted)"
+                       data-date-format="MM/DD/YYYY hh:mm A">
+        @Model.Posted.ToShortDateString() @Model.Posted.ToShortTimeString() (UTC)
+    </time>
+</p>
+<div class="mail_user">
+    <b>From:</b><br />
+    @Helpers.ProfilePicture(@Url.Action("ProfilePicture", new { ID = Model.FromUserProfileID }))
+    @Model.FromUserProfile.FirstName @Model.FromUserProfile.LastName
+</div>
+
+<div class="mail_user">
+    <b>To:</b><br />
+    @if (ViewBag.AllRecipients == null)
+    {
+        @Helpers.ProfilePicture(@Url.Action("ProfilePicture", new { ID = Model.ToUserProfileID }))
+        @Model.ToUserProfile.FirstName @Model.ToUserProfile.LastName
+    }
+    else
+    {
+        foreach (UserProfile p in ViewBag.AllRecipients)
+        {
+            var id = p.ID;
+            var name = p.FirstName + " " + p.LastName;
+
+            <div id="@p.ID" class="recipient">
+                <a>
+                    <img src="@Url.Action("ProfilePicture")/@p.ID" class="small_profile_picture" alt="Profile Picture" />
+                    @p.FirstName @p.LastName
+                </a>
+            </div>
+        }
+    }
+</div>
+<div id="mail_message">
+    @Html.Raw(HttpUtility.HtmlDecode(Helpers.Linkify(Model.Message).ToHtmlString()))
+</div>
+
+@if (null != attachmentUrls && attachmentUrls.Count() > 0)
+{
+    <div class="attachments">
+        <h4>Attachments:</h4>
+        <ul>
+            @foreach (string attachment in attachmentUrls)
+            {
+                var filename = attachment.Split('=').Last();
+                <li>
+                    <a class="file-header" href="@attachment" title="@filename">
+                        @if (filename.IndexOf('.') > -1) // if path contains '.'
+                        {
+                            <img src="@Helpers.GetIconImgPath(filename.Substring(filename.LastIndexOf('.')).ToLower())" />
+                        }
+                        else
+                        {
+                            <img src="@Helpers.GetIconImgPath("")" />
+                        }
+                        @filename
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+}
+
+@{
+    //Replying
+    using (Html.BeginForm("CreateReply", "Mail", FormMethod.Get))
+    {
+        <input type="hidden" name="replyTo" value="@Model.ID" />
+        <input class="MailInput" type="submit" value="Reply" />
+    }
+
+    //Reply all
+    using (Html.BeginForm("CreateReplyAll", "Mail", FormMethod.Get))
+    {
+        <input type="hidden" name="replyAll" value="@Model.ThreadID" />
+        <input class="MailInput" type="submit" value="Reply All" />
+    }
+
+    //Forwarding
+    using (Html.BeginForm("CreateForward", "Mail", FormMethod.Get))
+    {
+        <input type="hidden" name="forwardTo" value="@Model.ID" />
+        <input class="MailInput" type="submit" value="Forward" />
+    }
+
+    if (ViewBag.CurrentUser.ID == Model.ToUserProfile.ID)
+    {
+        //Delete
+        using (Html.BeginForm("DeleteSingle", "Mail", FormMethod.Post))
+        {
+            <input type="hidden" name="ID" value="@Model.ID" />
+            <input type="hidden" name="deleteFrom" value="inbox" />
+            <input class="MailInput" type="submit" value="Delete" onclick="return confirm(@(confirmMessage))" />
+        }
+        <br /><br />
+    }
+    else
+    {   //outbox
+        //Delete
+        using (Html.BeginForm("DeleteSingle", "Mail", FormMethod.Post))
+        {
+            <input type="hidden" name="ID" value="@Model.ID" />
+            <input type="hidden" name="deleteFrom" value="outbox" />
+            <input type="submit" value="Delete" onclick="return confirm(" @(confirmMessage) ")" />
+        }
+        <br /><br />
+    }
+}
+<table>
+    <tr>
+        <td class="email_view_links">
+            @if (ViewBag.Prev < Model.ID)
+            {
+                @Html.ActionLink("Older", "View", new { id = ViewBag.Prev }) <a>&nbsp;</a>
+            }
+            else
+            {
+            }
+        </td>
+        <td class="email_view_links">
+            @if (ViewBag.CurrentUser.ID == Model.ToUserProfile.ID)
+            { // inbox
+                @Html.ActionLink("Back to Inbox\t", "Index") <a>&nbsp;</a>
+            }
+            else
+            { // outbox
+                @Html.ActionLink("Back to Outbox", "Outbox")
+            }
+        </td>
+        <td class="email_view_links">
+            @if (ViewBag.Next > Model.ID)
+            {
+                @Html.ActionLink("Newer", "View", new { id = ViewBag.Next })
+            }
+            else
+            {
+            }
+        </td>
+    </tr>
+</table>
+</p>

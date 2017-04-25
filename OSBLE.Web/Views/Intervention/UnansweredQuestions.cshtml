@@ -1,0 +1,111 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model OSBLE.Models.Intervention.UnansweredQuestionsViewModel
+
+@{
+    string webRoot = OSBLEPlus.Logic.Utility.StringConstants.WebClientRoot + "Feed/Details";
+    var activityFeedUrl = OSBLEPlus.Logic.Utility.StringConstants.WebClientRoot + "Feed/OSBIDE?component=7";
+
+    var currentCourseUsers = ViewBag.CurrentCourseUsers;
+    int currentCourseId = ViewBag.CurrentCourseId;
+    int currentUserProfileId = ViewBag.CurrentUserProfileId;
+    string currentUserFullName = ViewBag.CurrentUserFullName;
+
+}
+
+<script type="text/javascript" src="@Url.Content("~/Scripts/jquery.signalR-2.2.0.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/signalr/hubs")"></script>
+
+<link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/interventions.css")?version=1.0" />
+<script type="text/javascript" src="@Url.Content("~/Scripts/Interventions.js")?version=1.01"></script>
+
+@* titlebar alert *@
+<script type="text/javascript" src="@Url.Content("~/Scripts/jquery.titlealert.js")"></script>
+
+<script type="text/javascript">
+    var vm;
+    $(document).ready(function() {
+        vm = new FeedViewModel("@currentUserFullName", @currentUserProfileId);
+        ko.applyBindings(vm);
+        vm.GetUnansweredPosts("@Model.UnansweredPostIds");
+    });
+
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#feed-footer").hide();
+
+        /*START Autocomplete block*/
+        //TODO: need to re-build the url/<a/> tags for @@name and #hashtag.
+        var userNames = []
+        var userIds = [];
+
+        //we need to get hashtags from the hashtag table and populate it like names are populated.
+        //we also need to add hashtags to the table if there are no matches so others will see hashtags they've seen already.
+        var hashtags = [];
+        @{
+            if (null != ViewBag.HashTags)
+            {
+                foreach(string hashTag in ViewBag.HashTags)
+                {
+                    @:hashtags.push("@hashTag");
+                                                                    }
+            }
+
+            if (null != currentCourseUsers)
+            {
+                foreach (var userProfile in currentCourseUsers)
+                {
+                    @:userNames.push("@userProfile.FirstName" + "@userProfile.LastName");
+                                                                        @:userIds.push("@userProfile.ID");
+                                                                    }
+            }
+        }
+
+        localStorage['UserNames'] = userNames;
+        localStorage['UserIds'] = userIds;
+
+        $(document).on("focus", "textarea", function () {
+            $(this).atwho({
+                at: "@@",
+                data: userNames,
+                insertTpl: "@@${name}", //insert template i.e. what is inserted into the textarea
+            });
+
+            $(this).atwho({
+                at: "#",
+                data: hashtags
+            });
+        });
+    });
+</script>
+
+<input type="hidden" id="courseIdVal" value="@ViewBag.CurrentCourseId" />
+@Html.Partial("_UserFeedbackPrompt", new ViewDataDictionary { { "interventionId", Model.Intervention.Id } })
+<h4><em>Some users have un-answered questions or questions with replies that have not been marked helpful...</em></h4>
+<h5>Marking replies to these questions as 'helpful' will remove them from future results on this page.</h5>
+
+@*START Post List Area*@
+@* This is a message displayed while the feed is loading posts *@
+<div id="loadingMsg" class="message">
+    @Helpers.LoadingSmall() Loading Posts...
+</div>
+
+@* Feed is inserted here *@
+<div id="dp_posts" class="panel-group">
+    <div class="panel panel-info" style="text-align: right;">
+        <div class="panel-heading" style=" padding: 5px;">
+            <span class="intervention-heading"><strong>Sort:</strong></span>
+            <span class="glyphicon glyphicon-sort-by-order intervention-heading" id="reverse-sort-a"></span>
+            <span class="glyphicon glyphicon-sort-by-order-alt intervention-heading" id="reverse-sort-d" style="display: none;"></span>
+        </div>
+    </div>
+    @Html.Partial("Feed/_Feed")
+</div>
+<input id="iid" type="hidden" value="@Model.Intervention.Id" />
+@Html.Partial("_SuggestionFeedbackModal", Model.Intervention)
+<div id="visibility-dialog" title="Post Visibility:" hidden="hidden"></div>

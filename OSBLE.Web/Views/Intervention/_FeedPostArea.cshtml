@@ -1,0 +1,318 @@
+﻿@using OSBLE.Models.Courses
+@using OSBLEPlus.Logic.Utility
+@using OSBLEPlus.Logic.Utility.Lookups
+@using OSBLE.Models.Queries
+@using OSBLE.Models.Users
+@using OSBLE.Models
+@using OSBLE.Utility
+
+@{
+    UserProfile currentUser = ViewBag.CurrentUser;
+
+    var courseUsers = DBHelper.GetAllCourseUsersFromCourseId(ViewBag.ActiveCourse.AbstractCourseID);
+
+    string EnableCustomPostVisibility = ViewBag.EnableCustomPostVisibility;
+}
+
+<script type="text/javascript">
+
+    function toggleVisibilityTooltip(visibleIcon) {
+        var values = visibleIcon.split(',');
+        var idName = "";
+        if (values.length == 2) { //instructors and tas
+            idName = values[0] + "-" + values[1];
+        }
+        else //all the rest
+        {
+            idName = values[0];
+            if (idName == "Selected Users") {
+                idName = "selected-users";
+            }
+        }
+
+        $("[id^='visibility-tooltip-']").each(function () {
+            $(this).css('display', 'none');
+        });
+
+        var selectedId = '#visibility-tooltip-' + idName;
+        $(selectedId).css('display', 'inline');
+    }
+
+    $(document).ready(function () {
+        $(".make_anonymous").on("click", function () {
+            if ($("#make_anonymous").is(":checked")) {
+                $('#visibility-dropdown').css('opacity', '0.65');
+                $('#visibility-dropdown').css('cursor', 'not-allowed');
+                $('#visibility-dropdown').css('background-color', '#ffeeee');
+                $('#visibility-dropdown').prop('selectedIndex', 0);
+                $("#btn_post_active").val("Post to " + $("#data-course-link").text());
+                $("#email_post").text("Email to Class");
+                $('#visibility-dropdown').prop("disabled", true);
+                toggleVisibilityTooltip($("#visibility-dropdown option:selected").val());
+                toggleCustomGroups('hide');
+                clearSelection();
+            }
+            else {
+                $('#visibility-dropdown').css('opacity', '1.0');
+                $('#visibility-dropdown').css('cursor', 'default');
+                $('#visibility-dropdown').prop("disabled", false);
+                $('#visibility-dropdown').css('background-color', '#ffffff');
+            }
+        });
+
+        //alternate dropdown for use in the plugin. datatable doesn't work in chromium renderer for some reason.
+        $("#courseUsersList-plugin").change(function () {
+            if ($("#courseUsersList-plugin").prop('selectedIndex') > 0) {
+                var fullName = $("#courseUsersList-plugin option:selected").text();
+                var userId = $(this).val().split('-');
+
+                //add the user to the visible list only if they are not already on it
+                if (userId.length > 0 && $("#" + 'selected-user-id-' + userId[userId.length - 1]).length == 0) {
+                    $("#selected-users-div").append(
+                    '<div id="selected-user-id-' + userId[userId.length - 1] + '" class="recipient">' +
+                    '<div class="recipient_tools">' +
+                    '<a href="#" title="remove this user" onclick="removeUser(' + userId[userId.length - 1] + ')" class="deleteIconDiv">' +
+                    '<img src="/Content/images/delete_up.png" alt="Remove User Button"></a>' +
+                    '</div><a><img src="/Mail/ProfilePicture/' + userId[userId.length - 1] + '" class="small_profile_picture" alt="Profile Picture">' + fullName + '</a></div>'
+                    );
+                }
+
+                var usersCount = updateHiddenUserIdList();
+
+                if (usersCount == 0) {
+                    $('#custom-search-clear-selection').css('opacity', '0.65');
+                    $('#custom-search-clear-selection').css('cursor', 'not-allowed');
+                    $('#NoUsers').css('display', 'inline');
+                }
+                else {
+                    $('#custom-search-clear-selection').css('opacity', '1.0');
+                    $('#custom-search-clear-selection').css('cursor', 'pointer');
+                    $('#NoUsers').css('display', 'none');
+                }
+            }
+        });
+
+        if (!detectBrowser()) {
+            $("#custom-user-search-input").css('display', 'none');
+            $("#custom-search-clear").css('display', 'none');
+
+            $("#courseUsersList-plugin").css('display', 'inline');
+        }
+
+        $("#visibility-dropdown").on("change", function () {
+            toggleVisibilityTooltip($("#visibility-dropdown option:selected").val());
+            if ($("#visibility-dropdown option:selected").text() != "Everyone") {
+
+                if ($("#visibility-dropdown option:selected").text() == "Selected Users...") {
+                    toggleCustomGroups('show');
+                }
+                else {
+                    toggleCustomGroups('hide');
+                    clearSelection();
+                }
+
+                $("#btn_post_active").val("Post to: " + $("#visibility-dropdown option:selected").text());
+                $("#email_post").text("Email to: " + $("#visibility-dropdown option:selected").text());
+            }
+            else {
+                toggleCustomGroups('hide');
+                $("#btn_post_active").val("Post to: " + $("#CourseSelect option:selected").text());
+                $("#email_post").text("Email to Class");
+                clearSelection();
+            }
+        });
+
+        $("#custom-user-search-input").on('input', function () {
+            var val = this.value;
+            if ($('#courseUsersList').find('option').filter(function () {
+
+                if (val.length > 0) {
+                    $('#custom-search-clear').css('opacity', '1.0');
+                    $('#custom-search-clear').css('cursor', 'pointer');
+                    $('#custom-search-clear').css('padding', '3px 5px 3px 5px');
+                    $('.icon-state').css('color', '#000');
+            }
+            else {
+                        $('#custom-search-clear').css('opacity', '0.65');
+                        $('#custom-search-clear').css('cursor', 'not-allowed');
+                        $('#custom-search-clear').css('padding', '2px 5px 2px 5px');
+                        $('.icon-state').css('color', '#aaa');
+            }
+
+                return this.value.toUpperCase() === val.toUpperCase();
+            }).length) {
+                var fullName = $("#custom-user-search-input").val();
+                var userId = "";
+
+                //get the user id
+                $("#courseUsersList > option").each(function () {
+                    if (this.value.toUpperCase() === fullName.toUpperCase()) {
+                        userId = $(this).data("uid").split('-');
+                        return false; //exit the foreach
+                    }
+                });
+
+                //add the user to the visible list only if they are not already on it
+                if (userId.length > 0 && $("#" + 'selected-user-id-' + userId[userId.length - 1]).length == 0) {
+                    $("#selected-users-div").append(
+                    '<div id="selected-user-id-' + userId[userId.length - 1] + '" class="recipient">' +
+                    '<div class="recipient_tools">' +
+                    '<a href="#" title="remove this user" onclick="removeUser(' + userId[userId.length - 1] + ')" class="deleteIconDiv">' +
+                    '<img src="/Content/images/delete_up.png" alt="Remove User Button"></a>' +
+                    '</div><a><img src="/Mail/ProfilePicture/' + userId[userId.length - 1] + '" class="small_profile_picture" alt="Profile Picture">' + fullName + '</a></div>'
+                    );
+                }
+                //clear the input box
+                $("#custom-user-search-input").val('');
+                //reset search x
+                $('#custom-search-clear').css('opacity', '0.65');
+                $('#custom-search-clear').css('cursor', 'not-allowed');
+                $('#custom-search-clear').css('padding', '2px 5px 2px 5px');
+                $('.icon-state').css('color', '#aaa');
+
+                var usersCount = updateHiddenUserIdList();
+
+                if (usersCount == 0) {
+                    $('#custom-search-clear-selection').css('opacity', '0.65');
+                    $('#custom-search-clear-selection').css('cursor', 'not-allowed');
+                    $('#NoUsers').css('display', 'inline');
+                }
+                else {
+                    $('#custom-search-clear-selection').css('opacity', '1.0');
+                    $('#custom-search-clear-selection').css('cursor', 'pointer');
+                    $('#NoUsers').css('display', 'none');
+                }
+            }
+        });
+
+        $('input[id=custom-user-search-input]').keydown(function (e) {
+            var code = e.keyCode || e.which;
+            if (code === 9) {  //user pressed tab, keep cursor in the input
+                e.preventDefault();
+            }
+        });
+
+    });
+</script>
+
+<div id="activity_new_post">
+    @if (ViewBag.ActiveCourse.AbstractRole != null)
+    {
+        if ((ViewBag.ActiveCourse.AbstractRole.CanGrade == true) || (ViewBag.ActiveCourse.AbstractRole.Anonymized) || ((ViewBag.ActiveCourse.AbstractCourse is Course) && (ViewBag.ActiveCourse.AbstractCourse.AllowDashboardPosts) == true))
+        {
+            @* Make new post form *@
+            <form id="feed-post-form" role="form">
+                <div class="form-group">
+                    @{ string defaultText = "Enter new feed post here...\nUse @ and # to tag users or topics"; }
+                    <textarea id="feed-post-textbox" class="form-control" rows="4" placeholder="@defaultText"></textarea>
+                </div>
+                <input type="submit" data-bind="click: MakePost" id="btn_post_active" class="btn btn-default" name="post_active" value="Post to: My Section" />
+
+                @{ var isCourse = DBHelper.IsCourse(ViewBag.ActiveCourse.AbstractCourseID); }
+
+                @if (isCourse)
+                {
+                    @Html.Label("Post Visibility: ", new { id = "visibilty-label" })
+
+                    List<SelectListItem> listItems = new List<SelectListItem>();
+                    listItems.Add(new SelectListItem
+                    {
+                        Text = "Everyone",
+                        Value = "class",
+                    });
+                    listItems.Add(new SelectListItem
+                    {
+                        Text = "My Section",
+                        Value = "section",
+                        Selected = true,
+                    });
+
+                    listItems.Add(new SelectListItem
+                         {
+                             Text = "Instructors Only",
+                             Value = "instructors",
+                         });
+                    listItems.Add(new SelectListItem
+                         {
+                             Text = "TAs Only",
+                             Value = "tas"
+                         });
+                    listItems.Add(new SelectListItem
+                    {
+                        Text = "Instructors and TAs Only",
+                        Value = "instructors,tas"
+                    });
+
+                    if (EnableCustomPostVisibility == "true")
+                    {
+                        listItems.Add(new SelectListItem
+                        {
+                            Text = "Selected Users...",
+                            Value = "Selected Users"
+                        });
+                    }
+
+                    @Html.DropDownList("visibility-dropdown", listItems, null, new { @class = "visibility-dropdown" })
+
+                    @Helpers.CreateToolTip(ToolTips.VisibilityEveryone, "visibility-tooltip-class", "display: none;", "glyphicon-globe", "19px")
+                    @Helpers.CreateToolTip(ToolTips.VisibilitySection, "visibility-tooltip-section", "display: inline;", "glyphicon-th-list", "19px")
+                    @Helpers.CreateToolTip(ToolTips.VisibilityInstructors, "visibility-tooltip-instructors", "display: none;", "glyphicon-education", "19px")
+                    @Helpers.CreateToolTip(ToolTips.VisibilityTAs, "visibility-tooltip-tas", "display: none;", "glyphicon-education", "19px")
+                    @Helpers.CreateToolTip(ToolTips.VisibilityInstructorsAndTAs, "visibility-tooltip-instructors-tas", "display: none;", "glyphicon-education", "19px")
+                    @Helpers.CreateToolTip(ToolTips.VisibilitySelectedUsers, "visibility-tooltip-selected-users", "display: none;", "glyphicon-user", "19px")
+
+                }
+                @if (ViewBag.IsInstructor || ViewBag.CanGrade)
+                {
+                    @*<input type="submit" id="btn_post_all" class="btn btn-default" name="post_all" value="Post to All Courses I Teach" onclick="return confirm('Post this message to all your taught courses?');" />*@
+                    <label class="checkbox-inline"><input type="checkbox" value="True" name="send_email" /><span id="email_post">Email to: My Section</span></label>                    
+                    <input type="hidden" id="can-grade" value="true" />
+                }
+                <label class="checkbox-inline"><input type="checkbox" value="True" name="make_anonymous" class="make_anonymous" id="make_anonymous" /><span class="make_anonymous">Post Anonymously</span></label>
+                @Helpers.CreateToolTip(ToolTips.AnonymousPost, "anonymous-post", "display: inline;", "glyphicon-info-sign", "19px")
+                <input type="hidden" id="enable-pm" value="@EnableCustomPostVisibility" />
+            </form>
+        }
+    }
+</div>
+<div id="custom-visiblity-selection">
+    <div class="panel panel-default custom-selection">
+        <div class="panel-heading">
+            @Html.Label("Select Users: ")
+
+            <input list="courseUsersList" id="custom-user-search-input" class="main-dropdown" placeholder="Search by Name...">
+            <datalist id="courseUsersList">
+                @foreach (var user in courseUsers)
+                {
+                    if (currentUser.ID != user.ID) //don't add the current user to the list, self is always included!
+                    {
+                        <option data-uid="user-profile-id-@user.ID" value="@user.FullName"></option>
+                    }
+                }
+            </datalist>
+            <input type="hidden" name="selected-user" id="custom-user-search-input-hidden"><button id="custom-search-clear" class="main-dropdown-button" onclick="clearFilter()"><span class="glyphicon glyphicon-remove icon-state"></span></button>
+
+            @* ALTERNATE dropdown - this is show in the plugin because the chromium browser doesn't properly handle the datalist *@
+            <select id="courseUsersList-plugin" class="main-dropdown" style="display: none;">
+                <option value="0">Select User to Add...</option>
+                @foreach (var user in courseUsers)
+                {
+                    if (currentUser.ID != user.ID) //don't add the current user to the list, self is always included!
+                    {
+                        <option value="user-profile-id-@user.ID">@user.FullName</option>
+                    }
+                }
+            </select>
+
+            <button id="custom-search-clear-selection" type="button" class="btn btn-secondary" onclick="clearSelection()">Clear Selection</button>
+        </div>
+        <div class="panel-body" id="selected-users-div">
+            <div id="NoUsers" class="recipient-default" style="display:inline">
+                <a> << No Users Selected >> </a>
+            </div>
+            <input type="hidden" id="current-user-id" value="@currentUser.ID" />
+            <input type="hidden" id="custom-visibility-selection-id-list" name="custom-visibility-selection-id-list" value="@currentUser.ID" />
+            <input type="hidden" id="private-page" value="true" />
+        </div>
+    </div>
+</div>

@@ -1,0 +1,47 @@
+﻿@{
+    ViewBag.Title = "Creating a Rubric";
+}
+<h1>Creating a Rubric</h1>
+<p>
+    <br />
+    In OSBLE, any assignment other than a Team Evaluation can have an instructor-defined grading rubric. In this tutorial, we will be adding a rubric to a "Basic Assignment". If you do not know how to create a basic assignment, review the <a href="/Help/CreateBasicAssignment"><u>creating basic assignments</u></a> help page.
+    <br />After selecting your assignment type in the Assignment Wizard, check the box that says "The instructor will use a grading rubric".
+</p>
+<img src="@Url.Content("~/Content/images/help/rubric_1.png")" alt="a sample course" />
+<p>
+    <br />
+    Feel free to select any other components here, then press the "Continue" button when finished. On the Basic Settings page, fill out the assignment info as you would for any assignment, then press "Next" at the bottom of the page.
+</p>
+<img src="@Url.Content("~/Content/images/help/rubric_2.png")" alt="basic settings" />
+<p>
+    <br />
+    Finally, we arrive at the Rubric page. This page is broken down into 4 sections. First, you can assign a title for this assignment's rubric in the topmost box.
+</p>
+<img src="@Url.Content("~/Content/images/help/rubric_3.png")" alt="rubric title" />
+<p>
+    <br />
+    Next, you can import a previously created rubric from another assignment even from another course. Additionally, you have the option to select "Overall Comments" which will enable a global comment box for the entire rubric and "Comments for each criterion" which will enable a comment box for each individual criterion specified by the rubric.
+</p>
+<img src="@Url.Content("~/Content/images/help/rubric_4.png")" alt="upload rubric" />
+<p>
+    <br />
+    Under that, you can specify the acceptable increment values for the rubric grading scale. For example, selecting "Allow half-point grades in rubric evaluation" will let you give students a 9.5 out of 10 points. Selecting "Allow quarter-point grades in rubric evaluation" will let you give students a 9.75 out of 10 points.
+</p>
+<img src="@Url.Content("~/Content/images/help/rubric_5.png")" alt="point increment" />
+<p>
+    <br />
+    Finally, we get to the dynamic rubric table which allows us to specify multiple performance criteria, assign them each different weights, and also allows us to define different level point spreads. You can add criteria and levels by clicking on the "+" buttons at the bottom left and top right of the table.
+</p>
+<img src="@Url.Content("~/Content/images/help/rubric_6.png")" alt="add row and column" />
+<p>
+    <br />
+    At this point, the rubric structure itself relies completely on the assignment at hand and your requirements. Here is an example of a simple rubric for a writing assignment. Note that it is broken into 3 main criteria: Research, Organization, and Style. Here, Research is weighted twice as heavily as the other two criteria. Furthermore, each criterion is broken up into 3 level spreads: Needs Work, Acceptable, and Outstanding. A description for each level describes to the student what their score means relative to the assignment. Each level has a point spread of 5, meaning the total score for each criterion is 15. Refer to the images below for clarification.
+</p>
+<img src="@Url.Content("~/Content/images/help/rubric_7.png")" alt="example rubric" />
+<p>
+    <br />
+    Congratulations! Your rubric is finished. Press "Next" and publish your assignment. To view the rubric, navigate to the assignment page and click "View Rubric" located right below the "Late Policy" description.
+</p>
+<img src="@Url.Content("~/Content/images/help/rubric_8.png")" alt="rubric view" />
+<br /> <br />
+<img src="@Url.Content("~/Content/images/help/rubric_9.png")" alt="rubric view 2" />

@@ -1,0 +1,1612 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A88C37D7-0144-490F-8101-BD30B14A48ED}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OSBLE</RootNamespace>
+    <AssemblyName>OSBLE.Web</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <MvcBuildViews>false</MvcBuildViews>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort>3615</IISExpressSSLPort>
+    <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
+    <IISExpressWindowsAuthentication>disabled</IISExpressWindowsAuthentication>
+    <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+    <UseGlobalApplicationHostFile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <FilesToIncludeForPublish>OnlyFilesToRunTheApp</FilesToIncludeForPublish>
+    <ExcludeGeneratedDebugSymbol>false</ExcludeGeneratedDebugSymbol>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ClosedXML">
+      <HintPath>..\packages\ClosedXML.0.80.1\lib\net40-client\ClosedXML.dll</HintPath>
+    </Reference>
+    <Reference Include="Dapper, Version=1.40.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Dapper.1.42\lib\net45\Dapper.dll</HintPath>
+    </Reference>
+    <Reference Include="DDay.iCal">
+      <HintPath>..\packages\DDay.iCal.1.0.2.575\lib\DDay.iCal.dll</HintPath>
+    </Reference>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\DocumentFormat.OpenXml.2.5\lib\DocumentFormat.OpenXml.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth">
+      <HintPath>..\packages\DotNetOpenAuth\DotNetOpenAuth.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="FileCache, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\FileCache.2.0.1\lib\FileCache.dll</HintPath>
+    </Reference>
+    <Reference Include="Ionic.Zip, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DotNetZip.1.9.1.8.Signed\Ionic.Zip.dll</HintPath>
+    </Reference>
+    <Reference Include="LumenWorks.Framework.IO, Version=3.7.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\LumenWorks.Framework.IO.3.8.0\lib\net20\LumenWorks.Framework.IO.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Core">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.2.0\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.2.2.0\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Data.Edm, Version=5.6.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Data.Edm.5.2.0\lib\net40\Microsoft.Data.Edm.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Data.OData, Version=5.6.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Data.OData.5.2.0\lib\net40\Microsoft.Data.OData.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin">
+      <HintPath>..\packages\Microsoft.Owin.2.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Host.SystemWeb">
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.2.1.0\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security">
+      <HintPath>..\packages\Microsoft.Owin.Security.2.1.0\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure">
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="PortableChemProvNet4, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\ChemProV\PortableChemProvNet4.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.Formatting">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Activation" />
+    <Reference Include="System.Spatial, Version=5.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\System.Spatial.5.2.0\lib\net40\System.Spatial.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.OData">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.OData.4.0.30506\lib\net40\System.Web.Http.OData.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.WebHost, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.2.3\lib\net45\System.Web.Http.WebHost.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=4.0.0.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.4.0.20710.0\lib\net40\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Abstractions" />
+    <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Web.Optimization">
+      <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.0.0\lib\net40\System.Web.Optimization.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Providers">
+      <HintPath>..\packages\Microsoft.AspNet.Providers.Core.1.2\lib\net40\System.Web.Providers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.Razor.2.0.20715.0\lib\net40\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.WebPages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="WebGrease">
+      <HintPath>..\packages\WebGrease.1.3.0\lib\WebGrease.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="App_Start\FilterConfig.cs" />
+    <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Areas\Analytics\AnalyticsAreaRegistration.cs" />
+    <Compile Include="Areas\Analytics\Controllers\AnalyticsController.cs" />
+    <Compile Include="Areas\Analytics\Controllers\CalendarController.cs" />
+    <Compile Include="Areas\Analytics\Controllers\DefaultController.cs" />
+    <Compile Include="Areas\Analytics\Controllers\TimelineController.cs" />
+    <Compile Include="Areas\AssessmentWizard\AssessmentWizardAreaRegistration.cs" />
+    <Compile Include="Areas\AssessmentWizard\Controllers\AssessmentBaseController.cs" />
+    <Compile Include="Areas\AssessmentWizard\Controllers\HomeController.cs" />
+    <Compile Include="Areas\AssessmentWizard\Models\AssessmentWizardComponentManager.cs" />
+    <Compile Include="Areas\AssignmentDetails\AssignmentDetailsAreaRegistration.cs" />
+    <Compile Include="Areas\AssignmentDetails\Controllers\ContentController.cs" />
+    <Compile Include="Areas\AssignmentDetails\Controllers\HomeController.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\DefaultBuilder.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\ABETOutcomesDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\AnchoredDiscussionSubmitDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\CriticalReviewStudentDownloadDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\AnchoredDiscussionSubmissionDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\CriticalReviewSubmissionDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\DiscussionTeamMemberDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\DownloadDiscussionItemsDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\HeaderDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\IHeaderBuilder.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\InitialFinalDueDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\LatePolicyHeaderDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\PreviousAssignmentDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\PublishCriticalReviewDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\RubricDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\RubricGradeDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\RubricGradingProgressDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\StudentDiscussionLinkDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\StudentSubmissionDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\StudentTeamEvalSubmissionDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\TeacherDeliverablesHeaderDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\TeacherDiscussionLinkDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\TeamEvalProgressDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\TeamMembersDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\ABETProficiencyDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\CriticalReviewsPerformedDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\CriticalReviewsReceivedDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\DeliverablesTableDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\DiscussionPostsTableDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\DiscussionRepliesTableDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\DiscussionTotalTableDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\InlineReviewTableDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\ITableBuilder.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\LatePenaltyTableDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\RubricTableDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\StudentRubricsReceivedDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\TableDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\TeamEvaluationMultiplierTableDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\TeamEvaluationProgressTableDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\ViewModels\AssignmentDetailsFactory.cs" />
+    <Compile Include="Areas\AssignmentDetails\ViewModels\AssignmentDetailsViewModel.cs" />
+    <Compile Include="Areas\AssignmentDetails\ViewModels\CriticalReviewsReceivedTeam.cs" />
+    <Compile Include="Areas\AssignmentWizard\AssignmentWizardAreaRegistration.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\ABETController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\AnchoredDiscussionController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\AnchoredDiscussionDocumentsController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\BasicsController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\CommentCategoryController.cs" />
+    <Compile Include="Areas\AssessmentWizard\Controllers\AssessmentBasicsController.cs" />
+    <Compile Include="Areas\AssessmentWizard\Controllers\CommitteeDiscussionController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\ContentController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\CriticalReviewController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\CriticalReviewDiscussionTeamsController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\DeliverablesController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\DiscussionController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\DiscussionTeamsController.cs" />
+    <Compile Include="Areas\AssessmentWizard\Controllers\CommitteeReviewController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\HomeController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\PreviousAssignmentController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\RubricBaseController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\RubricController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\StudentRubricController.cs" />
+    <Compile Include="Areas\AssessmentWizard\Controllers\ReviewOfStudentWorkController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\TeamController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\TeamEvaluationController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\WizardBaseController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Models\AssignmentWizardComponentManager.cs" />
+    <Compile Include="Areas\AssignmentWizard\Models\IWizardBaseController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Models\WizardComparer.cs" />
+    <Compile Include="Areas\AssignmentWizard\Models\WizardComponentManagerBase.cs" />
+    <Compile Include="Areas\AssignmentWizard\Models\WizardSortOrderComparer.cs" />
+    <Compile Include="Areas\AssignmentWizard\ViewModels\RubricSelectionViewModel.cs" />
+    <Compile Include="Attributes\CanCreateCourses.cs" />
+    <Compile Include="Attributes\CanGradeCourse.cs" />
+    <Compile Include="Attributes\CanModifyCourse.cs" />
+    <Compile Include="Attributes\CanPostEvent.cs" />
+    <Compile Include="Attributes\CanSeeAllCourse.cs" />
+    <Compile Include="Attributes\CanSubmitAssignments.cs" />
+    <Compile Include="Attributes\EmailAttribute.cs" />
+    <Compile Include="Attributes\FileCacheAttribute.cs" />
+    <Compile Include="Attributes\ForceHttp.cs" />
+    <Compile Include="Attributes\IsInstructor.cs" />
+    <Compile Include="Attributes\IsAdmin.cs" />
+    <Compile Include="Attributes\IsCommunity.cs" />
+    <Compile Include="Attributes\IsNotAnonymized.cs" />
+    <Compile Include="Attributes\NotForCommunity.cs" />
+    <Compile Include="Attributes\OsbleAuthorize.cs" />
+    <Compile Include="Attributes\RequireActiveCourse.cs" />
+    <Compile Include="Controllers\ABETOutcomesAdminController.cs" />
+    <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Controllers\AssignmentController.cs" />
+    <Compile Include="Controllers\CloneController.cs" />
+    <Compile Include="Controllers\CommitteeController.cs" />
+    <Compile Include="Controllers\CommunityController.cs" />
+    <Compile Include="Controllers\CookieTestController.cs" />
+    <Compile Include="Controllers\CourseController.cs" />
+    <Compile Include="Controllers\DepartmentsController.cs" />
+    <Compile Include="Controllers\DiscussionAssignmentController.cs" />
+    <Compile Include="Controllers\EventController.cs" />
+    <Compile Include="Controllers\FeedController.cs" />
+    <Compile Include="Controllers\FileHandlerController.cs" />
+    <Compile Include="Controllers\GradebookController.cs" />
+    <Compile Include="Controllers\HelpController.cs" />
+    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\iCalendarController.cs" />
+    <Compile Include="Controllers\InterventionController.cs" />
+    <Compile Include="Controllers\MailController.cs" />
+    <Compile Include="Controllers\NotificationController.cs" />
+    <Compile Include="Controllers\OpenIdController.cs" />
+    <Compile Include="Controllers\OSBLECommunityController.cs" />
+    <Compile Include="Controllers\OSBLEController.cs" />
+    <Compile Include="Controllers\PdfCriticalReviewController.cs" />
+    <Compile Include="Controllers\ProfileController.cs" />
+    <Compile Include="Controllers\RosterController.cs" />
+    <Compile Include="Controllers\RubricController.cs" />
+    <Compile Include="Controllers\SchoolController.cs" />
+    <Compile Include="Controllers\StudioAssignmentController.cs" />
+    <Compile Include="Controllers\SubmissionController.cs" />
+    <Compile Include="Controllers\TestController.cs" />
+    <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Hubs\ActivityFeedHub.cs" />
+    <Compile Include="Models\Queries\ActivityFeedQuery.cs" />
+    <Compile Include="Models\Queries\IOSBLEQuery.cs" />
+    <Compile Include="Models\UserFeedSetting.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resources\CsvParser.cs" />
+    <Compile Include="Resources\CSVReader\CSVDriver.cs" />
+    <Compile Include="Resources\CSVReader\CSVReader.cs" />
+    <Compile Include="Resources\CSVReader\CSVState.cs" />
+    <Compile Include="Resources\CSVReader\DefaultState.cs" />
+    <Compile Include="Resources\CSVReader\EndState.cs" />
+    <Compile Include="Resources\CSVReader\QuoteState.cs" />
+    <Compile Include="Resources\CSVReader\SecondQuoteState.cs" />
+    <Compile Include="Resources\DateTimeExtensions.cs" />
+    <Compile Include="Resources\DynamicDictionary.cs" />
+    <Compile Include="Resources\StringExtensions.cs" />
+    <Compile Include="Services\AssignmentSubmissionService.svc.cs">
+      <DependentUpon>AssignmentSubmissionService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="Services\AuthenticationService.svc.cs">
+      <DependentUpon>AuthenticationService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="Services\CourseFilesOps.ashx.cs">
+      <DependentUpon>CourseFilesOps.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Services\CourseFilesUploader.ashx.cs">
+      <DependentUpon>CourseFilesUploader.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Services\OsbleService.svc.cs">
+      <DependentUpon>OsbleService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="Services\SilverlightFaultBehavior.cs" />
+    <Compile Include="Services\UploaderWebService.svc.cs">
+      <DependentUpon>UploaderWebService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="Startup.cs" />
+    <Compile Include="TempCode\FeedControllerUnusedCode.cs" />
+    <Compile Include="Utility\ActionResultExtensions.cs" />
+    <Compile Include="Utility\DBHelper.cs" />
+    <Compile Include="Utility\Constants.cs" />
+    <Compile Include="Utility\DateTimeExtensions.cs" />
+    <Compile Include="Utility\Email.cs" />
+    <Compile Include="Utility\FileCacheHelper.cs" />
+    <Compile Include="Utility\NTree.cs" />
+    <Compile Include="Utility\ObjectBinder.cs" />
+    <Compile Include="Utility\OpenId\AccountMembershipService.cs" />
+    <Compile Include="Utility\OpenId\AnonymousIdentifierProvider.cs" />
+    <Compile Include="Utility\OpenId\FormsAuthenticationService.cs" />
+    <Compile Include="Utility\OpenId\IFormsAuthentication.cs" />
+    <Compile Include="Utility\OpenId\IMembershipService.cs" />
+    <Compile Include="Utility\OpenId\ReadOnlyXmlMembershipProvider.cs" />
+    <Compile Include="Utility\OpenId\User.cs" />
+    <Compile Include="Utility\OpenId\Util.cs" />
+    <Compile Include="Utility\OsbleAuthentication.cs" />
+    <Compile Include="Utility\OSBLEConvert.cs" />
+    <Compile Include="Utility\RenderPartialToStringExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="App_Code\Libraries\LumenWorks.Framework.IO.dll" />
+    <Content Include="Areas\Analytics\Content\AnalyticsIndex.css" />
+    <Content Include="Areas\Analytics\Content\bootstrap-datetimepicker.css" />
+    <Content Include="Areas\Analytics\Content\bootstrap-datetimepicker.min.css" />
+    <Content Include="Areas\Analytics\Content\Calendar.css" />
+    <Content Include="Areas\Analytics\Content\loading.gif" />
+    <Content Include="Areas\Analytics\Content\Timeline.css" />
+    <Content Include="Areas\Analytics\Scripts\AnalyticsIndex.js" />
+    <Content Include="Areas\Analytics\Scripts\bootstrap-datetimepicker.js" />
+    <Content Include="Areas\Analytics\Scripts\bootstrap-datetimepicker.min.js" />
+    <Content Include="Areas\Analytics\Scripts\bullet.js" />
+    <Content Include="Areas\Analytics\Scripts\Calendar.js" />
+    <Content Include="Areas\Analytics\Scripts\d3-tip.min.js" />
+    <Content Include="Areas\Analytics\Scripts\d3.min.js" />
+    <Content Include="Areas\Analytics\Scripts\data-visualization.js" />
+    <Content Include="Areas\Analytics\Scripts\jquery.datetimepicker.js" />
+    <Content Include="Areas\Analytics\Scripts\TrendingCalendar.js" />
+    <Content Include="Areas\AssignmentDetails\Content\css\Home.css" />
+    <Content Include="Areas\AssignmentDetails\Content\css\Section.css" />
+    <Content Include="Areas\AssignmentDetails\Content\js\Home.js" />
+    <Content Include="Areas\AssignmentWizard\Content\css\criticalReview.css" />
+    <Content Include="Areas\AssignmentWizard\Content\css\home.css" />
+    <Content Include="Areas\AssignmentWizard\Content\css\layout.css" />
+    <Content Include="Areas\AssignmentWizard\Content\css\team.css" />
+    <Content Include="Areas\AssignmentWizard\Content\icons\rubric_add.png" />
+    <Content Include="Areas\AssignmentWizard\Content\icons\rubric_delete.png" />
+    <Content Include="Areas\AssignmentWizard\Content\js\anchoredDiscussionSetup.js" />
+    <Content Include="Areas\AssignmentWizard\Content\js\assignmentFilesUploader.js" />
+    <Content Include="Areas\AssignmentWizard\Content\js\basics.js" />
+    <Content Include="Areas\AssignmentWizard\Content\js\commentCategories.js" />
+    <Content Include="Areas\AssignmentWizard\Content\js\discussion.js" />
+    <Content Include="Areas\AssignmentWizard\Content\js\criticalReview.js" />
+    <Content Include="Areas\AssignmentWizard\Content\js\criticalReviewDiscussionTeams.js" />
+    <Content Include="Areas\AssignmentWizard\Content\js\deliverables.js" />
+    <Content Include="Areas\AssignmentWizard\Content\js\discussionTeam.js" />
+    <Content Include="Areas\AssignmentWizard\Content\js\jquery.path.js" />
+    <Content Include="Areas\AssignmentWizard\Content\js\team.js" />
+    <Content Include="Areas\AssignmentWizard\Controllers\README.txt" />
+    <Content Include="clientaccesspolicy.xml" />
+    <Content Include="Content\bootstrap-3.3.5\css\bootstrap-theme.css" />
+    <Content Include="Content\bootstrap-3.3.5\css\bootstrap-theme.min.css" />
+    <Content Include="Content\bootstrap-3.3.5\css\bootstrap.css" />
+    <Content Include="Content\bootstrap-3.3.5\css\bootstrap.min.css" />
+    <Content Include="Content\bootstrap-3.3.5\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Content\bootstrap-3.3.5\js\bootstrap.js" />
+    <Content Include="Content\bootstrap-3.3.5\js\bootstrap.min.js" />
+    <Content Include="Content\bootstrap-3.3.5\js\npm.js" />
+    <Content Include="Content\DiscussionAssignment.css" />
+    <Content Include="Content\font-awesome.min.css" />
+    <Content Include="Content\images\ajax-loader-s.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\alert.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\favicon.ico" />
+    <Content Include="Content\images\account.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\add_up.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ajax-loader.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\arrow_down.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\arrow_left.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\arrow_right.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\calendar_icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\cut_context.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\default.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\delete_up.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\delete_up_disabled.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\edit_up.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\enroll.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\aac.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\ai.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\aiff.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\avi.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\bmp.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\c.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\cpp.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\css.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\csv.png" />
+    <Content Include="Content\images\fileextimages\dat.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\dmg.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\doc.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\docx.png" />
+    <Content Include="Content\images\fileextimages\dotx.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\dwg.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\dxf.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\eps.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\exe.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\flv.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\gif.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\h.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\hpp.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\html.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\ics.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\iso.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\java.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\jpg.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\key.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\link.png" />
+    <Content Include="Content\images\fileextimages\mid.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\mp3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\mp4.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\mpg.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\odf.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\ods.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\odt.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\otp.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\ots.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\ott.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\pdf.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\php.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\png.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\ppt.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\psd.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\py.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\qt.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\rar.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\rb.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\rtf.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\sql.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\tga.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\tgz.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\tiff.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\txt.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\wav.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\xls.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\xlsx.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\xml.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\yml.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\zip.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\_blank.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\fileextimages\_page.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\Folder-icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\folder_plus.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\gradebookexamples\DblExclimationExample.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\gradebookexamples\ExclimationExample.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\gradebookexamples\ExcludeWorksheetExample1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\gradebookexamples\ExcludeWorksheetExample2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\gradebookexamples\PoundExample.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\gradebookexamples\RequiredFormatingExample.PNG">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\helplab_logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\activity-feed-addition-highlighted.png" />
+    <Content Include="Content\images\help\add_ta_1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\add_ta_2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\add_ta_3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\availability-details-highlighted.png" />
+    <Content Include="Content\images\help\availability-users.png" />
+    <Content Include="Content\images\help\basic_1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\basic_2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\basic_3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\basic_4.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\basic_5.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\basic_6.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\basic_7.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\basic_mobile_1.PNG" />
+    <Content Include="Content\images\help\create_1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\create_2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\create_3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\create_4.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\create_5.PNG" />
+    <Content Include="Content\images\help\create_mobile_1.PNG" />
+    <Content Include="Content\images\help\create_mobile_2.PNG" />
+    <Content Include="Content\images\help\discussion_1.PNG" />
+    <Content Include="Content\images\help\discussion_2.PNG" />
+    <Content Include="Content\images\help\discussion_3.PNG" />
+    <Content Include="Content\images\help\discussion_4.PNG" />
+    <Content Include="Content\images\help\discussion_5.PNG" />
+    <Content Include="Content\images\help\discussion_6.PNG" />
+    <Content Include="Content\images\help\dismissed-suggestions-highlighted.png" />
+    <Content Include="Content\images\help\editOffline_1.PNG" />
+    <Content Include="Content\images\help\editOffline_2.PNG" />
+    <Content Include="Content\images\help\editOffline_3.PNG" />
+    <Content Include="Content\images\help\editOffline_4.PNG" />
+    <Content Include="Content\images\help\editOffline_5.PNG" />
+    <Content Include="Content\images\help\editOffline_6.PNG" />
+    <Content Include="Content\images\help\editOffline_7.PNG" />
+    <Content Include="Content\images\help\gradebook_1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\gradebook_1TA.PNG" />
+    <Content Include="Content\images\help\gradebook_2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\gradebook_3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\gradebook_4.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\gradebook_5.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\gradebook_6.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\gradebook_6TA.PNG" />
+    <Content Include="Content\images\help\gradebook_7.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\gradebook_7AfterTAEdits.PNG" />
+    <Content Include="Content\images\help\gradebook_7TA.PNG" />
+    <Content Include="Content\images\help\gradebook_9StudentView.PNG" />
+    <Content Include="Content\images\help\manageRoster_1.png" />
+    <Content Include="Content\images\help\manageRoster_10.PNG" />
+    <Content Include="Content\images\help\manageRoster_2.png" />
+    <Content Include="Content\images\help\manageRoster_3.png" />
+    <Content Include="Content\images\help\manageRoster_4.png" />
+    <Content Include="Content\images\help\manageRoster_5.png" />
+    <Content Include="Content\images\help\manageRoster_6.png" />
+    <Content Include="Content\images\help\manageRoster_7.png" />
+    <Content Include="Content\images\help\manageRoster_8.png" />
+    <Content Include="Content\images\help\manageRoster_9.png" />
+    <Content Include="Content\images\help\post_1.png" />
+    <Content Include="Content\images\help\private-conversations-highlighted.png" />
+    <Content Include="Content\images\help\review_1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\review_2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\review_3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\review_4.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\review_5.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\review_6.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\roster_1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\roster_2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\roster_3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\roster_4.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\roster_mobile_1.PNG" />
+    <Content Include="Content\images\help\rubric_1.PNG" />
+    <Content Include="Content\images\help\rubric_2.PNG" />
+    <Content Include="Content\images\help\rubric_3.PNG" />
+    <Content Include="Content\images\help\rubric_4.PNG" />
+    <Content Include="Content\images\help\rubric_5.PNG" />
+    <Content Include="Content\images\help\rubric_6.PNG" />
+    <Content Include="Content\images\help\rubric_7.PNG" />
+    <Content Include="Content\images\help\rubric_8.PNG" />
+    <Content Include="Content\images\help\rubric_9.PNG" />
+    <Content Include="Content\images\help\selected_course.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\suggestions-dashboard-all-highlighted.png" />
+    <Content Include="Content\images\help\suggestions-general-highlighted.png" />
+    <Content Include="Content\images\help\team_1.PNG" />
+    <Content Include="Content\images\help\team_2.PNG" />
+    <Content Include="Content\images\help\team_3.PNG" />
+    <Content Include="Content\images\help\team_4.PNG" />
+    <Content Include="Content\images\help\team_5.PNG" />
+    <Content Include="Content\images\help\team_6.PNG" />
+    <Content Include="Content\images\help\team_7.PNG" />
+    <Content Include="Content\images\help\team_8.PNG" />
+    <Content Include="Content\images\help\uploadfiles_1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\uploadfiles_2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\uploadfiles_3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\uploadfiles_4.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\uploadfiles_5.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\uploadfiles_6.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\help\visibility_1.png" />
+    <Content Include="Content\images\help\visibility_10.png" />
+    <Content Include="Content\images\help\visibility_11.png" />
+    <Content Include="Content\images\help\visibility_12.png" />
+    <Content Include="Content\images\help\visibility_13.png" />
+    <Content Include="Content\images\help\visibility_14.png" />
+    <Content Include="Content\images\help\visibility_15.png" />
+    <Content Include="Content\images\help\visibility_16.png" />
+    <Content Include="Content\images\help\visibility_17.png" />
+    <Content Include="Content\images\help\visibility_18.png" />
+    <Content Include="Content\images\help\visibility_2.png" />
+    <Content Include="Content\images\help\visibility_3.png" />
+    <Content Include="Content\images\help\visibility_4.png" />
+    <Content Include="Content\images\help\visibility_5.png" />
+    <Content Include="Content\images\help\visibility_6.png" />
+    <Content Include="Content\images\help\visibility_7.png" />
+    <Content Include="Content\images\help\visibility_8.png" />
+    <Content Include="Content\images\help\visibility_9.png" />
+    <Content Include="Content\images\help\visual-studio-suggestion-components.png" />
+    <Content Include="Content\images\help\visual-studio-suggestion-main-window.png" />
+    <Content Include="Content\images\help_top_menu.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\info_circle.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\light-bulb-pencil.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\logoff.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\logon_bg.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\logon_bg.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\logon_logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\logo_text.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\mail.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\mail_up.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\move_down.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\move_left.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\move_right.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\move_up.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\navbar_logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\page_white_add.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\page_white_delete.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\page_white_edit.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\publish.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\refresh.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\search_up.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\sort_asc.png" />
+    <Content Include="Content\images\sort_asc_disabled.png" />
+    <Content Include="Content\images\sort_both.png" />
+    <Content Include="Content\images\sort_desc.png" />
+    <Content Include="Content\images\sort_desc_disabled.png" />
+    <Content Include="Content\images\thumbs_up.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\thumb_down.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\tooltip\109_AllAnnotations_Help_16x16_72.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\tooltip\109_AllAnnotations_Help_19x19_72.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\tooltip\bubble-1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\tooltip\bubble-2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\tooltip\bubble-3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\tooltip\bubble-4.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\tooltip\bubble-5.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\tooltip\bubble-6.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\tooltip\bubble-7.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\tooltip\bubble-8.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\tooltip\bubble-tail2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-bg_flat_0_aaaaaa_40x100.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-bg_flat_65_ffffff_40x100.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-bg_flat_75_074974_40x100.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-bg_flat_75_f0f0f0_40x100.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-bg_flat_75_ffffff_40x100.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-bg_glass_55_fbf9ee_1x400.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-bg_glass_65_ffffff_1x400.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-bg_glass_75_074974_1x400.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-bg_glass_75_e6e6e6_1x400.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-bg_highlight-soft_75_074974_1x100.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-bg_inset-soft_95_fef1ec_1x100.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-icons_222222_256x240.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-icons_2e83ff_256x240.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-icons_444444_256x240.png" />
+    <Content Include="Content\images\ui-icons_454545_256x240.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-icons_555555_256x240.png" />
+    <Content Include="Content\images\ui-icons_888888_256x240.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-icons_cd0a0a_256x240.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-icons_eeeeee_256x240.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-icons_eee_256x240.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ui-icons_ffffff_256x240.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\unpublish.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\withdraw.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\jquery-tooltip.css" />
+    <Content Include="Content\jquery-ui-1.8.13.custom.css" />
+    <Content Include="Content\jquery-ui-timepicker.css" />
+    <Content Include="Content\jquery-ui.css" />
+    <Content Include="Content\jquery.atwho.css" />
+    <Content Include="Content\jquery.contextMenu.css" />
+    <Content Include="Content\jquery.dataTables.css" />
+    <Content Include="Content\jquery.timepicker.css" />
+    <Content Include="Content\navbar.css" />
+    <Content Include="Content\interventions.css" />
+    <Content Include="Content\post-visibility.css" />
+    <Content Include="Content\themes\base\images\animated-overlay.gif" />
+    <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_75_dadada_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+    <Content Include="Content\themes\base\images\ui-icons_222222_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_454545_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_888888_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="Content\themes\base\jquery-ui.css" />
+    <Content Include="Content\themes\base\jquery.ui.accordion.css" />
+    <Content Include="Content\themes\base\jquery.ui.all.css" />
+    <Content Include="Content\themes\base\jquery.ui.autocomplete.css" />
+    <Content Include="Content\themes\base\jquery.ui.base.css" />
+    <Content Include="Content\themes\base\jquery.ui.button.css" />
+    <Content Include="Content\themes\base\jquery.ui.core.css" />
+    <Content Include="Content\themes\base\jquery.ui.datepicker.css" />
+    <Content Include="Content\themes\base\jquery.ui.dialog.css" />
+    <Content Include="Content\themes\base\jquery.ui.menu.css" />
+    <Content Include="Content\themes\base\jquery.ui.progressbar.css" />
+    <Content Include="Content\themes\base\jquery.ui.resizable.css" />
+    <Content Include="Content\themes\base\jquery.ui.selectable.css" />
+    <Content Include="Content\themes\base\jquery.ui.slider.css" />
+    <Content Include="Content\themes\base\jquery.ui.spinner.css" />
+    <Content Include="Content\themes\base\jquery.ui.tabs.css" />
+    <Content Include="Content\themes\base\jquery.ui.theme.css" />
+    <Content Include="Content\themes\base\jquery.ui.tooltip.css" />
+    <Content Include="Content\themes\base\minified\images\animated-overlay.gif" />
+    <Content Include="Content\themes\base\minified\images\page_white_paste.png" />
+    <Content Include="Content\themes\base\minified\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="Content\themes\base\minified\images\ui-bg_flat_75_ffffff_40x100.png" />
+    <Content Include="Content\themes\base\minified\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+    <Content Include="Content\themes\base\minified\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="Content\themes\base\minified\images\ui-bg_glass_75_dadada_1x400.png" />
+    <Content Include="Content\themes\base\minified\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+    <Content Include="Content\themes\base\minified\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <Content Include="Content\themes\base\minified\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+    <Content Include="Content\themes\base\minified\images\ui-icons_222222_256x240.png" />
+    <Content Include="Content\themes\base\minified\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="Content\themes\base\minified\images\ui-icons_454545_256x240.png" />
+    <Content Include="Content\themes\base\minified\images\ui-icons_888888_256x240.png" />
+    <Content Include="Content\themes\base\minified\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="Content\themes\base\minified\jquery-ui.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.accordion.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.autocomplete.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.button.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.core.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.datepicker.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.dialog.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.menu.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.progressbar.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.resizable.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.selectable.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.slider.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.spinner.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.tabs.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.theme.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.tooltip.min.css" />
+    <Content Include="Content\themes\highlight\vs.css" />
+    <Content Include="crossdomain.xml" />
+    <Content Include="Global.asax" />
+    <Content Include="Content\Site.css" />
+    <Content Include="Areas\AssignmentWizard\Views\Web.config" />
+    <Content Include="Areas\AssignmentDetails\Views\Web.config" />
+    <Content Include="App_Code\Helpers.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Content\Index.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Home\DiscussionAssignmentIndex.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Home\Index.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Home\TeamEvaluationIndex.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Home\TeamIndex.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Basics\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\CommentCategory\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Basics\Content\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\CriticalReviewDiscussionTeams\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\CriticalReview\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Deliverables\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\DiscussionTeams\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Discussion\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Home\ContextLost.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Home\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Home\SelectComponent.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Home\Summary.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\PreviousAssignment\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Rubric\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Rubric\_RubricCreationTool.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\StudentRubric\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\TeamEvaluation\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Team\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\CriticalReviewStudentDownloadDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\CriticalReviewSubmissionDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\DiscussionTeamMemberDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\DownloadDiscussionItemsDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\InitialFinalDueDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\LatePolicyHeaderDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\PreviousAssignmentDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\PublishCriticalReviewDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\RubricDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\RubricGradeDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\RubricGradingProgressDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\StudentDiscussionLinkDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\StudentSubmissionDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\StudentTeamEvalSubmissionDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\TeacherDeliverablesHeaderDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\TeacherDiscussionLinkDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\TeamEvalProgressDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\TeamMembersDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\CriticalReviewsPerformedDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\CriticalReviewsReceivedDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\DeliverablesTableDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\DiscussionPostsTableDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\DiscussionRepliesTableDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\DiscussionTotalTableDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\InlineReviewTableDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\LatePenaltyTableDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\RubricTableDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\StudentRubricsReceivedDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\TeamEvaluationMultiplierTableDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\TeamEvaluationProgressTableDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\ABET\Index.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\ABETProficiencyDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\ABETOutcomesDecorator.cshtml" />
+    <Content Include="Areas\AssessmentWizard\Views\Web.config" />
+    <Content Include="Areas\AssignmentWizard\Views\AssessmentBasics\Index.cshtml" />
+    <Content Include="Areas\AssessmentWizard\Views\CommitteeDiscussion\Index.cshtml" />
+    <Content Include="Areas\AssessmentWizard\Views\ReviewOfStudentWork\Index.cshtml" />
+    <Content Include="Areas\AssessmentWizard\Views\CommitteeReview\Index.cshtml" />
+    <Content Include="Resources\CSVReader\CSVCellReaderStateMachine.png" />
+    <Content Include="Scripts\ActivityFeed.js" />
+    <Content Include="Scripts\autolink.js" />
+    <Content Include="Scripts\bootstrap.js" />
+    <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\contextMenu.js" />
+    <Content Include="Scripts\CourseFileManager.js" />
+    <Content Include="Scripts\CourseFilesUploader.js" />
+    <Content Include="Areas\AssessmentWizard\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\AssessmentWizard\Views\Content\Index.cshtml" />
+    <Content Include="Areas\AssessmentWizard\Views\Home\ContextLost.cshtml" />
+    <Content Include="Areas\AssessmentWizard\Views\Home\Index.cshtml" />
+    <Content Include="Areas\AssessmentWizard\Views\Home\SelectComponent.cshtml" />
+    <Content Include="Areas\AssessmentWizard\Views\Home\Summary.cshtml" />
+    <Content Include="Content\gradebook.zip" />
+    <Content Include="ClassDiagram1.cd" />
+    <Content Include="Areas\AssignmentWizard\Views\AnchoredDiscussion\Index.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Home\AnchoredDiscussionIndex.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\AnchoredDiscussionSubmissionDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\AnchoredDiscussionSubmitDecorator.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\AnchoredDiscussionDocuments\Index.cshtml" />
+    <Content Include="Areas\Analytics\Views\Web.config" />
+    <Content Include="Areas\Analytics\Views\Analytics\Index.cshtml" />
+    <Content Include="Areas\Analytics\Views\Calendar\_Calendar.cshtml" />
+    <Content Include="Areas\Analytics\Views\Timeline\_Timeline.cshtml" />
+    <Content Include="Content\bootstrap-3.3.5\css\bootstrap-theme.css.map" />
+    <Content Include="Content\bootstrap-3.3.5\css\bootstrap.css.map" />
+    <Content Include="Content\bootstrap-3.3.5\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Content\bootstrap-3.3.5\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="Content\bootstrap-3.3.5\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="Content\bootstrap-3.3.5\fonts\glyphicons-halflings-regular.woff2" />
+    <Content Include="Areas\Analytics\Views\Default\_Default.cshtml" />
+    <Content Include="Areas\Analytics\Views\Timeline\_TimelineOptions.cshtml" />
+    <Content Include="Areas\Analytics\Views\Timeline\DataVisualizationLegend.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Areas\Analytics\Views\Timeline\DataVisualizationLegendDetails.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Areas\Analytics\Content\jquery.datetimepicker.css" />
+    <None Include="Properties\PublishProfiles\filesystem.pubxml" />
+    <None Include="Scripts\jquery-2.0.1.intellisense.js" />
+    <Content Include="Scripts\highlight.pack.js" />
+    <Content Include="Scripts\Interventions.js" />
+    <Content Include="Scripts\jquery-2.0.1.js" />
+    <Content Include="Scripts\jquery-2.0.1.min.js" />
+    <Content Include="Scripts\jquery-2.0.1.min.map" />
+    <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery-tooltip.js" />
+    <Content Include="Scripts\jquery-ui-1.10.4.js" />
+    <Content Include="Scripts\jquery-ui-1.10.4.min.js" />
+    <Content Include="Scripts\jquery.atwho.js" />
+    <Content Include="Scripts\jquery.caret.js" />
+    <Content Include="Scripts\jquery.collapse.js" />
+    <Content Include="Scripts\jquery.contextMenu.js" />
+    <Content Include="Scripts\jquery.cookie.js" />
+    <Content Include="Scripts\jquery.dataTables.js" />
+    <Content Include="Scripts\jquery.easing.js" />
+    <Content Include="Scripts\jquery.selectboxes.js" />
+    <Content Include="Scripts\jquery.signalR-2.2.0.js" />
+    <Content Include="Scripts\jquery.signalR-2.2.0.min.js" />
+    <Content Include="Scripts\jquery.timepicker.js" />
+    <Content Include="Scripts\jquery.titlealert.js" />
+    <Content Include="Scripts\jquery.tmpl.min.js" />
+    <Content Include="Scripts\jquery.ui.position.js" />
+    <Content Include="Scripts\jquery.ui.timepicker.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
+    <Content Include="Scripts\jquery.validate.js" />
+    <Content Include="Scripts\jquery.validate.min.js" />
+    <Content Include="Scripts\jquery.validate.unobtrusive.js" />
+    <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\json2.min.js" />
+    <Content Include="Scripts\knockout-2.2.1.debug.js" />
+    <Content Include="Scripts\knockout-2.2.1.js" />
+    <Content Include="Scripts\knockout-3.3.0.js" />
+    <Content Include="Scripts\knockout-switch-case.js" />
+    <Content Include="Scripts\MicrosoftAjax.debug.js" />
+    <Content Include="Scripts\MicrosoftAjax.js" />
+    <Content Include="Scripts\MicrosoftMvcAjax.debug.js" />
+    <Content Include="Scripts\MicrosoftMvcAjax.js" />
+    <Content Include="Scripts\MicrosoftMvcValidation.debug.js" />
+    <Content Include="Scripts\MicrosoftMvcValidation.js" />
+    <Content Include="Scripts\modernizr-2.6.2.js" />
+    <Content Include="Scripts\moment.min.js" />
+    <Content Include="Scripts\multifile.js" />
+    <Content Include="Scripts\navbar.js" />
+    <Content Include="Scripts\npm.js" />
+    <Content Include="Scripts\osble.assignments.js" />
+    <Content Include="Scripts\osble.assignment_list.js" />
+    <Content Include="Scripts\osble.courses.js" />
+    <Content Include="Scripts\osble.js" />
+    <Content Include="Scripts\osble.teacher_activity.js" />
+    <Content Include="Scripts\RosterScripts.js" />
+    <Content Include="Scripts\Silverlight.js" />
+    <Content Include="Scripts\time.js" />
+    <Content Include="Scripts\_references.js" />
+    <Content Include="Services\AssignmentSubmissionService.svc" />
+    <Content Include="Services\AuthenticationService.svc" />
+    <Content Include="Services\OsbleService.svc" />
+    <Content Include="Services\UploaderWebService.svc" />
+    <Content Include="Views\Clone\readme.txt" />
+    <Content Include="Views\OpenId\AskUser_old.aspx" />
+    <Content Include="Views\OpenId\Provider.aspx" />
+    <Content Include="Content\osble-community.css" />
+    <Content Include="Views\Shared\LogOnUserControl.ascx" />
+    <Content Include="Views\Shared\Xrds.aspx" />
+    <Content Include="Views\User\Identity.aspx" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Views\Web.config" />
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Services\CourseFilesOps.ashx" />
+    <Content Include="Services\CourseFilesUploader.ashx" />
+    <Content Include="Utility\Notification\Index.cshtml" />
+    <Content Include="Views\Account\AcademiaRegister.cshtml" />
+    <Content Include="Views\Account\AccountCreated.cshtml" />
+    <Content Include="Views\Account\ActivateAccount.cshtml" />
+    <Content Include="Views\Account\ChangePasswordSuccess.cshtml" />
+    <Content Include="Views\Account\ContactUs.cshtml" />
+    <Content Include="Views\Account\ContactUsSuccess.cshtml" />
+    <Content Include="Views\Account\ErrorPage.cshtml" />
+    <Content Include="Views\Account\LogOn.cshtml" />
+    <Content Include="Views\Account\Privacy.cshtml" />
+    <Content Include="Views\Account\ProfessionalRegister.cshtml" />
+    <Content Include="Views\Account\Profile.cshtml" />
+    <Content Include="Views\Account\ResetPassword.cshtml" />
+    <Content Include="Views\Account\ResetPasswordFailure.cshtml" />
+    <Content Include="Views\Account\ResetPasswordSuccess.cshtml" />
+    <Content Include="Views\Admin\Delete.cshtml" />
+    <Content Include="Views\Admin\Details.cshtml" />
+    <Content Include="Views\Admin\Edit.cshtml" />
+    <Content Include="Views\Admin\Index.cshtml" />
+    <Content Include="Views\Assignment\Index.cshtml" />
+    <Content Include="Views\Assignment\_ModeratorIndex.cshtml" />
+    <Content Include="Views\Assignment\_StudentIndex.cshtml" />
+    <Content Include="Views\Assignment\_StudentTeamEvaluationView.cshtml" />
+    <Content Include="Views\Assignment\_TeacherIndex.cshtml" />
+    <Content Include="Views\Assignment\_TeacherTeamEvaluationView.cshtml" />
+    <Content Include="Views\Community\Create.cshtml" />
+    <Content Include="Views\Community\Delete.cshtml" />
+    <Content Include="Views\Community\Edit.cshtml" />
+    <Content Include="Views\Community\Index.cshtml" />
+    <Content Include="Views\CookieTest\Index.cshtml" />
+    <Content Include="Views\CoursesUsers\Create.cshtml" />
+    <Content Include="Views\CoursesUsers\Delete.cshtml" />
+    <Content Include="Views\CoursesUsers\Details.cshtml" />
+    <Content Include="Views\CoursesUsers\Edit.cshtml" />
+    <Content Include="Views\CoursesUsers\Index.cshtml" />
+    <Content Include="Views\Course\Create.cshtml" />
+    <Content Include="Views\Course\Delete.cshtml" />
+    <Content Include="Views\Course\Edit.cshtml" />
+    <Content Include="Views\Deliverable\Create.cshtml" />
+    <Content Include="Views\Deliverable\Delete.cshtml" />
+    <Content Include="Views\Deliverable\Details.cshtml" />
+    <Content Include="Views\Deliverable\Edit.cshtml" />
+    <Content Include="Views\Deliverable\Index.cshtml" />
+    <Content Include="Views\DiscussionAssignment\Index.cshtml" />
+    <Content Include="Views\Event\AlreadyApproved.cshtml" />
+    <Content Include="Views\Event\Approval.cshtml" />
+    <Content Include="Views\Event\Create.cshtml" />
+    <Content Include="Views\Event\Details.cshtml" />
+    <Content Include="Views\Event\Edit.cshtml" />
+    <Content Include="Views\Event\Index.cshtml" />
+    <Content Include="Views\Event\NeedsApproval.cshtml" />
+    <Content Include="Views\Gradebook\GradebookHelp.cshtml" />
+    <Content Include="Views\Gradebook\Index.cshtml" />
+    <Content Include="Views\Help\AddingOthers.cshtml" />
+    <Content Include="Views\Help\AddingStudents.cshtml" />
+    <Content Include="Views\Help\AddWebLinks.cshtml" />
+    <Content Include="Views\Help\CreateBasicAssignment.cshtml" />
+    <Content Include="Views\Help\CreateCourse.cshtml" />
+    <Content Include="Views\Help\CreateReviewAssignment.cshtml" />
+    <Content Include="Views\Help\CreateReviewDiscussion.cshtml" />
+    <Content Include="Views\Help\FileUploader.cshtml" />
+    <Content Include="Views\Help\Gradebook.cshtml" />
+    <Content Include="Views\Help\Index.cshtml" />
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Home\NoCourses.cshtml" />
+    <Content Include="Views\Home\Time.cshtml" />
+    <Content Include="Views\Home\ViewThread.cshtml" />
+    <Content Include="Views\Home\_ActivityFeed.cshtml" />
+    <Content Include="Views\Home\_AjaxEmpty.cshtml" />
+    <Content Include="Views\Home\_FeedItem.cshtml" />
+    <Content Include="Views\Home\_ImportantDates.cshtml" />
+    <Content Include="Views\Home\_SubDashboardReply.cshtml" />
+    <Content Include="Views\Mail\Create.cshtml" />
+    <Content Include="Views\Mail\Index.cshtml" />
+    <Content Include="Views\Mail\NoCourses.cshtml" />
+    <Content Include="Views\Mail\NotFound.cshtml" />
+    <Content Include="Views\Mail\View.cshtml" />
+    <Content Include="Views\Notification\Index.cshtml" />
+    <Content Include="Views\OpenId\AskUser.cshtml" />
+    <Content Include="Views\PdfCriticalReview\Index.cshtml" />
+    <Content Include="Views\PdfCriticalReview\Review.cshtml" />
+    <Content Include="Views\Roster\Create.cshtml" />
+    <Content Include="Views\Roster\CreateByEmail.cshtml" />
+    <Content Include="Views\Roster\Edit.cshtml" />
+    <Content Include="Views\Roster\ImportRoster.cshtml" />
+    <Content Include="Views\Roster\Index.cshtml" />
+    <Content Include="Views\Roster\RosterError.cshtml" />
+    <Content Include="Views\Rubric\ExportAllToFile.cshtml" />
+    <Content Include="Views\Rubric\ExportIndividualToFile.cshtml" />
+    <Content Include="Views\Rubric\ImportIndividualFromFile.cshtml" />
+    <Content Include="Views\Rubric\Index.cshtml" />
+    <Content Include="Views\Rubric\View.cshtml" />
+    <Content Include="Views\Rubric\ViewForCriticalReview.cshtml" />
+    <Content Include="Views\Rubric\_Display.cshtml" />
+    <Content Include="Views\School\Create.cshtml" />
+    <Content Include="Views\School\Delete.cshtml" />
+    <Content Include="Views\School\Edit.cshtml" />
+    <Content Include="Views\School\Index.cshtml" />
+    <Content Include="Views\Shared\DisplayTemplates\SilverlightObject.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Date.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Time.cshtml" />
+    <Content Include="Views\Shared\_AddToGradebook.cshtml" />
+    <Content Include="Views\Shared\_AjaxEmpty.cshtml" />
+    <Content Include="Views\Shared\_CourseList.cshtml" />
+    <Content Include="Views\Shared\_Events.cshtml" />
+    <Content Include="Views\Shared\_LogOn.cshtml" />
+    <Content Include="Views\Shared\_LogOnPartial.cshtml" />
+    <Content Include="Views\Shared\_MenuControl.cshtml" />
+    <Content Include="Views\Shared\_Notifications.cshtml" />
+    <Content Include="Views\Shared\_ReCaptcha.cshtml" />
+    <Content Include="Views\Submission\Create.cshtml" />
+    <Content Include="Views\Submission\SubmittedSuccessfully.cshtml" />
+    <Content Include="Views\Submission\_Submit.cshtml" />
+    <Content Include="Views\Weight\Create.cshtml" />
+    <Content Include="Views\Weight\Delete.cshtml" />
+    <Content Include="Views\Weight\Details.cshtml" />
+    <Content Include="Views\Weight\Edit.cshtml" />
+    <Content Include="Views\Weight\Index.cshtml" />
+    <Content Include="Views\Departments\Index.cshtml" />
+    <Content Include="Views\ABETOutcomesAdmin\Index.cshtml" />
+    <Content Include="Views\Account\FindUsername.cshtml" />
+    <Content Include="Views\Account\FindUsernameSuccess.cshtml" />
+    <Content Include="Views\Account\FindUsernameFailure.cshtml" />
+    <Content Include="Views\Committee\Create.cshtml" />
+    <Content Include="Views\Course\CommunitySearch.cshtml" />
+    <Content Include="Views\Course\CourseSearch.cshtml" />
+    <Content Include="Views\Course\CourseCurrentlyEnrolled.cshtml" />
+    <Content Include="Views\Roster\EditWTUser.cshtml" />
+    <Content Include="Views\Course\CommunityCurrentlyEnrolled.cshtml" />
+    <Content Include="Views\Course\CourseAwaitingApproval.cshtml" />
+    <Content Include="Views\Course\CommunityAwaitingApproval.cshtml" />
+    <Content Include="Views\Shared\_ConsolidatedNotifications.cshtml" />
+    <Content Include="Views\Test\Index.cshtml" />
+    <Content Include="Views\Course\CloneSetup.cshtml" />
+    <Content Include="Views\Course\SelectAssignmentsToClone.cshtml" />
+    <Content Include="Views\iCalendar\Index.cshtml" />
+    <Content Include="Views\Clone\CloneCourse.cshtml" />
+    <Content Include="Views\Clone\CourseSetup.cshtml" />
+    <Content Include="Views\Clone\CloneAssignment.cshtml" />
+    <Content Include="Views\Course\CloneCourse.cshtml" />
+    <Content Include="Views\Home\_Replies.cshtml" />
+    <Content Include="Views\Home\_Post.cshtml" />
+    <Content Include="Views\Shared\Feed\_AskForHelpEvent.cshtml" />
+    <Content Include="Views\Shared\Feed\_BuildEvent.cshtml" />
+    <Content Include="Views\Shared\Feed\_DebugEvent.cshtml" />
+    <Content Include="Views\Shared\Feed\_ExceptionEvent.cshtml" />
+    <Content Include="Views\Shared\Feed\_Feed.cshtml" />
+    <Content Include="Views\Shared\Feed\_FeedFooter.cshtml" />
+    <Content Include="Views\Shared\Feed\_FeedItems.cshtml" />
+    <Content Include="Views\Shared\Feed\_FeedPostEvent.cshtml" />
+    <Content Include="Views\Shared\Feed\_HelpfulMarkGivenEvent.cshtml" />
+    <Content Include="Views\Shared\Feed\_LogCommentEvent.cshtml" />
+    <Content Include="Views\Shared\Feed\_SubmitEvent.cshtml" />
+    <Content Include="Views\Feed\AjaxFeed.cshtml" />
+    <Content Include="Views\Feed\Details.cshtml" />
+    <Content Include="Views\Feed\GetItemUpdates.cshtml" />
+    <Content Include="Views\Feed\Index.cshtml" />
+    <Content Include="Views\Feed\Details\_AskForHelpEvent.cshtml" />
+    <Content Include="Views\Feed\Details\_BuildEvent.cshtml" />
+    <Content Include="Views\Feed\Details\_DebugEvent.cshtml" />
+    <Content Include="Views\Feed\Details\_ExceptionEvent.cshtml" />
+    <Content Include="Views\Feed\Details\_FeedPostEvent.cshtml" />
+    <Content Include="Views\Feed\Details\_SubmitEvent.cshtml" />
+    <Content Include="Views\Shared\_CommentSingle.cshtml" />
+    <Content Include="Views\Home\_NEWActivityFeedCode_Temp.cshtml" />
+    <Content Include="Views\Home\_DashboardPost.cshtml" />
+    <Content Include="Views\Profile\Index.cshtml" />
+    <Content Include="Views\Home\_FilesAndLinks.cshtml" />
+    <Content Include="Views\Feed\Details\_LogCommentEvent.cshtml" />
+    <Content Include="Views\Shared\_OSBIDELayout.cshtml" />
+    <Content Include="Views\Shared\_OSBIDECourses.cshtml" />
+    <Content Include="Views\Feed\ShowHashtag.cshtml" />
+    <Content Include="Views\OSBLECommunity\Error.cshtml" />
+    <Content Include="Views\OSBLECommunity\Index.cshtml" />
+    <Content Include="Views\OSBLECommunity\OSBLECommunityGenericError.cshtml" />
+    <Content Include="Views\OSBLECommunity\_CommunityStanding.cshtml" />
+    <Content Include="Views\OSBLECommunity\_Goals.cshtml" />
+    <Content Include="Views\OSBLECommunity\_Online.cshtml" />
+    <Content Include="Views\OSBLECommunity\_PersonalStanding.cshtml" />
+    <Content Include="Views\OSBLECommunity\_RecentActivity.cshtml" />
+    <Content Include="Views\Rubric\ImportError.cshtml" />
+    <Content Include="Views\Rubric\ImportAllFromFile.cshtml" />
+    <Content Include="Views\Rubric\ImportSuccess.cshtml" />
+    <Content Include="Views\Help\CreateRubric.cshtml" />
+    <Content Include="Views\Help\EditRubricOffline.cshtml" />
+    <Content Include="Views\Help\RosterGuide.cshtml" />
+    <Content Include="Views\Help\UsingTeamBuilder.cshtml" />
+    <Content Include="Views\Intervention\_Intervention.cshtml" />
+    <Content Include="Views\Intervention\_BuildFailure.cshtml" />
+    <Content Include="Views\Feed\_PostVisibilityAddMore.cshtml" />
+    <Content Include="Views\Help\ActvitiyFeedVisibility.cshtml" />
+    <Content Include="Views\Help\ActvitiyFeedComponents.cshtml" />
+    <Content Include="Views\Help\ActvitiyFeedModifyVisibility.cshtml" />
+    <Content Include="Views\Intervention\_RuntimeError.cshtml" />
+    <Content Include="Views\Intervention\_ClassmatesAvailable.cshtml" />
+    <Content Include="Views\Intervention\_OfferHelp.cshtml" />
+    <Content Include="Views\Intervention\_AskForHelp.cshtml" />
+    <Content Include="Views\Intervention\_MakeAPost.cshtml" />
+    <Content Include="Views\Intervention\_AvailableDetails.cshtml" />
+    <Content Include="Views\Intervention\_UnansweredQuestions.cshtml" />
+    <Content Include="Views\Intervention\_MakeAPostAssignmentSubmit.cshtml" />
+    <Content Include="Views\Shared\_UserHashtagTagScript.cshtml" />
+    <Content Include="Views\Intervention\_SuggestionFeedbackModal.cshtml" />
+    <Content Include="Views\Intervention\_UserFeedbackPrompt.cshtml" />
+    <Content Include="Views\Intervention\_UserFeedback.cshtml" />
+    <Content Include="Views\Intervention\_Availability.cshtml" />
+    <Content Include="Views\Intervention\_DismissedInterventions.cshtml" />
+    <Content Include="Views\Intervention\_PrivateMessages.cshtml" />
+    <Content Include="Views\Intervention\_FeedPostArea.cshtml" />
+    <Content Include="Views\Intervention\_CourseSelect.cshtml" />
+    <Content Include="Views\Intervention\_UnansweredQuestionsAlternate.cshtml" />
+    <Content Include="Views\Help\PrivateConversations.cshtml" />
+    <Content Include="Views\Help\UserStatus.cshtml" />
+    <Content Include="Views\Help\SuggestionsDashboard.cshtml" />
+    <Content Include="Views\Help\VisualStudioSuggestionsOverview.cshtml" />
+    <Content Include="Views\Intervention\_EmbeddedSuggestionsWindow.cshtml" />
+    <Content Include="Views\Intervention\DismissedInterventions.cshtml" />
+    <Content Include="Views\Intervention\UserFeedback.cshtml" />
+    <Content Include="Views\Intervention\_InterventionList.cshtml" />
+    <Content Include="Views\Intervention\UnansweredQuestions.cshtml" />
+    <Content Include="Views\Intervention\SuggestionsSettings.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+    <Folder Include="Areas\AssignmentWizard\Views\Deliverables\Deliverables\" />
+    <Folder Include="Areas\AssignmentWizard\Views\Rubric\Rubric\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OSBLE.Library\OSBLE.Library.csproj">
+      <Project>{6873caf7-4914-4b62-af7e-bfffa0a9ffd4}</Project>
+      <Name>OSBLE.Library</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OSBLEPlus.Logic\OSBLEPlus.Logic.csproj">
+      <Project>{cd97e12a-c4c1-4319-8809-9a3a0eb9d302}</Project>
+      <Name>OSBLEPlus.Logic</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OSBLEPlus.Services\OSBLEPlus.Services.csproj">
+      <Project>{32428e0a-501c-4532-96f8-9a4755714797}</Project>
+      <Name>OSBLEPlus.Services</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
+    <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>3615</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:3715/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target> -->
+</Project>

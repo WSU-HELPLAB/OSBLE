@@ -1,0 +1,34 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+
+    string publishedString = dataModel.GradingProgress.publishedString;
+    bool showDraftString = dataModel.GradingProgress.showDraftString;
+    string draftString = dataModel.GradingProgress.draftString;
+    int AssignmentID = dataModel.GradingProgress.AssignmentID;
+}
+
+<tr class="GradingProgress">
+<th>Grading Progress:</th>
+    <td id="publishedString">
+        @publishedString
+    </td>
+        @if (showDraftString)
+        {
+            @:<td id="draftString">
+                @:@draftString&nbsp @Html.ActionLink("Publish All","PublishAllRubrics","Assignment",new { area = "", assignmentId = AssignmentID }, new { })
+            @:</td>
+        }
+    <td>
+        @Html.ActionLink("Export grades to CSV", "ExportAssignmentGrades", "Assignment",new { area = "", assignmentId = AssignmentID }, new { })
+    </td>
+</tr>
+
+<style media="screen" type="text/css">
+    .GradingProgress td {
+    padding: 20px 40px;
+    display: block;
+    }
+</style>

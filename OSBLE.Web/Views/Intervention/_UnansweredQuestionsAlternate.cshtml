@@ -1,0 +1,181 @@
+﻿@model OSBLE.Models.Intervention.UnansweredQuestionsViewModel
+
+@{
+    string webRoot = OSBLEPlus.Logic.Utility.StringConstants.WebClientRoot + "Feed/Details";
+    var activityFeedUrl = OSBLEPlus.Logic.Utility.StringConstants.WebClientRoot + "Feed/OSBIDE?component=7";
+    
+    var currentCourseUsers = ViewBag.CurrentCourseUsers;
+    int currentCourseId = ViewBag.CurrentCourseId;
+    int currentUserProfileId = ViewBag.CurrentUserProfileId;
+    string currentUserFullName = ViewBag.CurrentUserFullName;
+    
+}
+
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>OSBLE+ Suggestion</title>
+
+    @* highlight.js code syntax highlighting block*@
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/themes/highlight/vs.css")" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/highlight.pack.js")"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    @* highlight.js code syntax highlighting block*@
+
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery.contextMenu.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery-tooltip.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery-ui-1.8.13.custom.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery-ui-timepicker.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/bootstrap-3.3.5/css/bootstrap.min.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/Site.css")?version=1.2.82" /> @* Update version to cause browsers to reload css file *@
+
+    @*post visiblity styles*@
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/post-visibility.css")" />
+
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-2.0.1.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.validate.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.unobtrusive-ajax.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.contextMenu.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.ui.position.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.cookie.js")"></script>
+
+    <script type="text/javascript" src="@Url.Content("~/Scripts/json2.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/modernizr-2.6.2.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.collapse.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.easing.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.ui.timepicker.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.tmpl.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.selectboxes.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-tooltip.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/bootstrap-3.3.5/js/bootstrap.min.js")"></script>
+    <!--jquery-ui under bootstrap... this fixes an issue where dialog box 'X' was not showing-->
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-ui-1.10.4.min.js")"></script>
+
+    <script type="text/javascript" src="@Url.Content("~/Scripts/osble.js")?version=1.1"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/autolink.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/knockout-3.3.0.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/knockout-switch-case.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.signalR-2.2.0.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/ActivityFeed.js")?version=1.01"></script>
+    <script type="text/javascript" src="@Url.Content("~/signalr/hubs")"></script>
+    @* autocomplete block *@
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery.atwho.css")" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.caret.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.atwho.js")"></script>
+    @* autocomplete block end *@
+
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/interventions.css")?version=1.0" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/Interventions.js")?version=1.01"></script>
+
+    @* titlebar alert *@
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.titlealert.js")"></script>
+
+    <script type="text/javascript">
+        var vm;
+        $(document).ready(function() {
+            vm = new FeedViewModel("@currentUserFullName", @currentUserProfileId);
+            ko.applyBindings(vm);
+            vm.GetUnansweredPosts("@Model.UnansweredPostIds");
+        });
+
+    </script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $("#feed-footer").hide();
+
+            /*START Autocomplete block*/
+            //TODO: need to re-build the url/<a/> tags for @@name and #hashtag.
+            var userNames = []
+            var userIds = [];
+
+            //we need to get hashtags from the hashtag table and populate it like names are populated.
+            //we also need to add hashtags to the table if there are no matches so others will see hashtags they've seen already.
+            var hashtags = [];
+            @{
+            if (null != ViewBag.HashTags)
+            {
+                foreach(string hashTag in ViewBag.HashTags)
+                {
+                    @:hashtags.push("@hashTag");
+                                        }
+            }
+
+            if (null != currentCourseUsers)
+            {
+                foreach (var userProfile in currentCourseUsers)
+                {
+                    @:userNames.push("@userProfile.FirstName" + "@userProfile.LastName");
+                                            @:userIds.push("@userProfile.ID");
+                                        }
+            }
+        }
+
+            localStorage['UserNames'] = userNames;
+            localStorage['UserIds'] = userIds;
+
+            $(document).on("focus", "textarea", function () {
+                $(this).atwho({
+                    at: "@@",
+                    data: userNames,
+                    insertTpl: "@@${name}", //insert template i.e. what is inserted into the textarea
+                });
+
+                $(this).atwho({
+                    at: "#",
+                    data: hashtags
+                });
+            });
+        });
+    </script>
+
+</head>
+
+<body>
+    <input type="hidden" id="courseIdVal" value="@ViewBag.CurrentCourseId" />
+    <div class="panel panel-primary">
+        <div class="panel-heading intervention-heading">Help Another Student!</div>
+        <div class="panel-body">
+            @Html.Partial("_UserFeedbackPrompt", new ViewDataDictionary { { "interventionId", Model.Intervention.Id } })
+            @Html.Partial("_CourseSelect")
+            <h4><em>Some of your classmates have un-answered questions or questions with replies that have not been marked helpful...</em> Try and help them out!</h4>
+            <h5>You can either give replies to your classmates' questions or mark replies to these questions as 'helpful'</h5>
+            <h4>Your classmates have recently asked: </h4>
+
+            @*START Post List Area*@
+
+
+            @* This is a message displayed while the feed is loading posts *@
+            <div id="loadingMsg" class="message">
+                @Helpers.LoadingSmall() Loading Posts...
+            </div>
+
+            @* Feed is inserted here *@
+            <div id="dp_posts" class="panel-group">
+                <div class="panel panel-info" style="text-align: right;">
+                    <div class="panel-heading" style=" padding: 5px;">
+                        <span class="intervention-heading"><strong>Sort:</strong></span>
+                        <span class="glyphicon glyphicon-sort-by-order intervention-heading" id="reverse-sort-a"></span>
+                        <span class="glyphicon glyphicon-sort-by-order-alt intervention-heading" id="reverse-sort-d" style="display: none;"></span>
+                    </div>
+                </div>
+                @Html.Partial("Feed/_Feed")
+            </div>
+
+            @*END Post List Area*@
+
+            <div>
+                <a class="btn btn-primary right" href="@activityFeedUrl" role="button">View All Posts</a>                                                
+            </div>
+
+        </div>
+    </div>
+    <input id="iid" type="hidden" value="@Model.Intervention.Id" />
+    @Html.Partial("_SuggestionFeedbackModal", Model.Intervention)
+    <div id="visibility-dialog" title="Post Visibility:" hidden="hidden"></div>
+</body>
+</html>

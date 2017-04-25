@@ -1,0 +1,57 @@
+﻿@{
+    ViewBag.Title = "Creating a Review Assignment";
+}
+<h1>Creating a Review Assignment</h1>
+<p>
+    This tutorial demonstrates how to create a critical review assignment in OSBLE.
+    Note that this tutorial assumes that you have already completed the steps outlined in the
+    &quot;@Html.ActionLink("Creating a Basic Assignment", "CreateBasicAssignment")&quot; tutorial.
+    To begin, navigate to the &quot;Assignments&quot; tab.
+    <br /> Once there, click on the &quot;Create New Assignment&quot; link.
+</p>
+<img src="@Url.Content("~/Content/images/help/basic_1.png")" alt="click the create new assignment link" />
+<hr width="90%" />
+<p>
+    To reach this location on the <b>mobile</b> version of the site, simply open the main menu and select &quot;Assignments&quot;.
+</p>
+<img src="@Url.Content("~/Content/images/help/basic_mobile_1.png")" alt="navigate to the users tab on mobile" />
+<hr width="90%" />
+<p>
+    <br /> At the assignment type selection page, we will select the critical review radio button and click the &quot;Begin&quot; button.
+</p>
+<img src="@Url.Content("~/Content/images/help/review_1.png")" alt="click on critical review" />
+<p>
+    <br /> We are next brought to the component selection page.  Critical review assignments can be team based and can include both student and 
+    instructor rubrics.  
+    For simplicity, we will not select any of these options.  Click the &quot;Continue&quot; button to advance to the next screen.
+</p>
+<img src="@Url.Content("~/Content/images/help/review_2.png")" alt="do not select any components" />
+<p>
+    <br /> The &quot;Basic Settings&quot; page for critical reviews is exactly the same as it is for @Html.ActionLink("basic assignments", "CreateBasicAssignment").  
+    Use this page to specify the assignment's name, description, due date, and late submission options:
+</p>
+<img src="@Url.Content("~/Content/images/help/review_3.png")" alt="fill out basic settings" />
+<p>
+    <br /> Clicking the &quot;Next&quot; button will load the &quot;Link Previous Assignment&quot; tab.  In a previous tutorial, we created a basic 
+    assignment entitled &quot;Assignment 1&quot;. We now select that assignment from the dropdown list and click the &quot;Next&quot; button.
+</p>
+<img src="@Url.Content("~/Content/images/help/review_4.png")" alt="choose sample assignment" />
+<p>
+    <br /> The final tab allows the instructor to set up the review teams.  In the example pictured below, we have 
+    two reviewers and two authors.  Notice that the boxes for both authors have red backgrounds.  
+    This indicates that neither author has submitted a deliverable for the assignment under review.  
+    As these are assignments are created as an example, this is to be expected and we will ignore the warning.  
+    However, in an actual class, we might use this information to not assign any students these authors.  
+    Furthermore, a more typical course will contain many more reviewers and authors.  
+    To assist in creating review teams, OSBIDE has the functionality to automatically create teams for all 
+    authors that have checkboxes next to their names.  OSBIDE also supports anonymous critical reviews, 
+    which can also be specified on this page.<br /><br />
+    In the example below, we have Christian reviewing Sean and Sean reviewing Christian.  
+    Note that OSBLE does allow authors to participate on review teams, so we could potentially 
+    have both Christian and Sean reviewing Christian's work.  When satisfied with the review settings, click the &quot;Next&quot; button.
+</p>
+<img src="@Url.Content("~/Content/images/help/review_5.png")" alt="set reviewers" />
+<p>
+    <br /> Clicking the &quot;Next&quot; button brings us to the final screen of the assignment creation wizard.  
+    From here, we can go back and edit the assignment's details, publish the assignment, or return to the main assignment page.
+</p>

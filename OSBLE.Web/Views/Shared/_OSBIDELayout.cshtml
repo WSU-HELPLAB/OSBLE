@@ -1,0 +1,184 @@
+﻿@using System.Configuration
+@using OSBLE.Utility
+@model Int32
+
+@{
+    var currentCourseUsers = ViewBag.CurrentCourseUsers;
+    string EnableCustomPostVisibility = ViewBag.EnableCustomPostVisibility;
+
+    string urlReferrer = Request != null && Request.UrlReferrer != null ? Request.UrlReferrer.ToString() : "";
+    bool interventionReferrer = urlReferrer.Contains("Intervention");
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery.contextMenu.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery-tooltip.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery-ui-1.8.13.custom.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery-ui-timepicker.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/bootstrap-3.3.5/css/bootstrap.min.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/Site.css")?version=1.2.82" /> @* Update version to cause browsers to reload css file *@    
+
+    @*post visiblity styles*@
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/post-visibility.css")" />
+
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-2.0.1.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.validate.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.unobtrusive-ajax.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.contextMenu.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.ui.position.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.cookie.js")"></script>
+
+    <script type="text/javascript" src="@Url.Content("~/Scripts/json2.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/modernizr-2.6.2.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.collapse.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.easing.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.ui.timepicker.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.tmpl.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.selectboxes.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-tooltip.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/bootstrap-3.3.5/js/bootstrap.min.js")"></script>
+    <!--jquery-ui under bootstrap... this fixes an issue where dialog box 'X' was not showing-->
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-ui-1.10.4.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/osble.js")?version=1.1"></script>
+
+    <script type="text/javascript" src="@Url.Content("~/Scripts/moment.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/navbar.js")?version=1.8"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/time.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/autolink.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/knockout-3.3.0.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/knockout-switch-case.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.signalR-2.2.0.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/ActivityFeed.js")?version=1.01"></script>
+    <script type="text/javascript">
+        function increaseZoom(amount) {
+            var zoom = Number($("body").css('zoom'));
+            $("body").css('zoom', zoom + amount);
+            //set zoom level in local storage
+            localStorage.setItem('lastZoomLevelFeed', getZoomLevel());
+        }
+
+        function getZoomLevel() {
+            return $("body").css('zoom');
+        }
+    </script>
+
+    @* titlebar alert *@
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.titlealert.js")"></script>
+
+    @* autocomplete block *@
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery.atwho.css")" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.caret.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.atwho.js")"></script>
+    @* autocomplete block end *@
+
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+</head>
+<body style="zoom: 0.75">
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            //get the last saved zoom if possible
+            var lastZoomLevel = localStorage.getItem("lastZoomLevelFeed");
+            if (lastZoomLevel === null) { //if there is not a zoom level in history, save the current zoom level (1.0 more than likely)
+                localStorage.setItem('lastZoomLevelFeed', getZoomLevel());
+            }
+            else { //set the zoom level to the last remembered level
+                $("body").css('zoom', lastZoomLevel);
+            }
+
+        //ShowBackToSuggestions inconsistently working... disabling for now
+        //$("#previous-url").val(GetPreviousUrl());        
+        //ShowBackToSuggestions();
+
+        //if ($("#suggestion-back-link").length) {
+        //    if (window.location.href.indexOf("auth") == -1) { //activity feed tab
+        //        $("#suggestion-back-link").css("display", "none");
+        //    }
+        //}        
+
+        /*START Autocomplete block*/
+        //TODO: need to re-build the url/<a/> tags for @@name and #hashtag.
+        var userNames = []
+        var userIds = [];
+
+        //we need to get hashtags from the hashtag table and populate it like names are populated.
+        //we also need to add hashtags to the table if there are no matches so others will see hashtags they've seen already.
+        var hashtags = [];
+        @{
+            if (null != ViewBag.HashTags)
+            {
+                foreach(string hashTag in ViewBag.HashTags)
+                {
+                    @:hashtags.push("@hashTag");
+                }
+            }
+            if (null != currentCourseUsers)
+            {
+                foreach (var userProfile in currentCourseUsers)
+                {
+                    @:userNames.push("@userProfile.FirstName" + "@userProfile.LastName");
+                    @:userIds.push("@userProfile.ID");
+                }
+            }
+        }
+
+        localStorage['UserNames'] = userNames;
+        localStorage['UserIds'] = userIds;
+
+        $(document).on("focus", "textarea", function () {
+            $(this).atwho({
+                at: "@@",
+                data: userNames,
+                insertTpl: "@@${name}", //insert template i.e. what is inserted into the textarea
+            });
+
+            $(this).atwho({
+                at: "#",
+                data: hashtags
+            });
+        });
+    });
+    </script>    
+    @* Forward/Back buttons if desired *@
+    @if (!string.IsNullOrEmpty(ViewBag.ForwardURL))
+    {
+        <a href="@ViewBag.ForwardURL" id="osbide_forward" class="osbide_nav_btn"><span class="glyphicon glyphicon-arrow-right"></span></a>
+    }
+    @if (!string.IsNullOrEmpty(ViewBag.BackURL))
+    {
+        <a href="@ViewBag.BackURL" id="osbide_forward" class="osbide_nav_btn"><span class="glyphicon glyphicon-arrow-left"></span></a>
+    }
+
+    @*Back to Suggestion link working inconsistently, disabled for now*@
+    @*@if (interventionReferrer)
+    {
+        <a href="@urlReferrer" class="btn btn-primary"><span class="glyphicon glyphicon-arrow-left intervention-info"></span> Back to Suggestion</a>
+    }   
+    else
+    {
+        <a href="@urlReferrer" class="btn btn-primary" id="suggestion-back-link" style="display: none;"><span class="glyphicon glyphicon-arrow-left intervention-info"></span> Back to Suggestion</a>
+    }*@ 
+
+    <div class="btn-group" id="osbide-nav">
+        @Html.Partial("_OSBIDECourses")        
+    </div>
+    <div class="btn-group">
+        <a class="btn btn-primary" href="#"><span class="">Zoom:</span></a>
+        <a class="btn btn-primary" title="Zoom In" href="#"><span class="glyphicon glyphicon-plus" onclick="increaseZoom(0.07)"></span></a>
+        <a class="btn btn-primary" title="Zoom Out" href="#"><span class="glyphicon glyphicon-minus" onclick="increaseZoom(-0.07)"></span></a>
+    </div>
+    
+    <section id="main" data-service-path="@ConfigurationManager.AppSettings["DataServiceUrl"]">
+        <div class="container-fluid osbide-container" id="main_container">
+            @RenderBody()
+        </div>
+    </section>
+
+    @{ string enableLogging = ConfigurationManager.AppSettings["EnableActivityLogging"];}
+    <input type="hidden" id="enableLogging" value="@enableLogging" />
+    <input type="hidden" id="previous-url" value="" />
+</body>
+</html>

@@ -1,0 +1,38 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>OSBLE - @ViewBag.Title</title>
+
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/bootstrap-3.3.5/css/bootstrap.min.css")" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/Site.css")?version=1.2.0" /> @* Update version to cause browsers to reload css file *@
+    <link rel="stylesheet" type="text/css" href="../../Content/jquery-ui-1.8.13.custom.css" />
+    <link rel="shortcut icon" type="text/css" href="../../Content/favicon.ico" />
+    <link href="@Url.Content("~/Content/jquery-tooltip.css")" rel="stylesheet" type="text/css" />
+
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-2.0.1.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-ui-1.10.4.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.validate.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.unobtrusive-ajax.min.js")"></script>
+
+    <script src="../../Scripts/MicrosoftAjax.debug.js" type="text/javascript"></script>
+    <script src="../../Scripts/MicrosoftMvcAjax.debug.js" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery-tooltip.js")" type="text/javascript"></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body id="layoutLogOn">
+    <div class="container-fluid">
+        <div class="row">
+            <div id="contentLogOn" class="col-md-6 col-md-offset-3">
+                <span><a href="/"><img id="logon_logo" src="@Url.Content("~/Content/images/logon_logo.png")" /></a></span>
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+</body>
+</html>

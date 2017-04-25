@@ -1,0 +1,19 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@using OSBLE.Models.Courses
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+    List<Deliverable> deliverables = dataModel.Assignment.Deliverables;
+    Deliverable deliverable = deliverables.First();     
+    //TODO: handle multiple documents      
+}
+
+<tr>
+    <th>Submission to Review</th>
+    <td>        
+        @(Html.ActionLink("Annotate Review Document", "GetAnnotatedDocument", "FileHandler",
+                new { area = "", assignmentId = dataModel.Assignment.ID, authorTeamId = 1 },
+        new { onclick = "create_and_open_downloading_submission_dialog()" }))       
+    </td>
+</tr>

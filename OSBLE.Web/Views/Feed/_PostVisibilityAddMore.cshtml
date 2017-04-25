@@ -1,0 +1,342 @@
+﻿@using OSBLE.Utility
+@{
+    var courseUsers = DBHelper.GetAllCourseUsersFromCourseId(ViewBag.ActiveCourse.AbstractCourseID);    
+}
+
+<ul id="addNewUsersToVisiblity" class="custom-bullet"></ul>
+
+<div id="add-users-container">
+    <ul class="filter-bullet">
+        <li>
+            <input list="add-courseUsersList" id="add-custom-user-search-input" placeholder="Add by Name...">
+            <datalist id="add-courseUsersList">
+                @foreach (var user in courseUsers)
+                {
+                    <option data-uid="user-profile-id-@user.ID" value="@user.FullName"></option>
+                }
+            </datalist>
+
+            <input type="hidden" name="add-selected-user" id="add-custom-user-search-input-hidden"><button id="add-custom-search-clear" onclick="addClearFilter()"><span class="glyphicon glyphicon-remove add-icon-state"></span></button>
+
+            @* ALTERNATE dropdown - this is show in the plugin because the chromium browser doesn't properly handle the datalist *@
+            <select id="add-courseUsersList-plugin" class="main-dropdown" style="display: none;">
+                <option value="0">Select User to Add...</option>
+                @foreach (var user in courseUsers)
+                {
+                    <option value="user-profile-id-@user.ID">@user.FullName</option>   
+                }
+            </select>
+        </li>
+    </ul>
+
+    <div>
+        @using (Html.BeginForm("ModifyPostVisibility", "Feed", FormMethod.Post, new { id = "add-users-form" }))
+        {
+            <button id="add-users-button" type="button" class="btn btn-primary disabled" onclick="">Apply Changes</button>
+            <button id="add-custom-search-clear-selection" type="button" class="btn btn-secondary disabled" onclick="addClearSelection()">Clear Selection</button>
+            <input type="hidden" id="add-custom-visibility-selection-id-list" name="addCustomVisibilitySelectionIdList" value="" />
+            <input type="hidden" id="event-log-id" name="eventLogId" value="0" />
+            <input type="hidden" name="currentUserId" value="@ViewBag.ActiveCourseUser.UserProfileID" />
+        }
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    function addClearFilter() {
+        $('#add-custom-user-search-input').val('');
+        $('#add-custom-search-clear').css('opacity', '0.65');
+        $('#add-custom-search-clear').css('cursor', 'not-allowed');
+        $('#add-custom-search-clear').css('padding', '2px 5px 2px 5px');
+        $('.add-icon-state').css('color', '#aaa');
+    }
+
+    function addClearSelection() {
+
+        $('li').remove('[id^=add-participant-profile-id-]');
+        $(".removable-user").each(function () {
+            $("#" + $(this).attr('id')).removeClass('mark-remove');
+            $("#" + $(this).attr('id')).find('span').removeClass('glyphicon-remove');
+            $("#" + $(this).attr('id')).find('span').addClass('glyphicon-trash');
+        });
+        addUpdateHiddenUserIdList();
+        $('#add-custom-search-clear-selection').css('opacity', '0.65');
+        $('#add-custom-search-clear-selection').css('cursor', 'not-allowed');
+        $('#addNoUsers').css('display', 'inline');
+
+        $('#add-users-button').css('opacity', '0.65');
+        $('#add-users-button').css('cursor', 'not-allowed');
+        $('#add-users-button').addClass('disabled');
+    }
+
+    function addUpdateHiddenUserIdList() {
+        var usersCount = 0;
+        var selectedIds = "";
+
+        //existing users
+        $("[id^=participant-profile-id-]").each(function () {
+            var skipParticipant = false;
+            var currentId = $(this).attr('id');
+            $(".mark-remove").each(function () {
+                if ($(this).attr('id') == currentId) {
+                    skipParticipant = true;
+                    return false; //exit the foreach
+                }
+            });
+
+            if (skipParticipant) {
+                return true; //skip this iteration of the participant foreach
+            }
+
+            var id = $(this).attr('id').split('-');
+            if (selectedIds == "") {
+                selectedIds += id[id.length - 1];
+            }
+            else {
+                selectedIds += "," + id[id.length - 1];
+            }
+            usersCount++;
+        });
+
+        //new users
+        $("[id^=add-participant-profile-id-]").each(function () {
+            var id = $(this).attr('id').split('-');
+            if (selectedIds == "") {
+                selectedIds += id[id.length - 1];
+            }
+            else {
+                selectedIds += "," + id[id.length - 1];
+            }
+            usersCount++;
+        });
+
+        $('#add-custom-visibility-selection-id-list').val(selectedIds);
+
+        var expand = false;
+        $(".mark-remove").each(function () {
+            expand = true;
+            return false; //exit foreach, we found at least one
+        });
+
+        if (expand) {
+            $('#add-users-container').css('max-height', '1000px');
+            $('#add-users-button').css('opacity', '1.0');
+            $('#add-users-button').css('cursor', 'pointer');
+            $('#add-users-button').removeClass('disabled');
+        }
+
+        if ($("#add-custom-visibility-selection-id-list").val() == "") {
+            $('#add-users-button').css('opacity', '0.65');
+            $('#add-users-button').css('cursor', 'not-allowed');
+            $('#add-users-button').addClass('disabled');
+        }
+
+        return usersCount;
+    }
+
+    function addedUsersCount() {
+        var usersCount = 0;
+        $("[id^=add-participant-profile-id-]").each(function () {
+            usersCount++;
+        });
+        $(".mark-remove").each(function () {
+            usersCount++;
+        });
+        return usersCount;
+    }
+
+    function usersCount() {
+        var usersCount = 0;
+        $(".add-user").each(function () { usersCount++; });
+        $(".mark-remove").each(function () { usersCount++; });
+
+        return usersCount;
+    }
+
+    $("#visibilityListAddMore").on("click", function () {
+        $('#add-users-container').css('max-height', '1000px');
+        $(this).css('display', 'none');
+    });
+
+    $('#add-users-button').on('click', function () {
+        if (addedUsersCount() > 0 && $("#add-custom-visibility-selection-id-list").val() != "") {
+            $('#add-users-form').submit();
+        }
+        else {
+            //ignore
+        }
+    });
+
+    $(".custom-bullet").on('click', '*', function () {
+        $('#' + $(this).attr('id')).remove();
+
+        if (usersCount() == 0)
+            addClearSelection();
+    });
+
+    $(".removable-user").on('click', function () {
+        $('#visibilityListAddMore').css('display', 'none');
+
+        //toggle user from remove list
+        if ($("#" + $(this).attr('id')).hasClass('mark-remove')) {
+            $("#" + $(this).attr('id')).removeClass('mark-remove');
+            $("#" + $(this).attr('id')).find('span').removeClass('glyphicon-remove');
+            $("#" + $(this).attr('id')).find('span').addClass('glyphicon-trash');
+
+            if ($(".add-user").length == 0 && $(".mark-remove").length == 0) {
+                $('#add-users-button').css('opacity', '0.65');
+                $('#add-users-button').css('cursor', 'not-allowed');
+                $('#add-users-button').addClass('disabled');
+            }
+        }
+        else {
+            $("#" + $(this).attr('id')).addClass('mark-remove');
+            $("#" + $(this).attr('id')).find('span').removeClass('glyphicon-trash');
+            $("#" + $(this).attr('id')).find('span').addClass('glyphicon-remove');
+        }
+        //update the list
+        addUpdateHiddenUserIdList();
+
+        if (usersCount() == 0) {
+            addClearSelection();
+        }
+        else {
+            $('#add-custom-search-clear-selection').css('opacity', '1.0');
+            $('#add-custom-search-clear-selection').css('cursor', 'pointer');
+        }
+    });
+
+    $('input[id=add-custom-user-search-input]').keydown(function (e) {
+        var code = e.keyCode || e.which;
+        if (code === 9) {  //user pressed tab, keep cursor in the input
+            e.preventDefault();
+        }
+    });
+
+    $(document).ready(function () {
+
+        //alternate dropdown for use in the plugin. datatable doesn't work in chromium renderer for some reason.
+        $("#add-courseUsersList-plugin").change(function () {
+            if ($("#add-courseUsersList-plugin").prop('selectedIndex') > 0) {
+                var fullName = $("#add-courseUsersList-plugin option:selected").text();
+                var userId = $(this).val().split('-');
+
+                //add the user to the visible list only if they are not already on it
+                if (userId.length > 0 && $("#" + 'add-participant-profile-id-' + userId[userId.length - 1]).length == 0 && $("#" + 'participant-profile-id-' + userId[userId.length - 1]).length == 0) {
+                    $("#addNewUsersToVisiblity").append("<li" + " id=\"add-participant-profile-id-" + userId[userId.length - 1] + "\"  class=\"add-user\"> <span class=\"glyphicon glyphicon-remove remove-user remove-added\"></span> <span class=\"glyphicon glyphicon-trash added-user\"></span> <img class=\"mini-profile-image\" src=\"/user/" + userId[userId.length - 1] + "/Picture?size=16\" alt=\"Profile Image for " + userId[userId.length - 1] + "\" >" + fullName + "</li>");
+                    $('#addNoUsers').css('display', 'none');
+                    $('#add-users-button').css('opacity', '1.0');
+                    $('#add-users-button').css('cursor', 'pointer');
+                    $('#add-users-button').removeClass('disabled');
+                }                
+
+                //switch
+                var usersCount = addUpdateHiddenUserIdList();
+
+                if (usersCount == 0) {
+                    $('#add-custom-search-clear-selection').css('opacity', '0.65');
+                    $('#add-custom-search-clear-selection').css('cursor', 'not-allowed');
+                }
+                else {
+                    $('#add-custom-search-clear-selection').css('opacity', '1.0');
+                    $('#add-custom-search-clear-selection').css('cursor', 'pointer');
+                }
+            }
+        });
+
+        if (!detectBrowser()) {
+            $("#add-custom-user-search-input").css('display', 'none');
+            $("#add-custom-search-clear").css('display', 'none');
+
+            $("#add-courseUsersList-plugin").css('display', 'inline');
+        }
+
+        if ($("#enable-pm").val() == "false" || $("#enable-pm").length == 0) {
+            $("#visibilityListAddMore").css('display', 'none');
+        }
+        else {
+
+            if ($("#can-grade").length > 0 && $("#can-grade").val() == "true") {
+                $("#visibilityListAddMore").css('display', 'inline');
+            }
+            else if ($("#is-op").val() == "true") {
+                $("#visibilityListAddMore").css('display', 'inline');
+            }
+            else {
+                $("#visibilityListAddMore").css('display', 'none');
+            }
+
+            addUpdateHiddenUserIdList();
+
+            $("#event-log-id").val($("#selected-event-id").val());
+            $("#add-custom-user-search-input").on('input', function () {
+
+                var val = this.value;
+                if ($('#add-courseUsersList').find('option').filter(function () {
+
+                    if (val.length > 0) {
+                        $('#add-custom-search-clear').css('opacity', '1.0');
+                        $('#add-custom-search-clear').css('cursor', 'pointer');
+                        $('#add-custom-search-clear').css('padding', '3px 5px 3px 5px');
+                        $('.add-icon-state').css('color', '#000');
+
+                }
+                else {
+                            $('#add-custom-search-clear').css('opacity', '0.65');
+                            $('#add-custom-search-clear').css('cursor', 'not-allowed');
+                            $('#add-custom-search-clear').css('padding', '2px 5px 2px 5px');
+                            $('.add-icon-state').css('color', '#aaa');
+                }
+
+                    return this.value.toUpperCase() === val.toUpperCase();
+                }).length) {
+                    var fullName = $("#add-custom-user-search-input").val();
+                    var userId = "";
+
+                    //get the user id
+                    $("#add-courseUsersList > option").each(function () {
+                        if (this.value.toUpperCase() === fullName.toUpperCase()) {
+                            userId = $(this).data("uid").split('-');
+                            return false; //exit the foreach
+                        }
+                    });
+
+                    //add the user to the visible list only if they are not already on it
+                    if (userId.length > 0 && $("#" + 'add-participant-profile-id-' + userId[userId.length - 1]).length == 0 && $("#" + 'participant-profile-id-' + userId[userId.length - 1]).length == 0) {
+                        $("#addNewUsersToVisiblity").append("<li" + " id=\"add-participant-profile-id-" + userId[userId.length - 1] + "\"  class=\"add-user\"> <span class=\"glyphicon glyphicon-remove remove-user remove-added\"></span> <span class=\"glyphicon glyphicon-trash added-user\"></span> <img class=\"mini-profile-image\" src=\"/user/" + userId[userId.length - 1] + "/Picture?size=16\" alt=\"Profile Image for " + userId[userId.length - 1] + "\" >" + fullName + "</li>");
+                        $('#addNoUsers').css('display', 'none');
+                        $('#add-users-button').css('opacity', '1.0');
+                        $('#add-users-button').css('cursor', 'pointer');
+                        $('#add-users-button').removeClass('disabled');
+                    }
+                    //clear the input box
+                    $("#add-custom-user-search-input").val('');
+                    //reset search x
+                    $('#add-custom-search-clear').css('opacity', '0.65');
+                    $('#add-custom-search-clear').css('cursor', 'not-allowed');
+                    $('#add-custom-search-clear').css('padding', '2px 5px 2px 5px');
+                    $('.add-icon-state').css('color', '#aaa');
+
+                    //switch
+                    var usersCount = addUpdateHiddenUserIdList();
+
+                    if (usersCount == 0) {
+                        $('#add-custom-search-clear-selection').css('opacity', '0.65');
+                        $('#add-custom-search-clear-selection').css('cursor', 'not-allowed');
+                    }
+                    else {
+                        $('#add-custom-search-clear-selection').css('opacity', '1.0');
+                        $('#add-custom-search-clear-selection').css('cursor', 'pointer');
+                    }
+                }
+            });
+
+
+        }
+
+        if ($("#enable-pm").val() == "true" && ($("#is-op").val() == "true" || ($("#can-grade").length > 0 && $("#can-grade").val() == "true"))) {
+            $("#add-users-container").css('display', 'inline');
+        }
+    });
+</script>
+

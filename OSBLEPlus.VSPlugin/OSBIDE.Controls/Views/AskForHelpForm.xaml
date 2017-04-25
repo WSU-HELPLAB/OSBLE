@@ -1,0 +1,31 @@
+﻿<Window x:Class="OSBIDE.Controls.Views.AskForHelpForm"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:wfi="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
+             xmlns:winForms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+             mc:Ignorable="d" 
+        Height="534" Width="464"
+        Title="Ask for Help" ResizeMode="NoResize"
+        >
+    <StackPanel Orientation="Vertical">
+        <TextBlock Text="Ask For Help" FontSize="24" Foreground="CornflowerBlue" FontWeight="Bold" />
+        <TextBlock Text="Code segemnt (truncated to 750 characters or less):" FontWeight="Bold" />
+        <ScrollViewer Height="300">
+            <TextBlock Text="{Binding Path=Code}" TextWrapping="Wrap" x:Name="CodeSegment" />
+        </ScrollViewer>
+        <TextBlock Text="Add a comment:" FontWeight="Bold" />
+        <Border BorderThickness="1" BorderBrush="Gray">
+            <TextBox x:Name="UserComment" Text="{Binding Path=UserText}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" Height="100" />
+        </Border>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <wfi:WindowsFormsHost Margin="0,0,15,0" >
+                <winForms:PictureBox x:Name="LoadingIcon" Visible="False" >
+                </winForms:PictureBox>
+            </wfi:WindowsFormsHost>
+            <Button Content="Ask For Help" x:Name="SubmitButton" Padding="3" Margin="5" Command="{Binding Path=SubmitCommand}"/>
+            <Button Content="Cancel" Padding="3" Margin="5" Command="{Binding Path=CancelCommand}"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

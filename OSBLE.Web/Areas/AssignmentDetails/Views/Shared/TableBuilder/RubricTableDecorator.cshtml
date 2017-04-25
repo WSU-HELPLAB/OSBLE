@@ -1,0 +1,8 @@
+﻿@using OSBLE.Resources
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;   
+    string linkText = dataModel.Grade.LinkText;
+    object values = dataModel.Grade.ActionValues;
+}
+<td>@Html.ActionLink(linkText, "Index", "Rubric", values, new { })</td>

@@ -1,0 +1,35 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+    IAssignmentTeam currentTeam = dataModel.AssignmentTeam as IAssignmentTeam;       
+    Deliverable deliverable = currentTeam.Assignment.Deliverables.Where(d => d.DeliverableType == DeliverableType.PDF).FirstOrDefault();    
+}
+<td>
+    @if (currentTeam is AssignmentTeam)
+    {
+        AssignmentTeam at = currentTeam as AssignmentTeam;
+        DateTime? sub = at.GetSubmissionTime();
+        if (at.GetSubmissionTime() != null)
+        {
+            <time class="utc-time-link"
+                  datetime="@Helpers.DateAsUnixTime((DateTime)sub)"
+                  data-original-date="@Helpers.RawDate((DateTime)sub)"
+                  data-date-format="MM/DD/YY hh:mm:ss A">
+                @Html.ActionLink(sub.ToString() + " (UTC)", "GetSubmissionZip", "FileHandler", new { area = "", assignmentID = currentTeam.Assignment.ID, teamID = currentTeam.Team.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
+            </time>
+            string currentTeamId = "annotate_" + currentTeam.AssignmentID+ "_" + currentTeam.TeamID;
+            string currentId = "annotateId_" + currentTeam.TeamID;
+            
+            if (null != deliverable && currentTeam.Assignment.IsAnnotatable) //only show the refresh icon if it is a annotatable PDF. 
+            {
+                <a href="#" title="Note: -ALL- previous annotations for this document will be lost!" id="@currentId"  class="@currentTeamId">@Helpers.Refresh()</a>
+                <div id="dialog-confirm"></div>    
+            }            
+        }
+        else
+        {
+            @:Nothing Received
+        } } else { //currently only handling submissions for assignment teams.  May need to be reworked in the //future. @: not supported
+        } </td>

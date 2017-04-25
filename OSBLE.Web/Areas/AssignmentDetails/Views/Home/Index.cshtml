@@ -1,0 +1,175 @@
+﻿@using OSBLE.Models.Assignments
+@using OSBLE.Areas.AssignmentDetails.ViewModels
+@using OSBLE.Models.Courses;
+@using OSBLE.Resources
+
+@model AssignmentDetailsViewModel
+@{
+    ViewBag.Title = "Assignment Details";
+    DynamicDictionary headerData = Model.HeaderBuilder.BuildHeader(Model.CurrentAssignment);
+
+    bool HideMail = true;
+    if (null == ViewBag.HideMail)
+    {
+        HideMail = OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ViewBag.ActiveCourseUser.AbstractCourseID);
+    }
+    else
+    {
+        HideMail = ViewBag.HideMail;
+    }
+}
+
+@section AssignmentDetails
+{
+    <tr>
+        <th>
+            Due:
+        </th>
+        <td>
+            <time class="utc-time"
+                  datetime="@Helpers.DateAsUnixTime(Model.CurrentAssignment.DueDate)"
+                  data-original-date="@Helpers.RawDate(Model.CurrentAssignment.DueDate)"
+                  data-date-format="MM/DD/YYYY hh:mm A">
+                @Model.CurrentAssignment.DueDate.ToShortDateString() @Model.CurrentAssignment.DueDate.ToShortTimeString() (UTC)
+            </time>
+        </td>
+    </tr>
+    @foreach (string view in Model.HeaderViews)
+    {
+        string viewLocation = string.Format("HeaderBuilder/{0}", view);
+        @Html.Partial(viewLocation, headerData);
+    }
+}
+
+@section TableData
+    {
+    @if (Model.Client.AbstractRole.CanGrade)
+    {
+
+        CourseUser currentUser = ViewBag.ActiveCourseUser;
+
+        var teams = from pair in Model.TeamTableBuilders                    
+                    orderby pair.Key.Team.TeamMembers.Count() == 0 ? 0 : pair.Key.Team.TeamMembers.FirstOrDefault().CourseUser.Section ascending
+                    select pair.Key;
+
+        HashSet<int> sections = new HashSet<int>(); //This hash set is to get all of the sections for this assignment
+
+        foreach (IAssignmentTeam assignmentTeam in teams) //iterate through all sections and add them to hash set
+        {
+            if (assignmentTeam.Team.TeamMembers.Count > 0)
+            {
+                sections.Add(assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.Section);
+            }
+        }
+
+        teams = from pair in Model.TeamTableBuilders
+                orderby pair.Key.Team.TeamMembers.Count() == 0 ? pair.Key.Team.Name : pair.Key.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(Model.Client.AbstractRoleID, false) ascending
+                select pair.Key;
+
+
+        //this bool is to determine whether or not there needs to be a row with a section header.
+        bool sectionBool = false;
+
+        //only show sections if there are more than 1 section
+        bool showSections = false;
+
+        if (sections.Count > 1)
+        {
+            showSections = true;
+        }
+
+        foreach (int section in sections)
+        {
+            // For TAs, we only want the TA to see students in the section they are in
+
+            if (currentUser != null)
+            {
+                //check to see if we need to hide any teams (teams not in current user's section)
+                if (currentUser.AbstractRole.Name == "TA") //see if the user is a TA
+                {
+                    if (currentUser.Section >= 0) //check if the user is a multi-section user or not
+                    {
+                        if (section != currentUser.Section) //if not, make sure they are in this section before displaying the grades
+                        {
+                            continue;
+                        }
+                    }
+
+                    else if (currentUser.Section == -1)
+                    {
+
+                        //create a list of the multiSections
+                        List<string> multiSections = currentUser.MultiSection != null ? currentUser.MultiSection.Split(',').ToList() : new List<string>();
+
+                        int isInList = multiSections.IndexOf(section.ToString());
+                        if (isInList == -1) //if this user's multisection does not contain this section
+                        {
+                            continue;
+                        }
+                    }
+                    //no case for -2, section -2 indicates that user is in all sections, so they can see all teams
+                }
+            }
+
+            sectionBool = false;
+            bool altRow = false;
+
+            foreach (IAssignmentTeam assignmentTeam in teams)
+            {
+                if (assignmentTeam.Team.TeamMembers.Count() == 0)
+                {                    
+                    continue;
+                }
+                
+                if (assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.Section != section) //check if this student belongs in this section.
+                {
+                    continue;
+                }
+
+                if ((!sectionBool) && showSections)
+                {
+                    <tr class="SectionRow">
+                        <th class="Student" colspan="1">
+                            Section: @Html.Raw(section)
+                        </th>
+
+                        <td colspan="5">
+                            @Html.ActionLink("[Download Section Submissions]", "GetAllSubmissionsForAssignment", "FileHandler", new { assignmentID = Model.CurrentAssignment.ID, downloadSection = section, area = "" }, new { onclick = "create_and_open_downloading_submission_dialog()", style = "text-decoration:none" })
+                        </td>
+                    </tr>
+                    sectionBool = true;
+                }
+
+                string rowText = "class=\"NormalRow\"";
+                if (altRow)
+                {
+                    rowText = "class=\"AltRow\"";
+                }
+                altRow = !altRow;
+                <tr @Html.Raw(rowText)>
+                    <th class="StudentName">
+                        @{string actionLink = Url.Action("CreateUser", "Mail", new
+                        {
+                            area = "",
+                            id = assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfileID
+                        });
+                        }
+                        @if (!HideMail)
+                        {
+                            <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
+                        }
+                        @assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(Model.Client.AbstractRoleID, false)  <!-- This displays the user name -->
+                    </th>
+
+                    @foreach (string view in Model.TableColumnHeaders.Keys) // This loop populates the rest of the rows for a table
+                    {
+                        DynamicDictionary tableData = Model.TeamTableBuilders[assignmentTeam].BuildTableForTeam(assignmentTeam);
+                        string viewLocation = string.Format("TableBuilder/{0}", view);
+                        @Html.Partial(viewLocation, tableData);
+                    }
+
+                </tr>
+            }
+        }
+    }
+}

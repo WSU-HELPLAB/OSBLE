@@ -1,0 +1,5 @@
+﻿CREATE TABLE [dbo].[HashTags] (
+	[ID]		INT IDENTITY(1,1) NOT NULL,
+	[Content]	[NVARCHAR](800) NOT NULL,
+	CONSTRAINT	[PK_dbo.Hashtags] PRIMARY KEY CLUSTERED (ID ASC)
+)

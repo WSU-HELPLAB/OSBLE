@@ -1,0 +1,65 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "OSBLE+ Suggestions Dashboard Details";
+}
+
+<h1>Using the OSBLE+ Suggestions Dashboard</h1>
+
+<p>
+    The OSBLE+ suggestions dashboard has the following components (see images below):
+</p>
+
+<img src="@Url.Content("~/Content/images/help/suggestions-dashboard-all-highlighted.png")" alt="suggestions dashboard" />
+
+<p>
+    <ol>
+        <li>
+            New suggestion notification icon. The header will also blink for 15 seconds when a new suggestion is present.
+        </li>
+        <li>
+            View private conversations (see @Html.ActionLink("Private Conversations help", "PrivateConversations") for details)
+        </li>
+        <li>
+            View your status/availability (see @Html.ActionLink("Availability/Status Details help", "UserStatus") for details)
+        </li>
+        <li>
+            View dismissed suggestions (see below for more details)
+        </li>
+        <li>
+            View your user profile page.
+        </li>
+        <li>
+            Provide general feedback for the OSBLE+ suggestions system
+        </li>
+        <li>
+            View the OSBLE+ help page
+        </li>
+        <li>
+            Expand/Collapse the Suggestions Dashboard Options
+        </li>
+        <li>
+            Adjust the page zoom level.
+        </li>
+    </ol>
+</p>
+
+<h2>Dismissed Suggestions</h2>
+<p>
+    Clicking the "Dismissed Suggestions" icon will show the following page:
+    <br /><img src="@Url.Content("~/Content/images/help/dismissed-suggestions-highlighted.png")" alt="suggestions dashboard" />
+    <ol>
+        <li>
+            Suggestion title
+        </li>
+        <li>
+            Suggestion details and link
+        </li>
+        <li>
+            The date the suggestion was generated
+        </li>
+        <li>
+            Links to provide feedback for a) the dismissed suggestions page and b) individual dismissed suggestions
+        </li>
+    </ol>
+</p>
+<hr width="90%">

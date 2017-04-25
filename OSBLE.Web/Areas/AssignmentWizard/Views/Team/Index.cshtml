@@ -1,0 +1,209 @@
+﻿@using OSBLE.Models.Courses;
+@using OSBLE.Models.Assignments;
+@using System.Collections.Generic;
+@using OSBLE.Models;
+@model Assignment          
+@{
+    List<CourseUser> unassignedUsers = ViewBag.UnassignedUsers;
+    List<IAssignmentTeam> teams = ViewBag.Teams;
+    List<CourseUser> allUsers = ViewBag.AllUsers;
+    List<Assignment> previousTeamAssignments = ViewBag.PreviousTeamAssignments;
+    ViewBag.Title = "Assignment Wizard";
+    HashSet<int> sections = new HashSet<int>();
+    
+}
+
+<h5><span class="glyphicon glyphicon-info-sign"></span> Need help creating teams? Check out the OSBLE Help page <a href="~/help/UsingTeamBuilder" class="Hashtag"><u>"Using the Team Builder"</u></a>!</h5>
+<br />
+
+@section Header
+{
+    <link href="@Url.Content("~/areas/AssignmentWizard/Content/css/team.css")" type="text/css" rel="Stylesheet" />
+    <script src="@Url.Content("~/areas/AssignmentWizard/Content/js/discussionTeam.js")" type="text/javascript"></script>
+}
+<div id="teamDiv" >
+<p>
+    @Html.Raw(ToolTips.BasicAssignmentIsTeam)
+</p> 
+@Html.HiddenFor(m => m.ID)
+<div>
+<h3>Auto Generation Options</h3>
+    <div id="checkContainer">
+        <input id="allow_cross_section" type="checkbox" name="crossSection" value="yes">Allow Cross-Section teams
+        <br>
+    </div>
+<ul>
+    <li id="studentsPerTeam">
+        Create a configuration with at least <input type="text" id="AutoGenByStudentTextBox"  /> students per team per section
+        <button type="button" id="AutoGenByStudentButton" onclick="generateTeamsByNumberOfStudents()">Go</button>
+    </li>
+    <li id="teamPerCourse">
+        Create a configuration with <input type="text" id="AutoGenByteamTextBox" size="3" /> total teams per section
+        <button type="button" id="AutoGenByTeamButton" onclick="generateTeamsByNumberOfTeams()">Go</button>
+    </li>
+    <li>
+        Use a layout from the previous assignment: 
+        <select id="AutoGenFromPastSelect" name="AutoGenFromPastSelect">
+            @foreach (Assignment assignment in previousTeamAssignments)
+            {
+                <option value="@assignment.ID">@assignment.AssignmentName</option>
+            }
+        </select>
+        <button type="submit" name="AutoGenFromPastButton" id="AutoGenFromPastButton">Go</button>
+    </li>
+</ul>
+</div>
+
+<div id="ErrorBox">
+    This is the error box
+</div>
+
+<div id="TeamContent">
+<div id="TeamCreationOptions">
+    <a id="CreateTeamLink" class="NoDecoration">
+        <img src="@Url.Content("~/Content/images/add_up.png")" alt="Create New Team" title="Create New Team" />
+        Create New Team </a>
+</div>
+    
+<div id="AvailableStudentList">
+    <h3>
+        Unassigned Students</h3>
+    <ul id="AvailableStudent" class="TeamSortable">
+        @foreach (CourseUser cu in unassignedUsers)
+        {            
+            <li id="cu_@(cu.ID)" section="@cu.Section" class="ui-state-default Student">
+            @cu.UserProfile.LastName, @cu.UserProfile.FirstName
+            <br />
+                <text class="sectionText">Section: @cu.Section</text>
+            </li>
+            
+            <li style="display:none;"
+            @sections.Add(cu.Section);
+            />
+        }
+    </ul>
+
+</div>
+    
+<div id="TeamsDiv">
+    <h3>Teams</h3>
+
+    @{int counter = 0;}
+    @foreach (IAssignmentTeam aTeam in teams.OrderBy(t => t.Team.Name))
+    {
+        counter++;
+        <div id="teamDiv_@(counter)_@(aTeam.TeamID)" class="TeamDiv">
+            <input type="text" class="TeamNameTextBox" value="@aTeam.Team.Name" />
+            <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" alt="remove team" title="remove team" onclick="removeTeam('teamDiv_@(counter)_@(aTeam.TeamID)')" />
+            <ul id="team_@(counter)_@(@aTeam.TeamID)" class="TeamSortable">
+                @foreach (TeamMember member in aTeam.Team.TeamMembers)
+                {
+                    if (member.CourseUser != null) //catch the case where a withdrawn users is part of a team. They will be a member nut no longer a courseuser
+                    {
+                    <li id="cu_@(member.CourseUserID)" section="@member.CourseUser.Section" class="ui-state-default Student">
+                    @member.CourseUser.UserProfile.LastName, @member.CourseUser.UserProfile.FirstName
+                    <br />
+                    Section: @member.CourseUser.Section
+                    </li>
+                    
+                    <li style="hidden"
+                    @sections.Add(member.CourseUser.Section);
+                     />
+                    }
+
+                }
+            </ul>
+        </div>
+                if (counter % 3 == 0)
+                {
+            <div style="clear:both;"></div>
+                }
+    }
+</div>
+
+<!-- hidden form values needed for team assignment -->
+@foreach (CourseUser cu in allUsers)
+{
+    <input type="hidden" id="student_@(cu.ID)" name="student_@(cu.ID)" value="@(cu.UserProfile.FirstName) @(cu.UserProfile.LastName)" />
+}
+@foreach (IAssignmentTeam team in teams)
+{
+    //we only care about teams that already have DB values
+    if (team.TeamID == 0)
+    {
+        continue;
+    }
+    <input type="hidden" id="team_@(team.TeamID)" name="team_@(team.TeamID)" value="@team.Team.Name" />
+}
+
+</div>
+<br />
+<br />
+<!-- end TeamContent div -->
+
+    @if (sections.Count > 1)
+    {
+        <div id="moreThanOneSection" isTrue="true"></div>
+    }
+    else
+    {
+        <div id="moreThanOneSection" isTrue="false"></div>
+    }
+</div>
+
+
+
+<script type="text/javascript">
+
+    $('input[name=teamRadio]').change(function () {
+        if ($('#radioYes').attr('checked')) {
+            $('#teamDiv').show();
+        }
+        else {
+            $('#teamDiv').hide();
+        }
+    });
+
+    //change the text when checkbox is checked.
+    document.getElementById("allow_cross_section").addEventListener("change", changeText); 
+
+    $('document').ready(function () { //on load determine if there are multiple sections. If not, disable the check and hide it.
+        var temp = document.getElementById("moreThanOneSection");
+        
+        if (temp.getAttribute("isTrue") != "true") { //if there's only one section, disable the cross section team box
+            var disableThis = document.getElementById("checkContainer");
+            disableThis.hidden = true;
+
+            document.getElementById("studentsPerTeam").innerHTML = 'Create a configuration with at least <input type="text" id="AutoGenByStudentTextBox"  /> students per team' +
+        '<button type="button" id="AutoGenByStudentButton" onclick="generateTeamsByNumberOfStudents()">Go</button>'
+            document.getElementById("teamPerCourse").innerHTML = 'Create a configuration with <input type="text" id="AutoGenByteamTextBox" size="3" /> total teams' +
+        '<button type="button" id="AutoGenByTeamButton" onclick="generateTeamsByNumberOfTeams()">Go</button>'
+
+            //hide the sections from the user if there is only one section
+            $.each($(".sectionText"), function (index, value) {
+                this.style = "display:none;";
+            });
+        }     
+    });
+
+
+
+
+    function changeText() {
+        if (document.getElementById("allow_cross_section").checked)//if cross section teams allowed
+        { 
+            document.getElementById("studentsPerTeam").innerHTML = 'Create a configuration with at least <input type="text" id="AutoGenByStudentTextBox"  /> students per team' +
+        '<button type="button" id="AutoGenByStudentButton" onclick="generateTeamsByNumberOfStudents()">Go</button>'
+            document.getElementById("teamPerCourse").innerHTML = 'Create a configuration with <input type="text" id="AutoGenByteamTextBox" size="3" /> total teams' +
+        '<button type="button" id="AutoGenByTeamButton" onclick="generateTeamsByNumberOfTeams()">Go</button>'
+        }
+        else
+        {
+            document.getElementById("studentsPerTeam").innerHTML = 'Create a configuration with at least <input type="text" id="AutoGenByStudentTextBox"  /> students per team per section' +
+        '<button type="button" id="AutoGenByStudentButton" onclick="generateTeamsByNumberOfStudents()">Go</button>'
+            document.getElementById("teamPerCourse").innerHTML = 'Create a configuration with <input type="text" id="AutoGenByteamTextBox" size="3" /> total teams per section' +
+        '<button type="button" id="AutoGenByTeamButton" onclick="generateTeamsByNumberOfTeams()">Go</button>'
+        }
+    }
+
+</script>

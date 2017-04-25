@@ -1,0 +1,57 @@
+﻿@model OSBLE.Models.ViewModels.OSBLECommunityOnlineViewModel
+
+<div id="Online">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                Who's Online?
+            </h3>
+        </div>
+
+        @if (Model.OnlineUser.Count == 0)
+        {
+            <div class="panel-body-center">
+                No Users Online
+            </div>
+        }
+        else
+        {
+            foreach (KeyValuePair<string, int> entry in Model.OnlineUser)
+            {
+                <div class="panel-body">
+                    <div class="panel-body-left">
+                        <a href="@Url.Action("Index", "Profile", new { id = entry.Value, area ="" })" target="_blank">
+                            <img src="@Url.Action("Picture", "User", new { id = entry.Value, size = 30 })"
+                                 alt="Picture of @entry.Key"
+                                 class="profile_picture" />
+                        </a>
+                    </div>
+                    <div class="panel-body-center profile_image">
+                        <a href="@Url.Action("Index", "Profile", new { id = entry.Value, area ="" })" target="_blank">
+                            @entry.Key @*UserFullName*@
+                        </a>
+                    </div>
+                    <div class="panel-body-right profile_mail">
+                        <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { id = entry.Value })" target="_blank">@Helpers.MailButton()</a>
+                    </div>
+                </div>
+            }
+        }
+
+        <div class="panel-footer">
+            <ul style="list-style-type:none">
+                <li>
+                    @* TODO: create modal dialog that pops up with a box to post on the feed *@
+                    <a href="@Url.Action("OSBIDE", "Feed", new { area ="" })" target="_blank">
+                        Make a post on the activity feed.
+                    </a>
+                </li>
+                <li>
+                    @* TODO: format date correctly. currently it's mis-matched from the recent activity time *@
+                    Last Activity: @Model.LastActivty.TimeOfDay
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+

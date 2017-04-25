@@ -1,0 +1,269 @@
+﻿@model OSBLE.Models.ViewModels.OSBLECommunityViewModel
+
+@{
+    int userProfileId = Model.UserProfileId;
+    int courseId = Model.AbstractCourseId;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>OSBLE+ Community</title>
+
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-2.0.1.min.js")"></script>
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery-ui.css")" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-ui-1.10.4.min.js")"></script>
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/bootstrap-3.3.5/css/bootstrap.min.css")" />
+    <script type="text/javascript" src="@Url.Content("~/Content/bootstrap-3.3.5/js/bootstrap.min.js")"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/osble-community.css")" />
+
+    <script>
+        //load google chart api
+        google.load("visualization", "1.0", { packages: ["corechart"] });
+        
+        $(function() { //initialize the zoom slider
+            $( "#slider" ).slider({
+                min: 75,
+                max: 150,
+                value: 100,
+                slide: function( event, ui ) {
+                    changeZoom(ui.value);
+                }
+            });
+        });
+
+        function changeZoom(amount) //zoom change by slider
+        {
+            var zoom = Number($("body").css('zoom'));
+            $("body").css('zoom', amount/100);
+            $( "#zoom_pct" ).html( amount + "%" );
+        }
+
+        function increaseZoom(amount) //zoom change by dropdown+click
+        {
+            var zoom = Number($("body").css('zoom'));
+            var newZoom = zoom + amount;
+            if(newZoom < 1.5 && newZoom >= 0.75) //keep zoom within the slider range
+            {
+                $("body").css('zoom', newZoom);
+                var display = parseInt(newZoom * 100);
+                $( "#zoom_pct" ).html( display + "%" );
+                $( "#slider" ).slider( "option", "value", display ); //update the slider to the new zoom value
+            }
+        }
+
+        function addNewGrid(type, category, chartDraw) {
+            ShowLoading();
+            var gridPresent = false; //used to verify we're not trying to add a grid that's already on the grid-stack
+            var id = ""; //will store new id from controller ajax call
+
+            $.ajax({ //get the new grid html
+                url: '/OSBLECommunity/GetGridPartialView/',
+                data: { gridType: type },
+                dataType: "html",
+                async: false,
+                success: function (data) {
+                    //split off the new grid id from the partial view
+                    var temp = data.split('__');   //todo... find a better way to get this without delimiter. could end up splitting a view
+                    id = temp[0];
+
+                    //TODO: make sure we're not adding duplicate grid id
+
+                    if(category == "updates")
+                    {
+                        //$('.column-left').append(temp[1]);
+                        $('.col-md-3').append(temp[1]);
+                    }
+                    else
+                    {
+                        //$('.column').append(temp[1]);
+                        //$('#body-row').append(temp[1]);
+                        $('.col-md-6').append(temp[1]);
+                    }
+
+
+                },
+                error: function (data) {
+                    //todo: handle error cases
+                },
+                complete: function (data) {
+                    HideLoading();
+
+                    //need to do this dynamically - dummy data for now
+                    if(type == "CommunityStanding")
+                    {
+                        var data = google.visualization.arrayToDataTable([
+                      ['Task', 'Community', 'You'],
+                      ['PA1 Time (Hrs)', 4, 3],
+                      ['Debugging (Pct)', 5, 4],
+                      ['Posts (#)', 3, 5],
+                      ['PA2 Time (Hrs)', 1, 1],
+                      ['Error States (#)', 3, 3]
+                        ]);
+
+                        // Instantiate and draw our chart, passing in some options
+                        var chart = new google.visualization.ComboChart(document.getElementById('communitychart'));
+
+                        //set chart options
+                        var options = {
+                            legend: "none",
+                            position: "top",
+                            fontsize: "16px",
+                            //chartArea: {  width: "50%" },
+                            legend: {position: 'bottom'},
+                            width: 400,
+                            height: 400,
+                            is3D: true,
+                            //backgroundColor: '#e6e6e6',
+                            series: {0: {type: 'bars', visibleInLegend: false,}},
+                        };
+
+                        chart.draw(data, options);
+                    }
+
+                    if(type == "PersonalStanding")
+                    {
+                        var data = google.visualization.arrayToDataTable([
+                      ['Task', 'Goal', 'You'],
+                      ['PA1 Time (Hrs)', 11, 3],
+                      ['Debugging (Pct)', 2, 4],
+                      ['Posts (#)', 2, 5],
+                      ['PA2 Time (Hrs)', 2, 1],
+                      ['Error States (#)', 7, 3]
+                        ]);
+
+                        // Instantiate and draw our chart, passing in some options
+                        var chart = new google.visualization.BarChart(document.getElementById('personalchart'));
+
+                        //set chart options
+                        var options = {
+                            //title: "Where do I stand? (Personal Goals)",
+                            legend: "none",
+                            position: "top",
+                            fontsize: "16px",
+                            chartArea: {  width: "60%", height: "80%" },
+                            legend: {position: 'bottom'},
+                            width: 400,
+                            height: 400,
+                            //backgroundColor: '#e6e6e6',
+                        };
+
+                        chart.draw(data, options);
+                    }
+                }
+            });
+        };
+
+        //TODO:this will load data from the db
+        function loadGrids()
+        {
+            $.get("LoadUserGrids", { userProfileId: @userProfileId , courseId: @courseId })
+            .done(function (data) {
+                alert("Data Loaded: " + data);
+            });
+        }
+
+        function ShowLoading() {
+            if ($('#loadingMsg').css('display') != 'none')
+                return;
+            $('#loadingMsg').show('fade');
+        }
+
+        function HideLoading() {
+            if ($('#loadingMsg').css('display') == 'none')
+                return;
+            $('#loadingMsg').hide('fade');
+        }
+
+        //TODO: need to switch this to load from user configured / pushed items
+        $(document).ready(function () {
+            addNewGrid("Online", "updates");
+            addNewGrid("RecentActivity", "updates");
+            addNewGrid("Goals");
+            addNewGrid("CommunityStanding");
+            addNewGrid("PersonalStanding");
+        });
+    </script>
+
+</head>
+<body>
+
+    <div class="container-fluid">
+        
+@* HEADER/NAVBAR SECTION*@
+        <div class="row">
+           
+            <div class="col-md-12">
+                <nav id="community-banner" class="navbar  navbar-static-top">
+                    <div class="navbar-header  navbar-right">
+                        <ul class="nav navbar-nav" style="padding: 5px; margin: 5px;">
+                            <li>
+                                @* This is a message displayed while items are loading *@
+                                <div id="loadingMsg" class="message">
+                                    @Helpers.LoadingSmall() Adding Widget...
+                                </div>
+                            </li>
+                            <li>
+                                <span id="zoom_pct">100%</span>
+                            </li>
+                            <li>
+                                <div id="slider"></div>
+                            </li>
+                            <li><a href="#" title="Zoom In" onclick="increaseZoom(0.05)">Zoom +</a></li>
+                            <li><a href="#" title="Zoom Out" onclick="increaseZoom(-0.05)">Zoom -</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </div>
+
+@* BODY SECTION *@
+        <div class="row" id="body-row">
+            <div class="col-md-3 col-sm-4  col-lg-3">
+            </div>
+            <div class="col-md-6 col-sm-8  col-lg-9">
+            </div>
+        </div>
+
+
+    </div> @*end container-fluid div*@ 
+    
+@* MODAL DIALOG SECTION *@
+    <div class="modal fade" id="modal-container-111272" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        ×
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        DIALOG ? For boxes
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    [RELATED INFO]
+                </div>
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        Close
+                    </button>
+                    @*<button type="button" class="btn btn-primary">
+                            Save changes
+                        </button>*@
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</body>
+</html>

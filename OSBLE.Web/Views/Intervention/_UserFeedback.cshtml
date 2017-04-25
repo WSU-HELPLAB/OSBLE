@@ -1,0 +1,29 @@
+﻿
+<link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/bootstrap-3.3.5/css/bootstrap.min.css")" />
+<script type="text/javascript" src="@Url.Content("~/Scripts/jquery-2.0.1.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Content/bootstrap-3.3.5/js/bootstrap.min.js")"></script>
+<link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery-ui.css")" />
+<script type="text/javascript" src="@Url.Content("~/Scripts/jquery-ui-1.10.4.min.js")"></script>
+
+<link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/interventions.css")?version=1.0" />
+<script type="text/javascript" src="@Url.Content("~/Scripts/Interventions.js")?version=1.01"></script>
+
+@{
+    string placeholderMessage = "Let us know how we are doing! Any feedback is greatly appreciated. " +
+                                "Let us know what works, doesn't work, is helpful/not helpful, random thoughts, suggestions, etc... All thoughts welcome! \n\n" +
+                                "Please describe any issues in detail to ensure that we can properly address it.";
+}
+
+<div class="panel panel-primary">
+    <div class="panel-heading center"><h4>"OSBLE+ Suggestions" Feedback</h4></div>
+    <div class="panel-body">
+        <textarea id="feedback-textarea" placeholder="@placeholderMessage"></textarea>
+    </div>
+    
+    <div class="panel-footer">             
+        <button type="button" class="btn btn-primary right" id="submit-user-feedback">Submit Feedback</button>
+        <span class="right" id="feedback-post-success"></span>
+        <span class="right" id="feedback-post-error"></span>        
+        &nbsp;<br />  <br />   
+    </div>
+</div>

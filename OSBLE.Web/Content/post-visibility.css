@@ -1,0 +1,180 @@
+﻿#visibilityListAddMore {
+        display: none;
+    }
+
+    #add-users-container {
+        max-height: 1000px;
+        overflow: hidden;
+        -webkit-transition: max-height 1s;
+        -moz-transition: max-height 1s;
+        transition: max-height 1s;
+        display: none;
+    }
+
+    #add-custom-search-input, .ui-autocomplete {
+        width: 300px;
+    }
+
+    #add-users-button {
+        opacity: 0.65;
+        cursor: not-allowed;
+    }
+
+    #add-custom-search-clear {
+        color: #aaa;
+        padding: 2px 5px 2px 5px;
+        border: 1px solid #ccc;
+        border-left-width: 0;
+        border-bottom-right-radius: 4px;
+        border-top-right-radius: 4px;
+        opacity: 0.65;
+        cursor: not-allowed;
+        margin-left: -5px;
+    }
+
+    .add-icon-state {
+        color: #aaa;
+    }
+
+    #add-custom-search-input {
+        margin-top: 5px;
+    }
+
+    #add-custom-search-clear-selection {
+        float: right;
+        opacity: 0.65;
+        cursor: not-allowed;
+    }
+
+    .add-custom-selection > .panel-heading {
+        padding-bottom: 15px;
+    }
+
+    .remove-added-user {
+        margin-left: 10px;
+    }
+
+    .remove-user, .added-user {
+        color: #aaa;
+    }
+
+    .remove-current {
+        color: #ff0000;
+    }
+
+    .mark-remove span, .remove-added {
+        color: #ff0000;
+    }
+
+    .add-user:hover .remove-added {
+        display: inline;
+    }
+
+    .add-user:hover .added-user {
+        display: none;
+    }
+
+    .removable-user:hover .remove-current {
+        display: inline;
+    }
+
+    .removable-user:hover .remove-user {
+        display: none;
+    }
+
+    .remove-added, remove-current {
+        display: none;
+    }
+
+    .remove-current {
+        display: none;
+    }
+
+    .custom-bullet-participants, .custom-bullet, .filter-bullet {
+        list-style-type: none;
+    }
+
+    .mini-profile-image {
+        margin: 2px;
+        margin-right: 5px;
+    }
+
+    #addNewUsersToVisiblity {
+        margin-top: -10px;
+        margin-bottom: 0;
+    }
+
+    .filter-bullet {
+        margin-top: 10px;
+    }
+
+    #current-user-container {
+        margin: 10px;
+    }
+
+    #visibility-dialog {
+        overflow: hidden;
+        width:auto;
+    }
+
+    #custom-search-input, .ui-autocomplete {
+        width: 300px;
+    }
+
+    #custom-visiblity-selection {
+        /*overflow: hidden;
+        max-height: none;*/
+        /* Initially we don't want any height, and we want the contents to be hidden */
+        max-height: 0;
+        overflow: hidden;
+        /* Set our transitions up. */
+        -webkit-transition: max-height 1s;
+        -moz-transition: max-height 1s;
+        transition: max-height 1s;
+    }
+
+    .custom-visiblity-selection {
+        padding: 5px;
+        margin-bottom: 5px;        
+    } 
+
+    #custom-search-clear {
+        color: #aaa;              
+        /*padding: 5px 9px 0px 9px;*/   
+        padding: 2px 5px 2px 5px;             
+        border: 1px solid #ccc;
+        border-left-width: 0;
+        border-bottom-right-radius: 4px;
+        border-top-right-radius: 4px;
+        /*cursor: pointer;*/
+        /*display: none;*/
+        opacity: 0.65;
+        cursor: not-allowed;
+        margin-left: -5px;
+    }
+
+    .icon-state {
+        color: #aaa;
+    }
+
+    #custom-search-input {        
+        margin-top: 5px;
+    }
+
+    #custom-search-clear-selection {        
+        float: right;
+        opacity: 0.65;
+        cursor: not-allowed;
+    }
+
+    .custom-selection > .panel-heading {
+        padding-bottom: 15px;
+    }
+
+    #add-custom-user-search-input {
+        margin-top: 5px;
+    }
+
+    .visibility-clickable {
+        cursor: pointer;
+    }

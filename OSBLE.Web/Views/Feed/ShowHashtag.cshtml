@@ -1,0 +1,96 @@
+﻿@using OSBLE.Models.Courses
+@using OSBLEPlus.Logic.Utility
+@using OSBLEPlus.Logic.Utility.Lookups
+@using OSBLE.Models.Queries
+@using OSBLE.Models.Users
+@{
+    UserProfile currentUser = ViewBag.CurrentUser;
+    string defaultEvents = string.Join(",", ActivityFeedQuery.GetSocialEvents().Select(e => (int)e));
+    var currentCourseUsers = ViewBag.CurrentCourseUsers;   
+    string urlReferrer = Request.UrlReferrer.ToString();
+    bool interventionReferrer = urlReferrer.Contains("Intervention");
+}
+<script type="text/javascript" src="@Url.Content("~/signalr/hubs")"></script>
+@* autocomplete block *@
+<link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery.atwho.css")" />
+<script type="text/javascript" src="@Url.Content("~/Scripts/jquery.caret.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/jquery.atwho.js")"></script>
+@* autocomplete block end *@
+<script type="text/javascript">
+    var vm;
+    $(document).ready(function() {
+        vm = new FeedViewModel("@currentUser.FullName", @currentUser.ID);
+        ko.applyBindings(vm);
+        vm.ShowHashTagResults("#" + "@ViewBag.Hashtag");
+    });
+
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        /*START Autocomplete block*/
+        //TODO: need to re-build the url/<a/> tags for @@name and #hashtag.
+        var userNames = []
+        var userIds = [];
+
+        //we need to get hashtags from the hashtag table and populate it like names are populated.
+        //we also need to add hashtags to the table if there are no matches so others will see hashtags they've seen already.
+        var hashtags = [];
+        @{
+            if (null != ViewBag.HashTags)
+            {
+                foreach(string hashTag in ViewBag.HashTags)
+                {
+                    @:hashtags.push("@hashTag");
+                }
+            }
+
+            if (null != currentCourseUsers)
+            {
+                foreach (var userProfile in currentCourseUsers)
+                {
+                    @:userNames.push("@userProfile.FirstName" + "@userProfile.LastName");
+                    @:userIds.push("@userProfile.ID");
+                }
+            }
+        }
+
+        localStorage['UserNames'] = userNames;
+        localStorage['UserIds'] = userIds;
+
+        $(document).on("focus", "textarea", function () {
+            $(this).atwho({
+                at: "@@",
+                data: userNames,
+                insertTpl: "@@${name}", //insert template i.e. what is inserted into the textarea
+            });
+
+            $(this).atwho({
+                at: "#",
+                data: hashtags
+            });
+        });
+
+        $("#back-to-suggestion").on('click', function(){
+            alert("click");
+        });
+    });
+</script>        
+
+    @*Back to Suggestion link working inconsistently, disabled for now*@
+    @*@if (interventionReferrer)
+    {
+        <a href="@urlReferrer" class="btn btn-primary"><span class="glyphicon glyphicon-arrow-left intervention-info"></span> Back to Suggestion</a> <br />    
+    }*@
+        
+    <h3 style="display: inline-block">Posts and replies containing <span class="Hashtag">#@ViewBag.Hashtag</span></h3>
+
+    @* This is a message displayed while the feed is loading posts *@
+    <div id="loadingMsg" class="message">
+        @Helpers.LoadingSmall() Loading Posts...
+    </div>
+
+    @* Feed is inserted here *@
+    <div id="dp_posts" class="panel-group">
+        @Html.Partial("Feed/_Feed")
+    </div>

@@ -1,0 +1,50 @@
+﻿@{
+    bool parseSuccess = false;
+    int interventionId = 0;
+    parseSuccess = int.TryParse(ViewData["interventionId"].ToString(), out interventionId);
+    OSBLE.Models.Intervention.InterventionItem interventionItem = new OSBLE.Models.Intervention.InterventionItem();
+    string text0 = "<strong>You are providing feedback for the suggestion: </strong> \"";
+    string text = "";    
+
+    if (parseSuccess)
+    {
+        interventionItem = OSBLE.Controllers.InterventionController.GetInterventionItem(interventionId);
+
+        if (interventionItem.ContentFirst)
+        {
+            text = "<em>" + interventionItem.Title + ": " + interventionItem.ListItemContent + " " + interventionItem.LinkText + "\"</em>";
+        }
+        else
+        {
+            text = "<em>" + interventionItem.Title + ": " + interventionItem.LinkText + " " + interventionItem.ListItemContent + "\"</em>";
+        }
+    }
+}
+
+<span class="feedback right">
+    @if (parseSuccess && interventionId > 0)
+    {
+        <span style="font-size: medium;" id="feedback-prompt-@interventionId">Was this suggestion helpful?</span>
+        <a href="#" data-toggle="tooltip" title="Mark Helpful">
+            <span class="glyphicon glyphicon-thumbs-up" data-toggle="modal" data-target="#feedback-modal" id="thumbs-up-feedback-@interventionId"></span>
+        </a>
+        <a href="#" data-toggle="tooltip" title="Mark NOT Helpful">
+            <span class="glyphicon glyphicon-thumbs-down" data-toggle="modal" data-target="#feedback-modal" id="thumbs-down-feedback-@interventionId"></span>
+        </a>
+        <input id="feedback-prompt-text-prefix-@interventionId" type="hidden" value="@text0" style="display:none;" />
+        <input id="feedback-prompt-text-@interventionId" type="hidden" value="@text" style="display:none;" />
+    }
+    else
+    {
+        <span style="font-size: medium;" id="feedback-prompt">Was this page helpful?</span>
+        <a href="#" data-toggle="tooltip" title="Mark Helpful">
+            <span class="glyphicon glyphicon-thumbs-up" data-toggle="modal" data-target="#feedback-modal" id="thumbs-up-feedback"></span>
+        </a>
+        <a href="#" data-toggle="tooltip" title="Mark NOT Helpful">
+            <span class="glyphicon glyphicon-thumbs-down" data-toggle="modal" data-target="#feedback-modal" id="thumbs-down-feedback"></span>
+        </a>
+    }
+
+</span>
+<input id="mark-clicked" type="hidden" value="" style="display:none;" />
+

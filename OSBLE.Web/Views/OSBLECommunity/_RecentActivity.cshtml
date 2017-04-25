@@ -1,0 +1,73 @@
+﻿@using System.Globalization
+@model List<OSBLE.Models.ViewModels.OSBLECommunityRecentActivtyViewModel>
+
+<div id="RecentActivity">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                Recent Activty
+            </h3>
+        </div>
+        <div class="panel-body activity-header">
+            <div class="activity-panel-body-left">
+                Time
+            </div>
+            <div class="activity-panel-body-center">
+                Activity
+            </div>
+            <div class="activity-panel-body-right">
+                Details
+            </div>
+        </div>
+
+        @foreach (var userEvent in Model)
+        {
+            <div class="panel-body">
+                <div class="activity-panel-body-left">
+                    @* TODO: need to format this to convert to course time, currently still UTC *@
+                    @userEvent.EventDate.ToString(CultureInfo.InvariantCulture)
+                </div>
+                <div class="activity-panel-body-center">
+                    @{ string firstName = userEvent.User.Keys.First();}
+                    <a href="@Url.Action("Index", "Profile", new { id = userEvent.User.Values.First(), area ="" })" target="_blank">
+                        @firstName
+                    </a>
+                    @*TODO: redo the text*@
+                    @switch (userEvent.Event.Keys.First())
+                    {
+                        case "AskForHelpEvent":
+                            @: asked for help.
+                                break;
+                        case "ExceptionEvent":
+                        @: had a runtime exception.
+                                break;
+                        case "FeedPostEvent":
+                        @: made a post.
+                                break;
+                        case "HelpfulMarkGivenEvent":
+                        @: marked a comment helpful.
+                                break;
+                        case "LogCommentEvent":
+                        @: replied to a post.
+                                break;
+                        case "SubmitEvent":
+                        @: submitted an assignment.
+                                break;
+                        default:
+                        @: [unknown activity]
+                                break;
+                    }
+                </div>
+                <div class="activity-panel-body-right">
+                    <a title="Details" href="@Url.Action("Details", "Feed", new { id = userEvent.Event.Values.First() })" target="_blank">@Helpers.Info()</a>
+                </div>
+            </div>
+        }
+
+        <div class="panel-footer">
+            @* TODO: Make the # populate based on settings *@
+            Latest 20 activites
+        </div>
+    </div>
+</div>
+

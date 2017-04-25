@@ -1,0 +1,144 @@
+﻿@model FeedItem
+       
+@using System.Diagnostics.Eventing.Reader
+@using System.Runtime.Remoting.Channels
+@using OSBLE.Models.AbstractCourses
+@using OSBLE.Models.HomePage;
+@using OSBLE.Models.Courses;
+@using OSBLE.Models.Users
+@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+@{
+    AbstractCourse course = new Course();
+    
+    var FPEvent = Model.Event as FeedPostEvent;
+    
+    if (FPEvent != null)
+    {
+        course = FPEvent.GetCourseUser().AbstractCourse;
+    }
+}
+
+<script type="text/javascript">
+
+    function RemainingCharsReply(id) {
+        var remainingReply = $('#MaxContentChars').val() - $('#dp_replybox_content_' + id).val().length;
+        $('#remCharsReply').val("(" + remainingReply + ") Characters left");
+    }
+
+    //refreshes the count of how many charecters you can input
+    function refreshCount() {
+        $('body').css('cursor', 'wait');
+        $('#remCharsReply').val("(" + $('#MaxContentChars').val() + ") Characters left");
+    }
+
+</script>
+<div class="dp_post" id="dp_post_@(Model.Event.EventId)">
+            <div class="dp_post_header">
+                @* Reply Only *@
+        @if (Model.Event is FeedPostEvent)
+                {
+                    <script>
+                        @* Updates maximum reply for this post so new replies can return any interim posts. *@
+                        $(function() {
+                    $('#latest_reply_@(Model.Event.SenderId)').val(Math.max($('#latest_reply_@(Model.Event.SenderId)').val(), @(Model.Event.SenderId)));
+                        });
+                    </script>
+                }
+
+        @* Profile Picture For Main post *@
+        @if(Model.Event.ShowProfilePicture && Model.Event is FeedPostEvent){
+            <img src="@Url.Action("Picture", "User", new {id = Model.Event.SenderId, size = 52})"
+                    alt="Picture of @((FeedPostEvent)Model.Event).GetCourseUser().DisplayName(ViewBag.ActiveCourseUser.AbstractRoleID)"
+                    class="profile_picture" />
+                }
+        else if (Model.Event.ShowProfilePicture == false)
+                {
+                    @Helpers.DefaultProfilePicture();
+                }
+
+                @* Show course tag if viewing posts for all courses *@
+
+                @if (!ViewBag.DashboardSingleCourseMode)
+                {
+                    <span class="dp_course">@Helpers.CourseTag(course)</span>
+                }
+                
+                @* Poster's Name *@
+                
+        @Helpers.DisplayNameForFeedPost((FeedPostEvent)Model.Event)
+
+                @* Mail and Delete Buttons *@
+                <span class="dp_tools">
+        @if (Model.Event.CanMail)
+                {
+            <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { id = Model.Event.SenderId })">@Helpers.MailButton()</a>
+                }
+        @if (Model.Event.CanDelete)
+        {
+            string deleteAction = "";
+            string deleteConfirm = "";
+            if (Model.Event is FeedPostEvent)
+            {
+                deleteAction = "DeleteFeedPost";
+                deleteConfirm = "Are you sure you want to delete this post and all its replies?";
+            }
+            else if (Model.Event is LogCommentEvent)
+            {
+                deleteAction = "DeleteLogComment";
+                deleteConfirm = "Are you sure you want to delete this reply?";
+            }
+
+                <form action="@Url.Action(deleteAction)"
+                      style="display: inline;"
+                      data-ajax="true"
+                      data-ajax-success="$('#dp_post_@(Model.Event.EventId)').hide('blind',{},'slow',function(){$(this).remove();})"
+                      data-ajax-confirm="@deleteConfirm"
+                      method="post">
+                    <input type="hidden" name="id" value="@Model.Event.EventId" />
+                    @*@Helpers.DeleteSubmit("Delete This Dashboard Post")*@
+                    <a title="Delete This Dashboard Post" onclick="$(this).parents('form:first').submit();"><span class="glyphicon glyphicon-remove"></span></a>
+                </form>
+            
+                    @*<form action="@Url.Action(deleteAction)"
+                        style="display: inline;"
+                        data-ajax="true"
+                data-ajax-success="$('#dp_post_@(Model.Event.EventId)').hide('blind',{},'slow',function(){$(this).remove();})"
+                        data-ajax-confirm="@deleteConfirm"
+                        method="post">
+                <input type="hidden" name="ID" value="@Model.Event.SenderId" />
+                @Helpers.DeleteSubmit("Delete This Dashboard Post")
+                    </form>*@
+                }
+        </div>
+                <br />
+                @* Posting Date *@
+
+                 <time 
+        datetime="@Helpers.DateAsUnixTime(Model.Event.EventDate)" 
+        data-original-date="@Helpers.RawDate(Model.Event.EventDate)" 
+                data-date-format="MM/DD/YYYY hh:mm A">
+                @Model.Event.EventDate.ToShortDateString() @Model.Event.EventDate.ToShortTimeString() (UTC)
+                     </time>
+
+            @* Post Content *@
+            <div class="dp_content">
+             @{
+                string content = HttpUtility.HtmlDecode(Helpers.Linkify((Model.Event as FeedPostEvent).Comment).ToHtmlString());
+                 content = content.Replace("\n", "<br />");
+                    }
+                    @Html.Raw(content)
+            </div>
+            @* Post Replies *@
+                <div class="dp_replies">
+            <div id='dp_replies_for_@Model.Event.SenderId'>
+                @if (FPEvent != null && FPEvent.CanReply)
+                {
+                    foreach (LogCommentEvent lce in (Model.Comments))
+                        {
+                        Html.Partial("_Replies", lce);
+                    }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>

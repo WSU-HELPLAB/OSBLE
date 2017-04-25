@@ -1,0 +1,30 @@
+﻿@{
+    ViewBag.Title = "Import Error";
+    string redirectUrl = "";
+    if (ViewBag.ErrorLocation != null && ViewBag.ErrorLocation == "ImportIndividual")
+    {
+        redirectUrl = "../Rubric?assignmentId=" + Session["AssignmentId"] + "&cuId=" + Session["CuId"];
+    }
+    else 
+    {
+        redirectUrl = "../Rubric/ViewAsUneditable?assignmentId=" + Session["AssignmentId"];
+    }
+}
+
+<h2>Import Rubric</h2>
+
+<p class="error">@ViewBag.Error</p>
+
+<ol class="errorList">
+    @{
+        foreach(string error in ViewBag.errorMessages)
+        {
+            <li>@error</li>
+        }
+    }
+</ol>
+
+<div>
+    <br />
+    <a href="@redirectUrl">Back to Rubric</a>
+</div>

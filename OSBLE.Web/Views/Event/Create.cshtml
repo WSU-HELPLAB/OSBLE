@@ -1,0 +1,119 @@
+﻿@model OSBLE.Models.HomePage.Event
+@using OSBLE.Models
+@using OSBLE.Utility;
+@{
+    ViewBag.Title = "Create Event";
+}
+<h2>
+    Create Event</h2>
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/areas/AssignmentWizard/Content/js/basics.js")" type="text/javascript"></script>
+
+@using (Ajax.BeginForm("Create", "Event", new AjaxOptions { HttpMethod = "POST", OnBegin = "begin", OnComplete = "completed"}))
+{
+    @Html.ValidationSummary()
+
+    <div class="editor-label">
+        @Html.LabelFor(model => model.Title)
+    </div>
+    <div class="editor-field">
+        @Html.EditorFor(model => model.Title)
+        @Html.ValidationMessageFor(model => model.Title)
+    </div>
+    
+    <input id="utc-offset" name="utc-offset"  value="" type="hidden"/>
+    
+    <table>
+        <tr>
+            <td class="editor-label">@Html.LabelFor(model => model.StartDate)
+            </td>
+            <td class="editor-label">@Html.LabelFor(model => model.StartTime)
+            </td>
+        </tr>
+        <tr>
+            <td class="editor-field">@Html.EditorFor(model => model.StartDate)
+            </td>
+            <td class="editor-field">@Html.EditorFor(model => model.StartTime)
+            </td>
+        </tr>
+        <tr>
+            <td>@Html.ValidationMessageFor(model => model.StartDate)
+            </td>
+            <td>@Html.ValidationMessageFor(model => model.StartTime)
+            </td>
+        </tr>
+        <tr>
+            <td class="editor-label">@Html.LabelFor(model => model.EndDate)
+            </td>
+            <td class="editor-label">@Html.LabelFor(model => model.EndTime)
+            </td>
+        </tr>
+        <tr>
+            <td class="editor-field">@Html.EditorFor(model => model.EndDate)
+            </td>
+            <td class="editor-field">@Html.EditorFor(model => model.EndTime)
+            </td>
+        </tr>
+        <tr>
+            <td>@Html.ValidationMessageFor(model => model.EndDate)
+            </td>
+            <td>@Html.ValidationMessageFor(model => model.EndTime)
+            </td>
+        </tr>
+        <tr>
+            @{
+    if (Request.Params["start"] != null)
+    {
+                    <td colspan="2"><input type="checkbox" name="IncludeEndDate" id="IncludeEndDate" /><label for="IncludeEndDate">Show end date and time in calendar</label></td>
+    }
+    else
+    {
+                    <td colspan="2"><input type="checkbox" checked="checked" name="IncludeEndDate" id="IncludeEndDate" /><label for="IncludeEndDate">Show end date and time in calendar</label></td>
+    }
+            }
+        </tr>
+    </table>
+    <br />
+    <div class="editor-label">
+        @Html.LabelFor(model => model.Description)
+        @Helpers.CreateToolTip(ToolTips.EventDescription)
+    </div>
+    <div class="editor-field">
+        @Html.TextAreaFor(model => model.Description, new { rows = 5, cols = 50 })
+        @Html.ValidationMessageFor(model => model.Description)
+    </div>
+    
+    <p>
+        <table cellspacing="10" cellpadding="10">
+            <tr>
+                <td>
+                    <input type="submit" value="Create Event" id="createEvent" />
+                </td><td></td>
+                <td>
+                    <img src="@Url.Content("~/Areas/Analytics/Content/loading.gif")" class="spinner-img" hidden="hidden" id="loadingSpinner"/>
+                </td>
+            </tr>
+        </table>
+    </p>
+}
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+<script type="text/javascript">
+    function begin() {
+        $("#loadingSpinner").prop("hidden", false);
+        $("#createEvent").addClass("disabled");
+        $("#createEvent").attr("disabled", "disabled");
+    }
+    function completed() {
+        window.location.href = '.'; // Redirect to /Events page
+    }
+</script>
+
+<style type="text/css">
+    .disabled {
+        opacity : 0.5;
+    }
+</style>

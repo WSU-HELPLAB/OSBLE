@@ -1,0 +1,167 @@
+﻿@using OSBLE.Models
+@using OSBLE.Models.Courses
+@using OSBLE.Models.HomePage
+
+
+
+<script type="text/javascript">
+
+    function RemainingChars() {
+        var remaining =  $('#MaxContentChars').val() - $('#ActivityFeed').val().length;
+        $('#remChars').val("(" + remaining + ") Characters left");
+
+        // disable posting if no characters have been typed
+        if ($('#ActivityFeed').val().length == 0)
+        {
+            $('#btn_post_active').prop("disabled", true);
+            $('#btn_post_all').prop("disabled", true);
+        }
+        else
+        {
+            $('#btn_post_active').prop("disabled", false);
+            $('#btn_post_all').prop("disabled", false);
+        }
+    }
+
+    //we need to update the activity feed timestamps when it's done loading
+    $(document).ready(function () {
+        @*$.ajax({
+            type: "GET",
+            url: '@Url.Action("UpdateViewbag", "Home")',
+            success: function (result) {
+                //alert("success!");
+            },
+            error: function (result) {
+                //TODO: handle error...
+                //alert("error");
+            }
+        });*@
+        parseDates();
+        RemainingChars();
+    });
+
+    function completed() {
+        //update to show the new posts
+        location.reload();
+    }
+
+</script>
+
+<div id="activity_new_post">
+    @if (ViewBag.ActiveCourse.AbstractRole != null)
+    {
+        if ((ViewBag.ActiveCourse.AbstractRole.CanGrade == true) || (ViewBag.ActiveCourse.AbstractRole.Anonymized) || ((ViewBag.ActiveCourse.AbstractCourse is Course) && (ViewBag.ActiveCourse.AbstractCourse.AllowDashboardPosts) == true))
+        {
+            <input type="hidden" id="MaxContentChars" value="@ViewBag.MaxActivityFeedLength"/>
+
+            if (ViewBag.Error != null)
+            {
+                <h3 class="error">@ViewBag.Error</h3>
+            }
+            //using (Html.BeginForm("NewPost", "Home", FormMethod.Post))
+            using (Ajax.BeginForm("NewPost", "Home",
+                new AjaxOptions
+                {
+                    HttpMethod = "POST",
+                    OnComplete = "completed",
+
+                }))
+            {
+                <div class="form-group">
+                    <input id="remChars" name="remainingChars" readonly="readonly" type="text" value="(@ViewBag.MaxActivityFeedLength) Characters left" /><br />
+                    @{ string defaultText = "Enter new feed post here...\nUse @ and # to tag users or topics"; }
+                    <textarea id="ActivityFeed" class="form-control" name="Content" rows="4" placeholder="@defaultText"
+                              onkeyup="RemainingChars();" onkeydown="RemainingChars();"></textarea>
+                </div>
+
+                <input type="submit" id="btn_post_active" class="btn btn-default" name="post_active" value="Post to @Helpers.CourseTag(ViewBag.ActiveCourse.AbstractCourse)" />
+
+                if (ViewBag.IsInstructor)
+                {
+                    <input type="submit" id="btn_post_all" class="btn btn-default" name="post_all" value="Post to All Courses I Teach" onclick="return confirm('Post this message to all your taught courses?');" />
+                    <label class="checkbox-inline"><input type="checkbox" value="True" name="send_email" /> Email to Class</label>
+                }
+
+                if (ViewBag.IsLeader)
+                {
+                    <label class="checkbox-inline"><input type="checkbox" value="True" name="send_email" /> Email to Community</label>
+                }
+            }
+        }
+    }
+</div>
+
+<div class="dashboard_mode">
+    @using (Html.BeginForm("SetDashboardMode", "Home", FormMethod.Post, new { id = "set_dashboard" }))
+    {
+        <label class="radio-inline">
+            <input type="radio" name="mode" value="false" @if (!ViewBag.DashboardSingleCourseMode) { <text> checked="checked" </text> } /> 
+            Show all courses/communities
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="mode" value="true" @if (ViewBag.DashboardSingleCourseMode) { <text> checked="checked" </text> } />
+            Show only <em>@Helpers.CourseTag(ViewBag.ActiveCourse.AbstractCourse)</em>
+        </label>
+    }
+</div>
+<script type="text/javascript">
+    $("input[name='mode']").change(function () {
+        $('#set_dashboard').submit();
+    });
+</script>
+
+
+<div id="dp_posts" class="panel-group">
+    @foreach (DashboardPost dp in ViewBag.DashboardPosts)
+    {
+        @Html.Partial("_DashboardPost", dp);
+    }
+</div>
+
+
+@* TODO: Make this into a general purpose pagination helper? *@
+@if (ViewBag.StartPost > 0 || ViewBag.ShowAll)
+{
+    int newStart = Math.Max(ViewBag.StartPost - ViewBag.PostsPerPage, 0);
+
+    @Html.ActionLink("<< Newest Posts", "Index", new { startPost = 0 })
+
+    if (newStart != 0)
+    {
+        <text>&nbsp;&nbsp;</text>
+        @Html.ActionLink("< Newer Posts", "Index", new { startPost = Math.Max(ViewBag.StartPost - ViewBag.PostsPerPage, 0) })
+    }
+}
+
+@if ((ViewBag.StartPost + ViewBag.PostsPerPage) < ViewBag.DashboardPostCount)
+{
+    int last;
+    if (ViewBag.DashboardPostCount % ViewBag.PostsPerPage == 0)
+    {
+        last = ViewBag.DashboardPostCount - ViewBag.PostsPerPage;
+    }
+    else
+    {
+        last = ViewBag.DashboardPostCount - ViewBag.DashboardPostCount % ViewBag.PostsPerPage;
+    }
+
+    int newEnd = Math.Max(last, ViewBag.StartPost + ViewBag.PostsPerPage);
+
+    int older = ViewBag.StartPost + ViewBag.PostsPerPage;
+
+    if (older < newEnd)
+    {
+        <text>&nbsp;&nbsp;</text>
+        @Html.ActionLink("Older Posts >", "Index", new { startPost = older })
+    }
+    <text>&nbsp;&nbsp;</text>
+    @Html.ActionLink("Oldest Posts >>", "Index", new { startPost = newEnd })
+    if (!(Convert.ToBoolean(ViewBag.ShowAll)))
+    {
+        <text>&nbsp;&nbsp;</text>
+        @Html.ActionLink("All Posts >>", "Index", new { showAll = true })
+    }
+
+}
+
+

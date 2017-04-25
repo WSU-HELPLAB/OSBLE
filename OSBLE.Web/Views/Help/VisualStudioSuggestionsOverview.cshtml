@@ -1,0 +1,53 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "OSBLE+ Suggestion Visual Studio Components";
+}
+
+<h1>OSBLE+ Suggestion Visual Studio Components</h1>
+
+<p>
+    The OSBLE+ Visual Studio plugin now includes components for the "OSBLE+ Suggestion Dashboard" (see images below).
+</p>
+<img src="@Url.Content("~/Content/images/help/visual-studio-suggestion-components.png")" alt="Visual Studio Components Highlighted" />
+
+<p>    
+    <ol>
+        <li>
+            Click the "?" on the OSBLE+ toolbar to manually show the OSBLE+ Suggestions window
+        </li>
+        <li>
+            The OSBLE+ Suggestions window contains:
+            <ul>
+                <li>
+                    The @Html.ActionLink("Suggestions Dashboard", "SuggestionsDashboard")
+                </li>
+                <li>
+                    A list of OSBLE+ Suggestions (see below)
+                </li>
+            </ul>
+        </li>        
+    </ol>
+</p>
+
+<p>
+    <h2>OSBLE+ Suggestion components</h2>
+    <img src="@Url.Content("~/Content/images/help/suggestions-general-highlighted.png")" alt="OSBLE+ Suggestion Components Highlighted" />
+    <br />   An OSBLE+ suggestion contains the following components:    
+    <ol>
+        <li>
+            A title
+        </li>
+        <li>
+            A dismiss button
+        </li>
+        <li>
+            A suggestion description
+        </li>
+        <li>
+            An action link. Clicking the action link will open the suggestion in the main window (e.g. see below)
+        </li>
+    </ol>
+</p>
+<img src="@Url.Content("~/Content/images/help/visual-studio-suggestion-main-window.png")" alt="Visual Studio suggestion in main window" />
+
+<hr width="90%">

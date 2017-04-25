@@ -1,0 +1,92 @@
+﻿@model OSBLE.Models.Intervention.InterventionsList
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".dismiss-intervention").on('click', function () {
+            var id = $(this).parent().parent().attr('id');
+            var interventionId = id.split("-");
+            interventionId = interventionId[1];
+            //dismiss in the database
+
+            $.ajax({
+                url: "/Intervention/DismissIntervention",
+                data: { interventionId: interventionId },
+                //dataType: "json",
+                method: "POST",
+                success: function (result) {
+                    //dismiss if db change successful
+                    if (result == "True") {
+                        $("#" + id).fadeOut(300);
+                    }
+                },
+                error: function (result) {
+                }
+            });
+        });
+    });
+</script>
+
+<style type="text/css">
+    .suggestions-icons {
+        color: white;
+        margin-left: 5px;
+        margin-right: 5px;
+    }
+    .suggestion {
+        margin-bottom: 5px;
+        margin-left: 5px;
+        margin-right: 5px;   
+        margin-top: 2px;     
+    }
+
+    .intervention-info {
+        float: left;
+        margin-left: 5px;
+    }
+
+    .dismiss-intervention {
+        float: right;
+        margin-right: 5px;
+        cursor: pointer;
+    }
+
+    .suggestion-title {
+        text-align: center;
+    }
+
+    .brackets {
+        color: green;
+        font-weight: bold;
+    }
+
+    .suggestion {
+        border: 1px solid rgba(0,0,0,0.1);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+    }
+
+</style>
+
+@foreach (var interventionItem in Model.InterventionItemList) //Populate Suggestion window with interventions.
+{
+    @* TEMPLATE ASK FOR HELP*@
+    <div class="panel panel-primary suggestion" id="intervention-@interventionItem.Id">
+        <div class="panel-heading suggestion-title" style="background-color: #81add4;">
+            <span class="glyphicon glyphicon-@interventionItem.Icon1 intervention-info"></span><span class="glyphicon glyphicon-@interventionItem.Icon2 intervention-info"></span>
+            @interventionItem.Title
+            <span class="glyphicon glyphicon-remove dismiss-intervention" data-toggle="tooltip" title="Dismiss Suggestion"></span>
+        </div>
+        <div class="panel-body suggestion-body">
+            <div class="left">
+                @if (interventionItem.ContentFirst)
+                {
+                    @interventionItem.ListItemContent <span class="brackets">&lt;&lt;</span> <a href="@interventionItem.Link">@interventionItem.LinkText</a>  <span class="brackets">&gt;&gt;</span>
+                }
+                else
+                {
+                    <span class="brackets">&lt;&lt;</span> <a href="@interventionItem.Link">@interventionItem.LinkText</a>  <span class="brackets">&gt;&gt;</span> @interventionItem.ListItemContent
+                }
+            </div>
+        </div>
+    </div>
+    @* END TEMPLATE *@
+}

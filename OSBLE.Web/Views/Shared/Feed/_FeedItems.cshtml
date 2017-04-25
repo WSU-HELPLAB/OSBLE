@@ -1,0 +1,164 @@
+﻿@using OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
+@using OSBLE.Models.Users
+@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+@using OSBLE.Models.Courses;
+@using OSBLE.Models;
+@using OSBLEPlus.Logic.Utility
+@{
+    bool isComment = ViewBag.IsComment ?? false;
+    bool showDetails = ViewBag.ShowDetails ?? false;
+    int genericComponent = (int)VsComponent.GenericComponent;
+    string detailsLink = ViewBag.DetailsLink ?? "'/Feed/Details/' + idString";
+    detailsLink += "+'?component='+" + genericComponent;
+}
+
+<div data-bind="if: show && vm.InEventVisibleToList(options.eventVisibleTo)">
+    @* prevents deleted items from displaying *@
+    <article data-bind="attr: { id: 'feed-item-' + eventId }, data: {id: eventId}" class="dp_post panel panel-default">
+
+        @* Header Content *@
+        <div class="dp_post_header panel-heading">
+            @* Display Picture *@
+            <div data-bind="if: options.showPicture">
+                <img data-bind="attr: {src: '/user/' + senderId + '/Picture?size=52'}" class="profile_picture" title="profile image" alt="profile image" />
+            </div>
+
+            @* New replies & post notifications *@
+            @if (!isComment)
+            {
+                <div class="badge new-reply-badge" style="display:none">New Replies</div>
+                <div class="badge new-post-badge" style="display:none" data-bind="click: HideNewPostBadge(eventId)">New</div>
+            }
+            
+            @* Button Controls *@
+            <div class="dp_tools">
+                
+                @* Mark as Helpful Button *@
+                @if (isComment)
+                {
+                    <span>+</span>
+                    <span data-bind="text: numberHelpfulMarks"></span>
+
+                    @* Don't allow self upvoting *@
+                    <div data-bind="if: options.canVote">
+                        <a title="Mark Comment as Helpful" data-bind="click: MarkCommentHelpful, css: { 'icon-highlight' : highlightMark() == true }">
+                            <span class="glyphicon glyphicon-thumbs-up"></span>
+                        </a>
+                    </div>
+                }
+
+                @* Mail Button *@
+                <div data-bind="if: options.canMail && !options.hideMail">
+                    <a title="Mail This User" data-bind="attr: {href: '/Mail/CreateUser/' + senderId + '?component=' + @genericComponent}"><span class="glyphicon glyphicon-envelope"></span></a>
+                </div>
+
+                @* Delete Button *@
+                <div data-bind="if: options.canDelete">
+                    <a title="Delete this post" data-bind="click: Delete"><span class="glyphicon glyphicon-trash"></span></a>
+                </div>
+
+                @* Edit Button *@
+                <div data-bind="if: options.canEdit">
+                    <a title="Edit this post" data-bind="click: ShowEditBox, attr: {id: 'btn-edit-' + eventId}"><span class="glyphicon glyphicon-pencil"></span></a>
+                </div>
+            </div>
+
+            @* Display Name & Date/Time *@
+            <!-- ko ifnot: options.isAnonymous -->
+            <a class="display_name" data-bind=" text: senderName, attr: {href: '/Profile/Index/' + senderId}"></a>
+            <span data-bind="text: vm.GetRole(eventId, role)" style="color: #074974; font-style: italic; font-size: small;"></span>
+            <!-- /ko -->
+            <!-- ko if: options.isAnonymous -->
+            <span class="display_name" style="color: #074974;" data-bind=" text: senderName"></span>            
+            <!-- /ko -->
+            
+            <span class="feed-item-date" data-bind="text: timeString()"></span>
+
+            @if (!isComment)
+            {
+                @*Post visibility area*@
+                <a 
+                   data-bind="attr: { title: 'Post Visibility: (' + vm.EventVisibilityGroups(options.eventVisibilityGroups) + ')' +  buildTitleOutput(options.eventVisibleTo, vm.namesAndIds) }, click:  (vm.EventVisibilityGroups(options.eventVisibilityGroups) != 'EVERYONE') ? ShowUserVisibilityDialog : '' "
+                   style=" padding-left: 5px; padding-right: 5px;">
+                    <!-- ko switch: options.eventVisibilityGroups -->
+                    <!-- ko case: $default -->
+                    <span class="glyphicon glyphicon-globe"></span>
+                    <!-- /ko -->
+                    <!-- ko case: 'Selected Users' -->
+                    <span data-bind=" " class=" glyphicon glyphicon-user visibility-clickable"></span>
+                    <!-- /ko -->
+                    <!-- ko case: 'instructors' -->
+                    <span class="glyphicon glyphicon-education visibility-clickable"></span>
+                    <!-- /ko -->
+                    <!-- ko case: 'tas' -->
+                    <span class="glyphicon glyphicon-education visibility-clickable"></span>
+                    <!-- /ko -->
+                    <!-- ko case: 'instructors,tas' -->
+                    <span class="glyphicon glyphicon-education visibility-clickable"></span>
+                    <!-- /ko -->
+                    <!-- ko case: 'section' -->
+                    <span class="glyphicon glyphicon-th-list visibility-clickable"></span>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                </a>
+            }
+        </div>
+
+        @* Body Content *@
+        <div class="dp_content" data-bind="html: htmlContent().autoLink(), attr: {id: 'feed-item-content-' + eventId}">
+            @* Content here will be by knockout *@
+        </div>
+
+        @* Edit Content Form *@
+        <div data-bind="if: options.canEdit">
+            <form class="feed-edit-form" data-bind="attr: {id: 'feed-edit-' + eventId}">
+                <textarea class="form-control" data-bind="attr: {id: 'feed-edit-textbox-' + eventId}"></textarea>
+                <input name="response-submit" class="btn btn-default btn-sm" type="button" value="Save" data-bind="click: Edit, attr: {id: 'feed-edit-submit-' + eventId}" />
+                <input name="response-cancel" class="btn btn-default btn-sm" type="reset" value="Cancel" data-bind="click: HideEditBox, attr: {id: 'feed-edit-cancel-' + eventId}" />
+            </form>
+        </div>
+
+        @if (!isComment)
+        {
+            @* Comments: Recursively render this view for comments. Comments are stored in the Knockout ViewModel as the same class as
+                normal events, so it will parse the values for the comment objs when rendering this recursive partial view *@
+            ViewBag.IsComment = true;
+            <div class="feed-item-comments panel-group" data-bind="attr: {id: 'feed-item-comments-' + eventId}, foreach: comments()">
+                @Html.Partial("Feed/_FeedItems")
+            </div>
+
+            @* Footer Content *@
+            <div class="feed-item-footer">
+
+                @* Reply Form (Hidden by default. Only shows when user clicks reply) *@
+                <form class="feed-reply-form" data-bind="attr: {id: 'feed-reply-' + eventId}">
+                    @{ string defaultText = "Say something...\nUse @ and # to tag users or topics"; }
+                    <textarea class="form-control feed-reply-textbox" placeholder="@defaultText" data-bind="attr: {id: 'feed-reply-textbox-' + eventId}"></textarea>
+                    <input name="response-submit" class="btn btn-default btn-sm" type="button" value="Post Reply" data-bind="click: AddComment, attr: {id: 'feed-reply-submit-' + eventId}" />
+                    <input name="response-cancel" class="btn btn-default btn-sm" type="reset" value="Cancel" data-bind="click: HideReplyBox, attr: {id: 'feed-reply-cancel-' + eventId}" />
+                    <label class="checkbox-inline"><input type="checkbox" value="True" data-bind="attr: {name: 'make_reply_anonymous_' + eventId}" /><span data-bind="attr: {id: 'make_reply_anonymous_' + eventId}">Make Reply Anonymous</span></label>
+                </form>
+
+                @* Footer Links *@
+                <ul class="feed-item-links">
+                    @* Don't show "details" or "View Conversation link if we're on the details page *@
+                    @if (!showDetails)
+                    {
+                        @* View Conversation Link *@
+                        <li>
+                            <a data-bind="attr: {id: 'expand-comments-' + eventId}, click: expandComments" class="anchor-pointer" >
+                                <span data-bind="attr: {id: 'expand-comments-text-' + eventId}">View</span> Replies (<span data-bind="text: comments().length"></span>)
+                            </a>
+                        </li>
+
+                        @* Details Link *@
+                        <li><a data-bind="attr: {href: @detailsLink}, click: LogDetailsActivity">Details</a></li>
+                    }
+
+                    @* Reply Link *@
+                    <li><a data-bind="visible: !isHelpfulMark, attr: {id: 'btn-reply-' + eventId}, click: ShowReplyBox">Reply</a></li>
+                </ul>
+            </div>
+        }
+    </article>
+</div>

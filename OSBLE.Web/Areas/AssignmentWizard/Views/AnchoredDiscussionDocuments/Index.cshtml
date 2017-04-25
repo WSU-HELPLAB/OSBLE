@@ -1,0 +1,78 @@
+﻿@using OSBLE.Models.Assignments;
+@using OSBLE.Models;
+@model Assignment
+
+@{
+    int assignmentID = Model.ID;
+    string previousDeliverables = "false";
+    if (Model.Deliverables.Count > 1)
+    {
+        previousDeliverables = "true";
+        HtmlHelper.ClientValidationEnabled = false;
+    }   
+}
+
+@Html.HiddenFor(m => m.ID)
+
+<h4>Select Documents To Upload For Review</h4>
+
+<div id="file_submission">
+    <table>
+        <tr>
+            @if(Model.Deliverables.Count == 0)
+            { 
+            <td>
+                <strong>@Html.Label("Upload Documents: ")</strong>
+            </td>
+            }
+            <td>                      
+                
+                @if (Model.Deliverables.Count > 0)
+                {
+                    
+                    <table>
+                        <tr>
+                            <th>@Html.Label("Uploaded Documents:")</th>
+                            <th>@Html.Label("File Name")</th>
+                        </tr>
+                        @foreach (Deliverable deliverable in Model.Deliverables)
+                        {
+                        <tr>
+                            <td></td>
+                            <td>
+                                @deliverable.Name
+                            </td>                            
+                        </tr>
+                        }
+                        <tr><td><br /></td></tr>
+                        <tr>
+                            <td>Upload More Documents:</td>
+                            <td><input type="file" id="anchoredFilesUpload" name="files" multiple /></td>
+                        </tr>
+                    </table>
+                }
+                else
+                {
+                    <input type="file" id="anchoredFilesUpload" data-val="true" data-val-required="At least one review document is required to continue." name="files" multiple />
+                    @Html.ValidationMessage("files")
+                }
+                
+            </td>
+        </tr>
+    </table>
+</div>
+
+<script>
+    $(document).ready(function () {
+        
+        if(@previousDeliverables)
+        {            
+            $("#anchoredFilesUpload").removeAttr("data-val");
+            $("#anchoredFilesUpload").removeAttr("data-val-required");
+            $(".field-validation-error").remove();
+            $(".field-validation-valid").remove();
+            $("#anchoredFilesUpload").rules("remove");
+        }
+
+    });
+</script>

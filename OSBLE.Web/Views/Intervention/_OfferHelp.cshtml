@@ -1,0 +1,181 @@
+﻿@model OSBLE.Models.Intervention.AvailableDetailsViewModel
+
+@{
+    var activityFeedUrl = OSBLEPlus.Logic.Utility.StringConstants.WebClientRoot + "Feed/OSBIDE?component=7";
+
+    string availableUntil = Model.CurrentUserStatus != null ? String.Format("{0:t}", Model.CurrentUserStatus.AvailableEndTime) : "";
+    string availableUntilDate = Model.CurrentUserStatus != null ? String.Format("{0:f}", Model.CurrentUserStatus.AvailableEndTime) : "";
+    if (availableUntilDate == "")
+    {
+        availableUntilDate = String.Format("{0:f}", DateTime.Now);
+    }
+    string currentUser = availableUntil == "" ? ViewBag.CurrentUserName : Model.AvailableUsers.Where(u => u.Key == Model.CurrentUserStatus.UserProfileId).FirstOrDefault().Value;
+    string currentUserStatus = availableUntil == "" ? "" : Model.CurrentUserStatus.StatusMessage;
+    string currentUserProfileId = availableUntil == "" ? ViewBag.CurrentUserProfileId.ToString() : Model.CurrentUserStatus.UserProfileId.ToString();
+}
+
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>OSBLE+ Suggestion</title>
+
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/bootstrap-3.3.5/css/bootstrap.min.css")" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-2.0.1.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/bootstrap-3.3.5/js/bootstrap.min.js")"></script>
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery-ui.css")" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-ui-1.10.4.min.js")"></script>
+
+    @* highlight.js code syntax highlighting block*@
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/themes/highlight/vs.css")" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/highlight.pack.js")"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    @* highlight.js code syntax highlighting block*@
+
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/interventions.css")?version=1.0" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/Interventions.js")?version=1.01"></script>
+
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/jquery.timepicker.css")" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.timepicker.js")"></script>
+
+    @Html.Partial("_UserHashtagTagScript")
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            //set the status box width to the size of the placeholder text
+            var input = document.querySelectorAll('input#status-message-placeholder');
+            input[0].setAttribute('size', input[0].getAttribute('placeholder').length);
+
+            //set the chosen value if it has been loaded
+            $("#chosen-time").val($(".timepicker").val());
+
+            //initialize calendar date
+            $("#datepicker").datepicker({ defaultDate: new Date("@availableUntilDate") });
+
+            //initialize time picker
+            $('.timepicker').timepicker({
+                timeFormat: 'h:mm p',
+                interval: 30,
+                minTime: '0',
+                maxTime: '23',
+                //defaultTime: '17',
+                startTime: '24',
+                dynamic: true,
+                dropdown: true,
+                scrollbar: true,
+                change: function (time) {
+                    if (time != false) {
+                        // the input field
+                        var element = $(this), text;
+                        // get access to this Timepicker instance
+                        var timepicker = element.timepicker();
+                        text = timepicker.format(time);
+                        //set hidden input value
+                        $("#chosen-time").val(text);
+                    }
+                }
+            });
+
+        });
+    </script>
+
+</head>
+
+<body class="intervention-body">
+    <div>
+        <div class="panel panel-primary">
+            <div class="panel-heading intervention-heading">
+                <span class="left">
+                    <a href="/" style="color: #FFFFFF; text-decoration: none;">
+                        <span class="glyphicon glyphicon-circle-arrow-left"></span>
+                        <span class="glyphicon glyphicon-dashboard"></span>
+                    </a>
+                </span>
+                Help out your classmates!
+            </div>
+            <div class="panel-body">
+                @Html.Partial("_UserFeedbackPrompt", new ViewDataDictionary { { "interventionId", Model.Intervention.Id } })
+                @Html.Partial("_CourseSelect")
+                <h4>You have successfully submitted your assignment early! <em>Some of your classmates'</em> programs have encountered errors...</h4>
+                <h5>Would you like to offer your help?</h5>
+                <div>
+                    <div class="left">
+                        <h4>Let your classmates know:</h4>
+                    </div>
+                    <div class=" btn-right">
+                        <button class="btn btn-primary clear-default-text">Clear Template Text</button>
+                    </div>
+                </div>
+
+                <div id="question-area">
+                    <textarea name="ask-a-question">@Model.Intervention.InterventionTemplateText</textarea>
+                    <br />
+                    @if (availableUntil == "")
+                    {
+                        <h4 id="status-header">Update Your Status (Your current status is 'unavailable') </h4>
+                    }
+                    else
+                    {
+                        <h4 id="status-header">Update Your Status </h4>
+                    }
+
+                    <div>
+                        <h5>Status Message:</h5>
+                        @if (Model.CurrentUserStatus != null && String.IsNullOrEmpty(Model.CurrentUserStatus.StatusMessage))
+                        {
+                            <input type="text" id="status-message-placeholder" placeholder="Add a status message here! (optional)" />
+                        }
+                        else
+                        {
+                            <input type="text" id="status-message-placeholder" placeholder="Add a status message here! (optional)" value="@currentUserStatus" />
+                        }
+
+                    </div>
+                    <div>
+                        <h5>Availability: </h5>
+                        <div>
+                            <span class="button-checkbox">
+                                <button type="button" class="btn" data-color="primary" id="availability-check">You're available</button>
+                                <input type="checkbox" class="hidden" checked="checked" />
+                            </span>
+                        </div>
+                        <div id="availability-text" class="hidden">
+                            <h5>Until: </h5>
+                            <div style="clear:both;">
+                                <div class="left">
+                                    <span id="datepicker"></span>
+                                </div>
+                                <div class="left">
+                                    <span style="vertical-align: middle; font-size: large; font-weight: 600; margin-left: 10px; margin-right: 10px;">@@</span>
+                                </div>
+                                <div class="left">
+                                    <input class="timepicker" value="@availableUntil" /><input type="hidden" value="" id="chosen-time" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="clear:both;" id="status-update-message"><span><em>(Updating your status will let other users know that you are open to answer questions related to the current course assignments and activities)</em></span></div>
+                </div>
+
+                <div>
+                    <a class="btn btn-primary" href="@activityFeedUrl" role="button" id="view-other-page">View Classmates'<br />Questions</a>
+                    <button class="btn btn-primary right" id="update-status-post-class">Post to Class AND<br /> Update Status</button>
+                    <button class="btn btn-primary right" id="update-status">ONLY <br /> Update Status</button>
+                    <span class="right" id="update-post-result"></span>
+                    <span class="right" id="update-post-result-error"></span>
+                    <span class="right" id="post-result"></span>
+                    <span class="right" id="post-success"></span>
+                    <span class="right" id="post-error"></span>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <input id="iid" type="hidden" value="@Model.Intervention.Id" />
+    @Html.Partial("_SuggestionFeedbackModal")
+
+</body>
+</html>

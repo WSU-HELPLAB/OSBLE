@@ -1,0 +1,68 @@
+﻿@{
+    ViewBag.Title = "Help";
+    bool CanGrade = ViewBag.CanGrade;
+    string EnableSelectedUsers = ViewBag.EnableCustomPostVisibility;
+}
+
+<h1>Help</h1>
+OSBLE contains the following help articles:
+<br />
+@if (CanGrade)
+{
+    <h2>Managing Courses and Users</h2>
+    <ul>
+        <li>@Html.ActionLink("Creating a new course", "CreateCourse")</li>
+        <li>@Html.ActionLink("Adding students to a course", "AddingStudents")</li>
+        <li>@Html.ActionLink("Adding TAs or moderators to a course", "AddingOthers")</li>
+        <li>@Html.ActionLink("Managing your Course Roster", "RosterGuide")</li>
+    </ul>
+
+    <h2>Creating Assignments</h2>
+    <ul>
+        <li>@Html.ActionLink("Creating basic assignments", "CreateBasicAssignment")</li>
+        <li>@Html.ActionLink("Creating a review assignment", "CreateReviewAssignment")</li>
+        <li>@Html.ActionLink("Creating review discussion assignments", "CreateReviewDiscussion")</li>
+        <li>@Html.ActionLink("Creating a Rubric", "CreateRubric")</li>
+        <li>@Html.ActionLink("Using the Team Builder", "UsingTeamBuilder")</li>
+    </ul>
+
+    <h2>Managing Assignments</h2>
+    <ul>
+        <li>@Html.ActionLink("Using the gradebook", "Gradebook")</li>
+        <li>@Html.ActionLink("Editing an Assignment Rubric offline", "EditRubricOffline")</li>
+        <li>@Html.ActionLink("Adding web links to an assignment's description", "AddWebLinks")</li>
+    </ul>
+}
+
+<h2>Activity Feed Usage</h2>
+<ul>
+    <li>@Html.ActionLink("Activity feed post components", "ActvitiyFeedComponents")</li>
+    <li>@Html.ActionLink("Choosing a post visiblity (who can see your post)", "ActvitiyFeedVisibility")</li>
+    @if (EnableSelectedUsers == "true")
+    {
+        <li>@Html.ActionLink("Modifying post visibility", "ActvitiyFeedModifyVisibility")</li>    
+    }
+    else
+    {
+        <li>@Html.ActionLink("Viewing post visibility", "ActvitiyFeedModifyVisibility")</li>
+    }
+    <li>@Html.ActionLink("(NEW) Private Conversations", "PrivateConversations")</li>
+    <li>@Html.ActionLink("(NEW) Availability/Status Details", "UserStatus")</li>
+</ul>
+
+<h2>Using the OSBLE+ Visual Studio Plugin</h2>
+<ul>
+    <li><a href="http://osble.codeplex.com/wikipage?title=VS%20Plugin&referringTitle=Documentation" target="_blank">OSBLE+ Visual Studio Plugin Documentation</a></li>
+    <li><a href="http://osble.codeplex.com/wikipage?title=Installation%20Guide&referringTitle=VS%20Plugin" target="_blank">Installation Guide</a></li>
+    <li><a href="http://osble.codeplex.com/wikipage?title=Basic%20OSBLE%2b%20VS%20Plugin%20Usage&referringTitle=VS%20Plugin" target="_blank">Beginner's Guide</a></li>
+    <li><a href="http://osble.codeplex.com/wikipage?title=Submitting%20an%20Assignment&referringTitle=VS%20Plugin" target="_blank">Submitting an Assignment</a></li>
+    <li><a href="http://osble.codeplex.com/wikipage?title=Submission%20Verification&referringTitle=VS%20Plugin" target="_blank">Verifying a Submission</a></li>
+    <li><a href="http://osble.codeplex.com/wikipage?title=Uninstalling%20the%20OSBLE%2b%20VS%20Plugin&referringTitle=VS%20Plugin" target="_blank">Uninstalling the OSBLE+ Visual Studio Plugin</a></li>
+    <li><a href="http://osble.codeplex.com/wikipage?title=Privacy%20Policy&referringTitle=VS%20Plugin" target="_blank">Privacy Policy</a></li>
+</ul>
+
+<h2>(NEW) OSBLE+ Suggestions</h2>
+<ul>
+    <li>@Html.ActionLink("Visual Studio Plugin Components", "VisualStudioSuggestionsOverview")</li>
+    <li>@Html.ActionLink("Using the Suggestions Dashboard", "SuggestionsDashboard")</li>    
+</ul>

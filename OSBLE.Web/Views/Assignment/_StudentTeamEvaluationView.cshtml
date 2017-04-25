@@ -1,0 +1,146 @@
+﻿@using OSBLE.Models.Assignments
+@{
+    ViewBag.Title = "_StudentTeamEvaluationView";
+}
+<h2>
+    Team Evaluations</h2>
+@{
+    List<TeamEvaluation> teamEvalList = ViewBag.TeamEvaluations;
+    AssignmentTeam at = ViewBag.AssignmentTeam;
+    Team previousTeam = ViewBag.PreviousTeam;
+    int pointsRemaining = previousTeam.TeamMembers.Count * 100;
+    int assignId = ViewBag.AssignmentTeam.AssignmentID;
+    
+    <input id="requiredCommentLength" type="hidden" value="@at.Assignment.TeamEvaluationSettings.RequiredCommentLength" />
+    
+    using (Html.BeginForm("SubmitTeamEvaluation", "Assignment", new { assignmentId = assignId }, FormMethod.Post))
+    {
+        <fieldset style="width: 400px;">
+            <table id="teamEvaltable" style="width: 400px;">
+                <tr>
+                    <td>
+                        <b>Points Remaining:</b>
+                    </td>
+                    <td style="text-align: right;">
+                        <div id="pointsPossibleId">@ViewBag.InitialPointsPossible</div>
+                    </td>
+                </tr>
+                @foreach (TeamEvaluation tme in teamEvalList)
+                {
+                    <tr>
+                        <td>@tme.Recipient.UserProfile.FirstName @tme.Recipient.UserProfile.LastName:
+                        </td>
+                        <td style="text-align: right;">
+                            <input class="points" name="points-@tme.Recipient.ID" id="points-@tme.Recipient.ID" onkeyup="changePoints(@pointsRemaining);" size="1" value="@tme.Points"/>
+                        </td>
+                    </tr>
+                }
+                <tr>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <textarea class="textAreaClass" name="inBrowserText" rows="10" cols="53">@ViewBag.Comment</textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <div id="errorText" style="color: Red;">
+                            &nbsp
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <p>
+                <input type="submit" value=@ViewBag.SubmitButtonValue onclick="checkForErrors(event);" />
+                <input type="button" value="Cancel" />
+            </p>
+        </fieldset>
+    }
+}
+<script type="text/javascript">
+
+    function changePoints(pp) {
+        var points = 0;
+        var pointsPossible = parseInt(pp);
+        $("#errorText").html("&nbsp");
+        $("table").find("tr").each(function (i) {
+            //loop tr's in table with class 'adminlist'
+            $(this).find(".points").each(function (j) {
+                var addTo = parseInt($(this).val());
+                if (isNaN($(this).val())) {
+                    $("#errorText").html("Values can only be numbers.");
+                }
+                else if (addTo < 0) {
+                    $("#errorText").html("Values cannot be negative.");
+                }
+                points += parseInt($(this).val());
+            });
+        });
+        pointsPossible = pointsPossible - points;
+        if (pointsPossible < 0) {
+            $("#errorText").html("Points remaining has to equal 0.");
+        }
+        $("#pointsPossibleId").html(pointsPossible);
+
+    }
+
+    $('#file_uploader_form').submit(function (e) {
+
+        $("table tr").each(function (i) {
+            //loop tr's in table with class 'adminlist'
+            $(this).find(".points").each(function (j) {
+                var addTo = parseInt($(this).val());
+
+                if (isNaN($(this).val())) {
+                    $("#errorText").text("Values can only be numbers.");
+                    e.preventDefault();
+                }
+                else if (addTo < 0) {
+                    alert("here");
+                    $("#errorText").text("Values cannot be negative.");
+                    e.preventDefault();
+                }
+            });
+        });
+
+        if (parseInt($("#pointsPossibleId").text()) < 0) {
+            $("#errorText").text("Points remaining must equal 0.");
+            e.preventDefault();
+        }
+    });
+
+    function checkForErrors(e) {
+
+        if (parseInt($("#pointsPossibleId").text()) == 0) {
+            /*go through .points-CUid for each member and see if a grade is a descrepency*/
+
+            var maxValue =  -1;
+            var minValue = 10000;
+            var currentValue = 0;
+            @foreach (TeamMember tm in previousTeam.TeamMembers)
+            {
+               @:currentValue= parseInt($("#points-@(tm.CourseUserID)").val());
+               @:if(currentValue > maxValue)
+               {
+                    @:maxValue = currentValue;
+               }
+               @:if(currentValue < minValue)
+               {
+                    @:minValue = currentValue;
+               }
+            }
+
+            if(maxValue - minValue > @ViewBag.AssignmentTeam.Assignment.TeamEvaluationSettings.DiscrepancyCheckSize)
+            {
+                if ($(".textAreaClass").val().length < $("#requiredCommentLength").val()) {
+                    $("#errorText").html("Comment length must be greater than " + $("#requiredCommentLength").val().toString() + ".");
+                    e.preventDefault();
+                }
+            }
+        }
+        else {
+            $("#errorText").html("Points remaining must equal 0.");
+            e.preventDefault();
+        }
+    }
+</script>

@@ -1,0 +1,304 @@
+﻿@using OSBLE.Models.HomePage
+@using OSBLE.Models
+@using System.Web.Configuration
+
+@{
+    ViewBag.Title = "Dashboard";
+    bool courseCalendarFlag = false;
+    string activeCourseRole = ViewBag.ActiveCourse.AbstractRole.Name;
+    bool hasRootFolderAccess = ViewBag.ActiveCourseUser.AbstractRole.CanModify;
+    int courseID = ViewBag.ActiveCourse.AbstractCourse.ID;
+    //note: the current query only populates first, last, and ID for these users. change the query in DBHelper.cs to modify what values are available here.
+    var currentCourseUsers = ViewBag.CurrentCourseUsers;    
+    
+    switch (activeCourseRole)
+    {
+        case "Instructor":
+            courseCalendarFlag = true;
+            break;
+        case "Leader":
+            break;
+        case "Assessment Committee Chair":
+            break;
+        case "Student":
+            courseCalendarFlag = true;
+            break;
+        default:
+            break;
+    }
+
+}
+
+<input type="hidden" id="currentCourse" value="@ViewBag.ActiveCourse.AbstractCourse.ID"/>
+
+@* Dashboard Pills (used when width < 850px) *@
+<div class="btn-group btn-group-justified" id="dashboard_pills">
+    <div class="btn-group dbp_1">  <button type="button" id="btn_notifications" class="btn">Notifications <span id="notifications_badge" class="badge">@ViewBag.Notifications.Count</span></button> </div>
+    <div class="btn-group dbp_2">  <button type="button" id="btn_events_deadlines" class="btn">Calendar</button> </div>
+    <div class="btn-group dbp_3">  <button type="button" id="btn_activity_feed" class="btn btn-primary">Activity Feed <span class="badge new-activity-badge" style="display: none">new</span></button> </div>
+    <div class="btn-group dbp_4">  <button type="button" id="btn_files" class="btn">Files &amp; Links</button> </div>
+</div>
+
+<script type="text/javascript">
+
+    function setContent(btnID, divID, subDivID) {
+        $(".activeContent").removeClass("activeContent").addClass("unactiveContent");
+        $("#" + divID).addClass("activeContent").removeClass("unactiveContent");
+        if (subDivID != null && subDivID != "")
+            $("#" + subDivID).addClass("activeContent").removeClass("unactiveContent");
+
+        $(".btn-primary").removeClass("btn-primary");
+        $("#" + btnID).addClass("btn-primary");
+    }
+
+    $(document).ready(function () {
+        $("#btn_activity_feed").click(function () { setContent("btn_activity_feed", "dashboard_middle", ""); });
+        $("#btn_notifications").click(function () { setContent("btn_notifications", "dashboard_left", "dashboard_notifications"); });
+        $("#btn_events_deadlines").click(function () { setContent("btn_events_deadlines", "dashboard_left", "dashboard_events") });
+        $("#btn_files").click(function () { setContent("btn_files", "dashboard_right", ""); });
+
+        // set the click event for the "new activity" notifications
+        $(".new-activity-badge").click(function () {
+            $(".new-activity-badge").hide();
+            $(".new-post-badge").hide();
+        });
+
+        /*START Autocomplete block*/
+        //TODO: need to re-build the url/<a/> tags for @@name and #hashtag.
+        var userNames = []
+        var userIds = [];
+
+        //we need to get hashtags from the hashtag table and populate it like names are populated.
+        //we also need to add hashtags to the table if there are no matches so others will see hashtags they've seen already.
+        var hashtags = [];
+        @{
+            if (null != ViewBag.HashTags)
+            {
+                foreach(string hashTag in ViewBag.HashTags)
+                {
+                    @:hashtags.push("@hashTag");
+                }
+            }
+            if (null != currentCourseUsers)
+            {
+                foreach (var userProfile in currentCourseUsers)
+                {
+                    @:userNames.push("@userProfile.FirstName" + "@userProfile.LastName");
+                    @:userIds.push("@userProfile.ID");
+                }
+            }
+        }
+
+        localStorage['UserNames'] = userNames;
+        localStorage['UserIds'] = userIds;
+
+        $(document).on("focus", "textarea", function () {
+            $(this).atwho({
+                at: "@@",
+                data: userNames,
+                insertTpl: "@@${name}", //insert template i.e. what is inserted into the textarea
+            });
+
+            $(this).atwho({
+                at: "#",
+                data: hashtags
+            });
+        });
+    });
+</script>
+
+
+@* Dashboard Content *@
+<div id="dashboard_outer">
+    <div class="row" id="dashboard_inner">
+        <div class="col-sm-3 unactiveContent" id="dashboard_left">
+
+            @*-------------- NOTIFICATIONS -------------------*@
+
+            <div id="dashboard_notifications" class="unactiveContent">
+                <h3>Notifications</h3>
+
+                <div id="notifications">
+
+
+                    @if (ViewBag.Notifications.Count == 0)
+                    {
+                        <p>No Unread Notifications!</p>
+                    }
+
+                    @{ViewBag.ShowNotificationDelete = true;}
+                    @Html.Partial("_ConsolidatedNotifications")
+
+                    
+                    @if (ViewBag.Notifications.Count != 0)
+                    {
+                        <div id="markAllAsReadDiv">
+                            <form id="MarkAllForm" action="@Url.Action("MarkAllAsRead", "Notification")"
+                                  data-ajax="true"
+                                  data-ajax-success="$('#notifications_list').hide('slow');$('#markAllAsReadDiv').hide('slow');$('#notifications_badge').hide('slow');"
+                                  method="post">
+                                <a href="#" onclick="$('#MarkAllForm').submit()">Mark All Notifications As Read</a>
+                            </form>
+                        </div>
+                    }
+
+
+                    @{
+                        if (ViewBag.Notifications.Count > 5)
+                        {
+                            String temp = "Displaying 5 out of " + @Html.Raw(ViewBag.Notifications.Count).ToString() + " (Show All)";
+                            <p>
+                                @Html.ActionLink(temp, "Index", "Notification")
+                            </p>
+                        }
+                        else
+                        {
+                            <p>
+                                @Html.ActionLink("Show All Notifications", "Index", "Notification")
+                            </p>
+                        }
+                    }
+
+                </div>
+            </div>
+
+            @*-------------- EVENTS & DEADLINES -------------------*@
+            <div id="dashboard_events" class="unactiveContent">
+                <h3>
+                    Calendar
+                    @if (@ViewBag.ActiveCourse.AbstractRole.CanModify || @ViewBag.ActiveCourse.AbstractCourse.AllowEventPosting)
+                    {
+                        <a href="@Url.Action("Create", "Event")" title="Add New Event or Deadline">@Helpers.AddButton()</a>
+                    }
+                    @if (courseCalendarFlag)
+                    {
+                        <a href="@Url.Action("DownloadCourseCalendar", "iCalendar", new { id = courseID })" title="Download Course Calendar">@Helpers.UnPublishButton()</a>
+                        <a href="@Url.Action("SubscribeToCalendar", "iCalendar", new { id = courseID, })" target="_blank" title="Subscribe to Course Calendar">@Helpers.CalendarButton()</a>
+
+                    }
+                </h3>
+
+                <div id="important_dates">
+                    <p>Next @ViewBag.ActiveCourse.AbstractCourse.CalendarWindowOfTime Weeks</p>
+                    <div class="partialContents" data-url="/Home/Events">
+                        <img src="~/Content/images/ajax-loader.gif" /> Loading...
+                    </div>
+                    @*@Html.Partial("_Events", (List<Event>)ViewBag.Events)*@
+                    <p>@Html.ActionLink("Show All Events", "Index", "Event")</p>
+                </div>
+            </div>
+        </div>
+
+        @*------------------- ACTIVITY FEED -------------------*@
+        <div class="col-sm-6 activeContent" id="dashboard_middle">
+            <h3>
+                Activity Feed
+                <span class="badge new-activity-badge" style="display: none" data-toggle="tooltip" title="Click to dismiss">New Activity</span>
+                @*<a href="@Url.Action("DownloadDashboardPosts", "Course")" title="Download Activity Feed as csv">@Helpers.UnPublishButton()</a>*@
+                <span style="float:right;">
+                    @*For instructor/ta show unanswered questions link*@
+                    <a href="/Intervention/UnansweredQuestionsLayout" style="text-decoration: none;">
+                        <span style="font-size: x-small; vertical-align: middle;">Unanswered Posts:</span>
+                        <span class="glyphicon glyphicon-exclamation-sign" title="Unanswered Posts"></span>
+                    </a>
+
+                    <a href="/Home/PrivateMessages" style="text-decoration: none;">
+                        <span style="font-size: x-small; vertical-align: middle;">Private Conversations:</span>
+                        <span class="glyphicon glyphicon-comment" title="Private Conversations"></span>
+                    </a>
+                    <a href="/Home/Availability" style="text-decoration: none;">
+                        <span style="font-size: x-small; vertical-align: middle; ">Availability:</span>
+                        <span class="glyphicon glyphicon-flag" title="Availability/Status"></span>
+                    </a>
+                </span>                
+            </h3>
+            
+            <div id="activity_feed">
+                <div id="activity_feed_content" @*class="partialContents" data-url="/Feed/Index"*@>
+                    @*<img src="~/Content/images/ajax-loader.gif" /> Loading...*@
+                    @{ Html.RenderAction("Index", "Feed"); }
+                </div>
+            </div>
+
+        </div>
+
+        @*-------------- FILES AND LINKS -------------------*@
+        <div class="col-sm-3 unactiveContent" id="dashboard_right">
+            <h3>
+                Files &amp; Links
+                @if (hasRootFolderAccess) // need to see if the user can add to root folder
+                {
+                    <a href="#" title="Create New Folder" onclick="cfm_CreateFolderIconClicked(0)"><span class="glyphicon glyphicon-folder-open"></span></a>
+                    <a href="#" title="Upload File" onclick="cfm_AddUploader(0)"><span class="glyphicon glyphicon-open-file"></span></a>
+                }
+            </h3>
+
+            @* DEBUG *@
+            @* @{ Html.RenderPartial("_FilesAndLinks"); } *@
+
+            <!-- File manager for course files -->
+            <div id="divFileManager">
+                (Please wait, loading files...)
+            </div>
+
+            <!--yc: file upload size change!-->
+            <!-- Scripts for file manager -->
+            <!--yc: currently cant find a way to put this line of code into the script so its placed here for now-->
+            @* These Files are now included in the layout *@
+            @*<script src="../../Scripts/CourseFilesUploader.js?version=1.1" type="text/javascript"></script>
+                <script src="../../Scripts/CourseFileManager.js?version=1.1" type="text/javascript"></script>
+            *@
+            <script type="text/javascript">
+                // Write the HTML for the file manager control
+                if (XMLHttpRequest) {
+                    cfm_getListing("divFileManager");
+                }
+                else {
+                    document.write("File upload not supported. Please upgrade your web browser.");
+                }
+            </script>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    // Disable caching of AJAX responses.
+    // This prevents a bug in IE where content will
+    // not reload when the course was changed.
+    $.ajaxSetup({
+        cache: false
+    });
+
+    // This uses the JQuery-AJAX method .load to populate each partial content container
+    function LoadPartialContents() {
+        $(".partialContents").each(function (index, item) {
+            var startPost = $(location).attr('search'); // used for pagination
+            var url = $(item).data("url");
+
+            if (startPost && url == "/Home/ActivityFeed") {
+                url = url + "/" + startPost;
+            }
+
+            if (url && url.length > 0) {
+                $(item).load(url);
+            }
+        });
+    }
+
+    $(document).ready(function (e) {
+
+        var hideHint = $.cookie('hide_hint');
+        if (hideHint == "true") {
+            $("#search_hint").hide();
+        }
+
+        $("#hide_search").click(function () {
+            $("#search_hint").hide();
+            $.cookie('hide_hint', 'true');
+        });
+
+        LoadPartialContents();
+    });
+
+</script>

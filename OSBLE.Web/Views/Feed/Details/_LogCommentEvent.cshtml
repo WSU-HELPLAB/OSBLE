@@ -1,0 +1,5 @@
+﻿@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+@model LogCommentEvent
+
+@* Spacing is very important, all spacing is preserved (including newlines) *@
+<div class="user-text" id="content-comment-@Model.EventLogId">@Model.Content</div>

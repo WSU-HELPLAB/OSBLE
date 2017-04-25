@@ -1,0 +1,682 @@
+﻿@using OSBLE.Models.Assignments;
+@using OSBLE.Models.Courses.Rubrics;
+@using OSBLE.Areas.AssignmentWizard.ViewModels;
+@model Assignment
+@{
+    int defaultPointSpread = 5;
+    bool hasRubric = Model.HasRubric;
+    RubricSelectionViewModel rubricSelection = ViewBag.rubricSelection;
+    bool EvalsExist = ViewBag.EvalsExist;
+    string dropDownKey = "/AssignmentWizard/Rubric/LoadExistingRubric";
+    if(ViewBag.Student)
+    {
+        dropDownKey = "/AssignmentWizard/StudentRubric/LoadExistingRubric";
+    }
+    int maximumRubricLevels = 10;
+} 
+
+@Html.HiddenFor(m => m.ID)
+
+<style media="screen" type="text/css">
+
+.rubric {
+	border-width: 1px;
+	border-spacing: 2px;
+	border-style: outset;
+	border-collapse: collapse;
+	border-color: Black;
+}
+.rubric th {
+	border-width: 1px;
+	padding: 10px;
+	border-style: inset;
+    border-color:Black;
+}
+.rubric td {
+	border-width: 1px;
+	padding: 10px;
+	border-style: inset;
+    border-color:Black;
+}
+
+td.top
+{
+   vertical-align:top;
+}
+
+ul.RubricList
+{
+    list-style-type: none;
+    float:left;
+    padding:0;
+    margin:0;
+}
+
+.RubricSelect
+{
+    display:none;
+}
+
+.FloatLeft
+{
+    float:left;
+}
+
+.Input
+{
+    border:0;
+    width:100%;
+    height:100%;
+}
+
+.Level
+{
+    min-width:215px;
+}
+
+.PerformanceCriterionCell
+{
+    display:inline-block;
+    vertical-align:top;
+}
+
+#import_rubric_from_csv
+{
+	border: 1px solid #eeeeff;
+	border-bottom: 5px solid #eeeeff;
+	padding-left: 8px;
+	padding-right: 8px;
+	padding-bottom: 8px;
+	width: 250px;
+	display: none;
+}
+
+</style>
+
+<html>
+<body>
+    <h5><span class="glyphicon glyphicon-info-sign"></span> Need help creating a rubric? Check out the OSBLE Help page <a href="~/help/CreateRubric" class="Hashtag"><u>"Creating a Rubric"</u></a>!</h5>
+    <h5>Rubric Title:</h5>
+    <textarea name="rubricDescription" rows="2" cols="40">@ViewBag.rubricDescription</textarea>
+    <br /> <br />
+<table>
+    <tr>
+        <td>
+            @if (rubricSelection.CourseIds().Count > 0)
+            {
+            <text>Load Rubric from</text>
+            <select class="CourseSelect">
+                <option>Select Course</option>
+                @foreach (int courseId in rubricSelection.CourseIds())
+                {
+                    <option value="@courseId" class ="CourseOption">@rubricSelection.GetCourseName(courseId)</option>
+                }
+            </select>
+            }
+        </td>
+
+        <td>
+            @*Create a hidden dropdown of assignment for each course
+            When the user selects a course from the first select, the corresonding
+            one here will become visible*@
+
+            <form id="set_rubric" method="post" action="/AssignmentWizard/Rubric/LoadExistingRubric">
+                @foreach(int courseId in rubricSelection.CourseIds())
+                {
+                    <select  id="Assignment_@(courseId)" class="RubricSelect">
+                        <option>Select Rubric</option>
+                        @foreach (RubricViewModel rvm in rubricSelection.rubricSelection[courseId].rubricViewModel)
+                        {
+                            if (rvm.RubricID != null)
+                            {
+                                <option class="AssignmentOption" value="@rvm.RubricID">@rvm.AssignmentName</option>
+                            }
+                            if (rvm.StudentRubricID != null)
+                            {
+                                <option class="AssignmentOption" value="@rvm.StudentRubricID">@rvm.AssignmentName - Student Rubric</option>
+                            }
+                        }
+                    </select>
+                }
+            </form>
+        </td>
+    </tr>
+
+    <tr>
+        <a href="javascript:void(0)" onclick="displayUploadRubric()">Upload Rubric From File</a>
+    </tr>
+
+    <tr>
+        <td>
+            <ul class="RubricList">
+                <li>
+                    <input type="checkbox" name="globalComments" @ViewBag.globalCommentsCheckedValue/>Overall Comments
+                </li>
+                <li>
+                    <input type="checkbox" name="criterionComments" @ViewBag.criteriaCommentsCheckedValue/>Comments for each criterion
+                </li>
+                <li>
+                    <h5>Point increment for grade scale:</h5>
+                </li>
+                <li>
+                    <input type="radio" class="gradeIncrement" name="gradeStepRadio" value="fullStep" checked="checked" />Allow only full-point grades in rubric evaluation
+                </li>
+                <li>
+                    <input type="radio" class="gradeIncrement" name="gradeStepRadio" value="halfStep" @ViewBag.enableHalfStepCheckedValue />Allow half-point grades in rubric evaluation
+                </li>
+                <li>
+                    <input type="radio" class="gradeIncrement" name="gradeStepRadio" value="quarterStep" @ViewBag.enableQuarterStepCheckedValue />Allow quarter-point grades in rubric evaluation
+                </li>
+            </ul>
+        </td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <td>
+            @* Start Table for Rubric *@
+            <table id="dataTable" class="rubric">
+                @*Row for column titles*@
+                <tr>
+                    <th style="min-width:185px">
+                        Performance Criterion
+                    </th>
+                        
+                    <th style="min-width:85px">Criterion<br />Weight</th>
+                        
+                    @* Level Title *@
+                    @{
+                        int n = 0;
+                        foreach (Level level in ViewBag.levels)
+                        {
+                            if (level.PointSpread == 0) { level.PointSpread = defaultPointSpread; }
+                            
+                            <th class="Level">
+                                <ul class="RubricList">
+                                    <li>
+                                        <img src="/Content/images/delete_up.png" alt="Delete Column" onclick="openConfirmEditWindow(3, 'dataTable',this.parentNode.parentNode.parentNode.cellIndex)" />
+                                    </li>
+                                    <li>Level Point Spread
+                                        <input class="SpreadInput" name="rubric:@n:S" value="@level.PointSpread" type="text" style="width:40px; text-align:center; border-radius:10%" />
+                                    </li>
+                                    <li>Level Title<input class="Input" name="rubric:@n:L" type="text" value="@level.LevelTitle"/></li>
+                                </ul>
+                            </th>
+                            n++;
+                        }
+                    }
+                </tr>
+                @{
+                    n = 0;
+                    foreach (List<string> row in ViewBag.rubricTable)
+                    {
+                        @*Default first row of rubric*@
+                        string name = "row" + n.ToString();
+                        <tr name="@name">
+                            @*Performance Criterion*@
+                            <td>
+                            
+                                <ul class="RubricList">
+                                    <li class="PerformanceCriterionCell">
+                                        <ul class="RubricList" style="float:left">
+                                            <li><input class="hiddenRow" type="hidden" /></li> <!--Hidden input used to keep track of swapping used during rubric editing-->
+                                            <li><img src="/Content/images/move_up.png" alt="Move Row Up" onclick="openConfirmEditWindow(4, 'dataTable', this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
+                                            <li><img src="/Content/images/delete_up.png" alt="Delete Row" onclick="openConfirmEditWindow(2, 'dataTable', this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
+                                            <li><img src="/Content/images/move_down.png" alt="Move Row Down" onclick="openConfirmEditWindow(5, 'dataTable', this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
+                                        </ul>
+                                   </li>
+
+                                    <li class="PerformanceCriterionCell">     
+                                        <textarea class="Input" style="max-width:140px" name="rubric:0:@n" rows="5" cols="20">@row[0]</textarea>
+                                   </li> 
+                                </ul>
+                            </td>
+
+                            @*Criterion Weight*@
+                            <td>
+                                <input class="Input" type="text" name="rubric:1:@n"  size="1" value="@row[1]"/>
+                            </td>
+
+                            @*Level Description*@
+                            @for (int d = 2; d < row.Count; d++)
+                            {
+                                <td>
+                                    @* Name=X:Y *@
+                                    <textarea class="Input" name="rubric:@d:@n" rows="5" cols="30">@row[d]</textarea>
+                                </td>
+                            }
+                        </tr>
+                            n++;
+                    }
+                }
+            </table>
+        </td>
+        <td class ="top">
+            <img src="/Content/images/add_up.png" alt="Add Column" onclick="openConfirmEditWindow(1, 'dataTable', 0)"/>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <img  src="/Content/images/add_up.png" alt="Add Row" onclick="openConfirmEditWindow(0, 'dataTable', 0)" />
+        </td>
+    </tr>
+</table>
+
+@*Modal box for uploading rubrics to CSVs*@
+<div id='import_rubric_from_csv'  title="Import file">Upload a rubric definition file (CSV).<br />
+The current rubric will be replaced with a new one and all progress will be lost.
+<br />
+    <form id="set_rubric" enctype="multipart/form-data" method="post" action="/AssignmentWizard/Rubric/LoadRubricFromCsv">
+        <input type="hidden" name="assignmentColumnId" id="column_assignment_id" />
+        <fieldset>
+            <legend>Select Files To Submit</legend>
+            <table>
+                <tr>
+                    <td><input type="file" id="file" name="file"/> </td>
+                </tr>
+                <tr>
+                    <td><input type="submit" value="Submit"/></td>
+                </tr>
+            </table>
+        </fieldset>
+    </form>
+</div>
+
+</body> </html>
+
+<!--Element for modal confirmation box-->
+<div id="confirmEditWindow" style="display:none;" title="Warning">
+    Adding/removing existing columns or rows or swapping rows will cause existing rubric evaluations associated with this rubric to be deleted. Are you sure you want to continue?
+</div>
+
+<!--Element for modal confirmation box-->
+<div id="confirmEditSpreadWindow" style="display:none;" title="Warning">
+    Editing the level spread can lead to grade changes due to rounding. Are you sure you want to continue?
+</div>
+
+<input name="CriticalEditStatus" id="CriticalEditStatus" type="hidden" value="False"/>
+<input id="EvalsExistStatus" type="hidden" value="@EvalsExist" />
+<input id="LevelSpreadEditStatus" type="hidden" value="False" />
+<script type="text/javascript" src="@Url.Content("~/Areas/AssignmentWizard/Content/js/jquery.path.js")"></script>
+<script type="text/javascript" language="javascript">
+    $("#confirmEditSpreadWindow").dialog({
+        modal: true,
+        resizable: false,
+        width: 310,
+        height: 200,
+        closeOnEscape: false,
+        autoOpen: false,
+        buttons: {
+            'Continue': function () {
+                $("#LevelSpreadEditStatus").val("True")
+                $("#confirmEditSpreadWindow").dialog('close');
+            },
+            'Cancel': function () {
+                $("#confirmEditSpreadWindow").dialog('close');
+            }
+        }
+    });
+
+    function openConfirmEditSpreadWindow(event) {
+        var evalsExist = $("#EvalsExistStatus").val();
+        var levelEditsConfirmed = $("#LevelSpreadEditStatus").val();
+        if (evalsExist == "True" && levelEditsConfirmed == "False") {
+            //If there exist evaluations and edits have not been confirmed yet, then open confirmation dialog
+            $("#confirmEditSpreadWindow").dialog("open");
+        }
+    }
+
+    $("#confirmEditWindow").dialog({
+        modal: true,
+        resizable: false,
+        width: 310,
+        height: 240,
+        closeOnEscape: false,
+        autoOpen: false,
+        buttons: {
+            'Continue': function () {
+                editConfirmed()
+                hideConfirmEditWindow()
+                handleAddOrDelete();
+            },
+            'Cancel': function () {
+                hideConfirmEditWindow()
+            }
+        }
+    });
+    //controlValue represents which function to call after the modalbox's callback function
+    //the value willbe 0 for "addRow", 1 for "addColumn", 2 for "deleteRow", 3 for "deleteColumn", 4 for "moveRowUp", and 5 for "moveRowDown"
+    //In addition, parameters to be routed to the functions being called need to be saved.
+    controlValue = 0;
+    tableIdValue = 0;
+    indexValue = 0;
+    function openConfirmEditWindow(controlInput,tableIdInput, indexInput ){
+        //if "EvaluationsExist" is true && "CriticalEdit" is false (error only occurs if evaluations exist and they havent agreed to this yet)
+        controlValue = controlInput;
+        tableIdValue = tableIdInput;
+        indexValue = indexInput;
+
+        var evalsExist = $("#EvalsExistStatus").val();
+        var editsConfirmed = $("#CriticalEditStatus").val();
+
+
+        if (evalsExist == "True" && editsConfirmed == "False") {
+            //If there exist evaluations and edits have not been confirmed yet, then open confirmation dialog
+            $("#confirmEditWindow").dialog("open");
+        }
+        else {
+            //Otherwise just handle the input
+            handleAddOrDelete()
+        }
+
+        //if editsConfirmed == False && EvalsExist, then open the confirm window
+        //if EvalsExist == False, just handle then input
+        //if editsConfirmed == True && EvalsExist, then just handle the logic
+    }
+
+    function handleAddOrDelete(){
+
+        //Handle event
+        if (controlValue == 0) {
+            addRow(tableIdValue)
+        }
+        else if (controlValue == 1) {
+            addColumn(tableIdValue)
+        }
+        else if (controlValue == 2) {
+            deleteRow(tableIdValue, indexValue)
+        }
+        else if (controlValue == 3) {
+            deleteColumn(tableIdValue, indexValue)
+        }
+        else if (controlValue == 4) {
+            moveRowUp(tableIdValue, indexValue)
+        }
+        else if (controlValue == 5) {
+            moveRowDown(tableIdValue, indexValue)
+        }
+
+    }
+
+    function editConfirmed() {
+        //Set "CriticalEdit" value to "On" by giving it a non-0 value
+        $("#CriticalEditStatus").val("True")
+        var editsConfirmed = $("#CriticalEditStatus").val();
+    }
+
+    function hideConfirmEditWindow() {
+        $("#confirmEditWindow").dialog('close');
+    }
+
+    $('.CourseSelect').change(function () {
+        $('.RubricSelect').hide();
+        $('#Assignment_' + $(this).children(":selected").val()).show();
+    });
+
+    $('.RubricSelect').change(function () {
+        this.name = "AssignmentOption";
+
+        var ok = window.confirm("This rubric will be replaced with a new one\n" +
+                                "and all progress will be lost\n\n" +
+                                "Are you sure you want to continue?");
+        if (ok) {
+            $('#WizardForm').submit();
+        }
+    });
+
+    function displayUploadRubric() {
+        $("#import_rubric_from_csv").dialog({
+            modal: true,
+            resizable: false,
+            width: 500,
+            height: 225,
+            closeOnEscape: false
+        });
+    }
+
+    function addRow(tableID) {
+
+        var table = document.getElementById(tableID);
+
+        var rowCount = table.rows.length;
+        var columnCount = table.rows[0].cells.length;
+
+        var newRow = table.insertRow(rowCount);
+
+        $(newRow).html(table.rows[rowCount - 1].innerHTML);
+
+        //note: rowCount is now the index of the last row (because a row was added)
+        //Modify the Y value of the name (name="rubric:X:Y") for the new rubric
+        for (var i = 0; i < columnCount; i++) {
+            var name = $(table.rows[rowCount - 1].cells[i]).find('.Input').attr("name");
+            var spl = name.split(':');
+            $(newRow.cells[i]).find(".Input").attr("name", spl[0] + ":" + spl[1] + ":" + (parseInt(spl[2]) + 1));
+
+            //don't copy the values (inputs) from the old cells
+            $(newRow.cells[i]).find(".Input").attr('value', "");
+            $(newRow.cells[i]).find(".Input").text("");
+        }
+
+    }
+
+    function addColumn(tableID) {
+
+        var table = document.getElementById(tableID);
+
+        var rowCount = table.rows.length;
+        var columnCount = table.rows[0].cells.length;
+
+        // Before adding new level, check to see if we're not already at the max
+        if (columnCount > @maximumRubricLevels + 1)
+        {
+            alert("You may not put more than @maximumRubricLevels.ToString() levels in a rubric.");
+            return;
+        }
+
+        //loop over each row and append a copy of the last cell in that row to the end
+        for (var i = 0; i < rowCount; i++) {
+            if (i == 0) {
+                var element = document.createElement("th");
+            }
+            else {
+                var element = document.createElement("td");
+            }
+
+            // assign the class from the cells in the previous column to the corresponding
+            // cells in the new column
+            $(element).attr('class', $(table.rows[i].cells[columnCount - 1]).attr('class'));
+
+            table.rows[i].appendChild(element);
+            element.innerHTML = table.rows[i].cells[columnCount - 1].innerHTML;
+
+            //get name of previous element ( in the form X:Y) and increment X to create a unique
+            //name for the corresponding element in the new column
+            var name = $(table.rows[i].cells[columnCount - 1]).find('.Input').attr("name");
+            var spl = name.split(':');
+            $(element).find('.Input').attr("name", spl[0] + ":" + (parseInt(spl[1]) + 1) + ":" + spl[2]);
+
+            //don't copy the values (inputs) from the old cells
+            $(element).find('.Input').attr("value", "");
+            $(element).find('.Input').text("");
+
+            //special case to handle level point spread
+            if (i == 0) {
+                name = $(table.rows[i].cells[columnCount - 1]).find('.SpreadInput').attr("name");
+                spl = name.split(':');
+                $(element).find('.SpreadInput').attr("name", spl[0] + ":" + (parseInt(spl[1]) + 1) + ":" + spl[2]);
+            }
+        }
+    }
+
+    function deleteColumn(tableID, columnIndex) {
+        var table = document.getElementById(tableID);
+
+        //Delete a column only if there are more than the default amount: 3
+        if (table.rows[0].cells.length > 3) {
+            var n = columnIndex + 1;
+            $('td:nth-child(' + n + '), th:nth-child(' + n + ')').remove();
+        }
+    }
+
+    function deleteRow(tableID, rowIndex) {
+        var table = document.getElementById(tableID);
+
+        var row = $(table.rows[rowIndex]);
+
+        //Delete a row only if there are more than the default amount: 2
+        if (table.rows.length > 2) {
+            document.getElementById(tableID).deleteRow(rowIndex);
+        }
+    }
+
+    function moveRowUp(tableID, rowIndex) {
+        var table = document.getElementById(tableID);
+        //swap the names in each cell to preserve order
+        if (rowIndex > 1) {
+            var row2 = table.rows[rowIndex];
+            var row = table.rows[rowIndex - 1];
+
+            animateSwap(row, row2, table);
+        }
+    }
+
+    function moveRowDown(tableID, rowIndex) {
+        var table = document.getElementById(tableID);
+        if (rowIndex < table.rows.length - 1) {
+            var row = table.rows[rowIndex];
+            var row2 = table.rows[rowIndex + 1];
+            animateSwap(row, row2, table);
+
+        }
+    }
+
+    function animateSwap(topRow, bottomRow, table) {
+        swapped = false;
+        var animationTime = 300;
+        var i = 0;
+
+        //animations don't work well in (old) firefox, so just perform the swap with no animation
+        if ($.browser != null && $.browser.mozilla) {
+            $(topRow).insertAfter($(topRow).next());
+            var counter = 0;
+            var cellLength = table.rows[0].cells.length;
+            for (counter = 0; counter < cellLength; counter++) {
+                var name = $(topRow.cells[counter]).find('.Input').attr('name');
+                var name2 = $(bottomRow.cells[counter]).find('.Input').attr('name');
+
+                $(bottomRow.cells[counter]).find('.Input').attr('name', name);
+                $(topRow.cells[counter]).find('.Input').attr('name', name2);
+            }
+            swapped = true;
+        }
+        else {
+            $.each($(topRow).find('td'), function () {
+
+                var oldOffset = $(this).position();
+                var newOffset = $(bottomRow.cells[i]).position();
+
+                var $tempTop = $(this).clone().appendTo(table);
+                $tempTop
+                .css('position', 'absolute')
+                .css('left', oldOffset.left)
+                .css('top', oldOffset.top)
+                .css('zIndex', 1000)
+                .css('border-style', 'none')
+                .css('vertical-align', 'middle');
+
+                $tempTop.height($(this).height());
+
+                $tempTop.find('.Input').css('vertical-align', 'middle');
+
+                var $tempBottom = $(bottomRow.cells[i]).clone().appendTo(table);
+                $tempBottom
+                .css('position', 'absolute')
+                .css('left', newOffset.left)
+                .css('top', newOffset.top)
+                .css('zIndex', 1001)
+                .css('border-style', 'none')
+                .css('vertical-align', 'middle');
+
+                $tempBottom.height($(bottomRow.cells[i]).height());
+
+                $tempTop.find('textarea').text($(this).find('textarea').val());
+                $tempTop.find('textarea').css('width', $(this).find('textarea').css('width'));
+
+                $tempBottom.find('textarea').text($(bottomRow.cells[i]).find('textarea').val());
+                $tempBottom.find('textarea').css('width', $(bottomRow.cells[i]).find('textarea').css('width'));
+
+                $(this).css('visibility', 'hidden');
+                $(bottomRow.cells[i]).css('visibility', 'hidden');
+
+                //  Curve animation implementation
+                //            var arc_params = {
+                //                center: [285, 185],
+                //                radius: 100,
+                //                start: 30,
+                //                end: 200,
+                //                dir: -1
+                //            };
+
+                $tempBottom.animate({
+                    'top': oldOffset.top
+                    //path: new $.path.arc(arc_params)
+                }, animationTime, function () {
+                    $tempBottom.remove();
+                    $(table).find('td').css('visibility', 'visible');
+                });
+
+                //'top': newOffset.top
+                $tempTop.animate({
+
+                    'top': newOffset.top
+                }, animationTime, function () {
+                    $tempTop.remove();
+                    //if this is the last td, perform the actual swap
+                    if (!swapped) {
+                        $(topRow).insertAfter($(topRow).next());
+                        var counter = 0;
+                        var cellLength = table.rows[0].cells.length;
+                        for (counter = 0; counter < cellLength; counter++) {
+                            var name = $(topRow.cells[counter]).find('.Input').attr('name');
+                            var name2 = $(bottomRow.cells[counter]).find('.Input').attr('name');
+
+                            $(bottomRow.cells[counter]).find('.Input').attr('name', name);
+                            $(topRow.cells[counter]).find('.Input').attr('name', name2);
+                        }
+                        swapped = true;
+                    }
+                });
+                i++;
+            });
+        }
+    }
+
+    function isIntKey(e) {
+        var charCode = (e.which) ? e.which : e.keyCode;
+        if (charCode < 48 || charCode > 57)  return false;
+        return true;
+    }
+
+    $('.rubric').on('change', '.SpreadInput', function () {
+        var value = parseInt($(this).val());
+
+        if (isNaN(value)) {
+            $(this).val(@defaultPointSpread);
+            return;
+        }
+
+        $(this).val(value); // Values like 50fjaklsdsdf actually pass the parseInt, but value will just be 50, so set the value just in case
+        if (value === 0) $(this).val(1);    // Prevent 0.
+        return;
+    });
+
+    $('.rubric').on('keypress', '.SpreadInput', function (e) {
+        var charCode = (e.which) ? e.which : e.keyCode;
+        if (charCode < 48 || charCode > 57) return false;
+        return true;
+    });
+
+</script>
+
+

@@ -1,0 +1,32 @@
+﻿@{
+    ViewBag.Title = "Adding Moderators and TAs to the Course";
+}
+<h1>Adding Moderators and TAs to the Course</h1>
+<p>
+    <br /> Teaching assistants and other user types are added to a course in the @Html.ActionLink("same manner as students", "AddingStudents").
+    To begin, navigate to the &quot;Users&quot; tab at the top of the screen.
+    <br /> Once there, click the &quot;Add/Update Users&quot; link near the top of the page.  
+</p>
+<img src="@Url.Content("~/Content/images/help/roster_1.png")" alt="click the add/update users link" />
+<hr width="90%">
+<p>
+    To reach this location on the <b>mobile</b> version of the site, simply open the main menu and select &quot;Users&quot;.
+    Once at this page, the rest of the tutorial is the same for desktop and mobile.
+</p>
+<img src="@Url.Content("~/Content/images/help/roster_mobile_1.png")" alt="navigate to the users tab on mobile" />
+<hr width="90%">
+<p>
+    <br /> Performing this action brings up a new dialog that allows you to add students by school 
+    ID number or email address.  OSBLE also allows users to be added in @Html.ActionLink("bulk through the roster import", "AddingStudents")
+    functionality.  In this example, we will add a TA using their email.  To begin, we click the &quot;Add By Email&quot; link.
+</p>
+<img src="@Url.Content("~/Content/images/help/add_ta_1.png")" alt="click add by email" />
+<p>
+    <br /> This opens another page that allows you to add a TA using a specific email address:
+</p>
+<img src="@Url.Content("~/Content/images/help/add_ta_2.png")" alt="click add by email" />
+<p>
+    <br /> When finished, click the "Add User" button at the bottom of the form.  OSBLE will then return to the main Users tab.  
+    Notice the new TA section that contains the TA added in the previous step.
+</p>
+<img src="@Url.Content("~/Content/images/help/add_ta_3.png")" alt="click add by email" />

@@ -1,0 +1,12 @@
+NOTE: 
+the /api/assemblyinfo/versionnumber call in the plugin checks the local plugin assembly in the OSBLEPlus.Logic.Shell.Signed, 
+so in order to trigger a plugin update, the OSBLEPlus.Logic AssemblyInfo.cs file must be changed to reflect an updated plugin version.
+
+The UpdateUrl in StringConstants.cs indicates where the update .vsix file must be placed (renamed from .vsix to .zip).
+
+Steps to properly force an update of the plugin
+1. In the OSBLE.sln project increment the OSBLEPlus.Logic AssemblyInfo.cs "AssemblyVersion" and "AssemblyFileVersion"
+2. In the OSBLEPlus.VS2013.sln project increment ~\OSBLEPlus.VSPlugin\OSBIDE.Plugins.VS2013\source.extension.vsixmanifest version number
+3. In the OSBLEPlus.VS2013.sln project increment the ~\OSBIDE.Plugins.VS2013\ > Properties > AssemblyInfo.cs "AssemblyVersion" and "AssemblyFileVersion"
+3. In the OSBLEPlus.VS2013.sln project increment the ~\OSBLEPlus.Logic.Shell.Signed\ > Properties > AssemblyInfo.cs "AssemblyVersion" and "AssemblyFileVersion"
+4. Copy the latest .vsix to the web server UpdateUrl (e.g. ~/Content/) and rename per the StringConstants.cs expected .zip name.

@@ -1,0 +1,118 @@
+﻿@model OSBLE.Models.Intervention.AvailableDetailsViewModel
+
+@{
+    string currentUserProfileId = ViewBag.CurrentUserProfileId.ToString();
+}
+
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>OSBLE+ Suggestion</title>
+
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/bootstrap-3.3.5/css/bootstrap.min.css")" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-2.0.1.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/bootstrap-3.3.5/js/bootstrap.min.js")"></script>
+
+    @* highlight.js code syntax highlighting block*@
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/themes/highlight/vs.css")" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/highlight.pack.js")"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    @* highlight.js code syntax highlighting block*@
+
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/interventions.css")?version=1.0" />
+    <script type="text/javascript" src="@Url.Content("~/Scripts/Interventions.js")?version=1.01"></script>
+
+    @Html.Partial("_UserHashtagTagScript")
+
+</head>
+
+<body class="intervention-body">
+    <div>
+        <div class="panel panel-primary">
+            <div class="panel-heading intervention-heading">
+                <span class="left">
+                    <a href="/" style="color: #FFFFFF; text-decoration: none;">
+                        <span class="glyphicon glyphicon-circle-arrow-left"></span>
+                        <span class="glyphicon glyphicon-dashboard"></span>
+                    </a>
+                </span>
+                Classmates Offering Help
+            </div>
+            <div class="panel-body">
+                @Html.Partial("_UserFeedbackPrompt", new ViewDataDictionary { { "interventionId", Model.Intervention.Id } })
+                @Html.Partial("_CourseSelect")
+                <h4>Some of your classmates, TAs, or instructors have said they are available to help out!</h4>
+
+                <ul class="available-users-details">
+                    <li class="user-availability-row">
+                        <div class="checkbox" id="select-all">
+                            <h5 id="available-select-all" @if (Model.AvailableUsers.Count() == 0) { <text> style="display: none;" </text>    }>
+                                <input type="checkbox" class="checkbox" name="user-selected" value="-1" checked="checked"> <strong>Select All</strong>
+                            </h5>
+                        </div>
+                    </li>
+                </ul>
+
+                <ul class="available-users-details" id="available-user-list">
+                    @foreach (KeyValuePair<int, string> user in Model.AvailableUsers)
+                    {
+                        var status = Model.UsersStatus.Where(us => us.UserProfileId == user.Key).FirstOrDefault();
+                        <li class="user-availability-row">
+                            <div class="checkbox">
+                                <h5>
+                                    <span id="user-checkbox-@user.Key"><input type="checkbox" class="checkbox" name="user-selected" value="@user.Key" checked="checked"></span>
+                                    <span id="user-image-@user.Key"><img src="/User/@user.Key/Picture?size=32" class="small_profile_picture" alt="Profile Picture" /></span>
+                                    <span id="user-name-@user.Key"><strong>@user.Value:</strong></span>
+                                    <span id="user-status-@user.Key">" @status.StatusMessage "</span>
+                                    @{ var availableDate = String.Format("{0:g}", status.AvailableEndTime);}
+                                    <span id="user-available-time-@user.Key"><em>until </em> @availableDate</span>
+                                </h5>
+                            </div>
+                        </li>
+                    }
+                    @if (Model.AvailableUsers.Count() == 0)
+                    {
+                        <li id="no-users-available">
+                            <h5>Unfortunately, these classmates are no longer currently available!</h5>
+                            <h5>Post your question to the class instead!</h5>
+                        </li>
+                    }
+                </ul>
+
+                <div>
+                    <div class="left">
+                        <h4>Ask them a question: </h4>
+                    </div>
+                    <div class=" btn-right">
+                        <button class="btn btn-primary clear-default-text">Clear Template Text</button>
+                    </div>
+                </div>
+
+                <div id="question-area">
+                    <textarea name="ask-a-question">@Model.Intervention.InterventionTemplateText</textarea>
+                    <br />
+                </div>
+                <div>
+                    @if (Model.AvailableUsers.Count() == 0)
+                    {
+                        <button class="btn btn-primary right" id="post-class-feed">Post Question<br /> to Class</button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-primary right" id="post-selected">Post Question<br /> to Selected Classmates</button>
+                    }
+                    <button class="btn btn-default right" id="post-class-feed-anon"><span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span> Post Question<br /> to Class (Anonymously)</button>
+                    <span class="right" id="post-success"></span>
+                    <span class="right" id="post-error"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <input id="cupid" type="hidden" value="@currentUserProfileId" />
+    <input id="iid" type="hidden" value="@Model.Intervention.Id" />
+    @Html.Partial("_SuggestionFeedbackModal")
+</body>
+</html>

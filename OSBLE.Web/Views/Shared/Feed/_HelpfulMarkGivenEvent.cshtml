@@ -1,0 +1,20 @@
+﻿@using OSBLEPlus.Logic.DomainObjects.ActivityFeeds
+@model AggregateFeedItem  
+@{
+    HelpfulMarkGivenEvent helpful = Model.Items.First().Event as HelpfulMarkGivenEvent;
+    LogCommentEvent comment = helpful.LogComment;    
+    //Model.Items.First().LogId = comment.SourceEventLogId;
+    string senderFirstName = null == helpful.LogComment ? "OSBLE USER" : null == helpful.LogComment.Sender ? "OSBLE USER" : helpful.LogComment.Sender.FirstName;
+    if (senderFirstName == "OSBLE USER")
+    {
+        //try to get the sender's first name.
+        senderFirstName = OSBLE.Utility.DBHelper.GetUserFirstNameFromEventLogId(comment.SourceEventLogId);
+    }
+} 
+@if (null != helpful.LogComment)
+{
+    <span class="non-user-text">
+        <em>@Model.Creator.FirstName</em> marked <em>@senderFirstName</em>'s comment as being helpful:
+    </span><br />
+    @comment.Content
+}

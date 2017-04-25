@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://plus.osble.org/Services/OsbleService.svc?xsd=xsd6" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.HomePage" />
+  <xs:import schemaLocation="http://plus.osble.org/Services/OsbleService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" />
+  <xs:import schemaLocation="http://plus.osble.org/Services/OsbleService.svc?xsd=xsd8" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" />
+  <xs:import schemaLocation="http://plus.osble.org/Services/OsbleService.svc?xsd=xsd7" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+  <xs:import schemaLocation="http://plus.osble.org/Services/OsbleService.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+  <xs:complexType name="ArrayOfAssignment">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Assignment" nillable="true" type="tns:Assignment" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfAssignment" nillable="true" type="tns:ArrayOfAssignment" />
+  <xs:complexType name="Assignment">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ABETDepartment" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ABETOutcomes" nillable="true" type="tns:ArrayOfAbetAssignmentOutcome" />
+      <xs:element minOccurs="0" name="AssignmentDescription" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="AssignmentName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="AssignmentTeams" nillable="true" type="tns:ArrayOfAssignmentTeam" />
+      <xs:element minOccurs="0" name="AssignmentTypeID" type="xs:int" />
+      <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/OSBLE.Models.HomePage" minOccurs="0" name="AssociatedEvent" nillable="true" type="q1:Event" />
+      <xs:element minOccurs="0" name="AssociatedEventID" nillable="true" type="xs:int" />
+      <xs:element minOccurs="0" name="CommentCategory" nillable="true" type="tns:CommentCategoryConfiguration" />
+      <xs:element minOccurs="0" name="CommentCategoryID" nillable="true" type="xs:int" />
+      <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" minOccurs="0" name="Course" nillable="true" type="q2:Course" />
+      <xs:element minOccurs="0" name="CourseID" nillable="true" type="xs:int" />
+      <xs:element minOccurs="0" name="CriticalReviewPublishDate" nillable="true" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="CriticalReviewSettings" nillable="true" type="tns:CriticalReviewSettings" />
+      <xs:element minOccurs="0" name="DeductionPerUnit" type="xs:double" />
+      <xs:element minOccurs="0" name="Deliverables" nillable="true" type="tns:ArrayOfDeliverable" />
+      <xs:element minOccurs="0" name="DiscussionSettings" nillable="true" type="tns:DiscussionSetting" />
+      <xs:element minOccurs="0" name="DiscussionTeams" nillable="true" type="tns:ArrayOfDiscussionTeam" />
+      <xs:element minOccurs="0" name="DueDate" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="DueTime" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="HoursLateWindow" type="xs:int" />
+      <xs:element minOccurs="0" name="HoursPerDeduction" type="xs:double" />
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="IsAnnotatable" type="xs:boolean" />
+      <xs:element minOccurs="0" name="IsDraft" type="xs:boolean" />
+      <xs:element minOccurs="0" name="PrecededingAssignmentID" nillable="true" type="xs:int" />
+      <xs:element minOccurs="0" name="PreceedingAssignment" nillable="true" type="tns:Assignment" />
+      <xs:element minOccurs="0" name="ReleaseDate" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="ReleaseTime" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="ReviewTeams" nillable="true" type="tns:ArrayOfReviewTeam" />
+      <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" minOccurs="0" name="Rubric" nillable="true" type="q3:Rubric" />
+      <xs:element minOccurs="0" name="RubricID" nillable="true" type="xs:int" />
+      <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" minOccurs="0" name="StudentRubric" nillable="true" type="q4:Rubric" />
+      <xs:element minOccurs="0" name="StudentRubricID" nillable="true" type="xs:int" />
+      <xs:element minOccurs="0" name="TeamEvaluationSettings" nillable="true" type="tns:TeamEvaluationSettings" />
+      <xs:element minOccurs="0" name="Type" type="tns:AssignmentTypes" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Assignment" nillable="true" type="tns:Assignment" />
+  <xs:complexType name="ArrayOfAbetAssignmentOutcome">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="AbetAssignmentOutcome" nillable="true" type="tns:AbetAssignmentOutcome" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfAbetAssignmentOutcome" nillable="true" type="tns:ArrayOfAbetAssignmentOutcome" />
+  <xs:complexType name="AbetAssignmentOutcome">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Assignment" nillable="true" type="tns:Assignment" />
+      <xs:element minOccurs="0" name="AssignmentID" type="xs:int" />
+      <xs:element minOccurs="0" name="Outcome" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="AbetAssignmentOutcome" nillable="true" type="tns:AbetAssignmentOutcome" />
+  <xs:complexType name="ArrayOfAssignmentTeam">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="AssignmentTeam" nillable="true" type="tns:AssignmentTeam" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfAssignmentTeam" nillable="true" type="tns:ArrayOfAssignmentTeam" />
+  <xs:complexType name="AssignmentTeam">
+    <xs:sequence>
+      <xs:element name="_submissionTime" nillable="true" type="xs:dateTime" />
+      <xs:element name="_submissionTimeAccessed" type="xs:boolean" />
+      <xs:element name="_x003C_AssignmentID_x003E_k__BackingField" type="xs:int" />
+      <xs:element name="_x003C_Assignment_x003E_k__BackingField" nillable="true" type="tns:Assignment" />
+      <xs:element name="_x003C_TeamID_x003E_k__BackingField" type="xs:int" />
+      <xs:element name="_x003C_Team_x003E_k__BackingField" nillable="true" type="tns:Team" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="AssignmentTeam" nillable="true" type="tns:AssignmentTeam" />
+  <xs:complexType name="Team">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="TeamMembers" nillable="true" type="tns:ArrayOfTeamMember" />
+      <xs:element minOccurs="0" name="UsedAsAssignmentTeam" nillable="true" type="tns:ArrayOfAssignmentTeam" />
+      <xs:element minOccurs="0" name="UsedInAssignments" nillable="true" type="tns:ArrayOfAssignment" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Team" nillable="true" type="tns:Team" />
+  <xs:complexType name="ArrayOfTeamMember">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="TeamMember" nillable="true" type="tns:TeamMember" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfTeamMember" nillable="true" type="tns:ArrayOfTeamMember" />
+  <xs:complexType name="TeamMember">
+    <xs:sequence>
+      <xs:element name="_x003C_CourseUserID_x003E_k__BackingField" type="xs:int" />
+      <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" name="_x003C_CourseUser_x003E_k__BackingField" nillable="true" type="q5:CourseUser" />
+      <xs:element name="_x003C_TeamID_x003E_k__BackingField" type="xs:int" />
+      <xs:element name="_x003C_Team_x003E_k__BackingField" nillable="true" type="tns:Team" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="TeamMember" nillable="true" type="tns:TeamMember" />
+  <xs:complexType name="CommentCategoryConfiguration">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Categories" nillable="true" type="tns:ArrayOfCommentCategory" />
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CommentCategoryConfiguration" nillable="true" type="tns:CommentCategoryConfiguration" />
+  <xs:complexType name="ArrayOfCommentCategory">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="CommentCategory" nillable="true" type="tns:CommentCategory" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfCommentCategory" nillable="true" type="tns:ArrayOfCommentCategory" />
+  <xs:complexType name="CommentCategory">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Options" nillable="true" type="tns:ArrayOfCommentCategoryOption" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CommentCategory" nillable="true" type="tns:CommentCategory" />
+  <xs:complexType name="ArrayOfCommentCategoryOption">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="CommentCategoryOption" nillable="true" type="tns:CommentCategoryOption" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfCommentCategoryOption" nillable="true" type="tns:ArrayOfCommentCategoryOption" />
+  <xs:complexType name="CommentCategoryOption">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CommentCategoryOption" nillable="true" type="tns:CommentCategoryOption" />
+  <xs:complexType name="CriticalReviewSettings">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="AllowDownloadAfterPublish" type="xs:boolean" />
+      <xs:element minOccurs="0" name="AnonymizeAuthor" type="xs:boolean" />
+      <xs:element minOccurs="0" name="AnonymizeComments" type="xs:boolean" />
+      <xs:element minOccurs="0" name="AnonymizeCommentsAfterPublish" type="xs:boolean" />
+      <xs:element minOccurs="0" name="Assignment" nillable="true" type="tns:Assignment" />
+      <xs:element minOccurs="0" name="AssignmentID" type="xs:int" />
+      <xs:element minOccurs="0" name="ReviewSettings" type="xs:unsignedByte" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CriticalReviewSettings" nillable="true" type="tns:CriticalReviewSettings" />
+  <xs:complexType name="ArrayOfDeliverable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Deliverable" nillable="true" type="tns:Deliverable" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfDeliverable" nillable="true" type="tns:ArrayOfDeliverable" />
+  <xs:complexType name="Deliverable">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Assignment" nillable="true" type="tns:Assignment" />
+      <xs:element minOccurs="0" name="AssignmentID" type="xs:int" />
+      <xs:element minOccurs="0" name="DeliverableType" type="tns:DeliverableType" />
+      <xs:element xmlns:q6="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="FileExtensions" nillable="true" type="q6:ArrayOfstring" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Type" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Deliverable" nillable="true" type="tns:Deliverable" />
+  <xs:simpleType name="DeliverableType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="PluginSubmission" />
+      <xs:enumeration value="Zip" />
+      <xs:enumeration value="Code" />
+      <xs:enumeration value="Text" />
+      <xs:enumeration value="ChemProV" />
+      <xs:enumeration value="Video" />
+      <xs:enumeration value="InBrowserText" />
+      <xs:enumeration value="PowerPoint" />
+      <xs:enumeration value="WordDocument" />
+      <xs:enumeration value="PDF" />
+      <xs:enumeration value="ExcelSpreadSheet" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="DeliverableType" nillable="true" type="tns:DeliverableType" />
+  <xs:complexType name="DiscussionSetting">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="AnonymitySettings" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="Assignment" nillable="true" type="tns:Assignment" />
+      <xs:element minOccurs="0" name="AssignmentID" type="xs:int" />
+      <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/OSBLE.Models.HomePage" minOccurs="0" name="AssociatedEvent" nillable="true" type="q7:Event" />
+      <xs:element minOccurs="0" name="AssociatedEventID" nillable="true" type="xs:int" />
+      <xs:element minOccurs="0" name="HasAnonymousInstructorsToStudents" type="xs:boolean" />
+      <xs:element minOccurs="0" name="HasAnonymousModeratorsToStudents" type="xs:boolean" />
+      <xs:element minOccurs="0" name="HasAnonymousStudentsToModerators" type="xs:boolean" />
+      <xs:element minOccurs="0" name="HasAnonymousStudentsToStudents" type="xs:boolean" />
+      <xs:element minOccurs="0" name="HasHiddenRoles" type="xs:boolean" />
+      <xs:element minOccurs="0" name="InitialPostDueDate" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="InitialPostDueDueTime" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="MaximumFirstPostLength" type="xs:int" />
+      <xs:element minOccurs="0" name="MinimumFirstPostLength" type="xs:int" />
+      <xs:element minOccurs="0" name="RequiresPostBeforeView" type="xs:boolean" />
+      <xs:element minOccurs="0" name="TAsCanPostToAllDiscussions" type="xs:boolean" />
+      <xs:element minOccurs="0" name="WillEmailInstructorsOnModeratorPost" type="xs:boolean" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="DiscussionSetting" nillable="true" type="tns:DiscussionSetting" />
+  <xs:complexType name="ArrayOfDiscussionTeam">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="DiscussionTeam" nillable="true" type="tns:DiscussionTeam" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfDiscussionTeam" nillable="true" type="tns:ArrayOfDiscussionTeam" />
+  <xs:complexType name="DiscussionTeam">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Assignment" nillable="true" type="tns:Assignment" />
+      <xs:element minOccurs="0" name="AssignmentID" type="xs:int" />
+      <xs:element minOccurs="0" name="AuthorTeam" nillable="true" type="tns:Team" />
+      <xs:element minOccurs="0" name="AuthorTeamID" nillable="true" type="xs:int" />
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="Team" nillable="true" type="tns:Team" />
+      <xs:element minOccurs="0" name="TeamID" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="DiscussionTeam" nillable="true" type="tns:DiscussionTeam" />
+  <xs:complexType name="ArrayOfReviewTeam">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ReviewTeam" nillable="true" type="tns:ReviewTeam" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfReviewTeam" nillable="true" type="tns:ArrayOfReviewTeam" />
+  <xs:complexType name="ReviewTeam">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Assignment" nillable="true" type="tns:Assignment" />
+      <xs:element minOccurs="0" name="AssignmentID" type="xs:int" />
+      <xs:element minOccurs="0" name="AuthorTeam" nillable="true" type="tns:Team" />
+      <xs:element minOccurs="0" name="AuthorTeamID" type="xs:int" />
+      <xs:element minOccurs="0" name="ReviewTeamID" type="xs:int" />
+      <xs:element minOccurs="0" name="ReviewingTeam" nillable="true" type="tns:Team" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ReviewTeam" nillable="true" type="tns:ReviewTeam" />
+  <xs:complexType name="TeamEvaluationSettings">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Assignment" nillable="true" type="tns:Assignment" />
+      <xs:element minOccurs="0" name="AssignmentID" type="xs:int" />
+      <xs:element minOccurs="0" name="DiscrepancyCheckSize" type="xs:int" />
+      <xs:element minOccurs="0" name="MaximumMultiplier" type="xs:double" />
+      <xs:element minOccurs="0" name="RequiredCommentLength" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="TeamEvaluationSettings" nillable="true" type="tns:TeamEvaluationSettings" />
+  <xs:simpleType name="AssignmentTypes">
+    <xs:annotation>
+      <xs:appinfo>
+        <ActualType Name="unsignedByte" Namespace="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Basic">
+        <xs:annotation>
+          <xs:appinfo>
+            <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1</EnumerationValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CriticalReview">
+        <xs:annotation>
+          <xs:appinfo>
+            <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">2</EnumerationValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="DiscussionAssignment">
+        <xs:annotation>
+          <xs:appinfo>
+            <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">3</EnumerationValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="TeamEvaluation">
+        <xs:annotation>
+          <xs:appinfo>
+            <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">4</EnumerationValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CriticalReviewDiscussion">
+        <xs:annotation>
+          <xs:appinfo>
+            <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">5</EnumerationValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CommitteeDiscussion">
+        <xs:annotation>
+          <xs:appinfo>
+            <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">6</EnumerationValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ReviewOfStudentWork">
+        <xs:annotation>
+          <xs:appinfo>
+            <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">7</EnumerationValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CommitteeReview">
+        <xs:annotation>
+          <xs:appinfo>
+            <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">8</EnumerationValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AggregateAssessment">
+        <xs:annotation>
+          <xs:appinfo>
+            <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">9</EnumerationValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AnchoredDiscussion">
+        <xs:annotation>
+          <xs:appinfo>
+            <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">10</EnumerationValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="AssignmentTypes" nillable="true" type="tns:AssignmentTypes" />
+</xs:schema>
