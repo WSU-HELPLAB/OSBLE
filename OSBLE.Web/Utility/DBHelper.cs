@@ -1798,5 +1798,70 @@ namespace OSBLE.Utility
             }
             return roleName;
         }
+
+        internal static bool GetGradebookSectionEditableSettings(int courseId)
+        {
+            bool sectionsEditable = false;
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+
+                    string query = "SELECT * FROM GradebookSettings WHERE CourseId = @CourseId ";
+
+                    var result = sqlConnection.Query(query, new { CourseId = courseId }).SingleOrDefault();
+
+                    if (result != null)
+                    {
+                        sectionsEditable = result.SectionsEditable;
+                    }   // else we'll just return false
+
+                    sqlConnection.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                return sectionsEditable;
+            }
+            return sectionsEditable;
+        }
+
+        internal static bool ToggleGradebookSectionsEditable(int courseId)
+        {
+            bool updateSuccess = false;
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+
+                    string query = "SELECT * FROM GradebookSettings WHERE CourseId = @CourseId ";
+
+                    var result = sqlConnection.Query(query, new { CourseId = courseId }).SingleOrDefault();
+
+                    if (result != null) //we found a match, let's update it.
+                    {
+                        bool sectionsEditable = result.SectionsEditable;
+
+                        string updateQuery = "UPDATE GradebookSettings SET SectionsEditable = @SectionsEditable WHERE CourseId = @CourseId ";
+                        updateSuccess = sqlConnection.Execute(updateQuery, new { CourseId = courseId, SectionsEditable = !sectionsEditable }) != 0; //toggle the sectionsEditable value
+
+                    }   
+                    else //no match, insert a row... set to true because the default will be false
+                    {
+                        string insertQuery = "INSERT INTO GradebookSettings (CourseId, SectionsEditable) VALUES (@CourseId, 1) ";
+                        updateSuccess = sqlConnection.Execute(insertQuery, new { CourseId = courseId }) != 0;
+                    }
+
+                    sqlConnection.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                return updateSuccess; //failure!
+            }
+            return updateSuccess;
+        }
     }
 }

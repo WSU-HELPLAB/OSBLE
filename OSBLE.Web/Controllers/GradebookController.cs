@@ -84,6 +84,11 @@ namespace OSBLE.Controllers
             if (userRole == (int)CourseRole.CourseRoles.Instructor)
             {
                 deleteGradebookAbility = true;
+                ViewBag.IsInstructor = true;
+            }
+            else
+            {
+                ViewBag.IsInstructor = false;
             }
 
             ViewBag.deleteGradebookAbility = deleteGradebookAbility;
@@ -162,7 +167,9 @@ namespace OSBLE.Controllers
                 //Generate additional upload fail messages. 
             }
 
-            ViewBag.HideMail = OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID); 
+            ViewBag.HideMail = DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID);
+
+            ViewBag.EditSections = DBHelper.GetGradebookSectionEditableSettings(ActiveCourseUser.AbstractCourseID);
 
             return View();
         }
@@ -928,6 +935,17 @@ namespace OSBLE.Controllers
                 gfp.AllFiles().Delete();
             }
             return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        [CanGradeCourse]
+        public bool ToggleSectionEdit()
+        {
+            if (ActiveCourseUser == null)
+            {
+                return false;
+            }
+            return DBHelper.ToggleGradebookSectionsEditable(ActiveCourseUser.AbstractCourseID);
         }
 
         /// <summary>

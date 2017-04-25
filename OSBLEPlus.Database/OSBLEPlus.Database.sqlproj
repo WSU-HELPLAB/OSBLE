@@ -236,6 +236,7 @@
     <Build Include="Schema\Tables\OSBLEInterventionsStatus.sql" />
     <Build Include="Schema\Tables\OSBLEInterventionSettings.sql" />
     <Build Include="Schema\Tables\OSBLEInterventionsCourses.sql" />
+    <Build Include="Schema\Tables\GradebookSettings.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Post-Deployment\Script.PostDeployment.sql" />

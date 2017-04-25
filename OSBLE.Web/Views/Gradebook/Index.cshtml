@@ -4,7 +4,8 @@
     string SelectedTab = ViewBag.SelectedTab;
     List<List<string>> Table = ViewBag.TableData;
     bool GradeBookExists = ViewBag.GradeBookExists;
-    bool IsInstructorOrTa = ViewBag.CanUpload;    
+    bool IsInstructorOrTa = ViewBag.CanUpload;
+    bool IsInstructor = ViewBag.IsInstructor ?? false;
     bool DisplaySearch = false;
     int NameColumnIndex = -1;
     List<int> hiddenColumnIndicies = ViewBag.Instructor_ColumnsToHide;
@@ -17,6 +18,10 @@
     int sectionIndex = 1;    
     string helpLink = Url.Action("GradebookHelp", "Gradebook", new { area = "" });
     int nameIndex = 0;
+
+    bool EditSections = ViewBag.EditSections ?? false;
+
+    string editToolTip = "Edit Section Values: \n\t toggle between sortable and editable for ALL instructors or TAs for this course.";
 }
 <style type="text/css">
     #gb_header > h2 {
@@ -68,6 +73,10 @@
 
     .modal-footer {
         border-top: none;
+    }
+
+    #gradebook-toggle-sections-edit-tooltip-class {
+        cursor: pointer;
     }
     
 </style>
@@ -288,25 +297,55 @@ else
 
                                 if (globalRowIndicies.Contains(i) || i == 0)
                                 {
-                                    <th>@displayValue <input type="hidden" id="@tdId" name="@tdId" value="@displayValue" readonly /> </th>
-                                }
-                                else
-                                {
-                                    if (j >= sectionIndex)
+                                    if (displayValue.ToLower().Contains("section") && IsInstructor)
                                     {
-                                        if (ViewBag.CanUpload && j != nameIndex)
-                                        {                                            
-                                            <td class="@tdClass"><input type="text" id="@tdId" name="@tdId" value="@displayValue" /></td>
-                                        }
-                                        else
-                                        {
-                                            <td class="@tdClass">@displayValue</td>
-                                        }
+                                        <th>@displayValue <input type="hidden" id="@tdId" name="@tdId" value="@displayValue" readonly />                                             
+                                            <span id="gradebook-toggle-sections-edit-tooltip-class" class="glyphicon glyphicon-edit" title="@editToolTip"></span>
+                                        </th>
                                     }
                                     else
                                     {
-                                        <td class="@tdClass">@displayValue <input type="hidden" id="@tdId" name="@tdId" value="@displayValue" readonly /></td>
+                                        <th>@displayValue <input type="hidden" id="@tdId" name="@tdId" value="@displayValue" readonly /> </th>                                        
+                                    }                                    
+                                }
+                                else
+                                {
+                                    if (EditSections)
+                                    {
+                                        if (j >= sectionIndex)
+                                        {
+                                            if (ViewBag.CanUpload && j != nameIndex)
+                                            {   
+                                                <td class="@tdClass"><input type="text" id="@tdId" name="@tdId" value="@displayValue" /></td>
+                                            }
+                                            else
+                                            {
+                                                <td class="@tdClass">@displayValue</td>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <td class="@tdClass">@displayValue <input type="hidden" id="@tdId" name="@tdId" value="@displayValue" readonly /></td>
+                                        }   
                                     }
+                                    else
+                                    {
+                                        if (j > sectionIndex)
+                                        {
+                                            if (ViewBag.CanUpload && j != nameIndex)
+                                            {                                            
+                                                <td class="@tdClass"><input type="text" id="@tdId" name="@tdId" value="@displayValue" /></td>
+                                            }
+                                            else
+                                            {
+                                                <td class="@tdClass">@displayValue</td>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <td class="@tdClass">@displayValue <input type="hidden" id="@tdId" name="@tdId" value="@displayValue" readonly /></td>
+                                        }   
+                                    }                                    
                                 }
                             }
                         }
@@ -322,8 +361,9 @@ else
         @if (ViewBag.CanUpload)
         {
             <button id="Gradebook_button" class="btn btn-primary" type="button">Submit Changes</button>
-        }
-    </div>
+        }        
+    </div>    
+    
     <div><input type="hidden" id="uploader" value="@ViewBag.CanUpload" /></div>
 }
 
@@ -429,12 +469,22 @@ else
             //get the original data values so we can compare for changes on submit
             //we only want to submit the rows that have changes
             Table_Data = table.$('input, select').serialize(); //Table_Data is a global declared on the _Layout.cshtml
-
-            $("#submit_changes").insertAfter("#Gradebook_filter");
+            
+            $("#submit_changes").insertAfter("#Gradebook_filter");            
 
             $('#Gradebook_button').click(function () {
                 ShowLoading();
                 process(table);
+            });
+
+            $('#gradebook-toggle-sections-edit-tooltip-class').click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/Gradebook/ToggleSectionEdit",                    
+                    success: function () {                        
+                        location.reload();                        
+                    }
+                });
             });
         }
         HideLoadingGb();
