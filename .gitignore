@@ -158,3 +158,4 @@ $RECYCLE.BIN/
 #ignore the web.config files
 Web.config
 Web.Debug.config
+\.vs/config/applicationhost\.config
