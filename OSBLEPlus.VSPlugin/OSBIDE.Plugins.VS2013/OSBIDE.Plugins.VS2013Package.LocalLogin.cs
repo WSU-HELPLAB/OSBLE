@@ -50,24 +50,25 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
 
                 //setup intervention window cache
                 bool showInterventionWindow = false;
-                try //we don't want this to cause any issue if it fails...
-                {
-                    var settingsTask = AsyncServiceClient.GetUserInterventionSettings(result); //result is the authkey
-                    var settingsResult = await settingsTask;
-                    showInterventionWindow = settingsResult.ShowInIDE;
-                    //setup cache for intervention settings
-                    _cache["ShowSuggestionsWindow"] = showInterventionWindow.ToString();
-                    //refresh threshold                    
-                    _cache["InterventionRefreshThresholdInMinutes"] = settingsResult.RefreshThreshold;
-                    //set last refresh time as now since we will open the window now if they are seeing interventions
-                    _cache["LastRefreshTime"] = DateTime.Now.ToString();
-                }
-                catch (Exception e)
-                {
-                    _errorLogger.WriteToLog(string.Format("Open Suggestions window error: {0}", e.Message), LogPriority.HighPriority);
-                }
+                //TODO: re-enable for non control version of the plugin
+                //try //we don't want this to cause any issue if it fails...
+                //{
+                //    var settingsTask = AsyncServiceClient.GetUserInterventionSettings(result); //result is the authkey
+                //    var settingsResult = await settingsTask;
+                //    showInterventionWindow = settingsResult.ShowInIDE;
+                //    //setup cache for intervention settings
+                //    _cache["ShowSuggestionsWindow"] = showInterventionWindow.ToString();
+                //    //refresh threshold                    
+                //    _cache["InterventionRefreshThresholdInMinutes"] = settingsResult.RefreshThreshold;
+                //    //set last refresh time as now since we will open the window now if they are seeing interventions
+                //    _cache["LastRefreshTime"] = DateTime.Now.ToString();
+                //}
+                //catch (Exception e)
+                //{
+                //    _errorLogger.WriteToLog(string.Format("Open Suggestions window error: {0}", e.Message), LogPriority.HighPriority);
+                //}
 
-                Init_BrowserLogin(result, showInterventionWindow);
+                Init_BrowserLogin(result, false); //disabling the suggestions menu for the control version.
                 InitStepTwo_LoginCompleted(result);
             }
             catch (Exception e)
