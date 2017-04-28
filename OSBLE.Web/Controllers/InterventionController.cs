@@ -363,13 +363,13 @@ namespace OSBLE.Controllers
                 {
                     if (InterventionRequiresRefresh(existingIntervention)) //check for certain types that need to be refreshed if they exist e.g. build/runtime errors need the latest info while unanswered questions wont.
                     {
-                        dismissSuccess = DismissIntervention(existingIntervention.Id, true);   
-                    }     
+                        dismissSuccess = DismissIntervention(existingIntervention.Id, true);
+                    }
                     //else leave dismissSuccess as false so we wont save...
                 }
                 //if an existing intervention of this type exists and was successfully dismissed OR if one didn't exist before
                 if ((existingIntervention.Id != -1 && dismissSuccess) || existingIntervention.Id == -1)
-                {                    
+                {
                     try
                     {
                         using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
@@ -643,20 +643,20 @@ namespace OSBLE.Controllers
 
             if (userProfileId > 0 && courseId > 0)
             {
-            //check if we need to generate a 'ClassmatesAvailable' intervention first. try catch in case this breaks
-            try
-            {
-                    bool generateIntervention = CheckIfOtherUsersAreAvailable(userProfileId, courseId);
-                if (generateIntervention)
+                //check if we need to generate a 'ClassmatesAvailable' intervention first. try catch in case this breaks
+                try
                 {
+                    bool generateIntervention = CheckIfOtherUsersAreAvailable(userProfileId, courseId);
+                    if (generateIntervention)
+                    {
                         SaveIntervention(GenerateClassmatesAvailableIntervention(userProfileId));
+                    }
                 }
-            }
-            catch (Exception e)
-            {
-                throw new Exception("Failed to CheckIfOtherUsersAreAvailable in Index()", e);
-            }
-            //Get all interventions for the current user
+                catch (Exception e)
+                {
+                    throw new Exception("Failed to CheckIfOtherUsersAreAvailable in Index()", e);
+                }
+                //Get all interventions for the current user
                 vm = BuildInterventionsViewModel(userProfileId);
             }
 
@@ -778,15 +778,15 @@ namespace OSBLE.Controllers
                     var results = sqlConnection.Query(query, new { UserProfileId = userProfileId }).SingleOrDefault();
                     if (results != null)
                     {
-                    ViewBag.ShowSuggestionsWindow = results.ShowInIDESuggestions;
-                    ViewBag.RefreshThreshold = results.RefreshThreshold;
+                        ViewBag.ShowSuggestionsWindow = results.ShowInIDESuggestions;
+                        ViewBag.RefreshThreshold = results.RefreshThreshold;
                     }
                     else
                     {
                         ViewBag.ShowSuggestionsWindow = true;
                         ViewBag.RefreshThreshold = 10;
                     }
-                    
+
                     sqlConnection.Close();
                 }
             }
@@ -806,7 +806,7 @@ namespace OSBLE.Controllers
         {
             int userProfileId = ActiveCourseUser.UserProfileID;
             bool updateSuccess = false;
-            
+
             //enable/disable in-IDE suggestions
             try
             {
@@ -819,7 +819,7 @@ namespace OSBLE.Controllers
                     string insertQuery = "INSERT INTO OSBLEInterventionSettings ([UserProfileId], [ShowInIDESuggestions], [RefreshThreshold]) VALUES( @UserProfileId, @ShowInIDESuggestions, @RefreshThreshold) ";
 
                     var results = sqlConnection.Query(query, new { UserProfileId = userProfileId });
-                    
+
                     if (results.Count() == 0) //insert
                     {
                         updateSuccess = sqlConnection.Execute(insertQuery, new { UserProfileId = userProfileId, ShowInIDESuggestions = enableSuggestionsIDE, RefreshThreshold = refreshThreshold }) != 0;

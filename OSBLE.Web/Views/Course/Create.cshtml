@@ -189,6 +189,12 @@
             @Helpers.CreateToolTip(ToolTips.CourseHideMail) <br />
             @Html.ValidationMessageFor(model => model.HideMail)
         </div>
+    
+        <div class="editor-field">
+            @Html.CheckBox("IsProgrammingCourse") @Html.Label("IsProgrammingCourse", "Set course as a 'programming' related course.") 
+            @Helpers.CreateToolTip(ToolTips.IsProgrammingCourse) <br />
+            @Html.ValidationMessage("IsProgrammingCourse")
+        </div>
 
         <br />
         <div class="editor-field">

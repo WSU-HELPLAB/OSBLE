@@ -1863,5 +1863,70 @@ namespace OSBLE.Utility
             }
             return updateSuccess;
         }
+
+        internal static bool SetIsProgrammingCourse(int courseId, bool isProgrammingCourse)
+        {
+            bool updateSuccess = false;
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+
+                    string query = "SELECT * FROM OSBLEInterventionsCourses WHERE CourseId = @CourseId ";
+
+                    var result = sqlConnection.Query(query, new { CourseId = courseId }).SingleOrDefault();
+
+                    if (result != null) //we found a match, let's update it if it's different than the current value
+                    {
+                        string updateQuery = "UPDATE OSBLEInterventionsCourses SET IsProgrammingCourse = @IsProgrammingCourse WHERE CourseId = @CourseId ";
+                        updateSuccess = sqlConnection.Execute(updateQuery, new { CourseId = courseId, IsProgrammingCourse = isProgrammingCourse }) != 0; //toggle the sectionsEditable value
+
+                    }
+                    else //no match, insert a row, default to interventions disabled
+                    {
+                        string insertQuery = "INSERT INTO OSBLEInterventionsCourses (CourseId, InterventionsEnabled, IsProgrammingCourse) VALUES (@CourseId, 0, @IsProgrammingCourse) ";
+                        updateSuccess = sqlConnection.Execute(insertQuery, new { CourseId = courseId, IsProgrammingCourse = isProgrammingCourse }) != 0;
+                    }
+
+                    sqlConnection.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                return updateSuccess; //failure!
+            }
+            return updateSuccess;
+        }
+
+        internal static bool GetIsProgrammingCourseSetting(int courseId)
+        {
+            bool isProgrammingCourse = false;
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+
+                    string query = "SELECT * FROM OSBLEInterventionsCourses WHERE CourseId = @CourseId ";
+
+                    var result = sqlConnection.Query(query, new { CourseId = courseId }).SingleOrDefault();
+
+                    if (result != null) //we found a match
+                    {
+                        isProgrammingCourse = result.IsProgrammingCourse;
+                    }
+                    
+                    //else no match, leave it false
+
+                    sqlConnection.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                return isProgrammingCourse; //failure!
+            }
+            return isProgrammingCourse;
+        }
     }
 }

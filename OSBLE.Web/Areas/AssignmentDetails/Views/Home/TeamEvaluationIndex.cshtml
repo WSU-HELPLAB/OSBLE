@@ -80,7 +80,9 @@
             int temp;
             bool flagCheck;
             bool sectionFlag;
-            temp = assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.Section;
+
+            temp = assignmentTeam.Team.TeamMembers.FirstOrDefault() != null ? assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.Section : -1;
+
             flagCheck = false;
             sectionFlag = false;
 
@@ -180,7 +182,7 @@
                 //Make sure all team members are on the same team.
                 int temp;
                 bool flagCheck;
-                temp = assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.Section;
+                temp = assignmentTeam.Team.TeamMembers.FirstOrDefault() != null ? assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.Section : -1;
                 flagCheck = false;
 
                 foreach (TeamMember tm in assignmentTeam.Team.TeamMembers)
@@ -197,7 +199,7 @@
                     continue;
                 }
 
-                if (assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.Section != section)
+                if (assignmentTeam.Team.TeamMembers.FirstOrDefault() != null && assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.Section != section)
                 {
                     continue;
                 }

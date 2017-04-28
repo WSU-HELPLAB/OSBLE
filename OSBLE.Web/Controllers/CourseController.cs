@@ -417,6 +417,18 @@ namespace OSBLE.Controllers
                     icalControl.CreateCourseCalendar(course.ID);
                 }
 
+                //now update IsProgrammingCourse value
+                try
+                {
+                    string isProgrammingCourseString = Request.Form["IsProgrammingCourse"].Split(',').First();
+                    bool isProgrammingCourse = isProgrammingCourseString == "true" ? true : false;
+                    DBHelper.SetIsProgrammingCourse(course.ID, isProgrammingCourse);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("Failed to set IsProgrammingCourse value in the database: ", e);
+                }
+
                 return RedirectToAction("Index", "Home");
             }
             return View(course);
@@ -751,7 +763,11 @@ namespace OSBLE.Controllers
                 }
             }
 
-            return View(course);
+            CourseSettingsViewModel vm = new CourseSettingsViewModel();
+            vm.Course = course;
+            vm.IsProgrammingCourse = DBHelper.GetIsProgrammingCourseSetting(course.ID);
+
+            return View(vm);
         }
 
         //
@@ -809,6 +825,18 @@ namespace OSBLE.Controllers
                 using (iCalendarController icalControl = new iCalendarController())
                 {
                     icalControl.CreateCourseCalendar(course.ID);
+                }
+
+                //now update IsProgrammingCourse value
+                try
+                {
+                    string isProgrammingCourseString = Request.Form["IsProgrammingCourse"].Split(',').First();
+                    bool isProgrammingCourse = isProgrammingCourseString == "true" ? true : false;
+                    DBHelper.SetIsProgrammingCourse(course.ID, isProgrammingCourse);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("Failed to set IsProgrammingCourse value in the database: ", e);
                 }
 
                 return RedirectToAction("Index", "Home");
