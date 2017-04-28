@@ -99,7 +99,7 @@
             <div class="panel-body">
                 @Html.Partial("_UserFeedbackPrompt", new ViewDataDictionary { { "interventionId", Model.Intervention.Id } })
                 @Html.Partial("_CourseSelect")
-                <h4>You have successfully submitted your assignment early! <em>Some of your classmates'</em> programs have encountered errors...</h4>
+                <h4 id="template-change">You have successfully submitted your assignment early! <em>Some of your classmates'</em> programs have encountered errors...</h4>
                 <h5>Would you like to offer your help?</h5>
                 <div>
                     <div class="left">
@@ -175,6 +175,7 @@
         </div>
     </div>
     <input id="iid" type="hidden" value="@Model.Intervention.Id" />
+    <input id="suggestions-type-name" type="hidden" value="OfferHelp" />
     @Html.Partial("_SuggestionFeedbackModal")
 
 </body>

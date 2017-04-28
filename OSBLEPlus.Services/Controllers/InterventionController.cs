@@ -718,11 +718,11 @@ namespace OSBLEPlus.Services.Controllers
                     {
                         if (dashboardRefresh)
                         {
-                            refreshInterventions = result.RefreshInterventionsDashboard || refreshInterventions; //we want to refresh if either is true                           
+                            refreshInterventions = result.RefreshInterventionsDashboard ?? false || refreshInterventions; //we want to refresh if either is true                           
                         }
                         else
                         {
-                            refreshInterventions = result.RefreshInterventions || refreshInterventions; //we want to refresh if either is true                           
+                            refreshInterventions = result.RefreshInterventions ?? false || refreshInterventions; //we want to refresh if either is true                           
                         }                        
                     }
                     else //insert the user

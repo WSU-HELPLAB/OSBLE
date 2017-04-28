@@ -465,6 +465,32 @@ namespace OSBLE.Controllers
             }
         }
 
+        [HttpPost]
+        public string IsProgrammingCourse(int courseId, string suggestionsType)
+        {
+            bool isProgrammingCourse = DBHelper.GetIsProgrammingCourseSetting(courseId);
+
+            if (isProgrammingCourse) //return 'true', dont' make any change to the template
+            {
+                return "true";
+            }
+            else //non-programming course, modify the template text based on suggestion type
+            {
+                switch (suggestionsType)
+                {
+                    case "ClassmatesAvailable":
+                        return "Hey all, I having difficulty with [... describe current task ...]. I am running into [... describe the difficulty here ...]. Does anyone have any tips on how I could resolve this?\n\nI have tried [... describe what you've tried so far...]\n\nThanks!";
+                        break;
+                    case "OfferHelp":
+                        return "You have successfully submitted your assignment early! Some of your classmates' may be having difficulty...";
+                        break;
+                    default:
+                        return "true";
+                        break;
+                }
+            }            
+        }
+
         private InterventionItem GetInterventionFromUserProfileAndType(int userProfileId, string interventionType, bool includeDismissed = false)
         {
             InterventionItem intervention = new InterventionItem();
