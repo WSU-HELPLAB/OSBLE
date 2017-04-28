@@ -26,7 +26,7 @@
     <script type="text/javascript" src="@Url.Content("~/Scripts/Interventions.js")?version=1.01"></script>
 
     @Html.Partial("_UserHashtagTagScript")
-
+    
 </head>
 
 <body class="intervention-body">
@@ -113,6 +113,7 @@
     </div>
     <input id="cupid" type="hidden" value="@currentUserProfileId" />
     <input id="iid" type="hidden" value="@Model.Intervention.Id" />
+    <input id="suggestions-type-name" type="hidden" value="ClassmatesAvailable" />
     @Html.Partial("_SuggestionFeedbackModal")
 </body>
 </html>

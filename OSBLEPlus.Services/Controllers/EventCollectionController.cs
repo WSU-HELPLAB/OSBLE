@@ -172,7 +172,7 @@ namespace OSBLEPlus.Services.Controllers
                     sqlConnection.Close();
                 }
 
-                if (activeCourseIds.Count() == 0 && courseId > 0)
+                if (activeCourseIds.Count == 0 && courseId > 0)
                 {
                     activeCourseIds.Add(courseId);
                 }

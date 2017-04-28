@@ -17,6 +17,8 @@
             $("#CourseSelect").val($('#CourseSelect option:last-child').val());
             ChangeCurrentCourse();
         }
+
+        AdjustTemlateTextForNonProgrammingCourse();
     });
 
     function ChangeCurrentCourse()
@@ -32,6 +34,40 @@
             }
         });
     }
+
+    function AdjustTemlateTextForNonProgrammingCourse() {
+        var courseId = $("#CourseSelect option:selected").val();
+        var suggestionsType = $("#suggestions-type-name").val();
+
+        $.ajax({
+            url: "/Intervention/IsProgrammingCourse",
+            data: { courseId: courseId, suggestionsType: suggestionsType },
+            method: "POST",
+            success: function (result) {                
+                //check if template needs to change
+                if (result === "true") { 
+                    //programming course, do nothing
+                }
+                else //change template text to non-programming alternative
+                {
+                    switch (suggestionsType) {
+                        case "ClassmatesAvailable":
+                            $("[name='ask-a-question']").text(result);
+                            break;
+                        case "OfferHelp":
+                            $("#template-change").text(result);
+                            break;
+                        default:
+                            break;
+                    }                    
+                }
+            },
+            error: function (result) {
+                //do nothing for now
+            }
+        });
+    }
+
 </script>
 
 <div>
