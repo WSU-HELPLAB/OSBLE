@@ -129,6 +129,14 @@ namespace OSBLEPlus.Services.Controllers
             }
         }
 
+        public void ProcessLogForInterventionSync(ActivityEvent log)
+        {
+            using (InterventionController intervention = new InterventionController())
+            {
+                intervention.ProcessActivityEvent(log);
+            }
+        }
+
         public void NotifyNewSuggestion(int userId, int courseId = 0, string authKey = "")
         {
             bool refreshSuggestion = false;
@@ -141,30 +149,32 @@ namespace OSBLEPlus.Services.Controllers
             if (refreshSuggestion)
             {
                 List<int> activeCourseIds = new List<int>(); //push notification to all active courses that have suggestions enabled for this user
-                if (courseId == 0) 
-                {   
-                    using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+                    string query = "SELECT DISTINCT ac.ID FROM AbstractCourses ac " +
+                                   "INNER JOIN CourseUsers cu " +
+                                   "ON ac.ID = cu.AbstractCourseID " +
+                                   "INNER JOIN OSBLEInterventionsCourses oic " +
+                                   "ON ac.ID = oic.CourseId " +
+                                   "WHERE cu.UserProfileID = @UserProfileId ";
+
+                    var result = sqlConnection.Query(query, new { UserProfileId = userId });
+
+                    if (result != null)
                     {
-                        sqlConnection.Open();
-                        string query = "SELECT DISTINCT ac.ID FROM AbstractCourses ac " + 
-                                       "INNER JOIN CourseUsers cu " + 
-                                       "ON ac.ID = cu.AbstractCourseID " + 
-                                       "INNER JOIN OSBLEInterventionsCourses oic " +
-                                       "ON ac.ID = oic.CourseId " + 
-                                       "WHERE cu.UserProfileID = @UserProfileId ";
-
-                        var result = sqlConnection.Query(query, new { UserProfileId = userId });
-
-                        if (result != null)
+                        foreach (var item in result)
                         {
-                            foreach (var item in result)
-                            {
-                                activeCourseIds.Add(item.ID);
-                            }                            
-                        }                        
-
-                        sqlConnection.Close();
+                            activeCourseIds.Add(item.ID);
+                        }
                     }
+
+                    sqlConnection.Close();
+                }
+
+                if (activeCourseIds.Count() == 0 && courseId > 0)
+                {
+                    activeCourseIds.Add(courseId);
                 }
 
                 foreach (int id in activeCourseIds) //send to all 'active' courses with suggestions enabled

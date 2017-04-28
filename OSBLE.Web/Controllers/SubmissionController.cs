@@ -12,6 +12,8 @@ using Ionic.Zip;
 using OSBLEPlus.Logic.DataAccess.Activities;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
 using OSBLEPlus.Logic.Utility.Lookups;
+using OSBLEPlus.Services.Controllers;
+using OSBLE.Utility;
 
 namespace OSBLE.Controllers
 {
@@ -69,23 +71,68 @@ namespace OSBLE.Controllers
 
         //
         // POST: /Submission/Create
-        
+
         [HttpPost]
         [CanSubmitAssignments]
         public ActionResult Create(int? id, IEnumerable<HttpPostedFileBase> files, int? authorTeamID = null)
         {
             if (id != null)
             {
-
-                var sub = new SubmitEvent
-                {
-                    AssignmentId = id.Value,
-                    SenderId = CurrentUser.ID
-                };
-                Posts.SaveEvent(sub);
-                
-
                 Assignment assignment = db.Assignments.Find(id);
+
+                //submit event to the eventlog
+                try
+                {
+                    if (assignment != null)
+                    {
+                        var sub = new SubmitEvent
+                        {
+                            AssignmentId = id.Value,
+                            SenderId = CurrentUser.ID,
+                            SolutionName = assignment.AssignmentName,
+                            CourseId = assignment.CourseID,
+                        };
+                        int eventLogId = Posts.SaveEvent(sub);
+
+                        if (eventLogId == -1)
+                        {
+                            throw new Exception("Failed to log submit event to the eventlog table -- Posts.SaveEvent returned -1");
+                        }
+                        else
+                        {
+                            if (DBHelper.InterventionEnabledForCourse(assignment.CourseID ?? -1))
+                            {
+                                //process suggestions if interventions are enabled for this course.
+                                using (EventCollectionController ecc = new EventCollectionController())
+                                {
+                                    ecc.ProcessLogForInterventionSync((ActivityEvent)sub);
+
+                                    string authKey = Request.Cookies["AuthKey"].Value.Split('=').Last();
+                                    ecc.NotifyNewSuggestion(CurrentUser.ID, assignment.CourseID ?? 0, authKey);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var sub = new SubmitEvent
+                        {
+                            AssignmentId = id.Value,
+                            SenderId = CurrentUser.ID,
+                            SolutionName = "NULL ASSIGNMENT",
+                        };
+                        int eventLogId = Posts.SaveEvent(sub);
+
+                        if (eventLogId == -1)
+                        {
+                            throw new Exception("Failed to log submit event to the eventlog table -- Posts.SaveEvent returned -1 -- Assignment is null");
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("Failed to log submit event to the eventlog table: ", e);
+                }
 
                 if (assignment != null && (assignment.HasDeliverables == true ||
                                             assignment.Type == AssignmentTypes.CriticalReview ||
@@ -326,7 +373,7 @@ namespace OSBLE.Controllers
                             {
                                 //delName = Request.Params["desiredName[" + j + "]"];
                                 delName = Request.Unvalidated.Form["desiredName[" + j + "]"];
-                            }                                
+                            }
                             else //TODO: change this to releveant string
                                 delName = null;
 
