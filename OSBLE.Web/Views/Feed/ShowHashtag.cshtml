@@ -7,7 +7,7 @@
     UserProfile currentUser = ViewBag.CurrentUser;
     string defaultEvents = string.Join(",", ActivityFeedQuery.GetSocialEvents().Select(e => (int)e));
     var currentCourseUsers = ViewBag.CurrentCourseUsers;   
-    string urlReferrer = Request.UrlReferrer.ToString();
+    string urlReferrer = Request.UrlReferrer != null ? Request.UrlReferrer.ToString() : "";
     bool interventionReferrer = urlReferrer.Contains("Intervention");
 }
 <script type="text/javascript" src="@Url.Content("~/signalr/hubs")"></script>

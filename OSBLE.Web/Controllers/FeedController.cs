@@ -1746,6 +1746,8 @@ namespace OSBLE.Controllers
             if (hashtag == null || hashtag == "")
                 return RedirectToAction("Index", "Home");
 
+            hashtag = hashtag.Split('?').First(); // //?component=7 is added to links to force opening in the main window in the VS Plugin, it has no effect in-browser. the actual hashtag should be the first item always
+
             ViewBag.Hashtag = hashtag;
             ViewBag.HideLoadMore = true;
             ViewBag.CurrentCourseUsers = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
@@ -1766,6 +1768,23 @@ namespace OSBLE.Controllers
             }
 
             return View();
+        }
+
+        [HttpPost]
+        [OsbleAuthorize]
+        public string GetFeedPostContent(int eventId, int parentEventId)
+        {
+            if (parentEventId == -1) //feedpost
+            {
+                FeedPostEvent feedPost = DBHelper.GetFeedPostEvent(eventId);
+                return feedPost.Comment;    
+            }
+            else //logcomment
+            {
+                LogCommentEvent logComment = DBHelper.GetLogCommentEvents(parentEventId).Where(lce => lce.EventLogId == eventId).FirstOrDefault();
+                return logComment.Content;
+            }
+            
         }
 
         public JsonResult GetPermissions(int eventId)

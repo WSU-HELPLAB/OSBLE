@@ -1928,5 +1928,35 @@ namespace OSBLE.Utility
             }
             return isProgrammingCourse;
         }
+
+        internal static DateTime GetInterventionLastRefreshTime(int userProfileId)
+        {
+            DateTime lastRefresh = DateTime.UtcNow;
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+
+                    string query = "SELECT * FROM OSBLEInterventionsStatus WHERE UserProfileId = @UserProfileId ";
+
+                    var result = sqlConnection.Query(query, new { UserProfileId = userProfileId }).SingleOrDefault();
+
+                    if (result != null) //we found a match
+                    {
+                        lastRefresh = result.LastRefresh;
+                    }
+
+                    //else no match, leave it time now
+
+                    sqlConnection.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                return lastRefresh; //failure!
+            }
+            return lastRefresh;
+        }
     }
 }

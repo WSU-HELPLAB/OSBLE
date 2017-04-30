@@ -810,7 +810,12 @@ function onDeleteSuccess(item) {
 
 function ShowEditBox(item) {
     // populate the box with the correct content
-    var text = $("#content-comment-" + item.eventId).text();    
+    var text = GetFeedPostContent(item.eventId, item.parentEventId); //getting the content from the database because the text box does not contain autolinked items
+
+    if (text === "false") { //we failed to get the user text from the database so just grab the text that is there already...
+        text = $("#content-comment-" + item.eventId).text();
+    }
+    
     $('#feed-edit-textbox-' + item.eventId).val(text);
 
     $('#feed-edit-' + item.eventId).show('fade');
@@ -1351,5 +1356,22 @@ function replaceMentionWithId(text) {
         var name = userNames[i], id = "id=" + userIds[i] + ";";
         text = text.replace(name, id);
     }
+    return text;
+}
+
+function GetFeedPostContent(eventId, parentEventId) {
+    var text = "false";
+    $.ajax({
+        url: "/Feed/GetFeedPostContent",
+        method: "POST",
+        data: { eventId: eventId, parentEventId: parentEventId },
+        async: false,
+        success: function (result) {
+            text = result;
+        },
+        error: function (result) {
+            //do nothing
+        }
+    });
     return text;
 }

@@ -2,26 +2,38 @@
 //Downloaded from: https://github.com/bryanwoods/autolink-js
 
 (function () {
-    var autoLink, linkUsernames, linkHashtags, embedYouTube, formatCode,
+    var autoLink, linkUsernames, linkHashtags, embedYouTube, formatCode, embedImages,
       __slice = [].slice;
     var courseUserNames = getUserNames();
 
+    //NOTE: ?component=7 is added to links to force opening in the main window in the VS Plugin, it has no effect in-browser
     autoLink = function () {
         var k, linkAttributes, option, options, pattern, v, text;
         options = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
 
         text = this;
 
+        //embed any images in the text
+        text = embedImages(text);
+
         if (detectBrowser()) { //only do this if we can detect the browser... this returns false from the VS Plugin and we want to prevent doing this as it breaks the feed on the plugin
             text = embedYouTube(text);
         }
 
-        //format any code
-        text = formatCode(text);
+        //format any code, but only if the page is not on the embedded feed (it breaks the feed for some reason...)
+        var re = /\/feed\/osbide/g;        
+        var isMatch = false;
+        while ((match = re.exec($(location).attr('href').toLowerCase())) != null) {
+            isMatch = true;
+        }
+
+        if (!isMatch) {
+            text = formatCode(text);
+        }
 
         pattern = /(^|[\s\n>]|<br\/?>)((?:https?|ftp):\/\/[\-A-Z0-9+\u0026\u2019@#\/%?=()~_|!:,.;]*[\-A-Z0-9+\u0026@#\/%=~()_|])/gi;
         if (!(options.length > 0)) {
-            return text.replace(pattern, "$1<a href='$2'>$2</a>").linkUsernames().linkHashtags();
+            return text.replace(pattern, "$1<a href='$2?component=7'>$2</a>").linkUsernames().linkHashtags();
         }
         option = options[0];
         linkAttributes = ((function () {
@@ -89,7 +101,7 @@
                     if (studentFullName === "" || studentFullName === undefined) continue; // If the ID doesn't represent a user, don't make a link
 
                     // Now replace the id number in the string with an html link with the user's full name
-                    text = text.replace(text.substr(index, length + 2), "<a href=\"/Feed/Profile/" + id + "\" class=\"Mention\">@" + studentFullName + "</a>");
+                    text = text.replace(text.substr(index, length + 2), "<a href=\"/Feed/Profile/" + id + "?component=7\" class=\"Mention\">@" + studentFullName + "</a>");
                 }
             }
 
@@ -101,7 +113,7 @@
 
     linkHashtags = function () {
         var htPattern = /(^|[\s\n>]|<br\/?>)#([a-z|0-9]+)/gi;
-        return this.replace(htPattern, '$1<a class="Hashtag" href="/Feed/ShowHashtag?hashtag=$2">#$2</a>');
+        return this.replace(htPattern, '$1<a class="Hashtag" href="/Feed/ShowHashtag?hashtag=$2?component=7">#$2</a>');
     }
 
     embedYouTube = function (text) {
@@ -140,6 +152,7 @@
     }
 
     formatCode = function (text) {
+
         var re = /\[code\]/g;
         var indexList = new Array();
         while ((match = re.exec(text)) != null) {            
@@ -177,11 +190,35 @@
         return text;
     }
 
+    embedImages = function (text) {
+        
+        var re = /(https?:\/\/.*\.(?:png|jpg|gif|gifv))/gi;        
+                
+        var indexListUrl = new Array();
+        while ((match = re.exec(text)) != null) {            
+            indexListUrl.push(match[0]);
+        }
+        
+        //remove any duplicates so we only replace once
+        var uniqueUrls = new Array();
+        $.each(indexListUrl, function (i, el) {
+            if ($.inArray(el, uniqueUrls) === -1) uniqueUrls.push(el);
+        });
+
+        for (var i = 0; i < uniqueUrls.length; i++) {
+            var re = new RegExp(RegExp.quote(uniqueUrls[i]), "g");
+            text = text.replace(re, "<br/><a target=\"_blank\" href=\"" + uniqueUrls[i] + "?component=7\"><img src=\"" + uniqueUrls[i] + "?component=7\" alt=\"Embedded Image\" style=\"width:320px;height:240;\"></a><br/>");
+        }
+
+        return text;
+    }
+
     String.prototype['autoLink'] = autoLink;
     String.prototype['linkUsernames'] = linkUsernames;
     String.prototype['linkHashtags'] = linkHashtags;
     String.prototype['embedYouTube'] = embedYouTube;
     String.prototype['formatCode'] = formatCode;
+    String.prototype['embedImages'] = embedImages;
 
 }).call(this);
 
@@ -208,3 +245,7 @@ function decodeHtml(html) {
     txt.innerHTML = html;
     return txt.value;
 }
+
+RegExp.quote = function (str) {
+    return str.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
+};
