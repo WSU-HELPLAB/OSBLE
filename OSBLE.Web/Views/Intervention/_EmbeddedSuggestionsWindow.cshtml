@@ -13,7 +13,7 @@
 
 <script type="text/javascript">   
     
-    $(document).ready(function () {       
+    $(document).ready(function () {
 
         if (!detectBrowser()) {
             //show the private conversations and availability links
@@ -84,6 +84,9 @@
                 $("#suggestions-content").css("width", "100%");
             });
         });
+
+        GetLastRefreshDateTime();
+        
     });
 
     function increaseZoom(amount) {
@@ -104,6 +107,24 @@
             method: "GET",
             success: function (result) {
                 $("#dashboard-items").html(result);
+            },
+            error: function (result) {
+                //TODO: handle error
+            }
+        });
+    }
+
+    function GetLastRefreshDateTime() {
+        $.ajax({
+            url: "/Intervention/GetLastRefreshTime",            
+            method: "POST",
+            success: function (result) {
+                var d = new Date(result);                                                
+                var month = d.getMonth() + 1;
+                var day = d.getDay();
+                var year = d.getYear();
+
+                $("#new-suggestions-time").text(" (Updated: " + FormatDate(result) + ")");
             },
             error: function (result) {
                 //TODO: handle error
@@ -163,7 +184,19 @@
         var date = new Date();
         var hours = date.getHours();
         var minutes = date.getMinutes();
-        var ampm = hours >= 12 ? 'pm' : 'am';
+        var ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // the hour '0' should be '12'
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        var strTime = hours + ':' + minutes + ' ' + ampm;
+        return strTime;
+    }
+
+    function FormatDate(datetime) {
+        var date = new Date(datetime);
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        var ampm = hours >= 12 ? 'PM' : 'AM';
         hours = hours % 12;
         hours = hours ? hours : 12; // the hour '0' should be '12'
         minutes = minutes < 10 ? '0' + minutes : minutes;

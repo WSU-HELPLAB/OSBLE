@@ -491,6 +491,18 @@ namespace OSBLE.Controllers
             }            
         }
 
+        [HttpPost]
+        public DateTime GetLastRefreshTime(int userProfileId = 0)
+        {
+            if (userProfileId == 0)
+            {
+                userProfileId = ActiveCourseUser.UserProfileID;
+            }
+            DateTime lastRefresh = DBHelper.GetInterventionLastRefreshTime(userProfileId).UTCToCourse(ActiveCourseUser != null ? ActiveCourseUser.AbstractCourseID : 1);
+
+            return lastRefresh;
+        }
+
         private InterventionItem GetInterventionFromUserProfileAndType(int userProfileId, string interventionType, bool includeDismissed = false)
         {
             InterventionItem intervention = new InterventionItem();
