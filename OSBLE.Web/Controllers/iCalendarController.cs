@@ -20,6 +20,7 @@ using DDay.iCal;
 using DDay.iCal.Serialization;
 using DDay.iCal.Serialization.iCalendar;
 using System.Threading.Tasks;
+using OSBLE.Utility;
 
 
 
@@ -148,7 +149,7 @@ namespace OSBLE.Controllers
                          * if there happens to be a "meeting times" in the database without a day of the week associated with
                          * the meeting, we need to skip the while and switch case, otherwise it's an infinite loop!
                         */
-                        bool meetingTimeWithoutDaysOfWeek = cm.Sunday || cm.Monday || cm.Tuesday || cm.Wednesday 
+                        bool meetingTimeWithoutDaysOfWeek = cm.Sunday || cm.Monday || cm.Tuesday || cm.Wednesday
                                                             || cm.Thursday || cm.Friday || cm.Saturday ? false : true;
 
                         int count = 0; //infinite loop protection x2!
@@ -157,7 +158,7 @@ namespace OSBLE.Controllers
                         //AND if we've hit a count of 7, that means we've already checked each day of the week and will never find one!
                         //exit while if we fail either of these conditions!
                         while ((!matchingStartDay && !meetingTimeWithoutDaysOfWeek) && count < 7)
-                        {                            
+                        {
                             switch (currentTime.DayOfWeek) //find which day of the week for this meeting
                             {
                                 case DayOfWeek.Monday:
@@ -202,7 +203,7 @@ namespace OSBLE.Controllers
                         }
 
                         //proceed only if there was a day of the week found for this course meeting time
-                        if(!meetingTimeWithoutDaysOfWeek && matchingStartDay)
+                        if (!meetingTimeWithoutDaysOfWeek && matchingStartDay)
                         {
                             evt.Start = new iCalDateTime(currentTime.UTCToCourse(ActiveCourseUser.AbstractCourseID));
                             evt.End = new iCalDateTime(evtEnd.UTCToCourse(ActiveCourseUser.AbstractCourseID));
@@ -210,7 +211,7 @@ namespace OSBLE.Controllers
                             evt.Summary = cm.Name;
                             evt.Location = cm.Location;
                             evt.RecurrenceRules.Add(pattern);
-                        }                        
+                        }
                     }
                 }
 
@@ -292,7 +293,7 @@ namespace OSBLE.Controllers
             //Create the calendar object 
             iCalendar courseCalendar = new iCalendar();
             //initalize the Calendar object 
-            courseCalendar.AddTimeZone(DateTimeExtensions.GetTimeZone(((Course) ActiveCourseUser.AbstractCourse).TimeZoneOffset));
+            courseCalendar.AddTimeZone(DateTimeExtensions.GetTimeZone(((Course)ActiveCourseUser.AbstractCourse).TimeZoneOffset));
             courseCalendar.Method = "PUBLISH";
             courseCalendar.Name = "VCALENDAR";
             courseCalendar.Version = "2.0";
@@ -369,7 +370,7 @@ namespace OSBLE.Controllers
                         //WHILE matchingStartDay is false (default false) AND the meeting time has at least one day of the week
                         //AND if we've hit a count of 7, that means we've already checked each day of the week and will never find one!
                         //exit while if we fail either of these conditions!
-                        while ((!matchingStartDay && !meetingTimeWithoutDaysOfWeek) && count < 7)                        
+                        while ((!matchingStartDay && !meetingTimeWithoutDaysOfWeek) && count < 7)
                         {
                             switch (currentTime.DayOfWeek)
                             {
@@ -423,7 +424,7 @@ namespace OSBLE.Controllers
                             evt.Summary = cm.Name;
                             evt.Location = cm.Location;
                             evt.RecurrenceRules.Add(pattern);
-                        }    
+                        }
                     }
                 }// end foreach
 
@@ -538,6 +539,78 @@ namespace OSBLE.Controllers
 
             System.IO.File.WriteAllBytes(path + prefix + number + "-" + course.Semester + "-" + course.Year + ".ics", courseCalendar);
 
+        }
+
+        [HttpPost]
+        [IsInstructor, OsbleAuthorize]
+        public ActionResult ImportEvents(HttpPostedFileBase file, string from = "", string to = "", bool showEndDate = false)
+        {
+            int courseId = ActiveCourseUser.AbstractCourseID;
+
+            DateTime fromDate = new DateTime();
+            DateTime toDate = new DateTime();
+            bool fromParse = false;
+            bool toParse = false;
+
+            fromParse = DateTime.TryParse(from, out fromDate);
+            toParse = DateTime.TryParse(to, out toDate);            
+
+            IICalendarCollection calendars = iCalendar.LoadFromStream(new StreamReader(file.InputStream));
+
+            IList<Occurrence> occurrences = fromParse && toParse ? calendars.GetOccurrences(fromDate, toDate) : calendars.GetOccurrences(DateTime.Today.AddYears(-1), DateTime.Today.AddYears(1)); //if no range specified, arbitrarily choose +/- 1 year max future/past range
+
+            List<OSBLE.Models.HomePage.Event> events = new List<OSBLE.Models.HomePage.Event>();
+
+            foreach (Occurrence occurrence in occurrences)
+            {
+                IRecurringComponent component = occurrence.Source as IRecurringComponent;
+                
+                events.Add(new OSBLE.Models.HomePage.Event
+                {
+                    Poster = ActiveCourseUser,
+                    Approved = true,
+                    StartDate = DateTime.SpecifyKind(occurrence.Period.StartTime.Local.Date, DateTimeKind.Unspecified).CourseToUTC(courseId),
+                    EndDate = showEndDate ? 
+                        (occurrence.Period.EndTime.IsUniversalTime ? 
+                            DateTime.SpecifyKind(occurrence.Period.EndTime.Local.Date, DateTimeKind.Unspecified) : 
+                                DateTime.SpecifyKind(occurrence.Period.EndTime.Local.Date, DateTimeKind.Unspecified).CourseToUTC(courseId)) : 
+                                    (DateTime?)null,
+                    StartTime = occurrence.Period.StartTime.IsUniversalTime ? 
+                        DateTime.SpecifyKind(occurrence.Period.StartTime.Local, DateTimeKind.Unspecified) : 
+                            DateTime.SpecifyKind(occurrence.Period.StartTime.Local, DateTimeKind.Unspecified).CourseToUTC(courseId),
+                    EndTime = occurrence.Period.EndTime.IsUniversalTime ? 
+                        DateTime.SpecifyKind(occurrence.Period.EndTime.Local, DateTimeKind.Unspecified) : 
+                            DateTime.SpecifyKind(occurrence.Period.EndTime.Local, DateTimeKind.Unspecified).CourseToUTC(courseId),
+                    Description = component.Description,
+                    Title = String.IsNullOrEmpty(((DDay.iCal.Event)component).Location) ? 
+                        component.Summary : 
+                            component.Summary + " - " + ((DDay.iCal.Event)component).Location,
+                });
+            }
+
+            CreateEvents(events);
+
+            return RedirectToAction("Index", "Event");
+        }
+
+        private bool CreateEvents(List<OSBLE.Models.HomePage.Event> events)
+        {
+            List<OSBLE.Models.HomePage.Event> uniqueEvents = DBHelper.RemoveDuplicateEvents(events);
+            if (uniqueEvents.Count() > 0)
+            {
+                foreach (var item in uniqueEvents)
+                {
+                    db.Events.Add(item);
+                }
+                
+                db.SaveChanges();
+                
+                using (iCalendarController ical = new iCalendarController())
+                {
+                    ical.CreateCourseCalendar(ActiveCourseUser.AbstractCourseID);
+                }
+            }
+            return true;
         }
     }
 }
