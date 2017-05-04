@@ -1549,7 +1549,7 @@ namespace OSBLE.Utility
 
                     connection.Open();
                     cmd.ExecuteScalar();
-                    connection.Close();                    
+                    connection.Close();
                 }
                 return true;
             }
@@ -1787,7 +1787,7 @@ namespace OSBLE.Utility
                     string query = "SELECT Name FROM AbstractRoles ar INNER JOIN CourseUsers cu ON ar.ID = cu.AbstractRoleID " +
                                    "WHERE cu.AbstractCourseID = @CourseId AND cu.UserProfileID = @UserProfileId ";
 
-                    roleName = sqlConnection.Query<string>(query, new { CourseId = courseId, UserProfileId = userProfileId }).SingleOrDefault();                    
+                    roleName = sqlConnection.Query<string>(query, new { CourseId = courseId, UserProfileId = userProfileId }).SingleOrDefault();
 
                     sqlConnection.Close();
                 }
@@ -1847,7 +1847,7 @@ namespace OSBLE.Utility
                         string updateQuery = "UPDATE GradebookSettings SET SectionsEditable = @SectionsEditable WHERE CourseId = @CourseId ";
                         updateSuccess = sqlConnection.Execute(updateQuery, new { CourseId = courseId, SectionsEditable = !sectionsEditable }) != 0; //toggle the sectionsEditable value
 
-                    }   
+                    }
                     else //no match, insert a row... set to true because the default will be false
                     {
                         string insertQuery = "INSERT INTO GradebookSettings (CourseId, SectionsEditable) VALUES (@CourseId, 1) ";
@@ -1916,7 +1916,7 @@ namespace OSBLE.Utility
                     {
                         isProgrammingCourse = result.IsProgrammingCourse;
                     }
-                    
+
                     //else no match, leave it false
 
                     sqlConnection.Close();
@@ -1957,6 +1957,74 @@ namespace OSBLE.Utility
                 return lastRefresh; //failure!
             }
             return lastRefresh;
+        }
+
+        internal static List<Event> RemoveDuplicateEvents(List<Event> events)
+        {
+            if (events.Count() == 0)
+            {
+                return events;
+            }
+
+            int posterId = events.First().Poster.ID;
+            List<Event> newEvents = new List<Event>(events);
+
+            try
+            {
+                using (SqlConnection sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+                    string query = "SELECT * FROM Events WHERE PosterID = @PosterId ";
+                    var results = sqlConnection.Query(query, new { PosterId = posterId });
+                    sqlConnection.Close();
+
+                    if (results == null || results.Count() == 0)
+                    {
+                        return events;
+                    }
+
+                    foreach (var item in results)
+                    {
+                        foreach (Event newEvent in events)
+                        {
+                            if (item.StartDate == newEvent.StartDate &&
+                                item.EndDate == newEvent.EndDate &&
+                                item.Title == newEvent.Title &&
+                                item.Description == newEvent.Description)
+                            {
+                                newEvents.Remove(newEvent);
+                                break;   
+                            }                            
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Failed to remove duplicate events: ", e);
+                return new List<Event>();
+            }
+
+            return newEvents;
+        }
+
+        internal static bool DeleteCurrentUserEvents(int posterId)
+        {
+            try
+            {
+                using (SqlConnection sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+                    string query = "DELETE FROM Events WHERE PosterID = @PosterId ";
+                    sqlConnection.Execute(query, new { PosterId = posterId });
+                    sqlConnection.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error in DeleteCurrentUserEvents(): ", e);
+            }
+            return true;
         }
     }
 }

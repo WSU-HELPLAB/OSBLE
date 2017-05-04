@@ -539,6 +539,13 @@ namespace OSBLE.Controllers
             return View("_AjaxEmpty");
         }
 
+        [IsInstructor, OsbleAuthorize]
+        public ActionResult DeleteUserEvents()
+        {            
+            bool success = DBHelper.DeleteCurrentUserEvents(ActiveCourseUser.ID);
+            return RedirectToAction("Index");
+        }
+
         [NonAction]
         public List<Event> GetActiveCourseEvents(DateTime StartDate, DateTime EndDate)
         {

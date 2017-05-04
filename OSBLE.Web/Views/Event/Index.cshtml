@@ -23,12 +23,132 @@
     }
 }
 
-<h2>Events &amp; Deadlines
+<script type="text/javascript">
+
+    var hash = {
+        '.ics': 1,
+    };
+
+    function check_extension(filename) {
+        var re = /\..+$/;
+        var ext = filename.match(re);
+        if (hash[ext] == 1) {
+            $('#upload').removeAttr("disabled");
+            $("#errorMsg").text("");
+            return true;
+        }
+        else {
+            $("#errorMsg").text("Invalid File Type");
+            $('#upload').attr("disabled", "disabled");
+            return false;
+        }
+    }
+
+    $(document).on('click', '.browse', function () {
+        var file = $(this).parent().parent().parent().find('.file');
+        file.trigger('click');
+    });
+    $(document).on('change', '.file', function () {
+        $(this).parent().find('.form-control').val($(this).val().replace(/C:\\fakepath\\/i, ''));
+    });
+
+    $(function () {
+        var dateFormat = "mm/dd/yy",
+          from = $("#from")
+            .datepicker({
+                defaultDate: "+1w",
+                changeMonth: true,
+                numberOfMonths: 3
+            })
+            .on("change", function () {
+                to.datepicker("option", "minDate", getDate(this));
+            }),
+          to = $("#to").datepicker({
+              defaultDate: "+1w",
+              changeMonth: true,
+              numberOfMonths: 3
+          })
+          .on("change", function () {
+              from.datepicker("option", "maxDate", getDate(this));
+          });
+
+        function getDate(element) {
+            var date;
+            try {
+                date = $.datepicker.parseDate(dateFormat, element.value);
+            } catch (error) {
+                date = null;
+            }
+
+            return date;
+        }
+    });
+
+    function areYouSure(selection) {
+        if (confirm("Are you sure you want to delete all custom events? \n\n(note: this will not delete any course meetings or breaks created on the 'Course Settings' page.") == true) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    $(document).ready(function () {
+        $("#delete-events").on("click", function (event) {            
+            if (areYouSure()) {
+                //do nothing, let it submit.
+            }
+            else {   //prevent post submission
+                event.preventDefault();
+            }
+        });
+    });
+
+</script>
+
+<style type="text/css">
+    .file {
+        visibility: hidden;
+        position: absolute;
+    }
+
+    .options.uForm {
+        text-align: center;
+        padding: 10px;
+        border-bottom: none;
+    }
+
+    #upload, #date-range, #show-end-date-checkbox {
+        margin-top: 10px;
+    }
+
+    .modal-body {
+        padding: 5px;
+    }
+
+    .form-group {
+        margin-bottom: 0px;
+    }
+
+    select.ui-datepicker-month {
+        color: black;
+    }
+
+    #options-header {
+        text-align: left;
+    }
+</style>
+
+<h2>
+    Events &amp; Deadlines
     @if (courseCalendarFlag)
-{
-    <a href="@Url.Action("DownloadCourseCalendar", "iCalendar", new { id = courseID })" title="Download Course Calendar">@Helpers.UnPublishButton()</a>
-    <a href="@Url.Action("SubscribeToCalendar", "iCalendar", new { id = courseID })" title="Subscribe to Course Calendar ()">@Helpers.CalendarButton()</a>
-}</h2>
+    {
+        <a href="@Url.Action("DownloadCourseCalendar", "iCalendar", new { id = courseID })" title="Download Course Calendar">@Helpers.UnPublishButton()</a>
+        <a href="@Url.Action("SubscribeToCalendar", "iCalendar", new { id = courseID })" title="Subscribe to Course Calendar (EXPERIMENTAL)">@Helpers.CalendarButton()</a>
+        <a href="" title="Import Calendar Events from ICS File" data-toggle="modal" data-target="#import-ics">@Helpers.AddButton()</a>
+        <a href="@Url.Action("DeleteUserEvents", "Event")" id="delete-events" title="Delete ALL manually added events">@Helpers.DeleteButton()</a>
+    }
+</h2>
 
 
 <p>@Html.ActionLink("Back to Dashboard", "Index", "Home")</p>
@@ -50,27 +170,78 @@
 
 @if (pastEvents.Count > 0)
 {
-    
-<h3>
-    <a href="#" onclick="$('#past_events').toggle('blind'); return false;">Past Events (@pastEvents.Count)</a>
-    @Helpers.CreateToolTip(ToolTips.EventPastEvents) 
-</h3>
+
+    <h3>
+        <a href="#" onclick="$('#past_events').toggle('blind'); return false;">Past Events (@pastEvents.Count)</a>
+        @Helpers.CreateToolTip(ToolTips.EventPastEvents)
+    </h3>
 
     <div id="past_events">
-    @Html.Partial("_Events", pastEvents)
+        @Html.Partial("_Events", pastEvents)
     </div>
 }
 
 @if (currentEvents.Count > 0)
 {
-    
-<h3>
-    <a href="#" onclick="$('#current_events').toggle('blind'); return false;">Current Events (@currentEvents.Count)</a>
-    @Helpers.CreateToolTip(ToolTips.EventCurrentEvents) 
-</h3>
+
+    <h3>
+        <a href="#" onclick="$('#current_events').toggle('blind'); return false;">Current Events (@currentEvents.Count)</a>
+        @Helpers.CreateToolTip(ToolTips.EventCurrentEvents)
+    </h3>
 
     <div id="current_events">
-    @Html.Partial("_Events", currentEvents)
+        @Html.Partial("_Events", currentEvents)
     </div>
 
 }
+
+
+<!-- Modal -->
+<div id="import-ics" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Import Calendar Events</h4>
+            </div>
+            <div class="modal-body">
+                <div class="options uForm">
+                    <!--Upload ICS Form-->
+                    <form id="upload_ics" enctype="multipart/form-data" method="post" action="/icalendar/ImportEvents">
+                        <div class="form-group">
+                            <input class="file" type="file" id="file" name="file" onchange="check_extension(this.value)" />
+                            <div class="input-group ">
+                                <input type="text" class="form-control input-lg" disabled placeholder="Select an iCal .ics file">
+                                <span class="input-group-btn">
+                                    <button class="browse btn btn-primary input-lg" type="button"><i class="glyphicon glyphicon-upload"></i> Choose File</button>
+                                </span>
+                            </div>
+                            <div>
+                                <span id="errorMsg"></span>
+                            </div>
+                            <hr />
+                            <h5 id="options-header">Options:</h5>
+                            <div id="date-range">
+                                <label for="from">Import events from </label>
+                                <input type="text" id="from" name="from">
+                                <label for="to">to</label>
+                                <input type="text" id="to" name="to">
+                                <span><br /><strong><em>(Default: import all events +/- 1 year)</em></strong></span>
+                            </div>
+                            <div id="show-end-date-checkbox">
+                                <label><input type="checkbox" name="showEndDate" value="true" /> Show end time in calendar</label>
+                            </div>
+                            <hr />
+                            <input class="btn btn-primary" id="upload" type="submit" value="Upload iCalendar File" disabled="disabled" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
