@@ -21,6 +21,7 @@ using DDay.iCal.Serialization;
 using DDay.iCal.Serialization.iCalendar;
 using System.Threading.Tasks;
 using OSBLE.Utility;
+using OSBLEPlus.Logic.Utility;
 
 
 
@@ -496,10 +497,13 @@ namespace OSBLE.Controllers
             string prefix = course.Prefix.Replace(@"/", "-");
             string number = course.Number.Replace(@"/", "-");
 
-            string path = AppDomain.CurrentDomain.BaseDirectory + "Content/iCal/" + course.ID.ToString() + "/" + prefix + number + "-" + course.Semester + "-" + course.Year + ".ics";
+            //this is the local path... 
+            string path = AppDomain.CurrentDomain.BaseDirectory + "Content/iCal/" + course.ID.ToString() + "/" + prefix + number + "-" + course.Semester + "-" + course.Year + ".ics";            
 
-            if (System.IO.File.Exists(path))
+            if (System.IO.File.Exists(path)) //does the file exist locally? We only want to create a link to the calendar if it exists!
             {
+                //change the path to the external path Google needs to find the .ics... Google also needs http not https or this wont work.
+                path = StringConstants.WebClientRoot.Replace("https", "http") + "Content/iCal/" + course.ID.ToString() + "/" + prefix + number + "-" + course.Semester + "-" + course.Year + ".ics";
                 return Redirect("http://www.google.com/calendar/render?cid=" + path + "?nocache");
             }
 
