@@ -1,8 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Installer Information", "Installer Information", "{276FB18B-9C38-43C9-9858-7B0FEE15D69C}"
+	ProjectSection(SolutionItems) = preProject
+		Installer Information\installer_readme.txt = Installer Information\installer_readme.txt
+	EndProjectSection
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSBIDE.Controls", "OSBLEPlus.VSPlugin\OSBIDE.Controls\OSBIDE.Controls.csproj", "{9EA09E78-0541-4233-B189-EE1DBD56520D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSBIDE.Library.ServiceClient", "OSBLEPlus.VSPlugin\OSBIDE.Library.ServiceClient\OSBIDE.Library.ServiceClient.csproj", "{5AAF5126-7931-40F4-9B46-92CE15C47CCA}"
@@ -15,29 +20,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSBLEPlus.Library.Shell.Sig
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSBLEPlus.Logic.Shell.Signed", "OSBLEPlus.VSPlugin\OSBLEPlus.Logic.Shell.Signed\OSBLEPlus.Logic.Shell.Signed.csproj", "{C8D4FEB7-2E69-4C21-B51F-49DED7D96AC9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Installer Information", "Installer Information", "{276FB18B-9C38-43C9-9858-7B0FEE15D69C}"
-	ProjectSection(SolutionItems) = preProject
-		Installer Information\installer_readme.txt = Installer Information\installer_readme.txt
-	EndProjectSection
-EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "OSBIDE.Installer", "OSBIDE.Installer\OSBIDE.Installer.vdproj", "{F55D46F8-A5A8-4C3B-8C23-A93212618CF1}"
 EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 2
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs25
-		SccProjectUniqueName0 = OSBLEPlus.VSPlugin\\OSBIDE.Controls\\OSBIDE.Controls.csproj
-		SccProjectName0 = OSBLEPlus.VSPlugin/OSBIDE.Controls
-		SccAuxPath0 = https://tfs.codeplex.com/tfs/tfs25
-		SccLocalPath0 = OSBLEPlus.VSPlugin\\OSBIDE.Controls
-		SccProvider0 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccProjectUniqueName1 = OSBLEPlus.VSPlugin\\OSBIDE.Library.ServiceClient\\OSBIDE.Library.ServiceClient.csproj
-		SccProjectName1 = OSBLEPlus.VSPlugin/OSBIDE.Library.ServiceClient
-		SccAuxPath1 = https://tfs.codeplex.com/tfs/tfs25
-		SccLocalPath1 = OSBLEPlus.VSPlugin\\OSBIDE.Library.ServiceClient
-		SccProvider1 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x86 = Debug|x86
