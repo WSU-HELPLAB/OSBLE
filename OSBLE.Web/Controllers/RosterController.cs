@@ -1952,7 +1952,7 @@ namespace OSBLE.Controllers
             string message = "Dear " + WTU.Name2 + " " + WTU.Name1 + @", <br/>
                 <br/>
                 Congratulations! You have been enrolled in the following course at plus.osble.org: " + ActiveCourseUser.AbstractCourse.Name +
-            " In order to access this course, please create an OSBLE account with OSBLE first by " +
+            " by " + ActiveCourseUser.UserProfile.FullName + " In order to access this course, please create an OSBLE account with OSBLE first by " +
             "<a href='" + link + @"'>clicking on this link</a>. 
                 <br/>
                 <br/>
@@ -1991,7 +1991,7 @@ namespace OSBLE.Controllers
                 string message = "Dear " + wtUser.Name2 + " " + wtUser.Name1 + @", <br/>
                 <br/>
                 This email was sent to notify you that you have been added to " + ActiveCourseUser.AbstractCourse.Name +
-                " To access this course you need to create an account with OSBLE first. You may create an account " +
+                " by " +ActiveCourseUser.UserProfile.FullName+ " To access this course you need to create an account with OSBLE first. You may create an account " +
                 "by <a href='" + link + @"'>following this link</a>. 
                 <br/>
                 <br/>
