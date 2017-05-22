@@ -96,13 +96,11 @@
                 idString = idString.substr(0, idString.length - 1);
 
                 // Then get the student's name from the id
-                if (isObserver)
-                {
+                if (isObserver) {
                     studentFullName = "Anonymous" + Math.floor(Math.random() * 2000).toString(); //Possibly get number of students in the class, x, and multiply random by 2*x or i*x instead of 1000 (an arbitrary value)
                     text = text.replace(text.substr(index, length + 2), "<a>@" + studentFullName + "</a>"); //Observer can see someone was mentioned but will remove the link to the @ person's profile
                 }
-                else
-                {
+                else {
                     var id = parseInt(idString);
 
                     if (id != NaN) {
@@ -116,122 +114,121 @@
                     }
                 }
             }
+            return text;
         }
+        catch (e) {
+            return this; // Will return unmodified text in failure
+        }
+    };
 
-        return text;
-    } catch (e) {
-        return this; // Will return unmodified text in failure
+    linkHashtags = function () {
+        var htPattern = /(^|[\s\n>]|<br\/?>)#([a-z|0-9]+)/gi;
+        return this.replace(htPattern, '$1<a class="Hashtag" href="/Feed/ShowHashtag?hashtag=$2?component=7">#$2</a>');
     }
-};
 
-linkHashtags = function () {
-    var htPattern = /(^|[\s\n>]|<br\/?>)#([a-z|0-9]+)/gi;
-    return this.replace(htPattern, '$1<a class="Hashtag" href="/Feed/ShowHashtag?hashtag=$2?component=7">#$2</a>');
-}
+    embedYouTube = function (text) {
+        var regexG = /(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?/g;
+        var regex = /(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?/;
+        var match = text.match(regexG);
 
-embedYouTube = function (text) {
-    var regexG = /(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?/g;
-    var regex = /(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?/;
-    var match = text.match(regexG);
-
-    if (match) {
-        if (match.length === 1) { // Single link
-            // Get non-global match so we can get the video id
-            match = text.match(regex);
-            var url = match[0], videoId = match[1];
-
-            // First check to see if the match accidentally took the <div> as well
-            if (url.includes("</div>")) url = url.replace("</div>", "");
-
-            return text.replace(url, '<br /><iframe width="360" height="202" src="//www.youtube.com/embed/' + videoId + '" frameborder="0" allowfullscreen></iframe><br />');
-        }
-        else { // Multiple links
-            for (i = 0; i < match.length; i++) {
-                var url = match[i];
+        if (match) {
+            if (match.length === 1) { // Single link
+                // Get non-global match so we can get the video id
+                match = text.match(regex);
+                var url = match[0], videoId = match[1];
 
                 // First check to see if the match accidentally took the <div> as well
                 if (url.includes("</div>")) url = url.replace("</div>", "");
 
-                // Then get video id by doing another match (non-global) which we know will only have one result.
-                var videoId = url.match(regex);
-                videoId = videoId[1];
-
-                text = text.replace(url, '<br /><iframe width="360" height="202" src="//www.youtube.com/embed/' + videoId + '" frameborder="0" allowfullscreen></iframe><br />');
+                return text.replace(url, '<br /><iframe width="360" height="202" src="//www.youtube.com/embed/' + videoId + '" frameborder="0" allowfullscreen></iframe><br />');
             }
-            return text;
+            else { // Multiple links
+                for (i = 0; i < match.length; i++) {
+                    var url = match[i];
+
+                    // First check to see if the match accidentally took the <div> as well
+                    if (url.includes("</div>")) url = url.replace("</div>", "");
+
+                    // Then get video id by doing another match (non-global) which we know will only have one result.
+                    var videoId = url.match(regex);
+                    videoId = videoId[1];
+
+                    text = text.replace(url, '<br /><iframe width="360" height="202" src="//www.youtube.com/embed/' + videoId + '" frameborder="0" allowfullscreen></iframe><br />');
+                }
+                return text;
+            }
         }
-    }
-    else return text; // If no youtube link found by regex, just return original content
-}
-
-formatCode = function (text) {
-
-    var re = /\[code\]/g;
-    var indexList = new Array();
-    while ((match = re.exec(text)) != null) {
-        indexList.push(match.index);
+        else return text; // If no youtube link found by regex, just return original content
     }
 
-    var start, middle, end;
+    formatCode = function (text) {
 
-    if (indexList.length == 2) {
-        start = text.slice(0, indexList[0]);
-        middle = (text.slice(indexList[0], indexList[1] + 6)).replace(/\[code\]/g, "").trim();
-        end = text.slice(indexList[1] + 6), text.length;
+        var re = /\[code\]/g;
+        var indexList = new Array();
+        while ((match = re.exec(text)) != null) {
+            indexList.push(match.index);
+        }
 
-        var result = self.hljs.highlightAuto(middle);
-        middle = result.value;
-        text = start + "<pre><code >" + decodeHtml(middle) + "</code></pre>" + end;
+        var start, middle, end;
+
+        if (indexList.length == 2) {
+            start = text.slice(0, indexList[0]);
+            middle = (text.slice(indexList[0], indexList[1] + 6)).replace(/\[code\]/g, "").trim();
+            end = text.slice(indexList[1] + 6), text.length;
+
+            var result = self.hljs.highlightAuto(middle);
+            middle = result.value;
+            text = start + "<pre><code >" + decodeHtml(middle) + "</code></pre>" + end;
+        }
+
+        var re = /```/g;
+        var indexList = new Array();
+        while ((match = re.exec(text)) != null) {
+            indexList.push(match.index);
+        }
+
+        if (indexList.length == 2) {
+            start = text.slice(0, indexList[0]);
+            middle = (text.slice(indexList[0], indexList[1] + 3)).replace(/```/g, "").trim();
+            end = text.slice(indexList[1] + 3), text.length;
+
+            var result = self.hljs.highlightAuto(middle);
+            middle = result.value;
+            text = start + "<pre><code >" + decodeHtml(middle) + "</code></pre>" + end;
+        }
+
+        return text;
     }
 
-    var re = /```/g;
-    var indexList = new Array();
-    while ((match = re.exec(text)) != null) {
-        indexList.push(match.index);
+    embedImages = function (text) {
+
+        var re = /(https?:\/\/.*\.(?:png|jpg|gif|gifv))/gi;
+
+        var indexListUrl = new Array();
+        while ((match = re.exec(text)) != null) {
+            indexListUrl.push(match[0]);
+        }
+
+        //remove any duplicates so we only replace once
+        var uniqueUrls = new Array();
+        $.each(indexListUrl, function (i, el) {
+            if ($.inArray(el, uniqueUrls) === -1) uniqueUrls.push(el);
+        });
+
+        for (var i = 0; i < uniqueUrls.length; i++) {
+            var re = new RegExp(RegExp.quote(uniqueUrls[i]), "g");
+            text = text.replace(re, "<br/><a target=\"_blank\" href=\"" + uniqueUrls[i] + "?component=7\"><img src=\"" + uniqueUrls[i] + "?component=7\" alt=\"Embedded Image\" style=\"width:320px;height:240;\"></a><br/>");
+        }
+
+        return text;
     }
 
-    if (indexList.length == 2) {
-        start = text.slice(0, indexList[0]);
-        middle = (text.slice(indexList[0], indexList[1] + 3)).replace(/```/g, "").trim();
-        end = text.slice(indexList[1] + 3), text.length;
-
-        var result = self.hljs.highlightAuto(middle);
-        middle = result.value;
-        text = start + "<pre><code >" + decodeHtml(middle) + "</code></pre>" + end;
-    }
-
-    return text;
-}
-
-embedImages = function (text) {
-
-    var re = /(https?:\/\/.*\.(?:png|jpg|gif|gifv))/gi;
-
-    var indexListUrl = new Array();
-    while ((match = re.exec(text)) != null) {
-        indexListUrl.push(match[0]);
-    }
-
-    //remove any duplicates so we only replace once
-    var uniqueUrls = new Array();
-    $.each(indexListUrl, function (i, el) {
-        if ($.inArray(el, uniqueUrls) === -1) uniqueUrls.push(el);
-    });
-
-    for (var i = 0; i < uniqueUrls.length; i++) {
-        var re = new RegExp(RegExp.quote(uniqueUrls[i]), "g");
-        text = text.replace(re, "<br/><a target=\"_blank\" href=\"" + uniqueUrls[i] + "?component=7\"><img src=\"" + uniqueUrls[i] + "?component=7\" alt=\"Embedded Image\" style=\"width:320px;height:240;\"></a><br/>");
-    }
-
-    return text;
-}
-
-String.prototype['autoLink'] = autoLink;
-String.prototype['linkUsernames'] = linkUsernames;
-String.prototype['linkHashtags'] = linkHashtags;
-String.prototype['embedYouTube'] = embedYouTube;
-String.prototype['formatCode'] = formatCode;
-String.prototype['embedImages'] = embedImages;
+    String.prototype['autoLink'] = autoLink;
+    String.prototype['linkUsernames'] = linkUsernames;
+    String.prototype['linkHashtags'] = linkHashtags;
+    String.prototype['embedYouTube'] = embedYouTube;
+    String.prototype['formatCode'] = formatCode;
+    String.prototype['embedImages'] = embedImages;
 
 }).call(this);
 
