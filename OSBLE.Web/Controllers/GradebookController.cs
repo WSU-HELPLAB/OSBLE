@@ -140,7 +140,7 @@ namespace OSBLE.Controllers
             //Setup viewbags based on usertype
             if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor || ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
             {
-                //Setting instructor/Ta specific viewbags
+                //Setting instructor/TA specific viewbags
                 ViewBag.CanUpload = true;
 
                 //Grabbing error message then wiping it.
@@ -1195,9 +1195,7 @@ namespace OSBLE.Controllers
             else if (Path.GetExtension(file.FileName) == ".csv")
             {
                 Dictionary<string, List<string>> newGradebook = new Dictionary<string, List<string>>();
-                //
                 newGradebook.Add(file.FileName, new StreamReader(file.InputStream).ReadToEnd().Replace("\r", String.Empty).Split('\n').ToList());
-
                 filesFailedToLoadCount += ProcessGradebookChanges(gfp, newGradebook);
             }
             else
@@ -1214,7 +1212,6 @@ namespace OSBLE.Controllers
                 {
                     Cache["UploadErrorMessage"] = filesFailedToLoadCount.ToString() + " file(s) during upload was not of .csv file type or did not match current gradebook format, upload may have failed.";
                 }
-            
             }
             return RedirectToAction("Index");
         }
@@ -1274,7 +1271,7 @@ namespace OSBLE.Controllers
             }
             else if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
             {
-                table = ParseTATable(table);
+                table = ParseTATable(table); //Displays the students' grades in any order
             }
             else
             {
@@ -1370,14 +1367,15 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-        /// Takes a full gradebook table and parses the table down to rows that have a leading "#" (indicating they are "global" rows)
-        /// and columns that do not have a leading "!" (indiciating they are not to be shown). This has special permissions when it comes to what a TA and instructor could see. 
+        /// Takes a full gradebook table and a boolean, indicating whether the output should be alphabetically sorted or
+        /// not and parses the table down to rows that have a leading "#" (indicating they are "global" rows)
+        /// and columns that do not have a leading "!" (indiciating they are not to be shown). This has special permissions 
+        /// when it comes to what a TA and instructor could see.
         /// </summary>
         /// <param name="gradebookTable"></param>
         /// <returns></returns>
         private List<List<string>> ParseTATable(List<List<string>> gradebookTable)
         {
-            
             //Declare all necessary empty lists.
             List<string> currentTASections = new List<string>();
             List<List<string>> TATable = new List<List<string>>();
@@ -1387,7 +1385,6 @@ namespace OSBLE.Controllers
             currentTASections = GetPermittedSections();
             //get sections in course
             bool HasMultipleSections = DBHelper.GetCourseSections(ActiveCourseUser.AbstractCourseID).Count() > 1 ? true : false;
-
             if (gradebookTable.Count > 0)
             {
                 //find section index
@@ -1402,25 +1399,20 @@ namespace OSBLE.Controllers
                 //find which rows should be displayed
                 for (int i = 0; i < gradebookTable.Count; i++)
                 {
-
                     int section = 0;
                     bool sectionParse = SectionColumn > 0 ? Int32.TryParse(gradebookTable[i][SectionColumn], out section) : false;
-
                     if (!HasMultipleSections || (sectionParse && currentTASections.Contains(section.ToString())))
                     {
                         TATable.Add(gradebookTable[i].ToList());
                     }
-
-                    //Add global rows (denoted by a leading '#').
+                    //Add global rows (denoted by a leading '#') in any order.
                     else if (gradebookTable[i][0].Length > 0 && gradebookTable[i][0][0] == '#')
                     {
                         TATable.Add(gradebookTable[i].ToList());
                         studentGlobalRows.Add(TATable.Count - 1);
                     }
                 }
-
                 ViewBag.GlobalRows = studentGlobalRows;
-
                 //Iterating over studentTable to find columns that should not be displayed (denoted by leading '!')
                 List<int> columnsToRemove = new List<int>();
                 for (int i = 0; i < TATable.Count; i++)
@@ -1437,7 +1429,6 @@ namespace OSBLE.Controllers
                 //removing columns that were marked with a '!'.  
                 //Removing them in from highest index to lowest index so that indicies are not messed up upon first removal
                 columnsToRemove.Sort();
-
                 for (int i = columnsToRemove.Count() - 1; i >= 0; i--)
                 {
                     int currentStudentTableLength = TATable.Count;
