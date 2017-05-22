@@ -91,9 +91,13 @@ namespace OSBLE.Controllers
                 }
 
                 if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor)
+                {
                     ViewBag.IsInstructor = true;
+                }
                 else
+                {
                     ViewBag.IsInstructor = false;
+                }
 
                 ViewBag.EnableCustomPostVisibility = ConfigurationManager.AppSettings["EnableCustomPostVisibility"]; //<add key="EnableCustomPostVisibility" value="false"/> in web.config
 
@@ -220,8 +224,8 @@ namespace OSBLE.Controllers
                 {
                     _activityFeedQuery.MaxQuerySize += 20;
                     initialReturnItems = _activityFeedQuery.Execute().ToList();
-                    returnItems = new List<FeedItem>();    
-                }                
+                    returnItems = new List<FeedItem>();
+                }
             }
 
             // restore the original end date and query size
@@ -236,7 +240,7 @@ namespace OSBLE.Controllers
             {
                 foreach (FeedItem f in returnItems)
                 {
-                    if (f.Event.IsAnonymous)
+                    if (f.Event.IsAnonymous || ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer)
                     {
                         //make anon userprofile
                         UserProfile anonUserProfile = new UserProfile();
@@ -352,6 +356,30 @@ namespace OSBLE.Controllers
             return Json(1);
         }
 
+        [HttpPost]
+        public string GetUserRole()
+        {
+            switch (ActiveCourseUser.AbstractRoleID)
+            {
+                case (int)CourseRole.CourseRoles.Instructor:
+                    return "Instructor";
+                case (int)CourseRole.CourseRoles.Moderator:
+                    return "Moderator";
+                case (int)CourseRole.CourseRoles.Observer:
+                    return "Observer";
+                case (int)CourseRole.CourseRoles.Pending:
+                    return "Pending";
+                case (int)CourseRole.CourseRoles.Student:
+                    return "Student";
+                case (int)CourseRole.CourseRoles.TA:
+                    return "TA";
+                case (int)CourseRole.CourseRoles.Withdrawn:
+                    return "Withdrawn";
+                default:
+                    return "None";
+            }
+        }
+
         private string GetDisplayTimeString(DateTime time, CourseUser courseUser = null)
         {
             if (courseUser != null)
@@ -365,12 +393,21 @@ namespace OSBLE.Controllers
         {
             comment.SetPrivileges(ActiveCourseUser, (ActivityEvent)comment);
             comment.NumberHelpfulMarks = DBHelper.GetHelpfulMarksLogIds(comment.EventLogId, sql).Count;
+            int name;
+            if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer)
+            {
+                name = 1000;
+            }
+            else
+            {
+                name = comment.SenderId;
+            }
             return new
             {
                 EventId = comment.EventLogId,
                 ParentEventId = comment.SourceEventLogId,
                 SenderName = comment.DisplayTitle,
-                SenderId = comment.SenderId,
+                SenderId = name,
                 TimeString = GetDisplayTimeString(comment.EventDate),
                 EventDate = comment.EventDate.Ticks,
                 EventLogId = comment.EventLogId,
@@ -900,8 +937,8 @@ namespace OSBLE.Controllers
                 bool hasLastPost = vm.Feed.Count < _activityFeedQuery.MaxQuerySize;
                 if (hasLastPost)
                 {
-                    vm.Feed.RemoveAt(0);    
-                }                
+                    vm.Feed.RemoveAt(0);
+                }
             }
             return GetJsonFromViewModel(vm);
         }
@@ -1558,11 +1595,15 @@ namespace OSBLE.Controllers
 #endif
         }
 
-
+        /// <summary>
+        /// If the current user is an Observer, the @mention tags will be anonymous
+        /// Else, the @mention tags will be replaced with the correct names
+        /// </summary>
+        /// <param name="body"></param>
+        /// <returns></returns>
         public string ReplaceMentionWithName(string body)
         {
             List<int> nameIndices = new List<int>();
-
             for (int i = 0; i < body.Length; i++)
             {
                 // If we find an '@' character, see if it's followed by "id=" then a number then a semicolon
@@ -1584,32 +1625,59 @@ namespace OSBLE.Controllers
                 }
             }
             nameIndices.Reverse();
-
-            foreach (int index in nameIndices) // In reverse order, we need to replace each @... with the students name
+            if (ActiveCourseUser.AbstractCourseID == (int)CourseRole.CourseRoles.Observer)
             {
-                // First let's get the length of the part we will replace and also record the id
-                int length = 0, tempIndex = index + 1;
-                string idString = "";
-                while (body[tempIndex] != ';') { length++; tempIndex++; idString += body[tempIndex]; }
-
-                // Get the id= part off the beginning of idString and the ; from the end
-                idString = idString.Substring(2);
-                idString = idString.Substring(0, idString.Length - 1);
-
-                // Then get the student's name from the id
-                int id; int.TryParse(idString, out id);
-                if (id != null)
+                foreach (int index in nameIndices) // In reverse order, we need to replace each @... with Anonymous
                 {
-                    UserProfile referencedUser = (from user in db.UserProfiles where user.ID == id select user).FirstOrDefault();
-                    if (referencedUser == null) continue; // It's possible the user no longer exists, or for some reason someone manually entered @id=blahblahblah; into the text field.
-                    string studentFullName = referencedUser.FirstName + referencedUser.LastName;
+                    // First let's get the length of the part we will replace and also record the id
+                    int length = 0, tempIndex = index + 1;
+                    string idString = "";
+                    while (body[tempIndex] != ';') { length++; tempIndex++; idString += body[tempIndex]; }
 
-                    // Now replace the id number in the string with the user name
-                    body = body.Replace(body.Substring(index + 1, length + 1), string.Format("<a href=\"{0}\">{1}</a>", Url.Action("Index", "Profile", new { id = id }, Request.Url.Scheme), studentFullName));
+                    // Get the id= part off the beginning of idString and the ; from the end
+                    idString = idString.Substring(2);
+                    idString = idString.Substring(0, idString.Length - 1);
+
+                    // Then get the student's name from the id
+                    int id; int.TryParse(idString, out id);
+                    if (id != null)
+                    {
+                        string studentFullName = "Anonymous user";
+                        //anonUserProfile.LastName = f.Event.EventId.ToString();
+
+                        // Now replace the id number in the string with the user name
+                        body = body.Replace(body.Substring(index + 1, length + 1), string.Format("<a href=\"{0}\">{1}</a>", Url.Action("Index", "Profile", new { id = id }, Request.Url.Scheme), studentFullName));
+                    }
                 }
+                return body;
             }
+            else
+            {
+                foreach (int index in nameIndices) // In reverse order, we need to replace each @... with the students name
+                {
+                    // First let's get the length of the part we will replace and also record the id
+                    int length = 0, tempIndex = index + 1;
+                    string idString = "";
+                    while (body[tempIndex] != ';') { length++; tempIndex++; idString += body[tempIndex]; }
 
-            return body;
+                    // Get the id= part off the beginning of idString and the ; from the end
+                    idString = idString.Substring(2);
+                    idString = idString.Substring(0, idString.Length - 1);
+
+                    // Then get the student's name from the id
+                    int id; int.TryParse(idString, out id);
+                    if (id != null)
+                    {
+                        UserProfile referencedUser = (from user in db.UserProfiles where user.ID == id select user).FirstOrDefault();
+                        if (referencedUser == null) continue; // It's possible the user no longer exists, or for some reason someone manually entered @id=blahblahblah; into the text field.
+                        string studentFullName = referencedUser.FirstName + referencedUser.LastName;
+
+                        // Now replace the id number in the string with the user name
+                        body = body.Replace(body.Substring(index + 1, length + 1), string.Format("<a href=\"{0}\">{1}</a>", Url.Action("Index", "Profile", new { id = id }, Request.Url.Scheme), studentFullName));
+                    }
+                }
+                return body;
+            }
         }
 
         [HttpPost]
@@ -1777,14 +1845,14 @@ namespace OSBLE.Controllers
             if (parentEventId == -1) //feedpost
             {
                 FeedPostEvent feedPost = DBHelper.GetFeedPostEvent(eventId);
-                return feedPost.Comment;    
+                return feedPost.Comment;
             }
             else //logcomment
             {
                 LogCommentEvent logComment = DBHelper.GetLogCommentEvents(parentEventId).Where(lce => lce.EventLogId == eventId).FirstOrDefault();
                 return logComment.Content;
             }
-            
+
         }
 
         public JsonResult GetPermissions(int eventId)
