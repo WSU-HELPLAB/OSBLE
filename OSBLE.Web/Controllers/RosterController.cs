@@ -1947,12 +1947,12 @@ namespace OSBLE.Controllers
 
             string subject = "Welcome to OSBLE";
             string link = StringConstants.WebClientRoot + "Account/AcademiaRegister?email="
-                + WTU.Email + "&firstname=" + WTU.Name2 + "&lastname=" + WTU.Name1 + "&identification=" + WTU.Identification;
+                + WTU.Email + "&firstname=" + WTU.Name1 + "&lastname=" + WTU.Name2 + "&identification=" + WTU.Identification;
 
-            string message = "Dear " + WTU.Name2 + " " + WTU.Name1 + @", <br/>
+            string message = "Dear " + WTU.Name1 + " " + WTU.Name2 + @", <br/>
                 <br/>
                 Congratulations! You have been enrolled in the following course at plus.osble.org: " + ActiveCourseUser.AbstractCourse.Name +
-            " by " + ActiveCourseUser.UserProfile.FullName + " In order to access this course, please create an OSBLE account with OSBLE first by " +
+            " by " + ActiveCourseUser.UserProfile.FullName + ". In order to access this course, please create an OSBLE account with OSBLE first by " +
             "<a href='" + link + @"'>clicking on this link</a>. 
                 <br/>
                 <br/>
@@ -1986,12 +1986,12 @@ namespace OSBLE.Controllers
             {
                 string subject = "Welcome to OSBLE";
                 string link = StringConstants.WebClientRoot + "Account/AcademiaRegister?email="
-                    + wtUser.Email + "&firstname=" + wtUser.Name2 + "&lastname=" + wtUser.Name1 + "&identification=" + wtUser.Identification;
+                    + wtUser.Email + "&firstname=" + wtUser.Name1 + "&lastname=" + wtUser.Name2 + "&identification=" + wtUser.Identification;
 
-                string message = "Dear " + wtUser.Name2 + " " + wtUser.Name1 + @", <br/>
+                string message = "Dear " + wtUser.Name1 + " " + wtUser.Name2 + @", <br/>
                 <br/>
                 This email was sent to notify you that you have been added to " + ActiveCourseUser.AbstractCourse.Name +
-                " by " + ActiveCourseUser.UserProfile.FullName + " To access this course you need to create an account with OSBLE first. You may create an account " +
+                " by " + ActiveCourseUser.UserProfile.FullName + ". To access this course you need to create an account with OSBLE first. You may create an account " +
                 "by <a href='" + link + @"'>following this link</a>. 
                 <br/>
                 <br/>
