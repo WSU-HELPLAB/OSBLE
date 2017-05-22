@@ -32,8 +32,8 @@ namespace OSBLE.Controllers
         {
             ViewBag.CurrentTab = "Users";
             ViewBag.ActiveCourseUser = ActiveCourseUser;
-            
-            ViewBag.HideMail = OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID); 
+
+            ViewBag.HideMail = OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID);
         }
 
         public class RosterEntry
@@ -60,7 +60,7 @@ namespace OSBLE.Controllers
                 get;
                 set;
             }
-        } 
+        }
 
         public class UsersBySection
         {
@@ -76,7 +76,7 @@ namespace OSBLE.Controllers
                 set;
             }
 
-        } 
+        }
 
         public class UsersByRole
         {
@@ -116,11 +116,11 @@ namespace OSBLE.Controllers
             //yc this portion is used to populate a white table relative to the current course 
             //this information should only be visible to instructors/admins (currently all students see this information
 
-           //Get all the WhiteTabled Users for the current class 
+            //Get all the WhiteTabled Users for the current class 
             var WTusers = (from d in db.WhiteTableUsers
                            where d.CourseID == ActiveCourseUser.AbstractCourseID
                            select d);
- 
+
             var WTusersGroupedByCourseID = WTusers.GroupBy(WhiteTableUsers => WhiteTableUsers.CourseID).OrderBy(WhiteTableUsers => WhiteTableUsers.Key).ToList();
 
             List<WhiteTableUser> WTup = new List<WhiteTableUser>();
@@ -129,12 +129,12 @@ namespace OSBLE.Controllers
             {
                 WTup.Add(WTu);
             }
-            
+
             //Remove duplicates that may slip in 
             WTup = WTup.Distinct().ToList();
             ViewBag.WhiteTableUsers = WTup;
 
-           //\FW
+            //\FW
 
             foreach (var section in usersGroupedBySection)
             {
@@ -158,7 +158,7 @@ namespace OSBLE.Controllers
                     foreach (CourseRole.CourseRoles r in rolesOrder)
                     {
                         roles.Add(db.CourseRoles.Find((int)r));
-                        
+
                     }
                 }
                 else
@@ -210,7 +210,7 @@ namespace OSBLE.Controllers
             }
 
             return View();
-        } 
+        }
 
         [HttpPost]
         [CanModifyCourse]
@@ -237,7 +237,7 @@ namespace OSBLE.Controllers
                 Stream s = file.InputStream;
                 List<string> headers = getRosterHeaders(s);
 
-                if(headers.Count() == 0)
+                if (headers.Count() == 0)
                 {
                     ViewBag.Error = "OSBLE was unable to import the selected file. Check the formatting of your roster's header to ensure  that all rows have the same number of columns.";
                     return View("RosterError");
@@ -249,7 +249,7 @@ namespace OSBLE.Controllers
                 string guessedIdentification = null;
                 string guessedName = null;
                 string guessedName2 = null;
-                string guessedEmail = null;                
+                string guessedEmail = null;
 
                 // Guess headers for section and identification
                 foreach (string header in headers)
@@ -328,7 +328,7 @@ namespace OSBLE.Controllers
 
                 if (rosterEntries.Count > 0)
                 {
-                   
+
                     // First check to make sure there are no duplicates in the ID table.
                     List<string> usedIdentifications = new List<string>();
                     foreach (RosterEntry entry in rosterEntries)
@@ -348,7 +348,7 @@ namespace OSBLE.Controllers
                     List<CourseUser> otherMembers = db.CourseUsers.Where(c => c.AbstractCourseID == ActiveCourseUser.AbstractCourseID && c.AbstractRoleID != (int)CourseRole.CourseRoles.Student).ToList();
                     foreach (CourseUser member in otherMembers)
                     {
-                        
+
                         if (usedIdentifications.Contains(member.UserProfile.Identification) && member.AbstractRoleID != (int)CourseRole.CourseRoles.Pending)
                         {
                             ViewBag.Error = "There is a " + "[" + member.AbstractRole.Name + "]" + " non-student (" + member.UserProfile.FirstName + " " + member.UserProfile.LastName + ") in the course with the same School ID as a student on the roster. Please check your roster and try again.";
@@ -372,25 +372,25 @@ namespace OSBLE.Controllers
 
                     //on new roster import clear the whitetable
                     clearWhiteTableOnRosterImport();
-                   
+
                     foreach (RosterEntry entry in rosterEntries)
                     {
 
                         UserProfile userWithAccount = getEntryUserProfile(entry);
-                        
 
-                        if(userWithAccount != null)
+
+                        if (userWithAccount != null)
                         {
                             CourseUser userIsPending = getPendingUserOnRoster(entry);
-                            if(userIsPending != null)
+                            if (userIsPending != null)
                             {
                                 userIsPending.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
                                 orphans.Remove(userIsPending.UserProfile);
                                 db.Entry(userIsPending).State = EntityState.Modified;
-                                continue;                            
+                                continue;
                             }
-                            CourseUser existingUser = new CourseUser(); 
-                            
+                            CourseUser existingUser = new CourseUser();
+
                             //yc: before using create course user, you must set the following
                             existingUser.UserProfile = userWithAccount;
                             existingUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
@@ -399,16 +399,16 @@ namespace OSBLE.Controllers
 
                             //add section if a section column exists
                             if (sectionColumn != "")
-                                existingUser.Section = entry.Section;                            
+                                existingUser.Section = entry.Section;
 
                             createCourseUser(existingUser);
                             rosterCount++;
                             //email the user notifying them that they have been added to this course 
-                            if(entry != null && !String.IsNullOrEmpty(entry.Email))
+                            if (entry != null && !String.IsNullOrEmpty(entry.Email))
                                 emailCourseUser(existingUser);
-        
 
-                         
+
+
                             orphans.Remove(existingUser.UserProfile);
 
 
@@ -493,7 +493,7 @@ namespace OSBLE.Controllers
 
                     }// end foreach loop for whitetables
 
-                  
+
 
                     db.SaveChanges();
 
@@ -565,9 +565,9 @@ namespace OSBLE.Controllers
                 courseuser.AbstractRoleID = Convert.ToInt32(AbstractRoleID);
                 courseuser.UserProfile.SchoolID = Convert.ToInt32(SchoolID);
             }
-           
-            
-            
+
+
+
             //if modelState isValid
             if (ModelState.IsValid && courseuser.AbstractRoleID != 0)
             {
@@ -575,20 +575,20 @@ namespace OSBLE.Controllers
                 {
                     createCourseUser(courseuser);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     ModelState.AddModelError("", e.Message);
                     ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name");
                     ViewBag.SchoolID = new SelectList(db.Schools, "ID", "Name");
-                    return View();  
+                    return View();
                 }
             }
 
             Course thisCourse = ActiveCourseUser.AbstractCourse as Course;
             //if there is at least one assignmnet in the course that has teams/is team based
-            if(thisCourse != null && thisCourse.Assignments.Count(a => a.HasTeams) > 0)
+            if (thisCourse != null && thisCourse.Assignments.Count(a => a.HasTeams) > 0)
             {
-                return RedirectToAction("Index", new { notice = "You have successfully added " + courseuser.UserProfile.LastAndFirst() + " to the course. Please note that this course has an ongoing team-based assignment, and " + courseuser.UserProfile.LastAndFirst() + " will need to be manually added to a team."});
+                return RedirectToAction("Index", new { notice = "You have successfully added " + courseuser.UserProfile.LastAndFirst() + " to the course. Please note that this course has an ongoing team-based assignment, and " + courseuser.UserProfile.LastAndFirst() + " will need to be manually added to a team." });
             }
 
             return RedirectToAction("Index", new { notice = "You have successfully added " + courseuser.UserProfile.LastAndFirst() + " to the course." });
@@ -626,7 +626,7 @@ namespace OSBLE.Controllers
                 {
                     //yc this check for multiple emails added in. 
                     string temp = courseuser.UserProfile.UserName;
-                    char[] delim = new char[] { ' ', ',' , ';' };
+                    char[] delim = new char[] { ' ', ',', ';' };
                     string[] emails = temp.Split(delim, StringSplitOptions.RemoveEmptyEntries);
                     string[] invalidEmails = new string[emails.Count()];
                     int invalidCount = 0;
@@ -674,7 +674,7 @@ namespace OSBLE.Controllers
                         }
                         else
                         {
-                           
+
                             //if there is at least one assignmnet in the course that has teams/is team based
                             if (thisCourse != null && thisCourse.Assignments.Count(a => a.HasTeams) > 0)
                             {
@@ -696,7 +696,7 @@ namespace OSBLE.Controllers
                     return View();
                 }
             }
-          
+
             //if there is at least one assignmnet in the course that has teams/is team based
             if (thisCourse != null && thisCourse.Assignments.Count(a => a.HasTeams) > 0)
             {
@@ -713,7 +713,7 @@ namespace OSBLE.Controllers
             WhiteTableUser wtUser = getWhiteTableUser(wtuID);
             //wtu has been loaded up
             //setup views
-            
+
             return View(wtUser);
         }
 
@@ -755,8 +755,8 @@ namespace OSBLE.Controllers
             }
             else
             {
-                
-                thisCourse = ActiveCourseUser.AbstractCourse as Course;    
+
+                thisCourse = ActiveCourseUser.AbstractCourse as Course;
             }
 
             Notification n = null;
@@ -767,12 +767,12 @@ namespace OSBLE.Controllers
             }
             else
             {
-                n = db.Notifications.Where(item => item.SenderID == pendingUser.ID && item.RecipientID == ActiveCourseUser.ID).FirstOrDefault();    
+                n = db.Notifications.Where(item => item.SenderID == pendingUser.ID && item.RecipientID == ActiveCourseUser.ID).FirstOrDefault();
             }
 
-            
+
             //there is not always a notification for a pending user, say a instructor manually adds them to the pending list?
-            if(n != null)
+            if (n != null)
             {
                 n.Read = true;
                 db.SaveChanges();
@@ -792,21 +792,21 @@ namespace OSBLE.Controllers
                 {
                     if (pendingUser != null && pendingUser.UserProfile != null)
                     {
-                        return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " has been enrolled into this course. Please note that this course has an ongoing team-based assignment, and you will need to manually add " + pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " to a team." });    
-                }
+                        return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " has been enrolled into this course. Please note that this course has an ongoing team-based assignment, and you will need to manually add " + pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " to a team." });
+                    }
                     else //case: pendingUser and/or UserProfile are null, so it must be just the role changing.
                     {
-                        return RedirectToAction("Index", "Roster", new { notice = "1 user role has been changed. Please note that this course has an ongoing team-based assignment, and you will need to manually add the student to a team." });    
+                        return RedirectToAction("Index", "Roster", new { notice = "1 user role has been changed. Please note that this course has an ongoing team-based assignment, and you will need to manually add the student to a team." });
                     }
                 }
 
                 if (pendingUser != null && pendingUser.UserProfile != null)
                 {
-                return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " has been enrolled into this course." });
-            }
+                    return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " has been enrolled into this course." });
+                }
                 else //case: pendingUser and/or UserProfile are null, so it must be just the role changing.
                 {
-                    return RedirectToAction("Index", "Roster", new { notice = "1 user role has been changed for this course." });    
+                    return RedirectToAction("Index", "Roster", new { notice = "1 user role has been changed for this course." });
                 }
             }
             else if (pendingUser.AbstractRoleID == (int)CommunityRole.OSBLERoles.Pending)
@@ -821,7 +821,7 @@ namespace OSBLE.Controllers
             {
                 return RedirectToAction("Index", "Roster", new { notice = pendingUser.UserProfile.FirstName + " " + pendingUser.UserProfile.LastName + " IS NOT A PENDING USER." });
             }
-            
+
         }
         /// <summary>
         /// yc: get- deny pending user for current course enrollmenet, clean up notifications to instructor
@@ -845,8 +845,8 @@ namespace OSBLE.Controllers
             // database when we remove the pending user and they aren't associated with the notification anymore.
             if (null != n)
             {
-                db.Notifications.Remove(n);    
-            }            
+                db.Notifications.Remove(n);
+            }
 
             //remove the kid from the db
             db.CourseUsers.Remove(pendingUser);
@@ -857,7 +857,7 @@ namespace OSBLE.Controllers
             else
                 return RedirectToAction("Index", "Roster", new { notice = firstName + " " + lastName + " has been denied the ability to participate in this community." });
         }
-        
+
         /// <summary>
         /// yc: creating a batch approval on pending users based on the current course
         /// </summary>
@@ -899,7 +899,7 @@ namespace OSBLE.Controllers
                     db.Entry(n).State = EntityState.Modified;
                 }
 
-                
+
                 db.SaveChanges();
                 if (thisCourse != null && thisCourse.Assignments.Count(a => a.HasTeams) > 0)
                 {
@@ -959,9 +959,9 @@ namespace OSBLE.Controllers
             {
 
                 pendingUsers = (from c in db.CourseUsers
-                                             where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
-                                             c.AbstractRoleID == (int)CourseRole.CourseRoles.Pending
-                                             select c).ToList();
+                                where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                                c.AbstractRoleID == (int)CourseRole.CourseRoles.Pending
+                                select c).ToList();
             }
             else
             {
@@ -1009,9 +1009,9 @@ namespace OSBLE.Controllers
 
             //find all students for current course
             List<CourseUser> students = (from c in db.CourseUsers
-                                             where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
-                                             c.AbstractRoleID == (int)CourseRole.CourseRoles.Student
-                                             select c).ToList();
+                                         where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                                         c.AbstractRoleID == (int)CourseRole.CourseRoles.Student
+                                         select c).ToList();
             count = students.Count();
 
             foreach (CourseUser p in students)
@@ -1067,7 +1067,7 @@ namespace OSBLE.Controllers
         public ActionResult ChangeWithdrawnToStudentRole(int userProfileID)
         {
             CourseUser CourseUser = getCourseUser(userProfileID);
-            
+
             if (CanModifyOwnLink(CourseUser))
             {
                 if (ModelState.IsValid)
@@ -1155,7 +1155,7 @@ namespace OSBLE.Controllers
                     }
                 }
             }
-            
+
             return RedirectToAction("Index");
         }
 
@@ -1234,10 +1234,10 @@ namespace OSBLE.Controllers
 
             //find all withdrawn students for current course
             List<CourseUser> students = (from c in db.CourseUsers
-                                            where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
-                                            c.AbstractRoleID == (int)CourseRole.CourseRoles.Withdrawn &&
-                                            idInts.Contains(c.UserProfileID)
-                                            select c).ToList();
+                                         where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                                         c.AbstractRoleID == (int)CourseRole.CourseRoles.Withdrawn &&
+                                         idInts.Contains(c.UserProfileID)
+                                         select c).ToList();
             int count = students.Count();
 
             foreach (CourseUser p in students)
@@ -1277,7 +1277,7 @@ namespace OSBLE.Controllers
             //find all withdrawn students for current course
             List<CourseUser> students = (from c in db.CourseUsers
                                          where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
-                                         idInts.Contains(c.UserProfileID) 
+                                         idInts.Contains(c.UserProfileID)
                                          select c).ToList();
 
             int count = students.Count();
@@ -1339,9 +1339,9 @@ namespace OSBLE.Controllers
             {
 
                 CourseUser cu = (from c in db.CourseUsers
-                                   where c.UserProfileID == id
-                                   && c.AbstractCourseID == courseID
-                                   select c).FirstOrDefault();
+                                 where c.UserProfileID == id
+                                 && c.AbstractCourseID == courseID
+                                 select c).FirstOrDefault();
 
                 if (CurrentUser.ID == cu.UserProfileID)
                     continue;
@@ -1361,7 +1361,7 @@ namespace OSBLE.Controllers
                 {
                     continue;
                 }
-               
+
 
                     //if not an instructor
                 else
@@ -1370,11 +1370,11 @@ namespace OSBLE.Controllers
                     if (section == -2) //if you're moving them to all sections
                         cu.MultiSection = "all";
                     else
-                     cu.MultiSection = String.Copy(sectionList);
+                        cu.MultiSection = String.Copy(sectionList);
                 }
             }
 
-                db.SaveChanges();
+            db.SaveChanges();
 
             return true;
         }
@@ -1492,12 +1492,12 @@ namespace OSBLE.Controllers
             else
             {
                 return (from c in db.CourseUsers
-                    where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID
-                    && c.UserProfileID == userProfileId
-                    select c).FirstOrDefault();
+                        where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID
+                        && c.UserProfileID == userProfileId
+                        select c).FirstOrDefault();
             }
 
-            
+
         }
 
         /// <summary>
@@ -1517,7 +1517,7 @@ namespace OSBLE.Controllers
                                select c);
 
             if (courseUser.UserProfileID != CurrentUser.ID || diffTeacher.Count() > 0)
-            {   
+            {
                 return true;
             }
             else
@@ -1532,13 +1532,13 @@ namespace OSBLE.Controllers
             StreamReader sr = new StreamReader(roster);
             CachedCsvReader csvReader = new CachedCsvReader(sr, true);
 
-            List<string> getFieldHeaders = new List<string>(); 
+            List<string> getFieldHeaders = new List<string>();
 
             try
             {
                 getFieldHeaders = csvReader.GetFieldHeaders().ToList();
             }
-            catch(Exception)
+            catch (Exception)
             {
             }
 
@@ -1591,7 +1591,7 @@ namespace OSBLE.Controllers
                 {
                     entry.Section = 0;
                 }
-                if(emailColumn != "" && emailColumn != "None")
+                if (emailColumn != "" && emailColumn != "None")
                 {
                     entry.Email = csvReader[csvReader.GetFieldIndex(emailColumn)];
                 }
@@ -1655,7 +1655,7 @@ namespace OSBLE.Controllers
             }
             else //If the CourseUser already has a UserProfile..
             {
-                if (courseuser.UserProfile.FirstName != null) 
+                if (courseuser.UserProfile.FirstName != null)
                 {
                     user.FirstName = courseuser.UserProfile.FirstName;
                     user.LastName = courseuser.UserProfile.LastName;
@@ -1676,7 +1676,7 @@ namespace OSBLE.Controllers
                 addNewStudentToTeams(courseuser);
             }
         }
-       
+
         /// <summary>
         /// This method will add the new courseUser to all the various types of teams they need to be on for each assignment type.
         /// </summary>
@@ -1688,7 +1688,7 @@ namespace OSBLE.Controllers
             {
                 //If we already have assignments in the course, we need to add the new student into these assignments
                 int currentCourseId = 0;
-                
+
                 if (ActiveCourseUser == null)
                 {
                     //Handle the case of whitelisted users
@@ -1699,7 +1699,7 @@ namespace OSBLE.Controllers
                 {
                     currentCourseId = ActiveCourseUser.AbstractCourseID;
                 }
-                 
+
                 List<Assignment> assignments = (from a in db.Assignments
                                                 where a.CourseID == currentCourseId
                                                 select a).ToList();
@@ -1709,7 +1709,7 @@ namespace OSBLE.Controllers
                 {
                     bool present = false;
                     // First lets make sure the user isn't already in a team for this assignment
-                    foreach(AssignmentTeam aTeam in a.AssignmentTeams)
+                    foreach (AssignmentTeam aTeam in a.AssignmentTeams)
                     {
                         foreach (TeamMember member in aTeam.Team.TeamMembers)
                         {
@@ -1765,7 +1765,7 @@ namespace OSBLE.Controllers
                         //If the assignment is a CRD, the discussion team must also have an author team\
                         //Since this CRD will already be completely invalid for use (as its a CRD with only 1 member..) 
                         //we will do a small hack and have them be the author team and review team.
-                        if(a.Type == AssignmentTypes.CriticalReviewDiscussion)
+                        if (a.Type == AssignmentTypes.CriticalReviewDiscussion)
                         {
                             dt.AuthorTeamID = assignmentTeam.TeamID;
                         }
@@ -1816,7 +1816,7 @@ namespace OSBLE.Controllers
             //do the same thing as createCourseUser but make the function work with our whitetable
             //This will return one if they exist already or null if they don't
             var user = (from c in db.WhiteTableUsers
-                        where c.Identification == whitetable.WhiteTableUser.Identification 
+                        where c.Identification == whitetable.WhiteTableUser.Identification
                         && c.SchoolID == ActiveCourseUser.UserProfile.SchoolID
                         select c).FirstOrDefault();
             if (user == null || user.CourseID != ActiveCourseUser.AbstractCourseID)
@@ -1827,7 +1827,7 @@ namespace OSBLE.Controllers
                 up.SchoolID = CurrentUser.SchoolID;
                 up.Identification = whitetable.WhiteTableUser.Identification; //courseuser.UserProfile.Identification;                
                 up.CourseID = ActiveCourseUser.AbstractCourseID; //is this used anywhere? previous implementation it was always 0...
-                
+
 
                 if (whitetable.WhiteTableUser.Name1 != null)
                 {
@@ -1851,20 +1851,20 @@ namespace OSBLE.Controllers
                 }
                 db.WhiteTableUsers.Add(up);
                 db.SaveChanges();
-                                
-                WhiteTable wt = new WhiteTable 
-                { 
+
+                WhiteTable wt = new WhiteTable
+                {
                     WhiteTableUserID = up.ID,
                     AbstractCourseID = ActiveCourseUser.AbstractCourseID,
                     Section = whitetable.Section,
                     Hidden = false
                 };
-                
+
                 db.WhiteTable.Add(wt);
                 db.SaveChanges();
             }
-                
-            
+
+
             else //If the CourseUser already has a UserProfile..
             {
                 if (whitetable.WhiteTableUser.Name1 != null)
@@ -1879,7 +1879,7 @@ namespace OSBLE.Controllers
                 whitetable.WhiteTableUserID = user.ID;
 
                 db.Entry(whitetable).State = EntityState.Modified;
-                db.SaveChanges();                
+                db.SaveChanges();
             }
         }
 
@@ -1889,10 +1889,10 @@ namespace OSBLE.Controllers
                            where d.CourseID == ActiveCourseUser.AbstractCourseID
                            select d;
 
-            foreach (var user in oldUsers) 
+            foreach (var user in oldUsers)
             {
                 db.WhiteTableUsers.Remove(user);
-                
+
             }
 
             db.SaveChanges();
@@ -1901,7 +1901,7 @@ namespace OSBLE.Controllers
         private UserProfile getEntryUserProfile(RosterEntry entry)
         {
             UserProfile possibleUser = (from d in db.UserProfiles
-                                        where d.Identification == entry.Identification 
+                                        where d.Identification == entry.Identification
                                         //&& d.UserName == entry.Email
                                         select d).FirstOrDefault();
             return possibleUser;
@@ -1946,13 +1946,13 @@ namespace OSBLE.Controllers
             var WTU = whitetable.WhiteTableUser;
 
             string subject = "Welcome to OSBLE";
-            string link = StringConstants.WebClientRoot + "Account/AcademiaRegister?email=" 
-                + WTU.Email + "&firstname=" + WTU.Name2 + "&lastname=" + WTU.Name1 + "&identification=" + WTU.Identification; 
+            string link = StringConstants.WebClientRoot + "Account/AcademiaRegister?email="
+                + WTU.Email + "&firstname=" + WTU.Name2 + "&lastname=" + WTU.Name1 + "&identification=" + WTU.Identification;
 
             string message = "Dear " + WTU.Name2 + " " + WTU.Name1 + @", <br/>
                 <br/>
                 Congratulations! You have been enrolled in the following course at plus.osble.org: " + ActiveCourseUser.AbstractCourse.Name +
-            " In order to access this course, please create an OSBLE account with OSBLE first by " +
+            " by " + ActiveCourseUser.UserProfile.FullName + " In order to access this course, please create an OSBLE account with OSBLE first by " +
             "<a href='" + link + @"'>clicking on this link</a>. 
                 <br/>
                 <br/>
@@ -1961,9 +1961,9 @@ namespace OSBLE.Controllers
             message += @"Best regards,<br/>
                 The OSBLE Team in the <a href='www.helplab.org'>HELP lab</a> at <a href='www.wsu.edu'>Washington State University</a>";
 
-            if(WTU.Email != null)
+            if (WTU.Email != null)
                 Email.Send(subject, message, new List<MailAddress>() { new MailAddress(WTU.Email) });
-            
+
         }
 
         /// <summary>
@@ -1991,7 +1991,7 @@ namespace OSBLE.Controllers
                 string message = "Dear " + wtUser.Name2 + " " + wtUser.Name1 + @", <br/>
                 <br/>
                 This email was sent to notify you that you have been added to " + ActiveCourseUser.AbstractCourse.Name +
-                " To access this course you need to create an account with OSBLE first. You may create an account " +
+                " by " + ActiveCourseUser.UserProfile.FullName + " To access this course you need to create an account with OSBLE first. You may create an account " +
                 "by <a href='" + link + @"'>following this link</a>. 
                 <br/>
                 <br/>
@@ -2009,7 +2009,7 @@ namespace OSBLE.Controllers
                 return View("Index");
             }
         }
-            
+
         /// <summary>
         /// This will take a list of Course User IDs and return the list of multiSection strings associated with those users in order
         /// </summary>
@@ -2021,7 +2021,7 @@ namespace OSBLE.Controllers
         {
             List<string> multiSections = new List<string>();
 
-            
+
             //this will go in order of the list passed in
             foreach (int id in studentIDs)
             {
@@ -2031,14 +2031,14 @@ namespace OSBLE.Controllers
                                    select stu).FirstOrDefault();
 
                 multiSections.Add(temp.MultiSection);
-        }
+            }
 
-             
+
             if (multiSections.Count == 0)
                 return null;
             string output = new JavaScriptSerializer().Serialize(multiSections);
             return output;
-           
+
         }
 
         /// <summary>
