@@ -462,6 +462,8 @@ namespace OSBLE.Controllers
             //remove any duplicate course names
             allCoursePrefix = allCoursePrefix.Distinct().ToList();
 
+            course.Add(new SelectListItem { Text = "Select a Course Prefix", Value = null});
+
             foreach(string prefix in allCoursePrefix)
                 course.Add(new SelectListItem { Text = prefix, Value = prefix });
 
@@ -487,10 +489,9 @@ namespace OSBLE.Controllers
         }
 
         [HttpPost]
-        public ActionResult SearchResults(string course, string number)
+        public ActionResult SearchResults(string course)
         {
-            if (number == "Search All")
-            {
+
                 var Results = from d in db.Courses
                               where d.Prefix == course 
                               select d;
@@ -502,22 +503,6 @@ namespace OSBLE.Controllers
                 TempData["SearchResults"] = Results.Distinct().ToList();
 
                 return RedirectToAction("CourseSearch", "Course");
-            }
-            else
-            {
-                var Results = from d in db.Courses
-                              where d.Prefix.Contains(course) && d.Number == number
-                              select d;
-
-                Results.GroupBy(x => x.Number)
-                        .OrderBy(x => x.Count())
-                        .Select(x => x.First());
-
-                TempData["SearchResults"] = Results.Distinct().ToList();
-
-                return RedirectToAction("CourseSearch", "Course");
-            }
-
 
         }
 
