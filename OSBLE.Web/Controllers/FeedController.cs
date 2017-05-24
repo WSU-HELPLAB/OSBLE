@@ -400,7 +400,6 @@ namespace OSBLE.Controllers
         {
             comment.SetPrivileges(ActiveCourseUser, (ActivityEvent)comment);
             comment.NumberHelpfulMarks = DBHelper.GetHelpfulMarksLogIds(comment.EventLogId, sql).Count;
-            name = comment.SenderId;
             return new
             {
                 EventId = comment.EventLogId,
@@ -596,6 +595,9 @@ namespace OSBLE.Controllers
             // get all the eventLogIds for the comments passed in
             List<int> commentIds = comments.Select(comment => comment.EventLogId).ToList();
 
+            //If the current user is tagged, let them see their own tag
+            //bool isTagged = commentIds.Contains(ActiveCourseUser.UserProfileID) ? true : false;
+
             using (SqlConnection sql = DBHelper.GetNewConnection())
             {
                 Dictionary<int, bool> logCommentMarkedByCurrentUser =
@@ -605,7 +607,6 @@ namespace OSBLE.Controllers
                 {
                     //If the Active User is an Observer AND it wasn't their comment, hide the sender's identity
                     bool isSelf = ActiveCourseUser.UserProfileID == e.SenderId ? true : false;
-                    //if ()
                     if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer && !isSelf)
                     {
                         e.Sender.FirstName = "Anonymous ";
