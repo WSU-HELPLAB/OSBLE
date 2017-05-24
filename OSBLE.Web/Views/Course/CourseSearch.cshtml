@@ -15,12 +15,8 @@
     <fieldset>
         <legend><b>Search For Courses</b></legend>
         @Html.Label("Search for courses to join:")
-        @Html.DropDownList("Course", ViewBag.CourseName as SelectList, "Select a Course Prefix", new { id = "Course" })
+        @Html.DropDownList("Course", ViewBag.CourseName as SelectList)
         
-
-        @Html.Label("Course Number")
-        <select id="Number" name="Number"> </select>
-
        
         <p> <input type="submit" id="submitSearch" value="Search"/> </p>
 
@@ -61,13 +57,31 @@
                                             var instructors = ViewBag.SearchResultsInstructors;                                
                                             }
                                         <tr>
-                                            @foreach (var instructor in instructors)
-                                            {
-                                                if (instructor.AbstractCourseID == result.ID)
+
+                                            @{
+                                                
+                                                List<String> constructInstructorResults = new List<string>(); 
+                                                foreach (var instructor in instructors)
                                                 {
-                                                    <td>
-                                                        @instructor.UserProfile.LastName, @instructor.UserProfile.FirstName;
-                                                    </td>
+                                                    String instructorFirstName = instructor.UserProfile.FirstName;
+                                                    String instructorLastName = instructor.UserProfile.LastName; 
+                                                    if (instructor.AbstractCourseID == result.ID)
+                                                    {
+                                                        String fullName = instructorFirstName + " " + instructorLastName;
+                                                        constructInstructorResults.Add(fullName);
+                                                    } 
+                                                }
+                                                for (int i = 0; i <= constructInstructorResults.Count-1; i++)
+                                                {
+                                                    if(i != constructInstructorResults.Count-1 )
+                                                    {
+                                                        <td>@constructInstructorResults.ElementAt(i),</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>@constructInstructorResults.ElementAt(i)</td>
+                                                    }
+                                                    
                                                 }
                                             }
                                         </tr>
