@@ -21,6 +21,7 @@ using DDay.iCal.Serialization;
 using DDay.iCal.Serialization.iCalendar;
 using System.Threading.Tasks;
 using OSBLE.Utility;
+using OSBLEPlus.Logic.Utility;
 
 
 
@@ -496,10 +497,13 @@ namespace OSBLE.Controllers
             string prefix = course.Prefix.Replace(@"/", "-");
             string number = course.Number.Replace(@"/", "-");
 
+            //this is the local path... 
             string path = AppDomain.CurrentDomain.BaseDirectory + "Content/iCal/" + course.ID.ToString() + "/" + prefix + number + "-" + course.Semester + "-" + course.Year + ".ics";
 
-            if (System.IO.File.Exists(path))
+            if (System.IO.File.Exists(path)) //does the file exist locally? We only want to create a link to the calendar if it exists!
             {
+                //change the path to the external path Google needs to find the .ics... Google also needs http not https or this wont work.
+                path = StringConstants.WebClientRoot.Replace("https", "http") + "Content/iCal/" + course.ID.ToString() + "/" + prefix + number + "-" + course.Semester + "-" + course.Year + ".ics";
                 return Redirect("http://www.google.com/calendar/render?cid=" + path + "?nocache");
             }
 
@@ -553,39 +557,62 @@ namespace OSBLE.Controllers
             bool toParse = false;
 
             fromParse = DateTime.TryParse(from, out fromDate);
-            toParse = DateTime.TryParse(to, out toDate);            
+            toParse = DateTime.TryParse(to, out toDate);
 
             IICalendarCollection calendars = iCalendar.LoadFromStream(new StreamReader(file.InputStream));
 
             IList<Occurrence> occurrences = fromParse && toParse ? calendars.GetOccurrences(fromDate, toDate) : calendars.GetOccurrences(DateTime.Today.AddYears(-1), DateTime.Today.AddYears(1)); //if no range specified, arbitrarily choose +/- 1 year max future/past range
 
             List<OSBLE.Models.HomePage.Event> events = new List<OSBLE.Models.HomePage.Event>();
+            List<OSBLE.Models.HomePage.Event> nullDescriptionEvents = new List<OSBLE.Models.HomePage.Event>();
 
             foreach (Occurrence occurrence in occurrences)
             {
                 IRecurringComponent component = occurrence.Source as IRecurringComponent;
-                
-                events.Add(new OSBLE.Models.HomePage.Event
+
+                OSBLE.Models.HomePage.Event newEvent = new OSBLE.Models.HomePage.Event
+                    {
+                        Poster = ActiveCourseUser,
+                        Approved = true,
+                        StartDate = DateTime.SpecifyKind(occurrence.Period.StartTime.Local.Date, DateTimeKind.Unspecified).CourseToUTC(courseId),
+                        EndDate = showEndDate ?
+                            (occurrence.Period.EndTime.IsUniversalTime ?
+                                DateTime.SpecifyKind(occurrence.Period.EndTime.Local.Date, DateTimeKind.Unspecified) :
+                                    DateTime.SpecifyKind(occurrence.Period.EndTime.Local.Date, DateTimeKind.Unspecified).CourseToUTC(courseId)) :
+                                        (DateTime?)null,
+                        StartTime = occurrence.Period.StartTime.IsUniversalTime ?
+                            DateTime.SpecifyKind(occurrence.Period.StartTime.Local, DateTimeKind.Unspecified) :
+                                DateTime.SpecifyKind(occurrence.Period.StartTime.Local, DateTimeKind.Unspecified).CourseToUTC(courseId),
+                        EndTime = occurrence.Period.EndTime.IsUniversalTime ?
+                            DateTime.SpecifyKind(occurrence.Period.EndTime.Local, DateTimeKind.Unspecified) :
+                                DateTime.SpecifyKind(occurrence.Period.EndTime.Local, DateTimeKind.Unspecified).CourseToUTC(courseId),
+                        Description = component.Description,
+                        Title = String.IsNullOrEmpty(((DDay.iCal.Event)component).Location) ?
+                            component.Summary :
+                                component.Summary + " - " + ((DDay.iCal.Event)component).Location,
+                    };
+
+                if (String.IsNullOrEmpty(newEvent.Description))
                 {
-                    Poster = ActiveCourseUser,
-                    Approved = true,
-                    StartDate = DateTime.SpecifyKind(occurrence.Period.StartTime.Local.Date, DateTimeKind.Unspecified).CourseToUTC(courseId),
-                    EndDate = showEndDate ? 
-                        (occurrence.Period.EndTime.IsUniversalTime ? 
-                            DateTime.SpecifyKind(occurrence.Period.EndTime.Local.Date, DateTimeKind.Unspecified) : 
-                                DateTime.SpecifyKind(occurrence.Period.EndTime.Local.Date, DateTimeKind.Unspecified).CourseToUTC(courseId)) : 
-                                    (DateTime?)null,
-                    StartTime = occurrence.Period.StartTime.IsUniversalTime ? 
-                        DateTime.SpecifyKind(occurrence.Period.StartTime.Local, DateTimeKind.Unspecified) : 
-                            DateTime.SpecifyKind(occurrence.Period.StartTime.Local, DateTimeKind.Unspecified).CourseToUTC(courseId),
-                    EndTime = occurrence.Period.EndTime.IsUniversalTime ? 
-                        DateTime.SpecifyKind(occurrence.Period.EndTime.Local, DateTimeKind.Unspecified) : 
-                            DateTime.SpecifyKind(occurrence.Period.EndTime.Local, DateTimeKind.Unspecified).CourseToUTC(courseId),
-                    Description = component.Description,
-                    Title = String.IsNullOrEmpty(((DDay.iCal.Event)component).Location) ? 
-                        component.Summary : 
-                            component.Summary + " - " + ((DDay.iCal.Event)component).Location,
-                });
+                    nullDescriptionEvents.Add(newEvent);
+                }
+                else
+                {
+                    events.Add(newEvent);
+                }
+            }
+
+            //add non duplicate events with null description. doing this because it seems google saves an additional event when you 
+            //edit an event in a recurring series to add more description
+            foreach (var nullDescriptionEvent in nullDescriptionEvents)
+            {
+                if (events.Where(e => e.StartDate == nullDescriptionEvent.StartDate &&
+                                      e.EndDate == nullDescriptionEvent.EndDate &&
+                                      e.StartTime == nullDescriptionEvent.StartTime &&
+                                      e.EndTime == nullDescriptionEvent.EndTime).Count() == 0)
+                {
+                    events.Add(nullDescriptionEvent);
+                }
             }
 
             CreateEvents(events);
@@ -602,9 +629,9 @@ namespace OSBLE.Controllers
                 {
                     db.Events.Add(item);
                 }
-                
+
                 db.SaveChanges();
-                
+
                 using (iCalendarController ical = new iCalendarController())
                 {
                     ical.CreateCourseCalendar(ActiveCourseUser.AbstractCourseID);

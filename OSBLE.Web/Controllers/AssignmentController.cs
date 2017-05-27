@@ -650,7 +650,10 @@ namespace OSBLE.Controllers
             //seed dictionary with student last, first names
             foreach (CourseUser student in students)
             {
-                grades.Add(student.UserProfile.FullName, "");
+                if (!grades.ContainsKey(student.UserProfile.FullName))
+                {
+                    grades.Add(student.UserProfile.FullName, "");    
+                }                
             }
             //get graded rubrics
             List<RubricEvaluation> rubricEvaluations = null;
