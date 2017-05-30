@@ -1354,7 +1354,7 @@ function replaceMentionWithId(text) {
     // TODO: to boost performance, could add functionality to know which names were used (if any)
     // Replace all occurrences of @user with @id;
     for (i = 0; i < userNames.length; i++) {
-        var name = userNames[i], id = "id=" + userIds[i] + ";";
+        var name = userNames[i], id = "@id=" + userIds[i] + ";"; //Must include @id or else the id will not be replaced with a hyperlink to the user's profile but will reveal the id #
         var atMention = "@" + name; //MUST HAVE THIS or else ID numbers are revealed when someone does #Name (e.g. #AdMin -> #id=2)
         text = text.replace(atMention, id);
     }
