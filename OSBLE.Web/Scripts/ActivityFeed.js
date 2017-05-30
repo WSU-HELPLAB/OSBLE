@@ -323,6 +323,7 @@ function FeedViewModel(userName, userId, current) {
         //make anonymous post
         var makeAnonymous = $("[name='make_anonymous']").is(':checked');
 
+        //
         text = replaceMentionWithId(text);
 
         // Disable buttons while waiting for server response
@@ -1354,7 +1355,8 @@ function replaceMentionWithId(text) {
     // Replace all occurrences of @user with @id;
     for (i = 0; i < userNames.length; i++) {
         var name = userNames[i], id = "id=" + userIds[i] + ";";
-        text = text.replace(name, id);
+        var atMention = "@" + name; //MUST HAVE THIS or else ID numbers are revealed when someone does #Name (e.g. #AdMin -> #id=2)
+        text = text.replace(atMention, id);
     }
     return text;
 }
