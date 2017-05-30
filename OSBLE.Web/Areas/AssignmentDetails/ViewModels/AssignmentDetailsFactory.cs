@@ -12,6 +12,8 @@ using OSBLE.Areas.AssignmentDetails.Models.TableBuilder;
 using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models;
 using OSBLE.Models.AbstractCourses.Course;
+using OSBLEPlus.Services.Controllers;
+using OSBLE.Controllers;
 
 namespace OSBLE.Areas.AssignmentDetails.ViewModels
 {
@@ -196,14 +198,47 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                 //rubric?
                 if (assignment.HasRubric)
                 {
-                    //add rubric link
-                    vm.HeaderBuilder = new RubricDecorator(vm.HeaderBuilder);
-                    vm.HeaderViews.Add("RubricDecorator");
 
+
+
+                    RubricEvaluation rubricEvaluation = null;
+
+
+
+                    //Getting the assignment team for Student, and if its non-null then we take that team ID and find the RubricEvaluation
+                    //that they were the recipient of. 
+                    AssignmentTeam at = OSBLEController.GetAssignmentTeam(assignment, vm.Client);
+                    int teamId = 0;
+                    if (at != null)
+                    {
+                        teamId = at.TeamID;
+
+                        using (OSBLEContext db = new OSBLEContext())
+                        {
+                            //Only want to look at evaluations where Evaluator.AbstractRole.CanGrade is true, otherwise
+                            //the rubric evaluation is a  student rubric (not interested in them here)
+                            rubricEvaluation = (from re in db.RubricEvaluations
+                                                where re.AssignmentID == assignment.ID &&
+                                                re.Evaluator.AbstractRole.CanGrade &&
+                                                re.RecipientID == teamId
+                                                select re).FirstOrDefault();
+                        }
+                    }
+                    //add rubric link
+                    if (rubricEvaluation == null)
+                    {
+                        vm.HeaderBuilder = new RubricDecorator(vm.HeaderBuilder);
+                        vm.HeaderViews.Add("RubricDecorator");
+                    }
                     //add link to graded rubric link
-                    vm.HeaderBuilder = new RubricGradeDecorator(vm.HeaderBuilder, vm.Client);
-                    vm.HeaderViews.Add("RubricGradeDecorator");
+                    else
+                    {
+                        vm.HeaderBuilder = new RubricGradeDecorator(vm.HeaderBuilder, vm.Client);
+                        vm.HeaderViews.Add("RubricGradeDecorator");
+                    }
                 }
+               
+
 
 
             }

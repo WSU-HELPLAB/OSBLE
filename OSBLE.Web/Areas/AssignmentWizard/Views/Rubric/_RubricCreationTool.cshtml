@@ -6,91 +6,83 @@
     int defaultPointSpread = 5;
     bool hasRubric = Model.HasRubric;
     RubricSelectionViewModel rubricSelection = ViewBag.rubricSelection;
-    bool EvalsExist = ViewBag.EvalsExist;
+    bool EvalsExist = (bool)ViewBag.EvalsExist;
     string dropDownKey = "/AssignmentWizard/Rubric/LoadExistingRubric";
-    if(ViewBag.Student)
+    if (ViewBag.Student)
     {
         dropDownKey = "/AssignmentWizard/StudentRubric/LoadExistingRubric";
     }
     int maximumRubricLevels = 10;
-} 
+}
 
 @Html.HiddenFor(m => m.ID)
 
 <style media="screen" type="text/css">
+    .rubric {
+        border-width: 1px;
+        border-spacing: 2px;
+        border-style: outset;
+        border-collapse: collapse;
+        border-color: Black;
+    }
 
-.rubric {
-	border-width: 1px;
-	border-spacing: 2px;
-	border-style: outset;
-	border-collapse: collapse;
-	border-color: Black;
-}
-.rubric th {
-	border-width: 1px;
-	padding: 10px;
-	border-style: inset;
-    border-color:Black;
-}
-.rubric td {
-	border-width: 1px;
-	padding: 10px;
-	border-style: inset;
-    border-color:Black;
-}
+        .rubric th {
+            border-width: 1px;
+            padding: 10px;
+            border-style: inset;
+            border-color: Black;
+        }
 
-td.top
-{
-   vertical-align:top;
-}
+        .rubric td {
+            border-width: 1px;
+            padding: 10px;
+            border-style: inset;
+            border-color: Black;
+        }
 
-ul.RubricList
-{
-    list-style-type: none;
-    float:left;
-    padding:0;
-    margin:0;
-}
+    td.top {
+        vertical-align: top;
+    }
 
-.RubricSelect
-{
-    display:none;
-}
+    ul.RubricList {
+        list-style-type: none;
+        float: left;
+        padding: 0;
+        margin: 0;
+    }
 
-.FloatLeft
-{
-    float:left;
-}
+    .RubricSelect {
+        display: none;
+    }
 
-.Input
-{
-    border:0;
-    width:100%;
-    height:100%;
-}
+    .FloatLeft {
+        float: left;
+    }
 
-.Level
-{
-    min-width:215px;
-}
+    .Input {
+        border: 0;
+        width: 100%;
+        height: 100%;
+    }
 
-.PerformanceCriterionCell
-{
-    display:inline-block;
-    vertical-align:top;
-}
+    .Level {
+        min-width: 215px;
+    }
 
-#import_rubric_from_csv
-{
-	border: 1px solid #eeeeff;
-	border-bottom: 5px solid #eeeeff;
-	padding-left: 8px;
-	padding-right: 8px;
-	padding-bottom: 8px;
-	width: 250px;
-	display: none;
-}
+    .PerformanceCriterionCell {
+        display: inline-block;
+        vertical-align: top;
+    }
 
+    #import_rubric_from_csv {
+        border: 1px solid #eeeeff;
+        border-bottom: 5px solid #eeeeff;
+        padding-left: 8px;
+        padding-right: 8px;
+        padding-bottom: 8px;
+        width: 250px;
+        display: none;
+    }
 </style>
 
 <html>
@@ -99,191 +91,194 @@ ul.RubricList
     <h5>Rubric Title:</h5>
     <textarea name="rubricDescription" rows="2" cols="40">@ViewBag.rubricDescription</textarea>
     <br /> <br />
-<table>
-    <tr>
-        <td>
-            @if (rubricSelection.CourseIds().Count > 0)
-            {
-            <text>Load Rubric from</text>
-            <select class="CourseSelect">
-                <option>Select Course</option>
-                @foreach (int courseId in rubricSelection.CourseIds())
+    <table>
+        <tr>
+            <td>
+                @if (rubricSelection.CourseIds().Count > 0)
                 {
-                    <option value="@courseId" class ="CourseOption">@rubricSelection.GetCourseName(courseId)</option>
-                }
-            </select>
-            }
-        </td>
-
-        <td>
-            @*Create a hidden dropdown of assignment for each course
-            When the user selects a course from the first select, the corresonding
-            one here will become visible*@
-
-            <form id="set_rubric" method="post" action="/AssignmentWizard/Rubric/LoadExistingRubric">
-                @foreach(int courseId in rubricSelection.CourseIds())
-                {
-                    <select  id="Assignment_@(courseId)" class="RubricSelect">
-                        <option>Select Rubric</option>
-                        @foreach (RubricViewModel rvm in rubricSelection.rubricSelection[courseId].rubricViewModel)
+                    <text>Load Rubric from</text>
+                    <select class="CourseSelect">
+                        <option>Select Course</option>
+                        @foreach (int courseId in rubricSelection.CourseIds())
                         {
-                            if (rvm.RubricID != null)
-                            {
-                                <option class="AssignmentOption" value="@rvm.RubricID">@rvm.AssignmentName</option>
-                            }
-                            if (rvm.StudentRubricID != null)
-                            {
-                                <option class="AssignmentOption" value="@rvm.StudentRubricID">@rvm.AssignmentName - Student Rubric</option>
-                            }
+                            <option value="@courseId" class="CourseOption">@rubricSelection.GetCourseName(courseId)</option>
                         }
                     </select>
                 }
-            </form>
-        </td>
-    </tr>
+            </td>
 
-    <tr>
-        <a href="javascript:void(0)" onclick="displayUploadRubric()">Upload Rubric From File</a>
-    </tr>
+            <td>
+                @*Create a hidden dropdown of assignment for each course
+                    When the user selects a course from the first select, the corresonding
+                    one here will become visible*@
 
-    <tr>
-        <td>
-            <ul class="RubricList">
-                <li>
-                    <input type="checkbox" name="globalComments" @ViewBag.globalCommentsCheckedValue/>Overall Comments
-                </li>
-                <li>
-                    <input type="checkbox" name="criterionComments" @ViewBag.criteriaCommentsCheckedValue/>Comments for each criterion
-                </li>
-                <li>
-                    <h5>Point increment for grade scale:</h5>
-                </li>
-                <li>
-                    <input type="radio" class="gradeIncrement" name="gradeStepRadio" value="fullStep" checked="checked" />Allow only full-point grades in rubric evaluation
-                </li>
-                <li>
-                    <input type="radio" class="gradeIncrement" name="gradeStepRadio" value="halfStep" @ViewBag.enableHalfStepCheckedValue />Allow half-point grades in rubric evaluation
-                </li>
-                <li>
-                    <input type="radio" class="gradeIncrement" name="gradeStepRadio" value="quarterStep" @ViewBag.enableQuarterStepCheckedValue />Allow quarter-point grades in rubric evaluation
-                </li>
-            </ul>
-        </td>
-    </tr>
-</table>
+                <form id="set_rubric" method="post" action="/AssignmentWizard/Rubric/LoadExistingRubric">
+                    @foreach (int courseId in rubricSelection.CourseIds())
+                    {
+                        <select id="Assignment_@(courseId)" class="RubricSelect">
+                            <option>Select Rubric</option>
+                            @foreach (RubricViewModel rvm in rubricSelection.rubricSelection[courseId].rubricViewModel)
+                            {
+                                if (rvm.RubricID != null)
+                                {
+                                    <option class="AssignmentOption" value="@rvm.RubricID">@rvm.AssignmentName</option>
+                                }
+                                if (rvm.StudentRubricID != null)
+                                {
+                                    <option class="AssignmentOption" value="@rvm.StudentRubricID">@rvm.AssignmentName - Student Rubric</option>
+                                }
+                            }
+                        </select>
+                    }
+                </form>
+            </td>
+        </tr>
 
-<table>
-    <tr>
-        <td>
-            @* Start Table for Rubric *@
-            <table id="dataTable" class="rubric">
-                @*Row for column titles*@
-                <tr>
-                    <th style="min-width:185px">
-                        Performance Criterion
-                    </th>
-                        
-                    <th style="min-width:85px">Criterion<br />Weight</th>
-                        
-                    @* Level Title *@
+        <tr>
+            <a href="javascript:void(0)" onclick="displayUploadRubric()">Upload Rubric From File</a>
+        </tr>
+
+        <tr>
+            <td>
+                <ul class="RubricList">
+                    <li>
+                        <input type="checkbox" name="globalComments" @ViewBag.globalCommentsCheckedValue />Overall Comments
+                    </li>
+                    <li>
+                        <input type="checkbox" name="criterionComments" @ViewBag.criteriaCommentsCheckedValue />Comments for each criterion
+                    </li>
+                    <li>
+                        <h5>Point increment for grade scale:</h5>
+                    </li>
+                    <li>
+                        <input type="radio" class="gradeIncrement" name="gradeStepRadio" value="fullStep" checked="checked" />Allow only full-point grades in rubric evaluation
+                    </li>
+                    <li>
+                        <input type="radio" class="gradeIncrement" name="gradeStepRadio" value="halfStep" @ViewBag.enableHalfStepCheckedValue />Allow half-point grades in rubric evaluation
+                    </li>
+                    <li>
+                        <input type="radio" class="gradeIncrement" name="gradeStepRadio" value="quarterStep" @ViewBag.enableQuarterStepCheckedValue />Allow quarter-point grades in rubric evaluation
+                    </li>
+                </ul>
+            </td>
+        </tr>
+    </table>
+
+    <table>
+        <tr>
+            <td>
+                @* Start Table for Rubric *@
+                <table id="dataTable" class="rubric">
+                    @*Row for column titles*@
+                    <tr>
+                        <th style="min-width:185px">
+                            Performance Criterion
+                        </th>
+
+                        <th style="min-width:85px">Criterion<br />Weight</th>
+
+                        @* Level Title *@
+                        @{
+                            int n = 0;
+                            foreach (Level level in ViewBag.levels)
+                            {
+                                if (level.PointSpread == 0) { level.PointSpread = defaultPointSpread; }
+
+                                <th class="Level">
+                                    <ul class="RubricList">
+                                        <li>
+                                            <img src="/Content/images/delete_up.png" alt="Delete Column" onclick="openConfirmEditWindow(3, 'dataTable',this.parentNode.parentNode.parentNode.cellIndex)" />
+                                        </li>
+                                        <li>
+                                            Level Point Spread
+                                            <input class="SpreadInput" name="rubric:@n:S" value="@level.PointSpread" type="text" style="width:40px; text-align:center; border-radius:10%" />
+                                        </li>
+                                        <li>Level Title<input class="Input" name="rubric:@n:L" type="text" value="@level.LevelTitle" /></li>
+                                    </ul>
+                                </th>
+                                n++;
+                            }
+                        }
+                    </tr>
                     @{
-                        int n = 0;
-                        foreach (Level level in ViewBag.levels)
+                        n = 0;
+                        foreach (List<string> row in ViewBag.rubricTable)
                         {
-                            if (level.PointSpread == 0) { level.PointSpread = defaultPointSpread; }
-                            
-                            <th class="Level">
-                                <ul class="RubricList">
-                                    <li>
-                                        <img src="/Content/images/delete_up.png" alt="Delete Column" onclick="openConfirmEditWindow(3, 'dataTable',this.parentNode.parentNode.parentNode.cellIndex)" />
-                                    </li>
-                                    <li>Level Point Spread
-                                        <input class="SpreadInput" name="rubric:@n:S" value="@level.PointSpread" type="text" style="width:40px; text-align:center; border-radius:10%" />
-                                    </li>
-                                    <li>Level Title<input class="Input" name="rubric:@n:L" type="text" value="@level.LevelTitle"/></li>
-                                </ul>
-                            </th>
-                            n++;
+                            @*Default first row of rubric*@
+                            string name = "row" + n.ToString();
+                            <tr name="@name">
+                                @*Performance Criterion*@
+                                <td>
+
+                                    <ul class="RubricList">
+                                        <li class="PerformanceCriterionCell">
+                                            <ul class="RubricList" style="float:left">
+                                                <li><input class="hiddenRow" type="hidden" /></li> <!--Hidden input used to keep track of swapping used during rubric editing-->
+                                                <li><img src="/Content/images/move_up.png" alt="Move Row Up" onclick="openConfirmEditWindow(4, 'dataTable', this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
+                                                <li><img src="/Content/images/delete_up.png" alt="Delete Row" onclick="openConfirmEditWindow(2, 'dataTable', this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
+                                                <li><img src="/Content/images/move_down.png" alt="Move Row Down" onclick="openConfirmEditWindow(5, 'dataTable', this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
+                                            </ul>
+                                        </li>
+
+                                        <li class="PerformanceCriterionCell">
+                                            <textarea class="Input" style="max-width:140px" name="rubric:0:@n" rows="5" cols="20">@row[0]</textarea>
+                                        </li>
+                                    </ul>
+                                </td>
+
+                                @*Criterion Weight*@
+                                <td>
+                                    <input class="Input" type="text" name="rubric:1:@n" size="1" value="@row[1]" />
+                                </td>
+
+                                @*Level Description*@
+                                @for (int d = 2; d < row.Count; d++)
+                                {
+                                    <td>
+                                        @* Name=X:Y *@
+                                        <textarea class="Input" name="rubric:@d:@n" rows="5" cols="30">@row[d]</textarea>
+                                    </td>
+                                }
+                            </tr>
+                                n++;
                         }
                     }
-                </tr>
-                @{
-                    n = 0;
-                    foreach (List<string> row in ViewBag.rubricTable)
-                    {
-                        @*Default first row of rubric*@
-                        string name = "row" + n.ToString();
-                        <tr name="@name">
-                            @*Performance Criterion*@
-                            <td>
-                            
-                                <ul class="RubricList">
-                                    <li class="PerformanceCriterionCell">
-                                        <ul class="RubricList" style="float:left">
-                                            <li><input class="hiddenRow" type="hidden" /></li> <!--Hidden input used to keep track of swapping used during rubric editing-->
-                                            <li><img src="/Content/images/move_up.png" alt="Move Row Up" onclick="openConfirmEditWindow(4, 'dataTable', this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
-                                            <li><img src="/Content/images/delete_up.png" alt="Delete Row" onclick="openConfirmEditWindow(2, 'dataTable', this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
-                                            <li><img src="/Content/images/move_down.png" alt="Move Row Down" onclick="openConfirmEditWindow(5, 'dataTable', this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
-                                        </ul>
-                                   </li>
+                </table>
+            </td>
+            <td class="top">
+                <img src="/Content/images/add_up.png" alt="Add Column" onclick="openConfirmEditWindow(1, 'dataTable', 0)" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <img src="/Content/images/add_up.png" alt="Add Row" onclick="openConfirmEditWindow(0, 'dataTable', 0)" />
+            </td>
+        </tr>
+    </table>
 
-                                    <li class="PerformanceCriterionCell">     
-                                        <textarea class="Input" style="max-width:140px" name="rubric:0:@n" rows="5" cols="20">@row[0]</textarea>
-                                   </li> 
-                                </ul>
-                            </td>
+    @*Modal box for uploading rubrics to CSVs*@
+    <div id='import_rubric_from_csv' title="Import file">
+        Upload a rubric definition file (CSV).<br />
+        The current rubric will be replaced with a new one and all progress will be lost.
+        <br />
+        <form id="set_rubric" enctype="multipart/form-data" method="post" action="/AssignmentWizard/Rubric/LoadRubricFromCsv">
+            <input type="hidden" name="assignmentColumnId" id="column_assignment_id" />
+            <fieldset>
+                <legend>Select Files To Submit</legend>
+                <table>
+                    <tr>
+                        <td><input type="file" id="file" name="file" /> </td>
+                    </tr>
+                    <tr>
+                        <td><input type="submit" value="Submit" /></td>
+                    </tr>
+                </table>
+            </fieldset>
+        </form>
+    </div>
 
-                            @*Criterion Weight*@
-                            <td>
-                                <input class="Input" type="text" name="rubric:1:@n"  size="1" value="@row[1]"/>
-                            </td>
-
-                            @*Level Description*@
-                            @for (int d = 2; d < row.Count; d++)
-                            {
-                                <td>
-                                    @* Name=X:Y *@
-                                    <textarea class="Input" name="rubric:@d:@n" rows="5" cols="30">@row[d]</textarea>
-                                </td>
-                            }
-                        </tr>
-                            n++;
-                    }
-                }
-            </table>
-        </td>
-        <td class ="top">
-            <img src="/Content/images/add_up.png" alt="Add Column" onclick="openConfirmEditWindow(1, 'dataTable', 0)"/>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <img  src="/Content/images/add_up.png" alt="Add Row" onclick="openConfirmEditWindow(0, 'dataTable', 0)" />
-        </td>
-    </tr>
-</table>
-
-@*Modal box for uploading rubrics to CSVs*@
-<div id='import_rubric_from_csv'  title="Import file">Upload a rubric definition file (CSV).<br />
-The current rubric will be replaced with a new one and all progress will be lost.
-<br />
-    <form id="set_rubric" enctype="multipart/form-data" method="post" action="/AssignmentWizard/Rubric/LoadRubricFromCsv">
-        <input type="hidden" name="assignmentColumnId" id="column_assignment_id" />
-        <fieldset>
-            <legend>Select Files To Submit</legend>
-            <table>
-                <tr>
-                    <td><input type="file" id="file" name="file"/> </td>
-                </tr>
-                <tr>
-                    <td><input type="submit" value="Submit"/></td>
-                </tr>
-            </table>
-        </fieldset>
-    </form>
-</div>
-
-</body> </html>
+</body>
+</html>
 
 <!--Element for modal confirmation box-->
 <div id="confirmEditWindow" style="display:none;" title="Warning">
@@ -295,8 +290,8 @@ The current rubric will be replaced with a new one and all progress will be lost
     Editing the level spread can lead to grade changes due to rounding. Are you sure you want to continue?
 </div>
 
-<input name="CriticalEditStatus" id="CriticalEditStatus" type="hidden" value="False"/>
-<input id="EvalsExistStatus" type="hidden" value="@EvalsExist" />
+<input name="CriticalEditStatus" id="CriticalEditStatus" type="hidden" value="False" />
+<input id="EvalsExistStatus" type="hidden" value="@EvalsExist.ToString()" />
 <input id="LevelSpreadEditStatus" type="hidden" value="False" />
 <script type="text/javascript" src="@Url.Content("~/Areas/AssignmentWizard/Content/js/jquery.path.js")"></script>
 <script type="text/javascript" language="javascript">
@@ -351,7 +346,7 @@ The current rubric will be replaced with a new one and all progress will be lost
     controlValue = 0;
     tableIdValue = 0;
     indexValue = 0;
-    function openConfirmEditWindow(controlInput,tableIdInput, indexInput ){
+    function openConfirmEditWindow(controlInput, tableIdInput, indexInput) {
         //if "EvaluationsExist" is true && "CriticalEdit" is false (error only occurs if evaluations exist and they havent agreed to this yet)
         controlValue = controlInput;
         tableIdValue = tableIdInput;
@@ -375,7 +370,7 @@ The current rubric will be replaced with a new one and all progress will be lost
         //if editsConfirmed == True && EvalsExist, then just handle the logic
     }
 
-    function handleAddOrDelete(){
+    function handleAddOrDelete() {
 
         //Handle event
         if (controlValue == 0) {
@@ -468,8 +463,7 @@ The current rubric will be replaced with a new one and all progress will be lost
         var columnCount = table.rows[0].cells.length;
 
         // Before adding new level, check to see if we're not already at the max
-        if (columnCount > @maximumRubricLevels + 1)
-        {
+        if (columnCount > @maximumRubricLevels +1) {
             alert("You may not put more than @maximumRubricLevels.ToString() levels in a rubric.");
             return;
         }
@@ -654,7 +648,7 @@ The current rubric will be replaced with a new one and all progress will be lost
 
     function isIntKey(e) {
         var charCode = (e.which) ? e.which : e.keyCode;
-        if (charCode < 48 || charCode > 57)  return false;
+        if (charCode < 48 || charCode > 57) return false;
         return true;
     }
 
