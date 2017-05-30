@@ -2017,7 +2017,7 @@ namespace OSBLE.Utility
                 using (SqlConnection sqlConnection = new SqlConnection(StringConstants.ConnectionString))
                 {
                     sqlConnection.Open();
-                    string query = "DELETE FROM Events WHERE PosterID = @PosterId ";
+                    string query = "DELETE FROM Events WHERE PosterID = @PosterId AND (Description NOT LIKE '\\[url:Assignment Page%' ESCAPE '\\' OR Description IS NULL) ";
                     sqlConnection.Execute(query, new { PosterId = posterId });
                     sqlConnection.Close();
                 }
