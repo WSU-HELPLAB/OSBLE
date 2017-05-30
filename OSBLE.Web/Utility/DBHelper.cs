@@ -1603,7 +1603,9 @@ namespace OSBLE.Utility
 
             List<MailAddress> addresses = new List<MailAddress>(users.Select(u => new MailAddress(u.UserName, u.FullName)));
             if (originalPoster.EmailAllActivityPosts && !users.Any(u => u.ID == originalPoster.ID))
+            {
                 addresses.Add(new MailAddress(originalPoster.UserName, originalPoster.FullName));
+            }
 
             return addresses;
         }

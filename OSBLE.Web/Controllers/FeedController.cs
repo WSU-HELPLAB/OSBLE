@@ -247,7 +247,8 @@ namespace OSBLE.Controllers
                 foreach (FeedItem f in returnItems)
                 {
                     bool isSelf = ActiveCourseUser.UserProfileID == f.Event.SenderId ? true : false;
-                    if (f.Event.IsAnonymous || (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer && !isSelf))
+                    bool isObserver = ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer ? true : false;
+                    if (f.Event.IsAnonymous || (isObserver && !isSelf))
                     {
                         //make anon userprofile
                         UserProfile anonUserProfile = new UserProfile();
@@ -359,7 +360,6 @@ namespace OSBLE.Controllers
         [HttpPost]
         public JsonResult GetProfileFeed(int profileUserId)
         {
-
             return Json(1);
         }
 
@@ -385,6 +385,12 @@ namespace OSBLE.Controllers
                 default:
                     return "None";
             }
+        }
+
+        [HttpPost]
+        public int GetUserId()
+        {
+            return ActiveCourseUser.UserProfileID;
         }
 
         private string GetDisplayTimeString(DateTime time, CourseUser courseUser = null)
@@ -607,7 +613,8 @@ namespace OSBLE.Controllers
                 {
                     //If the Active User is an Observer AND it wasn't their comment, hide the sender's identity
                     bool isSelf = ActiveCourseUser.UserProfileID == e.SenderId ? true : false;
-                    if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer && !isSelf)
+                    bool isObserver = ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer;
+                    if (isObserver && !isSelf)
                     {
                         e.Sender.FirstName = "Anonymous ";
                         e.Sender.LastName = e.EventId.ToString();
@@ -1100,7 +1107,8 @@ namespace OSBLE.Controllers
             vm.Ids = id;
             vm.FeedItem = aggregateItems.FirstOrDefault();
             bool isSelf = ActiveCourseUser.UserProfileID == vm.FeedItem.Creator.ID ? true : false; //If the Active User is the poster, let them see who was tagged
-            if ((vm.FeedItem.IsAnonymous != null ? vm.FeedItem.IsAnonymous : false) || (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer && !isSelf))
+            bool isObserver = ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer;
+            if ((vm.FeedItem.IsAnonymous != null ? vm.FeedItem.IsAnonymous : false) || (isObserver && !isSelf))
             {
                 vm.FeedItem.Items.First().Event.SenderId = 0;
             }
@@ -1172,6 +1180,23 @@ namespace OSBLE.Controllers
 
             //remove users who do not belong in this post visibility group
             emailList = RemoveNonVisibilityGroupEmails(emailList, eventVisibleTo);
+
+            //Remove Observers here
+            var users = DBHelper.GetAllCourseUsersFromCourseId(courseID); //Get all users
+            foreach (var user in users)
+            {
+                //Get user's profile from ID
+                var profile = DBHelper.GetUserProfile(user.ID);
+                var role = DBHelper.GetRoleNameFromCourseAndUserProfileId(courseID, user.ID); //Must get role separately since role is not in profile
+                bool isObserver = role == "Observer" ? true : false;
+                MailAddress email = new MailAddress(profile.Email); //profile.Email is a string, must be of type MailAddress
+                
+                //If Course Role == Observer and email is in emailList, remove email from emailList
+                if (isObserver)
+                {
+                    emailList.Remove(emailList.Where(el => el.Address == email.Address).FirstOrDefault());
+                }
+            }
 
             // Parse text and create list of tagged users
             NotifyTaggedUsers(text, logID, eventVisibleTo, isAnonymous);
@@ -1526,7 +1551,7 @@ namespace OSBLE.Controllers
         /// Sends an email to those who have access to this post and have the
         /// "Send all activity feed posts to my e-mail address" option checked
         /// </summary>
-        private void SendEmailsToListeners(string postContent, int sourcePostID, int courseID, DateTime timePosted, List<MailAddress> emails, bool isReply = false, bool isAnonymous = false, bool isObserver = false)
+        private void SendEmailsToListeners(string postContent, int sourcePostID, int courseID, DateTime timePosted, List<MailAddress> emails, bool isReply = false, bool isAnonymous = false)
         {
 #if !DEBUG
             // first check to see if we need to email anyone about this post
@@ -1572,37 +1597,20 @@ namespace OSBLE.Controllers
                         UserProfile originalPoster = DBHelper.GetFeedItemSender(sourcePostID, conn, isAnonymous);
 
                         //we want to sanitize for the current user information if the reply was anonymous
-                        bool isSelf = ActiveCourseUser.UserProfile.FullName == CurrentUser.FullName ? true : false;
-                        string currentUserFullName = isAnonymous || (isObserver && !isSelf) ? "Anonymous User" : CurrentUser.FullName;
+                        string currentUserFullName = isAnonymous ? "Anonymous User" : CurrentUser.FullName;
                         subject = string.Format("OSBLE Plus - {0} replied to a post in {1}", currentUserFullName, DBHelper.GetCourseShortNameFromID(courseID, conn));
                         body = string.Format("{0} replied to a post{1} at {2}:\n\n{3}\n-----------------------\nOriginal Post:\n{4}\n\n", // by {1} > "" to temporarily handle anon reply
                             currentUserFullName, "", timePosted.UTCToCourse(courseID), postContent, originalPostComment);
-                        if (isObserver)
-                        {
-                            body = ReplaceMentionWithName(body, true);
-                        }
-                        else
-                        {
-                            body = ReplaceMentionWithName(body);
-                        }
+                        body = ReplaceMentionWithName(body);
                     }
                     else
                     {
                         //we want to sanitize for the current user information if the reply was anonymous
-                        string currentUserFullName = isAnonymous || isObserver ? "Anonymous User" : CurrentUser.FullName;
+                        string currentUserFullName = isAnonymous ? "Anonymous User" : CurrentUser.FullName;
 
                         subject = string.Format("OSBLE Plus - {0} posted in {1}", currentUserFullName, DBHelper.GetCourseShortNameFromID(courseID, conn));
                         body = string.Format("{0} made the following post at {1}:\n\n{2}\n\n", currentUserFullName, timePosted.UTCToCourse(courseID), postContent);
-
-                        //If the Active User is an Observer, need to parse the body and replace any @id=XXX; with AnonymousXXXX.
-                        if (isObserver == true) 
-                        {
-                            body = ReplaceMentionWithName(body, true);
-                        }
-                        else //Else, need to parse the body and replace any @id=XXX; with student's actual names.
-                        {
-                            body = ReplaceMentionWithName(body);
-                        }
+                        body = ReplaceMentionWithName(body);
                     }
                 }
 
@@ -1617,12 +1625,11 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-        /// If the current user is an Observer, the @mention tags will be anonymous
-        /// Else, the @mention tags will be replaced with the correct names
+        /// The @mention tags will be replaced with the correct names
         /// </summary>
         /// <param name="body"></param>
         /// <returns></returns>
-        public string ReplaceMentionWithName(string body, bool isObserver = false)
+        public string ReplaceMentionWithName(string body)
         {
             List<int> nameIndices = new List<int>();
             for (int i = 0; i < body.Length; i++)
@@ -1646,59 +1653,30 @@ namespace OSBLE.Controllers
                 }
             }
             nameIndices.Reverse();
-            if (isObserver)
+            foreach (int index in nameIndices) // In reverse order, we need to replace each @... with the students name
             {
-                foreach (int index in nameIndices) // In reverse order, we need to replace each @... with Anonymous
+                // First let's get the length of the part we will replace and also record the id
+                int length = 0, tempIndex = index + 1;
+                string idString = "";
+                while (body[tempIndex] != ';') { length++; tempIndex++; idString += body[tempIndex]; }
+
+                // Get the id= part off the beginning of idString and the ; from the end
+                idString = idString.Substring(2);
+                idString = idString.Substring(0, idString.Length - 1);
+
+                // Then get the student's name from the id
+                int id; int.TryParse(idString, out id);
+                if (id != null)
                 {
-                    // First let's get the length of the part we will replace and also record the id
-                    int length = 0, tempIndex = index + 1;
-                    string idString = "";
-                    while (body[tempIndex] != ';') { length++; tempIndex++; idString += body[tempIndex]; }
+                    UserProfile referencedUser = (from user in db.UserProfiles where user.ID == id select user).FirstOrDefault();
+                    if (referencedUser == null) continue; // It's possible the user no longer exists, or for some reason someone manually entered @id=blahblahblah; into the text field.
+                    string studentFullName = referencedUser.FirstName + referencedUser.LastName;
 
-                    // Get the id= part off the beginning of idString and the ; from the end
-                    idString = idString.Substring(2);
-                    idString = idString.Substring(0, idString.Length - 1);
-
-                    // Then get the student's name from the id
-                    int id; int.TryParse(idString, out id);
-                    if (id != null)
-                    {
-                        string studentFullName = "Anonymous user";
-                        //anonUserProfile.LastName = f.Event.EventId.ToString();
-
-                        // Now replace the id number in the string with the user name
-                        body = body.Replace(body.Substring(index + 1, length + 1), string.Format("<a href=\"{0}\">{1}</a>", Url.Action("Index", "Profile", new { id = id }, Request.Url.Scheme), studentFullName));
-                    }
+                    // Now replace the id number in the string with the user name
+                    body = body.Replace(body.Substring(index + 1, length + 1), string.Format("<a href=\"{0}\">{1}</a>", Url.Action("Index", "Profile", new { id = id }, Request.Url.Scheme), studentFullName));
                 }
-                return body;
             }
-            else
-            {
-                foreach (int index in nameIndices) // In reverse order, we need to replace each @... with the students name
-                {
-                    // First let's get the length of the part we will replace and also record the id
-                    int length = 0, tempIndex = index + 1;
-                    string idString = "";
-                    while (body[tempIndex] != ';') { length++; tempIndex++; idString += body[tempIndex]; }
-
-                    // Get the id= part off the beginning of idString and the ; from the end
-                    idString = idString.Substring(2);
-                    idString = idString.Substring(0, idString.Length - 1);
-
-                    // Then get the student's name from the id
-                    int id; int.TryParse(idString, out id);
-                    if (id != null)
-                    {
-                        UserProfile referencedUser = (from user in db.UserProfiles where user.ID == id select user).FirstOrDefault();
-                        if (referencedUser == null) continue; // It's possible the user no longer exists, or for some reason someone manually entered @id=blahblahblah; into the text field.
-                        string studentFullName = referencedUser.FirstName + referencedUser.LastName;
-
-                        // Now replace the id number in the string with the user name
-                        body = body.Replace(body.Substring(index + 1, length + 1), string.Format("<a href=\"{0}\">{1}</a>", Url.Action("Index", "Profile", new { id = id }, Request.Url.Scheme), studentFullName));
-                    }
-                }
-                return body;
-            }
+            return body;
         }
 
         [HttpPost]
@@ -1797,16 +1775,23 @@ namespace OSBLE.Controllers
         [HttpPost]
         public JsonResult GetProfileNames()
         {
+            bool isObserver = ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer ? true : false;
+            bool isSelf;
+            bool isInstructor;
+            bool addToEmailList;
             if (ActiveCourseUser == null) //new user with no active courses
             {
                 return Json(new { userProfiles = new Dictionary<string, string>() });
             }
             List<UserProfile> userProfiles = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
+            var instructors = DBHelper.GetCourseInstructorIds(ActiveCourseUser.AbstractCourseID);
             Dictionary<string, string> nameIdPairs = new Dictionary<string, string>();
-
-            foreach (UserProfile userProfile in userProfiles)
+            foreach (UserProfile userProfile in userProfiles) //
             {
-                if (!nameIdPairs.ContainsKey(userProfile.ID.ToString()))
+                isSelf = userProfile.ID == ActiveCourseUser.UserProfileID ? true : false;
+                isInstructor = instructors.Contains(userProfile.ID) ? true : false;
+                addToEmailList = !isObserver || (isObserver && (isSelf || isInstructor)) ? true : false; //Add to the list if the Active User is not an Observer OR if the Active User is an Observer but we are adding them or the instructor to the list
+                if (!nameIdPairs.ContainsKey(userProfile.ID.ToString()) && addToEmailList)
                 {
                     nameIdPairs.Add(userProfile.ID.ToString(), userProfile.FullName);
                 }
@@ -1931,12 +1916,12 @@ namespace OSBLE.Controllers
         /// Autocomplete Search for Posts. Returns JSON.
         /// </summary>
         /// <returns></returns>
-        public ActionResult AutoCompleteNames()
+        public ActionResult AutoCompleteNames() //Not used?
         {
             string term = Request.Params["term"].ToString().ToLower();
-            // If we are not anonymous in a course, allow search of all users.
+            // If we are not anonymous or an Observer in a course, allow search of all users.
             List<int> authorizedCourses = currentCourses
-                .Where(c => c.AbstractRole.Anonymized == false)
+                .Where(c => c.AbstractRole.Anonymized == false && c.AbstractRoleID != (int)CourseRole.CourseRoles.Observer)
                 .Select(c => c.AbstractCourseID)
                 .ToList();
 
@@ -1945,9 +1930,9 @@ namespace OSBLE.Controllers
                 .Select(c => c.UserProfile)
                 .ToList();
 
-            // If we are anonymous, limit search to ourselves plus instructors/TAs
+            // If we are anonymous or an Observer, limit search to ourselves plus instructors/TAs
             List<int> addedCourses = currentCourses
-                .Where(c => c.AbstractRole.Anonymized == true)
+                .Where(c => c.AbstractRole.Anonymized == true || c.AbstractRoleID != (int)CourseRole.CourseRoles.Observer)
                 .Select(c => c.AbstractCourseID)
                 .ToList();
 

@@ -97,6 +97,16 @@ namespace OSBLE.Models.Users
         }
 
         /// <summary>
+        /// Gets and sets the Abstract Course ID for the user. Necessary for the Create method in Roster Controller (will tell the user that Course Role is required even if there is a Course Role selected)
+        /// </summary>
+        [NotMapped]
+        public CourseRole AbstractCourseID
+        {
+            get { return AbstractCourseID; }
+            set { AbstractCourseID = value; }
+        }
+
+        /// <summary>
         /// Use UserName, this is for the IUser interface
         /// </summary>
         [NotMapped]
@@ -202,13 +212,15 @@ namespace OSBLE.Models.Users
         /// <param name="LastThenFirst">This is an optional boolean parameter that should be sent in as true when you want names displayed in "LastName, FirstName" format.</param>
         /// <param name="AssignmentHasAnonymousPosts">This is an optional boolean parameter that should be sent in when DisplayName is used within a specific assignment scenario (to mask users if anonymous settings turned on) Simply pass in <see cref="Assignment.DiscussionSettings.HasAnonymousPosts"/></param>
         /// <returns></returns>
-        public string DisplayName(int AbstractRoleId, bool? FirstThenLast = null, bool? AssignmentHasAnonymousPosts = null)
+        public string DisplayName(int AbstractRoleId, bool? FirstThenLast = null, bool? AssignmentHasAnonymousPosts = null, int? ProfileId = 0)
         {
             string returnValue = "";
+            bool isSelf = ProfileId == this.ID ? true : false;
             if ((AssignmentHasAnonymousPosts != null && AssignmentHasAnonymousPosts == true)
-                || AbstractRoleId == (int)CourseRole.CourseRoles.Observer)
+                || (AbstractRoleId == (int)CourseRole.CourseRoles.Observer && !isSelf))
             {
-                returnValue = string.Format("Anonymous {0}", this.ID);
+                Random number = new Random();
+                returnValue = string.Format("Anonymous {0}", number.Next(2000)); //Possibly change the Random number to the event number, like it is on the Feed
             }
             else if (FirstThenLast != null && FirstThenLast == true)
             {
@@ -223,7 +235,7 @@ namespace OSBLE.Models.Users
 
         public string DisplayName(CourseUser viewingUser)
         {
-            return DisplayName(viewingUser.AbstractRoleID, true);
+            return DisplayName(viewingUser.AbstractRoleID, true, false, viewingUser.UserProfileID);
         }
 
         public void SetProfileImage(System.Drawing.Bitmap bmp)
@@ -237,7 +249,7 @@ namespace OSBLE.Models.Users
                 ProfileImage.Picture = null;
                 return;
             }
-            
+
             if (ProfileImage == null)
             {
                 ProfileImage = new ProfileImage();

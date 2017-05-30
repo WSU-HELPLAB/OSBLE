@@ -190,7 +190,9 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
             ShowProfilePicture = !anonymous;
 
             if (Sender != null)
-                DisplayTitle = Sender.DisplayName(currentUser);            
+            {
+                DisplayTitle = Sender.DisplayName(currentUser);
+            }            
         }
     }
 }

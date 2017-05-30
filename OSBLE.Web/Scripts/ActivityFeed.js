@@ -104,10 +104,10 @@ function FeedItem(data) {
         //make anonymous post
         var makeAnonymous = $("[name='make_reply_anonymous_" + self.eventId + "']").is(':checked');
 
-        // Get text from the textarea
+        // Get text from the text area
         var text = $('#feed-reply-textbox-' + self.eventId).val();
 
-        // Make sure the user submited something
+        // Make sure the user submitted something
         if (text == "") {
             return;
         }
@@ -1374,4 +1374,20 @@ function GetFeedPostContent(eventId, parentEventId) {
         }
     });
     return text;
+}
+
+function getUserRole() {
+    var currentRole = "";
+    $.ajax({
+        url: "/Feed/GetUserRole", //Goes to FeedController, then GetUserRole method within that file
+        method: "POST", //HTTPPOST Tag in FeedController
+        async: false,
+        success: function (result) { //GetUserRole returns the user role as a string
+            currentRole = result;
+        },
+        error: function (result) {
+            currentRole = "Observer"; //If an error occurs, don't let the viewer see the @mentions
+        }
+    })
+    return currentRole;
 }
