@@ -40,7 +40,7 @@ namespace OSBLE.Controllers
         public AccountController()
         {
             ViewBag.ReCaptchaPublicKey = getReCaptchaPublicKey();
-            ViewBag.HideMail = null!= ActiveCourseUser? DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID) : true;  
+            ViewBag.HideMail = null != ActiveCourseUser ? DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID) : true;
         }
 
         //
@@ -298,7 +298,7 @@ namespace OSBLE.Controllers
             }
 
             if (changeEmailSucceeded)
-            {   
+            {
                 return RedirectToAction("LogOff");
             }
             else if (!validEmail)
@@ -357,7 +357,7 @@ namespace OSBLE.Controllers
             if (changeNameSucceeded)
             {
                 return RedirectToAction("Profile");
-            }            
+            }
             else
             {
                 ModelState.AddModelError("ChangeName", "OSBLE was unable to change user First and Last name. Please enter both a First and Last Name");
@@ -581,8 +581,8 @@ namespace OSBLE.Controllers
                 LastName = Request.QueryString["lastname"]
                 ,
                 Identification = Request.QueryString["identification"]
-                ,
-                SchoolID = Convert.ToInt32(Request.QueryString["schoolid"])
+                // ,
+                //  SchoolID = Convert.ToInt32(Request.QueryString["schoolid"])
             };
 
             if (WTmodel != null)
@@ -700,20 +700,20 @@ namespace OSBLE.Controllers
                             {
                                 //you have gathered all the users  time to add them to courses                                
                                 CourseUser newUser = new CourseUser();
-                                newUser.UserProfile = profile;                                
-                                newUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;                                
+                                newUser.UserProfile = profile;
+                                newUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
                                 newUser.AbstractCourseID = wtu.CourseID;
                                 newUser.AbstractCourse = (from c in db.AbstractCourses
                                                           where c.ID == newUser.AbstractCourseID
                                                           select c).FirstOrDefault();
                                 newUser.UserProfileID = profile.ID;
-                                                                
+
                                 WhiteTable whiteTable = db.WhiteTable.Where(wt => wt.WhiteTableUserID == wtu.ID).FirstOrDefault();
                                 newUser.Section = whiteTable.Section;
 
                                 db.CourseUsers.Add(newUser);
-                                db.WhiteTableUsers.Remove(wtu);                                
-                                db.WhiteTable.Remove(whiteTable);                                
+                                db.WhiteTableUsers.Remove(wtu);
+                                db.WhiteTable.Remove(whiteTable);
                                 db.SaveChanges();
 
                                 //we need to add the new student to existing assignments
@@ -753,7 +753,7 @@ namespace OSBLE.Controllers
             // If we got this far, something failed, redisplay form
             return View(model);
         }
-       
+
         /// <summary>
         /// Duplicate method from roster controller but tailored for whitelist users. Could not use the roster controller
         /// method without authenticating (was causing an error) so this is the workaround until this code can be refactored.
@@ -879,12 +879,12 @@ namespace OSBLE.Controllers
 
                             db.Entry(currentUser).State = EntityState.Modified;
                             db.SaveChanges();
-                            changePasswordSucceeded = true;    
+                            changePasswordSucceeded = true;
                         }
                         else
-                        {                            
-                            changePasswordSucceeded = false;                            
-                        }                        
+                        {
+                            changePasswordSucceeded = false;
+                        }
                     }
                     else
                     {
@@ -1008,7 +1008,7 @@ namespace OSBLE.Controllers
 
                 // Reset the cached user profile image on the server
                 ClearImageCache(profile.ID);
-                
+
                 return RedirectToAction("Profile");
             }
 
