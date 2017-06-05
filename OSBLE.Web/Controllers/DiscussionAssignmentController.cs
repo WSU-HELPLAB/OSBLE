@@ -170,7 +170,7 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         public ActionResult Index(int assignmentId, int discussionTeamId, bool? displayNewPosts = false)
         {
-            ViewBag.HideMail = OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID); 
+            ViewBag.HideMail = OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID);
 
             Assignment assignment = null;
             DiscussionTeam discussionTeam = null;
@@ -422,7 +422,7 @@ namespace OSBLE.Controllers
                             {
                             }
                         }
-                        string subject = "[OSBLE][Moderator] - New Post";
+                        string subject = "[OSBLE][Moderator] - New Post in " + assignment.Course.Name;
                         string linkUrl = string.Format("http://plus.osble.org{0}", Url.Action("TeacherIndex", "DiscussionAssignment", new { assignmentID = assignment.ID, discussionTeamID = newPost.DiscussionTeamID }));
                         string body = @"
 Greetings,
@@ -572,7 +572,7 @@ You may view the discussion on OSBLE by visiting the following link: <a href=""{
                 anonSettings = true;
             }
 
-            string subject = "[OSBLE][Discussion] - New Post";
+            string subject = "[OSBLE][Discussion] - New Post in " + assignment.Course.Name;
             string linkUrl = string.Format("http://plus.osble.org{0}", Url.Action("TeacherIndex", "DiscussionAssignment", new { assignmentID = assignment.ID, discussionTeamID = newPost.DiscussionTeamID }));
             string body = @"
                             Greetings,
@@ -586,7 +586,7 @@ You may view the discussion on OSBLE by visiting the following link: <a href=""{
                             ";
 
             body = string.Format(body,
-            ActiveCourseUser.UserProfile.DisplayName(   ActiveCourseUser.AbstractRoleID, true, anonSettings),
+            ActiveCourseUser.UserProfile.DisplayName(ActiveCourseUser.AbstractRoleID, true, anonSettings),
                                                         assignment.AssignmentName,
                                                         newPost.Content,
                                                         linkUrl,
