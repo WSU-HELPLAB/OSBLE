@@ -634,11 +634,12 @@ namespace OSBLE.Controllers
 
                     //make sure that the user name isn't already taken
                     UserProfile takenName = db.UserProfiles.Where(u => u.UserName == model.Email).FirstOrDefault();
+                    bool somethingIsTaken = false;
                     if (takenName != null)
                     {
                         //add an error message then get us out of here
-                        ModelState.AddModelError("", "The email address provided is already associated with an OSBLE account.");
-                        return AcademiaRegister();
+                        ModelState.AddModelError("", " - The email address provided is already associated with an OSBLE account.");
+                        somethingIsTaken = true;
                     }
 
                     // check for duplicate student id by checking noZeroId
@@ -650,10 +651,13 @@ namespace OSBLE.Controllers
                     if (takenName != null)
                     {
                         //add an error message then get us out of here
-                        ModelState.AddModelError("", "The Student ID provided is already associated with an OSBLE account for the school you provided.");
+                        ModelState.AddModelError("", " - The Student ID provided is already associated with an OSBLE account for the school you provided.");
+                        somethingIsTaken = true;
+                    }
+                    if (somethingIsTaken) //If the email, student ID #, or both are taken, this will return the errors
+                    {
                         return AcademiaRegister();
                     }
-
                     //try creating the account
                     UserProfile profile = new UserProfile();
                     try
