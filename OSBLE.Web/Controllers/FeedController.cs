@@ -179,7 +179,7 @@ namespace OSBLE.Controllers
             return true;
         }
 
-        private FeedViewModel GetFeedViewModel()
+        private FeedViewModel GetFeedViewModel(string keywords = "")
         {
             var query = _activityFeedQuery;
 
@@ -211,11 +211,11 @@ namespace OSBLE.Controllers
                         //do nothing for now.
                     }
                 }
-
+                
+                if (returnItems.Count() >= 20 || keywords != "")
+                    break; //we have 20, exit... otherwise try to get more posts. also exit if this is a keyword search, no need to try and query 20 times 
+                
                 //get more posts if we don't have 20
-                if (returnItems.Count() >= 20)
-                    break; //we have 20, exit... otherwise try to get more posts.  
-
                 if (i != 9) //only clear the list if it's not the last iteration
                 {
                     _activityFeedQuery.MaxQuerySize += 20;
@@ -341,7 +341,7 @@ namespace OSBLE.Controllers
             }
 
             // Build the model and convert it to JSON to send to the view
-            FeedViewModel vm = GetFeedViewModel();
+            FeedViewModel vm = GetFeedViewModel(keywords);
             return GetJsonFromViewModel(vm);
         }
 

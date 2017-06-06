@@ -18,6 +18,9 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
 {
     public class VsEventHandler : EventHandlerBase
     {
+        //TODO: re-enable for non control plugin version
+        private const bool EnableInterventionWindow = false;
+
         public event EventHandler InterventionUpdate = delegate { };
 
         /// <summary>
@@ -41,13 +44,13 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             BreakAtFunction = 311,
             EditorClick = 769
         };
-        
+
         private readonly ObjectCache _cache = new FileCache(StringConstants.LocalCacheDirectory, new ObjectBinder());
         private readonly ILogger _logger;
 
         public VsEventHandler(IServiceProvider serviceProvider, IEventGenerator osbideEvents)
             : base(serviceProvider, osbideEvents)
-        {            
+        {
         }
 
         private Command GetCommand(string guid, int id)
@@ -91,7 +94,10 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             //let others know that we have a new event
             NotifyEventCreated(this, new EventCreatedArgs(submit));
 
-            CheckInterventionStatus();
+            if (EnableInterventionWindow)
+            {
+                CheckInterventionStatus();
+            }
         }
 
         public async override void DocumentSaved(Document document)
@@ -106,7 +112,10 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             //let others know that we have a new event
             NotifyEventCreated(this, new EventCreatedArgs(save));
 
-            CheckInterventionStatus();
+            if (EnableInterventionWindow)
+            {
+                CheckInterventionStatus();
+            }
         }
 
         public override void OnBuildDone(vsBuildScope scope, vsBuildAction action)
@@ -173,7 +182,10 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             //let others know that we have created a new event
             NotifyEventCreated(this, new EventCreatedArgs(build));
 
-            CheckInterventionStatus();
+            if (EnableInterventionWindow)
+            {
+                CheckInterventionStatus();
+            }
         }
 
         public override void GenericCommand_AfterCommandExecute(string guid, int id, object customIn, object customOut)
@@ -201,7 +213,10 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
                         eventLogWatcher.Enabled = true;
                     }
 
-                    CheckInterventionStatus();
+                    if (EnableInterventionWindow)
+                    {
+                        CheckInterventionStatus();
+                    }
                 }
             }
         }
@@ -226,7 +241,10 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
                 };
                 NotifyEventCreated(this, new EventCreatedArgs(activity));
 
-                CheckInterventionStatus();
+                if (EnableInterventionWindow)
+                {
+                    CheckInterventionStatus();
+                }
             }
         }
 
@@ -286,7 +304,10 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             ex.SolutionName = Dte.Solution.FullName;
             NotifyEventCreated(this, new EventCreatedArgs(ex));
 
-            CheckInterventionStatus();
+            if (EnableInterventionWindow)
+            {
+                CheckInterventionStatus();
+            }
         }
 
         public override void NETErrorEventRecordWritten(object sender, System.Diagnostics.Eventing.Reader.EventRecordWrittenEventArgs e)
@@ -315,7 +336,7 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             }
         }
 
-        #endregion        
+        #endregion
 
 
 
@@ -324,7 +345,7 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
         private async void CheckInterventionStatus()
         {
             try //prevent this from crashing the plugin
-            {                
+            {
                 if (InterventionUpdate != null)
                 {
                     if (_cache.Contains("ShowSuggestionsWindow") && _cache["ShowSuggestionsWindow"].ToString() == "True")
@@ -340,7 +361,7 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
             catch (Exception ex)
             {
                 _logger.WriteToLog(string.Format("OpenInterventionToolWindow() in VsEventHandler Error: {0}", ex.Message), LogPriority.HighPriority);
-            } 
+            }
         }
 
         /// <summary>
