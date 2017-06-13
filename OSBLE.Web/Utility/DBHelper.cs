@@ -1727,6 +1727,46 @@ namespace OSBLE.Utility
             return assignmentName;
         }
 
+        //ckfrancisco
+        //create a dictionary of course assignments name keys and assignment id values
+        public static Dictionary<string, int> GetAssignmentDict(int courseId = 0, SqlConnection connection = null)
+        {
+            if (courseId == 0)
+            {
+                return null;
+            }
+
+            Dictionary<string, int> assignmentDict = new Dictionary<string, int>();
+
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection())
+                {
+                    assignmentDict = GetAssignmentDict(courseId, sqlc);
+                }
+                return assignmentDict;
+            }
+
+            string queryString = "SELECT AssignmentName, ID from Assignments WHERE CourseID = " + courseId.ToString();
+
+            connection.Open();
+
+            using (SqlCommand command = new SqlCommand(queryString, connection))
+            {
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    //insert each assignment name and id if the name does not exist in the dictionary
+                    while (reader.Read())
+                    {
+                        if (!assignmentDict.ContainsKey(reader.GetString(0)))
+                            assignmentDict.Add(reader.GetString(0), reader.GetInt32(1));
+                    }
+                }
+            }
+
+            return assignmentDict;
+        }
+
         #endregion
 
 

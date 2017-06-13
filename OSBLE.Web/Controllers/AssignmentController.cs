@@ -708,7 +708,22 @@ namespace OSBLE.Controllers
             else
                 return RedirectToAction("Index", "Home", new { area = "AssignmentDetails", assignmentId = assignmentID }); 
                 
-            
+        
+        }
+
+
+
+        //ckfrancisco
+        //determine if assignment name is unique to the active course
+        [HttpPost]
+        public bool IsUniqueAssignmentName(string oldName, string newName)
+        {
+            Dictionary<string, int> assignmentDict = OSBLE.Utility.DBHelper.GetAssignmentDict(ActiveCourseUser.AbstractCourseID);
+
+            //remove the old name from the dictionary to allow the same name during editing
+            assignmentDict.Remove(oldName);
+
+            return !assignmentDict.ContainsKey(newName);
         }
     }
 }

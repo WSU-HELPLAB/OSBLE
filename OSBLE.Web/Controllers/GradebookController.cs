@@ -171,6 +171,14 @@ namespace OSBLE.Controllers
 
             ViewBag.EditSections = DBHelper.GetGradebookSectionEditableSettings(ActiveCourseUser.AbstractCourseID);
 
+            ViewBag.AssignmentDict = DBHelper.GetAssignmentDict(ActiveCourseUser.AbstractCourseID);
+
+            ViewBag.cuID = ActiveCourseUser.ID;
+
+            ViewBag.WebClientRoot = OSBLEPlus.Logic.Utility.StringConstants.WebClientRoot;
+
+            ViewBag.PublishedAssignmentIds = PublishedAssignmentIds();
+
             return View();
         }
 
@@ -1586,6 +1594,31 @@ namespace OSBLE.Controllers
                 worksheet.Worksheet.Columns().AdjustToContents();
             }            
             return (workbook);
+        }
+
+        //ckfrancisco
+        //return list of the current user's published assignment ids
+        public List<int> PublishedAssignmentIds()
+        {
+            //retrieve student team ids for the current user
+            List<int> studentTeamIds = (from t in db.Teams 
+                                        where t.Name==CurrentUser.FullName 
+                                        select t.ID).ToList();
+
+            List<int> publishedAssignmentIds = new List<int>();
+
+            //create a list of published assignment ids
+            foreach(int teamId in studentTeamIds)
+            {
+                //for each of the current user's student team ids retrieve a list of published assignments with the student team id
+                List<int> tmp = (from re in db.RubricEvaluations
+                           where re.RecipientID == teamId && re.IsPublished == true
+                           select re.AssignmentID).ToList();
+
+                publishedAssignmentIds.AddRange(tmp);
+            }
+
+            return publishedAssignmentIds;
         }        
     }
 
