@@ -385,7 +385,9 @@ namespace OSBLE.Controllers
                             if (userIsPending != null)
                             {
                                 userIsPending.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
-                                orphans.Remove(userIsPending.UserProfile);
+                                userIsPending.Hidden = false; //IMPORTANT; Pending users have hidden = true from RequestCourseJoin
+                                userIsPending.Section = entry.Section;
+                                orphans.Remove(userIsPending.UserProfile); 
                                 db.Entry(userIsPending).State = EntityState.Modified;
                                 continue;
                             }
@@ -545,29 +547,63 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult Create(CourseUser courseuser)
         {
-
             var SchoolID = Request.Form["CurrentlySelectedSchool"];
             var AbstractRoleID = Request.Form["CurrentlySelectedAbstractRoleID"];
-            if (string.IsNullOrEmpty(SchoolID) || string.IsNullOrEmpty(AbstractRoleID))
+            bool emptySchoolID = string.IsNullOrEmpty(SchoolID) ? true : false;
+            bool emptyAbstractRoleID = string.IsNullOrEmpty(AbstractRoleID) ? true : false;
+            if (emptySchoolID || emptyAbstractRoleID) //If one or both of these fields is missing, do not add the user
             {
-                ModelState.AddModelError("School", "The School field is required.");
-                ModelState.AddModelError("SchoolID", "");
+                if (emptySchoolID && courseuser.UserProfile.SchoolID == 0) //If only the Abstract Role is missing, this message is not displayed
+                {
+                    ModelState.AddModelError("School", "The School field is required.");
+                    ModelState.AddModelError("SchoolID", "");
+                    //ViewBag.SchoolID = new SelectList(db.Schools, "ID", "Name");
+                }
+                else
+                {
+                    if (courseuser.UserProfile.SchoolID == 0) //Get the ID if it hasn't already been retrieved
+                    {
+                        courseuser.UserProfile.SchoolID = Convert.ToInt32(SchoolID);
+                    }
+                    //ViewBag.SchoolID = courseuser.UserProfile.SchoolID;
+                }
                 ViewBag.SchoolID = new SelectList(db.Schools, "ID", "Name");
-
-                ModelState.AddModelError("Course Role", "The Course Role field is required.");
-                ModelState.AddModelError("AbstractRoleID", "");
+                if (emptyAbstractRoleID && courseuser.AbstractRoleID == 0) //If only the School ID is missing, this message is not displayed
+                {
+                    ModelState.AddModelError("Course Role", "The Course Role field is required.");
+                    ModelState.AddModelError("AbstractRoleID", "");
+                    //ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name");
+                }
+                else
+                {
+                    if (courseuser.AbstractRoleID == 0)
+                    {
+                        courseuser.AbstractRoleID = Convert.ToInt32(AbstractRoleID);
+                    }
+                    //ViewBag.AbstractRoleID = courseuser.AbstractRoleID;
+                    //if (ModelState.Keys.Contains("AbstractRoleID"))
+                    //{
+                    //    ModelState.Remove("AbstractRoleID");
+                    //}
+                    //if (ModelState.Keys.Contains("Course Role"))
+                    //{
+                    //    ModelState.Remove("Course Role");
+                    //}
+                }
                 ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name");
-
                 return View();
             }
             else
             {
-                courseuser.AbstractRoleID = Convert.ToInt32(AbstractRoleID);
-                courseuser.UserProfile.SchoolID = Convert.ToInt32(SchoolID);
+                if (courseuser.AbstractRoleID == 0) //If courseUser AbstractRoleID hasn't already been set
+                {
+                    courseuser.AbstractRoleID = Convert.ToInt32(AbstractRoleID);
+                }
+                if (courseuser.UserProfile.SchoolID == 0)
+                {
+                    courseuser.UserProfile.SchoolID = Convert.ToInt32(SchoolID);
+                }
             }
-
-
-
             //if modelState isValid
             if (ModelState.IsValid && courseuser.AbstractRoleID != 0)
             {
@@ -751,6 +787,8 @@ namespace OSBLE.Controllers
             {
                 //Handle the case of whitelisted users
                 //(a user wont be logged on here so ActiveCourseUser should be null)
+                pendingUser = new CourseUser();
+                pendingUser.ID = userId;
                 thisCourse = db.AbstractCourses.FirstOrDefault(ac => ac.ID == courseId) as Course;
             }
             else
@@ -973,15 +1011,17 @@ namespace OSBLE.Controllers
 
             //get all notifications
             List<Notification> allUnreadNotifications = (from n in db.Notifications
-                                                         where n.RecipientID == ActiveCourseUser.ID && !n.Read
+                                                         where n.RecipientID == ActiveCourseUser.ID 
+                                                         && n.SenderID == ActiveCourseUser.ID
+                                                         && !n.Read
                                                          select n).ToList();
             //get all notifications pertaining to the pendingUsers List
             List<Notification> pendingUsersNotifications = allUnreadNotifications.Where(item => pendingUsers.Contains(item.Sender)).ToList();
-            //Mark them all as read
             foreach (Notification n in pendingUsersNotifications)
             {
-                n.Read = true;
-                db.Entry(n).State = EntityState.Modified;
+                //As seen in DenyPending, there is some conflict between removing the user before REMOVING (not marking as
+                //read) notifictions that the user is associated with
+                db.Notifications.Remove(n);
             }
 
             count = pendingUsers.Count();
@@ -1912,7 +1952,7 @@ namespace OSBLE.Controllers
             CourseUser pendingUser = (from d in db.CourseUsers
                                       where d.AbstractCourseID == ActiveCourseUser.AbstractCourseID
                                       && d.UserProfile.Identification == entry.Identification
-                                      && d.UserProfile.UserName == entry.Email
+                                      //&& d.UserProfile.UserName == entry.Email
                                       && d.AbstractRoleID == (int)CourseRole.CourseRoles.Pending
                                       select d).FirstOrDefault();
 
