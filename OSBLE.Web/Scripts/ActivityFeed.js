@@ -104,10 +104,10 @@ function FeedItem(data) {
         //make anonymous post
         var makeAnonymous = $("[name='make_reply_anonymous_" + self.eventId + "']").is(':checked');
 
-        // Get text from the textarea
+        // Get text from the text area
         var text = $('#feed-reply-textbox-' + self.eventId).val();
 
-        // Make sure the user submited something
+        // Make sure the user submitted something
         if (text == "") {
             return;
         }
@@ -323,6 +323,7 @@ function FeedViewModel(userName, userId, current) {
         //make anonymous post
         var makeAnonymous = $("[name='make_anonymous']").is(':checked');
 
+        //
         text = replaceMentionWithId(text);
 
         // Disable buttons while waiting for server response
@@ -1353,8 +1354,9 @@ function replaceMentionWithId(text) {
     // TODO: to boost performance, could add functionality to know which names were used (if any)
     // Replace all occurrences of @user with @id;
     for (i = 0; i < userNames.length; i++) {
-        var name = userNames[i], id = "id=" + userIds[i] + ";";
-        text = text.replace(name, id);
+        var name = userNames[i], id = "@id=" + userIds[i] + ";"; //Must include @id or else the id will not be replaced with a hyperlink to the user's profile but will reveal the id #
+        var atMention = "@" + name; //MUST HAVE THIS or else ID numbers are revealed when someone does #Name (e.g. #AdMin -> #id=2)
+        text = text.replace(atMention, id);
     }
     return text;
 }
@@ -1374,4 +1376,20 @@ function GetFeedPostContent(eventId, parentEventId) {
         }
     });
     return text;
+}
+
+function getUserRole() {
+    var currentRole = "";
+    $.ajax({
+        url: "/Feed/GetUserRole", //Goes to FeedController, then GetUserRole method within that file
+        method: "POST", //HTTPPOST Tag in FeedController
+        async: false,
+        success: function (result) { //GetUserRole returns the user role as a string
+            currentRole = result;
+        },
+        error: function (result) {
+            currentRole = "Observer"; //If an error occurs, don't let the viewer see the @mentions
+        }
+    })
+    return currentRole;
 }

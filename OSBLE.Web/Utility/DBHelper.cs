@@ -1603,7 +1603,9 @@ namespace OSBLE.Utility
 
             List<MailAddress> addresses = new List<MailAddress>(users.Select(u => new MailAddress(u.UserName, u.FullName)));
             if (originalPoster.EmailAllActivityPosts && !users.Any(u => u.ID == originalPoster.ID))
+            {
                 addresses.Add(new MailAddress(originalPoster.UserName, originalPoster.FullName));
+            }
 
             return addresses;
         }
@@ -2055,7 +2057,7 @@ namespace OSBLE.Utility
                 using (SqlConnection sqlConnection = new SqlConnection(StringConstants.ConnectionString))
                 {
                     sqlConnection.Open();
-                    string query = "DELETE FROM Events WHERE PosterID = @PosterId ";
+                    string query = "DELETE FROM Events WHERE PosterID = @PosterId AND (Description NOT LIKE '\\[url:Assignment Page%' ESCAPE '\\' OR Description IS NULL) ";
                     sqlConnection.Execute(query, new { PosterId = posterId });
                     sqlConnection.Close();
                 }
