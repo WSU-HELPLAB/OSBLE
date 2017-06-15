@@ -51,7 +51,24 @@ namespace OSBLE.Controllers
             SetupNotifications(); // Individual notifications (mail, grades, etc.)        
 
             //setup user list for autocomplete            
-            ViewBag.CurrentCourseUsers = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
+            var viewableProfiles = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
+            if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer) //If the current user is an Observer, remove everyone besides them and instructors from viewableProfiles
+            {
+                bool isSelf;
+                bool isInstructor;
+                var instructors = DBHelper.GetCourseInstructorIds(ActiveCourseUser.AbstractCourseID);
+                var tempViewableProfiles = new List<UserProfile>(viewableProfiles); //Need a deep copy of the list to iterate over so elements can be removed if necessary
+                foreach (var profile in tempViewableProfiles)
+                {
+                    isSelf = profile.ID == ActiveCourseUser.UserProfileID ? true : false;
+                    isInstructor = instructors.Contains(profile.ID) ? true : false;
+                    if (!isSelf && !isInstructor)
+                    {
+                        viewableProfiles.Remove(profile);
+                    }
+                }
+            }
+            ViewBag.CurrentCourseUsers = viewableProfiles;
             ViewBag.HashTags = DBHelper.GetHashTags();
             ViewBag.HideMail = OSBLE.Utility.DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID);                      
 

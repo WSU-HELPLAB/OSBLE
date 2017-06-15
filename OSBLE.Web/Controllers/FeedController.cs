@@ -159,7 +159,25 @@ namespace OSBLE.Controllers
             ViewBag.ActiveCourse = DBHelper.GetCourseUserFromProfileAndCourse(ActiveCourseUser.UserProfileID, (int)courseID);
 
             //setup user list for autocomplete            
-            ViewBag.CurrentCourseUsers = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
+            var viewableProfiles = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
+            if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer) //If the current user is an Observer, remove everyone besides them and instructors from viewableProfiles
+            {
+                bool isSelf;
+                bool isInstructor;
+                var instructors = DBHelper.GetCourseInstructorIds(ActiveCourseUser.AbstractCourseID);
+                var tempViewableProfiles = new List<UserProfile>(viewableProfiles); //Need a deep copy of the list to iterate over so elements can be removed if necessary
+                foreach (var profile in tempViewableProfiles)
+                {
+                    isSelf = profile.ID == ActiveCourseUser.UserProfileID ? true : false;
+                    isInstructor = instructors.Contains(profile.ID) ? true : false;
+                    if (!isSelf && !isInstructor)
+                    {
+                        viewableProfiles.Remove(profile);
+                    }
+                }
+            }
+            ViewBag.CurrentCourseUsers = viewableProfiles;
+
             ViewBag.HashTags = DBHelper.GetHashTags();
 
             ViewBag.EnableCustomPostVisibility = ConfigurationManager.AppSettings["EnableCustomPostVisibility"]; //<add key="EnableCustomPostVisibility" value="false"/> in web.config
@@ -366,6 +384,10 @@ namespace OSBLE.Controllers
         [HttpPost]
         public string GetUserRole()
         {
+            if (ActiveCourseUser == null)
+            {
+                return "None";
+            }
             switch (ActiveCourseUser.AbstractRoleID)
             {
                 case (int)CourseRole.CourseRoles.Instructor:
@@ -390,7 +412,8 @@ namespace OSBLE.Controllers
         [HttpPost]
         public int GetUserId()
         {
-            return ActiveCourseUser.UserProfileID;
+            //If the user is not enrolled in any courses or is only Withdrawn from courses, ActiveCourseUser = 0
+            return ActiveCourseUser != null ? ActiveCourseUser.UserProfileID : 0;
         }
 
         private string GetDisplayTimeString(DateTime time, CourseUser courseUser = null)
@@ -1050,7 +1073,24 @@ namespace OSBLE.Controllers
             ViewBag.EnableCustomPostVisibility = ConfigurationManager.AppSettings["EnableCustomPostVisibility"]; //<add key="EnableCustomPostVisibility" value="false"/> in web.config
 
             //setup user list for autocomplete            
-            ViewBag.CurrentCourseUsers = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
+            var viewableProfiles = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
+            if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer) //If the current user is an Observer, remove everyone besides them and instructors from viewableProfiles
+            {
+                bool isSelf;
+                bool isInstructor;
+                var instructors = DBHelper.GetCourseInstructorIds(ActiveCourseUser.AbstractCourseID);
+                var tempViewableProfiles = new List<UserProfile>(viewableProfiles); //Need a deep copy of the list to iterate over so elements can be removed if necessary
+                foreach (var profile in tempViewableProfiles)
+                {
+                    isSelf = profile.ID == ActiveCourseUser.UserProfileID ? true : false;
+                    isInstructor = instructors.Contains(profile.ID) ? true : false;
+                    if (!isSelf && !isInstructor)
+                    {
+                        viewableProfiles.Remove(profile);
+                    }
+                }
+            }
+            ViewBag.CurrentCourseUsers = viewableProfiles;
             ViewBag.HashTags = DBHelper.GetHashTags();
 
             ViewBag.RootId = id;
@@ -1775,10 +1815,6 @@ namespace OSBLE.Controllers
         [HttpPost]
         public JsonResult GetProfileNames()
         {
-            bool isObserver = ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer ? true : false;
-            bool isSelf;
-            bool isInstructor;
-            bool addToEmailList;
             if (ActiveCourseUser == null) //new user with no active courses
             {
                 return Json(new { userProfiles = new Dictionary<string, string>() });
@@ -1788,10 +1824,7 @@ namespace OSBLE.Controllers
             Dictionary<string, string> nameIdPairs = new Dictionary<string, string>();
             foreach (UserProfile userProfile in userProfiles) //
             {
-                isSelf = userProfile.ID == ActiveCourseUser.UserProfileID ? true : false;
-                isInstructor = instructors.Contains(userProfile.ID) ? true : false;
-                addToEmailList = !isObserver || (isObserver && (isSelf || isInstructor)) ? true : false; //Add to the list if the Active User is not an Observer OR if the Active User is an Observer but we are adding them or the instructor to the list
-                if (!nameIdPairs.ContainsKey(userProfile.ID.ToString()) && addToEmailList)
+                if (!nameIdPairs.ContainsKey(userProfile.ID.ToString()))
                 {
                     nameIdPairs.Add(userProfile.ID.ToString(), userProfile.FullName);
                 }
