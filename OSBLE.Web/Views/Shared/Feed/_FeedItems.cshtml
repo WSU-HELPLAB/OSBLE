@@ -7,6 +7,7 @@
 @{
     bool isComment = ViewBag.IsComment ?? false;
     bool showDetails = ViewBag.ShowDetails ?? false;
+    bool isObserver = ViewBag.CurrentUserCourseRole == 5 ? true : false;
     int genericComponent = (int)VsComponent.GenericComponent;
     string detailsLink = ViewBag.DetailsLink ?? "'/Feed/Details/' + idString";
     detailsLink += "+'?component='+" + genericComponent;
@@ -61,17 +62,37 @@
                 <div data-bind="if: options.canEdit">
                     <a title="Edit this post" data-bind="click: ShowEditBox, attr: {id: 'btn-edit-' + eventId}"><span class="glyphicon glyphicon-pencil"></span></a>
                 </div>
+
+                @* Upvote Button *@
+                <!-- <div data-bind="if: options.canVote">
+                    <a title="Upvote" data-bind="click: MarkCommentHelpful, css: { 'icon-highlight' : highlightMark() == true }">
+                        <span class="glyphicon glyphicon-chevron-up"></span>
+                    </a>
+                </div>
+
+                 <div data-bind="if: options.canVote">
+                    <a title="Upvote this post"> <span class="glyphicon glyphicon-chevron-up"> </span> </a>
+                </div> -->
             </div>
 
             @* Display Name & Date/Time *@
-            <!-- ko ifnot: options.isAnonymous -->
-            <a class="display_name" data-bind=" text: senderName, attr: {href: '/Profile/Index/' + senderId + '?component=7'}"></a>
-            <span data-bind="text: vm.GetRole(eventId, role)" style="color: #074974; font-style: italic; font-size: small;"></span>
-            <!-- /ko -->
-            <!-- ko if: options.isAnonymous -->
-            <span class="display_name" style="color: #074974;" data-bind=" text: senderName"></span>            
-            <!-- /ko -->
-            
+            @if (isObserver)
+            {
+                <a class="display_name" data-bind=" text: senderName"></a>
+                <span data-bind="text: vm.GetRole(eventId, role)" style="color: #074974; font-style: italic; font-size: small;"></span>
+            }
+            else
+            {
+                <!-- ko ifnot: options.isAnonymous -->
+                <a class="display_name" data-bind=" text: senderName, attr: {href: '/Profile/Index/' + senderId + '?component=7'}"></a>
+                <span data-bind="text: vm.GetRole(eventId, role)" style="color: #074974; font-style: italic; font-size: small;"></span>
+
+                <!-- /ko -->
+                <!-- ko if: options.isAnonymous -->
+                <span class="display_name" style="color: #074974;" data-bind=" text: senderName"></span>
+                <!-- /ko -->
+            }
+                        
             <span class="feed-item-date" data-bind="text: timeString()"></span>
 
             @if (!isComment)
