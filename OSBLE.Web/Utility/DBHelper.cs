@@ -1726,7 +1726,66 @@ namespace OSBLE.Utility
 
             return assignmentName;
         }
+        public static List<Assignment> GetObservableAssignments(int CourseID)
+        {
+            List<Assignment> assignments = new List<Assignment>();
+            var sqlConnection = new SqlConnection(StringConstants.ConnectionString);
 
+            string query = "SELECT * FROM AssignmentObserverSettings,Assignments WHERE Assignments.CourseID=@CourseID AND AssignmentObserverSettings.AssignmentID=Assignments.ID AND AssignmentObserverSettings.IsObservable=1";
+
+            assignments = sqlConnection.Query<Assignment>(query, new  {CourseID = CourseID}).ToList();
+
+            return assignments;
+        }
+        public static bool CheckIfObservable(int assignmentID)
+        {
+            
+
+            var sqlConnection = new SqlConnection(StringConstants.ConnectionString);
+
+            string query = "SELECT IsObservable From AssignmentObserverSettings WHERE AssignmentID=@AssignmentID";
+
+            List<bool> isOb = sqlConnection.Query<bool>(query, new { AssignmentID = assignmentID }).ToList();
+
+            if(isOb.Count == 0)
+            {
+                
+                return false;
+            }
+            else
+            {
+                
+                return isOb[0];
+            }
+           
+        }
+        public static void SwitchObservable(int assignmentID)
+        {
+   
+            string query;
+            bool isOb = true;
+            var sqlConnection = new SqlConnection(StringConstants.ConnectionString);
+
+            query = "SELECT IsObservable FROM AssignmentObserverSettings WHERE AssignmentID=@AssignmentID;";
+            var results = sqlConnection.Query(query, new { AssignmentID = assignmentID }).SingleOrDefault();
+            
+            if(results == null)
+            {
+                string InsertQuery = "INSERT INTO AssignmentObserverSettings VALUES(@AssignmentID,@isOb);";
+                sqlConnection.Execute(InsertQuery, new { AssignmentID = assignmentID, isOb = isOb });
+            }
+            else if(results.IsObservable)
+            {
+                query = "UPDATE AssignmentObserverSettings SET IsObservable = 0 WHERE AssignmentID=@AssignmentID";
+            }
+            else
+            {
+                query = "UPDATE AssignmentObserverSettings SET IsObservable = 1 WHERE AssignmentID=@AssignmentID";
+            }
+
+            sqlConnection.Execute(query, new { AssignmentID = assignmentID });
+            
+        }
         #endregion
 
 

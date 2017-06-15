@@ -40,6 +40,11 @@ else
     {
         @Html.Partial("_ModeratorIndex");
     }
+    else if (ViewBag.ActiveCourse.AbstractRoleID == (int)OSBLE.Models.Courses.CourseRole.CourseRoles.Observer)
+    {
+        @Html.Partial("_ObserverIndex");
+    }
+    //Check property on each assignment, can observer see, if can, anonimyze student names, hard coded is visible check for now
 }
 <script type="text/javascript">
 

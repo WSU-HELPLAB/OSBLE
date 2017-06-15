@@ -1554,6 +1554,7 @@
     <Content Include="Views\Intervention\SuggestionsSettings.cshtml" />
     <Content Include="Views\PdfCriticalReviewHTTPS\Index.cshtml" />
     <Content Include="Views\PdfCriticalReviewHTTPS\Review.cshtml" />
+    <Content Include="Views\Assignment\_ObserverIndex.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -104,6 +104,8 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.HeaderViews.Add("RubricGradingProgressDecorator");
                 }
 
+               
+
                 if (assignment.Type == AssignmentTypes.TeamEvaluation)
                 {
                     //Show progress of TeamEvaluation, such as "X of Y Team Evaluations completed"
@@ -135,8 +137,51 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.HeaderViews.Add("ABETOutcomesDecorator");
                 }
             }
+            else if (vm.Client.AbstractRoleID == (int)OSBLE.Models.Courses.CourseRole.CourseRoles.Observer)
+            {
+                //has discussion teams?
+                if (assignment.HasDiscussionTeams)
+                {
+                    vm.HeaderBuilder = new DiscussionTeamMemberDecorator(vm.HeaderBuilder, vm.Client);
+                    vm.HeaderViews.Add("DiscussionTeamMemberDecorator");
+                }
+                
+
+                if (assignment.HasRubric)
+                {
+                    //add link to rubric ViewAsUneditable mode
+                    vm.HeaderBuilder = new RubricDecorator(vm.HeaderBuilder);
+                    vm.HeaderViews.Add("RubricDecorator");
+                }
+                if (assignment.HasDeliverables && assignment.Type != AssignmentTypes.AnchoredDiscussion)
+                {
+                    //list deliverables add download link
+                    vm.HeaderBuilder = new TeacherDeliverablesHeaderDecorator(vm.HeaderBuilder);
+                    vm.HeaderViews.Add("TeacherDeliverablesHeaderDecorator");
+                }
+                else if (assignment.Type == AssignmentTypes.DiscussionAssignment && !assignment.HasDiscussionTeams)
+                {
+                    //link to classwide discussion
+                    vm.HeaderBuilder = new StudentDiscussionLinkDecorator(vm.HeaderBuilder, vm.Client);
+                    vm.HeaderViews.Add("StudentDiscussionLinkDecorator");
+                }
+                else if (assignment.Type == AssignmentTypes.CriticalReview)
+                {
+                    vm.HeaderBuilder = new TeacherDeliverablesHeaderDecorator(vm.HeaderBuilder);
+                    vm.HeaderViews.Add("TeacherDeliverablesHeaderDecorator");
+                }
+                
+                
+
+            }
             else if (vm.Client.AbstractRole.CanSubmit) //students
             {
+                DateTime due = assignment.DueDate.AddHours(assignment.HoursLateWindow);
+                due = due.UTCToCourse(vm.Client.AbstractCourseID);
+                DateTime now = DateTime.UtcNow;
+                now = now.UTCToCourse(vm.Client.AbstractCourseID);
+                bool canSub = (now < due);
+
                 //has discussion teams?
                 if (assignment.HasDiscussionTeams)
                 {
@@ -188,7 +233,7 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.HeaderBuilder = new StudentDiscussionLinkDecorator(vm.HeaderBuilder, vm.Client);
                     vm.HeaderViews.Add("StudentDiscussionLinkDecorator");
                 }
-                else if (assignment.Type == AssignmentTypes.TeamEvaluation)
+                else if (assignment.Type == AssignmentTypes.TeamEvaluation && canSub)
                 {
                     vm.HeaderBuilder = new StudentTeamEvalSubmissionDecorator(vm.HeaderBuilder, teamEvaluations, vm.Client);
                     vm.HeaderViews.Add("StudentTeamEvalSubmissionDecorator");

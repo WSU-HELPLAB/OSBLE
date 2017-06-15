@@ -1,5 +1,6 @@
 ﻿@using OSBLE.Models
 @using OSBLE.Models.Assignments
+@using OSBLE.Utility
 @{
     List<Assignment> assignments = ViewBag.Assignments;
     int PastCount = ViewBag.PastCount;
@@ -85,6 +86,15 @@
             //Now that headers are in place, inserting a assignment
             <tr class="checkeredRow"  >
                 <td style="padding-right:0; white-space:nowrap"><!--Cell for icons-->
+                    @if (DBHelper.CheckIfObservable(assignments[i].ID))
+                    {
+                         <a title="Click to Unpublish to Observers" class="pointerOnMouseOver" href="/Assignment/ToggleObservable?assignmentID=@assignments[i].ID"><span class="glyphicon glyphicon-eye-close"></span></a>
+                    }
+                    else
+                    {
+                        <a title="Click to Publish to Observers" class="pointerOnMouseOver" href="/Assignment/ToggleObservable?assignmentID=@assignments[i].ID"><span class="glyphicon glyphicon-eye-open"></span></a>
+                    }    
+               
                     @if (assignments[i].IsDraft)
                     {
                         <a title="Click to Publish"  class="pointerOnMouseOver" href="/Assignment/ToggleDraft?assignmentID=@assignments[i].ID" >@Helpers.PublishButton()</a>
