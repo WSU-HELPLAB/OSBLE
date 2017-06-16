@@ -178,8 +178,8 @@
                 $('#otherSection').on('change', function () {
                     var sectionAsInt = parseInt($('#otherSection').val());
 
-                    //If the input is a crazy high or low number, warn them and reset the input box
-                    if (sectionAsInt > 50 || sectionAsInt < 0) {
+                    //If the input is a negative number, warn them and reset the input box
+                    if (sectionAsInt < 0) {
                         alert("Please enter a reasonable course section number.");
                         $('#otherSection').val(""); //Reset the otherSection text box
                     }
