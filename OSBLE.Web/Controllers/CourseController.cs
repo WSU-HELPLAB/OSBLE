@@ -506,7 +506,7 @@ namespace OSBLE.Controllers
 
         }
 
-        public ActionResult ReqestCourseJoin(string id)
+        public ActionResult ReqestCourseJoin(string id, int section)
         {
             //get course from ID
             int intID = Convert.ToInt32(id);
@@ -543,6 +543,8 @@ namespace OSBLE.Controllers
                         currentCourseUser.AbstractCourseID = currentCourse.ID; //Make sure we are changing the user's status in the correct class!
                         db.CourseUsers.Attach(currentCourseUser); //Attach is better than .Entry since only the editted attributes are marked dirty
                         currentCourseUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending; //Update their status to Pending
+                        currentCourseUser.Section = section;
+
                         db.SaveChanges();
                         using (NotificationController nc = new NotificationController())
                         {
@@ -559,7 +561,8 @@ namespace OSBLE.Controllers
 
                         addedUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending;
                         addedUser.AbstractCourseID = currentCourse.ID;
-                        addedUser.Hidden = true;
+                        addedUser.Hidden = true; //Temporarily hide course content from the user
+                        addedUser.Section = section; //Put them in the correct section
 
                         db.CourseUsers.Add(addedUser);
                         // db.Entry(previousUser).State = EntityState.Modified;
@@ -584,6 +587,7 @@ namespace OSBLE.Controllers
                     newUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending; //FIX THIS NOW FORREST
                     newUser.AbstractCourseID = currentCourse.ID;
                     newUser.Hidden = true;
+                    newUser.Section = section;
 
                     db.CourseUsers.Add(newUser);
                     db.SaveChanges();
@@ -602,7 +606,7 @@ namespace OSBLE.Controllers
 
             else //ActiveCourseUser is enrolled in courses but still may be Withdrawn from the course!
             {
-                //THERE MAY BE MORE THAN ONE INSTANCE OF THE USER; MAKE SURE YOU ARE GETTING THE ONE IN THIS COURSE (CORRECT ID)
+                //THERE MAY BE MORE THAN ONE INSTANCE OF THE USER; MAKE SURE YOU ARE GETTING THE ONE IN THIS COURSE (CORRECT USER PROFILE ID)
                 var previousUser = (from d in db.CourseUsers
                                     where d.UserProfileID == this.CurrentUser.ID && d.AbstractCourseID == currentCourse.ID
                                     select d).FirstOrDefault();
@@ -610,9 +614,10 @@ namespace OSBLE.Controllers
                 //If the user exists in the database AND in the course
                 if (previousUser != null) 
                 {
-                    previousUser.AbstractCourseID = currentCourse.ID; //Make sure we are changing the user's status in the correct class!
                     db.CourseUsers.Attach(previousUser); //Attach is better than .Entry since only the editted attributes are marked dirty
                     previousUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending; //Update their status to Pending
+                    previousUser.Section = section;
+
                     db.SaveChanges();
                     using (NotificationController nc = new NotificationController())
                     {
@@ -624,7 +629,7 @@ namespace OSBLE.Controllers
                     //send notification to instructors
                     using (NotificationController nc = new NotificationController())
                     {
-                        //temporaly put them in the course as hidden
+                        //temporarily put them in the course as hidden
                         CourseUser tempUser = new CourseUser();
                         UserProfile profile = db.UserProfiles.Where(up => up.ID == this.CurrentUser.ID).FirstOrDefault();
                         tempUser.UserProfile = profile;
@@ -632,6 +637,7 @@ namespace OSBLE.Controllers
                         tempUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending; //FIX THIS NOW FORREST
                         tempUser.AbstractCourseID = currentCourse.ID;
                         tempUser.Hidden = true;
+                        tempUser.Section = section;
 
                         db.CourseUsers.Add(tempUser);
                         db.SaveChanges();
