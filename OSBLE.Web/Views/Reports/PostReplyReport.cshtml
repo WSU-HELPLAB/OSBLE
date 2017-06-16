@@ -5,12 +5,15 @@
 
     string postCounts = "";
     string replyCounts = "";
-    string outputText = "Name\tPosts\tReplies\n";
+    string outputText = "FirstName\tLastName\tPosts\tReplies\n";
     int count = 2; //extra row buffer
 
     foreach (var user in reportOutput.Item3)
     {
-        outputText += user.Item1 + "\t" + user.Item2 + "\t" + user.Item3 + "\n";
+        string name = user.Item1;
+        string firstname = name.Split(' ').ToList().First();
+        string lastname = name.Split(' ').ToList().Last();
+        outputText += firstname + "\t" + lastname + "\t" + user.Item2 + "\t" + user.Item3 + "\n";
         count++;
     }
 }
