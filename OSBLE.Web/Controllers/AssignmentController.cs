@@ -651,12 +651,15 @@ namespace OSBLE.Controllers
 
             //key-value pair for names-grades
             Dictionary<string, string> grades = new Dictionary<string, string>();
+            //key-value pair for fullname-lastname so we can sort by lastname when creating the csv
+            Dictionary<string, string> firstLast = new Dictionary<string, string>();
             //seed dictionary with student last, first names
             foreach (CourseUser student in students)
             {
-                if (!grades.ContainsKey(student.UserProfile.FullName))
+                if (!grades.ContainsKey(student.UserProfile.FullName) && !firstLast.ContainsKey(student.UserProfile.FullName))
                 {
-                    grades.Add(student.UserProfile.FullName, "");    
+                    grades.Add(student.UserProfile.FullName, "");
+                    firstLast.Add(student.UserProfile.FullName, student.UserProfile.LastName);
                 }                
             }
             //get graded rubrics
@@ -686,22 +689,23 @@ namespace OSBLE.Controllers
                     }
                 }
 
-                //sort the grades A-Z by last name
-                var sortedGradesList = grades.Keys.ToList();
-                sortedGradesList.Sort();
+                //sort the grades A-Z by last name                
+                var sortedNameList = from pair in firstLast
+                                     orderby pair.Value ascending
+                                     select pair;                
                 
                 //make a csv for export
                 var csv = new StringBuilder();                
                 csv.Append(String.Format("{0},{1},{2},{3}{4}", "FirstName", "LastName", "Score(PCT)", "Raw Points out of " + totalPoints.ToString(), Environment.NewLine));
-                foreach (var key in sortedGradesList)
-                {
+                foreach (KeyValuePair<string, string> pair in sortedNameList)
+                {   
                     //place quotes around name so the first, last format doesn't break the csv
-                    string firstname = "\"" + key.ToString().Split(' ').ToList().First() + "\"";
-                    string lastname = "\"" + key.ToString().Split(' ').ToList().Last() + "\"";                    
-                    var newLine = String.Format("{0},{1},{2},{3}{4}", firstname, lastname, grades[key], String.IsNullOrEmpty(grades[key]) ? "" : (Convert.ToDouble(grades[key]) * totalPoints).ToString(), Environment.NewLine);
+                    string firstname = "\"" + pair.Key.Split(' ').ToList().First() + "\""; //split off first name
+                    string lastname = "\"" + pair.Value + "\"";
+                    var newLine = String.Format("{0},{1},{2},{3}{4}", firstname, lastname, grades[pair.Key], String.IsNullOrEmpty(grades[pair.Key]) ? "" : (Convert.ToDouble(grades[pair.Key]) * totalPoints).ToString(), Environment.NewLine);
                     csv.Append(newLine);
                 }
-                
+
                 const string contentType = "text/plain";
                 var bytes = Encoding.UTF8.GetBytes(csv.ToString());
 
