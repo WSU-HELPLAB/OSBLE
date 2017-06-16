@@ -12,6 +12,7 @@ using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.DiscussionAssignment;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.ViewModels;
+using OSBLE.Utility;
 
 namespace OSBLE.Controllers
 {
@@ -606,6 +607,9 @@ namespace OSBLE.Controllers
         [CanGradeCourse]
         public ActionResult ExportAssignmentGrades(int assignmentID)
         {
+            //get total points for this assignment
+            int totalPoints = DBHelper.GetAssignmentPointTotal(assignmentID);
+
             //find all students for current course
             List<CourseUser> students = (from c in db.CourseUsers
                                          where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
@@ -676,7 +680,7 @@ namespace OSBLE.Controllers
                             //update value to match key
                             if (grades.ContainsKey(rubricStudentName))
                             {
-                                grades[rubricStudentName] = RubricEvaluation.GetGradeAsDouble(rubricEvaluation.ID).ToString();        
+                                grades[rubricStudentName] = RubricEvaluation.GetGradeAsDouble(rubricEvaluation.ID).ToString();
                             }
                         }
                     }
@@ -687,13 +691,14 @@ namespace OSBLE.Controllers
                 sortedGradesList.Sort();
                 
                 //make a csv for export
-                var csv = new StringBuilder();
-
+                var csv = new StringBuilder();                
+                csv.Append(String.Format("{0},{1},{2},{3}{4}", "FirstName", "LastName", "Score(PCT)", "Raw Points out of " + totalPoints.ToString(), Environment.NewLine));
                 foreach (var key in sortedGradesList)
                 {
                     //place quotes around name so the first, last format doesn't break the csv
-                    string temp = "\"" + key + "\"";
-                    var newLine = String.Format("{0},{1}{2}", temp, grades[key], Environment.NewLine);
+                    string firstname = "\"" + key.ToString().Split(' ').ToList().First() + "\"";
+                    string lastname = "\"" + key.ToString().Split(' ').ToList().Last() + "\"";                    
+                    var newLine = String.Format("{0},{1},{2},{3}{4}", firstname, lastname, grades[key], String.IsNullOrEmpty(grades[key]) ? "" : (Convert.ToDouble(grades[key]) * totalPoints).ToString(), Environment.NewLine);
                     csv.Append(newLine);
                 }
                 

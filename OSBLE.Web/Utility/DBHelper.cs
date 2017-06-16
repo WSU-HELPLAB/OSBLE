@@ -2082,5 +2082,30 @@ namespace OSBLE.Utility
             }
             return postReplyList;
         }
+
+        internal static int GetAssignmentPointTotal(int assignmentID)
+        {
+            int pointTotal = 0;
+            try
+            {
+                using (SqlConnection sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+                    string query = "SELECT PointSpread FROM Levels WHERE RubricID = (SELECT Top 1 a.RubricID FROM Assignments a WHERE a.ID = @AssignmentId) ";
+
+                    var results = sqlConnection.Query(query, new { AssignmentId = assignmentID}).ToList();
+                    foreach (var level in results)
+                    {
+                        pointTotal += level.PointSpread;
+                    }
+                    sqlConnection.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error in GetPostsAndRepliesCount(): ", e);
+            }
+            return pointTotal;
+        }
     }
 }
