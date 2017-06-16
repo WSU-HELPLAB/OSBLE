@@ -1,0 +1,22 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var reportOutput = ViewBag.ReportOutput;
+
+    string postCounts = "";
+    string replyCounts = "";
+    string outputText = "Name\tPosts\tReplies\n";
+    int count = 2; //extra row buffer
+
+    foreach (var user in reportOutput.Item3)
+    {
+        outputText += user.Item1 + "\t" + user.Item2 + "\t" + user.Item3 + "\n";
+        count++;
+    }
+}
+
+<h2>Posts and Replies between 12:00AM @String.Format("{0:M/d/yyyy}", reportOutput.Item1) to @String.Format("{0:M/d/yyyy}", reportOutput.Item2)</h2>
+<div style="float: left; margin: 5px 0; padding: 3px;">
+    <br /><textarea rows="@count" style="width:200%;">@outputText</textarea>
+</div>
+

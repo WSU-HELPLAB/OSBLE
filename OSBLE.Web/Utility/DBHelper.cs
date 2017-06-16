@@ -2026,5 +2026,61 @@ namespace OSBLE.Utility
             }
             return true;
         }
+
+
+
+        internal static List<Tuple<string, int, int>> GetPostsAndRepliesCount(int courseId, DateTime startDate, DateTime endDate)
+        {
+            List<Tuple<string, int, int>> postReplyList = new List<Tuple<string, int, int>>();
+
+            var userProfiles = GetUserProfilesForCourse(courseId);
+
+            try
+            {
+                using (SqlConnection sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+                    string postsQuery = "SELECT COUNT(*) FROM (SELECT up.FirstName, up.LastName, fpe.EventDate FROM FeedPostEvents fpe " + 
+	                                    "LEFT OUTER JOIN EventLogs e ON e.Id = fpe.EventLogId " +
+                                        "LEFT OUTER JOIN UserProfiles up ON e.SenderId = up.ID " + 
+	                                    "WHERE CourseId = @CourseId AND (IsDeleted IS NULL OR IsDeleted = 0) AND EventVisibilityGroups = 'class' " + 
+	                                    "AND SenderId = @UserProfileId AND fpe.EventDate BETWEEN @StartDate AND @EndDate	 " + 
+	                                    "GROUP BY up.FirstName, up.LastName, fpe.EventDate, fpe.EventDate) posts ";
+
+                    string askForHelpQuery = "SELECT COUNT(*) FROM (SELECT up.FirstName, up.LastName, afhe.EventDate FROM AskForHelpEvents afhe " +
+	                                         "LEFT OUTER JOIN EventLogs e ON e.Id = afhe.EventLogId " +
+	                                         "LEFT OUTER JOIN UserProfiles up ON e.SenderId = up.ID " +
+                                             "WHERE (IsDeleted IS NULL OR IsDeleted = 0) " +
+                                             "AND SenderId IN (SELECT UserProfileID FROM CourseUsers WHERE AbstractRoleID = 3) " +
+	                                         "AND afhe.EventDate BETWEEN @StartDate AND @EndDate " +
+	                                         "AND up.ID = @UserProfileId " +
+	                                         "GROUP BY up.FirstName, up.LastName, afhe.EventDate, afhe.EventDate) askforhelp";
+
+                    string repliesQuery = "SELECT COUNT(*) FROM (SELECT up.FirstName, up.LastName, lce.EventDate FROM LogCommentEvents lce " +
+	                                      "LEFT OUTER JOIN EventLogs e ON e.Id = lce.EventLogId " +
+	                                      "LEFT OUTER JOIN UserProfiles up ON e.SenderId = up.ID " +
+	                                      "WHERE CourseId = @CourseId AND (IsDeleted IS NULL OR IsDeleted = 0) " +
+                                          "AND SenderId IN (SELECT UserProfileID FROM CourseUsers WHERE AbstractCourseID = @CourseId AND AbstractRoleID = 3) " +
+	                                      "AND lce.EventDate BETWEEN @StartDate AND @EndDate " +
+                                          "AND up.ID = @UserProfileId " +
+	                                      "GROUP BY up.FirstName, up.LastName, lce.EventDate, lce.EventDate) replies";
+
+                    foreach (var user in userProfiles)
+                    {
+                        int postResult = sqlConnection.Query<int>(postsQuery, new { CourseId = courseId, UserProfileId = user.ID, StartDate = startDate, EndDate = endDate }).SingleOrDefault();
+                        int askForHelptResult = sqlConnection.Query<int>(askForHelpQuery, new { CourseId = courseId, UserProfileId = user.ID, StartDate = startDate, EndDate = endDate }).SingleOrDefault();
+                        int repliesResult = sqlConnection.Query<int>(repliesQuery, new { CourseId = courseId, UserProfileId = user.ID, StartDate = startDate, EndDate = endDate }).SingleOrDefault();    
+                        postReplyList.Add(new Tuple<string, int, int>(user.FullName, postResult + askForHelptResult, repliesResult));
+                    }
+
+                    sqlConnection.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error in GetPostsAndRepliesCount(): ", e);
+            }
+            return postReplyList;
+        }
     }
 }
