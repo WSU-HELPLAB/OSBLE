@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
-using System.Web.Http;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
@@ -196,6 +195,10 @@ namespace OSBLE.Controllers
                 //    }
 
                 //}
+
+                ViewBag.IsInstructor = ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor;
+                ViewBag.IsSelf = ActiveCourseUser != null ? ActiveCourseUser.UserProfileID == id || id == null : false;
+                ViewBag.UploadedImages = GetImageFilesForCurrentUser();
 
                 return View(vm);
             }
@@ -659,5 +662,51 @@ namespace OSBLE.Controllers
         //        return RedirectToAction("Index", "Error");
         //    }
         //}
+
+        [HttpPost]
+        public ActionResult UploadImages(IEnumerable<HttpPostedFileBase> files)
+        {
+            List<string> allowedExtensions = new List<string>(new string[] { ".jpg", ".jpeg", ".png", ".gif", ".gifv", ".bmp" });            
+
+            foreach (var file in files)
+            {                
+                if (file != null && file.ContentLength > 0 && allowedExtensions.Contains(Path.GetExtension(file.FileName)))
+                {
+                    string path = AppDomain.CurrentDomain.BaseDirectory + "Content\\OSBLEImages\\" + ActiveCourseUser.UserProfileID.ToString() + "\\";
+                    (new FileInfo(path)).Directory.Create();                    
+                    file.SaveAs(path +  file.FileName );
+                }
+            }
+            return RedirectToAction("Index", new { id = ActiveCourseUser.UserProfileID});
+        }
+
+        [HttpPost]
+        public ActionResult DeleteImage()
+        {
+            string filename = Request.Form["fileName"];
+            string path = AppDomain.CurrentDomain.BaseDirectory + "Content\\OSBLEImages\\" + ActiveCourseUser.UserProfileID.ToString() + "\\";
+            if (filename.Length > 0 && System.IO.File.Exists(path + filename))
+            {
+                System.IO.File.Delete(path + filename);
+            }
+
+            return RedirectToAction("Index", new { id = ActiveCourseUser.UserProfileID });
+        }
+
+        private List<string> GetImageFilesForCurrentUser()
+        {
+            List<string> fileList = new List<string>();
+            DirectoryInfo d = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "Content\\OSBLEImages\\" + ActiveCourseUser.UserProfileID.ToString() + "\\");
+            if (Directory.Exists(d.FullName))
+            {
+                FileInfo[] Files = d.GetFiles("*.*");
+                string str = "";
+                foreach (FileInfo file in Files)
+                {
+                    fileList.Add(file.Name);
+                }
+            }
+            return fileList;
+        }        
     }
 }
