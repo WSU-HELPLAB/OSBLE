@@ -2035,6 +2035,9 @@ namespace OSBLE.Utility
 
             var userProfiles = GetUserProfilesForCourse(courseId);
 
+            startDate = startDate.CourseToUTC(courseId);
+            endDate = endDate.CourseToUTC(courseId);
+
             try
             {
                 using (SqlConnection sqlConnection = new SqlConnection(StringConstants.ConnectionString))
