@@ -850,7 +850,7 @@ namespace OSBLE.Utility
                 return events;
             }
 
-            events = connection.Query<Event>("SELECT e.* FROM Events e INNER JOIN CourseUsers cu ON e.PosterID = cu.ID WHERE cu.AbstractCourseID = @cid AND e.StartDate >= @sd AND ( e.EndDate <= @ed OR e.EndDate is Null )AND e.Approved = '1'",
+            events = connection.Query<Event>("SELECT e.* FROM Events e INNER JOIN CourseUsers cu ON e.PosterID = cu.ID WHERE cu.AbstractCourseID = @cid AND e.StartDate >= @sd AND e.StartDate <= @ed AND e.Approved = '1'",
                 new { cid = courseID, sd = start, ed = end });
 
             return events;
