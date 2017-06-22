@@ -451,7 +451,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
             var evt = askHelps.SingleOrDefault(y => y.EventLogId == eventLog.EventLogId);
             if (evt == null) return null;
 
-            evt.Code = evt.Code.Replace("'", "''");
+            //evt.Code = evt.Code.Replace("'", "''");
 
             //not the best way to do this...
             //TODO: modify the stored procedure to get the proper/updated data instead of this...
