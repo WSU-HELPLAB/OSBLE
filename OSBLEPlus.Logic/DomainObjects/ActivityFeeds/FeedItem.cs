@@ -8,5 +8,7 @@ namespace OSBLEPlus.Logic.DomainObjects.ActivityFeeds
         public IActivityEvent Event { get; set; }
 
         public List<LogCommentEvent> Comments { get; set; }
+
+        public bool IsResolved { get; set; }
     }
 }
