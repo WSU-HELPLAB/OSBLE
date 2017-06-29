@@ -21,6 +21,7 @@
     *@
 }
 <input id="utc-offset" name="utc-offset"  value="" type="hidden"/>
+<input id="isDraft" name="isDraft" value="@ViewBag.IsNewAssignment" type="hidden">
 <table class="wizard_entry_table">
 <tr>
     <th>@Html.LabelFor(m => m.AssignmentName):</th>
@@ -79,8 +80,13 @@
     $("#AssignmentName").on("blur", UniqueAssignmentNameCheck);
 
     //check unique assignment name when page is submitted
+    
     $(document).ready(function () {
-        $("#DueTime").val("11:59 PM");
+        var isDraft = $("#IsDraft").val();
+        if(isDraft == "True"){
+            $("#DueTime").val("11:59 PM");
+        }
+        
         $("form").submit(function (e) {
             UniqueAssignmentNameCheck();
             var tmp = $("div[data-valmsg-summary='true']").find("li:contains('Please specify an unique assignment name')");

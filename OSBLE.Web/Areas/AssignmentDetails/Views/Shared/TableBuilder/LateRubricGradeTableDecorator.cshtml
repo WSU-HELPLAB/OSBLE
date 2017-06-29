@@ -1,0 +1,71 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+    
+    
+    
+    double gradeDouble = 0.0;
+    double lateDouble;
+    string notGraded = dataModel.grade.linktext;
+    string gradeString = "";
+    if(notGraded != "Not Graded")
+    {
+        string lateString = dataModel.LatePenaltyPercent;
+        if(lateString != null)
+        {
+            lateString = lateString.Substring(0, lateString.Length - 2);
+            
+        }
+        else
+        {
+            lateString = "0.0";
+        }
+
+        bool parseSuccess = Double.TryParse(lateString, out lateDouble);
+        
+        
+        //lateDouble = Convert.ToDouble(lateString);
+        
+        if(!parseSuccess)
+        {
+            lateDouble = 0.0;
+        }
+        gradeString = dataModel.grade.linktext;
+        if(gradeString.Length <= 8)
+        {
+            gradeString = gradeString.Substring(0, gradeString.Length - 2);
+       
+        
+            gradeDouble = Convert.ToDouble(gradeString);
+            gradeDouble = gradeDouble - lateDouble;
+            if(gradeDouble < 0)
+            {
+                gradeDouble = 0;
+            }
+
+            gradeString = Convert.ToString(gradeDouble);
+            gradeString += "%";
+        
+        }
+        
+        
+    }
+    
+
+    
+}
+<td>
+
+    @if(notGraded != "Not Graded")
+    {
+       @gradeString;
+    }
+    else
+    {
+        @notGraded;
+            
+    }
+  
+</td>

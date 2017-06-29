@@ -451,6 +451,10 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                                                                     vm.TeamTableBuilders[assignmentTeam]
                                                                     );
                         vm.TableColumnHeaders["RubricTableDecorator"] = "Rubric Grade";
+
+                        vm.TableColumnHeaders["LateRubricGradeTableDecorator"] = "Late Rubric Grade";
+
+                        
                     }
 
                     if (assignment.HasDeliverables || (assignment.Type == AssignmentTypes.DiscussionAssignment || (assignment.Type == AssignmentTypes.CriticalReviewDiscussion)))

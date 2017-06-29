@@ -1427,7 +1427,13 @@ namespace OSBLE.Controllers
             {
                 db.CourseUsers.Remove(p);
             }
-
+            var teamsWithNoMembers = (from at in db.AssignmentTeams
+                                      where at.Team.TeamMembers.Count == 0
+                                      select at).ToList();
+            foreach (var team in teamsWithNoMembers)
+            {
+                db.AssignmentTeams.Remove(team);
+            }
             db.SaveChanges();
             return RedirectToAction("Index", "Roster", new { notice = count.ToString() + " withdrawn students have been removed from the course" });
         }
