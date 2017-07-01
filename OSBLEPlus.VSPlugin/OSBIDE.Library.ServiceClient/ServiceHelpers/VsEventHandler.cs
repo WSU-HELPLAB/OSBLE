@@ -18,7 +18,8 @@ namespace OSBIDE.Library.ServiceClient.ServiceHelpers
 {
     public class VsEventHandler : EventHandlerBase
     {
-        private const bool EnableInterventionWindow = true; //toggle intervention checking
+        //TODO: re-enable for non control plugin version
+        private const bool EnableInterventionWindow = false;
 
         public event EventHandler InterventionUpdate = delegate { };
 
