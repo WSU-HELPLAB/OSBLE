@@ -6,91 +6,106 @@
     ViewBag.Title = "Administration";
 }
 
-<h2>
-    User Administration
-    @Helpers.CreateToolTip(ToolTips.AdminTitle) 
-</h2>
+<div>
+    <div style="float:left;">
+        <h2>
+            User Administration
+            @Helpers.CreateToolTip(ToolTips.AdminTitle)
+        </h2>
 
-@Html.ActionLink("Manage Schools", "Index", "School")
+        @Html.ActionLink("Manage Schools", "Index", "School")
+        <br />
+        @Html.ActionLink("Manage Departments", "Index", "Departments")
+        @if (ViewBag.ShowABETOutcomesLink)
+        {
+            @Html.Raw("<br />");
+            @Html.ActionLink("Manage ABET Outcomes for Departments", "Index", "ABETOutcomesAdmin");
+        }
+    </div>
+
+    <div style="float: left; border-left: 1px solid #000; height: 60px; margin: 20px;"></div>
+    <div style="float:left; margin-left: 10px;">
+        <h2>
+            Custom Reports
+        </h2>
+        @Html.ActionLink("Post-Reply Counts", "PostReplyCounts", "Reports")
+    </div>    
+</div>
+
 <br />
-@Html.ActionLink("Manage Departments", "Index", "Departments")
-@if (ViewBag.ShowABETOutcomesLink)
-{
-    @Html.Raw("<br />");
-    @Html.ActionLink("Manage ABET Outcomes for Departments", "Index", "ABETOutcomesAdmin");
-}
-<br /><br />
-<table>
-    <tr>
-        <th>
-            UserName
-            @Helpers.CreateToolTip(ToolTips.AdminUserName) 
-        </th>
-        <th>
-            School
-            @Helpers.CreateToolTip(ToolTips.AdminUserSchool) 
-        </th>
-        <th>
-            ID
-            @Helpers.CreateToolTip(ToolTips.AdminUserID) 
-        </th>
-        <th>
-            FirstName
-            @Helpers.CreateToolTip(ToolTips.AdminUserFirstName) 
-        </th>
-        <th>
-            LastName
-            @Helpers.CreateToolTip(ToolTips.AdminUserLastName) 
-        </th>
-        <th>
-            Admin
-            @Helpers.CreateToolTip(ToolTips.AdminUserIsAdmin) 
-        </th>
-        <th>
-            Course Creator
-            @Helpers.CreateToolTip(ToolTips.AdminUserIsCourseCreator) 
-        </th>
-        <th></th>
-    </tr>
+<div style="clear: both;">
+    <table>
+        <tr>
+            <th>
+                UserName
+                @Helpers.CreateToolTip(ToolTips.AdminUserName)
+            </th>
+            <th>
+                School
+                @Helpers.CreateToolTip(ToolTips.AdminUserSchool)
+            </th>
+            <th>
+                ID
+                @Helpers.CreateToolTip(ToolTips.AdminUserID)
+            </th>
+            <th>
+                FirstName
+                @Helpers.CreateToolTip(ToolTips.AdminUserFirstName)
+            </th>
+            <th>
+                LastName
+                @Helpers.CreateToolTip(ToolTips.AdminUserLastName)
+            </th>
+            <th>
+                Admin
+                @Helpers.CreateToolTip(ToolTips.AdminUserIsAdmin)
+            </th>
+            <th>
+                Course Creator
+                @Helpers.CreateToolTip(ToolTips.AdminUserIsCourseCreator)
+            </th>
+            <th></th>
+        </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @if (item.UserName != null)
-            {
-                @Html.DisplayFor(modelItem => item.UserName)
-            }
-            else
-            {
-                <text><em>Pending</em></text>
-            }
-            
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.School.Name)
-        </td>
-        <td>
-            @Helpers.DisplayLastFourID(item.Identification)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.FirstName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.LastName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.IsAdmin)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.CanCreateCourses)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id = item.ID }) |
-            @Html.ActionLink("Details", "Details", new { id = item.ID }) |
-            @Html.ActionLink("Delete", "Delete", new { id = item.ID }) |
-            @Html.ActionLink("Impersonate", "Impersonate", new { id = item.ID }, new { onclick="return confirm('You are about to impersonate a user. You will need to sign back in with your account after completion.');" })
-        </td>
-    </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @if (item.UserName != null)
+                    {
+                        @Html.DisplayFor(modelItem => item.UserName)
+                    }
+                    else
+                    {
+                        <text><em>Pending</em></text>
+                    }
 
-</table>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.School.Name)
+                </td>
+                <td>
+                    @Helpers.DisplayLastFourID(item.Identification)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FirstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsAdmin)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CanCreateCourses)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.ID }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.ID }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.ID }) |
+                    @Html.ActionLink("Impersonate", "Impersonate", new { id = item.ID }, new { onclick = "return confirm('You are about to impersonate a user. You will need to sign back in with your account after completion.');" })
+                </td>
+            </tr>
+        }
+    </table>
+</div>

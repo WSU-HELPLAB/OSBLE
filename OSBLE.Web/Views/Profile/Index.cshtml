@@ -14,7 +14,35 @@
     UserProfile currentUser = ViewBag.CurrentUser;
     bool pointsEnabled = ViewBag.PointsEnabled ?? false;
     List<AggregateFeedItem> marksHelpful = new List<AggregateFeedItem>();
+    string osbleImagesUrlBase = OSBLEPlus.Logic.Utility.StringConstants.WebClientRoot + "Content/OSBLEImages/" + currentUser.ID + "/";
+    bool displayImageUpload = ViewBag.IsInstructor != null ? (ViewBag.IsSelf != null ? ViewBag.IsInstructor && ViewBag.IsSelf : false) : false;
 }
+
+<style type="text/css">
+    .url input {
+        width: 100%;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+    }
+
+    .yesAndNoDiv {
+        text-align: right;
+        margin-top: 10px;
+    }
+
+    #image-table td {
+        padding: 5px;
+        border-top-style: inset;
+    }
+
+    #image-table th {
+        text-align: center;
+    }
+
+    .delete-button {
+        cursor: pointer;
+    }
+</style>
 
 <section data-tab="Profile">
     <div class="jumbotron" id="profile-page-jumbotron">
@@ -110,6 +138,62 @@
         </section>*@
 }
 
+@if (displayImageUpload)
+{
+    <div style="margin-left: 15px;">
+        <div>
+            <h1>OSBLE Hosted Images</h1>
+            <h5>Accepted image extensions: .jpg, .jpeg, .png, .gif, .gifv, .bmp</h5>
+            <div>
+                @using (Html.BeginForm("UploadImages", "Profile", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
+                    <div id="multiple">
+                        <input type="file" class="multiple" name="files" multiple accept=".jpg,.jpeg,.png,.gif,.gifv,.bmp" />
+                        <button class="btn btn-primary" style="margin-top: 10px;">Upload</button>
+                    </div>
+                }
+            </div>
+        </div>
+        @if (ViewBag.UploadedImages != null && ViewBag.UploadedImages.Count > 0)
+        {
+            <div>
+                <table id="image-table" style="text-align: center;">
+                    <tr>
+                        <th></th>
+                        <th>
+                            Image
+                        </th>
+                        <th>
+                            URL
+                        </th>
+                        <th>
+                            Delete
+                        </th>
+                    </tr>
+                    @foreach (var file in ViewBag.UploadedImages)
+                    {
+                        string url = osbleImagesUrlBase + file;
+                        <tr>
+                            <td>
+                                <img src="@url" style="width:30px;height:30px;" />
+                            </td>
+                            <td>
+                                <a href="@url" target="_blank">@file</a>
+                            </td>
+                            <td>
+                                <input type="text" class="url" value="@url" />
+                            </td>
+                            <td>
+                                <a title="Click to Delete" class="delete-button" onclick="openConfirmDeleteWindow('@file')">@Helpers.DeleteButton()</a>
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        }
+    </div>
+}
+
 <section id="recent-comments" class="profile-content">
     <h1>Recent Social Activity</h1>
     @if (Model.SocialActivity.TopLevelLogCount == 0 && Model.Feed.Feed.Count == 0)
@@ -147,7 +231,7 @@
                 <h2 class="date-header">@date.ToLongDateString()</h2>
 
                 @if (items.Count() > 0)
-                {                    
+                {
                     <p class="posts-heading"><strong><em>Posts</em></strong></p>
                 }
 
@@ -189,9 +273,9 @@
 
                 @if (eventIds.Count() > 0)
                 {
-                    <p class="comments-heading"><strong><em>Comments</em></strong></p>    
+                    <p class="comments-heading"><strong><em>Comments</em></strong></p>
                 }
-                
+
                 <ul class="comments-list">
                     @foreach (int logId in eventIds)
                     {
@@ -283,9 +367,9 @@
 
                 @if (marksHelpful.Count() > 0)
                 {
-                    <p class="marks-helpful-heading"><strong><em>Comments Marked Helpful</em></strong></p>    
+                    <p class="marks-helpful-heading"><strong><em>Comments Marked Helpful</em></strong></p>
                 }
-                
+
                 <ul class="marks-helpful-list">
                     @foreach (var afi in marksHelpful)
                     {
@@ -326,3 +410,46 @@
         padding-left: 10px;
     }
 </style>
+
+<script type="text/javascript">
+    $("input[type='text']").on("click", function () {
+        $(this).select();
+    });
+
+    function openConfirmDeleteWindow(filename) {
+        event.preventDefault();
+        $("#delete-file-name-display").text(filename);
+        $("#delete-file-name").val(filename);
+        $("#confirmDeleteWindow").dialog({
+            modal: true,
+            resizable: false,
+            width: 500,
+            height: 180,
+            closeOnEscape: false
+        });
+        return false;
+    }
+
+    function hideConfirmDeleteWindow() {
+        $("#confirmDeleteWindow").dialog('close');
+    }
+</script>
+
+<!--Element for modal confirmation box-->
+<div id="confirmDeleteWindow" style="display: none;" title="Delete Image">
+    <div id="confirmForm">
+        Are you sure you want to delete this image?
+        <br />
+        <br />
+        <strong><span id="delete-file-name-display"></span></strong>
+
+        @using (Html.BeginForm("DeleteImage", "Profile", new { }, FormMethod.Post))
+        {
+            <div class="yesAndNoDiv">
+                <input value="Delete" type="submit" />
+                <input value="Cancel" type="button" onclick="hideConfirmDeleteWindow()" />
+            </div>
+            <input id="delete-file-name" name="fileName" type="hidden" value="" />
+        }
+    </div>
+</div>
