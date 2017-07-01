@@ -12,6 +12,7 @@ using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.DiscussionAssignment;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.ViewModels;
+using OSBLE.Utility;
 
 namespace OSBLE.Controllers
 {
@@ -606,6 +607,9 @@ namespace OSBLE.Controllers
         [CanGradeCourse]
         public ActionResult ExportAssignmentGrades(int assignmentID)
         {
+            //get total points for this assignment
+            int totalPoints = DBHelper.GetAssignmentPointTotal(assignmentID);
+
             //find all students for current course
             List<CourseUser> students = (from c in db.CourseUsers
                                          where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
@@ -647,12 +651,18 @@ namespace OSBLE.Controllers
 
             //key-value pair for names-grades
             Dictionary<string, string> grades = new Dictionary<string, string>();
+            //key-value pair for fullname-lastname so we can sort by lastname when creating the csv
+            Dictionary<string, string> firstLast = new Dictionary<string, string>();
+            //key-value pair to keep track of the late penalty
+            Dictionary<string, string> latePenalty = new Dictionary<string, string>();
             //seed dictionary with student last, first names
             foreach (CourseUser student in students)
             {
-                if (!grades.ContainsKey(student.UserProfile.FullName))
+                if (!grades.ContainsKey(student.UserProfile.FullName) && !firstLast.ContainsKey(student.UserProfile.FullName) && !latePenalty.ContainsKey(student.UserProfile.FullName))
                 {
-                    grades.Add(student.UserProfile.FullName, "");    
+                    grades.Add(student.UserProfile.FullName, "");
+                    firstLast.Add(student.UserProfile.FullName, student.UserProfile.LastName);
+                    latePenalty.Add(student.UserProfile.FullName, "");
                 }                
             }
             //get graded rubrics
@@ -664,7 +674,7 @@ namespace OSBLE.Controllers
             {
                 foreach (RubricEvaluation rubricEvaluation in rubricEvaluations)
                 {
-                    string rubricStudentName = "";
+                    string rubricStudentName = "";                    
 
                     //we need to go through teams to handle team assignments. this works for individuals because an individual is a team of 1
                     foreach (var teamMember in rubricEvaluation.Recipient.TeamMembers)
@@ -676,27 +686,46 @@ namespace OSBLE.Controllers
                             //update value to match key
                             if (grades.ContainsKey(rubricStudentName))
                             {
-                                grades[rubricStudentName] = RubricEvaluation.GetGradeAsDouble(rubricEvaluation.ID).ToString();        
+                                grades[rubricStudentName] = RubricEvaluation.GetGradeAsDouble(rubricEvaluation.ID).ToString();
+                                
+                                AssignmentTeam team = new AssignmentTeam();
+                                team.Assignment = rubricEvaluation.Assignment;
+                                team.AssignmentID = rubricEvaluation.AssignmentID;                                
+                                team.Team = teamMember.Team;
+                                team.TeamID = teamMember.TeamID;
+
+                                latePenalty[rubricStudentName] = (GetLatePenalty(team)/100.0).ToString();
                             }
                         }
                     }
                 }
 
-                //sort the grades A-Z by last name
-                var sortedGradesList = grades.Keys.ToList();
-                sortedGradesList.Sort();
+                //sort the grades A-Z by last name                
+                var sortedNameList = from pair in firstLast
+                                     orderby pair.Value ascending
+                                     select pair;                
                 
                 //make a csv for export
-                var csv = new StringBuilder();
-
-                foreach (var key in sortedGradesList)
-                {
+                var csv = new StringBuilder();                
+                csv.Append(String.Format("{0},{1},{2},{3},{4},{5},{6}{7}", "FirstName", "LastName", "Score(PCT)", "Raw Points out of " + totalPoints.ToString(), "Late Penalty(PCT)","Score(PCT) - Late Penalty", "Raw Score - Late Penalty", Environment.NewLine));
+                foreach (KeyValuePair<string, string> pair in sortedNameList)
+                {   
                     //place quotes around name so the first, last format doesn't break the csv
-                    string temp = "\"" + key + "\"";
-                    var newLine = String.Format("{0},{1}{2}", temp, grades[key], Environment.NewLine);
+                    string firstname = "\"" + pair.Key.Split(' ').ToList().First() + "\""; //split off first name
+                    string lastname = "\"" + pair.Value + "\"";                    
+                    string rawScore = String.IsNullOrEmpty(grades[pair.Key]) ? "" : (Convert.ToDouble(grades[pair.Key]) * totalPoints).ToString();
+                    double grade = String.IsNullOrEmpty(grades[pair.Key]) ? -1.0 : Convert.ToDouble(grades[pair.Key]);
+                    //string gradePCT = String.IsNullOrEmpty(grades[pair.Key]) ? "" : (Convert.ToDouble(grades[pair.Key]) * 100).ToString();
+                    //string latePentaltyPCT = String.IsNullOrEmpty(latePenalty[pair.Key]) ? "" : (Convert.ToDouble(latePenalty[pair.Key]) * 100).ToString();
+                    string latePentaltyPCT = String.IsNullOrEmpty(latePenalty[pair.Key]) ? "" : (Convert.ToDouble(latePenalty[pair.Key])).ToString();
+                    double latePenaltyScore = String.IsNullOrEmpty(grades[pair.Key]) ? -1.0 : Convert.ToDouble(latePenalty[pair.Key]);
+                    string lateScorePCT = String.IsNullOrEmpty(grades[pair.Key]) ? "" : (grade - latePenaltyScore <= 0 ? 0 : grade - latePenaltyScore).ToString();
+                    string lateRawScore = String.IsNullOrEmpty(grades[pair.Key]) ? "" : (grade - latePenaltyScore <= 0 ? 0 : (grade - latePenaltyScore) * totalPoints).ToString();
+
+                    var newLine = String.Format("{0},{1},{2},{3},{4},{5},{6}{7}", firstname, lastname, grades[pair.Key], rawScore, latePentaltyPCT, lateScorePCT, lateRawScore, Environment.NewLine);
                     csv.Append(newLine);
                 }
-                
+
                 const string contentType = "text/plain";
                 var bytes = Encoding.UTF8.GetBytes(csv.ToString());
 

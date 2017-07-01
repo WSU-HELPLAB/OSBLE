@@ -11,7 +11,7 @@
         var k, linkAttributes, option, options, pattern, v, text;
         options = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
 
-        text = this;
+        text = decodeHtml(this);
 
         //embed any images in the text
         text = embedImages(text);

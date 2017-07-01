@@ -322,6 +322,7 @@
     <Compile Include="Controllers\PdfCriticalReviewHTTPSController.cs" />
     <Compile Include="Controllers\PdfCriticalReviewController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
+    <Compile Include="Controllers\ReportsController.cs" />
     <Compile Include="Controllers\RosterController.cs" />
     <Compile Include="Controllers\RubricController.cs" />
     <Compile Include="Controllers\SchoolController.cs" />
@@ -1554,6 +1555,8 @@
     <Content Include="Views\Intervention\SuggestionsSettings.cshtml" />
     <Content Include="Views\PdfCriticalReviewHTTPS\Index.cshtml" />
     <Content Include="Views\PdfCriticalReviewHTTPS\Review.cshtml" />
+    <Content Include="Views\Reports\PostReplyCounts.cshtml" />
+    <Content Include="Views\Reports\PostReplyReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
