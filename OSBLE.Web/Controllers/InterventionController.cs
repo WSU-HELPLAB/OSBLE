@@ -1729,7 +1729,9 @@ namespace OSBLE.Controllers
                     //3) of type FeedPost or AskForHelp
                     //4) within the last numberOfDays
                     //5) MAY have replies, but does NOT have any Helpful marks
+                    //6) Posts is not soft deleted (in EventLogs, IsDeleted = 1 if deleted, null otherwise)
                     string query = "(SELECT Id FROM EventLogs WHERE (CourseId = @CourseId OR CourseId IS NULL) " +
+                                   "AND (IsDeleted IS NULL OR IsDeleted != 1) " +
                                    "AND EventTypeId IN (7, 1) AND EventDate >= DATEADD(day, -@NumberOfDays, GETDATE()) " +
                                    "AND SenderId IN  " +
                                    "(SELECT UserProfileID FROM CourseUsers WHERE AbstractCourseID = @CourseId AND AbstractRoleID NOT IN (1, 2)) " +
