@@ -286,13 +286,32 @@ namespace OSBLE.Controllers
                 }
             }
 
-            //and finally, retrieve our list of feed items
+            // retrieve our list of feed items
             int maxIdQuery = int.MaxValue;
+
+            //Get the Resolved post IDs and display them as [Resolved]
+            var allResolvedPostIds = DBHelper.GetResolvedPostIds();
+
+            //Intersect the Resolved post IDs & the top 20 return items ids
+            var topResolvedPostIds = allResolvedPostIds.Intersect(returnItems.Select(item => item.Event.EventLogId));
+
+            //Store in the ViewBag so the post ids can be accessed in FeedItems.cshtml
+            ViewBag.ResolvedPostIds = topResolvedPostIds;
 
             foreach (FeedItem f in returnItems)
             {
                 if (f.Event.EventId < maxIdQuery)
                     maxIdQuery = f.Event.EventId;
+
+                //The intersected query contains the feed item
+                if (topResolvedPostIds.Contains(f.Event.EventId))
+                {
+                    f.IsResolved = true;
+                }
+                else
+                {
+                    f.IsResolved = false;
+                }
             }
 
             vm.LastLogId = maxIdQuery - 1;
@@ -381,6 +400,8 @@ namespace OSBLE.Controllers
             return Json(1);
         }
 
+        /// <returns> Returns Active Course User's course user role as a string. </returns>
+        /// courtney-snyder
         [HttpPost]
         public string GetUserRole()
         {
@@ -524,6 +545,7 @@ namespace OSBLE.Controllers
                 CanDelete = eventLog.CanDelete,
                 CanReply = eventLog.CanReply,
                 IsHelpfulMark = item.PrettyName == EventType.HelpfulMarkGivenEvent.ToString().ToDisplayText(),
+                IsResolved = item.Items[0].IsResolved,
                 HighlightMark = false,
                 ShowPicture = eventLog.ShowProfilePicture,
                 Comments = comments,
@@ -842,6 +864,50 @@ namespace OSBLE.Controllers
                     isMarker
                 }, JsonRequestBehavior.AllowGet);
             }
+        }
+
+
+        /// <summary>
+        /// Updates the FeedPostEventFlags Table, MarkedResolved column.
+        /// </summary>
+        /// <param name="eventLogToMark"></param>
+        /// <param name="markerId"></param>
+        /// <returns></returns>
+        /// courtney-snyder
+        [HttpGet]
+        public void MarkResolvedPost(int eventLogToMark, bool isResolved, int markerId)
+        {
+            int logToMarkSenderId = DBHelper.GetActivityEvent(eventLogToMark).SenderId;
+
+            if (ActiveCourseUser != null && logToMarkSenderId == markerId)
+            {
+                markerId = ActiveCourseUser.UserProfileID;
+            }
+            
+            //Update the db
+            using (SqlConnection sqlc = DBHelper.GetNewConnection())
+            {
+                DBHelper.MarkFeedPostResolved(eventLogToMark, isResolved);
+            }
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <returns></returns>
+        /// courtney-snyder
+        [HttpGet]
+        public JsonResult IsPostResolved(int eventId)
+        {
+            return Json(new { boolResult = DBHelper.IsPostResolved(eventId) }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult GetResolvedPostIds()
+        {
+            return Json(new { idList = DBHelper.GetResolvedPostIds() }, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -1928,7 +1994,7 @@ namespace OSBLE.Controllers
                 canVote = e.CanVote,
                 showPicture = e.ShowProfilePicture,
                 eventVisibleTo = e.EventVisibleTo,
-                isAnonymous = e.IsAnonymous,
+                isAnonymous = e.IsAnonymous
             });
         }
 

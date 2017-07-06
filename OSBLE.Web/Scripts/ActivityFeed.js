@@ -85,6 +85,7 @@ function FeedItem(data) {
     };
 
     self.MarkCommentHelpful = function () {
+        debugger;
         $.ajax({
             url: "/Feed/MarkHelpfulComment",
             data: { eventLogToMark: self.eventId, markerId: self.activeCourseUserId },
@@ -97,6 +98,58 @@ function FeedItem(data) {
         });
     };
 
+    ///summary: Allow the Original Poster to mark their post as [Resolved] and toggle between [Mark as Resolved] and [Resolved].
+    //courtney-snyder
+    self.MarkPostResolved = function () {
+        debugger;
+        var isResolved;
+        //Get the Resolved status of the post
+        $.ajax({
+            url: "/Feed/IsPostResolved",
+            async: false,
+            data: { eventId: self.eventId },
+            dataType: "json",
+            method: "GET",
+            success: function (data) {
+                //isResolved: The Resolved state of the post before the click
+                isResolved = data.boolResult; //Boolean stored in a JSON object because you can't just return a Boolean (too easy)
+
+                //Since the purpose of the click is to toggle the current status of the post, pass in the inverse of isResolved
+                MarkResolvedSucceeded(self, !isResolved);
+            }
+        });
+        debugger;
+        //If the current value is false, switch to [Resolved] on click
+        if (!isResolved) {
+            $('#mark-as-resolved-' + self.eventId).val('Resolved');
+            var icon = "<span style='color:green' class='glyphicon glyphicon-check'></span>" + ' [Resolved]';
+            //Clear text
+            $('#mark-as-resolved-' + self.eventId).text("");
+            //Add the cute lil check
+            $('#mark-as-resolved-' + self.eventId).append(icon);
+        }
+
+        //And vice versa
+        else {
+            $('#mark-as-resolved-' + self.eventId).val('Unresolved');
+            var icon = "<span class='glyphicon glyphicon-unchecked'></span>" + ' [Mark as Resolved]';
+            //Clear text
+            $('#mark-as-resolved-' + self.eventId).text("");
+            //Add the sad lonely box
+            $('#mark-as-resolved-' + self.eventId).append(icon);
+        }
+    };
+
+    //
+    function MarkResolvedSucceeded(item, resolved) {
+        debugger;
+        $.ajax({
+            url: "/Feed/MarkResolvedPost", //Goes to MarkResolvedPost in FeedController
+            data: { eventLogToMark: item.eventId, isResolved: resolved, markerId: item.activeCourseUserId }, //Input params for MarkResolvedPost
+            method: "GET"
+        });
+    }
+    
     self.AddComment = function () {
         if (self.isComment)
             return;
@@ -259,6 +312,7 @@ function FeedViewModel(userName, userId, current) {
     }
 
     self.hub.client.addMarkHelpful = function (postID, replyPostID, numHelpfulMarks) {
+        debugger;
         var post = self.GetPost(postID);
         if (post != null) {
             var comment = post.GetComment(replyPostID);
@@ -398,6 +452,25 @@ function FeedViewModel(userName, userId, current) {
             },
             complete: function () {
                 HideLoading();
+                //Add Show Mark Resolved function
+                debugger;
+                $.ajax({
+                    url: "/Feed/GetResolvedPostIds",
+                    data: {},
+                    datatype: "JSON",
+                    success: function (data) {
+                        //Get all the Resolved Post Ids
+                        var idList = data.idList;
+                        for (var i = 0; i < idList.length; i++)
+                        {
+                            //Mark Feed Item as [Resolved]
+                            $('#mark-as-resolved-' + idList[i]).val("Resolved");
+                            var icon = "<span style='color:green' class='glyphicon glyphicon-check'></span>" + ' [Resolved]';
+                            $('#mark-as-resolved-' + idList[i]).text("");
+                            $('#mark-as-resolved-' + idList[i]).append(icon);
+                        }
+                    }
+                })
             }
         });
     };
@@ -1136,6 +1209,31 @@ function HideNewPostBadge(postID) {
     $('#feed-item-' + postID + ' .new-post-badge').hide();
 }
 
+//Summary: Gets if a post is marked as resolved by the OP or not
+//courtney-snyder
+function IsMarkedResolved(eventID) {
+    var isResolved;
+    //Get the Resolved status of the post
+    $.ajax({
+        url: "/Feed/IsPostResolved",
+        async: false,
+        data: { eventId: eventID },
+        dataType: "json",
+        method: "GET",
+        success: function (data) {
+            isResolved = data.boolResult; //Boolean stored in a JSON object because you can't just return a Boolean (too easy)
+        }
+    });
+    if (isResolved)
+    {
+        $('#feed-item-' + eventID).attr(('mark-as-resolved-' + eventID), "Resolved");
+    }
+    else
+    {
+        $('#feed-item-' + eventID).attr(('mark-as-resolved-' + eventID), "Unresolved");
+    }
+    return isResolved;
+}
 
 function ShowUserVisibilityDialog(item) {
     var namesAndIds = [];
@@ -1378,6 +1476,8 @@ function GetFeedPostContent(eventId, parentEventId) {
     return text;
 }
 
+//summary: Returns the current user's Course Role.
+//courtney-snyder
 function getUserRole() {
     var currentRole = "";
     $.ajax({

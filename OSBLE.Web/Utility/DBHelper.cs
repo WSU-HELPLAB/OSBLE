@@ -1191,7 +1191,7 @@ namespace OSBLE.Utility
                 }
             }
 
-            List<int> helpfulMarkEventIds = GetHelpfulMarksLogIds(eventLogId, connection);
+            var eventIds = GetHelpfulMarksLogIds(eventLogId, connection);
 
             // get the Log Comment ID
             int logId = connection.Query<int>("SELECT Id " +
@@ -1205,7 +1205,7 @@ namespace OSBLE.Utility
             // do not allow user to possibly mark their own comment as helpful
             if (logSenderId == markerId)
             {
-                return helpfulMarkEventIds.Count;
+                return eventIds.Count;
             }
 
             // get the Source Event Log ID
@@ -1238,7 +1238,7 @@ namespace OSBLE.Utility
             List<ActivityEvent> eventLogs =
                 connection.Query<ActivityEvent>("SELECT Id AS EventLogId, EventTypeId AS EventId, EventDate, DateReceived, SenderId, CourseId, SolutionName, IsDeleted " +
                                                 "FROM EventLogs " +
-                                                "WHERE Id IN @logId", new { logId = helpfulMarkEventIds }).ToList();
+                                                "WHERE Id IN @logId", new { logId = eventIds }).ToList();
 
 
 
@@ -1254,7 +1254,7 @@ namespace OSBLE.Utility
                 connection.Execute("DELETE FROM EventLogs " +
                    "WHERE Id = @senderEventId", new { senderEventId = senderEvent.EventLogId });
                 // do not execute insert string, just return number of marks
-                return helpfulMarkEventIds.Count - 1;
+                return eventIds.Count - 1;
             }
 
             try
@@ -1291,12 +1291,96 @@ namespace OSBLE.Utility
                     connection.Open();
                     cmd.ExecuteScalar();
                     connection.Close();
-                    return helpfulMarkEventIds.Count + 1;
+                    return 1;
                 }
             }
             catch (Exception ex)
             {
-                return helpfulMarkEventIds.Count;
+                return 10;
+            }
+        }
+
+        /// <summary>
+        /// Updates the FeedPostEventFlags db.
+        /// </summary>
+        /// <param name="eventLogId"> The event's identification number. In the EventLogs db, the column is just "Id". In
+        /// FeedPostEventFlags db, the column is FeedPostEventId. </param>
+        /// <param name="isResolved"> Boolean that determines whether the event has been marked as resolve or not. In
+        /// FeedPostEventFlags db, the column is MarkedResolved. </param>
+        /// courtney-snyder
+        public static void MarkFeedPostResolved(int eventLogId, bool isResolved)
+        {
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+
+                    string query = "SELECT * FROM FeedPostEventFlags WHERE FeedPostEventId = @EventLogId ";
+                    string updateQuery = "UPDATE FeedPostEventFlags SET MarkedResolved = @IsResolved WHERE FeedPostEventId = @EventLogId ";
+                    string insertQuery = "INSERT INTO FeedPostEventFlags (FeedPostEventId,MarkedResolved) VALUES (@EventLogId, @IsResolved) ";
+
+                    var result = sqlConnection.Query(query, new { EventLogId = eventLogId, IsResolved = isResolved }).FirstOrDefault();
+
+                    //If the post is already in the table, update the MarkResolved value
+                    if (result != null)
+                    {
+                        sqlConnection.Execute(updateQuery, new { EventLogId = eventLogId, IsResolved = isResolved });
+                    }
+
+                    //Otherwise, add the post to the table with the correct MarkResolved value
+                    else
+                    {
+                        sqlConnection.Execute(insertQuery, new { EventLogId = eventLogId, IsResolved = isResolved });
+                    }
+                }
+            }
+            
+            catch (Exception e)
+            {
+                //Nothing for now
+            }
+        }
+
+        /// <returns>
+        /// Returns a list of post IDs marked as "Resolved" from the FeedPostEventFlags db
+        /// </returns>
+        /// courtney-snyder
+        public static List<int> GetResolvedPostIds()
+        {
+            using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                sqlConnection.Open();
+                
+                //Get all Resolved posts
+                string query = "SELECT FeedPostEventId FROM FeedPostEventFlags WHERE MarkedResolved = 1 ";
+                List<int> resolvedPosts = sqlConnection.Query<int>(query).ToList();
+                return resolvedPosts;
+            }
+        }
+
+        /// <summary>
+        /// Takes the event ID and returns true (is Resolved) or false (is not Resolved).
+        /// </summary>
+        /// <param name="eventId"> The post's event ID. </param>
+        /// <returns> Returns true or false. </returns>
+        /// courtney-snyder
+        public static bool IsPostResolved(int eventId)
+        {
+            using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                sqlConnection.Open();
+
+                //Get the post with the given eventId and make sure it is marked as Resolved
+                string query = "SELECT * FROM FeedPostEventFlags WHERE FeedPostEventId = @EventLogId AND MarkedResolved = 1 ";
+                var result = sqlConnection.Query(query, new { EventLogId = eventId, IsResolved = 1 }).FirstOrDefault();
+                //If the query gives a result, the post with that eventId is Resolved
+                if (result != null)
+                {
+                    return true;
+                }
+                //Otherwise, that post is either not in the database or not resolved
+                return false;
             }
         }
 
