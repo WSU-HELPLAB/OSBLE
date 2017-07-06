@@ -102,7 +102,10 @@ namespace OSBLE.Controllers
                 //Even if the user has selected to save as draft,
                 //it should store the DatePublished to be displayed when the draft was last saved.
                 viewModel.Evaluation.IsPublished = false;
+                DateTime rubricPublished = (DateTime)viewModel.Evaluation.DatePublished;
                 viewModel.Evaluation.DatePublished = DateTime.UtcNow;
+
+                OSBLE.Utility.DBHelper.RemoveNotifications(viewModel.SelectedAssignment, teamId, ActiveCourseUser, rubricPublished);
             }
 
             string globalCommentKey = ViewBag.GlobalCommentId;

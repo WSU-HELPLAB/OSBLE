@@ -160,6 +160,11 @@
                             if (null != assignments[i].AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault())
                             {
                                 @: @assignments[i].GetPublishedCount() of @assignments[i].AssignmentTeams.Count published.&nbsp @Html.ActionLink("Grade Now", "Index", "Rubric", new { assignmentId = assignments[i].ID, cuId = assignments[i].AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID }, new { })<br />
+                                if (assignments[i].GetPublishedCount() > 0)
+                                {
+                                    @: @Html.ActionLink("Unpublish all rubrics", "UnPublishAllRubrics", "Assignment", new { area = "", assignmentId = assignments[i].ID }, new { }) <br /> 
+                                }
+                                
                             }
                             else
                             {
