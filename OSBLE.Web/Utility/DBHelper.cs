@@ -18,7 +18,7 @@ using OSBLE.Attributes;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Queries;
 using OSBLEPlus.Logic.Utility.Lookups;
-
+using OSBLE.Models;
 namespace OSBLE.Utility
 {
     /// <summary>
@@ -850,7 +850,7 @@ namespace OSBLE.Utility
                 return events;
             }
 
-            events = connection.Query<Event>("SELECT e.* FROM Events e INNER JOIN CourseUsers cu ON e.PosterID = cu.ID WHERE cu.AbstractCourseID = @cid AND e.StartDate >= @sd AND ( e.EndDate <= @ed OR e.EndDate is Null )AND e.Approved = '1'",
+            events = connection.Query<Event>("SELECT e.* FROM Events e INNER JOIN CourseUsers cu ON e.PosterID = cu.ID WHERE cu.AbstractCourseID = @cid AND e.StartDate >= @sd AND e.StartDate <= @ed AND e.Approved = '1'",
                 new { cid = courseID, sd = start, ed = end });
 
             return events;
@@ -1191,7 +1191,7 @@ namespace OSBLE.Utility
                 }
             }
 
-            List<int> helpfulMarkEventIds = GetHelpfulMarksLogIds(eventLogId, connection);
+            var eventIds = GetHelpfulMarksLogIds(eventLogId, connection);
 
             // get the Log Comment ID
             int logId = connection.Query<int>("SELECT Id " +
@@ -1205,7 +1205,7 @@ namespace OSBLE.Utility
             // do not allow user to possibly mark their own comment as helpful
             if (logSenderId == markerId)
             {
-                return helpfulMarkEventIds.Count;
+                return eventIds.Count;
             }
 
             // get the Source Event Log ID
@@ -1238,7 +1238,7 @@ namespace OSBLE.Utility
             List<ActivityEvent> eventLogs =
                 connection.Query<ActivityEvent>("SELECT Id AS EventLogId, EventTypeId AS EventId, EventDate, DateReceived, SenderId, CourseId, SolutionName, IsDeleted " +
                                                 "FROM EventLogs " +
-                                                "WHERE Id IN @logId", new { logId = helpfulMarkEventIds }).ToList();
+                                                "WHERE Id IN @logId", new { logId = eventIds }).ToList();
 
 
 
@@ -1254,7 +1254,7 @@ namespace OSBLE.Utility
                 connection.Execute("DELETE FROM EventLogs " +
                    "WHERE Id = @senderEventId", new { senderEventId = senderEvent.EventLogId });
                 // do not execute insert string, just return number of marks
-                return helpfulMarkEventIds.Count - 1;
+                return eventIds.Count - 1;
             }
 
             try
@@ -1291,12 +1291,180 @@ namespace OSBLE.Utility
                     connection.Open();
                     cmd.ExecuteScalar();
                     connection.Close();
-                    return helpfulMarkEventIds.Count + 1;
+                    return eventIds.Count + 1;
                 }
             }
             catch (Exception ex)
             {
-                return helpfulMarkEventIds.Count;
+                return eventIds.Count;
+            }
+        }
+
+        /// <summary>
+        /// Updates the FeedPostEventFlags db.
+        /// </summary>
+        /// <param name="eventLogId"> The event's identification number. In the EventLogs db, the column is just "Id". In
+        /// FeedPostEventFlags db, the column is FeedPostEventId. </param>
+        /// <param name="isResolved"> Boolean that determines whether the event has been marked as resolve or not. In
+        /// FeedPostEventFlags db, the column is MarkedResolved. </param>
+        /// courtney-snyder
+        public static void MarkFeedPostResolved(int eventLogId, bool isResolved)
+        {
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+
+                    string query = "SELECT * FROM FeedPostEventFlags WHERE FeedPostEventId = @EventLogId ";
+                    string updateQuery = "UPDATE FeedPostEventFlags SET MarkedResolved = @IsResolved WHERE FeedPostEventId = @EventLogId ";
+                    string insertQuery = "INSERT INTO FeedPostEventFlags (FeedPostEventId,MarkedResolved) VALUES (@EventLogId, @IsResolved) ";
+
+                    var result = sqlConnection.Query(query, new { EventLogId = eventLogId, IsResolved = isResolved }).FirstOrDefault();
+
+                    //If the post is already in the table, update the MarkResolved value
+                    if (result != null)
+                    {
+                        sqlConnection.Execute(updateQuery, new { EventLogId = eventLogId, IsResolved = isResolved });
+                    }
+
+                    //Otherwise, add the post to the table with the correct MarkResolved value
+                    else
+                    {
+                        sqlConnection.Execute(insertQuery, new { EventLogId = eventLogId, IsResolved = isResolved });
+                    }
+                }
+            }
+            
+            catch (Exception e)
+            {
+                //Nothing for now
+            }
+        }
+
+        /// <returns>
+        /// Returns a list of post IDs marked as "Resolved" from the FeedPostEventFlags db
+        /// </returns>
+        /// courtney-snyder
+        public static List<int> GetResolvedPostIds()
+        {
+            using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                sqlConnection.Open();
+                
+                //Get all Resolved posts
+                string query = "SELECT FeedPostEventId FROM FeedPostEventFlags WHERE MarkedResolved = 1 ";
+                List<int> resolvedPosts = sqlConnection.Query<int>(query).ToList();
+                return resolvedPosts;
+            }
+        }
+
+        /// <summary>
+        /// Takes the event ID and returns true (is Resolved) or false (is not Resolved).
+        /// </summary>
+        /// <param name="eventId"> The post's event ID. </param>
+        /// <returns> Returns true or false. </returns>
+        /// courtney-snyder
+        public static bool IsPostResolved(int eventId)
+        {
+            using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                sqlConnection.Open();
+
+                //Get the post with the given eventId and make sure it is marked as Resolved
+                string query = "SELECT * FROM FeedPostEventFlags WHERE FeedPostEventId = @EventLogId AND MarkedResolved = 1 ";
+                var result = sqlConnection.Query(query, new { EventLogId = eventId, IsResolved = 1 }).FirstOrDefault();
+                //If the query gives a result, the post with that eventId is Resolved
+                if (result != null)
+                {
+                    return true;
+                }
+                //Otherwise, that post is either not in the database or not resolved
+                return false;
+            }
+        }
+
+
+        /// <summary>
+        /// Finds all occurrences of the eventID in the FeedPostLikes table and returns the count.
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <returns></returns>
+        /// courtney-snyder
+        public static int GetPostLikeCount (int eventId)
+        {
+            using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                sqlConnection.Open();
+
+                //Get the post with the given eventId
+                string query = "SELECT * FROM FeedPostLikes WHERE EventLogId = @EventId ";
+                var result = sqlConnection.Query(query, new { EventId = eventId }).ToList();
+                //If the query gives a result, get the number of elements in the list
+                if (result != null)
+                {
+                    return result.Count;
+                }
+                //Otherwise, that post has no likes
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Checks to see if a user has already liked a post.
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <param name="senderId"></param>
+        /// <returns> True (has been liked by that user) or False (has not). </returns>
+        /// courtney-snyder
+        public static bool IsPostLikedByUser(int eventId, int senderId)
+        {
+            using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                sqlConnection.Open();
+
+                //Get the post with the given eventId and check if the user who clicked "Like" (senderId) has already liked the post
+                string query = "SELECT * FROM FeedPostLikes WHERE EventLogId = @InputEventLogId AND UserProfileId = @InputSenderId ";
+                var result = sqlConnection.Query(query, new { InputEventLogId = eventId, InputSenderId = senderId }).FirstOrDefault();
+                //If the query gives a result, that user has liked the post, so return true
+                if (result != null)
+                {
+                    return true;
+                }
+                //Otherwise, that post has not been liked by that user
+                return false;
+            }
+        }
+
+
+        /// <summary>
+        /// Updates the number of likes a post has by either adding a new row (like) or removing an existing column (unlike)
+        /// </summary>
+        /// <param name="eventId"> Item to be affected </param>
+        /// <param name="senderId"> Person liking or unliking </param>
+        /// courtney-snyder
+        public static void UpdatePostItemLikeCount(int eventId, int senderId)
+        {
+            using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                sqlConnection.Open();
+
+                string query = "SELECT * FROM FeedPostLikes WHERE EventLogId = @EventId AND UserProfileId = @SenderId ";
+                string deleteQuery = "DELETE FROM FeedPostLikes WHERE EventLogId = @EventId AND UserProfileId = @SenderId ";
+                string insertQuery = "INSERT INTO FeedPostLikes (EventLogId, UserProfileId) VALUES (@EventId, @SenderId) ";
+
+                var result = sqlConnection.Query(query, new { EventId = eventId, SenderId = senderId }).FirstOrDefault();
+
+                //If the user has not liked the event, add a row to the table
+                if (result == null)
+                {
+                    sqlConnection.Execute(insertQuery, new { EventId = eventId, SenderId = senderId });
+                }
+                //Otherwise the user has already liked this event and it is an "Unlike", so remove the like from the db
+                else
+                {
+                    sqlConnection.Execute(deleteQuery, new { EventId = eventId, SenderId = senderId });
+                }
             }
         }
 
@@ -1825,11 +1993,108 @@ namespace OSBLE.Utility
 
             return assignmentDict;
         }
+        /// <summary>
+        /// This runs a query to update a published rubric to make it unpublished 
+        /// </summary>
+        /// <param name="rubricID"></param>
+        /// <returns></returns>
+        internal static bool UnPublishRubric(int assignmentID, int rubricID)
+        {
+            string query;
+            bool didUpdate = false;
+            var sqlConnection = new SqlConnection(StringConstants.ConnectionString);
+
+            query = "UPDATE RubricEvaluations SET IsPublished=0, DatePublished=NULL WHERE ID=@rubricID AND AssignmentID=@assignmentID ;";
+
+            int temp = sqlConnection.Execute(query, new { rubricID = rubricID, assignmentID = assignmentID }); //temporary int to later conver to bool
+            didUpdate = Convert.ToBoolean(temp);
+            return didUpdate;
+        }
+        internal static bool UnPublishAllRubrics(int assignmentID)
+        {
+            string query;
+            bool didUpdate = false; ;
+            var sqlConnestion = new SqlConnection(StringConstants.ConnectionString);
+
+            query = "UPDATE RubricEvaluations SET IsPublished=0, DatePublished=NULL WHERE AssignmentID=@assignmentID;";
+
+            int temp = sqlConnestion.Execute(query, new { assignmentID = assignmentID });
+            didUpdate = Convert.ToBoolean(temp);
+            return didUpdate;
+        }
 
         #endregion
 
+        /// <summary>
+        /// Removes notifications for the published rubrics when the instructor unpublishes a rubric.
+        /// </summary>
+        /// <param name="assignment"></param>
+        /// <param name="teamID"></param>
+        /// <param name="instructor"></param>
+        /// <param name="rubricPublished"></param>
+        internal static void RemoveNotifications(Assignment assignment, int teamID, CourseUser instructor, DateTime rubricPublished)
+        {
+            string query = "";
+            string addMinutes;
+            string rubricPublishedString;
+
+            string  assignmentName = assignment.AssignmentName;
+            int TeamID = teamID;
+            int userID = instructor.ID;
+
+            DateTime addMinute = rubricPublished;
+            addMinute = addMinute.AddSeconds(7);
+
+            addMinutes = Convert.ToString(addMinute);
+
+            rubricPublishedString = Convert.ToString(rubricPublished);
+
+            rubricPublished = Convert.ToDateTime(rubricPublishedString);
+
+            addMinute = Convert.ToDateTime(addMinutes);
+
+            
 
 
+
+
+
+            var sqlConnection = new SqlConnection(StringConstants.ConnectionString);
+
+            query = "SELECT CourseUserID FROM TeamMembers WHERE TeamID=@TeamID;";
+
+            var RecipientID = sqlConnection.Query<int>(query, new { TeamID = TeamID }).FirstOrDefault();
+
+            RecipientID = Convert.ToInt32(RecipientID);
+
+            query = "DELETE FROM Notifications WHERE Data LIKE '%@assignmentName%' AND SenderID=@userID AND RecipientID=@RecipientID AND Posted BETWEEN @rubricPublished AND @addMinute;";
+            
+            var result = sqlConnection.Query(query, new { assignmentName = assignmentName, userID = userID, RecipientID = RecipientID, rubricPublished = rubricPublished, addMinute = addMinute }).FirstOrDefault();
+
+            
+
+
+        }
+
+        /// <summary>
+        /// Removes all notifications from the database for the given assignment. 
+        /// </summary>
+        /// <param name="assignmentID"></param>
+        /// <param name="instructorID"></param>
+        internal static void RemoveNotificationsForEntireAssignment(int assignmentID, int instructorID)
+        {
+            string query = "";
+            string assignmentName = GetAssignmentName(assignmentID);
+
+            
+            int userID = instructorID;
+
+            var sqlConnection = new SqlConnection(StringConstants.ConnectionString);
+
+            query = "DELETE FROM Notifications WHERE Data LIKE '%@assignmentName%' AND SenderID=@userID;";
+
+            var result = sqlConnection.Query(query, new { assignmentName = assignmentName, userID = userID });
+        }
         internal static void UpdateEventVisibleToList(int eventLogId, string updatedVisibilityList, SqlConnection connection = null)
         {
             if (connection == null)

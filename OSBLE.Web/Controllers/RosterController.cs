@@ -314,9 +314,14 @@ namespace OSBLE.Controllers
         [NotForCommunity]
         public ActionResult ApplyRoster(string idColumn, string sectionColumn, string nameColumn, string name2Column, string emailColumn)
         {
+            //Minimum info: ID
+            //Optional info: First Name, Last Name, Section and Username/Email
+
             byte[] rosterContent = (byte[])Cache["RosterFile"];
             int rosterCount = 0;
             int wtCount = 0;
+            bool hasSectionColumn = !String.IsNullOrEmpty(sectionColumn);
+            bool hasEmailColumn = !String.IsNullOrEmpty(emailColumn);
 
             if ((rosterContent != null) && (idColumn != null) && (nameColumn != null))
             {
@@ -364,6 +369,10 @@ namespace OSBLE.Controllers
                                     &&
                                     c.AbstractRoleID == (int)CourseRole.CourseRoles.Student
                                     select c;
+
+                    //Get all students in the course
+                    List<CourseUser> otherStudents = db.CourseUsers.Where(c => c.AbstractCourseID == ActiveCourseUser.AbstractCourseID && c.AbstractRoleID == (int)CourseRole.CourseRoles.Student).ToList();
+
                     List<UserProfile> orphans = oldRoster.Select(cu => cu.UserProfile).ToList();
                     List<CourseUser> newRoster = new List<CourseUser>();
                     List<WhiteTable> newTable = new List<WhiteTable>();
@@ -375,46 +384,169 @@ namespace OSBLE.Controllers
 
                     foreach (RosterEntry entry in rosterEntries)
                     {
-
                         UserProfile userWithAccount = getEntryUserProfile(entry);
-
-
                         if (userWithAccount != null)
                         {
                             CourseUser userIsPending = getPendingUserOnRoster(entry);
+                            CourseUser existingCourseUser = getCourseUser(userWithAccount.ID);
+                            
                             if (userIsPending != null)
                             {
                                 userIsPending.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
                                 userIsPending.Hidden = false; //IMPORTANT; Pending users have hidden = true from RequestCourseJoin
-                                userIsPending.Section = entry.Section;
+
+                                //If the roster has section info in it, update the section
+                                if (hasSectionColumn && (String.IsNullOrEmpty(userIsPending.Section.ToString()) || userIsPending.Section != entry.Section))
+                                {
+                                    userIsPending.Section = entry.Section;
+                                }
+
+                                //Else, leave the Section alone (default is Section 0)
+                                
+
+                                /*Leave emails alone for now (too easy for instructors to enter them wrong) but may be useful
+                                  in the future?
+
+                                //If the roster has email info in it, update the email and username (they are the same)
+                                if (hasEmailColumn)
+                                {
+                                    string currentEmail = userIsPending.UserProfile.Email;
+                                    string currentUserName = userIsPending.UserProfile.UserName;
+                                    string rosterEmail = entry.Email;
+                                    if (String.Compare(currentEmail, rosterEmail) != 0)
+                                    {
+                                        userIsPending.UserProfile.Email = rosterEmail;
+                                    }
+                                    if (String.Compare(currentUserName, rosterEmail != 0)
+                                    {
+                                        userIsPending.UserProfile.UserName = rosterEmail;
+                                    }
+                                    userIsPending.UserProfile.UserName = hasEmailColumn ? hasSectionColumn : 
+                                }
+                                */
+
                                 orphans.Remove(userIsPending.UserProfile); 
                                 db.Entry(userIsPending).State = EntityState.Modified;
                                 continue;
                             }
-                            CourseUser existingUser = new CourseUser();
 
-                            //yc: before using create course user, you must set the following
-                            existingUser.UserProfile = userWithAccount;
-                            existingUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+                            //If the student is in a course already
+                            else if (existingCourseUser != null)
+                            {
+                                //existingCourseUser.UserProfile = userWithAccount;
+                                //existingCourseUser.UserProfile.Identification = entry.Identification;
+                                
+                                int oldSection = existingCourseUser.Section;
 
-                            newRoster.Add(existingUser);
+                                bool userInCourse = otherStudents.Contains(existingCourseUser) ? true : false;
 
-                            //add section if a section column exists
-                            if (sectionColumn != "")
-                                existingUser.Section = entry.Section;
+                                //If the student is in the current course already, update their info
+                                if (userInCourse)
+                                {
+                                    db.CourseUsers.Attach(existingCourseUser);
+                                    if (hasSectionColumn && (String.IsNullOrEmpty(existingCourseUser.Section.ToString()) || existingCourseUser.Section != entry.Section))
+                                    {
+                                        //Update section in DB if necessary
+                                        existingCourseUser.Section = entry.Section;
+                                    }
+                                    if (String.IsNullOrEmpty(existingCourseUser.MultiSection))
+                                    {
+                                        existingCourseUser.MultiSection = existingCourseUser.Section.ToString() + ",";
+                                    }
 
-                            createCourseUser(existingUser);
-                            rosterCount++;
-                            //email the user notifying them that they have been added to this course 
-                            if (entry != null && !String.IsNullOrEmpty(entry.Email))
-                                emailCourseUser(existingUser);
+                                    else
+                                    {
+                                        //Remove the old section from MultiSection
+                                        if (existingCourseUser.MultiSection.Contains(oldSection.ToString()))
+                                        {
+                                            //Get the length of the old section PLUS the comma after it
+                                            int lengthOfOldSection = oldSection.ToString().Length + 1;
+                                            //Get the index of where the old section is
+                                            var indexOfOldSection = existingCourseUser.MultiSection.IndexOf(oldSection.ToString());
+                                            //Remove the old section and its following comma
+                                            existingCourseUser.MultiSection = existingCourseUser.MultiSection.Remove(indexOfOldSection, lengthOfOldSection);
+                                        }
+                                        existingCourseUser.MultiSection += entry.Section.ToString() + ",";
+                                    }
+                                    db.SaveChanges();
+                                    orphans.Remove(existingCourseUser.UserProfile);
+                                }
 
+                                //Otherwise, use their CourseUser info to create a course user for the current course
+                                else
+                                {
+                                    CourseUser newCourseUser = new CourseUser(existingCourseUser);
+                                    newCourseUser.AbstractCourseID = ActiveCourseUser.AbstractCourseID; //Add them to the course
+                                    newCourseUser.UserProfile = userWithAccount;
+                                    db.CourseUsers.Add(newCourseUser);
 
+                                    //If the roster has section info in it, update the section
+                                    if (hasSectionColumn && (String.IsNullOrEmpty(newCourseUser.Section.ToString()) || newCourseUser.Section != entry.Section))
+                                    {
+                                        newCourseUser.Section = entry.Section;
+                                    }
 
-                            orphans.Remove(existingUser.UserProfile);
+                                    //Else, leave the Section alone (default is Section 0)
 
+                                    if (String.IsNullOrEmpty(newCourseUser.MultiSection))
+                                    {
+                                        newCourseUser.MultiSection = newCourseUser.Section.ToString() + ",";
+                                    }
 
+                                    else
+                                    {
+                                        //Remove the old section from MultiSection
+                                        if (newCourseUser.MultiSection.Contains(oldSection.ToString()))
+                                        {
+                                            //Get the length of the old section PLUS the comma after it
+                                            int lengthOfOldSection = oldSection.ToString().Length + 1;
+                                            //Get the index of where the old section is
+                                            var indexOfOldSection = existingCourseUser.MultiSection.IndexOf(oldSection.ToString());
+                                            //Remove the old section and its following comma
+                                            existingCourseUser.MultiSection = existingCourseUser.MultiSection.Remove(indexOfOldSection, lengthOfOldSection);
+                                        }
+                                        newCourseUser.MultiSection += entry.Section.ToString() + ",";
+                                    }
+                                    db.SaveChanges();
+                                    orphans.Remove(newCourseUser.UserProfile);
+                                    emailCourseUser(newCourseUser);
+                                }
+                                rosterCount++;
+                            }
+
+                            //The student is not in this course or any other courses (first time users)
+                            else
+                            {
+                                CourseUser existingUser = new CourseUser();
+
+                                //yc: before using create course user, you must set the following
+                                existingUser.UserProfile = userWithAccount;
+                                existingUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
+
+                                //cs: Must set User Profile ID for future lookups
+                                existingUser.AbstractCourseID = ActiveCourseUser.AbstractCourseID;
+                                existingUser.UserProfileID = Convert.ToInt32(entry.Identification);
+                                
+                                //add section if a section column exists
+                                if (sectionColumn != "")
+                                {
+                                    existingUser.Section = entry.Section;
+                                    existingUser.MultiSection = existingUser.Section.ToString() + ",";
+                                }
+
+                                newRoster.Add(existingUser);
+
+                                createCourseUser(existingUser);
+                                rosterCount++;
+                                
+                                //email the user notifying them that they have been added to this course 
+                                if (entry != null && !String.IsNullOrEmpty(entry.Email))
+                                    emailCourseUser(existingUser);
+
+                                orphans.Remove(existingUser.UserProfile);
+                            }
                         }
+
                         //else the entry does not have a user profile, so WT them 
                         else
                         {
@@ -549,8 +681,14 @@ namespace OSBLE.Controllers
         {
             var SchoolID = Request.Form["CurrentlySelectedSchool"];
             var AbstractRoleID = Request.Form["CurrentlySelectedAbstractRoleID"];
+            var Section = Request.Form["Section"];
+            var UserProfileID = Request.Form["UserProfile.Identification"];
+            //var keys = Request.Form.Keys;
             bool emptySchoolID = string.IsNullOrEmpty(SchoolID) ? true : false;
             bool emptyAbstractRoleID = string.IsNullOrEmpty(AbstractRoleID) ? true : false;
+            bool emptySection = string.IsNullOrEmpty(Section) ? true : false;
+            bool emptyUserProfileID = string.IsNullOrEmpty(UserProfileID) ? true : false;
+
             if (emptySchoolID || emptyAbstractRoleID) //If one or both of these fields is missing, do not add the user
             {
                 if (emptySchoolID && courseuser.UserProfile.SchoolID == 0) //If only the Abstract Role is missing, this message is not displayed
@@ -603,6 +741,11 @@ namespace OSBLE.Controllers
                 {
                     courseuser.UserProfile.SchoolID = Convert.ToInt32(SchoolID);
                 }
+                if (courseuser.UserProfileID == 0)
+                {
+                    courseuser.UserProfileID = Convert.ToInt32(UserProfileID);
+                }
+                courseuser.Section = Convert.ToInt32(Section);
             }
             //if modelState isValid
             if (ModelState.IsValid && courseuser.AbstractRoleID != 0)
@@ -1661,14 +1804,13 @@ namespace OSBLE.Controllers
         /// <param name="courseuser">It must have section, role set, and a reference to UserProfile with Identification set</param>
         private void createCourseUser(CourseUser courseuser)
         {
-            //This will return a user if they exist already or null if they don't
-
-
-            var user = (from c in db.UserProfiles
+            //This will return a user profile if they exist already or null if they don't
+            var userProfile = (from c in db.UserProfiles
                         where c.Identification == courseuser.UserProfile.Identification
                         && c.SchoolID == courseuser.UserProfile.SchoolID
                         select c).FirstOrDefault();
-            if (user == null)
+
+            if (userProfile == null)
             {
 
                 throw new Exception("No user exists with that Student ID!");
@@ -1699,17 +1841,34 @@ namespace OSBLE.Controllers
                 //courseuser.UserProfileID = up.ID;
                 //courseuser.AbstractCourseID = ActiveCourseUser.AbstractCourseID;
             }
-            else //If the CourseUser already has a UserProfile..
+            else //The CourseUser has a UserProfile.
             {
-                if (courseuser.UserProfile.FirstName != null)
+                //Check if the user is currently in the course
+                int intID = Convert.ToInt32(ActiveCourseUser.AbstractCourseID);
+                var currentCourse = (from c in db.Courses
+                                     where c.ID == intID
+                                     select c).FirstOrDefault();
+                courseuser.UserProfile = userProfile;
+                
+                //Get all students in the course
+                List<CourseUser> studentsInCourse = db.CourseUsers.Where(c => c.AbstractCourseID == ActiveCourseUser.AbstractCourseID && c.AbstractRoleID == (int)CourseRole.CourseRoles.Student).ToList();
+                var allCourseUsers = DBHelper.GetAllCourseUsersFromCourseId(currentCourse.ID).ToList();
+
+                //If the student isn't currently in the course, add them
+                if (!studentsInCourse.Contains(courseuser))
                 {
-                    user.FirstName = courseuser.UserProfile.FirstName;
-                    user.LastName = courseuser.UserProfile.LastName;
+                    
+                    if (courseuser.UserProfile.FirstName != null)
+                    {
+                        userProfile.FirstName = courseuser.UserProfile.FirstName;
+                        userProfile.LastName = courseuser.UserProfile.LastName;
+                        db.SaveChanges();
+                    }
+                    courseuser.UserProfile = userProfile;
+                    courseuser.UserProfileID = Convert.ToInt32(courseuser.UserProfile.Identification);
                     db.SaveChanges();
                 }
-                courseuser.UserProfile = user;
-                courseuser.UserProfileID = user.ID;
-                db.SaveChanges();
+                
             }
             courseuser.AbstractCourseID = ActiveCourseUser.AbstractCourseID;
             //Check uniqueness before adding the CourseUser and adding them to the Teams

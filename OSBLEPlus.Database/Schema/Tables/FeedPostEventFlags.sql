@@ -1,0 +1,9 @@
+﻿CREATE TABLE [dbo].[FeedPostEventFlags](
+	[FeedPostEventId] [int] NOT NULL,
+	[MarkedResolved] [bit] NOT NULL,
+ CONSTRAINT [PK_FeedPostEventFlags] PRIMARY KEY CLUSTERED 
+(
+	[FeedPostEventId] ASC,
+	[MarkedResolved] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]

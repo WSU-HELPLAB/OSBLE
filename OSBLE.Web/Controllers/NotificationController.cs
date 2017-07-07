@@ -79,7 +79,10 @@ namespace OSBLE.Controllers
                         case Notification.Types.InlineReviewCompleted:
                             return RedirectToAction("Details", "PeerReview", new { ID = n.ItemID });
                         case Notification.Types.RubricEvaluationCompleted:
-                            return RedirectToAction("View", "Rubric", new { assignmentId = n.ItemID, teamId = n.SenderID });
+                            return RedirectToAction("View", "Rubric", new { assignmentId = n.ItemID, cuID = n.RecipientID });
+                        case "CriticalReview":
+                            string[] splitArray = n.Data.Split(';');
+                            return RedirectToAction("ViewForCriticalReview", "Rubric", new { assignmentId = n.ItemID, authorTeamId = splitArray[3] });
                         case Notification.Types.TeamEvaluationDiscrepancy:
                             //n.Data = PrecedingTeamId + ";" + TeamEvaluationAssignment.ID;
                             int precteamId = 0;
@@ -353,16 +356,35 @@ namespace OSBLE.Controllers
         [NonAction]
         public void SendRubricEvaluationCompletedNotification(Assignment assignment, Team team)
         {
-            foreach (TeamMember member in team.TeamMembers)
-            {
-                Notification n = new Notification();
-                n.ItemType = Notification.Types.RubricEvaluationCompleted;
-                n.Data = assignment.ID.ToString() + ";" + member.CourseUserID + ";" + assignment.AssignmentName;
 
-                n.RecipientID = member.CourseUser.ID;
-                n.SenderID = ActiveCourseUser.ID;
-                addNotification(n);
+            if (assignment.Type == AssignmentTypes.CriticalReview)
+            {
+                foreach (TeamMember member in team.TeamMembers)
+                {
+                    Notification n = new Notification();
+                    n.ItemType = "CriticalReview";
+                    n.Data = assignment.ID.ToString() + ";" + member.CourseUserID + ";" + assignment.AssignmentName + ";" + team.ID;
+                    n.ItemID = assignment.ID;
+                    n.RecipientID = member.CourseUser.ID;
+                    n.SenderID = ActiveCourseUser.ID;
+                    addNotification(n);
+                }
             }
+
+            else
+            {
+                foreach (TeamMember member in team.TeamMembers)
+                {
+                    Notification n = new Notification();
+                    n.ItemType = Notification.Types.RubricEvaluationCompleted;
+                    n.Data = assignment.ID.ToString() + ";" + member.CourseUserID + ";" + assignment.AssignmentName;
+                    n.ItemID = assignment.ID;
+                    n.RecipientID = member.CourseUser.ID;
+                    n.SenderID = ActiveCourseUser.ID;
+                    addNotification(n);
+                }
+            }
+            
         }
 
         /// <summary>
@@ -538,7 +560,16 @@ namespace OSBLE.Controllers
                     case Notification.Types.RubricEvaluationCompleted:
                         subject += " - " + sender.FirstName + " " + sender.LastName;
 
-                        body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
+                        body = sender.FirstName + " " + sender.LastName + " has published a rubric for your assignment."; //Can we get name of assignment?
+
+                        action = "view this assignment submission.";
+
+                        break;
+
+                    case "CriticalReview":
+                        subject += " - " + sender.FirstName + " " + sender.LastName;
+
+                        body = sender.FirstName + " " + sender.LastName + " has published a critical review for your assignment."; //Can we get name of assignment?
 
                         action = "view this assignment submission.";
 

@@ -30,11 +30,11 @@
                 <div class="badge new-reply-badge" style="display:none">New Replies</div>
                 <div class="badge new-post-badge" style="display:none" data-bind="click: HideNewPostBadge(eventId)">New</div>
             }
-            
+
             @* Button Controls *@
             <div class="dp_tools">
-                
-                @* Mark as Helpful Button *@
+
+                @* Mark as Helpful Button (for comments)*@
                 @if (isComment)
                 {
                     <span>+</span>
@@ -43,6 +43,21 @@
                     @* Don't allow self upvoting *@
                     <div data-bind="if: options.canVote">
                         <a title="Mark Comment as Helpful" data-bind="click: MarkCommentHelpful, css: { 'icon-highlight' : highlightMark() == true }">
+                            <span class="glyphicon glyphicon-thumbs-up"></span>
+                        </a>
+                    </div>
+                }
+                @* 
+                courtney-snyder
+                Like Button (for feed posts)
+                *@
+                else if (!isComment)
+                {
+                    <span data-bind="attr: {id: 'feed-post-' + eventId + '-likes'}"> + </span>
+
+                    @* Don't allow self upvoting *@
+                    <div data-bind="ifnot: options.canEdit">
+                        <a title="Like Post" data-bind="click: LikeFeedPost, css: { 'icon-highlight' : highlightMark() == true }">
                             <span class="glyphicon glyphicon-thumbs-up"></span>
                         </a>
                     </div>
@@ -63,16 +78,28 @@
                     <a title="Edit this post" data-bind="click: ShowEditBox, attr: {id: 'btn-edit-' + eventId}"><span class="glyphicon glyphicon-pencil"></span></a>
                 </div>
 
-                @* Upvote Button *@
-                <!-- <div data-bind="if: options.canVote">
-                    <a title="Upvote" data-bind="click: MarkCommentHelpful, css: { 'icon-highlight' : highlightMark() == true }">
-                        <span class="glyphicon glyphicon-chevron-up"></span>
-                    </a>
+                
+                @* 
+                courtney-snyder
+                Mark as Resolved/Resolved 
+                *@
+                <div data-bind="if: options.canEdit">
+                    @if (!isComment)
+                    {
+                        //OP will see an anchor link version of "Mark As Resolved"
+                        <a data-bind="click: MarkPostResolved, attr: {id: 'mark-as-resolved-' + eventId}" style="color:black;"><span class="glyphicon glyphicon-unchecked"></span> [Mark as Resolved] </a>
+                    }
                 </div>
-
-                 <div data-bind="if: options.canVote">
-                    <a title="Upvote this post"> <span class="glyphicon glyphicon-chevron-up"> </span> </a>
-                </div> -->
+                <div data-bind="ifnot: options.canEdit">
+                    @if (!isComment)
+                    {
+                        //Everyone else will see Resolved IF the post value is Resolved
+                        <div data-bind="if: IsMarkedResolved(eventId)">
+                            <strong style="color:black"> <span class="glyphicon glyphicon-check" style="color:green" ></span> Resolved </strong>
+                        </div>
+                        //Otherwise, they will see nothing
+                    }
+                </div>
             </div>
 
             @* Display Name & Date/Time *@
@@ -92,14 +119,13 @@
                 <span class="display_name" style="color: #074974;" data-bind=" text: senderName"></span>
                 <!-- /ko -->
             }
-                        
+
             <span class="feed-item-date" data-bind="text: timeString()"></span>
 
             @if (!isComment)
             {
                 @*Post visibility area*@
-                <a 
-                   data-bind="attr: { title: 'Post Visibility: (' + vm.EventVisibilityGroups(options.eventVisibilityGroups) + ')' +  buildTitleOutput(options.eventVisibleTo, vm.namesAndIds) }, click:  (vm.EventVisibilityGroups(options.eventVisibilityGroups) != 'EVERYONE') ? ShowUserVisibilityDialog : '' "
+                <a data-bind="attr: { title: 'Post Visibility: (' + vm.EventVisibilityGroups(options.eventVisibilityGroups) + ')' +  buildTitleOutput(options.eventVisibleTo, vm.namesAndIds) }, click:  (vm.EventVisibilityGroups(options.eventVisibilityGroups) != 'EVERYONE') ? ShowUserVisibilityDialog : '' "
                    style=" padding-left: 5px; padding-right: 5px;">
                     <!-- ko switch: options.eventVisibilityGroups -->
                     <!-- ko case: $default -->
@@ -167,7 +193,7 @@
                     {
                         @* View Conversation Link *@
                         <li>
-                            <a data-bind="attr: {id: 'expand-comments-' + eventId}, click: expandComments" class="anchor-pointer" >
+                            <a data-bind="attr: {id: 'expand-comments-' + eventId}, click: expandComments" class="anchor-pointer">
                                 <span data-bind="attr: {id: 'expand-comments-text-' + eventId}">View</span> Replies (<span data-bind="text: comments().length"></span>)
                             </a>
                         </li>

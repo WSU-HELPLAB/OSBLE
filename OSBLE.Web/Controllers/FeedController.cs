@@ -286,13 +286,32 @@ namespace OSBLE.Controllers
                 }
             }
 
-            //and finally, retrieve our list of feed items
+            // retrieve our list of feed items
             int maxIdQuery = int.MaxValue;
+
+            //Get the Resolved post IDs and display them as [Resolved]
+            var allResolvedPostIds = DBHelper.GetResolvedPostIds();
+
+            //Intersect the Resolved post IDs & the top 20 return items ids
+            var topResolvedPostIds = allResolvedPostIds.Intersect(returnItems.Select(item => item.Event.EventLogId));
+
+            //Store in the ViewBag so the post ids can be accessed in FeedItems.cshtml
+            ViewBag.ResolvedPostIds = topResolvedPostIds;
 
             foreach (FeedItem f in returnItems)
             {
                 if (f.Event.EventId < maxIdQuery)
                     maxIdQuery = f.Event.EventId;
+
+                //The intersected query contains the feed item
+                if (topResolvedPostIds.Contains(f.Event.EventId))
+                {
+                    f.IsResolved = true;
+                }
+                else
+                {
+                    f.IsResolved = false;
+                }
             }
 
             vm.LastLogId = maxIdQuery - 1;
@@ -381,6 +400,8 @@ namespace OSBLE.Controllers
             return Json(1);
         }
 
+        /// <returns> Returns Active Course User's course user role as a string. </returns>
+        /// courtney-snyder
         [HttpPost]
         public string GetUserRole()
         {
@@ -524,6 +545,7 @@ namespace OSBLE.Controllers
                 CanDelete = eventLog.CanDelete,
                 CanReply = eventLog.CanReply,
                 IsHelpfulMark = item.PrettyName == EventType.HelpfulMarkGivenEvent.ToString().ToDisplayText(),
+                IsResolved = item.Items[0].IsResolved,
                 HighlightMark = false,
                 ShowPicture = eventLog.ShowProfilePicture,
                 Comments = comments,
@@ -822,6 +844,12 @@ namespace OSBLE.Controllers
             }
         }
 
+        /// <summary>
+        /// Allows other users to mark replies to the original post as "Helpful"
+        /// </summary>
+        /// <param name="eventLogToMark"></param>
+        /// <param name="markerId"></param>
+        /// <returns></returns>
         [HttpGet]
         public JsonResult MarkHelpfulComment(int eventLogToMark, int markerId)
         {
@@ -842,6 +870,116 @@ namespace OSBLE.Controllers
                     isMarker
                 }, JsonRequestBehavior.AllowGet);
             }
+        }
+
+        /// <summary>
+        /// Allows other users to like the actual feed item (not including replies)
+        /// </summary>
+        /// <param name="eventLogId"> Id of the feed post being liked </param>
+        /// <param name="senderId"> Id of the person "liking" the feed post </param>
+        /// <returns></returns>
+        /// courtney-snyder
+        [HttpGet]
+        public JsonResult LikeFeedPost (int eventLogId, int senderId)
+        {
+            int logToMarkSenderId = DBHelper.GetActivityEvent(eventLogId).SenderId;
+
+            if (ActiveCourseUser != null && logToMarkSenderId == senderId)
+            {
+                senderId = ActiveCourseUser.UserProfileID;
+            }
+
+            using (SqlConnection sqlc = DBHelper.GetNewConnection())
+            {
+                int helpfulMarks = DBHelper.GetPostLikeCount(eventLogId);
+                bool isMarker = DBHelper.UserMarkedLog(senderId, eventLogId, sqlc); // markerId is the CU
+                return Json(new
+                {
+                    helpfulMarks,
+                    isMarker
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        /// <summary>
+        /// Updates the FeedPostEventFlags Table, MarkedResolved column.
+        /// </summary>
+        /// <param name="eventLogToMark"></param>
+        /// <param name="markerId"></param>
+        /// <returns></returns>
+        /// courtney-snyder
+        [HttpGet]
+        public void MarkResolvedPost(int eventLogToMark, bool isResolved, int markerId)
+        {
+            int logToMarkSenderId = DBHelper.GetActivityEvent(eventLogToMark).SenderId;
+
+            if (ActiveCourseUser != null && logToMarkSenderId == markerId)
+            {
+                markerId = ActiveCourseUser.UserProfileID;
+            }
+            
+            //Update the db
+            using (SqlConnection sqlc = DBHelper.GetNewConnection())
+            {
+                DBHelper.MarkFeedPostResolved(eventLogToMark, isResolved);
+            }
+        }
+
+        /// <summary>
+        /// Calls the DBHelper method "IsPostResolved" and returns the bool result to the AJAX call in a JSON object
+        /// because you cannot return normal booleans for some reason.
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <returns> JSON Object containing boolean result </returns>
+        /// courtney-snyder
+        [HttpGet]
+        public JsonResult IsPostResolved(int eventId)
+        {
+            return Json(new { boolResult = DBHelper.IsPostResolved(eventId) }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Calls the DBHelper method "GetPostLikeCount" and returns it to the AJAX call.
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <param name="senderId"></param>
+        /// <returns> JSON Object containing number of likes </returns>
+        /// courtney-snyder
+        [HttpGet]
+        public JsonResult GetPostLikeCount (int eventId)
+        {
+            return Json(new { numberOfLikes = DBHelper.GetPostLikeCount(eventId) }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Checks the DB to see if that user liked the post
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <param name="senderId"></param>
+        /// <returns>JSON Object containing thte boolean result </returns>
+        /// courtney-snyder
+        [HttpGet]
+        public JsonResult IsPostLikedByUser (int eventId, int senderId)
+        {
+            return Json(new { boolResult = DBHelper.IsPostLikedByUser(eventId, senderId) }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Inserts new row into FeedPostLikes db.
+        /// </summary>
+        /// <param name="eventId"> Item to add like to/remove like from </param>
+        /// <param name="senderId"> Person liking/unliking that item </param>
+        /// courtney-snyder
+        [HttpGet]
+        public void UpdatePostItemLikeCount(int eventId, int senderId)
+        {
+            DBHelper.UpdatePostItemLikeCount(eventId, senderId);
+        }
+
+        [HttpGet]
+        public JsonResult GetResolvedPostIds()
+        {
+            return Json(new { idList = DBHelper.GetResolvedPostIds() }, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -1928,7 +2066,7 @@ namespace OSBLE.Controllers
                 canVote = e.CanVote,
                 showPicture = e.ShowProfilePicture,
                 eventVisibleTo = e.EventVisibleTo,
-                isAnonymous = e.IsAnonymous,
+                isAnonymous = e.IsAnonymous
             });
         }
 

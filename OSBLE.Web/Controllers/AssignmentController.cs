@@ -376,8 +376,21 @@ namespace OSBLE.Controllers
             }
             return Redirect(Request.UrlReferrer.ToString());
         }
-
-
+        /// <summary>
+        /// Unpublishes all rubrics for the selected assignment and removes the notifications sent for the assignment
+        /// </summary>
+        /// <param name="assignmentId"></param>
+        /// <returns></returns>
+        [CanGradeCourse]
+        public ActionResult UnPublishAllRubrics(int assignmentId)
+        {
+            if(assignmentId > 0)
+            {
+                DBHelper.UnPublishAllRubrics(assignmentId);
+                DBHelper.RemoveNotificationsForEntireAssignment(assignmentId, ActiveCourseUser.ID);
+            }
+            return Redirect(Request.UrlReferrer.ToString());
+        }
         
         /// <summary>
         /// This will display the team evaluations to the teacher. 
