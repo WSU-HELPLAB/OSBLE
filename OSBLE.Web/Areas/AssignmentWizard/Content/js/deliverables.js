@@ -10,36 +10,7 @@ var deliverableIndex = 0;
 
 // onLoad
 $(function () {
-    $('#add_new_deliverable').click(function () {
-
-        //clear validation formatting
-        clearValidation();
-
-        //check if a pluginSubmission has already been added
-        var pluginSubmission = false;
-        $(".deliverable td:contains('PluginSubmission (.zip)')").each(function () {
-            pluginSubmission = true;
-        });
-
-        //get dropdown value
-        var deliverableType = $("#new_deliverable_type :selected").text();        
-        var otherSubmissions = false;
-        //if dropdown is plugin, check to make sure there are no other submissions, we want to limit plugin submissions to 1 deliverable.
-        if (deliverableType == "PluginSubmission (.zip)") {
-            $("#deliverable_data").children().each(function () {
-                otherSubmissions = true;
-            });
-        }                    
-       
-        if (pluginSubmission || otherSubmissions) {
-            $("#plugin_submission_validation").prop('hidden', false);
-            $("#plugin_submission_validation_div").addClass("disabled");            
-        }        
-        else {
-            addNewDeliverable(true);
-        }        
-        return false;
-    });
+    $('#add_new_deliverable').click(tryAddNewDeliverable);
 
     $('#new_deliverable_name').keypress(deliverableFormSubmit);
 
@@ -72,6 +43,37 @@ $(function () {
     }
 });
 
+function tryAddNewDeliverable() {
+
+    //clear validation formatting
+    clearValidation();
+
+    //check if a pluginSubmission has already been added
+    var pluginSubmission = false;
+    $(".deliverable td:contains('PluginSubmission (.zip)')").each(function () {
+        pluginSubmission = true;
+    });
+
+    //get dropdown value
+    var deliverableType = $("#new_deliverable_type :selected").text();
+    var otherSubmissions = false;
+    //if dropdown is plugin, check to make sure there are no other submissions, we want to limit plugin submissions to 1 deliverable.
+    if (deliverableType == "PluginSubmission (.zip)") {
+        $("#deliverable_data").children().each(function () {
+            otherSubmissions = true;
+        });
+    }
+
+    if (pluginSubmission || otherSubmissions) {
+        $("#plugin_submission_validation").prop('hidden', false);
+        $("#plugin_submission_validation_div").addClass("disabled");
+    }
+    else {
+        addNewDeliverable(true);
+    }
+    return false;
+}
+
 function clearValidation() {
     $("#new_deliverable_validation").prop('hidden', true);
     $("#new_deliverable_name").removeClass("disabled");
@@ -103,7 +105,7 @@ function noDeliverables() {
 
 function deliverableFormSubmit(e) {
     if (e.which == '13') {
-        addNewDeliverable(true);
+        tryAddNewDeliverable();
         e.preventDefault();
     }
 }
