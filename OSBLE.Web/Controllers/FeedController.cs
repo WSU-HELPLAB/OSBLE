@@ -844,6 +844,12 @@ namespace OSBLE.Controllers
             }
         }
 
+        /// <summary>
+        /// Allows other users to mark replies to the original post as "Helpful"
+        /// </summary>
+        /// <param name="eventLogToMark"></param>
+        /// <param name="markerId"></param>
+        /// <returns></returns>
         [HttpGet]
         public JsonResult MarkHelpfulComment(int eventLogToMark, int markerId)
         {
@@ -866,6 +872,34 @@ namespace OSBLE.Controllers
             }
         }
 
+        /// <summary>
+        /// Allows other users to like the actual feed item (not including replies)
+        /// </summary>
+        /// <param name="eventLogId"> Id of the feed post being liked </param>
+        /// <param name="senderId"> Id of the person "liking" the feed post </param>
+        /// <returns></returns>
+        /// courtney-snyder
+        [HttpGet]
+        public JsonResult LikeFeedPost (int eventLogId, int senderId)
+        {
+            int logToMarkSenderId = DBHelper.GetActivityEvent(eventLogId).SenderId;
+
+            if (ActiveCourseUser != null && logToMarkSenderId == senderId)
+            {
+                senderId = ActiveCourseUser.UserProfileID;
+            }
+
+            using (SqlConnection sqlc = DBHelper.GetNewConnection())
+            {
+                int helpfulMarks = DBHelper.GetPostLikeCount(eventLogId);
+                bool isMarker = DBHelper.UserMarkedLog(senderId, eventLogId, sqlc); // markerId is the CU
+                return Json(new
+                {
+                    helpfulMarks,
+                    isMarker
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
 
         /// <summary>
         /// Updates the FeedPostEventFlags Table, MarkedResolved column.
@@ -891,17 +925,55 @@ namespace OSBLE.Controllers
             }
         }
 
-
         /// <summary>
-        /// 
+        /// Calls the DBHelper method "IsPostResolved" and returns the bool result to the AJAX call in a JSON object
+        /// because you cannot return normal booleans for some reason.
         /// </summary>
         /// <param name="eventId"></param>
-        /// <returns></returns>
+        /// <returns> JSON Object containing boolean result </returns>
         /// courtney-snyder
         [HttpGet]
         public JsonResult IsPostResolved(int eventId)
         {
             return Json(new { boolResult = DBHelper.IsPostResolved(eventId) }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Calls the DBHelper method "GetPostLikeCount" and returns it to the AJAX call.
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <param name="senderId"></param>
+        /// <returns> JSON Object containing number of likes </returns>
+        /// courtney-snyder
+        [HttpGet]
+        public JsonResult GetPostLikeCount (int eventId)
+        {
+            return Json(new { numberOfLikes = DBHelper.GetPostLikeCount(eventId) }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Checks the DB to see if that user liked the post
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <param name="senderId"></param>
+        /// <returns>JSON Object containing thte boolean result </returns>
+        /// courtney-snyder
+        [HttpGet]
+        public JsonResult IsPostLikedByUser (int eventId, int senderId)
+        {
+            return Json(new { boolResult = DBHelper.IsPostLikedByUser(eventId, senderId) }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Inserts new row into FeedPostLikes db.
+        /// </summary>
+        /// <param name="eventId"> Item to add like to/remove like from </param>
+        /// <param name="senderId"> Person liking/unliking that item </param>
+        /// courtney-snyder
+        [HttpGet]
+        public void UpdatePostItemLikeCount(int eventId, int senderId)
+        {
+            DBHelper.UpdatePostItemLikeCount(eventId, senderId);
         }
 
         [HttpGet]

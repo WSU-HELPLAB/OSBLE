@@ -1291,12 +1291,12 @@ namespace OSBLE.Utility
                     connection.Open();
                     cmd.ExecuteScalar();
                     connection.Close();
-                    return 1;
+                    return eventIds.Count + 1;
                 }
             }
             catch (Exception ex)
             {
-                return 10;
+                return eventIds.Count;
             }
         }
 
@@ -1381,6 +1381,89 @@ namespace OSBLE.Utility
                 }
                 //Otherwise, that post is either not in the database or not resolved
                 return false;
+            }
+        }
+
+
+        /// <summary>
+        /// Finds all occurrences of the eventID in the FeedPostLikes table and returns the count.
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <returns></returns>
+        /// courtney-snyder
+        public static int GetPostLikeCount (int eventId)
+        {
+            using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                sqlConnection.Open();
+
+                //Get the post with the given eventId
+                string query = "SELECT * FROM FeedPostLikes WHERE EventLogId = @EventId ";
+                var result = sqlConnection.Query(query, new { EventId = eventId }).ToList();
+                //If the query gives a result, get the number of elements in the list
+                if (result != null)
+                {
+                    return result.Count;
+                }
+                //Otherwise, that post has no likes
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Checks to see if a user has already liked a post.
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <param name="senderId"></param>
+        /// <returns> True (has been liked by that user) or False (has not). </returns>
+        /// courtney-snyder
+        public static bool IsPostLikedByUser(int eventId, int senderId)
+        {
+            using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                sqlConnection.Open();
+
+                //Get the post with the given eventId and check if the user who clicked "Like" (senderId) has already liked the post
+                string query = "SELECT * FROM FeedPostLikes WHERE EventLogId = @InputEventLogId AND UserProfileId = @InputSenderId ";
+                var result = sqlConnection.Query(query, new { InputEventLogId = eventId, InputSenderId = senderId }).FirstOrDefault();
+                //If the query gives a result, that user has liked the post, so return true
+                if (result != null)
+                {
+                    return true;
+                }
+                //Otherwise, that post has not been liked by that user
+                return false;
+            }
+        }
+
+
+        /// <summary>
+        /// Updates the number of likes a post has by either adding a new row (like) or removing an existing column (unlike)
+        /// </summary>
+        /// <param name="eventId"> Item to be affected </param>
+        /// <param name="senderId"> Person liking or unliking </param>
+        public static void UpdatePostItemLikeCount(int eventId, int senderId)
+        {
+            using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                sqlConnection.Open();
+
+                string query = "SELECT * FROM FeedPostLikes WHERE EventLogId = @EventId AND UserProfileId = @SenderId ";
+                string deleteQuery = "DELETE FROM FeedPostLikes WHERE EventLogId = @EventId AND UserProfileId = @SenderId ";
+                string insertQuery = "INSERT INTO FeedPostLikes (EventLogId, UserProfileId) VALUES (@EventId, @SenderId) ";
+
+                var result = sqlConnection.Query(query, new { EventId = eventId, SenderId = senderId }).FirstOrDefault();
+
+                //If the user has not liked the event, add a row to the table
+                if (result == null)
+                {
+                    sqlConnection.Execute(insertQuery, new { EventId = eventId, SenderId = senderId });
+                }
+                //Otherwise the user has already liked this event and it is an "Unlike", so remove the like from the db
+                else
+                {
+                    sqlConnection.Execute(deleteQuery, new { EventId = eventId, SenderId = senderId });
+                }
             }
         }
 

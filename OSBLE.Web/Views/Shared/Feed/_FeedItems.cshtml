@@ -34,7 +34,7 @@
             @* Button Controls *@
             <div class="dp_tools">
 
-                @* Mark as Helpful Button *@
+                @* Mark as Helpful Button (for comments)*@
                 @if (isComment)
                 {
                     <span>+</span>
@@ -43,6 +43,21 @@
                     @* Don't allow self upvoting *@
                     <div data-bind="if: options.canVote">
                         <a title="Mark Comment as Helpful" data-bind="click: MarkCommentHelpful, css: { 'icon-highlight' : highlightMark() == true }">
+                            <span class="glyphicon glyphicon-thumbs-up"></span>
+                        </a>
+                    </div>
+                }
+                @* 
+                courtney-snyder
+                Like Button (for feed posts)
+                *@
+                else if (!isComment)
+                {
+                    <span data-bind="attr: {id: 'feed-post-' + eventId + '-likes'}"> + </span>
+
+                    @* Don't allow self upvoting *@
+                    <div data-bind="ifnot: options.canEdit">
+                        <a title="Like Post" data-bind="click: LikeFeedPost, css: { 'icon-highlight' : highlightMark() == true }">
                             <span class="glyphicon glyphicon-thumbs-up"></span>
                         </a>
                     </div>
@@ -85,17 +100,6 @@
                         //Otherwise, they will see nothing
                     }
                 </div>
-
-                @* Upvote Button *@
-                <!-- <div data-bind="if: options.canVote">
-                    <a title="Upvote" data-bind="click: MarkCommentHelpful, css: { 'icon-highlight' : highlightMark() == true }">
-                        <span class="glyphicon glyphicon-chevron-up"></span>
-                    </a>
-                </div>
-
-                 <div data-bind="if: options.canVote">
-                    <a title="Upvote this post"> <span class="glyphicon glyphicon-chevron-up"> </span> </a>
-                </div>-->
             </div>
 
             @* Display Name & Date/Time *@

@@ -1,4 +1,4 @@
-﻿
+﻿debugger;
 //KnockoutJS Objects
 function FeedItem(data) {
     // Fields
@@ -85,7 +85,6 @@ function FeedItem(data) {
     };
 
     self.MarkCommentHelpful = function () {
-        debugger;
         $.ajax({
             url: "/Feed/MarkHelpfulComment",
             data: { eventLogToMark: self.eventId, markerId: self.activeCourseUserId },
@@ -98,10 +97,60 @@ function FeedItem(data) {
         });
     };
 
+    ///summary: Allow other course users to like feed posts
+    ///courtney-snyder
+    self.LikeFeedPost = function () {
+        $.ajax({
+            url: "/Feed/IsPostLikedByUser", //Check if the post is already liked by the user
+            data: { eventId: self.eventId, senderId: self.activeCourseUserId },
+            dataType: "json",
+            method: "GET",
+            success: function (data) {
+                //Note: boolResult is whether the user "liked" the post before the click or not
+                LikePostSucceeded(self, !data.boolResult);
+            }
+        });
+    }
+
+    ///summary: Updates the DB that the item has been liked or unliked
+    ///courtney-snyder
+    function LikePostSucceeded(self, markHighlighted) {
+        $.ajax({
+            url: "/Feed/UpdatePostItemLikeCount",
+            data: { eventId: self.eventId, senderId: self.activeCourseUserId },
+            method: "GET"
+        });
+        //Display number of likes for that post
+        GetNumberOfLikes(self, markHighlighted);
+    }
+
+    ///summary: Gets the number of likes for that post
+    ///courtney-snyder
+    function GetNumberOfLikes(self, markHighlighted) {
+        $.ajax({
+            url: "/Feed/GetPostLikeCount",
+            data: { eventId: self.eventId },
+            datatype: "json",
+            method: "GET",
+            success: function (result) {
+                var numberOfLikes = 0;
+                //Get the number of likes; if eventLogId is not in FeedPostLikes db, result will be null and like count is 0
+                if (result.numberOfLikes != null) {
+                    numberOfLikes = result.numberOfLikes;
+                }
+                //Update the highlight on glyphicon
+                self.highlightMark(markHighlighted);
+
+                var attributeId = "#feed-post-" + self.eventId + "-likes";
+                var name = "#feed-post-" + self.eventId + "-likes";
+                $(name).text("+ " + numberOfLikes);
+            }
+        });
+    }
+
     ///summary: Allow the Original Poster to mark their post as [Resolved] and toggle between [Mark as Resolved] and [Resolved].
-    //courtney-snyder
+    ///courtney-snyder
     self.MarkPostResolved = function () {
-        debugger;
         var isResolved;
         //Get the Resolved status of the post
         $.ajax({
@@ -118,7 +167,6 @@ function FeedItem(data) {
                 MarkResolvedSucceeded(self, !isResolved);
             }
         });
-        debugger;
         //If the current value is false, switch to [Resolved] on click
         if (!isResolved) {
             $('#mark-as-resolved-' + self.eventId).val('Resolved');
@@ -140,9 +188,9 @@ function FeedItem(data) {
         }
     };
 
-    //
+    ///summary: Updates the DB that the item's resolved status has been changed
+    ///courtney-snyder
     function MarkResolvedSucceeded(item, resolved) {
-        debugger;
         $.ajax({
             url: "/Feed/MarkResolvedPost", //Goes to MarkResolvedPost in FeedController
             data: { eventLogToMark: item.eventId, isResolved: resolved, markerId: item.activeCourseUserId }, //Input params for MarkResolvedPost
@@ -312,7 +360,6 @@ function FeedViewModel(userName, userId, current) {
     }
 
     self.hub.client.addMarkHelpful = function (postID, replyPostID, numHelpfulMarks) {
-        debugger;
         var post = self.GetPost(postID);
         if (post != null) {
             var comment = post.GetComment(replyPostID);
@@ -436,6 +483,7 @@ function FeedViewModel(userName, userId, current) {
 
     self.RequestUpdate = function () {
         ShowLoading();
+        var mappedItems;
         $.ajax({
             type: "GET",
             url: "/Feed/GetFeed",
@@ -443,7 +491,7 @@ function FeedViewModel(userName, userId, current) {
             data: { keywords: self.keywords(), events: GetCheckedEvents() },
             cache: false,
             success: function (data, textStatus, jqXHR) {
-                var mappedItems = $.map(data.Feed, function (item) { return new FeedItem(item) });
+                mappedItems = $.map(data.Feed, function (item) { return new FeedItem(item) });
                 self.items(mappedItems);
 
                 if ($('#load-old-posts').hasClass('disabled')) {
@@ -452,8 +500,7 @@ function FeedViewModel(userName, userId, current) {
             },
             complete: function () {
                 HideLoading();
-                //Add Show Mark Resolved function
-                debugger;
+                //Load Resolved status on visible post
                 $.ajax({
                     url: "/Feed/GetResolvedPostIds",
                     data: {},
@@ -461,19 +508,63 @@ function FeedViewModel(userName, userId, current) {
                     success: function (data) {
                         //Get all the Resolved Post Ids
                         var idList = data.idList;
-                        for (var i = 0; i < idList.length; i++)
-                        {
-                            //Mark Feed Item as [Resolved]
+                        for (var i = 0; i < idList.length; i++) {
+                            //Mark Feed Item as *checked box* Resolved
                             $('#mark-as-resolved-' + idList[i]).val("Resolved");
                             var icon = "<span style='color:green' class='glyphicon glyphicon-check'></span>" + ' [Resolved]';
                             $('#mark-as-resolved-' + idList[i]).text("");
                             $('#mark-as-resolved-' + idList[i]).append(icon);
                         }
+                        //Display the number of likes for each of the loaded posts
+                        for (var i = 0; i < mappedItems.length; i++)
+                        {
+                            var feedItem = mappedItems[i];
+                            LoadLikes(feedItem);
+                        }
                     }
-                })
+                });
             }
         });
     };
+
+    ///summary: Gets the number of likes for that post on page load/refresh (repeated because this is in the FeedViewModel).
+    ///courtney-snyder
+    function LoadLikes(feedItem) {
+        //Get number of likes for each post
+        $.ajax({
+            url: "/Feed/GetPostLikeCount",
+            data: { eventId: feedItem.eventId },
+            datatype: "json",
+            method: "GET",
+            success: function (result) {
+                var numberOfLikes = 0;
+                if (result.numberOfLikes != null) {
+                    numberOfLikes = result.numberOfLikes;
+                }
+                var name = "#feed-post-" + feedItem.eventId + "-likes";
+                $(name).text("+ " + numberOfLikes);
+                IsPostLiked(feedItem);
+            }
+        });
+    }
+
+    ///summary: Highlights the thumb if the current user liked that post.
+    ///courtney-snyder
+    function IsPostLiked(feedItem) {
+        $.ajax({
+            type: "GET",
+            url: "/Feed/IsPostLikedByUser",
+            data: { eventId: feedItem.eventId, senderId: self.userId},
+            dataType: "json",
+            success: function (data) {
+                //If the user liked the post at some point before page load, highlight thumb
+                if (data.boolResult)
+                {
+                    feedItem.highlightMark(true);
+                }
+            }
+        });
+    }
 
     self.ShowHashTagResults = function (hashtag) {
         ShowLoading();
@@ -1307,7 +1398,6 @@ function TitlebarNotification(message) {
 }
 
 function LogActivityEvent(eventAction, eventData, eventDataDescription) {
-
     var authKey = $.cookie('AuthKey').split("=")[1];
     var courseId = $("#data-course-link").attr("data-course-id");
 
