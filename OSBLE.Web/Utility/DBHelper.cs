@@ -1442,6 +1442,7 @@ namespace OSBLE.Utility
         /// </summary>
         /// <param name="eventId"> Item to be affected </param>
         /// <param name="senderId"> Person liking or unliking </param>
+        /// courtney-snyder
         public static void UpdatePostItemLikeCount(int eventId, int senderId)
         {
             using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))

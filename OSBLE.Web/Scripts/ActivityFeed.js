@@ -787,9 +787,85 @@ function DetailsViewModel(userName, userId, rootId) {
             success: function (data, textStatus, jqXHR) {
                 var itemAsList = [new FeedItem(data.Item)];
                 self.items(itemAsList);
-            }
+            },
+            complete: 
+                //Load Resolved status on the post
+                $.ajax({
+                    url: "/Feed/IsPostResolved",
+                    data: {eventId: self.rootId},
+                    datatype: "JSON",
+                    success: function (data) {
+                        //If post is resolved
+                        if (data.boolResult)
+                        {
+                            //Mark Feed Item as *checked box* Resolved
+                            $('#mark-as-resolved-' + self.rootId).val("Resolved");
+                            var icon = "<span style='color:green' class='glyphicon glyphicon-check'></span>" + ' [Resolved]';
+                            $('#mark-as-resolved-' + self.rootId).text("");
+                            $('#mark-as-resolved-' + self.rootId).append(icon);
+                        }
+                        //Display the number of likes for each of the loaded posts
+                        LoadLikes(self.rootId);
+                    }
+                })
         });
     };
+
+    ///summary: Gets the number of likes for that post on page load/refresh (repeated because this is in the DetailsViewModel).
+    ///         and highlights the thumb if the post has already been liked by the current viewer.
+    ///courtney-snyder
+    function LoadLikes(eventId) {
+        IsPostLiked(eventId);
+        GetPostLikeCount(eventId);
+    }
+
+    ///summary: Highlights the thumb if the current user liked that post.
+    ///courtney-snyder
+    function IsPostLiked(eventId) {
+        $.ajax({
+            type: "GET",
+            url: "/Feed/IsPostLikedByUser",
+            data: { eventId: eventId, senderId: self.userId },
+            dataType: "json",
+            success: function (data) {
+                //If the user liked the post at some point before page load, highlight thumb
+                if (data.boolResult) {
+                    self.items()[0].highlightMark(true);
+                }
+            }
+        });
+    }
+
+    ///summary: Gets the post like count for the specified post
+    ///courtney-snyder
+    function GetPostLikeCount (eventId)
+    {
+        $.ajax({
+            url: "/Feed/GetPostLikeCount",
+            data: { eventId: eventId },
+            datatype: "json",
+            method: "GET",
+            success: function (result) {
+                var numberOfLikes = 0;
+                if (result.numberOfLikes != null) {
+                    numberOfLikes = result.numberOfLikes;
+                }
+                var name = "#feed-post-" + eventId + "-likes";
+                $(name).text("+ " + numberOfLikes);
+            }
+        });
+    }
+
+    ///summary: If user likes/unlikes a post in the Details view, the action persists on the Feed
+    ///courtney-snyder
+    function UpdatePostItemLikeCount(eventId) {
+        $.ajax({
+            url: "/Feed/UpdatePostItemLikeCount",
+            data: { eventId: eventId, senderId: self.userId },
+            method: "GET"
+        });
+        GetPostLikeCount(eventId);
+    }
 
     self.GetRole = function (id, role) {
 
