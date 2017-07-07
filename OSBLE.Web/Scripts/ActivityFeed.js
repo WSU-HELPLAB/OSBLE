@@ -1,5 +1,4 @@
-﻿debugger;
-//KnockoutJS Objects
+﻿//KnockoutJS Objects
 function FeedItem(data) {
     // Fields
     var self = this;
