@@ -1731,7 +1731,7 @@ namespace OSBLE.Controllers
         /// </summary>
         private void SendEmailsToListeners(string postContent, int sourcePostID, int courseID, DateTime timePosted, List<MailAddress> emails, bool isReply = false, bool isAnonymous = false)
         {
-#if !DEBUG
+#if DEBUG
             // first check to see if we need to email anyone about this post
             if (emails.Count > 0)
             {
@@ -1810,48 +1810,67 @@ namespace OSBLE.Controllers
         public string ReplaceMentionWithName(string body)
         {
             List<int> nameIndices = new List<int>();
+            
+           
             for (int i = 0; i < body.Length; i++)
             {
-                // If we find an '@' character, see if it's followed by "id=" then a number then a semicolon
-                if (body[i] == '@')
-                {
-                    if (body.Substring(i + 1, 3) == "id=")
+                try
+                {// If we find an '@' character, see if it's followed by "id=" then a number then a semicolon
+                    if (body[i] == '@')
                     {
-                        // After the '=', make sure there are numbers then a semicolon following it
-                        int digit = 0, rIndex = 4;
-                        bool hasDigit = false;
-                        while (int.TryParse(body.Substring(i + rIndex, 1), out digit))  // Keep reading characters until we hit something that isn't a digit
+                        if (body.Substring(i + 1, 3) == "id=")
                         {
-                            hasDigit = true;
-                            rIndex++;
+                            // After the '=', make sure there are numbers then a semicolon following it
+                            int digit = 0, rIndex = 4;
+                            bool hasDigit = false;
+                            while (int.TryParse(body.Substring(i + rIndex, 1), out digit))  // Keep reading characters until we hit something that isn't a digit
+                            {
+                                hasDigit = true;
+                                rIndex++;
+                            }
+                            if (hasDigit && body[i + rIndex] == ';')
+                                nameIndices.Add(i); // If the character following the numbers is a semicolon, we know there is a name reference here so record the index
                         }
-                        if (hasDigit && body[i + rIndex] == ';')
-                            nameIndices.Add(i); // If the character following the numbers is a semicolon, we know there is a name reference here so record the index
                     }
+                }
+                catch (Exception e)
+                {
+                    //throw out some information about variables in the current state to try and get more information about the exception to generate an actual fix in the future. 
+                    throw new Exception("Body.Length = " + body.Length + " nameIndicies.Count= " + nameIndices.Count + " i= " + i, e);
                 }
             }
             nameIndices.Reverse();
             foreach (int index in nameIndices) // In reverse order, we need to replace each @... with the students name
             {
-                // First let's get the length of the part we will replace and also record the id
-                int length = 0, tempIndex = index + 1;
-                string idString = "";
-                while (body[tempIndex] != ';') { length++; tempIndex++; idString += body[tempIndex]; }
 
-                // Get the id= part off the beginning of idString and the ; from the end
-                idString = idString.Substring(2);
-                idString = idString.Substring(0, idString.Length - 1);
-
-                // Then get the student's name from the id
-                int id; int.TryParse(idString, out id);
-                if (id != null)
+                try
                 {
-                    UserProfile referencedUser = (from user in db.UserProfiles where user.ID == id select user).FirstOrDefault();
-                    if (referencedUser == null) continue; // It's possible the user no longer exists, or for some reason someone manually entered @id=blahblahblah; into the text field.
-                    string studentFullName = referencedUser.FirstName + referencedUser.LastName;
 
-                    // Now replace the id number in the string with the user name
-                    body = body.Replace(body.Substring(index + 1, length + 1), string.Format("<a href=\"{0}\">{1}</a>", Url.Action("Index", "Profile", new { id = id }, Request.Url.Scheme), studentFullName));
+                    // First let's get the length of the part we will replace and also record the id
+                    int length = 0, tempIndex = index + 1;
+                    string idString = "";
+                    while (body[tempIndex] != ';') { length++; tempIndex++; idString += body[tempIndex]; }
+
+                    // Get the id= part off the beginning of idString and the ; from the end
+                    idString = idString.Substring(2);
+                    idString = idString.Substring(0, idString.Length - 1);
+
+                    // Then get the student's name from the id
+                    int id; int.TryParse(idString, out id);
+                    if (id != null)
+                    {
+                        UserProfile referencedUser = (from user in db.UserProfiles where user.ID == id select user).FirstOrDefault();
+                        if (referencedUser == null) continue; // It's possible the user no longer exists, or for some reason someone manually entered @id=blahblahblah; into the text field.
+                        string studentFullName = referencedUser.FirstName + referencedUser.LastName;
+
+                        // Now replace the id number in the string with the user name
+                        body = body.Replace(body.Substring(index + 1, length + 1), string.Format("<a href=\"{0}\">{1}</a>", Url.Action("Index", "Profile", new { id = id }, Request.Url.Scheme), studentFullName));
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    throw new Exception("Index = " + index + " nameIndices.Count= " + nameIndices.Count,ex);
                 }
             }
             return body;
