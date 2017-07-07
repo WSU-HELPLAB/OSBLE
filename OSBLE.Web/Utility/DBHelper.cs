@@ -18,7 +18,7 @@ using OSBLE.Attributes;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Queries;
 using OSBLEPlus.Logic.Utility.Lookups;
-
+using OSBLE.Models;
 namespace OSBLE.Utility
 {
     /// <summary>
@@ -1992,11 +1992,108 @@ namespace OSBLE.Utility
 
             return assignmentDict;
         }
+        /// <summary>
+        /// This runs a query to update a published rubric to make it unpublished 
+        /// </summary>
+        /// <param name="rubricID"></param>
+        /// <returns></returns>
+        internal static bool UnPublishRubric(int assignmentID, int rubricID)
+        {
+            string query;
+            bool didUpdate = false;
+            var sqlConnection = new SqlConnection(StringConstants.ConnectionString);
+
+            query = "UPDATE RubricEvaluations SET IsPublished=0, DatePublished=NULL WHERE ID=@rubricID AND AssignmentID=@assignmentID ;";
+
+            int temp = sqlConnection.Execute(query, new { rubricID = rubricID, assignmentID = assignmentID }); //temporary int to later conver to bool
+            didUpdate = Convert.ToBoolean(temp);
+            return didUpdate;
+        }
+        internal static bool UnPublishAllRubrics(int assignmentID)
+        {
+            string query;
+            bool didUpdate = false; ;
+            var sqlConnestion = new SqlConnection(StringConstants.ConnectionString);
+
+            query = "UPDATE RubricEvaluations SET IsPublished=0, DatePublished=NULL WHERE AssignmentID=@assignmentID;";
+
+            int temp = sqlConnestion.Execute(query, new { assignmentID = assignmentID });
+            didUpdate = Convert.ToBoolean(temp);
+            return didUpdate;
+        }
 
         #endregion
 
+        /// <summary>
+        /// Removes notifications for the published rubrics when the instructor unpublishes a rubric.
+        /// </summary>
+        /// <param name="assignment"></param>
+        /// <param name="teamID"></param>
+        /// <param name="instructor"></param>
+        /// <param name="rubricPublished"></param>
+        internal static void RemoveNotifications(Assignment assignment, int teamID, CourseUser instructor, DateTime rubricPublished)
+        {
+            string query = "";
+            string addMinutes;
+            string rubricPublishedString;
+
+            string  assignmentName = assignment.AssignmentName;
+            int TeamID = teamID;
+            int userID = instructor.ID;
+
+            DateTime addMinute = rubricPublished;
+            addMinute = addMinute.AddSeconds(7);
+
+            addMinutes = Convert.ToString(addMinute);
+
+            rubricPublishedString = Convert.ToString(rubricPublished);
+
+            rubricPublished = Convert.ToDateTime(rubricPublishedString);
+
+            addMinute = Convert.ToDateTime(addMinutes);
+
+            
 
 
+
+
+
+            var sqlConnection = new SqlConnection(StringConstants.ConnectionString);
+
+            query = "SELECT CourseUserID FROM TeamMembers WHERE TeamID=@TeamID;";
+
+            var RecipientID = sqlConnection.Query<int>(query, new { TeamID = TeamID }).FirstOrDefault();
+
+            RecipientID = Convert.ToInt32(RecipientID);
+
+            query = "DELETE FROM Notifications WHERE Data LIKE '%@assignmentName%' AND SenderID=@userID AND RecipientID=@RecipientID AND Posted BETWEEN @rubricPublished AND @addMinute;";
+            
+            var result = sqlConnection.Query(query, new { assignmentName = assignmentName, userID = userID, RecipientID = RecipientID, rubricPublished = rubricPublished, addMinute = addMinute }).FirstOrDefault();
+
+            
+
+
+        }
+
+        /// <summary>
+        /// Removes all notifications from the database for the given assignment. 
+        /// </summary>
+        /// <param name="assignmentID"></param>
+        /// <param name="instructorID"></param>
+        internal static void RemoveNotificationsForEntireAssignment(int assignmentID, int instructorID)
+        {
+            string query = "";
+            string assignmentName = GetAssignmentName(assignmentID);
+
+            
+            int userID = instructorID;
+
+            var sqlConnection = new SqlConnection(StringConstants.ConnectionString);
+
+            query = "DELETE FROM Notifications WHERE Data LIKE '%@assignmentName%' AND SenderID=@userID;";
+
+            var result = sqlConnection.Query(query, new { assignmentName = assignmentName, userID = userID });
+        }
         internal static void UpdateEventVisibleToList(int eventLogId, string updatedVisibilityList, SqlConnection connection = null)
         {
             if (connection == null)
