@@ -1731,7 +1731,7 @@ namespace OSBLE.Controllers
         /// </summary>
         private void SendEmailsToListeners(string postContent, int sourcePostID, int courseID, DateTime timePosted, List<MailAddress> emails, bool isReply = false, bool isAnonymous = false)
         {
-#if DEBUG
+#if !DEBUG
             // first check to see if we need to email anyone about this post
             if (emails.Count > 0)
             {
