@@ -18,6 +18,7 @@ using OSBLE.Attributes;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Queries;
 using OSBLEPlus.Logic.Utility.Lookups;
+using OSBLE.Models.Report;
 
 namespace OSBLE.Utility
 {
@@ -1993,8 +1994,8 @@ namespace OSBLE.Utility
                                 item.Description == newEvent.Description)
                             {
                                 newEvents.Remove(newEvent);
-                                break;   
-                            }                            
+                                break;
+                            }
                         }
                     }
                 }
@@ -2027,13 +2028,18 @@ namespace OSBLE.Utility
             return true;
         }
 
-
-
+        /// <summary>
+        /// Generates a count of posts and replies for display in a table
+        /// </summary>
+        /// <param name="courseId"></param>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <returns></returns>
         internal static List<Tuple<string, int, int>> GetPostsAndRepliesCount(int courseId, DateTime startDate, DateTime endDate)
         {
             List<Tuple<string, int, int>> postReplyList = new List<Tuple<string, int, int>>();
 
-            var userProfiles = GetUserProfilesForCourse(courseId);
+            var userProfiles = GetStudentsFromUserProfiles(GetUserProfilesForCourse(courseId), courseId);
 
             startDate = startDate.CourseToUTC(courseId);
             endDate = endDate.CourseToUTC(courseId);
@@ -2043,36 +2049,36 @@ namespace OSBLE.Utility
                 using (SqlConnection sqlConnection = new SqlConnection(StringConstants.ConnectionString))
                 {
                     sqlConnection.Open();
-                    string postsQuery = "SELECT COUNT(*) FROM (SELECT up.FirstName, up.LastName, fpe.EventDate FROM FeedPostEvents fpe " + 
-	                                    "LEFT OUTER JOIN EventLogs e ON e.Id = fpe.EventLogId " +
-                                        "LEFT OUTER JOIN UserProfiles up ON e.SenderId = up.ID " + 
-	                                    "WHERE CourseId = @CourseId AND (IsDeleted IS NULL OR IsDeleted = 0) AND EventVisibilityGroups = 'class' " + 
-	                                    "AND SenderId = @UserProfileId AND fpe.EventDate BETWEEN @StartDate AND @EndDate	 " + 
-	                                    "GROUP BY up.FirstName, up.LastName, fpe.EventDate, fpe.EventDate) posts ";
+                    string postsQuery = "SELECT COUNT(*) FROM (SELECT up.FirstName, up.LastName, fpe.EventDate FROM FeedPostEvents fpe " +
+                                        "LEFT OUTER JOIN EventLogs e ON e.Id = fpe.EventLogId " +
+                                        "LEFT OUTER JOIN UserProfiles up ON e.SenderId = up.ID " +
+                                        "WHERE CourseId = @CourseId AND (IsDeleted IS NULL OR IsDeleted = 0) AND EventVisibilityGroups = 'class' " +
+                                        "AND SenderId = @UserProfileId AND fpe.EventDate BETWEEN @StartDate AND @EndDate	 " +
+                                        "GROUP BY up.FirstName, up.LastName, fpe.EventDate, fpe.EventDate) posts ";
 
                     string askForHelpQuery = "SELECT COUNT(*) FROM (SELECT up.FirstName, up.LastName, afhe.EventDate FROM AskForHelpEvents afhe " +
-	                                         "LEFT OUTER JOIN EventLogs e ON e.Id = afhe.EventLogId " +
-	                                         "LEFT OUTER JOIN UserProfiles up ON e.SenderId = up.ID " +
+                                             "LEFT OUTER JOIN EventLogs e ON e.Id = afhe.EventLogId " +
+                                             "LEFT OUTER JOIN UserProfiles up ON e.SenderId = up.ID " +
                                              "WHERE (IsDeleted IS NULL OR IsDeleted = 0) " +
                                              "AND SenderId IN (SELECT UserProfileID FROM CourseUsers WHERE AbstractRoleID = 3) " +
-	                                         "AND afhe.EventDate BETWEEN @StartDate AND @EndDate " +
-	                                         "AND up.ID = @UserProfileId " +
-	                                         "GROUP BY up.FirstName, up.LastName, afhe.EventDate, afhe.EventDate) askforhelp";
+                                             "AND afhe.EventDate BETWEEN @StartDate AND @EndDate " +
+                                             "AND up.ID = @UserProfileId " +
+                                             "GROUP BY up.FirstName, up.LastName, afhe.EventDate, afhe.EventDate) askforhelp";
 
                     string repliesQuery = "SELECT COUNT(*) FROM (SELECT up.FirstName, up.LastName, lce.EventDate FROM LogCommentEvents lce " +
-	                                      "LEFT OUTER JOIN EventLogs e ON e.Id = lce.EventLogId " +
-	                                      "LEFT OUTER JOIN UserProfiles up ON e.SenderId = up.ID " +
-	                                      "WHERE CourseId = @CourseId AND (IsDeleted IS NULL OR IsDeleted = 0) " +
+                                          "LEFT OUTER JOIN EventLogs e ON e.Id = lce.EventLogId " +
+                                          "LEFT OUTER JOIN UserProfiles up ON e.SenderId = up.ID " +
+                                          "WHERE CourseId = @CourseId AND (IsDeleted IS NULL OR IsDeleted = 0) " +
                                           "AND SenderId IN (SELECT UserProfileID FROM CourseUsers WHERE AbstractCourseID = @CourseId AND AbstractRoleID = 3) " +
-	                                      "AND lce.EventDate BETWEEN @StartDate AND @EndDate " +
+                                          "AND lce.EventDate BETWEEN @StartDate AND @EndDate " +
                                           "AND up.ID = @UserProfileId " +
-	                                      "GROUP BY up.FirstName, up.LastName, lce.EventDate, lce.EventDate) replies";
+                                          "GROUP BY up.FirstName, up.LastName, lce.EventDate, lce.EventDate) replies";
 
                     foreach (var user in userProfiles)
                     {
                         int postResult = sqlConnection.Query<int>(postsQuery, new { CourseId = courseId, UserProfileId = user.ID, StartDate = startDate, EndDate = endDate }).SingleOrDefault();
                         int askForHelptResult = sqlConnection.Query<int>(askForHelpQuery, new { CourseId = courseId, UserProfileId = user.ID, StartDate = startDate, EndDate = endDate }).SingleOrDefault();
-                        int repliesResult = sqlConnection.Query<int>(repliesQuery, new { CourseId = courseId, UserProfileId = user.ID, StartDate = startDate, EndDate = endDate }).SingleOrDefault();    
+                        int repliesResult = sqlConnection.Query<int>(repliesQuery, new { CourseId = courseId, UserProfileId = user.ID, StartDate = startDate, EndDate = endDate }).SingleOrDefault();
                         postReplyList.Add(new Tuple<string, int, int>(user.FullName, postResult + askForHelptResult, repliesResult));
                     }
 
@@ -2086,6 +2092,29 @@ namespace OSBLE.Utility
             return postReplyList;
         }
 
+        /// <summary>
+        /// Takes a list of user profiles and returns a list of user profiles where the user role is not instructor or TA for the given course id
+        /// </summary>
+        /// <param name="userProfiles">a list of user profiles</param>
+        /// <param name="courseId">a course id</param>
+        /// <returns>a list of user profiles that are not instructor or ta role for the input course id</returns>
+        internal static List<UserProfile> GetStudentsFromUserProfiles(List<UserProfile> userProfiles, int courseId)
+        {
+            List<UserProfile> students = new List<UserProfile>(); //empty list to store students
+
+            List<int> instructorIds = GetCourseInstructorIds(courseId);
+            List<int> taIds = GetCourseTAIds(courseId);
+
+            foreach (UserProfile user in userProfiles)
+            {
+                if (!instructorIds.Contains(user.ID) && !taIds.Contains(user.ID))
+                {
+                    students.Add(user);
+                }
+            }
+            return students;
+        }
+
         internal static int GetAssignmentPointTotal(int assignmentID)
         {
             int pointTotal = 0;
@@ -2096,7 +2125,7 @@ namespace OSBLE.Utility
                     sqlConnection.Open();
                     string query = "SELECT PointSpread FROM Levels WHERE RubricID = (SELECT Top 1 a.RubricID FROM Assignments a WHERE a.ID = @AssignmentId) ";
 
-                    var results = sqlConnection.Query(query, new { AssignmentId = assignmentID}).ToList();
+                    var results = sqlConnection.Query(query, new { AssignmentId = assignmentID }).ToList();
                     foreach (var level in results)
                     {
                         pointTotal += level.PointSpread;
@@ -2109,6 +2138,122 @@ namespace OSBLE.Utility
                 throw new Exception("Error in GetPostsAndRepliesCount(): ", e);
             }
             return pointTotal;
+        }
+
+        /// <summary>
+        /// Generates a list of OSBLEInterventionReportItem that can be used to display a summary of intervention interactions
+        /// </summary>
+        /// <param name="courseId">selected course id</param>
+        /// <param name="startDate">start date for activty events</param>
+        /// <param name="endDate">end date for activity events (inclusive)</param>
+        /// <param name="options">dictionary string-bool pair to enable query filtering</param>
+        /// <returns>a list of OSBLEInterventionReportItem</returns>
+        internal static List<OSBLEInterventionReportItem> GetInterventionInteractionReport(int courseId, DateTime startDate, DateTime endDate, Dictionary<string, bool> options)
+        {
+            List<OSBLEInterventionReportItem> reportItems = new List<OSBLEInterventionReportItem>();
+
+            startDate = startDate.CourseToUTC(courseId);
+            endDate = endDate.CourseToUTC(courseId);
+
+            try
+            {
+                using (SqlConnection sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+
+                    string query = "SELECT up.FirstName, up.LastName, cu.AbstractCourseID, oii.OSBLEInterventionId, oii.InteractionDateTime, oii.InteractionDetails, " +
+                                    "oii.InterventionFeedback, oii.InterventionDetailBefore, oii.InterventionDetailAfter, oii.AdditionalActionDetails,  " +
+                                    "oi.InterventionTrigger, oi.InterventionType, oi.InterventionTemplateText, oi.InterventionSuggestedCode,  " +
+                                    "oi.IsDismissed, ois.RefreshThreshold, ois.ShowInIDESuggestions " +
+                                    "FROM OSBLEInterventionInteractions oii " +
+                                    "INNER JOIN CourseUsers cu " +
+                                    "ON cu.UserProfileID = oii.UserProfileId " +
+                                    "INNER JOIN UserProfiles up " +
+                                    "ON up.ID = oii.UserProfileId " +
+                                    "LEFT JOIN OSBLEInterventions oi " +
+                                    "ON oi.Id = oii.OSBLEInterventionId " +
+                                    "LEFT JOIN OSBLEInterventionSettings ois " +
+                                    "ON ois.UserProfileId = up.ID " +
+                                    "WHERE cu.AbstractCourseID = @CourseId " +
+                                    "AND cu.AbstractRoleID = 3 " + //role == student
+                                    "AND oii.InteractionDateTime BETWEEN @StartDate AND @EndDate ";
+
+                    foreach (KeyValuePair<string, bool> pair in options)
+                    {
+                        switch (pair.Key)
+                        {
+                            case "Index":
+                                if (pair.Value) query += "AND InteractionDetails NOT LIKE '%Index()%' ";
+                                break;
+                            case "Availability":
+                                if (pair.Value) query += "AND InteractionDetails NOT LIKE '%Availability() page loaded%' ";
+                                break;
+                            case "DismissedInterventions":
+                                if (pair.Value) query += "AND InteractionDetails NOT LIKE '%DismissedInterventions() page loaded%' ";
+                                break;
+                            case "PrivateMessages":
+                                if (pair.Value) query += "AND InteractionDetails NOT LIKE '%PrivateMessages() page loaded%' ";
+                                break;
+                            case "UnansweredQuestionsLayout":
+                                if (pair.Value) query += "AND InteractionDetails NOT LIKE '%UnansweredQuestionsLayout() page loaded%' ";
+                                break;
+                            case "Status":
+                                if (pair.Value) query += "AND InteractionDetails NOT LIKE '%User Updated Status%' ";
+                                break;
+                            case "AvailableDetails":
+                                if (pair.Value) query += "AND InteractionDetails NOT LIKE '%AvailableDetails() page loaded%' ";
+                                break;
+                            case "DismissedInterventionsLayout":
+                                if (pair.Value) query += "AND InteractionDetails NOT LIKE '%DismissedInterventionsLayout() page loaded%' ";
+                                break;
+                            case "UpdateSuggestionsSettings":
+                                if (pair.Value) query += "AND InteractionDetails NOT LIKE '%UpdateSuggestionsSettings%' ";
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                    query += "ORDER BY up.LastName, oii.InteractionDateTime"; //add on sort
+
+                    var results = sqlConnection.Query(query, new { CourseId = courseId, StartDate = startDate, EndDate = endDate });
+
+                    if (results != null)
+                    {
+                        foreach (var row in results) //populate a OSBLEInterventionReportItem and add it to the list
+                        {
+                            OSBLEInterventionReportItem reportItem = new OSBLEInterventionReportItem
+                            {
+                                FirstName = row.FirstName ?? "N/A",
+                                LastName = row.LastName ?? "N/A",
+                                CourseId = row.AbstractCourseID ?? 0,
+                                OSBLEInterventionId = row.OSBLEInterventionId,
+                                InteractionDateTime = row.InteractionDateTime,
+                                InteractionDetails = row.InteractionDetails != null ? OSBLEInteractionReportFiltersExtensions.EscapeText(row.InteractionDetails) : "N/A",
+                                InterventionFeedback = row.InterventionFeedback != null ? OSBLEInteractionReportFiltersExtensions.EscapeText(row.InterventionFeedback) : "N/A",
+                                InterventionDetailBefore = row.InterventionDetailBefore != null ? OSBLEInteractionReportFiltersExtensions.EscapeText(row.InterventionDetailBefore) : "N/A",
+                                InterventionDetailAfter = row.InterventionDetailAfter != null ? OSBLEInteractionReportFiltersExtensions.EscapeText(row.InterventionDetailAfter) : "N/A",
+                                AdditionalActionDetails = row.AdditionalActionDetails != null ? OSBLEInteractionReportFiltersExtensions.EscapeText(row.AdditionalActionDetails) : "N/A",
+                                InterventionTrigger = row.InterventionTrigger ?? "N/A",
+                                InterventionType = row.InterventionType ?? "N/A",
+                                InterventionTemplateText = row.InterventionTemplateText != null ? OSBLEInteractionReportFiltersExtensions.EscapeText(OSBLEInteractionReportFiltersExtensions.RemoveLineEndingsAndTabs(row.InterventionTemplateText)) : "N/A",
+                                InterventionSuggestedCode = row.InterventionSuggestedCode != null ? OSBLEInteractionReportFiltersExtensions.EscapeText(OSBLEInteractionReportFiltersExtensions.RemoveLineEndingsAndTabs(row.InterventionSuggestedCode)) : "N/A",                                                                
+                                IsDismissed = row.IsDismissed != null ? Convert.ToInt16(row.IsDismissed) : -1,
+                                RefreshThreshold = row.RefreshThreshold != null ? Convert.ToInt16(row.RefreshThreshold) : -1,
+                                ShowInIDESuggestions = row.ShowInIDESuggestions != null ? Convert.ToInt16(row.ShowInIDESuggestions) : -1,
+                            };                            
+
+                            reportItems.Add(reportItem);
+                        }
+                    }
+                    sqlConnection.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error in GetInterventionInteractionReport(): ", e);
+            }
+            return reportItems;
         }
     }
 }

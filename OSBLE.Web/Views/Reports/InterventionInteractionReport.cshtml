@@ -1,0 +1,48 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    List<OSBLE.Models.Report.OSBLEInterventionReportItem> interventionReport = ViewBag.ReportItems ?? new List<OSBLE.Models.Report.OSBLEInterventionReportItem>();
+
+    string outputText = "FirstName\tLastName\tCourseID\tOSBLEInterventionId\tInteractionDateTime\tInteractionDetails\tInterventionFeedback\tInterventionDetailBefore\t" +
+                        "InterventionDetailAfter\tAdditionalActionDetails\tInterventionTrigger\tInterventionType\tInterventionTemplateText\tInterventionSuggestedCode\t" +
+                        "IsDismissed\tRefreshThreshold\tShowInIDESuggestions\n";
+    int count = 17; //extra row buffer
+    char tab = '\t';
+
+    foreach (var item in interventionReport)
+    {
+        outputText += item.FirstName + tab +
+                      item.LastName + tab +
+                      item.CourseId + tab +
+                      item.OSBLEInterventionId + tab +
+                      item.InteractionDateTime + tab +
+                      item.InteractionDetails + tab +
+                      item.InterventionFeedback + tab +
+                      item.InterventionDetailBefore + tab +
+                      item.InterventionDetailAfter + tab +
+                      item.AdditionalActionDetails + tab +
+                      item.InterventionTrigger + tab +
+                      item.InterventionType + tab +                      
+                      item.InterventionTemplateText + tab +
+                      item.InterventionSuggestedCode + tab +
+                      item.IsDismissed + tab +
+                      item.RefreshThreshold + tab +
+                      item.ShowInIDESuggestions + "\n";
+        count++;
+    }
+}
+
+
+<h2>Interaction Report</h2>
+
+@if (interventionReport.Count() == 0)
+{
+    <h5>No Results...</h5>
+}
+else
+{
+    @*<h2>Posts and Replies between 12:00AM @String.Format("{0:M/d/yyyy}", reportOutput.Item1) to @String.Format("{0:M/d/yyyy}", reportOutput.Item2)</h2>*@
+    <div style="float: left; margin: 5px 0; padding: 3px;">
+        <br /><textarea rows="@count" style="width:800%;">@outputText</textarea>
+    </div>
+}

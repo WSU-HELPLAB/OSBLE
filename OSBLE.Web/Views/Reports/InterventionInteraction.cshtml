@@ -1,0 +1,117 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Interaction Report Configuration</h1>
+
+
+<style type="text/css">
+    .ui-datepicker-month {
+        color: black;
+    }
+</style>
+
+@*@using (Html.BeginForm("InterventionInteractionReport", "Reports", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{*@
+<form action="" method="post">
+
+    <h2>Get intervention interaction report between dates:</h2>
+    <div>
+        <label for="from">From</label>
+        <input type="text" id="from" name="from">
+        <label for="to">to</label>
+        <input type="text" id="to" name="to">
+
+    </div>
+
+    <h2>Report Configuration Options</h2>
+    <div>
+        <h5>Filter out the following:</h5>
+        <ul>
+            <li>
+                <input type="checkbox" id="Index" name="Index">
+                <label for="Index">Index</label>
+            </li>
+            <li>
+                <input type="checkbox" id="Availability" name="Availability">
+                <label for="Availability">Availability</label>
+            </li>
+            <li>
+                <input type="checkbox" id="DismissedInterventions" name="DismissedInterventions">
+                <label for="DismissedInterventions">Dismissed Interventions</label>
+            </li>
+            <li>
+                <input type="checkbox" id="PrivateMessages" name="PrivateMessages">
+                <label for="PrivateMessages">Private Messages</label>
+            </li>
+            <li>
+                <input type="checkbox" id="UnansweredQuestionsLayout" name="UnansweredQuestionsLayout">
+                <label for="UnansweredQuestionsLayout">Unanswered Questions Layout</label>
+            </li>
+            <li>
+                <input type="checkbox" id="Status" name="Status">
+                <label for="Status">Status</label>
+            </li>
+            <li>
+                <input type="checkbox" id="AvailableDetails" name="AvailableDetails">
+                <label for="AvailableDetails">Available Details</label>
+            </li>
+            <li>
+                <input type="checkbox" id="DismissedInterventionsLayout" name="DismissedInterventionsLayout">
+                <label for="DismissedInterventionsLayout">Dismissed Interventions Layout</label>
+            </li>
+            <li>
+                <input type="checkbox" id="UpdateSuggestionsSettings" name="UpdateSuggestionsSettings">
+                <label for="UpdateSuggestionsSettings">Update Suggestions Settings</label>
+            </li>
+        </ul>
+    </div>
+    @*<input type="submit" />*@
+    <input type="submit" value="Get CSV" name="action:InterventionInteractionReportCSV" />
+    <input type="submit" value="Get Copy-Paste text" name="action:InterventionInteractionReport" />
+    @*}*@
+</form>
+
+    <script>
+        $(function () {
+            var dateFormat = "mm/dd/yy",
+              from = $("#from")
+                .datepicker({
+                    defaultDate: "+1w",
+                    changeMonth: true,
+                    numberOfMonths: 1
+                })
+                .on("change", function () {
+                    to.datepicker("option", "minDate", getDate(this));
+                }),
+              to = $("#to").datepicker({
+                  defaultDate: "+1w",
+                  changeMonth: true,
+                  numberOfMonths: 1
+              })
+              .on("change", function () {
+                  from.datepicker("option", "maxDate", getDate(this));
+              });
+
+            function getDate(element) {
+                var date;
+                try {
+                    date = $.datepicker.parseDate(dateFormat, element.value);
+                } catch (error) {
+                    date = null;
+                }
+
+                return date;
+            }
+        });
+
+        $(document).ready(function () {
+            var today = new Date();            
+            var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+            var tomorrowFormatted = (tomorrow.getMonth() + 1) + '/' + tomorrow.getDate() + '/' + tomorrow.getFullYear();
+            var lastWeek = new Date(today.getTime() - 168 * 60 * 60 * 1000);
+            var lastWeekFormatted = (lastWeek.getMonth() + 1) + '/' + lastWeek.getDate() + '/' + lastWeek.getFullYear();            
+            $("#from").val(lastWeekFormatted);
+            $("#to").val(tomorrowFormatted);
+        });
+    </script>
