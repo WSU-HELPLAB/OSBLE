@@ -679,15 +679,18 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult Create(CourseUser courseuser)
         {
+            //Get all info
             var SchoolID = Request.Form["CurrentlySelectedSchool"];
             var AbstractRoleID = Request.Form["CurrentlySelectedAbstractRoleID"];
             var Section = Request.Form["Section"];
-            var UserProfileID = Request.Form["UserProfile.Identification"];
-            //var keys = Request.Form.Keys;
+            var Identification = Request.Form["UserProfile.Identification"];
+            //See if any are empty
             bool emptySchoolID = string.IsNullOrEmpty(SchoolID) ? true : false;
             bool emptyAbstractRoleID = string.IsNullOrEmpty(AbstractRoleID) ? true : false;
             bool emptySection = string.IsNullOrEmpty(Section) ? true : false;
-            bool emptyUserProfileID = string.IsNullOrEmpty(UserProfileID) ? true : false;
+            bool emptyIdentification = string.IsNullOrEmpty(Identification) ? true : false;
+
+            bool isUpdate = false;
 
             if (emptySchoolID || emptyAbstractRoleID) //If one or both of these fields is missing, do not add the user
             {
@@ -741,17 +744,21 @@ namespace OSBLE.Controllers
                 {
                     courseuser.UserProfile.SchoolID = Convert.ToInt32(SchoolID);
                 }
-                if (courseuser.UserProfileID == 0)
+                if (string.IsNullOrEmpty(courseuser.UserProfile.Identification))
                 {
-                    courseuser.UserProfileID = Convert.ToInt32(UserProfileID);
+                    courseuser.UserProfile.Identification = Identification;
                 }
                 courseuser.Section = Convert.ToInt32(Section);
+                courseuser.MultiSection = courseuser.Section.ToString() + ",";
+                courseuser.AbstractCourseID = ActiveCourseUser.AbstractCourseID;
             }
             //if modelState isValid
             if (ModelState.IsValid && courseuser.AbstractRoleID != 0)
             {
                 try
                 {
+                    //Get whether the student was in the course or not before add/update
+                    isUpdate = DBHelper.IsUserInCourse(Identification, courseuser.AbstractCourseID);
                     createCourseUser(courseuser);
                 }
                 catch (Exception e)
@@ -764,12 +771,15 @@ namespace OSBLE.Controllers
             }
 
             Course thisCourse = ActiveCourseUser.AbstractCourse as Course;
-            //if there is at least one assignmnet in the course that has teams/is team based
+            //if there is at least one assignment in the course that has teams/is team based
             if (thisCourse != null && thisCourse.Assignments.Count(a => a.HasTeams) > 0)
             {
                 return RedirectToAction("Index", new { notice = "You have successfully added " + courseuser.UserProfile.LastAndFirst() + " to the course. Please note that this course has an ongoing team-based assignment, and " + courseuser.UserProfile.LastAndFirst() + " will need to be manually added to a team." });
             }
-
+            else if (isUpdate)
+            {
+                return RedirectToAction("Index", new { notice = "You have successfully updated " + courseuser.UserProfile.LastAndFirst() + " in the course." });
+            }
             return RedirectToAction("Index", new { notice = "You have successfully added " + courseuser.UserProfile.LastAndFirst() + " to the course." });
 
         }
@@ -1806,9 +1816,9 @@ namespace OSBLE.Controllers
         {
             //This will return a user profile if they exist already or null if they don't
             var userProfile = (from c in db.UserProfiles
-                        where c.Identification == courseuser.UserProfile.Identification
-                        && c.SchoolID == courseuser.UserProfile.SchoolID
-                        select c).FirstOrDefault();
+                               where c.Identification == courseuser.UserProfile.Identification
+                               && c.SchoolID == courseuser.UserProfile.SchoolID
+                               select c).FirstOrDefault();
 
             if (userProfile == null)
             {
@@ -1843,43 +1853,47 @@ namespace OSBLE.Controllers
             }
             else //The CourseUser has a UserProfile.
             {
-                //Check if the user is currently in the course
-                int intID = Convert.ToInt32(ActiveCourseUser.AbstractCourseID);
-                var currentCourse = (from c in db.Courses
-                                     where c.ID == intID
-                                     select c).FirstOrDefault();
+                //Update input param courseuser UserProfile
                 courseuser.UserProfile = userProfile;
-                
-                //Get all students in the course
-                List<CourseUser> studentsInCourse = db.CourseUsers.Where(c => c.AbstractCourseID == ActiveCourseUser.AbstractCourseID && c.AbstractRoleID == (int)CourseRole.CourseRoles.Student).ToList();
-                var allCourseUsers = DBHelper.GetAllCourseUsersFromCourseId(currentCourse.ID).ToList();
+                courseuser.UserProfileID = courseuser.UserProfile.ID;
 
+                //This will return a course user if the student is in the course, and null if they are not
+                var courseUserFromDB = (from c in db.CourseUsers
+                                       where c.AbstractCourseID == courseuser.AbstractCourseID && c.UserProfileID == courseuser.UserProfileID
+                                       select c).FirstOrDefault();
+                
                 //If the student isn't currently in the course, add them
-                if (!studentsInCourse.Contains(courseuser))
+                if (courseUserFromDB == null)
                 {
-                    
-                    if (courseuser.UserProfile.FirstName != null)
+                    db.CourseUsers.Add(courseuser);
+                    db.SaveChanges();
+                    addNewStudentToTeams(courseuser);
+                }
+                //Otherwise, update their Role and Section if necessary (always leave ID and School the same)
+                else
+                {
+                    db.CourseUsers.Attach(courseUserFromDB);
+                    if (courseUserFromDB.Section != courseuser.Section)
                     {
-                        userProfile.FirstName = courseuser.UserProfile.FirstName;
-                        userProfile.LastName = courseuser.UserProfile.LastName;
-                        db.SaveChanges();
+                        courseUserFromDB.Section = courseuser.Section;
+                        courseUserFromDB.MultiSection = courseuser.MultiSection;
                     }
-                    courseuser.UserProfile = userProfile;
-                    courseuser.UserProfileID = Convert.ToInt32(courseuser.UserProfile.Identification);
+                    if (courseUserFromDB.AbstractRoleID != courseuser.AbstractRoleID)
+                    {
+                        courseUserFromDB.AbstractRoleID = courseuser.AbstractRoleID;
+                    }
                     db.SaveChanges();
                 }
-                
             }
-            courseuser.AbstractCourseID = ActiveCourseUser.AbstractCourseID;
-            //Check uniqueness before adding the CourseUser and adding them to the Teams
-            if ((from c in db.CourseUsers
-                 where c.AbstractCourseID == courseuser.AbstractCourseID && c.UserProfileID == courseuser.UserProfileID
-                 select c).Count() == 0)
-            {
-                db.CourseUsers.Add(courseuser);
-                db.SaveChanges();
-                addNewStudentToTeams(courseuser);
-            }
+            ////Check uniqueness before adding the CourseUser and adding them to the Teams
+            //if ((from c in db.CourseUsers
+            //     where c.AbstractCourseID == courseuser.AbstractCourseID && c.UserProfileID == courseuser.UserProfileID
+            //     select c).Count() == 0)
+            //{
+            //    db.CourseUsers.Add(courseuser);
+            //    db.SaveChanges();
+            //    addNewStudentToTeams(courseuser);
+            //}
         }
 
         /// <summary>

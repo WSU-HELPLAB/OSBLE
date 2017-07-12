@@ -135,6 +135,31 @@ namespace OSBLE.Utility
             return currentUsers;
         }
 
+        /// <param name="identification"> The student's identification number as a string (found in UserProfile.Identification) </param>
+        /// <param name="abstractCourseId"> The ID of the course in question. </param>
+        /// <returns> True if student is in the course, false otherwise. </returns>
+        /// courtney-snyder
+        public static bool IsUserInCourse (string identification, int abstractCourseId )
+        {
+            using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                sqlConnection.Open();
+
+                string query = "SELECT * " +
+                               "FROM UserProfiles " +
+                               "INNER JOIN CourseUsers " +
+                               "ON UserProfiles.ID = CourseUsers.UserProfileID " +
+                               "WHERE CourseUsers.AbstractCourseID = @courseId " +
+                               "AND UserProfiles.Identification = @id ";
+
+                var result = sqlConnection.Query(query, new { id = identification, courseId = abstractCourseId }).FirstOrDefault();
+
+                sqlConnection.Close();
+
+                return result == null ? false : true;
+            }
+        }
+
         public static AbstractRole GetAbstractRole(int roleID, SqlConnection connection = null)
         {
             if (connection == null)
