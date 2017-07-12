@@ -952,6 +952,35 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
+        /// Calls the DBHelper method "GetPostLikeCount" and returns it to the AJAX call.
+        /// </summary>
+        /// <param name="eventIds"> A list of visible feed item IDs </param>
+        /// <returns> JSON Object containing a dictionary with eventIDs (key) and number of likes (value) </returns>
+        /// courtney-snyder
+        [HttpGet]
+        public JsonResult GetPostLikeCounts(string eventIds)
+        {
+            List<int> eventIdInts = new List<int>();
+            //Get the eventIds as a string
+            string eventIdsString = Convert.ToString(eventIds);
+            //Remove [ and ] from string
+            eventIdsString = eventIdsString.Substring(1, eventIdsString.Length-2);
+            //Split the IDs up
+            var splitEventIds = eventIdsString.Split(',');
+            //Convert IDs from strings to ints
+            foreach (var s in splitEventIds)
+            {
+                int temp = Convert.ToInt32(s);
+                eventIdInts.Add(temp);
+            }
+
+            var likeDictionary = DBHelper.GetPostLikeCount(eventIdInts);
+            string likeString = string.Join(",", likeDictionary.Select(m => m.Key + ":" + m.Value).ToArray());
+
+            return Json( new { likeString }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
         /// Checks the DB to see if that user liked the post
         /// </summary>
         /// <param name="eventId"></param>
@@ -962,6 +991,36 @@ namespace OSBLE.Controllers
         public JsonResult IsPostLikedByUser (int eventId, int senderId)
         {
             return Json(new { boolResult = DBHelper.IsPostLikedByUser(eventId, senderId) }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Checks the DB to see if that user liked any of the visible posts.
+        /// </summary>
+        /// <param name="eventIds"> A list of visible feed item ids. </param>
+        /// <param name="senderId"> The current viewer/user. </param>
+        /// <returns> A list of visible posts that the user has liked. </returns>
+        /// courtney-snyder
+        [HttpGet]
+        public JsonResult ArePostsLikedByUser (string eventIds, int senderId)
+        {
+            List<int> eventIdInts = new List<int>();
+            //Get the eventIds as a string
+            string eventIdsString = Convert.ToString(eventIds);
+            //Remove [ and ] from string
+            eventIdsString = eventIdsString.Substring(1, eventIdsString.Length - 2);
+            //Split the IDs up
+            var splitEventIds = eventIdsString.Split(',');
+            //Convert IDs from strings to ints
+            foreach (var s in splitEventIds)
+            {
+                int temp = Convert.ToInt32(s);
+                eventIdInts.Add(temp);
+            }
+            var likeList = DBHelper.ArePostsLikedByUser(eventIdInts, senderId);
+            //string likeString = string.Join(",", likeDictionary.Select(m => m.Key + ":" + m.Value).ToArray());
+            string likeString = string.Join(",", likeList);
+
+            return Json(new { likeString }, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
