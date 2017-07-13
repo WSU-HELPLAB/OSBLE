@@ -81,7 +81,7 @@ namespace OSBLEPlus.Logic.DataAccess.Activities
                                                             "FROM FeedPostEvents " +
                                                             "WHERE FeedPostEvents.Comment LIKE @filter) ", string.IsNullOrEmpty(nID) ? nID : "," + nID);
 
-
+                    commentFilter = "%" + commentFilter + "%";
                     List<int> eventLogsForComments = connection.Query<int>(eventLogSql, new {filter = commentFilter}).ToList();
 
                     // recursive call to Get
