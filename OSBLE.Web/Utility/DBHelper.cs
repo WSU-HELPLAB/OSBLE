@@ -135,6 +135,31 @@ namespace OSBLE.Utility
             return currentUsers;
         }
 
+        /// <param name="identification"> The student's identification number as a string (found in UserProfile.Identification) </param>
+        /// <param name="abstractCourseId"> The ID of the course in question. </param>
+        /// <returns> True if student is in the course, false otherwise. </returns>
+        /// courtney-snyder
+        public static bool IsUserInCourse (string identification, int abstractCourseId )
+        {
+            using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                sqlConnection.Open();
+
+                string query = "SELECT * " +
+                               "FROM UserProfiles " +
+                               "INNER JOIN CourseUsers " +
+                               "ON UserProfiles.ID = CourseUsers.UserProfileID " +
+                               "WHERE CourseUsers.AbstractCourseID = @courseId " +
+                               "AND UserProfiles.Identification = @id ";
+
+                var result = sqlConnection.Query(query, new { id = identification, courseId = abstractCourseId }).FirstOrDefault();
+
+                sqlConnection.Close();
+
+                return result == null ? false : true;
+            }
+        }
+
         public static AbstractRole GetAbstractRole(int roleID, SqlConnection connection = null)
         {
             if (connection == null)
@@ -1360,6 +1385,27 @@ namespace OSBLE.Utility
         }
 
         /// <summary>
+        /// Takes a list of post event IDs and returns a list of those post event IDs that are "Resolved".
+        /// </summary>
+        /// <param name="postEventIds"> An int list of post event ids. </param>
+        /// <returns>
+        /// Returns a list of post IDs marked as "Resolved" from the FeedPostEventFlags db
+        /// </returns>
+        /// courtney-snyder
+        public static IEnumerable<int> GetResolvedPostIds(List<int> postEventIds)
+        {
+            using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                sqlConnection.Open();
+                //Get Resolved posts from the list of postEventIds
+                string query = "SELECT FeedPostEventId FROM FeedPostEventFlags WHERE MarkedResolved = 1 ";
+                List<int> allResolvedPosts = sqlConnection.Query<int>(query).ToList();
+                var relevantPosts = postEventIds.Intersect(allResolvedPosts);
+                return relevantPosts;
+            }
+        }
+
+        /// <summary>
         /// Takes the event ID and returns true (is Resolved) or false (is not Resolved).
         /// </summary>
         /// <param name="eventId"> The post's event ID. </param>
@@ -1411,6 +1457,40 @@ namespace OSBLE.Utility
         }
 
         /// <summary>
+        /// Finds all occurrences of the eventIDs in the FeedPostLikes table and returns the counts.
+        /// </summary>
+        /// <param name="eventIds"> A list of visible feed item eventIds </param>
+        /// <returns> A dictionary of the feed items (key) with their respective like amounts (value) </returns>
+        /// courtney-snyder
+        public static Dictionary<int, int> GetPostLikeCount(List<int> eventIds)
+        {
+            using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                sqlConnection.Open();
+
+                //Get the posts
+                string query = "SELECT * FROM FeedPostLikes WHERE EventLogId IN @EventId ";
+                var result = sqlConnection.Query(query, new { EventId = eventIds }).ToList();
+                Dictionary<int, int> eventIdsAndLikes = new Dictionary<int, int>();
+                //Add all eventIds to the dictionary and initialize to 0 likes
+                foreach (int eventId in eventIds)
+                {
+                    eventIdsAndLikes.Add(eventId, 0);
+                }
+                //If the query gives a result, add each result (like) to the dictionary
+                if (result != null)
+                {
+                    foreach (var r in result)
+                    {
+                        //Increment number of likes for that event ID
+                        eventIdsAndLikes[r.EventLogId]++;
+                    }
+                }
+                return eventIdsAndLikes;
+            }
+        }
+
+        /// <summary>
         /// Checks to see if a user has already liked a post.
         /// </summary>
         /// <param name="eventId"></param>
@@ -1436,6 +1516,38 @@ namespace OSBLE.Utility
             }
         }
 
+        /// <summary>
+        /// Checks to see if a user has already liked a post.
+        /// </summary>
+        /// <param name="eventIds"> A list of visible feed items on the feed </param>
+        /// <param name="senderId"> The current user </param>
+        /// <returns> A list of eventIds that have been liked by the user </returns>
+        /// courtney-snyder
+        public static List<int> ArePostsLikedByUser(List<int> eventIds, int senderId)
+        {
+            using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                sqlConnection.Open();
+
+                //Get the posts with the given eventIds list and check if the user has liked any of the visible posts
+                string query = "SELECT EventLogId FROM FeedPostLikes WHERE EventLogId IN @InputEventLogId AND UserProfileId = @InputSenderId ";
+                var result = sqlConnection.Query(query, new { InputEventLogId = eventIds, InputSenderId = senderId }).ToList();
+                List<int> eventIdAndLikeStatus = new List<int>();
+                //If the query gives any results, that user has liked a post
+                if (result != null)
+                {
+                    foreach(var r in result)
+                    {
+                        var seeWhatRIs = r;
+                        eventIdAndLikeStatus.Add(r.EventLogId);
+                    }
+                    //Add each query result into the dictionary
+                    return eventIdAndLikeStatus;
+                }
+                //Otherwise, that post has not been liked by that user
+                return null;
+            }
+        }
 
         /// <summary>
         /// Updates the number of likes a post has by either adding a new row (like) or removing an existing column (unlike)
