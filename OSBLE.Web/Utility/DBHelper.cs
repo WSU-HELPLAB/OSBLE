@@ -2223,7 +2223,26 @@ namespace OSBLE.Utility
 
             return;
         }
+        /// <summary>
+        /// Adds a webpage submission to the SubmitEventProperties table that keeps track of where a submission came from
+        /// </summary>
+        /// <param name="EventLogId"></param>
+        internal static void AddToSubmitEventProperties(int EventLogId)
+        {
+            bool Webpage = true;
+            bool Plugin = false;
+            string query = "";
 
+
+            var sqlConnection = new SqlConnection(StringConstants.ConnectionString);
+
+            query = "INSERT INTO SubmitEventProperties(EventLogId,IsWebpageSubmit,IsPluginSubmit) VALUES (@EventLogId,@Webpage,@Plugin);";
+
+            var result = sqlConnection.Query(query, new { EventLogId = EventLogId, Webpage = Webpage, Plugin = Plugin });
+
+
+
+        }
         internal static bool InterventionEnabledForCourse(int courseId)
         {
             bool interventionsEnabled = false;
