@@ -457,11 +457,32 @@ function FeedViewModel(userName, userId, current) {
             dataType: "json",
             data: { endDate: lastDate, keywords: self.keywords(), events: GetCheckedEvents() },
             success: function (data) {
+                var feedItems = [];
                 $.each(data.Feed, function (index, value) {
                     var newFeedItem = new FeedItem(value);
                     var lastIndex = self.items().length - 1;
                     if (self.items()[lastIndex].eventId != newFeedItem.eventId) { //only push if it's not already on the feed
                         self.items.push(newFeedItem);
+                        feedItems.push(newFeedItem);
+                    }
+                });
+                //Load Resolved status on visible post
+                $.ajax({
+                    url: "/Feed/GetResolvedPostIds",
+                    data: {},
+                    datatype: "JSON",
+                    success: function (data) {
+                        //Get all the Resolved Post Ids
+                        var idList = data.idList;
+                        for (var i = 0; i < idList.length; i++) {
+                            //Mark Feed Item as *checked box* Resolved
+                            $('#mark-as-resolved-' + idList[i]).val("Resolved");
+                            var icon = "<span style='color:green' class='glyphicon glyphicon-check'></span>" + ' [Resolved]';
+                            $('#mark-as-resolved-' + idList[i]).text("");
+                            $('#mark-as-resolved-' + idList[i]).append(icon);
+                        }
+                        //Display the number of likes for each of the loaded posts
+                        LoadLikes(feedItems);
                     }
                 });
                 if (data.HasLastPost) {
@@ -527,7 +548,8 @@ function FeedViewModel(userName, userId, current) {
     function LoadLikes(feedItemList) {
         //Get feed ID from each feed item
         var feedEventIds = [];
-        for (var i = 0; i < feedItemList.length; i++)
+        //for (var i = 0; i < feedItemList.length; i++)
+        for (var i = 0; i < Object.keys(feedItemList).length; i++)
         {
             feedEventIds.push(feedItemList[i].eventId);
         }
@@ -578,7 +600,7 @@ function FeedViewModel(userName, userId, current) {
     ///courtney-snyder
     function ArePostsLiked(feedItemList) {
         var feedEventIds = [];
-        for (var i = 0; i < feedItemList.length; i++)
+        for (var i = 0; i < Object.keys(feedItemList).length; i++)
         {
             feedEventIds.push(feedItemList[i].eventId);
         }
@@ -601,10 +623,13 @@ function FeedViewModel(userName, userId, current) {
                     //Get the event from the feedItemList (IMPORTANT because you need the same object reference; highlight
                     //is in a knockout data-bind
                     var result = feedItemList.filter(function (obj) {
-                        return obj.eventId == elementAsInt ? obj : null;
+                        return obj.eventId == elementAsInt ? obj : null;               
                     });
                     //result is a single element list since each element in the feedItemList has a unique eventId
-                    result[0].highlightMark(true);
+                    if (result != null)
+                    {
+                        result[0].highlightMark(true);
+                    }
                 }
             }
         });
