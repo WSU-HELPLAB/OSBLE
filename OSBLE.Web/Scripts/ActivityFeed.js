@@ -9,7 +9,7 @@ function FeedItem(data) {
     self.eventLogId = data.EventLogId;
     self.timeString = ko.observable(data.TimeString);
     self.eventDate = data.EventDate;
-    self.options = new FeedItemOptions(data.CanMail, data.CanDelete, data.CanEdit, data.ShowPicture, data.CanVote, data.HideMail, data.EventVisibilityGroups, data.EventVisibleTo, data.IsAnonymous);
+    self.options = new FeedItemOptions(data.CanMail, data.CanDelete, data.CanEdit, data.ShowPicture, data.CanVote, data.HideMail, data.EventVisibilityGroups, data.EventVisibleTo, data.IsAnonymous, data.senderId);
     self.show = true;
     self.isComment = self.parentEventId != -1;
     self.isHelpfulMark = data.IsHelpfulMark;
@@ -243,7 +243,7 @@ function FeedItem(data) {
     }
 }
 
-function FeedItemOptions(canMail, canDelete, canEdit, showPicture, canVote, hideMail, eventVisibilityGroups, eventVisibleTo, isAnonymous) {
+function FeedItemOptions(canMail, canDelete, canEdit, showPicture, canVote, hideMail, eventVisibilityGroups, eventVisibleTo, isAnonymous, senderId) {
     var self = this;
     self.canMail = canMail;
     self.canDelete = canDelete;
@@ -254,6 +254,7 @@ function FeedItemOptions(canMail, canDelete, canEdit, showPicture, canVote, hide
     self.eventVisibilityGroups = eventVisibilityGroups;
     self.eventVisibleTo = eventVisibleTo;
     self.isAnonymous = isAnonymous;
+    self.senderId = senderId;
 }
 
 function FeedViewModel(userName, userId, current) {
@@ -549,8 +550,7 @@ function FeedViewModel(userName, userId, current) {
         //Get feed ID from each feed item
         var feedEventIds = [];
         //for (var i = 0; i < feedItemList.length; i++)
-        for (var i = 0; i < Object.keys(feedItemList).length; i++)
-        {
+        for (var i = 0; i < Object.keys(feedItemList).length; i++) {
             feedEventIds.push(feedItemList[i].eventId);
         }
 
@@ -588,15 +588,22 @@ function FeedViewModel(userName, userId, current) {
             data: { eventId: feedItem.eventId, senderId: self.userId },
             dataType: "json",
             success: function (data) {
+                //If the poster and current user are the same person, hide the thumb
+                if (feedItem.senderId == self.userId) {
+                    var name = "#feed-post-" + eventId + "-thumb";
+                    $(name).text("");
+                    alert("Hide " + name +  " thumb")
+                }
                 //If the user liked the post at some point before page load, highlight thumb
-                if (data.boolResult) {
+                else if (data.boolResult) {
                     feedItem.highlightMark(true);
                 }
             }
         });
     }
 
-    ///summary: Highlights the thumbs of the visible posts on the Feed if the user liked them.
+    ///summary: Highlights the thumbs of the visible posts on the Feed if the user liked them. Also removes thumbs from 
+    ///         user's own posts.
     ///courtney-snyder
     function ArePostsLiked(feedItemList) {
         var feedEventIds = [];
@@ -615,6 +622,9 @@ function FeedViewModel(userName, userId, current) {
                 var list = data.likeString;
                 //Split the string on commas
                 var listSplit = list.split(',');
+                //If there are no posts liked by the user, do not enter the first for loop
+                if (listSplit[0] == [])
+                    listSplit.length = 0;
                 for (var i = 0; i < listSplit.length; i++) {
                     //Get each Event ID as a string
                     var elementAsString = listSplit[i];
@@ -626,9 +636,18 @@ function FeedViewModel(userName, userId, current) {
                         return obj.eventId == elementAsInt ? obj : null;               
                     });
                     //result is a single element list since each element in the feedItemList has a unique eventId
-                    if (result != null)
+                    if (result != null && result != [])
                     {
                         result[0].highlightMark(true);
+                    }
+                }
+
+                //Remove thumbs from all posts made by the current user (Bob Smith cannot like his own post)
+                for (var i = 0; i < feedItemList.length; i++)
+                {
+                    if (feedItemList[i].senderId == self.userId) {
+                        var name = '#feed-post-' + feedItemList[i].eventId + '-thumb';
+                        $(name).removeClass();
                     }
                 }
             }
@@ -857,6 +876,7 @@ function DetailsViewModel(userName, userId, rootId) {
             success: function (data, textStatus, jqXHR) {
                 var itemAsList = [new FeedItem(data.Item)];
                 self.items(itemAsList);
+                self.senderId = data.Item.SenderId;
             },
             complete:
                 //Load Resolved status on the post
@@ -873,19 +893,24 @@ function DetailsViewModel(userName, userId, rootId) {
                             $('#mark-as-resolved-' + self.rootId).text("");
                             $('#mark-as-resolved-' + self.rootId).append(icon);
                         }
-                        //Display the number of likes for each of the loaded posts
-                        LoadLikes(self.rootId);
+                        //Display the number of likes for the post
+                        LoadLikes(self.rootId, self.senderId);
                     }
                 })
         });
     };
 
     ///summary: Gets the number of likes for that post on page load/refresh (repeated because this is in the DetailsViewModel).
-    ///         and highlights the thumb if the post has already been liked by the current viewer.
+    ///         and highlights the thumb if the post has already been liked by the current viewer OR removes the thumb if the
+    ///         user is the poster
     ///courtney-snyder
-    function LoadLikes(eventId) {
+    function LoadLikes(eventId, senderId) {
         IsPostLiked(eventId);
         GetPostLikeCount(eventId);
+        if (senderId == self.userId) {
+            var name = '#feed-post-' + eventId + '-thumb';
+            $(name).removeClass();
+        }
     }
 
     ///summary: Highlights the thumb if the current user liked that post.
