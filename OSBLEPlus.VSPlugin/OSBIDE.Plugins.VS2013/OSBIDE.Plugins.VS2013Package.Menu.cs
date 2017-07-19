@@ -160,11 +160,17 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
             var evt = new SubmitEvent();
             var dte = (DTE2)GetService(typeof(SDTE));
 
+
+
+            dte.Solution.Projects.DTE.Documents.SaveAll();
+           
+
             if (dte.Solution.FullName.Length == 0)
             {
-                MessageBox.Show(@"No solution is currently open.");
-                return;
+               MessageBox.Show(@"No solution is currently open.");
+               return;
             }
+
             var cacheItem = _cache[StringConstants.AuthenticationCacheKey];
             if (cacheItem != null && string.IsNullOrEmpty(cacheItem.ToString()) == false)
             {
