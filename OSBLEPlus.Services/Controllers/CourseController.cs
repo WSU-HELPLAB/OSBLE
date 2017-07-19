@@ -8,6 +8,11 @@ using OSBLEPlus.Logic.DataAccess.Profiles;
 using OSBLEPlus.Logic.DomainObjects.ActivityFeeds;
 using OSBLEPlus.Logic.DomainObjects.Profiles;
 using OSBLEPlus.Logic.Utility.Auth;
+using OSBLEPlus.Logic.Utility;
+using System.Data.SqlClient;
+using System.Data.SqlTypes;
+using Dapper;
+
 
 namespace OSBLEPlus.Services.Controllers
 {
@@ -92,7 +97,11 @@ namespace OSBLEPlus.Services.Controllers
             }
 
             var content = Posts.SaveEvent(request.SubmitEvent).ToString();
+            AddToSubmitEventProperties(Convert.ToInt16(content));
             Posts.SaveToFileSystem(request.SubmitEvent);
+
+
+
 
             try //don't want hub notification to break post
             {
@@ -125,6 +134,36 @@ namespace OSBLEPlus.Services.Controllers
             {
                 Content = new StringContent(content)
             };
+        }
+
+        /// <summary>
+        /// Same as the DBHelper function of the same name, except for a plugin submission,
+        ///  could not access DBHelper so had to write another function.
+        ///  Adds event to SubmitEventProperties for a plugin submission.
+        /// </summary>
+        /// <param name="EventLogId"></param>
+        private static void AddToSubmitEventProperties(int EventLogId)
+        {
+
+            bool Webpage = false;
+            bool Plugin = true;
+            string query = "";
+
+            try
+            {
+                var sqlConnection = new SqlConnection(StringConstants.ConnectionString);
+
+                query = "INSERT INTO SubmitEventProperties(EventLogId,IsWebpageSubmit,IsPluginSubmit) VALUES (@EventLogId,@Webpage,@Plugin);";
+
+                var result = sqlConnection.Query(query, new { EventLogId = EventLogId, Webpage = Webpage, Plugin = Plugin });
+
+            }
+            catch (Exception)
+            {
+                
+                throw;
+            }
+            
         }
 
         private async void ProcessLogForIntervention(SubmissionRequest request)
