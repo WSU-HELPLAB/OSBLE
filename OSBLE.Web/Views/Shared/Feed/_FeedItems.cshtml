@@ -11,6 +11,7 @@
     int genericComponent = (int)VsComponent.GenericComponent;
     string detailsLink = ViewBag.DetailsLink ?? "'/Feed/Details/' + idString";
     detailsLink += "+'?component='+" + genericComponent;
+    var activeCourseUser = ViewBag.ActiveCourseUser;
 }
 
 <div data-bind="if: show && vm.InEventVisibleToList(options.eventVisibleTo)">
@@ -49,20 +50,19 @@
                 }
                 @* 
                 courtney-snyder
-                Like Button (for feed posts)
+                Like Button (for posts)
                 *@
                 else if (!isComment)
                 {
                     <span data-bind="attr: {id: 'feed-post-' + eventId + '-likes'}"> + </span>
-
-                    @* Don't allow self upvoting *@
-                    <div data-bind="ifnot: options.canEdit">
-                        <a title="Like Post" data-bind="click: LikeFeedPost, css: { 'icon-highlight' : highlightMark() == true }">
-                            <span class="glyphicon glyphicon-thumbs-up"></span>
-                        </a>
+                    <div>
+                                @* If the current user was not the poster, allow them to like the event *@
+                                    <a title="Like Post" data-bind="click: LikeFeedPost, css: { 'icon-highlight' : highlightMark() == true }">
+                                        <span data-bind="attr: {id: 'feed-post-' + eventId + '-thumb' }" class="glyphicon glyphicon-thumbs-up"></span>
+                                    </a>
                     </div>
                 }
-
+                
                 @* Mail Button *@
                 <div data-bind="if: options.canMail && !options.hideMail">
                     <a title="Mail This User" data-bind="attr: {href: '/Mail/CreateUser/' + senderId + '?component=' + @genericComponent}"><span class="glyphicon glyphicon-envelope"></span></a>
