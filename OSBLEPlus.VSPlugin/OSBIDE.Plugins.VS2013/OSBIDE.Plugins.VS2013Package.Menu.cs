@@ -163,8 +163,16 @@ namespace WashingtonStateUniversity.OSBIDE_Plugins_VS2013
 
 
             dte.Solution.Projects.DTE.Documents.SaveAll();
-           
 
+            var build = dte.Solution.SolutionBuild.BuildState;
+
+          
+            var result = MessageBox.Show(@"If you do not build your soultion, all your files may not be submitted, would you like to build? If not, you may still submit your assignment.", "", MessageBoxButtons.YesNo);
+            if (result == DialogResult.Yes)
+            {
+               dte.Solution.SolutionBuild.Build(true);
+            }
+         
             if (dte.Solution.FullName.Length == 0)
             {
                MessageBox.Show(@"No solution is currently open.");
