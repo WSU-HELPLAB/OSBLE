@@ -1367,9 +1367,7 @@ namespace OSBLE.Utility
             }
         }
 
-        /// <returns>
-        /// Returns a list of post IDs marked as "Resolved" from the FeedPostEventFlags db
-        /// </returns>
+        /// <returns> Returns a list of post IDs marked as "Resolved" from the FeedPostEventFlags db </returns>
         /// courtney-snyder
         public static List<int> GetResolvedPostIds()
         {
@@ -1387,10 +1385,8 @@ namespace OSBLE.Utility
         /// <summary>
         /// Takes a list of post event IDs and returns a list of those post event IDs that are "Resolved".
         /// </summary>
-        /// <param name="postEventIds"> An int list of post event ids. </param>
-        /// <returns>
-        /// Returns a list of post IDs marked as "Resolved" from the FeedPostEventFlags db
-        /// </returns>
+        /// <param name="postEventIds"> An string list of post event ids. </param>
+        /// <returns> Returns a list of post IDs marked as "Resolved" from the FeedPostEventFlags db </returns>
         /// courtney-snyder
         public static IEnumerable<int> GetResolvedPostIds(List<int> postEventIds)
         {
@@ -1398,10 +1394,67 @@ namespace OSBLE.Utility
             {
                 sqlConnection.Open();
                 //Get Resolved posts from the list of postEventIds
-                string query = "SELECT FeedPostEventId FROM FeedPostEventFlags WHERE MarkedResolved = 1 ";
-                List<int> allResolvedPosts = sqlConnection.Query<int>(query).ToList();
-                var relevantPosts = postEventIds.Intersect(allResolvedPosts);
-                return relevantPosts;
+                string query = "SELECT FeedPostEventId FROM FeedPostEventFlags WHERE FeedPostEventId IN @EventList AND MarkedResolved = 1 ";
+                IEnumerable<int> result = sqlConnection.Query<int>(query, new { EventList = postEventIds }).ToList();
+                return result;
+            }
+        }
+
+        /// <returns>
+        /// Returns a dictionary of post IDs (key) and senders (value) marked as "Resolved" from the FeedPostEventFlags db
+        /// </returns>
+        /// courtney-snyder
+        public static Dictionary<int, int> GetResolvedPostIdsAndSenderIds()
+        {
+            using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                sqlConnection.Open();
+
+                //Get all Resolved posts
+                string query = "SELECT * FROM FeedPostEventFlags WHERE MarkedResolved = 1 ";
+                var resolvedPosts = sqlConnection.Query<int>(query).ToList();
+                Dictionary<int, int> returnDict = new Dictionary<int, int>();
+
+                return returnDict;
+            }
+        }
+
+        /// <returns>
+        /// Returns a dictionary of post IDs (key) and senders (value) marked as "Resolved" from the FeedPostEventFlags db
+        /// </returns>
+        /// <param name="postEventIds"> An int list of post event ids. </param>
+        /// courtney-snyder
+        public static Dictionary<int, int> GetResolvedPostIdsAndSenderIds(List<int> postEventIds)
+        {
+            using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                sqlConnection.Open();
+
+                //Get all Resolved posts
+                //string query = "SELECT * FROM FeedPostEventFlags WHERE MarkedResolved = 1 ";
+                //string query = "SELECT FeedPostEventFlags.FeedPostEventId, EventLogs.SenderId " +
+                //               "FROM FeedPostEventFlags " +
+                //               "INNER JOIN EventLogs " +
+                //               "ON FeedPostEventFlags.FeedPostEventId = EventLogs.Id " +
+                //               "WHERE FeedPostEventFlags.FeedPostEventId IN @postEventIds " +
+                //               "AND FeedPostEventFlags.MarkedResolved = 1 " ;
+                string query = "SELECT FeedPostEventFlags.FeedPostEventId, EventLogs.SenderId " +
+                               "FROM FeedPostEventFlags " +
+                               "INNER JOIN EventLogs " +
+                               "ON FeedPostEventId = EventLogs.Id " +
+                               "WHERE FeedPostEventFlags.FeedPostEventId IN @EventIdList " +
+                               "AND FeedPostEventFlags.MarkedResolved = 1 ";
+                //string temp = "SELECT * FROM LogCommentEvents l INNER JOIN EventLogs e ON l.EventLogId = e.Id WHERE (IsDeleted IS NULL OR IsDeleted = 0) AND e.SenderId = @uid ORDER BY e.EventDate DESC";
+                var resolvedPosts = sqlConnection.Query(query, new { EventIdList = postEventIds } ).ToList();
+                Dictionary<int, int> postIdSenderIdDict = new Dictionary<int, int>();
+                foreach (var r in resolvedPosts)
+                {
+                    int key = r.FeedPostEventId;
+                    int value = r.SenderId;
+                    postIdSenderIdDict.Add(key, value);
+                }
+
+                return postIdSenderIdDict;
             }
         }
 
@@ -1910,6 +1963,29 @@ namespace OSBLE.Utility
                 sender.LastName = "User";
             }
             return sender;
+        }
+
+        /// <summary>
+        /// Gets the senderId of the specified postId
+        /// </summary>
+        /// <param name="postID"> The post in question </param>
+        /// <param name="connection"></param>
+        /// <returns></returns>
+        /// courtney-snyder
+        public static int GetFeedItemSenderId(int postID, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection()) { return GetFeedItemSenderId(postID, sqlc); }
+            }
+
+            var sender = connection.Query(
+            "SELECT SenderId " +
+            "FROM EventLogs " +
+            "WHERE Id = @PostId ",
+            new { PostId = postID }).FirstOrDefault();
+
+            return sender.SenderId;
         }
 
         public static bool IsEventDeleted(int postID, SqlConnection connection = null)

@@ -169,7 +169,7 @@ function FeedItem(data) {
         //If the current value is false, switch to [Resolved] on click
         if (!isResolved) {
             $('#mark-as-resolved-' + self.eventId).val('Resolved');
-            var icon = "<span style='color:green' class='glyphicon glyphicon-check'></span>" + ' [Resolved]';
+            var icon = "<span style='color:green' class='glyphicon glyphicon-check'></span>" + '<b> [Resolved] </b>';
             //Clear text
             $('#mark-as-resolved-' + self.eventId).text("");
             //Add the cute lil check
@@ -179,7 +179,7 @@ function FeedItem(data) {
             //And vice versa
         else {
             $('#mark-as-resolved-' + self.eventId).val('Unresolved');
-            var icon = "<span class='glyphicon glyphicon-unchecked'></span>" + ' [Mark as Resolved]';
+            var icon = "<span class='glyphicon glyphicon-unchecked'></span>" + '<b> [Mark as Resolved] </b>';
             //Clear text
             $('#mark-as-resolved-' + self.eventId).text("");
             //Add the sad lonely box
@@ -521,23 +521,51 @@ function FeedViewModel(userName, userId, current) {
             },
             complete: function () {
                 HideLoading();
-                //Load Resolved status on visible post
+                var mappedItemsEventIds = [];
+                for (var i = 0; i < mappedItems.length; i++)
+                {
+                    mappedItemsEventIds.push(mappedItems[i].eventId);
+                }
+                //Load Resolved status on visible posts
                 $.ajax({
-                    url: "/Feed/GetResolvedPostIds",
-                    data: {},
-                    datatype: "JSON",
+                    url: "/Feed/GetSelectedResolvedPostIdsAndSenderIds",
+                    data: { viewablePostIds: JSON.stringify(mappedItemsEventIds) },
+                    datatype: "json",
                     success: function (data) {
-                        //Get all the Resolved Post Ids
-                        var idList = data.idList;
-                        for (var i = 0; i < idList.length; i++) {
-                            //Mark Feed Item as *checked box* Resolved
-                            $('#mark-as-resolved-' + idList[i]).val("Resolved");
-                            var icon = "<span style='color:green' class='glyphicon glyphicon-check'></span>" + ' [Resolved]';
-                            $('#mark-as-resolved-' + idList[i]).text("");
-                            $('#mark-as-resolved-' + idList[i]).append(icon);
+                        for (var i = 0; i < mappedItems.length; i++)
+                        {
+                            //if (mappedItems[i].eventType == "MarkHelpfulGivenEvent")
+                                //alert("eventType: " + mappedItems[i].eventType + " senderId: " + mappedItems[i].senderId);
+                        }
+                        //Get all the Resolved Post Ids and Sender Ids
+                        var dictionary = data.resolvedString;
+                        if (dictionary != "") {
+                            //Split the string on commas
+                            var dictionarySplit = dictionary.split(',');
+                            for (var i = 0; i < dictionarySplit.length; i++) {
+                                var elementSplit = dictionarySplit[i].split(':');
+                                eventId = elementSplit[0];
+                                senderId = elementSplit[1];
+                                //If the post is resolved and the current user was the poster, update the anchor link
+                                if (senderId == self.userId) {
+                                    $('#mark-as-resolved-' + eventId).val('Resolved');
+                                    $('#mark-as-resolved-' + eventId).text("");
+                                    $('#mark-as-resolved-' + eventId).append("<span style='color:green' class='glyphicon glyphicon-check'></span> <b> [Resolved] </b>");
+                                }
+                                //Otherwise, display text
+                                else {
+                                    $('#mark-as-resolved-' + eventId).val('Resolved');
+                                    var icon = "<span style='color:green' class='glyphicon glyphicon-check'></span> <b> Resolved </b>";
+                                    $('#mark-as-resolved-' + eventId).text("");
+                                    $('#mark-as-resolved-' + eventId).append(icon);
+                                }
+                            }
                         }
                         //Display the number of likes for each of the loaded posts
                         LoadLikes(mappedItems);
+                    },
+                    error: function (data) {
+
                     }
                 });
             }
@@ -1748,4 +1776,38 @@ function getUserRole() {
         }
     })
     return currentRole;
+}
+
+///summary: Used in _FeedItems databind to check if current user and event poster are the same user
+///courtney-snyder
+function IsSelf(postSenderId, currentUserId, eventId) {
+    var isSelf = null;
+    //If the post is Anon, get the poster ID from the DB and compare with current user ID
+    if (postSenderId == 0)
+    {
+        var anonSenderId;
+        $.ajax({
+            url: "/Feed/GetFeedItemSenderId",
+            data: { eventID: parseInt(eventId) },
+            datatype: "json",
+            method: "GET",
+            success: function (result) {
+                anonSenderId = result.senderId;
+                //alert("result.senderId: " + result.senderId + " anonSenderId: " + anonSenderId);
+                if (anonSenderId == currentUserId) {
+                    isSelf = true;
+                }
+            },
+            error: function (result) {
+            }
+        });
+    }
+    //Otherwise, just compared the post's sender ID and current user's sender ID
+    else
+    {
+        if (postSenderId == currentUserId) {
+            isSelf = true;
+        }
+    }
+    return isSelf;
 }

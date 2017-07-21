@@ -1035,10 +1035,81 @@ namespace OSBLE.Controllers
             DBHelper.UpdatePostItemLikeCount(eventId, senderId);
         }
 
+        /// <summary>
+        /// Gets all Resolved post IDs.
+        /// </summary>
+        /// <returns> Json result containing the resolved post IDs. </returns>
+        /// courtney-snyder
         [HttpGet]
         public JsonResult GetResolvedPostIds()
         {
             return Json(new { idList = DBHelper.GetResolvedPostIds() }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Gets all Resolved post IDs and their senders.
+        /// </summary>
+        /// <returns> Json result containing a dictionary of post IDs (key) and corresponding senders (value). </returns>
+        /// courtey-snyder
+        [HttpGet]
+        public JsonResult GetResolvedPostIdsAndSenderIds()
+        {
+            return Json(new { idDict = DBHelper.GetResolvedPostIdsAndSenderIds() }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Gets all Resolved post IDs from a list of post IDs.
+        /// </summary>
+        /// <param name="viewablePostIds"> A list of post items the user can see on the page. </param>
+        /// <returns> Json result containing the resolved post IDs in the list of given post IDs. </returns>
+        /// courtney-snyder
+        [HttpGet]
+        public JsonResult GetSelectedResolvedPostIds(string viewablePostIds)
+        {
+            //Remove [ and ]
+            viewablePostIds = viewablePostIds.Substring(1, viewablePostIds.Length - 2);
+            var splitPostIds = viewablePostIds.Split(',');
+            List<int> postEventIdInts = new List<int>();
+            //Parse Event Id strings
+            foreach (var s in splitPostIds)
+            {
+                int temp = Convert.ToInt32(s);
+                postEventIdInts.Add(temp);
+            }
+            return Json(new { idList = DBHelper.GetResolvedPostIds(postEventIdInts) }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Gets all Resolved post IDs and their senders from a list of post IDs. Used in ActivityFeed.js
+        /// </summary>
+        /// <param name="viewablePostIds"> A list of post items the user can see on the page. </param>
+        /// <returns> Json result containing the resolved post IDs in the list of given post IDs. </returns>
+        /// courtney-snyder
+        [HttpGet]
+        public JsonResult GetSelectedResolvedPostIdsAndSenderIds(string viewablePostIds)
+        {
+            //Remove [ and ]
+            viewablePostIds = viewablePostIds.Substring(1, viewablePostIds.Length - 2);
+            var splitPostIds = viewablePostIds.Split(',');
+            List<int> postEventIdInts = new List<int>();
+            //Parse Event Id strings
+            foreach (var s in splitPostIds)
+            {
+                int temp = Convert.ToInt32(s);
+                postEventIdInts.Add(temp);
+            }
+            var resolvedDictionary = DBHelper.GetResolvedPostIdsAndSenderIds(postEventIdInts);
+            //Because javascript seems to have issues with JSON objects containing dictionaries
+            string resolvedString = string.Join(",", resolvedDictionary.Select(m => m.Key + ":" + m.Value).ToArray());
+
+            return Json(new { resolvedString }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult GetFeedItemSenderId(int eventID)
+        {
+            int senderId = DBHelper.GetFeedItemSenderId(eventID);
+            return Json(new { senderId }, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
