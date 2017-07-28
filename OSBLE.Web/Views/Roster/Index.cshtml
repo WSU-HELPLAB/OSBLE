@@ -264,10 +264,9 @@
                     <input type="checkbox" title="Check this box to select / deselect all users in this section" id="sectionCheck" class="sectionCheckBox" onchange="sectionCheckChange(this)" section="@usersBySection.SectionNumber" style="width: 40px; height: 20px;" />
                 }
             }
-            else
-            {
-                <input type="checkbox" title="Check this box to select / deselect all users in this section" id="sectionCheck" class="sectionCheckBox" onchange="sectionCheckChange(this)" section="@usersBySection.SectionNumber" style="display: none;" />
-            }
+            
+            <input type="checkbox" title="Check this box to select / deselect all users in this section" id="sectionCheck" class="sectionCheckBox" onchange="sectionCheckChange(this)" section="@usersBySection.SectionNumber" style="display: none;" />
+
             @if (usersBySection.SectionNumber == "-2")
             {
                 <h2 id="SelectHelper" style="display:inline;">Click on users to perform actions on them</h2>

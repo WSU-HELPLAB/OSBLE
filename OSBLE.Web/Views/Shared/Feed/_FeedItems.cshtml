@@ -11,6 +11,7 @@
     int genericComponent = (int)VsComponent.GenericComponent;
     string detailsLink = ViewBag.DetailsLink ?? "'/Feed/Details/' + idString";
     detailsLink += "+'?component='+" + genericComponent;
+    var activeCourseUser = ViewBag.ActiveCourseUser;
 }
 
 <div data-bind="if: show && vm.InEventVisibleToList(options.eventVisibleTo)">
@@ -49,20 +50,19 @@
                 }
                 @* 
                 courtney-snyder
-                Like Button (for feed posts)
+                Like Button (for posts)
                 *@
                 else if (!isComment)
                 {
                     <span data-bind="attr: {id: 'feed-post-' + eventId + '-likes'}"> + </span>
-
-                    @* Don't allow self upvoting *@
-                    <div data-bind="ifnot: options.canEdit">
-                        <a title="Like Post" data-bind="click: LikeFeedPost, css: { 'icon-highlight' : highlightMark() == true }">
-                            <span class="glyphicon glyphicon-thumbs-up"></span>
-                        </a>
+                    <div>
+                           @* If the current user was not the poster, allow them to like the event *@
+                            <a title="Like Post" data-bind="click: LikeFeedPost, css: { 'icon-highlight' : highlightMark() == true }">
+                                <span data-bind="attr: {id: 'feed-post-' + eventId + '-thumb' }" class="glyphicon glyphicon-thumbs-up"></span>
+                            </a>
                     </div>
                 }
-
+                
                 @* Mail Button *@
                 <div data-bind="if: options.canMail && !options.hideMail">
                     <a title="Mail This User" data-bind="attr: {href: '/Mail/CreateUser/' + senderId + '?component=' + @genericComponent}"><span class="glyphicon glyphicon-envelope"></span></a>
@@ -78,27 +78,32 @@
                     <a title="Edit this post" data-bind="click: ShowEditBox, attr: {id: 'btn-edit-' + eventId}"><span class="glyphicon glyphicon-pencil"></span></a>
                 </div>
 
-                
                 @* 
                 courtney-snyder
-                Mark as Resolved/Resolved 
+                Mark as Resolved/Resolved (for posts)
                 *@
-                <div data-bind="if: options.canEdit">
-                    @if (!isComment)
-                    {
-                        //OP will see an anchor link version of "Mark As Resolved"
-                        <a data-bind="click: MarkPostResolved, attr: {id: 'mark-as-resolved-' + eventId}" style="color:black;"><span class="glyphicon glyphicon-unchecked"></span> [Mark as Resolved] </a>
-                    }
-                </div>
-                <div data-bind="ifnot: options.canEdit">
-                    @if (!isComment)
-                    {
-                        //Everyone else will see Resolved IF the post value is Resolved
-                        <div data-bind="if: IsMarkedResolved(eventId)">
-                            <strong style="color:black"> <span class="glyphicon glyphicon-check" style="color:green" ></span> Resolved </strong>
+                <div>
+                    <div data-bind="if: IsSelf(senderId, activeCourseUserId, eventId)">
+                        @* //OP will see an anchor link version of "Mark As Resolved" for Feed Posts and Ask For Help Events
+                           //Should work for Anon posts but doesn't ¯\_(ツ)_/¯ *@
+                        <div>
+                            <div data-bind="if: eventType == 'FeedPostEvent'">
+                                <a data-bind="click: MarkPostResolved, attr: {id: 'mark-as-resolved-' + eventId }" style="color:black;"><span class="glyphicon glyphicon-unchecked"></span> <b> [Mark as Resolved] </b> </a>
+                            </div>
+                            <div data-bind="if: eventType == 'AskForHelpEvent'">
+                                <a data-bind="click: MarkPostResolved, attr: {id: 'mark-as-resolved-' + eventId }" style="color:black;"><span class="glyphicon glyphicon-unchecked"></span> <b> [Mark as Resolved] </b> </a>
+                            </div>
                         </div>
-                        //Otherwise, they will see nothing
-                    }
+                    </div>
+                    <div data-bind="ifnot: IsSelf(senderId, activeCourseUserId, eventId)">
+                        @* //If the post value is Resolved, other course users will see Resolved *@
+                        <div data-bind="attr: {id: 'mark-as-resolved-' + eventId}">
+                            <div data-bind="if: IsMarkedResolved(eventId)">
+                                <strong style="color:black"> <span class="glyphicon glyphicon-check" style="color:green"></span> Resolved </strong>
+                            </div>
+                        </div>
+                        @* //Otherwise, they will see nothing *@
+                    </div>
                 </div>
             </div>
 

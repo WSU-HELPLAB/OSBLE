@@ -93,7 +93,7 @@ namespace OSBLE.Controllers
                             CourseId = assignment.CourseID,
                         };
                         int eventLogId = Posts.SaveEvent(sub);
-
+                        DBHelper.AddToSubmitEventProperties(eventLogId);
                         if (eventLogId == -1)
                         {
                             throw new Exception("Failed to log submit event to the eventlog table -- Posts.SaveEvent returned -1");

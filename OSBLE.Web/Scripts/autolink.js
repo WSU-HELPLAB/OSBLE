@@ -41,8 +41,14 @@
         }
 
         pattern = /(^|[\s\n>]|<br\/?>)((?:https?|ftp):\/\/[\-A-Z0-9+\u0026\u2019@#\/%?=()~_|!:,.;]*[\-A-Z0-9+\u0026@#\/%=~()_|])/gi;
-        if (!(options.length > 0)) {
+        //This if checks to see if we are in the plugin browser. If so add ?component=7 to link to make it work
+        if (!(options.length > 0) && !detectBrowser()) {
             return text.replace(pattern, "$1<a href='$2?component=7'>$2</a>").linkUsernames().linkHashtags();
+        }
+            //else we do not add component=7 as to not break the link
+            //add by Jacob Sadoian 7/10/17
+        else if (!(options.length > 0)) {
+            return text.replace(pattern, "$1<a href='$2'>$2</a>").linkUsernames().linkHashtags();
         }
         option = options[0];
         linkAttributes = ((function () {

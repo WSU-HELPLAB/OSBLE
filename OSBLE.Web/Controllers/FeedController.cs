@@ -952,6 +952,35 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
+        /// Calls the DBHelper method "GetPostLikeCount" and returns it to the AJAX call.
+        /// </summary>
+        /// <param name="eventIds"> A list of visible feed item IDs </param>
+        /// <returns> JSON Object containing a dictionary with eventIDs (key) and number of likes (value) </returns>
+        /// courtney-snyder
+        [HttpGet]
+        public JsonResult GetPostLikeCounts(string eventIds)
+        {
+            List<int> eventIdInts = new List<int>();
+            //Get the eventIds as a string
+            string eventIdsString = Convert.ToString(eventIds);
+            //Remove [ and ] from string
+            eventIdsString = eventIdsString.Substring(1, eventIdsString.Length-2);
+            //Split the IDs up
+            var splitEventIds = eventIdsString.Split(',');
+            //Convert IDs from strings to ints
+            foreach (var s in splitEventIds)
+            {
+                int temp = Convert.ToInt32(s);
+                eventIdInts.Add(temp);
+            }
+
+            var likeDictionary = DBHelper.GetPostLikeCount(eventIdInts);
+            string likeString = string.Join(",", likeDictionary.Select(m => m.Key + ":" + m.Value).ToArray());
+
+            return Json( new { likeString }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
         /// Checks the DB to see if that user liked the post
         /// </summary>
         /// <param name="eventId"></param>
@@ -962,6 +991,36 @@ namespace OSBLE.Controllers
         public JsonResult IsPostLikedByUser (int eventId, int senderId)
         {
             return Json(new { boolResult = DBHelper.IsPostLikedByUser(eventId, senderId) }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Checks the DB to see if that user liked any of the visible posts.
+        /// </summary>
+        /// <param name="eventIds"> A list of visible feed item ids. </param>
+        /// <param name="senderId"> The current viewer/user. </param>
+        /// <returns> A list of visible posts that the user has liked. </returns>
+        /// courtney-snyder
+        [HttpGet]
+        public JsonResult ArePostsLikedByUser (string eventIds, int senderId)
+        {
+            List<int> eventIdInts = new List<int>();
+            //Get the eventIds as a string
+            string eventIdsString = Convert.ToString(eventIds);
+            //Remove [ and ] from string
+            eventIdsString = eventIdsString.Substring(1, eventIdsString.Length - 2);
+            //Split the IDs up
+            var splitEventIds = eventIdsString.Split(',');
+            //Convert IDs from strings to ints
+            foreach (var s in splitEventIds)
+            {
+                int temp = Convert.ToInt32(s);
+                eventIdInts.Add(temp);
+            }
+            var likeList = DBHelper.ArePostsLikedByUser(eventIdInts, senderId);
+            //string likeString = string.Join(",", likeDictionary.Select(m => m.Key + ":" + m.Value).ToArray());
+            string likeString = string.Join(",", likeList);
+
+            return Json(new { likeString }, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -976,10 +1035,81 @@ namespace OSBLE.Controllers
             DBHelper.UpdatePostItemLikeCount(eventId, senderId);
         }
 
+        /// <summary>
+        /// Gets all Resolved post IDs.
+        /// </summary>
+        /// <returns> Json result containing the resolved post IDs. </returns>
+        /// courtney-snyder
         [HttpGet]
         public JsonResult GetResolvedPostIds()
         {
             return Json(new { idList = DBHelper.GetResolvedPostIds() }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Gets all Resolved post IDs and their senders.
+        /// </summary>
+        /// <returns> Json result containing a dictionary of post IDs (key) and corresponding senders (value). </returns>
+        /// courtey-snyder
+        [HttpGet]
+        public JsonResult GetResolvedPostIdsAndSenderIds()
+        {
+            return Json(new { idDict = DBHelper.GetResolvedPostIdsAndSenderIds() }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Gets all Resolved post IDs from a list of post IDs.
+        /// </summary>
+        /// <param name="viewablePostIds"> A list of post items the user can see on the page. </param>
+        /// <returns> Json result containing the resolved post IDs in the list of given post IDs. </returns>
+        /// courtney-snyder
+        [HttpGet]
+        public JsonResult GetSelectedResolvedPostIds(string viewablePostIds)
+        {
+            //Remove [ and ]
+            viewablePostIds = viewablePostIds.Substring(1, viewablePostIds.Length - 2);
+            var splitPostIds = viewablePostIds.Split(',');
+            List<int> postEventIdInts = new List<int>();
+            //Parse Event Id strings
+            foreach (var s in splitPostIds)
+            {
+                int temp = Convert.ToInt32(s);
+                postEventIdInts.Add(temp);
+            }
+            return Json(new { idList = DBHelper.GetResolvedPostIds(postEventIdInts) }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Gets all Resolved post IDs and their senders from a list of post IDs. Used in ActivityFeed.js
+        /// </summary>
+        /// <param name="viewablePostIds"> A list of post items the user can see on the page. </param>
+        /// <returns> Json result containing the resolved post IDs in the list of given post IDs. </returns>
+        /// courtney-snyder
+        [HttpGet]
+        public JsonResult GetSelectedResolvedPostIdsAndSenderIds(string viewablePostIds)
+        {
+            //Remove [ and ]
+            viewablePostIds = viewablePostIds.Substring(1, viewablePostIds.Length - 2);
+            var splitPostIds = viewablePostIds.Split(',');
+            List<int> postEventIdInts = new List<int>();
+            //Parse Event Id strings
+            foreach (var s in splitPostIds)
+            {
+                int temp = Convert.ToInt32(s);
+                postEventIdInts.Add(temp);
+            }
+            var resolvedDictionary = DBHelper.GetResolvedPostIdsAndSenderIds(postEventIdInts);
+            //Because javascript seems to have issues with JSON objects containing dictionaries
+            string resolvedString = string.Join(",", resolvedDictionary.Select(m => m.Key + ":" + m.Value).ToArray());
+
+            return Json(new { resolvedString }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult GetFeedItemSenderId(int eventID)
+        {
+            int senderId = DBHelper.GetFeedItemSenderId(eventID);
+            return Json(new { senderId }, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -1810,48 +1940,67 @@ namespace OSBLE.Controllers
         public string ReplaceMentionWithName(string body)
         {
             List<int> nameIndices = new List<int>();
+            
+           
             for (int i = 0; i < body.Length; i++)
             {
-                // If we find an '@' character, see if it's followed by "id=" then a number then a semicolon
-                if (body[i] == '@')
-                {
-                    if (body.Substring(i + 1, 3) == "id=")
+                try
+                {// If we find an '@' character, see if it's followed by "id=" then a number then a semicolon
+                    if (body[i] == '@')
                     {
-                        // After the '=', make sure there are numbers then a semicolon following it
-                        int digit = 0, rIndex = 4;
-                        bool hasDigit = false;
-                        while (int.TryParse(body.Substring(i + rIndex, 1), out digit))  // Keep reading characters until we hit something that isn't a digit
+                        if (body.Substring(i + 1, 3) == "id=")
                         {
-                            hasDigit = true;
-                            rIndex++;
+                            // After the '=', make sure there are numbers then a semicolon following it
+                            int digit = 0, rIndex = 4;
+                            bool hasDigit = false;
+                            while (int.TryParse(body.Substring(i + rIndex, 1), out digit))  // Keep reading characters until we hit something that isn't a digit
+                            {
+                                hasDigit = true;
+                                rIndex++;
+                            }
+                            if (hasDigit && body[i + rIndex] == ';')
+                                nameIndices.Add(i); // If the character following the numbers is a semicolon, we know there is a name reference here so record the index
                         }
-                        if (hasDigit && body[i + rIndex] == ';')
-                            nameIndices.Add(i); // If the character following the numbers is a semicolon, we know there is a name reference here so record the index
                     }
+                }
+                catch (Exception e)
+                {
+                    //throw out some information about variables in the current state to try and get more information about the exception to generate an actual fix in the future. 
+                    throw new Exception("Body.Length = " + body.Length + " nameIndicies.Count= " + nameIndices.Count + " i= " + i, e);
                 }
             }
             nameIndices.Reverse();
             foreach (int index in nameIndices) // In reverse order, we need to replace each @... with the students name
             {
-                // First let's get the length of the part we will replace and also record the id
-                int length = 0, tempIndex = index + 1;
-                string idString = "";
-                while (body[tempIndex] != ';') { length++; tempIndex++; idString += body[tempIndex]; }
 
-                // Get the id= part off the beginning of idString and the ; from the end
-                idString = idString.Substring(2);
-                idString = idString.Substring(0, idString.Length - 1);
-
-                // Then get the student's name from the id
-                int id; int.TryParse(idString, out id);
-                if (id != null)
+                try
                 {
-                    UserProfile referencedUser = (from user in db.UserProfiles where user.ID == id select user).FirstOrDefault();
-                    if (referencedUser == null) continue; // It's possible the user no longer exists, or for some reason someone manually entered @id=blahblahblah; into the text field.
-                    string studentFullName = referencedUser.FirstName + referencedUser.LastName;
 
-                    // Now replace the id number in the string with the user name
-                    body = body.Replace(body.Substring(index + 1, length + 1), string.Format("<a href=\"{0}\">{1}</a>", Url.Action("Index", "Profile", new { id = id }, Request.Url.Scheme), studentFullName));
+                    // First let's get the length of the part we will replace and also record the id
+                    int length = 0, tempIndex = index + 1;
+                    string idString = "";
+                    while (body[tempIndex] != ';') { length++; tempIndex++; idString += body[tempIndex]; }
+
+                    // Get the id= part off the beginning of idString and the ; from the end
+                    idString = idString.Substring(2);
+                    idString = idString.Substring(0, idString.Length - 1);
+
+                    // Then get the student's name from the id
+                    int id; int.TryParse(idString, out id);
+                    if (id != null)
+                    {
+                        UserProfile referencedUser = (from user in db.UserProfiles where user.ID == id select user).FirstOrDefault();
+                        if (referencedUser == null) continue; // It's possible the user no longer exists, or for some reason someone manually entered @id=blahblahblah; into the text field.
+                        string studentFullName = referencedUser.FirstName + referencedUser.LastName;
+
+                        // Now replace the id number in the string with the user name
+                        body = body.Replace(body.Substring(index + 1, length + 1), string.Format("<a href=\"{0}\">{1}</a>", Url.Action("Index", "Profile", new { id = id }, Request.Url.Scheme), studentFullName));
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    throw new Exception("Index = " + index + " nameIndices.Count= " + nameIndices.Count,ex);
                 }
             }
             return body;

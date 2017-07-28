@@ -9,7 +9,7 @@ function FeedItem(data) {
     self.eventLogId = data.EventLogId;
     self.timeString = ko.observable(data.TimeString);
     self.eventDate = data.EventDate;
-    self.options = new FeedItemOptions(data.CanMail, data.CanDelete, data.CanEdit, data.ShowPicture, data.CanVote, data.HideMail, data.EventVisibilityGroups, data.EventVisibleTo, data.IsAnonymous);
+    self.options = new FeedItemOptions(data.CanMail, data.CanDelete, data.CanEdit, data.ShowPicture, data.CanVote, data.HideMail, data.EventVisibilityGroups, data.EventVisibleTo, data.IsAnonymous, data.senderId);
     self.show = true;
     self.isComment = self.parentEventId != -1;
     self.isHelpfulMark = data.IsHelpfulMark;
@@ -169,17 +169,17 @@ function FeedItem(data) {
         //If the current value is false, switch to [Resolved] on click
         if (!isResolved) {
             $('#mark-as-resolved-' + self.eventId).val('Resolved');
-            var icon = "<span style='color:green' class='glyphicon glyphicon-check'></span>" + ' [Resolved]';
+            var icon = "<span style='color:green' class='glyphicon glyphicon-check'></span>" + '<b> [Resolved] </b>';
             //Clear text
             $('#mark-as-resolved-' + self.eventId).text("");
             //Add the cute lil check
             $('#mark-as-resolved-' + self.eventId).append(icon);
         }
 
-        //And vice versa
+            //And vice versa
         else {
             $('#mark-as-resolved-' + self.eventId).val('Unresolved');
-            var icon = "<span class='glyphicon glyphicon-unchecked'></span>" + ' [Mark as Resolved]';
+            var icon = "<span class='glyphicon glyphicon-unchecked'></span>" + '<b> [Mark as Resolved] </b>';
             //Clear text
             $('#mark-as-resolved-' + self.eventId).text("");
             //Add the sad lonely box
@@ -196,7 +196,7 @@ function FeedItem(data) {
             method: "GET"
         });
     }
-    
+
     self.AddComment = function () {
         if (self.isComment)
             return;
@@ -221,7 +221,7 @@ function FeedItem(data) {
 
         $.ajax({
             url: "/Feed/PostComment",
-            data: { id: self.eventId, content: text, isAnonymous : makeAnonymous },
+            data: { id: self.eventId, content: text, isAnonymous: makeAnonymous },
             dataType: "json",
             method: "POST",
             success: function (dataList) {
@@ -243,7 +243,7 @@ function FeedItem(data) {
     }
 }
 
-function FeedItemOptions(canMail, canDelete, canEdit, showPicture, canVote, hideMail, eventVisibilityGroups, eventVisibleTo, isAnonymous) {
+function FeedItemOptions(canMail, canDelete, canEdit, showPicture, canVote, hideMail, eventVisibilityGroups, eventVisibleTo, isAnonymous, senderId) {
     var self = this;
     self.canMail = canMail;
     self.canDelete = canDelete;
@@ -254,6 +254,7 @@ function FeedItemOptions(canMail, canDelete, canEdit, showPicture, canVote, hide
     self.eventVisibilityGroups = eventVisibilityGroups;
     self.eventVisibleTo = eventVisibleTo;
     self.isAnonymous = isAnonymous;
+    self.senderId = senderId;
 }
 
 function FeedViewModel(userName, userId, current) {
@@ -397,10 +398,10 @@ function FeedViewModel(userName, userId, current) {
     $.connection.hub.qs = { "userID": self.userId, "courseID": courseId };
     $.connection.hub.start();
     // *************************************
-    
-    self.GetRole = function (id, role) {               
-        
-        if (role == undefined || role == null) {            
+
+    self.GetRole = function (id, role) {
+
+        if (role == undefined || role == null) {
             var divId = "feed-item-" + id;
             $("#" + divId).find(".display_name").removeAttr("href");
             return "";
@@ -457,12 +458,33 @@ function FeedViewModel(userName, userId, current) {
             dataType: "json",
             data: { endDate: lastDate, keywords: self.keywords(), events: GetCheckedEvents() },
             success: function (data) {
-                $.each(data.Feed, function (index, value) {                    
+                var feedItems = [];
+                $.each(data.Feed, function (index, value) {
                     var newFeedItem = new FeedItem(value);
-                    var lastIndex = self.items().length - 1;                    
+                    var lastIndex = self.items().length - 1;
                     if (self.items()[lastIndex].eventId != newFeedItem.eventId) { //only push if it's not already on the feed
                         self.items.push(newFeedItem);
-                    }                    
+                        feedItems.push(newFeedItem);
+                    }
+                });
+                //Load Resolved status on visible post
+                $.ajax({
+                    url: "/Feed/GetResolvedPostIds",
+                    data: {},
+                    datatype: "JSON",
+                    success: function (data) {
+                        //Get all the Resolved Post Ids
+                        var idList = data.idList;
+                        for (var i = 0; i < idList.length; i++) {
+                            //Mark Feed Item as *checked box* Resolved
+                            $('#mark-as-resolved-' + idList[i]).val("Resolved");
+                            var icon = "<span style='color:green' class='glyphicon glyphicon-check'></span>" + ' [Resolved]';
+                            $('#mark-as-resolved-' + idList[i]).text("");
+                            $('#mark-as-resolved-' + idList[i]).append(icon);
+                        }
+                        //Display the number of likes for each of the loaded posts
+                        LoadLikes(feedItems);
+                    }
                 });
                 if (data.HasLastPost) {
                     $('#load-old-posts').addClass('disabled');;
@@ -499,50 +521,88 @@ function FeedViewModel(userName, userId, current) {
             },
             complete: function () {
                 HideLoading();
-                //Load Resolved status on visible post
+                var mappedItemsEventIds = [];
+                for (var i = 0; i < mappedItems.length; i++)
+                {
+                    mappedItemsEventIds.push(mappedItems[i].eventId);
+                }
+                //Load Resolved status on visible posts
                 $.ajax({
-                    url: "/Feed/GetResolvedPostIds",
-                    data: {},
-                    datatype: "JSON",
+                    url: "/Feed/GetSelectedResolvedPostIdsAndSenderIds",
+                    data: { viewablePostIds: JSON.stringify(mappedItemsEventIds) },
+                    datatype: "json",
                     success: function (data) {
-                        //Get all the Resolved Post Ids
-                        var idList = data.idList;
-                        for (var i = 0; i < idList.length; i++) {
-                            //Mark Feed Item as *checked box* Resolved
-                            $('#mark-as-resolved-' + idList[i]).val("Resolved");
-                            var icon = "<span style='color:green' class='glyphicon glyphicon-check'></span>" + ' [Resolved]';
-                            $('#mark-as-resolved-' + idList[i]).text("");
-                            $('#mark-as-resolved-' + idList[i]).append(icon);
-                        }
-                        //Display the number of likes for each of the loaded posts
                         for (var i = 0; i < mappedItems.length; i++)
                         {
-                            var feedItem = mappedItems[i];
-                            LoadLikes(feedItem);
+                            //if (mappedItems[i].eventType == "MarkHelpfulGivenEvent")
+                                //alert("eventType: " + mappedItems[i].eventType + " senderId: " + mappedItems[i].senderId);
                         }
+                        //Get all the Resolved Post Ids and Sender Ids
+                        var dictionary = data.resolvedString;
+                        if (dictionary != "") {
+                            //Split the string on commas
+                            var dictionarySplit = dictionary.split(',');
+                            for (var i = 0; i < dictionarySplit.length; i++) {
+                                var elementSplit = dictionarySplit[i].split(':');
+                                eventId = elementSplit[0];
+                                senderId = elementSplit[1];
+                                //If the post is resolved and the current user was the poster, update the anchor link
+                                if (senderId == self.userId) {
+                                    $('#mark-as-resolved-' + eventId).val('Resolved');
+                                    $('#mark-as-resolved-' + eventId).text("");
+                                    $('#mark-as-resolved-' + eventId).append("<span style='color:green' class='glyphicon glyphicon-check'></span> <b> [Resolved] </b>");
+                                }
+                                //Otherwise, display text
+                                else {
+                                    $('#mark-as-resolved-' + eventId).val('Resolved');
+                                    var icon = "<span style='color:green' class='glyphicon glyphicon-check'></span> <b> Resolved </b>";
+                                    $('#mark-as-resolved-' + eventId).text("");
+                                    $('#mark-as-resolved-' + eventId).append(icon);
+                                }
+                            }
+                        }
+                        //Display the number of likes for each of the loaded posts
+                        LoadLikes(mappedItems);
+                    },
+                    error: function (data) {
+
                     }
                 });
             }
         });
     };
 
-    ///summary: Gets the number of likes for that post on page load/refresh (repeated because this is in the FeedViewModel).
+    ///summary: Gets the number of likes for each post on page load/refresh.
     ///courtney-snyder
-    function LoadLikes(feedItem) {
+    function LoadLikes(feedItemList) {
+        //Get feed ID from each feed item
+        var feedEventIds = [];
+        //for (var i = 0; i < feedItemList.length; i++)
+        for (var i = 0; i < Object.keys(feedItemList).length; i++) {
+            feedEventIds.push(feedItemList[i].eventId);
+        }
+
         //Get number of likes for each post
         $.ajax({
-            url: "/Feed/GetPostLikeCount",
-            data: { eventId: feedItem.eventId },
-            datatype: "json",
+            url: "/Feed/GetPostLikeCounts",
+            data: { eventIds: JSON.stringify(feedEventIds) },
             method: "GET",
             success: function (result) {
+                var eventId = 0;
                 var numberOfLikes = 0;
-                if (result.numberOfLikes != null) {
-                    numberOfLikes = result.numberOfLikes;
+                //Note: result.likeString is a dictionary that was turned into a string (was having JSON issues)
+                var dictionary = result.likeString;
+                //Split the string on commas
+                var dictionarySplit = dictionary.split(',');
+                for (var i = 0; i < feedEventIds.length; i++)
+                {
+                    var elementSplit = dictionarySplit[i].split(':');
+                    eventId = elementSplit[0];
+                    numberOfLikes = elementSplit[1];
+                    var name = "#feed-post-" + eventId + "-likes";
+                    $(name).text("+ " + numberOfLikes);
                 }
-                var name = "#feed-post-" + feedItem.eventId + "-likes";
-                $(name).text("+ " + numberOfLikes);
-                IsPostLiked(feedItem);
+                ArePostsLiked(feedItemList);
             }
         });
     }
@@ -553,13 +613,70 @@ function FeedViewModel(userName, userId, current) {
         $.ajax({
             type: "GET",
             url: "/Feed/IsPostLikedByUser",
-            data: { eventId: feedItem.eventId, senderId: self.userId},
+            data: { eventId: feedItem.eventId, senderId: self.userId },
             dataType: "json",
             success: function (data) {
+                //If the poster and current user are the same person, hide the thumb
+                if (feedItem.senderId == self.userId) {
+                    var name = "#feed-post-" + eventId + "-thumb";
+                    $(name).text("");
+                    alert("Hide " + name +  " thumb")
+                }
                 //If the user liked the post at some point before page load, highlight thumb
-                if (data.boolResult)
-                {
+                else if (data.boolResult) {
                     feedItem.highlightMark(true);
+                }
+            }
+        });
+    }
+
+    ///summary: Highlights the thumbs of the visible posts on the Feed if the user liked them. Also removes thumbs from 
+    ///         user's own posts.
+    ///courtney-snyder
+    function ArePostsLiked(feedItemList) {
+        var feedEventIds = [];
+        for (var i = 0; i < Object.keys(feedItemList).length; i++)
+        {
+            feedEventIds.push(feedItemList[i].eventId);
+        }
+        $.ajax({
+            type: "GET",
+            url: "/Feed/ArePostsLikedByUser",
+            data: { eventIds: JSON.stringify(feedEventIds), senderId: self.userId },
+            //dataType: "json",
+            success: function (data) {
+                //If the user liked the post at some point before page load, highlight thumb
+                //Note: data.likeString is an int (event ID) list that was turned into a string (was having JSON issues)
+                var list = data.likeString;
+                //Split the string on commas
+                var listSplit = list.split(',');
+                //If there are no posts liked by the user, do not enter the first for loop
+                if (listSplit[0] == [])
+                    listSplit.length = 0;
+                for (var i = 0; i < listSplit.length; i++) {
+                    //Get each Event ID as a string
+                    var elementAsString = listSplit[i];
+                    //Parse to int
+                    var elementAsInt = parseInt(elementAsString);
+                    //Get the event from the feedItemList (IMPORTANT because you need the same object reference; highlight
+                    //is in a knockout data-bind
+                    var result = feedItemList.filter(function (obj) {
+                        return obj.eventId == elementAsInt ? obj : null;               
+                    });
+                    //result is a single element list since each element in the feedItemList has a unique eventId
+                    if (result != null && result != [])
+                    {
+                        result[0].highlightMark(true);
+                    }
+                }
+
+                //Remove thumbs from all posts made by the current user (Bob Smith cannot like his own post)
+                for (var i = 0; i < feedItemList.length; i++)
+                {
+                    if (feedItemList[i].senderId == self.userId) {
+                        var name = '#feed-post-' + feedItemList[i].eventId + '-thumb';
+                        $(name).removeClass();
+                    }
                 }
             }
         });
@@ -787,36 +904,41 @@ function DetailsViewModel(userName, userId, rootId) {
             success: function (data, textStatus, jqXHR) {
                 var itemAsList = [new FeedItem(data.Item)];
                 self.items(itemAsList);
+                self.senderId = data.Item.SenderId;
             },
-            complete: 
+            complete:
                 //Load Resolved status on the post
                 $.ajax({
                     url: "/Feed/IsPostResolved",
-                    data: {eventId: self.rootId},
+                    data: { eventId: self.rootId },
                     datatype: "JSON",
                     success: function (data) {
                         //If post is resolved
-                        if (data.boolResult)
-                        {
+                        if (data.boolResult) {
                             //Mark Feed Item as *checked box* Resolved
                             $('#mark-as-resolved-' + self.rootId).val("Resolved");
                             var icon = "<span style='color:green' class='glyphicon glyphicon-check'></span>" + ' [Resolved]';
                             $('#mark-as-resolved-' + self.rootId).text("");
                             $('#mark-as-resolved-' + self.rootId).append(icon);
                         }
-                        //Display the number of likes for each of the loaded posts
-                        LoadLikes(self.rootId);
+                        //Display the number of likes for the post
+                        LoadLikes(self.rootId, self.senderId);
                     }
                 })
         });
     };
 
     ///summary: Gets the number of likes for that post on page load/refresh (repeated because this is in the DetailsViewModel).
-    ///         and highlights the thumb if the post has already been liked by the current viewer.
+    ///         and highlights the thumb if the post has already been liked by the current viewer OR removes the thumb if the
+    ///         user is the poster
     ///courtney-snyder
-    function LoadLikes(eventId) {
+    function LoadLikes(eventId, senderId) {
         IsPostLiked(eventId);
         GetPostLikeCount(eventId);
+        if (senderId == self.userId) {
+            var name = '#feed-post-' + eventId + '-thumb';
+            $(name).removeClass();
+        }
     }
 
     ///summary: Highlights the thumb if the current user liked that post.
@@ -838,8 +960,7 @@ function DetailsViewModel(userName, userId, rootId) {
 
     ///summary: Gets the post like count for the specified post
     ///courtney-snyder
-    function GetPostLikeCount (eventId)
-    {
+    function GetPostLikeCount(eventId) {
         $.ajax({
             url: "/Feed/GetPostLikeCount",
             data: { eventId: eventId },
@@ -1055,7 +1176,7 @@ function ShowEditBox(item) {
     if (text === "false") { //we failed to get the user text from the database so just grab the text that is there already...
         text = $("#content-comment-" + item.eventId).text();
     }
-    
+
     $('#feed-edit-textbox-' + item.eventId).val(text);
 
     $('#feed-edit-' + item.eventId).show('fade');
@@ -1155,7 +1276,7 @@ function MakePostSucceeded(newPost) {
 
     // re-enable posting
     $('#feed-post-textbox').removeAttr('disabled');
-    $('#btn_post_active').removeAttr('disabled');    
+    $('#btn_post_active').removeAttr('disabled');
 
     newPost = ConfigureAnonymousSettings(newPost);
 
@@ -1390,12 +1511,10 @@ function IsMarkedResolved(eventID) {
             isResolved = data.boolResult; //Boolean stored in a JSON object because you can't just return a Boolean (too easy)
         }
     });
-    if (isResolved)
-    {
+    if (isResolved) {
         $('#feed-item-' + eventID).attr(('mark-as-resolved-' + eventID), "Resolved");
     }
-    else
-    {
+    else {
         $('#feed-item-' + eventID).attr(('mark-as-resolved-' + eventID), "Unresolved");
     }
     return isResolved;
@@ -1657,4 +1776,38 @@ function getUserRole() {
         }
     })
     return currentRole;
+}
+
+///summary: Used in _FeedItems databind to check if current user and event poster are the same user
+///courtney-snyder
+function IsSelf(postSenderId, currentUserId, eventId) {
+    var isSelf = null;
+    //If the post is Anon, get the poster ID from the DB and compare with current user ID
+    if (postSenderId == 0)
+    {
+        var anonSenderId;
+        $.ajax({
+            url: "/Feed/GetFeedItemSenderId",
+            data: { eventID: parseInt(eventId) },
+            datatype: "json",
+            method: "GET",
+            success: function (result) {
+                anonSenderId = result.senderId;
+                //alert("result.senderId: " + result.senderId + " anonSenderId: " + anonSenderId);
+                if (anonSenderId == currentUserId) {
+                    isSelf = true;
+                }
+            },
+            error: function (result) {
+            }
+        });
+    }
+    //Otherwise, just compared the post's sender ID and current user's sender ID
+    else
+    {
+        if (postSenderId == currentUserId) {
+            isSelf = true;
+        }
+    }
+    return isSelf;
 }

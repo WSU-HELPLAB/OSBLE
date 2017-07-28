@@ -481,7 +481,7 @@ namespace OSBLE.Controllers
                                     {
                                         if (null != file && file.ContentLength > 0)
                                         {                                            
-                                            Regex illegalInFileName = new Regex(@"[\\/:*?""<>|+#]");
+                                            Regex illegalInFileName = new Regex(@"[\\/:*?""<>|+#&]");
                                             string fileName = illegalInFileName.Replace(Path.GetFileName(file.FileName), "");
                                             mfp.AddFile(fileName, file.InputStream);
                                         }

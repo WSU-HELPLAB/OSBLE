@@ -135,6 +135,31 @@ namespace OSBLE.Utility
             return currentUsers;
         }
 
+        /// <param name="identification"> The student's identification number as a string (found in UserProfile.Identification) </param>
+        /// <param name="abstractCourseId"> The ID of the course in question. </param>
+        /// <returns> True if student is in the course, false otherwise. </returns>
+        /// courtney-snyder
+        public static bool IsUserInCourse (string identification, int abstractCourseId )
+        {
+            using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                sqlConnection.Open();
+
+                string query = "SELECT * " +
+                               "FROM UserProfiles " +
+                               "INNER JOIN CourseUsers " +
+                               "ON UserProfiles.ID = CourseUsers.UserProfileID " +
+                               "WHERE CourseUsers.AbstractCourseID = @courseId " +
+                               "AND UserProfiles.Identification = @id ";
+
+                var result = sqlConnection.Query(query, new { id = identification, courseId = abstractCourseId }).FirstOrDefault();
+
+                sqlConnection.Close();
+
+                return result == null ? false : true;
+            }
+        }
+
         public static AbstractRole GetAbstractRole(int roleID, SqlConnection connection = null)
         {
             if (connection == null)
@@ -1342,9 +1367,7 @@ namespace OSBLE.Utility
             }
         }
 
-        /// <returns>
-        /// Returns a list of post IDs marked as "Resolved" from the FeedPostEventFlags db
-        /// </returns>
+        /// <returns> Returns a list of post IDs marked as "Resolved" from the FeedPostEventFlags db </returns>
         /// courtney-snyder
         public static List<int> GetResolvedPostIds()
         {
@@ -1356,6 +1379,82 @@ namespace OSBLE.Utility
                 string query = "SELECT FeedPostEventId FROM FeedPostEventFlags WHERE MarkedResolved = 1 ";
                 List<int> resolvedPosts = sqlConnection.Query<int>(query).ToList();
                 return resolvedPosts;
+            }
+        }
+
+        /// <summary>
+        /// Takes a list of post event IDs and returns a list of those post event IDs that are "Resolved".
+        /// </summary>
+        /// <param name="postEventIds"> An string list of post event ids. </param>
+        /// <returns> Returns a list of post IDs marked as "Resolved" from the FeedPostEventFlags db </returns>
+        /// courtney-snyder
+        public static IEnumerable<int> GetResolvedPostIds(List<int> postEventIds)
+        {
+            using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                sqlConnection.Open();
+                //Get Resolved posts from the list of postEventIds
+                string query = "SELECT FeedPostEventId FROM FeedPostEventFlags WHERE FeedPostEventId IN @EventList AND MarkedResolved = 1 ";
+                IEnumerable<int> result = sqlConnection.Query<int>(query, new { EventList = postEventIds }).ToList();
+                return result;
+            }
+        }
+
+        /// <returns>
+        /// Returns a dictionary of post IDs (key) and senders (value) marked as "Resolved" from the FeedPostEventFlags db
+        /// </returns>
+        /// courtney-snyder
+        public static Dictionary<int, int> GetResolvedPostIdsAndSenderIds()
+        {
+            using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                sqlConnection.Open();
+
+                //Get all Resolved posts
+                string query = "SELECT * FROM FeedPostEventFlags WHERE MarkedResolved = 1 ";
+                var resolvedPosts = sqlConnection.Query<int>(query).ToList();
+                Dictionary<int, int> returnDict = new Dictionary<int, int>();
+
+                return returnDict;
+            }
+        }
+
+        /// <returns>
+        /// Returns a dictionary of post IDs (key) and senders (value) marked as "Resolved" from the FeedPostEventFlags db
+        /// </returns>
+        /// <param name="postEventIds"> An int list of post event ids. </param>
+        /// courtney-snyder
+        public static Dictionary<int, int> GetResolvedPostIdsAndSenderIds(List<int> postEventIds)
+        {
+            using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                sqlConnection.Open();
+
+                //Get all Resolved posts
+                //string query = "SELECT * FROM FeedPostEventFlags WHERE MarkedResolved = 1 ";
+                //string query = "SELECT FeedPostEventFlags.FeedPostEventId, EventLogs.SenderId " +
+                //               "FROM FeedPostEventFlags " +
+                //               "INNER JOIN EventLogs " +
+                //               "ON FeedPostEventFlags.FeedPostEventId = EventLogs.Id " +
+                //               "WHERE FeedPostEventFlags.FeedPostEventId IN @postEventIds " +
+                //               "AND FeedPostEventFlags.MarkedResolved = 1 " ;
+                string query = "SELECT FeedPostEventFlags.FeedPostEventId, EventLogs.SenderId " +
+                               "FROM FeedPostEventFlags " +
+                               "INNER JOIN EventLogs " +
+                               "ON FeedPostEventId = EventLogs.Id " +
+                               "WHERE FeedPostEventFlags.FeedPostEventId IN @EventIdList " +
+                               "AND FeedPostEventFlags.MarkedResolved = 1 ";
+                //string temp = "SELECT * FROM LogCommentEvents l INNER JOIN EventLogs e ON l.EventLogId = e.Id WHERE (IsDeleted IS NULL OR IsDeleted = 0) AND e.SenderId = @uid ORDER BY e.EventDate DESC";
+                var resolvedPosts = sqlConnection.Query(query, new { EventIdList = postEventIds } ).ToList();
+                Dictionary<int, int> postIdSenderIdDict = new Dictionary<int, int>();
+                foreach (var r in resolvedPosts)
+                {
+                    int key = r.FeedPostEventId;
+                    int value = r.SenderId;
+                    postIdSenderIdDict.Add(key, value);
+                }
+
+                return postIdSenderIdDict;
             }
         }
 
@@ -1411,6 +1510,40 @@ namespace OSBLE.Utility
         }
 
         /// <summary>
+        /// Finds all occurrences of the eventIDs in the FeedPostLikes table and returns the counts.
+        /// </summary>
+        /// <param name="eventIds"> A list of visible feed item eventIds </param>
+        /// <returns> A dictionary of the feed items (key) with their respective like amounts (value) </returns>
+        /// courtney-snyder
+        public static Dictionary<int, int> GetPostLikeCount(List<int> eventIds)
+        {
+            using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                sqlConnection.Open();
+
+                //Get the posts
+                string query = "SELECT * FROM FeedPostLikes WHERE EventLogId IN @EventId ";
+                var result = sqlConnection.Query(query, new { EventId = eventIds }).ToList();
+                Dictionary<int, int> eventIdsAndLikes = new Dictionary<int, int>();
+                //Add all eventIds to the dictionary and initialize to 0 likes
+                foreach (int eventId in eventIds)
+                {
+                    eventIdsAndLikes.Add(eventId, 0);
+                }
+                //If the query gives a result, add each result (like) to the dictionary
+                if (result != null)
+                {
+                    foreach (var r in result)
+                    {
+                        //Increment number of likes for that event ID
+                        eventIdsAndLikes[r.EventLogId]++;
+                    }
+                }
+                return eventIdsAndLikes;
+            }
+        }
+
+        /// <summary>
         /// Checks to see if a user has already liked a post.
         /// </summary>
         /// <param name="eventId"></param>
@@ -1436,6 +1569,38 @@ namespace OSBLE.Utility
             }
         }
 
+        /// <summary>
+        /// Checks to see if a user has already liked a post.
+        /// </summary>
+        /// <param name="eventIds"> A list of visible feed items on the feed </param>
+        /// <param name="senderId"> The current user </param>
+        /// <returns> A list of eventIds that have been liked by the user </returns>
+        /// courtney-snyder
+        public static List<int> ArePostsLikedByUser(List<int> eventIds, int senderId)
+        {
+            using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+            {
+                sqlConnection.Open();
+
+                //Get the posts with the given eventIds list and check if the user has liked any of the visible posts
+                string query = "SELECT EventLogId FROM FeedPostLikes WHERE EventLogId IN @InputEventLogId AND UserProfileId = @InputSenderId ";
+                var result = sqlConnection.Query(query, new { InputEventLogId = eventIds, InputSenderId = senderId }).ToList();
+                List<int> eventIdAndLikeStatus = new List<int>();
+                //If the query gives any results, that user has liked a post
+                if (result != null)
+                {
+                    foreach(var r in result)
+                    {
+                        var seeWhatRIs = r;
+                        eventIdAndLikeStatus.Add(r.EventLogId);
+                    }
+                    //Add each query result into the dictionary
+                    return eventIdAndLikeStatus;
+                }
+                //Otherwise, that post has not been liked by that user
+                return null;
+            }
+        }
 
         /// <summary>
         /// Updates the number of likes a post has by either adding a new row (like) or removing an existing column (unlike)
@@ -1800,6 +1965,29 @@ namespace OSBLE.Utility
             return sender;
         }
 
+        /// <summary>
+        /// Gets the senderId of the specified postId
+        /// </summary>
+        /// <param name="postID"> The post in question </param>
+        /// <param name="connection"></param>
+        /// <returns></returns>
+        /// courtney-snyder
+        public static int GetFeedItemSenderId(int postID, SqlConnection connection = null)
+        {
+            if (connection == null)
+            {
+                using (SqlConnection sqlc = GetNewConnection()) { return GetFeedItemSenderId(postID, sqlc); }
+            }
+
+            var sender = connection.Query(
+            "SELECT SenderId " +
+            "FROM EventLogs " +
+            "WHERE Id = @PostId ",
+            new { PostId = postID }).FirstOrDefault();
+
+            return sender.SenderId;
+        }
+
         public static bool IsEventDeleted(int postID, SqlConnection connection = null)
         {
             if (connection == null)
@@ -2111,7 +2299,26 @@ namespace OSBLE.Utility
 
             return;
         }
+        /// <summary>
+        /// Adds a webpage submission to the SubmitEventProperties table that keeps track of where a submission came from
+        /// </summary>
+        /// <param name="EventLogId"></param>
+        internal static void AddToSubmitEventProperties(int EventLogId)
+        {
+            bool Webpage = true;
+            bool Plugin = false;
+            string query = "";
 
+
+            var sqlConnection = new SqlConnection(StringConstants.ConnectionString);
+
+            query = "INSERT INTO SubmitEventProperties(EventLogId,IsWebpageSubmit,IsPluginSubmit) VALUES (@EventLogId,@Webpage,@Plugin);";
+
+            var result = sqlConnection.Query(query, new { EventLogId = EventLogId, Webpage = Webpage, Plugin = Plugin });
+
+
+
+        }
         internal static bool InterventionEnabledForCourse(int courseId)
         {
             bool interventionsEnabled = false;
