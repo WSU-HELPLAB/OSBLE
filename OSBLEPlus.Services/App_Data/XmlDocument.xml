@@ -675,6 +675,13 @@
             string DisplayName(CourseUser viewingUser);
             </returns>
         </member>
+        <member name="M:OSBLEPlus.Services.Controllers.UserProfilesController.GetName(System.String)">
+            <summary>
+            Gets the name of a user from the authentication token
+            </summary>
+            <param name="a">authentication token</param>
+            <returns>full name of user</returns>
+        </member>
         <member name="M:OSBLEPlus.Services.Controllers.UserProfilesController.IsValidKey(System.String)">
             <summary>
             Checks if the Authentication Key passed in is valid

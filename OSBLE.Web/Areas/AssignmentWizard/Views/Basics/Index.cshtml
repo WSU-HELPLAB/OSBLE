@@ -89,7 +89,7 @@
         
         $("form").submit(function (e) {
             UniqueAssignmentNameCheck();
-            var tmp = $("div[data-valmsg-summary='true']").find("li:contains('Please specify an unique assignment name')");
+            var tmp = $("div[data-valmsg-summary='true']").find("li:contains('Please specify a unique assignment name')");
             if (tmp.length) {
                 e.preventDefault();
                 $("html,body").animate({ scrollTop: 0 }, 100);
@@ -123,14 +123,14 @@
                 if (result == "True") {
 
                     //modifying validation summary message
-                    summaryError.find("li:contains('Please specify an unique assignment name')").remove();
+                    summaryError.find("li:contains('Please specify a unique assignment name')").remove();
 
                     if (!summaryError.find("li").length) {
                         summaryError.attr("class", "validation-summary-valid");
                     }
 
                     //modifying text box message
-                    txtBoxError.find("span:contains('Please specify an unique assignment name')").remove();
+                    txtBoxError.find("span:contains('Please specify a unique assignment name')").remove();
 
                     if (!txtBoxError.find("span").length) {
                         txtBoxError.attr("class", "field-validation-valid");
@@ -148,14 +148,14 @@
                     //modifying validation summary message
                     summaryError.find("li[style='display:none']").remove();
 
-                    if (!summaryError.find("li:contains('Please specify an unique assignment name')").length) {
-                        summaryError.find("ul:first").prepend("<li>Please specify an unique assignment name</li>");
+                    if (!summaryError.find("li:contains('Please specify a unique assignment name')").length) {
+                        summaryError.find("ul:first").prepend("<li>Please specify a unique assignment name</li>");
                         summaryError.attr("class", "validation-summary-errors");
                     }
 
                     //modifying text box message
-                    if (!txtBoxError.find("span:contains('Please specify an unique assignment name')").length) {
-                        txtBoxError.prepend("<span for='AssignmentName'>Please specify an unique assignment name</span>");
+                    if (!txtBoxError.find("span:contains('Please specify a unique assignment name')").length) {
+                        txtBoxError.prepend("<span for='AssignmentName'>Please specify a unique assignment name</span>");
                         txtBoxError.attr("class", "field-validation-error");
 
                         $("#AssignmentName").addClass("input-validation-error");

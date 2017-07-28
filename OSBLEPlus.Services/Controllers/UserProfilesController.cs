@@ -70,6 +70,17 @@ namespace OSBLEPlus.Services.Controllers
         }
 
         /// <summary>
+        /// Gets the name of a user from the authentication token
+        /// </summary>
+        /// <param name="a">authentication token</param>
+        /// <returns>full name of user</returns>
+        [HttpGet]
+        public string GetName(string a)
+        {
+            return (new Authentication()).GetActiveUser(a).FullName;
+        }
+
+        /// <summary>
         /// Checks if the Authentication Key passed in is valid
         /// </summary>
         /// <param name="a">Authentication Key</param>
