@@ -168,7 +168,7 @@ namespace OSBLE.Controllers
             }
 
             ViewBag.HideMail = DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID);
-
+           
             ViewBag.EditSections = DBHelper.GetGradebookSectionEditableSettings(ActiveCourseUser.AbstractCourseID);
 
             return View();
@@ -204,9 +204,27 @@ namespace OSBLE.Controllers
                         }
                         else
                         {
-                            //Add those extracted files from the zip right into the directory for the gradebook. 
-                            zip[i].FileName = Path.GetFileName(zip[i].FileName);
-                            zip[i].Extract(gfp.GetPath());
+                            Dictionary<string, List<string>> gradebook = new Dictionary<string, List<string>>();
+                            MemoryStream tempMemoryStream = new MemoryStream();
+                            zip[i].Extract(tempMemoryStream);
+                            tempMemoryStream.Position = 0;
+                            StreamReader sr = new StreamReader(tempMemoryStream);
+                            string temp = sr.ReadToEnd().Replace("\r", String.Empty);
+                            List<string> newGradebookTab = temp.Split('\n').ToList();
+                            gradebook.Add(zip[i].FileName.Split('\\').Last(), newGradebookTab);
+
+                            int rowError = checkRowLimit(gfp, gradebook); 
+
+                            if (rowError > 0)
+                            {
+                                filesFailedToLoadCount++;
+                            }
+                            else
+                            {
+                                //Add those extracted files from the zip right into the directory for the gradebook. 
+                                zip[i].FileName = Path.GetFileName(zip[i].FileName);
+                                zip[i].Extract(gfp.GetPath());
+                            }
                         }
                     }
                 }
@@ -239,11 +257,74 @@ namespace OSBLE.Controllers
                         }
                     }
                 }
-
+                int newGradebookCount = newGradebook.Count;
+                Dictionary<string, List<string>> approvedGradebook = checkRowLimitZipped(gfp, newGradebook);
+                int approvedGradebookCount = approvedGradebook.Count;
+                int rowErrors = newGradebookCount - approvedGradebookCount;
+                filesFailedToLoadCount += rowErrors; 
                 //process gradebooks
-                filesFailedToLoadCount += ProcessGradebookChanges(gfp, newGradebook, uploadingCourseUser);
+                filesFailedToLoadCount += ProcessGradebookChanges(gfp, approvedGradebook, uploadingCourseUser);
             }
             return filesFailedToLoadCount;
+        }
+
+        private Dictionary<string, List<string>> checkRowLimitZipped(GradebookFilePath gfp, Dictionary<string, List<string>> newGradebookDictionary)
+        {
+            Dictionary<string, List<string>> approvedGradebooks = new Dictionary<string, List<string>>(); 
+
+            foreach (KeyValuePair<string, List<string>> entry in newGradebookDictionary)
+            {
+                List<string> checkUploadedGradebook = entry.Value;
+                int count = 0;
+                bool isItWithinLimit = true; 
+                foreach (string gradebook in checkUploadedGradebook)
+                {
+                    if (count >= 2000)
+                    {
+                        isItWithinLimit = false; 
+                    }
+                    else
+                    {
+                        count++;
+                    }
+                }
+
+                if (isItWithinLimit == false)
+                {
+                    break;
+                }
+                else
+                {
+                    approvedGradebooks.Add(entry.Key, entry.Value);
+                }
+            }
+            return approvedGradebooks;
+        }
+
+        private Dictionary<string, List<string>> cleanUpKeys(Dictionary<string, List<string>> newGradebookDictionary)
+        {
+            Dictionary<string, List<string>> cleanedKeyGradebook = new Dictionary<string, List<string>>(); 
+
+            if(newGradebookDictionary.Count <= 1)
+            {
+                return newGradebookDictionary; 
+            }
+            else
+            {
+                foreach (KeyValuePair<string, List<string>> entry in newGradebookDictionary)
+                {
+                    string key = entry.Key;
+
+                    if (key.Contains("/"))
+                    {
+                        String[] rawKeys = key.Split('/');
+                        key = rawKeys.Last(); 
+                    }
+                    cleanedKeyGradebook.Add(key, entry.Value);
+                }
+                return cleanedKeyGradebook; 
+            }
+
         }
 
         /// <summary>
@@ -258,7 +339,7 @@ namespace OSBLE.Controllers
             //handle case where user is uploading from the Excel plugin
             int userRole = ActiveCourseUser == null ? uploadingCourseUser.AbstractRoleID : ActiveCourseUser.AbstractRoleID;
             int userProfileId = ActiveCourseUser == null ? uploadingCourseUser.UserProfileID : ActiveCourseUser.UserProfileID;
-
+            newGradebookDictionary = cleanUpKeys(newGradebookDictionary); 
             //first process gradebooks that already exist
             foreach (var existingGradebook in gfp.AllFiles())
             {
@@ -299,8 +380,6 @@ namespace OSBLE.Controllers
                                                         index + ", gradebook: " + existingGradebook);
                             return 1; //exit processing and add 1 to the filesFailedToLoadCount
                         }
-                            
-
                     //now split the rows to columns to check if they match. we know the number of global rows and index numbers match.
                     foreach (int index in newGradebookGlobalRows)
                     {   
@@ -502,7 +581,7 @@ namespace OSBLE.Controllers
                     mergedGradebook = RemoveEmptyGradebookRows(mergedGradebook);
                     //check if there are empty columns and remove them.                    
                     mergedGradebook = RemoveEmptyGradebookColumns(mergedGradebook);
-
+                    
                     //we processed it all, add it to the mergedGradebooks!
                     mergedGradebooks.Add(fileName, mergedGradebook);
                 }
@@ -847,6 +926,33 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
+        /// checks if the number of rows in the new gradebook does not exceed the row limit of 1000
+        /// </summary>
+        /// <param name="newGradebook">a list of new gradebook rows</param>
+        /// <returns>return 1 for exceeding row limit and 0 for maintaining row limit</returns>
+        private int checkRowLimit(GradebookFilePath gfp, Dictionary<string, List<string>> newGradebookDictionary)
+        {
+            int fileErrorCount = 0;
+            foreach (KeyValuePair<string, List<string>> entry in newGradebookDictionary)
+            {
+                List<string> checkUploadedGradebook = entry.Value;
+                int count = 0; 
+                foreach(string gradebook in checkUploadedGradebook)
+                {
+                    if(count >=2000)
+                    {
+                        fileErrorCount += 1;
+                        break; 
+                    }
+                    else
+                    {
+                        count++; 
+                    } 
+                }
+            }
+            return fileErrorCount; 
+        }
+        /// <summary>
         /// checks if the string row is a 'global' row
         /// </summary>
         /// <param name="gradebookRow">a string CSV row</param>
@@ -1139,7 +1245,16 @@ namespace OSBLE.Controllers
             newGradebook.Add(gradebookName + ".csv", modifiedGradeook.Split('\n').ToList());
             
             int filesFailedToLoadCount = 0; //integer used for error message
-            filesFailedToLoadCount += ProcessGradebookChanges(gfp, newGradebook);
+             int rowErrors = checkRowLimit(gfp, newGradebook);
+
+             if (rowErrors > 0)
+             {
+                 filesFailedToLoadCount += rowErrors;
+             }
+             else
+             {
+                 filesFailedToLoadCount += ProcessGradebookChanges(gfp, newGradebook);
+             }
 
             //Generate error message.
             if (filesFailedToLoadCount > 0)
@@ -1188,7 +1303,7 @@ namespace OSBLE.Controllers
                 using (MemoryStream zipStream = new MemoryStream())
                 {
                     file.InputStream.CopyTo(zipStream);
-                    zipStream.Position = 0;
+                    zipStream.Position = 0; 
                     filesFailedToLoadCount += UploadGradebookZip(zipStream.ToArray(), gfp);
                 }
             }
@@ -1196,7 +1311,15 @@ namespace OSBLE.Controllers
             {
                 Dictionary<string, List<string>> newGradebook = new Dictionary<string, List<string>>();
                 newGradebook.Add(file.FileName, new StreamReader(file.InputStream).ReadToEnd().Replace("\r", String.Empty).Split('\n').ToList());
-                filesFailedToLoadCount += ProcessGradebookChanges(gfp, newGradebook);
+                int rowErrors = checkRowLimit(gfp,newGradebook); 
+                if(rowErrors > 0)
+                {
+                    filesFailedToLoadCount += rowErrors; 
+                }
+                else
+                {
+                    filesFailedToLoadCount += ProcessGradebookChanges(gfp, newGradebook);
+                }
             }
             else
             {
@@ -1205,6 +1328,7 @@ namespace OSBLE.Controllers
             }
 
             //Generate error message.
+            // START HERE 
             if (filesFailedToLoadCount > 0)
             {
                 FileCache Cache = FileCacheHelper.GetCacheInstance(OsbleAuthentication.CurrentUser);
@@ -1521,13 +1645,11 @@ namespace OSBLE.Controllers
                 return RedirectToAction("Index");
             }
         }
-
         private List<string> ReadCsv(string fileName)
         {
             List<string> lines = System.IO.File.ReadAllLines(fileName).ToList(); 
             return lines;
         }
-
         private static XLWorkbook ConvertWithClosedXml(XLWorkbook workbook, string worksheetName, List<string> csvLines)
         {
             if (csvLines == null || csvLines.Count() == 0)
@@ -1588,7 +1710,6 @@ namespace OSBLE.Controllers
             return (workbook);
         }        
     }
-
     /// <summary>
     /// class used to convert cell values to an appropriate numeric value
     /// </summary>
