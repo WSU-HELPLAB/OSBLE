@@ -9,7 +9,7 @@
     bool hasRootFolderAccess = ViewBag.ActiveCourseUser.AbstractRole.CanModify;
     int courseID = ViewBag.ActiveCourse.AbstractCourse.ID;
     //note: the current query only populates first, last, and ID for these users. change the query in DBHelper.cs to modify what values are available here.
-    var currentCourseUsers = ViewBag.CurrentCourseUsers;    
+    var currentCourseUsers = ViewBag.CurrentCourseUsers;
     
     switch (activeCourseRole)
     {
@@ -81,9 +81,20 @@
             }
             if (null != currentCourseUsers)
             {
-                foreach (var userProfile in currentCourseUsers)
+                List<string> currentStringNames = new List<string>();
+                
+                foreach (var user in currentCourseUsers)
                 {
-                    @:userNames.push("@userProfile.FirstName" + "@userProfile.LastName");
+                    string userRemoveWhiteSpaces = user.FullName;
+                    userRemoveWhiteSpaces = userRemoveWhiteSpaces.Replace(" ", String.Empty);
+                    currentStringNames.Add(userRemoveWhiteSpaces);
+                }
+                foreach (string user in currentStringNames)
+                {
+                    @:userNames.push("@user");
+                }
+                foreach(var userProfile in currentCourseUsers)
+                {
                     @:userIds.push("@userProfile.ID");
                 }
             }
@@ -124,6 +135,7 @@
                     @if (ViewBag.Notifications.Count == 0)
                     {
                         <p>No Unread Notifications!</p>
+                        @Html.ActionLink("Show All Notifications", "Index", "Notification")
                     }
 
                     @{ViewBag.ShowNotificationDelete = true;}
@@ -135,7 +147,7 @@
                         <div id="markAllAsReadDiv">
                             <form id="MarkAllForm" action="@Url.Action("MarkAllAsRead", "Notification")"
                                   data-ajax="true"
-                                  data-ajax-success="$('#notifications_list').hide('slow');$('#markAllAsReadDiv').hide('slow');$('#notifications_badge').hide('slow');"
+                                  data-ajax-success="$('#notifications_list').hide('slow');$('#markAllAsReadDiv').hide('slow');$('#notifications_badge').hide('slow');$('#displayNumberOfNotifications').hide('slow'); $('#ShowAllNotifications').show();"
                                   method="post">
                                 <a href="#" onclick="$('#MarkAllForm').submit()">Mark All Notifications As Read</a>
                             </form>
@@ -144,20 +156,27 @@
 
 
                     @{
-                        if (ViewBag.Notifications.Count > 5)
-                        {
-                            String temp = "Displaying 5 out of " + @Html.Raw(ViewBag.Notifications.Count).ToString() + " (Show All)";
-                            <p>
-                                @Html.ActionLink(temp, "Index", "Notification")
-                            </p>
+                            if (ViewBag.Notifications.Count > 5)
+                            { 
+                                String temp = "Displaying 5 out of " + @Html.Raw(ViewBag.Notifications.Count).ToString() + " (Show All)";
+                                <span id="displayNumberOfNotifications">
+                                    <p>  
+                                        @Html.ActionLink(temp, "Index", "Notification")
+                                    </p>
+                                </span>
+                                <span id="ShowAllNotifications" style="display:none;">
+                                    <p>No Unread Notifications!</p>
+                                    @Html.ActionLink("Show All Notifications", "Index", "Notification")
+                                </span>
+                            }
+                            else
+                            {
+                                 <span id="ShowAllNotifications" style="display:none;">
+                                    <p>No Unread Notifications!</p>
+                                    @Html.ActionLink("Show All Notifications", "Index", "Notification")
+                                  </span>
+                            }
                         }
-                        else
-                        {
-                            <p>
-                                @Html.ActionLink("Show All Notifications", "Index", "Notification")
-                            </p>
-                        }
-                    }
 
                 </div>
             </div>
@@ -193,7 +212,7 @@
         <div class="col-sm-6 activeContent" id="dashboard_middle">
             <h3>
                 Activity Feed
-                <span class="badge new-activity-badge" style="display: none" data-toggle="tooltip" title="Click to dismiss">New Activity</span>
+                <span id ="NewActivityNotification"class="badge new-activity-badge" style="display: none" data-toggle="tooltip" title="Click to dismiss">New Activity</span>
                 @*<a href="@Url.Action("DownloadDashboardPosts", "Course")" title="Download Activity Feed as csv">@Helpers.UnPublishButton()</a>*@
                 <span style="float:right;">
                     @*For instructor/ta show unanswered questions link*@
@@ -229,7 +248,8 @@
                 @if (hasRootFolderAccess) // need to see if the user can add to root folder
                 {
                     <a href="#" title="Create New Folder" onclick="cfm_CreateFolderIconClicked(0)"><span class="glyphicon glyphicon-folder-open"></span></a>
-                    <a href="#" title="Upload File" onclick="cfm_AddUploader(0)"><span class="glyphicon glyphicon-open-file"></span></a>
+                    <a href="#" title="Upload File" onclick="cfm_AddUploader(0)"><span class="glyphicon glyphicon-open-file"></span></a>    
+                    @Helpers.CreateToolTip(ToolTips.FilesLinksCreateLink, "create-link-file", "display: inline;", "glyphicon-info-sign", "19px")
                 }
             </h3>
 

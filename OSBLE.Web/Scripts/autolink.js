@@ -105,9 +105,10 @@
 
                     if (id != NaN) {
 
-                        studentFullName = courseUserNames[id];
+                        studentFullName = courseUserNames[id]; 
                         if (studentFullName === "" || studentFullName === undefined) continue; // If the ID doesn't represent a user, don't make a link
 
+                        studentFullName = studentFullName.replace(/\s/g, '');
                         // Now replace the id number in the string with an html link with the user's full name
                         // If observer, remove href=\ (observer can see someone was mentioned but will remove the link to the @ person's profile)
                         text = text.replace(text.substr(index, length + 2), "<a href=\"/Feed/Profile/" + id + "?component=7\" class=\"Mention\">@" + studentFullName + "</a>");
