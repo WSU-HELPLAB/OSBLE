@@ -196,6 +196,91 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        [OsbleAuthorize]
+        [RequireActiveCourse]
+        [NotForCommunity]
+        public ActionResult GetAllSubmissionsForAssignmentObserver(int assignmentID, int downloadSection = -1)
+        {
+            Assignment assignment = db.Assignments.Find(assignmentID);
+
+            if(assignment.Type == AssignmentTypes.CriticalReview)
+            {
+                return GetAllCritReviews(assignmentID);
+                
+            }
+
+            try
+            {
+                if (assignment.CourseID == ActiveCourseUser.AbstractCourseID)
+                {
+                    string zipFileName = assignment.AssignmentName + ".zip";
+
+                    // If you download the file once it never updates if new submissions are posted, this has been commented out for now
+                    // Unfortunately every time you click Download All it will keep the zip files in {PathToCache}/Courses/{CourseID}/ZipFolder
+                    // We may want to rework this in the near future, but for now it works
+                    /*if (stream != null)
+                    {
+                        return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
+                    }*/
+
+                    string submissionfolder = FileSystem.GetAssignmentSubmissionFolder(assignment.Course, assignment.ID);
+
+                    using (ZipFile zipfile = new ZipFile())
+                    {
+                        DirectoryInfo acitvityDirectory = new DirectoryInfo(submissionfolder);
+
+                        if (!acitvityDirectory.Exists)
+                        {
+                            FileSystem.CreateZipFolder(ActiveCourseUser.AbstractCourse as Course, zipfile, assignment);
+                        }
+                        else
+                        {
+                            foreach (DirectoryInfo submissionDirectory in acitvityDirectory.GetDirectories())
+                            {
+                                Team currentTeam = (from c in assignment.AssignmentTeams where c.TeamID.ToString() == submissionDirectory.Name select c.Team).FirstOrDefault();
+
+                                if (currentTeam != null)
+                                {
+                                    string folderName = "";
+                                    if (assignment.HasTeams)
+                                    {
+                                        folderName = currentTeam.Name;
+                                    }
+                                    else
+                                    {
+                                        folderName = currentTeam.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ActiveCourseUser.AbstractRoleID);
+                                    }
+
+                                    if (downloadSection != -1) //check if a downloadSection was specified
+                                    {
+                                        if (currentTeam.TeamMembers.FirstOrDefault().CourseUser.Section == (downloadSection)) //if specified, only add those who are in this section
+                                        {
+                                            zipfile.AddDirectory(submissionDirectory.FullName, folderName);
+                                        }
+                                    }
+
+                                    else //if no section specified, download all
+                                    {
+                                        zipfile.AddDirectory(submissionDirectory.FullName, folderName);
+                                    }
+
+                                }
+                            }
+
+                            FileSystem.CreateZipFolder(ActiveCourseUser.AbstractCourse as Course, zipfile, assignment);
+                        }
+                        Stream stream = FileSystem.GetDocumentForRead(zipfile.Name);
+
+                        return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error in GetSubmissionZip", e);
+            }
+            return RedirectToAction("Index", "Home");
+        }
         //very similar to get all assignments, however this will only grab the assignments from teams that are in cross sections.
         [OsbleAuthorize]
         [RequireActiveCourse]
@@ -279,7 +364,62 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        
+        [OsbleAuthorize]
+        [RequireActiveCourse]
+        [NotForCommunity]
+        public ActionResult GetAllCritReviews(int assignmentId)
+        {
+            Assignment assignment = db.Assignments.Find(assignmentId);
+            
+
+
+            Stream submission = null;
+            if (assignment.Type == AssignmentTypes.CriticalReview)
+            {
+                //Critical Review: We want all the reviews this team was set to do. 
+
+                ZipFile zipfile = new ZipFile();
+
+                //List of all the teams who the current team was set to review
+                List<ReviewTeam> reviewTeams = (from rt in db.ReviewTeams
+                                                where rt.AssignmentID == assignmentId
+                                                select rt).ToList();
+
+                //Add each review into the zip
+                Dictionary<string, dynamic> reviewStreams = new Dictionary<string, dynamic>();
+                foreach (ReviewTeam reviewTeam in reviewTeams)
+                {
+                    string key = reviewTeam.AuthorTeam.Name;
+                    OSBLE.Models.FileSystem.FileCollection fc =
+                        Models.FileSystem.Directories.GetAssignment(
+                            ActiveCourseUser.AbstractCourseID, assignmentId)
+                        .Review(reviewTeam.AuthorTeam, reviewTeam.ReviewingTeam)
+                        .AllFiles();
+
+                    //don't create a zip if we don't have have anything to zip.
+                    if (fc.Count > 0)
+                    {
+                        var bytes = fc.ToBytes();
+                        reviewStreams[key] = bytes;
+                    }
+                }
+                Random rnd = new Random();
+                foreach (string author in reviewStreams.Keys)
+                {
+                    foreach (string file in reviewStreams[author].Keys)
+                    {
+                        string location = string.Format("{0}/{1}", "Review of Anoymous " + rnd.Next() , file);
+                        zipfile.AddEntry(location, reviewStreams[author][file]);
+                    }
+                }
+
+                submission = new MemoryStream();
+                zipfile.Save(submission);
+                submission.Position = 0;
+            }
+            string ZipName = assignment.AssignmentName + ".zip";
+            return new FileStreamResult(submission, "application/octet-stream") { FileDownloadName = ZipName };
+        }
         
         /// <summary>
         /// For the given team id and assignment id, it returns the submission. (Including critical reviews performed)
@@ -294,7 +434,7 @@ namespace OSBLE.Controllers
         [NotForCommunity]
         public ActionResult GetSubmissionZip(int assignmentId, int teamId, bool resubmission = false)
         {
-
+            
             //basic assignments have the option of being annotatable.  In this case,
             //send off to annotate rather than creating a zip file.
             Assignment assignment = db.Assignments.Find(assignmentId);
@@ -488,11 +628,12 @@ namespace OSBLE.Controllers
             }
 
             //If user does not belong to DiscussionTeam and is not an instructor, do not let them get the documents
-            if (belongsToDiscussionTeam || ActiveCourseUser.AbstractRole.CanModify)
+            if (belongsToDiscussionTeam || ActiveCourseUser.AbstractRole.CanModify || ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer)
             {
                 string zipFileName = "Critical Review Discussion Items for " + dt.TeamName + ".zip";
                 return GetAllReviewedDocuments(CRAssignment, AuthorTeam, zipFileName, CRDAssignment.DiscussionSettings);
             }
+           
             return RedirectToAction("Index", "Home");
         }
 
@@ -643,7 +784,7 @@ namespace OSBLE.Controllers
 
             //Determining displayname for the author team. 
             string authorDisplayName = authorTeam.Name;
-            if (AnonymizeAuthor(CRAssignment, authorTeam, discussionSetting))
+            if (AnonymizeAuthor(CRAssignment, authorTeam, discussionSetting) || ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer)
             {
                 authorDisplayName = "Anonymous " + authorTeam.ID;
             }
@@ -666,7 +807,7 @@ namespace OSBLE.Controllers
 
                     //Checking anonmous settings to determine name of folder
                     string reviewerDisplayName = reviewTeam.Team.Name;
-                    if (AnonymizeReviewer(CRAssignment, reviewTeam.Team, discussionSetting))
+                    if (AnonymizeReviewer(CRAssignment, reviewTeam.Team, discussionSetting) || ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer)
                     {
                         //Change displayName if Reviewer is to be anonymized
                         reviewerDisplayName = "Anonymous " + reviewTeam.Team.ID;

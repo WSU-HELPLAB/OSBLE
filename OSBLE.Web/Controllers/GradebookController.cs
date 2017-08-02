@@ -168,8 +168,16 @@ namespace OSBLE.Controllers
             }
 
             ViewBag.HideMail = DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID);
-           
+
             ViewBag.EditSections = DBHelper.GetGradebookSectionEditableSettings(ActiveCourseUser.AbstractCourseID);
+
+            ViewBag.AssignmentDict = DBHelper.GetAssignmentDict(ActiveCourseUser.AbstractCourseID);
+
+            ViewBag.cuID = ActiveCourseUser.ID;
+
+            ViewBag.WebClientRoot = OSBLEPlus.Logic.Utility.StringConstants.WebClientRoot;
+
+            ViewBag.PublishedAssignmentIds = PublishedAssignmentIds();
 
             return View();
         }
@@ -221,13 +229,13 @@ namespace OSBLE.Controllers
                             }
                             else
                             {
-                                //Add those extracted files from the zip right into the directory for the gradebook. 
-                                zip[i].FileName = Path.GetFileName(zip[i].FileName);
-                                zip[i].Extract(gfp.GetPath());
-                            }
+                            //Add those extracted files from the zip right into the directory for the gradebook. 
+                            zip[i].FileName = Path.GetFileName(zip[i].FileName);
+                            zip[i].Extract(gfp.GetPath());
                         }
                     }
                 }
+            }
             }
             else
             {
@@ -581,7 +589,7 @@ namespace OSBLE.Controllers
                     mergedGradebook = RemoveEmptyGradebookRows(mergedGradebook);
                     //check if there are empty columns and remove them.                    
                     mergedGradebook = RemoveEmptyGradebookColumns(mergedGradebook);
-                    
+
                     //we processed it all, add it to the mergedGradebooks!
                     mergedGradebooks.Add(fileName, mergedGradebook);
                 }
@@ -1253,7 +1261,7 @@ namespace OSBLE.Controllers
              }
              else
              {
-                 filesFailedToLoadCount += ProcessGradebookChanges(gfp, newGradebook);
+            filesFailedToLoadCount += ProcessGradebookChanges(gfp, newGradebook);
              }
 
             //Generate error message.
@@ -1303,7 +1311,7 @@ namespace OSBLE.Controllers
                 using (MemoryStream zipStream = new MemoryStream())
                 {
                     file.InputStream.CopyTo(zipStream);
-                    zipStream.Position = 0; 
+                    zipStream.Position = 0;
                     filesFailedToLoadCount += UploadGradebookZip(zipStream.ToArray(), gfp);
                 }
             }
@@ -1318,8 +1326,8 @@ namespace OSBLE.Controllers
                 }
                 else
                 {
-                    filesFailedToLoadCount += ProcessGradebookChanges(gfp, newGradebook);
-                }
+                filesFailedToLoadCount += ProcessGradebookChanges(gfp, newGradebook);
+            }
             }
             else
             {
@@ -1328,7 +1336,6 @@ namespace OSBLE.Controllers
             }
 
             //Generate error message.
-            // START HERE 
             if (filesFailedToLoadCount > 0)
             {
                 FileCache Cache = FileCacheHelper.GetCacheInstance(OsbleAuthentication.CurrentUser);
@@ -1528,6 +1535,10 @@ namespace OSBLE.Controllers
                     if (!HasMultipleSections || (sectionParse && currentTASections.Contains(section.ToString())))
                     {
                         TATable.Add(gradebookTable[i].ToList());
+
+                        if (gradebookTable[i][0].Length > 0 && gradebookTable[i][0][0] == '#')
+                            studentGlobalRows.Add(TATable.Count - 1);
+
                     }
                     //Add global rows (denoted by a leading '#') in any order.
                     else if (gradebookTable[i][0].Length > 0 && gradebookTable[i][0][0] == '#')
@@ -1708,6 +1719,31 @@ namespace OSBLE.Controllers
                 worksheet.Worksheet.Columns().AdjustToContents();
             }            
             return (workbook);
+        }        
+
+        //ckfrancisco
+        //return list of the current user's published assignment ids
+        public List<int> PublishedAssignmentIds()
+        {
+            //retrieve student team ids for the current user
+            List<int> studentTeamIds = (from t in db.Teams 
+                                        where t.Name==CurrentUser.FullName 
+                                        select t.ID).ToList();
+
+            List<int> publishedAssignmentIds = new List<int>();
+
+            //create a list of published assignment ids
+            foreach(int teamId in studentTeamIds)
+            {
+                //for each of the current user's student team ids retrieve a list of published assignments with the student team id
+                List<int> tmp = (from re in db.RubricEvaluations
+                           where re.RecipientID == teamId && re.IsPublished == true
+                           select re.AssignmentID).ToList();
+
+                publishedAssignmentIds.AddRange(tmp);
+            }
+
+            return publishedAssignmentIds;
         }        
     }
     /// <summary>

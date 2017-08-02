@@ -211,7 +211,7 @@ namespace OSBLE.Controllers
 
 
             //if ActiveCourseUser belongs to the discussionTeam, continue. Otherwise kick them out.
-            if (allowedInDiscussion)
+            if (allowedInDiscussion || ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer)
             {
                 DiscussionViewModel dvm = new DiscussionViewModel(discussionTeam, ActiveCourseUser);
 
@@ -262,7 +262,14 @@ namespace OSBLE.Controllers
                 }
 
                 ViewBag.LastVisit = GetAndUpdateLastVisit(discussionTeamId);
-                ViewBag.CanPost = assignment.DueDate > DateTime.UtcNow;
+                if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer)
+                {
+                    ViewBag.CanPost = false;
+                }
+                else
+                {
+                    ViewBag.CanPost = assignment.DueDate > DateTime.UtcNow;
+                }
                 ViewBag.DiscussionPostViewModelList = dvm.DiscussionPostViewModels.OrderBy(dpvm => dpvm.Posted).ToList();
                 ViewBag.ActiveCourse = ActiveCourseUser;
                 ViewBag.Assignment = assignment;
@@ -340,7 +347,6 @@ namespace OSBLE.Controllers
                 {
                     canPost = false;
                 }
-
                 //for CRD assignment types we need a list of all discussions they can participate in for navigation.
                 //additionally for CRD assignments we want to display all teammates invovled in the discussion
                 if (assignment.HasDiscussionTeams)

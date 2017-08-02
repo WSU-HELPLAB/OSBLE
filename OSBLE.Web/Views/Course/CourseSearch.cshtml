@@ -16,9 +16,9 @@
         <legend><b>Search For Courses</b></legend>
         @Html.Label("Search for courses to join:")
         @Html.DropDownList("Course", ViewBag.CourseName as SelectList)
-        
-       
-        <p> <input type="submit" id="submitSearch" value="Search"/> </p>
+
+
+        <p> <input type="submit" id="submitSearch" value="Search" /> </p>
 
 
         @if (ViewBag.SearchResults != null)
@@ -29,11 +29,43 @@
                 <table id="searchTable">
 
                     <tr>
-                        <th >Join</th>
-                        <th >Course Name</th>                        
-                        <th >Course Number</th>                      
-                        <th >Semester</th>                                                
+                        <th>Join</th>
+                        <th>Course Name</th>
+                        <th>Course Number</th>
+                        <th>Semester</th>
                         <th>Instructors</th>
+
+                        <!-- courtney-snyder -->
+                        <th>
+                            Section &nbsp;
+                            @{
+                                SelectList SectionList;
+
+                                List<SelectListItem> tempSectionList = new List<SelectListItem>();
+
+                                for (int i = 0; i < 11; i++) //Display arbitrary amount of sections (0 thru 10 because why not)
+                                {
+                                    SelectListItem tempItem = new SelectListItem();
+                                    tempItem.Value = i.ToString();
+                                    tempItem.Text = i.ToString();
+                                    tempSectionList.Add(tempItem);
+                                }
+                                //Allow user to select "Other" if they don't see their section
+                                SelectListItem otherOption = new SelectListItem();
+                                otherOption.Value = "Other";
+                                otherOption.Text = "Other";
+                                tempSectionList.Add(otherOption);
+                                SectionList = new SelectList(tempSectionList, "Value", "Text");
+                            }
+                            <div class="dropdown">
+                                @Html.DropDownList("Sections", SectionList)
+                                <input type="hidden" id="selectedSection" name="selectedSection" />
+                                <br /><input type="text" id="otherSection" name="otherSection" />
+                            </div>
+                        </th>
+                        <th>
+                            @Helpers.CreateToolTip(ToolTips.SectionSelection)
+                        </th>
                     </tr>
 
                     @foreach (var result in results)
@@ -42,66 +74,66 @@
                         if (result.EndDate > DateTime.Now && !isDeleted)
                         {
                             atLeastOneResult = true;
+                            <tr>
+                                <td>
+                                    <a style="margin-right:5px; margin-left:5px;" title="Request to join Course" class="request-course-join" href="@Url.Action("ReqestCourseJoin", "Course", new { id = result.ID, section = 0 })">@Helpers.AddButton()</a>
+                                </td>
+                                <td>@result.Name</td>
+                                <td>@result.Prefix @result.Number</td>
+                                <td>@result.Semester @result.Year</td>
+                                <td>
+                                    @if (ViewBag.SearchResultsInstructors != null)
+                                    {
+                                        <table id="searchInstructorTable">
+                                            @{
+                                        var instructors = ViewBag.SearchResultsInstructors;
+                                            }
+                                            <tr>
+
+                                                @{
+
+                                        List<String> constructInstructorResults = new List<string>();
+                                        foreach (var instructor in instructors)
+                                        {
+                                            String instructorFirstName = instructor.UserProfile.FirstName;
+                                            String instructorLastName = instructor.UserProfile.LastName;
+                                            if (instructor.AbstractCourseID == result.ID)
+                                            {
+                                                String fullName = instructorFirstName + " " + instructorLastName;
+                                                constructInstructorResults.Add(fullName);
+                                            }
+                                        }
+                                        for (int i = 0; i <= constructInstructorResults.Count - 1; i++)
+                                        {
+                                            if (i != constructInstructorResults.Count - 1)
+                                            {
+                                                <td>@constructInstructorResults.ElementAt(i),</td>
+                                            }
+                                            else
+                                            {
+                                                <td>@constructInstructorResults.ElementAt(i)</td>
+                                            }
+
+                                        }
+                                                }
+                                            </tr>
+
+                                        </table>
+                                    }
+                                </td>
+
+                            </tr>
+                        }
+
+
+                    }
+                    @if (!atLeastOneResult)
+                    {
                         <tr>
                             <td>
-                                <a style="margin-right:5px; margin-left:5px;" title="Request to join Course" href="@Url.Action("ReqestCourseJoin", "Course", new { id = result.ID })">@Helpers.AddButton()</a>
+                                <strong>No Results.</strong>
                             </td>
-                            <td>@result.Name</td>
-                            <td>@result.Prefix @result.Number</td>
-                            <td>@result.Semester @result.Year</td>
-                            <td>
-                                @if (ViewBag.SearchResultsInstructors != null)
-                                {
-                                    <table id="searchInstructorTable">
-                                        @{
-                                            var instructors = ViewBag.SearchResultsInstructors;                                
-                                            }
-                                        <tr>
-
-                                            @{
-                                                
-                                                List<String> constructInstructorResults = new List<string>(); 
-                                                foreach (var instructor in instructors)
-                                                {
-                                                    String instructorFirstName = instructor.UserProfile.FirstName;
-                                                    String instructorLastName = instructor.UserProfile.LastName; 
-                                                    if (instructor.AbstractCourseID == result.ID)
-                                                    {
-                                                        String fullName = instructorFirstName + " " + instructorLastName;
-                                                        constructInstructorResults.Add(fullName);
-                                                    } 
-                                                }
-                                                for (int i = 0; i <= constructInstructorResults.Count-1; i++)
-                                                {
-                                                    if(i != constructInstructorResults.Count-1 )
-                                                    {
-                                                        <td>@constructInstructorResults.ElementAt(i),</td>
-                                                    }
-                                                    else
-                                                    {
-                                                        <td>@constructInstructorResults.ElementAt(i)</td>
-                                                    }
-                                                    
-                                                }
-                                            }
-                                        </tr>
-
-                                    </table>
-                                }
-                            </td>
-                            
                         </tr>
-                        }
-                        
-                        
-                    }
-                    @if(!atLeastOneResult)
-                    {
-                    <tr>
-                        <td>
-                            <strong>No Results.</strong>
-                        </td>
-                    </tr>
                     }
                 </table>
 
@@ -115,12 +147,12 @@
     $(function () {
         $('#Number').prop('disabled', true);
         $('#submitSearch').prop('disabled', true);
-        $('#Course').change(function () { 
+        $('#Course').change(function () {
             $('#Number').prop('disabled', false);
             $('#submitSearch').prop('disabled', false);
             $.getJSON('/Course/CourseNumber?id="' + $('#Course').val() + '"', function (data) {
                 var items = '<option>Search All</option>';
-                var prefix = new Array();               
+                var prefix = new Array();
                 $.each(data, function (i, Number) {
                     if ($.inArray(Number.Text, prefix) == -1) {
                         prefix.push(Number.Text);
@@ -132,20 +164,59 @@
                 $('#Number').html(items);
             });
         });
+        $('#otherSection').hide();
+
+
+        // courtney-snyder
+        $('#Sections').on('change', function () {
+            selectedSection = $('#Sections').val();
+            if (selectedSection == undefined) {
+                selectedSection = 0;
+            }
+            if (selectedSection == "Other") { //If the User selected "Other", show the otherSection textbox and get the input
+                $('#otherSection').show();
+                $('#otherSection').on('change', function () {
+                    var sectionAsInt = parseInt($('#otherSection').val());
+
+                    //If the input is a negative number, warn them and reset the input box
+                    if (sectionAsInt < 0) {
+                        alert("Please enter a reasonable course section number.");
+                        $('#otherSection').val(""); //Reset the otherSection text box
+                    }
+
+                    //If the "Other" section input is a reasonable number, update the anchor links!
+                    else if (!isNaN(sectionAsInt)) {
+                        $.each($('.request-course-join'), function () { //Update each Request Course Join button
+                            var originalUrl = $(this).prop('href'); //Get the current url
+                            var urlSegments = originalUrl.split("="); //Split the URL on the only equals sign (section = XX)
+                            var newUrl = urlSegments[0] + '=' + $('#otherSection').val();
+                            $(this).prop('href', newUrl); //Replace the old section number with the new selected one
+                        });
+                    }
+
+                    //Otherwise, default the anchor link to Section 0
+                    else {
+                        $.each($('.request-course-join'), function () { //Update each Request Course Join button
+                            var originalUrl = $(this).prop('href'); //Get the current url
+                            var urlSegments = originalUrl.split("="); //Split the URL on the only equals sign (section = XX)
+                            var newUrl = urlSegments[0] + '=' + 0;
+                            $(this).prop('href', newUrl); //Replace the old section number with the new selected one
+                        });
+                    }
+
+                });
+            }
+            else { //The user selected a section in 0 - 10, so hide the textbox and update the anchor links
+                $('#otherSection').hide();
+                //alert("CHANGED TO " + selectedSection); //Used for testing purposes
+                $.each($('.request-course-join'), function () { //Update each Request Course Join button
+                    var originalUrl = $(this).prop('href'); //Get the current url
+                    var urlSegments = originalUrl.split("="); //Split the URL on the only equals sign (section = XX)
+                    var newUrl = urlSegments[0] + '=' + selectedSection;
+                    $(this).prop('href', newUrl); //Replace the old section number with the new selected one
+                });
+            }
+        });
     });
 
 </script>
-
-
-
-   
-
-
-
-
-
-
-
-
-
-

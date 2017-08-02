@@ -7,8 +7,10 @@
     var autoLink, linkUsernames, linkHashtags, embedYouTube, formatCode, embedImages,
       __slice = [].slice;
     var courseUserNames = getUserNames();
-    var currentUser = getUserRole(); //Gets current user's AbstractCourseRole
+    var currentUser = getUserRole(); //Gets Active User's AbstractCourseRole
+    var currentUserId = getUserId(); //Gets Active User's Profile Id
     var isObserver = false;
+    var isSelf = false;
     if (currentUser == "Observer") {
         isObserver = true;
     }
@@ -39,8 +41,14 @@
         }
 
         pattern = /(^|[\s\n>]|<br\/?>)((?:https?|ftp):\/\/[\-A-Z0-9+\u0026\u2019@#\/%?=()~_|!:,.;]*[\-A-Z0-9+\u0026@#\/%=~()_|])/gi;
-        if (!(options.length > 0)) {
+        //This if checks to see if we are in the plugin browser. If so add ?component=7 to link to make it work
+        if (!(options.length > 0) && !detectBrowser()) {
             return text.replace(pattern, "$1<a href='$2?component=7'>$2</a>").linkUsernames().linkHashtags();
+        }
+            //else we do not add component=7 as to not break the link
+            //add by Jacob Sadoian 7/10/17
+        else if (!(options.length > 0)) {
+            return text.replace(pattern, "$1<a href='$2'>$2</a>").linkUsernames().linkHashtags();
         }
         option = options[0];
         linkAttributes = ((function () {
@@ -96,8 +104,10 @@
                 idString = idString.substr(0, idString.length - 1);
 
                 // Then get the student's name from the id
-                if (isObserver) {
+                isSelf = idString == currentUserId ? true : false;
+                if (isObserver && !isSelf) { //If the Active User is an Observer and not the person being tagged, Anonymize the name
                     studentFullName = "Anonymous" + Math.floor(Math.random() * 2000).toString(); //Possibly get number of students in the class, x, and multiply random by 2*x or i*x instead of 1000 (an arbitrary value)
+                    //studentFullName = "Anonymous" + getEventId(); //Base the anon number off of the event ID
                     text = text.replace(text.substr(index, length + 2), "<a>@" + studentFullName + "</a>"); //Observer can see someone was mentioned but will remove the link to the @ person's profile
                 }
                 else {
@@ -265,6 +275,38 @@ function getUserRole() {
         }
     })
     return currentRole;
+}
+
+function getEventId() {
+    var eventId = "";
+    $.ajax({
+        url: "/Feed/GetEventId", //Goes to FeedController, then GetEventId method within that file
+        method: "POST", //HTTPPOST Tag in FeedController
+        async: false,
+        success: function (result) { //GetUserRole returns the event ID as a string
+            eventId = result;
+        },
+        error: function (result) {
+            eventId = Math.floor(Math.random() * 2000).toString(); //If an error occurs, don't let the viewer have access to people's class IDs
+        }
+    })
+    return eventId;
+}
+
+function getUserId() { //Gets Active User's Id
+    var id = "";
+    $.ajax({
+        url: "/Feed/GetUserId", //Goes to FeedController, then GetUserRole method within that file
+        method: "POST", //HTTPPOST Tag in FeedController
+        async: false,
+        success: function (result) { //GetUserRole returns the user role as a string
+            id = result;
+        },
+        error: function (result) {
+            id = 0; //If an error occurs, don't let the viewer see the @mentions
+        }
+    })
+    return id;
 }
 
 function decodeHtml(html) {

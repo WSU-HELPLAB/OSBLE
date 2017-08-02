@@ -241,6 +241,7 @@
 
             @if (!(ViewBag.ActiveCourse.AbstractCourse is Community))
             {
+                int sections = ViewBag.UsersBySections.Count;
                 if (usersBySection.SectionNumber == "-1")
                 {
                     <h3 style="display:inline;">Multiple Section Users</h3>
@@ -251,17 +252,21 @@
                 }
                 else
                 {
-                    <h3 style="display:inline;">@Helpers.DisplaySection(usersBySection.SectionNumber)
-                    </h3>
+                    if (sections > 2) //Must be 2 because section -2 is the course roles, and then section 0 is students
+                    {
+                        <h3 style="display:inline;">
+                            @Helpers.DisplaySection(usersBySection.SectionNumber)
+                        </h3>
+                    }
                 }
-
-
-                <input type="checkbox" title="Check this box to select / deselect all users in this section" id="sectionCheck" class="sectionCheckBox" onchange="sectionCheckChange(this)" section="@usersBySection.SectionNumber" style="width: 40px; height: 20px;" />
+                if (sections > 2) //Don't display the Section checkbox if there is only one section (Section 0) and the course roles section
+                {
+                    <input type="checkbox" title="Check this box to select / deselect all users in this section" id="sectionCheck" class="sectionCheckBox" onchange="sectionCheckChange(this)" section="@usersBySection.SectionNumber" style="width: 40px; height: 20px;" />
+                }
             }
-            else
-            {
-                <input type="checkbox" title="Check this box to select / deselect all users in this section" id="sectionCheck" class="sectionCheckBox" onchange="sectionCheckChange(this)" section="@usersBySection.SectionNumber" style="display: none;" />
-            }
+            
+            <input type="checkbox" title="Check this box to select / deselect all users in this section" id="sectionCheck" class="sectionCheckBox" onchange="sectionCheckChange(this)" section="@usersBySection.SectionNumber" style="display: none;" />
+
             @if (usersBySection.SectionNumber == "-2")
             {
                 <h2 id="SelectHelper" style="display:inline;">Click on users to perform actions on them</h2>

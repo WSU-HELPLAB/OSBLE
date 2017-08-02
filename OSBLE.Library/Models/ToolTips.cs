@@ -64,7 +64,9 @@ namespace OSBLE.Models
         public static string CourseLatePolicy = "Using this section, you specify the penalties that OSBLE will automatically apply to late assignments.";
 
         public static string CourseSearch = "A list of classes you may request enrollment for. Upon enrollment you will be notified via an email from the course instructor.";
-        public static string CommunitiesSearch = "A list of communities you may request to join. Upon joining you will be notified via an email from the communitie leader.";        
+        public static string CommunitiesSearch = "A list of communities you may request to join. Upon joining you will be notified via an email from the communitie leader.";
+
+        public static string SectionSelection = "A list of section you may join in the available courses. If you are unsure of what section you are in, leave Section 0 selected.";
         #endregion
 
         #region FeedToolTips
@@ -100,7 +102,7 @@ namespace OSBLE.Models
         public static string AssignmentTitle = "When you click \"Create New Assignment\" below, a dialog box will prompt you for which type of assignment you would like to create, either a Basic Assignment or a Studio Assignment. <br /><br /> Basic Assignments have the final products turned in then graded by an official grader.  <br /><br /> Studio Assignments are typically workshopped by peers prior to final grading.";
         public static string AssignmentLoadingError = "In some cases, this section may fail to load. First try reloading it by opening and closing this section. <br /><br /> It may also fail to load due to a feature of AVG Free 2011, which can be disabled by following instructions at <a href='http://free.avg.com/us-en/faq.num-2964'>AVG's FAQ page</a>.";
         public static string DiscussionPostRole = "Check this box if you want to hide the role of discussion participants (e.g., student, instructor, moderator, observer).";
-
+        public static string IsObservableOption = "Check this box to enable course observers to view the assignment details and rubric, as well as download anonymized submissions from students.";
         #endregion
 
         #region CloningToolTips
