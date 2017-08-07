@@ -7,9 +7,11 @@
 @{
     bool isComment = ViewBag.IsComment ?? false;
     bool showDetails = ViewBag.ShowDetails ?? false;
+    bool isObserver = ViewBag.CurrentUserCourseRole == 5 ? true : false;
     int genericComponent = (int)VsComponent.GenericComponent;
     string detailsLink = ViewBag.DetailsLink ?? "'/Feed/Details/' + idString";
     detailsLink += "+'?component='+" + genericComponent;
+    var activeCourseUser = ViewBag.ActiveCourseUser;
 }
 
 <div data-bind="if: show && vm.InEventVisibleToList(options.eventVisibleTo)">
@@ -29,11 +31,11 @@
                 <div class="badge new-reply-badge" style="display:none">New Replies</div>
                 <div class="badge new-post-badge" style="display:none" data-bind="click: HideNewPostBadge(eventId)">New</div>
             }
-            
+
             @* Button Controls *@
             <div class="dp_tools">
-                
-                @* Mark as Helpful Button *@
+
+                @* Mark as Helpful Button (for comments)*@
                 @if (isComment)
                 {
                     <span>+</span>
@@ -46,7 +48,21 @@
                         </a>
                     </div>
                 }
-
+                @* 
+                courtney-snyder
+                Like Button (for posts)
+                *@
+                else if (!isComment)
+                {
+                    <span data-bind="attr: {id: 'feed-post-' + eventId + '-likes'}"> + </span>
+                    <div>
+                           @* If the current user was not the poster, allow them to like the event *@
+                            <a title="Like Post" data-bind="click: LikeFeedPost, css: { 'icon-highlight' : highlightMark() == true }">
+                                <span data-bind="attr: {id: 'feed-post-' + eventId + '-thumb' }" class="glyphicon glyphicon-thumbs-up"></span>
+                            </a>
+                    </div>
+                }
+                
                 @* Mail Button *@
                 <div data-bind="if: options.canMail && !options.hideMail">
                     <a title="Mail This User" data-bind="attr: {href: '/Mail/CreateUser/' + senderId + '?component=' + @genericComponent}"><span class="glyphicon glyphicon-envelope"></span></a>
@@ -61,24 +77,57 @@
                 <div data-bind="if: options.canEdit">
                     <a title="Edit this post" data-bind="click: ShowEditBox, attr: {id: 'btn-edit-' + eventId}"><span class="glyphicon glyphicon-pencil"></span></a>
                 </div>
+
+                @* 
+                courtney-snyder
+                Mark as Resolved/Resolved (for posts)
+                *@
+                <div>
+                    <div data-bind="if: IsSelf(senderId, activeCourseUserId, eventId)">
+                        @* //OP will see an anchor link version of "Mark As Resolved" for Feed Posts and Ask For Help Events
+                           //Should work for Anon posts but doesn't ¯\_(ツ)_/¯ *@
+                        <div>
+                            <div data-bind="if: eventType == 'FeedPostEvent'">
+                                <a data-bind="click: MarkPostResolved, attr: {id: 'mark-as-resolved-' + eventId }" style="color:black;"><span class="glyphicon glyphicon-unchecked"></span> <b> [Mark as Resolved] </b> </a>
+                            </div>
+                            <div data-bind="if: eventType == 'AskForHelpEvent'">
+                                <a data-bind="click: MarkPostResolved, attr: {id: 'mark-as-resolved-' + eventId }" style="color:black;"><span class="glyphicon glyphicon-unchecked"></span> <b> [Mark as Resolved] </b> </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div data-bind="ifnot: IsSelf(senderId, activeCourseUserId, eventId)">
+                        @* //If the post value is Resolved, other course users will see Resolved *@
+                        <div data-bind="attr: {id: 'mark-as-resolved-' + eventId}">                           
+                        </div>
+                        @* //Otherwise, they will see nothing *@
+                    </div>
+                </div>
             </div>
 
             @* Display Name & Date/Time *@
-            <!-- ko ifnot: options.isAnonymous -->
-            <a class="display_name" data-bind=" text: senderName, attr: {href: '/Profile/Index/' + senderId + '?component=7'}"></a>
-            <span data-bind="text: vm.GetRole(eventId, role)" style="color: #074974; font-style: italic; font-size: small;"></span>
-            <!-- /ko -->
-            <!-- ko if: options.isAnonymous -->
-            <span class="display_name" style="color: #074974;" data-bind=" text: senderName"></span>            
-            <!-- /ko -->
-            
+            @if (isObserver)
+            {
+                <a class="display_name" data-bind=" text: senderName"></a>
+                <span data-bind="text: vm.GetRole(eventId, role)" style="color: #074974; font-style: italic; font-size: small;"></span>
+            }
+            else
+            {
+                <!-- ko ifnot: options.isAnonymous -->
+                <a class="display_name" data-bind=" text: senderName, attr: {href: '/Profile/Index/' + senderId + '?component=7'}"></a>
+                <span data-bind="text: vm.GetRole(eventId, role)" style="color: #074974; font-style: italic; font-size: small;"></span>
+
+                <!-- /ko -->
+                <!-- ko if: options.isAnonymous -->
+                <span class="display_name" style="color: #074974;" data-bind=" text: senderName"></span>
+                <!-- /ko -->
+            }
+
             <span class="feed-item-date" data-bind="text: timeString()"></span>
 
             @if (!isComment)
             {
                 @*Post visibility area*@
-                <a 
-                   data-bind="attr: { title: 'Post Visibility: (' + vm.EventVisibilityGroups(options.eventVisibilityGroups) + ')' +  buildTitleOutput(options.eventVisibleTo, vm.namesAndIds) }, click:  (vm.EventVisibilityGroups(options.eventVisibilityGroups) != 'EVERYONE') ? ShowUserVisibilityDialog : '' "
+                <a data-bind="attr: { title: 'Post Visibility: (' + vm.EventVisibilityGroups(options.eventVisibilityGroups) + ')' +  buildTitleOutput(options.eventVisibleTo, vm.namesAndIds) }, click:  (vm.EventVisibilityGroups(options.eventVisibilityGroups) != 'EVERYONE') ? ShowUserVisibilityDialog : '' "
                    style=" padding-left: 5px; padding-right: 5px;">
                     <!-- ko switch: options.eventVisibilityGroups -->
                     <!-- ko case: $default -->
@@ -146,7 +195,7 @@
                     {
                         @* View Conversation Link *@
                         <li>
-                            <a data-bind="attr: {id: 'expand-comments-' + eventId}, click: expandComments" class="anchor-pointer" >
+                            <a data-bind="attr: {id: 'expand-comments-' + eventId}, click: expandComments" class="anchor-pointer">
                                 <span data-bind="attr: {id: 'expand-comments-text-' + eventId}">View</span> Replies (<span data-bind="text: comments().length"></span>)
                             </a>
                         </li>

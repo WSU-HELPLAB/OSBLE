@@ -554,6 +554,14 @@
             </param>
             <returns></returns>
         </member>
+        <member name="M:OSBLEPlus.Services.Controllers.CourseController.AddToSubmitEventProperties(System.Int32)">
+            <summary>
+            Same as the DBHelper function of the same name, except for a plugin submission,
+             could not access DBHelper so had to write another function.
+             Adds event to SubmitEventProperties for a plugin submission.
+            </summary>
+            <param name="EventLogId"></param>
+        </member>
         <member name="M:OSBLEPlus.Services.Controllers.EventCollectionController.Echo(System.String)">
             <summary>
             Echos back the sent string.
@@ -675,6 +683,13 @@
             string DisplayName(CourseUser viewingUser);
             </returns>
         </member>
+        <member name="M:OSBLEPlus.Services.Controllers.UserProfilesController.GetName(System.String)">
+            <summary>
+            Gets the name of a user from the authentication token
+            </summary>
+            <param name="a">authentication token</param>
+            <returns>full name of user</returns>
+        </member>
         <member name="M:OSBLEPlus.Services.Controllers.UserProfilesController.IsValidKey(System.String)">
             <summary>
             Checks if the Authentication Key passed in is valid
@@ -716,6 +731,13 @@
             public LocalErrorLog Log { get; set; }
             </param>
             <returns></returns>
+        </member>
+        <member name="M:OSBLEPlus.Services.Controllers.WordController.Post(OSBLEPlus.Services.Models.WordStats)">
+            <summary>
+            Web api function that processes wordstats submissions
+            </summary>
+            <param name="request">Word statistics</param>
+            <returns>HttpResponseMessage</returns>
         </member>
     </members>
 </doc>

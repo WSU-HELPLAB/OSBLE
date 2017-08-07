@@ -26,7 +26,7 @@ namespace OSBLE.Controllers
 
             //need to rename sender on anonymous posts
             foreach (var notification in notifications)
-            {                
+            {
                 if (notification.Data != null && notification.Data == "IsAnonymous")
                 {
                     CourseUser anonUser = new CourseUser();
@@ -79,7 +79,10 @@ namespace OSBLE.Controllers
                         case Notification.Types.InlineReviewCompleted:
                             return RedirectToAction("Details", "PeerReview", new { ID = n.ItemID });
                         case Notification.Types.RubricEvaluationCompleted:
-                            return RedirectToAction("View", "Rubric", new { assignmentId = n.ItemID, teamId = n.SenderID });
+                            return RedirectToAction("View", "Rubric", new { assignmentId = n.ItemID, cuID = n.RecipientID });
+                        case "CriticalReview":
+                            string[] splitArray = n.Data.Split(';');
+                            return RedirectToAction("ViewForCriticalReview", "Rubric", new { assignmentId = n.ItemID, authorTeamId = splitArray[3] });
                         case Notification.Types.TeamEvaluationDiscrepancy:
                             //n.Data = PrecedingTeamId + ";" + TeamEvaluationAssignment.ID;
                             int precteamId = 0;
@@ -111,8 +114,8 @@ namespace OSBLE.Controllers
                             return RedirectToAction("Index", "Roster", new { ID = n.ItemID });
                         case Notification.Types.UserTag:
                             var UserTagMarkRead = (from d in db.Notifications
-                                                     where d.ID == n.ID && d.RecipientID == ActiveCourseUser.ID
-                                                     select d).ToList();
+                                                   where d.ID == n.ID && d.RecipientID == ActiveCourseUser.ID
+                                                   select d).ToList();
                             foreach (var foo in UserTagMarkRead)
                             {
                                 foo.Read = true;
@@ -247,16 +250,17 @@ namespace OSBLE.Controllers
             {
                 foreach (CourseUser recipient in recipients)
                 {
-                    Notification notification = new Notification();
-                    notification.ItemType = Notification.Types.UserTag;
-                    notification.ItemID = postId;
-                    notification.RecipientID = recipient.ID;
-                    if (sender != null) notification.SenderID = sender.ID;
-                    if (isAnonymous) notification.Data = "IsAnonymous";
-                    addNotification(notification);
+                    Notification n = new Notification();
+                    n.ItemType = Notification.Types.UserTag;
+                    n.ItemID = postId;
+                    n.RecipientID = recipient.ID;
+                    if (sender != null) n.SenderID = sender.ID;
+                    if (isAnonymous) n.Data = "IsAnonymous";
+                    addNotification(n);
                 }
             }
-            catch { // against Dan's better judgement, do nothing!!!!
+            catch
+            { // against Dan's better judgement, do nothing!!!!
             }
         }
 
@@ -292,10 +296,10 @@ namespace OSBLE.Controllers
         {
             // Get all instructors in the course.
             List<CourseUser> instructors = (from i in db.CourseUsers
-                                           where
-                                             i.AbstractCourseID == c.ID &&
-                                             i.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor
-                                           select i).ToList();
+                                            where
+                                              i.AbstractCourseID == c.ID &&
+                                              i.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor
+                                            select i).ToList();
 
 
             foreach (CourseUser instructor in instructors)
@@ -304,11 +308,11 @@ namespace OSBLE.Controllers
                 n.ItemType = Notification.Types.JoinCourseApproval;
                 n.ItemID = c.ID;
                 n.RecipientID = instructor.ID;
-                n.SenderID = sender.ID;                 
+                n.SenderID = sender.ID;
 
-                addNotification(n);       
+                addNotification(n);
             }
-            db.SaveChanges();            
+            db.SaveChanges();
         }
 
         [NonAction]
@@ -327,7 +331,7 @@ namespace OSBLE.Controllers
                 n.ItemID = c.ID;
                 n.RecipientID = leader.ID;
                 n.SenderID = sender.ID;
-                
+
 
                 addNotification(n);
 
@@ -352,16 +356,35 @@ namespace OSBLE.Controllers
         [NonAction]
         public void SendRubricEvaluationCompletedNotification(Assignment assignment, Team team)
         {
-            foreach (TeamMember member in team.TeamMembers)
-            {
-                Notification n = new Notification();
-                n.ItemType = Notification.Types.RubricEvaluationCompleted;
-                n.Data = assignment.ID.ToString() + ";" + member.CourseUserID + ";" + assignment.AssignmentName;
 
-                n.RecipientID = member.CourseUser.ID;
-                n.SenderID = ActiveCourseUser.ID;
-                addNotification(n);
+            if (assignment.Type == AssignmentTypes.CriticalReview)
+            {
+                foreach (TeamMember member in team.TeamMembers)
+                {
+                    Notification n = new Notification();
+                    n.ItemType = "CriticalReview";
+                    n.Data = assignment.ID.ToString() + ";" + member.CourseUserID + ";" + assignment.AssignmentName + ";" + team.ID;
+                    n.ItemID = assignment.ID;
+                    n.RecipientID = member.CourseUser.ID;
+                    n.SenderID = ActiveCourseUser.ID;
+                    addNotification(n);
+                }
             }
+
+            else
+            {
+                foreach (TeamMember member in team.TeamMembers)
+                {
+                    Notification n = new Notification();
+                    n.ItemType = Notification.Types.RubricEvaluationCompleted;
+                    n.Data = assignment.ID.ToString() + ";" + member.CourseUserID + ";" + assignment.AssignmentName;
+                    n.ItemID = assignment.ID;
+                    n.RecipientID = member.CourseUser.ID;
+                    n.SenderID = ActiveCourseUser.ID;
+                    addNotification(n);
+                }
+            }
+            
         }
 
         /// <summary>
@@ -375,9 +398,9 @@ namespace OSBLE.Controllers
             //Sender has completed a [url]Team Evaluation with a large percent spread.
 
             List<int> InstructorIDs = (from cu in db.CourseUsers
-                                     where cu.AbstractCourseID == TeamEvaluationAssignment.Course.ID &&
-                                     cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor
-                                     select cu.ID).ToList();
+                                       where cu.AbstractCourseID == TeamEvaluationAssignment.Course.ID &&
+                                       cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor
+                                       select cu.ID).ToList();
 
             foreach (int cuID in InstructorIDs)
             {
@@ -429,9 +452,10 @@ namespace OSBLE.Controllers
                 CourseUser recipient = (from a in db.CourseUsers
                                         where a.ID == n.RecipientID
                                         select a).FirstOrDefault();
-
+                bool isObserver = recipient.AbstractRoleID == (int)CourseRole.CourseRoles.Observer ? true : false;
 #if !DEBUG
-                if (recipient.UserProfile.EmailAllNotifications)
+                //If the recipient wants to receive e-mail notifications and they are not an Observer, send them an e-mail notification
+                if (recipient.UserProfile.EmailAllNotifications && !isObserver)
                 {
                     emailNotification(n);
                 }
@@ -455,10 +479,11 @@ namespace OSBLE.Controllers
             {
                 SmtpClient mailClient = new SmtpClient();
                 mailClient.UseDefaultCredentials = true;
-
                 //this line causes a break if the course user is not part of any courses
                 if (n.Sender == null)
+                {
                     n.Sender = db.CourseUsers.Find(ActiveCourseUser.ID);
+                }
 
                 UserProfile sender = db.UserProfiles.Find(n.Sender.UserProfileID);
                 UserProfile recipient = db.UserProfiles.Find(n.Recipient.UserProfileID);
@@ -498,7 +523,6 @@ namespace OSBLE.Controllers
                 {
                     case Notification.Types.Mail:
                         Mail m = db.Mails.Find(n.ItemID);
-
                         subject += " - " + sender.FirstName + " " + sender.LastName;
 
                         action = "reply to this message";
@@ -536,7 +560,16 @@ namespace OSBLE.Controllers
                     case Notification.Types.RubricEvaluationCompleted:
                         subject += " - " + sender.FirstName + " " + sender.LastName;
 
-                        body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
+                        body = sender.FirstName + " " + sender.LastName + " has published a rubric for your assignment."; //Can we get name of assignment?
+
+                        action = "view this assignment submission.";
+
+                        break;
+
+                    case "CriticalReview":
+                        subject += " - " + sender.FirstName + " " + sender.LastName;
+
+                        body = sender.FirstName + " " + sender.LastName + " has published a critical review for your assignment."; //Can we get name of assignment?
 
                         action = "view this assignment submission.";
 
@@ -611,7 +644,7 @@ namespace OSBLE.Controllers
             }
             catch (Exception e)
             {
-                throw new Exception("emailNotification(Notification n) failed: " + e.Message, e);                   
+                throw new Exception("emailNotification(Notification n) failed: " + e.Message, e);
             }
         }
 

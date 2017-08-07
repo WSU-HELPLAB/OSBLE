@@ -1,10 +1,19 @@
 ﻿
 //Downloaded from: https://github.com/bryanwoods/autolink-js
+//linkUsernames adjusted by Courtney Snyder (May 2017) to add anonymity to the feed when viewed by Observers.
+//getUserRole written by Courtney Snyder (May 2017).
 
 (function () {
     var autoLink, linkUsernames, linkHashtags, embedYouTube, formatCode, embedImages,
       __slice = [].slice;
     var courseUserNames = getUserNames();
+    var currentUser = getUserRole(); //Gets Active User's AbstractCourseRole
+    var currentUserId = getUserId(); //Gets Active User's Profile Id
+    var isObserver = false;
+    var isSelf = false;
+    if (currentUser == "Observer") {
+        isObserver = true;
+    }
 
     //NOTE: ?component=7 is added to links to force opening in the main window in the VS Plugin, it has no effect in-browser
     autoLink = function () {
@@ -21,7 +30,7 @@
         }
 
         //format any code, but only if the page is not on the embedded feed (it breaks the feed for some reason...)
-        var re = /\/feed\/osbide/g;        
+        var re = /\/feed\/osbide/g;
         var isMatch = false;
         while ((match = re.exec($(location).attr('href').toLowerCase())) != null) {
             isMatch = true;
@@ -67,9 +76,8 @@
             // We need to parse the body and replace any @id=XXX; with html links for student's actual names.
             var nameIndices = [];
 
-            for (i = 0; i < text.length; i++) {
-                // If we find an '@' character, see if it's followed by "id=" then a number then a semicolon
-                if (text[i] === '@') {
+            for (i = 0; i < text.length; i++) { //Get all instances of @mentions
+                if (text[i] === '@') { // If we find an '@' character, see if it's followed by "id=" then a number then a semicolon
                     if (text.substr(i + 1, 3) === "id=") {
                         var digit = 0, rIndex = 4, hasDigit = false;
                         while (!isNaN(parseInt(text.substr(i + rIndex, 1)))) { // Keep reading characters until we hit something that isn't a digit
@@ -82,12 +90,10 @@
                     }
                 }
             }
-
             nameIndices.reverse();
-
+            //For each iteration, check user role (if user is an Observer, display mentions as @AnonymousXXXX; else display mentions as @StudentName)
             for (i = 0; i < nameIndices.length; i++) { // In reverse order, we need to replace each @id=... with the student's link
                 var index = nameIndices[i];
-
                 // First let's get the length of the part we will replace and also record the id
                 var length = 0, tempIndex = index + 1;
                 var idString = "";
@@ -98,21 +104,30 @@
                 idString = idString.substr(0, idString.length - 1);
 
                 // Then get the student's name from the id
-                var id = parseInt(idString);
+                isSelf = idString == currentUserId ? true : false;
+                if (isObserver && !isSelf) { //If the Active User is an Observer and not the person being tagged, Anonymize the name
+                    studentFullName = "Anonymous" + Math.floor(Math.random() * 2000).toString(); //Possibly get number of students in the class, x, and multiply random by 2*x or i*x instead of 1000 (an arbitrary value)
+                    //studentFullName = "Anonymous" + getEventId(); //Base the anon number off of the event ID
+                    text = text.replace(text.substr(index, length + 2), "<a>@" + studentFullName + "</a>"); //Observer can see someone was mentioned but will remove the link to the @ person's profile
+                }
+                else {
+                    var id = parseInt(idString);
 
-                if (id != NaN) {
+                    if (id != NaN) {
 
-                    studentFullName = courseUserNames[id];
+                        studentFullName = courseUserNames[id]; 
+                        if (studentFullName === "" || studentFullName === undefined) continue; // If the ID doesn't represent a user, don't make a link
 
-                    if (studentFullName === "" || studentFullName === undefined) continue; // If the ID doesn't represent a user, don't make a link
-
-                    // Now replace the id number in the string with an html link with the user's full name
-                    text = text.replace(text.substr(index, length + 2), "<a href=\"/Feed/Profile/" + id + "?component=7\" class=\"Mention\">@" + studentFullName + "</a>");
+                        studentFullName = studentFullName.replace(/\s/g, '');
+                        // Now replace the id number in the string with an html link with the user's full name
+                        // If observer, remove href=\ (observer can see someone was mentioned but will remove the link to the @ person's profile)
+                        text = text.replace(text.substr(index, length + 2), "<a href=\"/Feed/Profile/" + id + "?component=7\" class=\"Mention\">@" + studentFullName + "</a>");
+                    }
                 }
             }
-
             return text;
-        } catch (e) {
+        }
+        catch (e) {
             return this; // Will return unmodified text in failure
         }
     };
@@ -161,7 +176,7 @@
 
         var re = /\[code\]/g;
         var indexList = new Array();
-        while ((match = re.exec(text)) != null) {            
+        while ((match = re.exec(text)) != null) {
             indexList.push(match.index);
         }
 
@@ -170,8 +185,8 @@
         if (indexList.length == 2) {
             start = text.slice(0, indexList[0]);
             middle = (text.slice(indexList[0], indexList[1] + 6)).replace(/\[code\]/g, "").trim();
-            end = text.slice(indexList[1] + 6), text.length;            
-           
+            end = text.slice(indexList[1] + 6), text.length;
+
             var result = self.hljs.highlightAuto(middle);
             middle = result.value;
             text = start + "<pre><code >" + decodeHtml(middle) + "</code></pre>" + end;
@@ -197,14 +212,14 @@
     }
 
     embedImages = function (text) {
-        
-        var re = /(https?:\/\/.*\.(?:png|jpg|gif|gifv))/gi;        
-                
+
+        var re = /(https?:\/\/.*\.(?:png|jpg|gif|gifv))/gi;
+
         var indexListUrl = new Array();
-        while ((match = re.exec(text)) != null) {            
+        while ((match = re.exec(text)) != null) {
             indexListUrl.push(match[0]);
         }
-        
+
         //remove any duplicates so we only replace once
         var uniqueUrls = new Array();
         $.each(indexListUrl, function (i, el) {
@@ -244,6 +259,54 @@ function getUserNames() {
         }
     })
     return namesAndIds;
+}
+
+function getUserRole() {
+    var currentRole = "";
+    $.ajax({
+        url: "/Feed/GetUserRole", //Goes to FeedController, then GetUserRole method within that file
+        method: "POST", //HTTPPOST Tag in FeedController
+        async: false,
+        success: function (result) { //GetUserRole returns the user role as a string
+            currentRole = result;
+        },
+        error: function (result) {
+            currentRole = "Observer"; //If an error occurs, don't let the viewer see the @mentions
+        }
+    })
+    return currentRole;
+}
+
+function getEventId() {
+    var eventId = "";
+    $.ajax({
+        url: "/Feed/GetEventId", //Goes to FeedController, then GetEventId method within that file
+        method: "POST", //HTTPPOST Tag in FeedController
+        async: false,
+        success: function (result) { //GetUserRole returns the event ID as a string
+            eventId = result;
+        },
+        error: function (result) {
+            eventId = Math.floor(Math.random() * 2000).toString(); //If an error occurs, don't let the viewer have access to people's class IDs
+        }
+    })
+    return eventId;
+}
+
+function getUserId() { //Gets Active User's Id
+    var id = "";
+    $.ajax({
+        url: "/Feed/GetUserId", //Goes to FeedController, then GetUserRole method within that file
+        method: "POST", //HTTPPOST Tag in FeedController
+        async: false,
+        success: function (result) { //GetUserRole returns the user role as a string
+            id = result;
+        },
+        error: function (result) {
+            id = 0; //If an error occurs, don't let the viewer see the @mentions
+        }
+    })
+    return id;
 }
 
 function decodeHtml(html) {

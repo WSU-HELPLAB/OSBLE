@@ -185,7 +185,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />
-    <Content Include="Global.asax" />    
+    <Content Include="Global.asax" />
     <None Include="Properties\PublishProfiles\local debug.pubxml" />
     <None Include="Scripts\jquery-1.6.4-vsdoc.js" />
     <Content Include="Scripts\jquery-1.6.4.js" />
@@ -241,6 +241,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Controllers\UserProfilesController.cs" />
+    <Compile Include="Controllers\WordController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -248,6 +249,7 @@
     <Compile Include="Models\CommentActivityLog.cs" />
     <Compile Include="Models\ProfileViewModel.cs" />
     <Compile Include="Models\SubmitEventModelBinder.cs" />
+    <Compile Include="Models\WordStatistics.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

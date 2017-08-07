@@ -131,6 +131,7 @@ namespace OSBLE.Controllers
 
             ViewBag.CurrentUserName = ActiveCourseUser.UserProfile.FullName;
             ViewBag.CurrentUserProfileId = ActiveCourseUser.UserProfileID;
+            ViewBag.CurrentUserCourseRole = ActiveCourseUser.AbstractRoleID;
 
             BuildCourseSelectViewBag();
             BuildFeedbackItemViewBag(0, "Availability Details");
@@ -714,9 +715,10 @@ namespace OSBLE.Controllers
             foreach (KeyValuePair<string, string> user in userNameIdPairs)
             {
                 string name = user.Value.Replace(" ", "");
-                string id = "id=" + user.Key + ";";
+                string id = "@id=" + user.Key + ";";
                 //text = text.replace(name, id);
-                postContent = postContent.Replace(name, id);
+                string atMention = "@" + name;
+                postContent = postContent.Replace(atMention, id);
             }
 
             AskForHelpEvent post = new AskForHelpEvent();
@@ -941,6 +943,8 @@ namespace OSBLE.Controllers
             ViewBag.CurrentCourseUsers = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
             //Hashtags
             ViewBag.HashTags = DBHelper.GetHashTags();
+            //Current User Role ID
+            ViewBag.CurrentUserCourseRole = ActiveCourseUser.AbstractRoleID;
 
             ViewBag.HideLoadMore = true;
 
@@ -1739,7 +1743,6 @@ namespace OSBLE.Controllers
                                    "(SELECT SourceEventLogId FROM LogCommentEvents WHERE Id IN  " +
                                    "(SELECT DISTINCT LogCommentEventId FROM HelpfulMarkGivenEvents))) " +
                                    "ORDER BY EventDate DESC";
-
                     var results = sqlConnection.Query<int>(query, new { CourseId = courseId, NumberOfDays = numberOfDays }).ToList();
 
                     foreach (var post in results)

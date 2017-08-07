@@ -52,7 +52,7 @@ namespace OSBLE.Controllers
                 if (id != null)
                 {
                     UserProfile user = DBHelper.GetUserProfile((int)id);
-                    if (user != null)
+                    if (user != null && ActiveCourseUser.AbstractCourseID != (int)CourseRole.CourseRoles.Observer)
                     {
                         vm.User = user;
                     }
@@ -158,6 +158,10 @@ namespace OSBLE.Controllers
                             UserProfile = vm.User,
                             UserProfileId = vm.User.ID
                         };
+                        if (ActiveCourseUser.AbstractCourseID == (int)CourseRole.CourseRoles.Observer)
+                        {
+                            cal.UserProfileId = 0;
+                        }
 
                         i++;
                         vm.SocialActivity.AddLog(cal);

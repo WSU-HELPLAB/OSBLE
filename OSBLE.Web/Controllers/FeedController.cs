@@ -91,9 +91,13 @@ namespace OSBLE.Controllers
                 }
 
                 if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor)
+                {
                     ViewBag.IsInstructor = true;
+                }
                 else
+                {
                     ViewBag.IsInstructor = false;
+                }
 
                 ViewBag.EnableCustomPostVisibility = ConfigurationManager.AppSettings["EnableCustomPostVisibility"]; //<add key="EnableCustomPostVisibility" value="false"/> in web.config
 
@@ -155,7 +159,25 @@ namespace OSBLE.Controllers
             ViewBag.ActiveCourse = DBHelper.GetCourseUserFromProfileAndCourse(ActiveCourseUser.UserProfileID, (int)courseID);
 
             //setup user list for autocomplete            
-            ViewBag.CurrentCourseUsers = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
+            var viewableProfiles = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
+            if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer) //If the current user is an Observer, remove everyone besides them and instructors from viewableProfiles
+            {
+                bool isSelf;
+                bool isInstructor;
+                var instructors = DBHelper.GetCourseInstructorIds(ActiveCourseUser.AbstractCourseID);
+                var tempViewableProfiles = new List<UserProfile>(viewableProfiles); //Need a deep copy of the list to iterate over so elements can be removed if necessary
+                foreach (var profile in tempViewableProfiles)
+                {
+                    isSelf = profile.ID == ActiveCourseUser.UserProfileID ? true : false;
+                    isInstructor = instructors.Contains(profile.ID) ? true : false;
+                    if (!isSelf && !isInstructor)
+                    {
+                        viewableProfiles.Remove(profile);
+                    }
+                }
+            }
+            ViewBag.CurrentCourseUsers = viewableProfiles;
+
             ViewBag.HashTags = DBHelper.GetHashTags();
 
             ViewBag.EnableCustomPostVisibility = ConfigurationManager.AppSettings["EnableCustomPostVisibility"]; //<add key="EnableCustomPostVisibility" value="false"/> in web.config
@@ -177,6 +199,12 @@ namespace OSBLE.Controllers
                 return false;
             }
             return true;
+        }
+
+        [HttpPost]
+        private string GetEventId(FeedItem f)
+        {
+            return f.Event.EventId.ToString();
         }
 
         private FeedViewModel GetFeedViewModel(string keywords = "")
@@ -220,8 +248,8 @@ namespace OSBLE.Controllers
                 {
                     _activityFeedQuery.MaxQuerySize += 20;
                     initialReturnItems = _activityFeedQuery.Execute().ToList();
-                    returnItems = new List<FeedItem>();    
-                }                
+                    returnItems = new List<FeedItem>();
+                }
             }
 
             // restore the original end date and query size
@@ -236,7 +264,9 @@ namespace OSBLE.Controllers
             {
                 foreach (FeedItem f in returnItems)
                 {
-                    if (f.Event.IsAnonymous)
+                    bool isSelf = ActiveCourseUser.UserProfileID == f.Event.SenderId ? true : false;
+                    bool isObserver = ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer ? true : false;
+                    if (f.Event.IsAnonymous || (isObserver && !isSelf))
                     {
                         //make anon userprofile
                         UserProfile anonUserProfile = new UserProfile();
@@ -256,13 +286,32 @@ namespace OSBLE.Controllers
                 }
             }
 
-            //and finally, retrieve our list of feed items
+            // retrieve our list of feed items
             int maxIdQuery = int.MaxValue;
+
+            //Get the Resolved post IDs and display them as [Resolved]
+            var allResolvedPostIds = DBHelper.GetResolvedPostIds();
+
+            //Intersect the Resolved post IDs & the top 20 return items ids
+            var topResolvedPostIds = allResolvedPostIds.Intersect(returnItems.Select(item => item.Event.EventLogId));
+
+            //Store in the ViewBag so the post ids can be accessed in FeedItems.cshtml
+            ViewBag.ResolvedPostIds = topResolvedPostIds;
 
             foreach (FeedItem f in returnItems)
             {
                 if (f.Event.EventId < maxIdQuery)
                     maxIdQuery = f.Event.EventId;
+
+                //The intersected query contains the feed item
+                if (topResolvedPostIds.Contains(f.Event.EventId))
+                {
+                    f.IsResolved = true;
+                }
+                else
+                {
+                    f.IsResolved = false;
+                }
             }
 
             vm.LastLogId = maxIdQuery - 1;
@@ -348,8 +397,44 @@ namespace OSBLE.Controllers
         [HttpPost]
         public JsonResult GetProfileFeed(int profileUserId)
         {
-
             return Json(1);
+        }
+
+        /// <returns> Returns Active Course User's course user role as a string. </returns>
+        /// courtney-snyder
+        [HttpPost]
+        public string GetUserRole()
+        {
+            if (ActiveCourseUser == null)
+            {
+                return "None";
+            }
+            switch (ActiveCourseUser.AbstractRoleID)
+            {
+                case (int)CourseRole.CourseRoles.Instructor:
+                    return "Instructor";
+                case (int)CourseRole.CourseRoles.Moderator:
+                    return "Moderator";
+                case (int)CourseRole.CourseRoles.Observer:
+                    return "Observer";
+                case (int)CourseRole.CourseRoles.Pending:
+                    return "Pending";
+                case (int)CourseRole.CourseRoles.Student:
+                    return "Student";
+                case (int)CourseRole.CourseRoles.TA:
+                    return "TA";
+                case (int)CourseRole.CourseRoles.Withdrawn:
+                    return "Withdrawn";
+                default:
+                    return "None";
+            }
+        }
+
+        [HttpPost]
+        public int GetUserId()
+        {
+            //If the user is not enrolled in any courses or is only Withdrawn from courses, ActiveCourseUser = 0
+            return ActiveCourseUser != null ? ActiveCourseUser.UserProfileID : 0;
         }
 
         private string GetDisplayTimeString(DateTime time, CourseUser courseUser = null)
@@ -460,6 +545,7 @@ namespace OSBLE.Controllers
                 CanDelete = eventLog.CanDelete,
                 CanReply = eventLog.CanReply,
                 IsHelpfulMark = item.PrettyName == EventType.HelpfulMarkGivenEvent.ToString().ToDisplayText(),
+                IsResolved = item.Items[0].IsResolved,
                 HighlightMark = false,
                 ShowPicture = eventLog.ShowProfilePicture,
                 Comments = comments,
@@ -560,6 +646,9 @@ namespace OSBLE.Controllers
             // get all the eventLogIds for the comments passed in
             List<int> commentIds = comments.Select(comment => comment.EventLogId).ToList();
 
+            //If the current user is tagged, let them see their own tag
+            //bool isTagged = commentIds.Contains(ActiveCourseUser.UserProfileID) ? true : false;
+
             using (SqlConnection sql = DBHelper.GetNewConnection())
             {
                 Dictionary<int, bool> logCommentMarkedByCurrentUser =
@@ -567,6 +656,15 @@ namespace OSBLE.Controllers
 
                 foreach (LogCommentEvent e in comments)
                 {
+                    //If the Active User is an Observer AND it wasn't their comment, hide the sender's identity
+                    bool isSelf = ActiveCourseUser.UserProfileID == e.SenderId ? true : false;
+                    bool isObserver = ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer;
+                    if (isObserver && !isSelf)
+                    {
+                        e.Sender.FirstName = "Anonymous ";
+                        e.Sender.LastName = e.EventId.ToString();
+                        e.SenderId = 0;
+                    }
                     obj.Add(MakeLogCommentJsonObject(e, logCommentMarkedByCurrentUser, sql));
                 }
             }
@@ -746,6 +844,12 @@ namespace OSBLE.Controllers
             }
         }
 
+        /// <summary>
+        /// Allows other users to mark replies to the original post as "Helpful"
+        /// </summary>
+        /// <param name="eventLogToMark"></param>
+        /// <param name="markerId"></param>
+        /// <returns></returns>
         [HttpGet]
         public JsonResult MarkHelpfulComment(int eventLogToMark, int markerId)
         {
@@ -766,6 +870,246 @@ namespace OSBLE.Controllers
                     isMarker
                 }, JsonRequestBehavior.AllowGet);
             }
+        }
+
+        /// <summary>
+        /// Allows other users to like the actual feed item (not including replies)
+        /// </summary>
+        /// <param name="eventLogId"> Id of the feed post being liked </param>
+        /// <param name="senderId"> Id of the person "liking" the feed post </param>
+        /// <returns></returns>
+        /// courtney-snyder
+        [HttpGet]
+        public JsonResult LikeFeedPost(int eventLogId, int senderId)
+        {
+            int logToMarkSenderId = DBHelper.GetActivityEvent(eventLogId).SenderId;
+
+            if (ActiveCourseUser != null && logToMarkSenderId == senderId)
+            {
+                senderId = ActiveCourseUser.UserProfileID;
+            }
+
+            using (SqlConnection sqlc = DBHelper.GetNewConnection())
+            {
+                int helpfulMarks = DBHelper.GetPostLikeCount(eventLogId);
+                bool isMarker = DBHelper.UserMarkedLog(senderId, eventLogId, sqlc); // markerId is the CU
+                return Json(new
+                {
+                    helpfulMarks,
+                    isMarker
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        /// <summary>
+        /// Updates the FeedPostEventFlags Table, MarkedResolved column.
+        /// </summary>
+        /// <param name="eventLogToMark"></param>
+        /// <param name="markerId"></param>
+        /// <returns></returns>
+        /// courtney-snyder
+        [HttpGet]
+        public void MarkResolvedPost(int eventLogToMark, bool isResolved, int markerId)
+        {
+            int logToMarkSenderId = DBHelper.GetActivityEvent(eventLogToMark).SenderId;
+
+            if (ActiveCourseUser != null && logToMarkSenderId == markerId)
+            {
+                markerId = ActiveCourseUser.UserProfileID;
+            }
+
+            //Update the db
+            using (SqlConnection sqlc = DBHelper.GetNewConnection())
+            {
+                DBHelper.MarkFeedPostResolved(eventLogToMark, isResolved);
+            }
+        }
+
+        /// <summary>
+        /// Calls the DBHelper method "IsPostResolved" and returns the bool result to the AJAX call in a JSON object
+        /// because you cannot return normal booleans for some reason.
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <returns> JSON Object containing boolean result </returns>
+        /// courtney-snyder
+        [HttpGet]
+        public JsonResult IsPostResolved(int eventId)
+        {
+            return Json(new { boolResult = DBHelper.IsPostResolved(eventId) }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Calls the DBHelper method "GetPostLikeCount" and returns it to the AJAX call.
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <param name="senderId"></param>
+        /// <returns> JSON Object containing number of likes </returns>
+        /// courtney-snyder
+        [HttpGet]
+        public JsonResult GetPostLikeCount(int eventId)
+        {
+            return Json(new { numberOfLikes = DBHelper.GetPostLikeCount(eventId) }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Calls the DBHelper method "GetPostLikeCount" and returns it to the AJAX call.
+        /// </summary>
+        /// <param name="eventIds"> A list of visible feed item IDs </param>
+        /// <returns> JSON Object containing a dictionary with eventIDs (key) and number of likes (value) </returns>
+        /// courtney-snyder
+        [HttpGet]
+        public JsonResult GetPostLikeCounts(string eventIds)
+        {
+            List<int> eventIdInts = new List<int>();
+            //Get the eventIds as a string
+            string eventIdsString = Convert.ToString(eventIds);
+            //Remove [ and ] from string
+            eventIdsString = eventIdsString.Substring(1, eventIdsString.Length - 2);
+            //Split the IDs up
+            var splitEventIds = eventIdsString.Split(',');
+            //Convert IDs from strings to ints
+            foreach (var s in splitEventIds)
+            {
+                int temp = Convert.ToInt32(s);
+                eventIdInts.Add(temp);
+            }
+
+            var likeDictionary = DBHelper.GetPostLikeCount(eventIdInts);
+            string likeString = string.Join(",", likeDictionary.Select(m => m.Key + ":" + m.Value).ToArray());
+
+            return Json(new { likeString }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Checks the DB to see if that user liked the post
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <param name="senderId"></param>
+        /// <returns>JSON Object containing thte boolean result </returns>
+        /// courtney-snyder
+        [HttpGet]
+        public JsonResult IsPostLikedByUser(int eventId, int senderId)
+        {
+            return Json(new { boolResult = DBHelper.IsPostLikedByUser(eventId, senderId) }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Checks the DB to see if that user liked any of the visible posts.
+        /// </summary>
+        /// <param name="eventIds"> A list of visible feed item ids. </param>
+        /// <param name="senderId"> The current viewer/user. </param>
+        /// <returns> A list of visible posts that the user has liked. </returns>
+        /// courtney-snyder
+        [HttpGet]
+        public JsonResult ArePostsLikedByUser(string eventIds, int senderId)
+        {
+            List<int> eventIdInts = new List<int>();
+            //Get the eventIds as a string
+            string eventIdsString = Convert.ToString(eventIds);
+            //Remove [ and ] from string
+            eventIdsString = eventIdsString.Substring(1, eventIdsString.Length - 2);
+            //Split the IDs up
+            var splitEventIds = eventIdsString.Split(',');
+            //Convert IDs from strings to ints
+            foreach (var s in splitEventIds)
+            {
+                int temp = Convert.ToInt32(s);
+                eventIdInts.Add(temp);
+            }
+            var likeList = DBHelper.ArePostsLikedByUser(eventIdInts, senderId);
+            //string likeString = string.Join(",", likeDictionary.Select(m => m.Key + ":" + m.Value).ToArray());
+            string likeString = string.Join(",", likeList);
+
+            return Json(new { likeString }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Inserts new row into FeedPostLikes db.
+        /// </summary>
+        /// <param name="eventId"> Item to add like to/remove like from </param>
+        /// <param name="senderId"> Person liking/unliking that item </param>
+        /// courtney-snyder
+        [HttpGet]
+        public void UpdatePostItemLikeCount(int eventId, int senderId)
+        {
+            DBHelper.UpdatePostItemLikeCount(eventId, senderId);
+        }
+
+        /// <summary>
+        /// Gets all Resolved post IDs.
+        /// </summary>
+        /// <returns> Json result containing the resolved post IDs. </returns>
+        /// courtney-snyder
+        [HttpGet]
+        public JsonResult GetResolvedPostIds()
+        {
+            return Json(new { idList = DBHelper.GetResolvedPostIds() }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Gets all Resolved post IDs and their senders.
+        /// </summary>
+        /// <returns> Json result containing a dictionary of post IDs (key) and corresponding senders (value). </returns>
+        /// courtey-snyder
+        [HttpGet]
+        public JsonResult GetResolvedPostIdsAndSenderIds()
+        {
+            return Json(new { idDict = DBHelper.GetResolvedPostIdsAndSenderIds() }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Gets all Resolved post IDs from a list of post IDs.
+        /// </summary>
+        /// <param name="viewablePostIds"> A list of post items the user can see on the page. </param>
+        /// <returns> Json result containing the resolved post IDs in the list of given post IDs. </returns>
+        /// courtney-snyder
+        [HttpGet]
+        public JsonResult GetSelectedResolvedPostIds(string viewablePostIds)
+        {
+            //Remove [ and ]
+            viewablePostIds = viewablePostIds.Substring(1, viewablePostIds.Length - 2);
+            var splitPostIds = viewablePostIds.Split(',');
+            List<int> postEventIdInts = new List<int>();
+            //Parse Event Id strings
+            foreach (var s in splitPostIds)
+            {
+                int temp = Convert.ToInt32(s);
+                postEventIdInts.Add(temp);
+            }
+            return Json(new { idList = DBHelper.GetResolvedPostIds(postEventIdInts) }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Gets all Resolved post IDs and their senders from a list of post IDs. Used in ActivityFeed.js
+        /// </summary>
+        /// <param name="viewablePostIds"> A list of post items the user can see on the page. </param>
+        /// <returns> Json result containing the resolved post IDs in the list of given post IDs. </returns>
+        /// courtney-snyder
+        [HttpGet]
+        public JsonResult GetSelectedResolvedPostIdsAndSenderIds(string viewablePostIds)
+        {
+            //Remove [ and ]
+            viewablePostIds = viewablePostIds.Substring(1, viewablePostIds.Length - 2);
+            var splitPostIds = viewablePostIds.Split(',');
+            List<int> postEventIdInts = new List<int>();
+            //Parse Event Id strings
+            foreach (var s in splitPostIds)
+            {
+                int temp = Convert.ToInt32(s);
+                postEventIdInts.Add(temp);
+            }
+            var resolvedDictionary = DBHelper.GetResolvedPostIdsAndSenderIds(postEventIdInts);
+            //Because javascript seems to have issues with JSON objects containing dictionaries
+            string resolvedString = string.Join(",", resolvedDictionary.Select(m => m.Key + ":" + m.Value).ToArray());
+
+            return Json(new { resolvedString }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult GetFeedItemSenderId(int eventID)
+        {
+            int senderId = DBHelper.GetFeedItemSenderId(eventID);
+            return Json(new { senderId }, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -900,8 +1244,8 @@ namespace OSBLE.Controllers
                 bool hasLastPost = vm.Feed.Count < _activityFeedQuery.MaxQuerySize;
                 if (hasLastPost)
                 {
-                    vm.Feed.RemoveAt(0);    
-                }                
+                    vm.Feed.RemoveAt(0);
+                }
             }
             return GetJsonFromViewModel(vm);
         }
@@ -997,7 +1341,24 @@ namespace OSBLE.Controllers
             ViewBag.EnableCustomPostVisibility = ConfigurationManager.AppSettings["EnableCustomPostVisibility"]; //<add key="EnableCustomPostVisibility" value="false"/> in web.config
 
             //setup user list for autocomplete            
-            ViewBag.CurrentCourseUsers = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
+            var viewableProfiles = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
+            if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer) //If the current user is an Observer, remove everyone besides them and instructors from viewableProfiles
+            {
+                bool isSelf;
+                bool isInstructor;
+                var instructors = DBHelper.GetCourseInstructorIds(ActiveCourseUser.AbstractCourseID);
+                var tempViewableProfiles = new List<UserProfile>(viewableProfiles); //Need a deep copy of the list to iterate over so elements can be removed if necessary
+                foreach (var profile in tempViewableProfiles)
+                {
+                    isSelf = profile.ID == ActiveCourseUser.UserProfileID ? true : false;
+                    isInstructor = instructors.Contains(profile.ID) ? true : false;
+                    if (!isSelf && !isInstructor)
+                    {
+                        viewableProfiles.Remove(profile);
+                    }
+                }
+            }
+            ViewBag.CurrentCourseUsers = viewableProfiles;
             ViewBag.HashTags = DBHelper.GetHashTags();
 
             ViewBag.RootId = id;
@@ -1053,12 +1414,12 @@ namespace OSBLE.Controllers
             FeedDetailsViewModel vm = new FeedDetailsViewModel();
             vm.Ids = id;
             vm.FeedItem = aggregateItems.FirstOrDefault();
-
-            if (vm.FeedItem.IsAnonymous != null ? vm.FeedItem.IsAnonymous : false)
+            bool isSelf = ActiveCourseUser.UserProfileID == vm.FeedItem.Creator.ID ? true : false; //If the Active User is the poster, let them see who was tagged
+            bool isObserver = ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer;
+            if ((vm.FeedItem.IsAnonymous != null ? vm.FeedItem.IsAnonymous : false) || (isObserver && !isSelf))
             {
                 vm.FeedItem.Items.First().Event.SenderId = 0;
             }
-
             return vm;
         }
 
@@ -1103,15 +1464,15 @@ namespace OSBLE.Controllers
 
             int courseID = ActiveCourseUser.AbstractCourseID;
             FeedPostEvent log = new FeedPostEvent()
-                {
-                    SenderId = CurrentUser.ID,
-                    Comment = text,
-                    CourseId = courseID,
-                    SolutionName = null,
-                    EventVisibilityGroups = postVisibilityGroups,
-                    EventVisibleTo = eventVisibleTo,
-                    IsAnonymous = isAnonymous,
-                };
+            {
+                SenderId = CurrentUser.ID,
+                Comment = text,
+                CourseId = courseID,
+                SolutionName = null,
+                EventVisibilityGroups = postVisibilityGroups,
+                EventVisibleTo = eventVisibleTo,
+                IsAnonymous = isAnonymous,
+            };
 
             int logID = Posts.SaveEvent(log);
             var newPost = new AggregateFeedItem(Feeds.Get(logID));
@@ -1127,6 +1488,23 @@ namespace OSBLE.Controllers
 
             //remove users who do not belong in this post visibility group
             emailList = RemoveNonVisibilityGroupEmails(emailList, eventVisibleTo);
+
+            //Remove Observers here
+            var users = DBHelper.GetAllCourseUsersFromCourseId(courseID); //Get all users
+            foreach (var user in users)
+            {
+                //Get user's profile from ID
+                var profile = DBHelper.GetUserProfile(user.ID);
+                var role = DBHelper.GetRoleNameFromCourseAndUserProfileId(courseID, user.ID); //Must get role separately since role is not in profile
+                bool isObserver = role == "Observer" ? true : false;
+                MailAddress email = new MailAddress(profile.Email); //profile.Email is a string, must be of type MailAddress
+
+                //If Course Role == Observer and email is in emailList, remove email from emailList
+                if (isObserver)
+                {
+                    emailList.Remove(emailList.Where(el => el.Address == email.Address).FirstOrDefault());
+                }
+            }
 
             // Parse text and create list of tagged users
             NotifyTaggedUsers(text, logID, eventVisibleTo, isAnonymous);
@@ -1502,22 +1880,22 @@ namespace OSBLE.Controllers
                         {
                             AskForHelpEvent afhe = DBHelper.GetAskForHelpEvent(sourcePostID, conn);
                             if (afhe != null)
-	                        {
+                            {
                                 originalPostComment = afhe.UserComment;
-	                        }
+                            }
                             else
                             {
                                 ExceptionEvent ee = DBHelper.GetExceptionEvent(sourcePostID, conn);
                                 if (ee != null)
-	                            {
-		                            originalPostComment = ee.ExceptionDescription;
-	                            }
+                                {
+                                    originalPostComment = ee.ExceptionDescription;
+                                }
                                 else
                                 {
                                     originalPostComment = "(See post in OSBLE for full details)";
                                 }
                             }
-                            
+
                         }
                         else
                         {
@@ -1528,11 +1906,9 @@ namespace OSBLE.Controllers
 
                         //we want to sanitize for the current user information if the reply was anonymous
                         string currentUserFullName = isAnonymous ? "Anonymous User" : CurrentUser.FullName;
-                        
                         subject = string.Format("OSBLE Plus - {0} replied to a post in {1}", currentUserFullName, DBHelper.GetCourseShortNameFromID(courseID, conn));
                         body = string.Format("{0} replied to a post{1} at {2}:\n\n{3}\n-----------------------\nOriginal Post:\n{4}\n\n", // by {1} > "" to temporarily handle anon reply
                             currentUserFullName, "", timePosted.UTCToCourse(courseID), postContent, originalPostComment);
-
                         body = ReplaceMentionWithName(body);
                     }
                     else
@@ -1542,9 +1918,7 @@ namespace OSBLE.Controllers
 
                         subject = string.Format("OSBLE Plus - {0} posted in {1}", currentUserFullName, DBHelper.GetCourseShortNameFromID(courseID, conn));
                         body = string.Format("{0} made the following post at {1}:\n\n{2}\n\n", currentUserFullName, timePosted.UTCToCourse(courseID), postContent);
-
-                        // We need to parse the body and replace any @id=XXX; with student's actual names.
-                        body = ReplaceMentionWithName(body);                        
+                        body = ReplaceMentionWithName(body);
                     }
                 }
 
@@ -1558,57 +1932,77 @@ namespace OSBLE.Controllers
 #endif
         }
 
-
+        /// <summary>
+        /// The @mention tags will be replaced with the correct names
+        /// </summary>
+        /// <param name="body"></param>
+        /// <returns></returns>
         public string ReplaceMentionWithName(string body)
         {
             List<int> nameIndices = new List<int>();
 
+
             for (int i = 0; i < body.Length; i++)
             {
-                // If we find an '@' character, see if it's followed by "id=" then a number then a semicolon
-                if (body[i] == '@')
-                {
-                    if (body.Substring(i + 1, 3) == "id=")
+                try
+                {// If we find an '@' character, see if it's followed by "id=" then a number then a semicolon
+                    if (body[i] == '@')
                     {
-                        // After the '=', make sure there are numbers then a semicolon following it
-                        int digit = 0, rIndex = 4;
-                        bool hasDigit = false;
-                        while (int.TryParse(body.Substring(i + rIndex, 1), out digit))  // Keep reading characters until we hit something that isn't a digit
+                        if (body.Substring(i + 1, 3) == "id=")
                         {
-                            hasDigit = true;
-                            rIndex++;
+                            // After the '=', make sure there are numbers then a semicolon following it
+                            int digit = 0, rIndex = 4;
+                            bool hasDigit = false;
+                            while (int.TryParse(body.Substring(i + rIndex, 1), out digit))  // Keep reading characters until we hit something that isn't a digit
+                            {
+                                hasDigit = true;
+                                rIndex++;
+                            }
+                            if (hasDigit && body[i + rIndex] == ';')
+                                nameIndices.Add(i); // If the character following the numbers is a semicolon, we know there is a name reference here so record the index
                         }
-                        if (hasDigit && body[i + rIndex] == ';')
-                            nameIndices.Add(i); // If the character following the numbers is a semicolon, we know there is a name reference here so record the index
                     }
+                }
+                catch (Exception e)
+                {
+                    //throw out some information about variables in the current state to try and get more information about the exception to generate an actual fix in the future. 
+                    throw new Exception("Body.Length = " + body.Length + " nameIndicies.Count= " + nameIndices.Count + " i= " + i, e);
                 }
             }
             nameIndices.Reverse();
-
             foreach (int index in nameIndices) // In reverse order, we need to replace each @... with the students name
             {
-                // First let's get the length of the part we will replace and also record the id
-                int length = 0, tempIndex = index + 1;
-                string idString = "";
-                while (body[tempIndex] != ';') { length++; tempIndex++; idString += body[tempIndex]; }
 
-                // Get the id= part off the beginning of idString and the ; from the end
-                idString = idString.Substring(2);
-                idString = idString.Substring(0, idString.Length - 1);
-
-                // Then get the student's name from the id
-                int id; int.TryParse(idString, out id);
-                if (id != null)
+                try
                 {
-                    UserProfile referencedUser = (from user in db.UserProfiles where user.ID == id select user).FirstOrDefault();
-                    if (referencedUser == null) continue; // It's possible the user no longer exists, or for some reason someone manually entered @id=blahblahblah; into the text field.
-                    string studentFullName = referencedUser.FirstName + referencedUser.LastName;
 
-                    // Now replace the id number in the string with the user name
-                    body = body.Replace(body.Substring(index + 1, length + 1), string.Format("<a href=\"{0}\">{1}</a>", Url.Action("Index", "Profile", new { id = id }, Request.Url.Scheme), studentFullName));
+                    // First let's get the length of the part we will replace and also record the id
+                    int length = 0, tempIndex = index + 1;
+                    string idString = "";
+                    while (body[tempIndex] != ';') { length++; tempIndex++; idString += body[tempIndex]; }
+
+                    // Get the id= part off the beginning of idString and the ; from the end
+                    idString = idString.Substring(2);
+                    idString = idString.Substring(0, idString.Length - 1);
+
+                    // Then get the student's name from the id
+                    int id; int.TryParse(idString, out id);
+                    if (id != null)
+                    {
+                        UserProfile referencedUser = (from user in db.UserProfiles where user.ID == id select user).FirstOrDefault();
+                        if (referencedUser == null) continue; // It's possible the user no longer exists, or for some reason someone manually entered @id=blahblahblah; into the text field.
+                        string studentFullName = referencedUser.FirstName + referencedUser.LastName;
+
+                        // Now replace the id number in the string with the user name
+                        body = body.Replace(body.Substring(index + 1, length + 1), string.Format("<a href=\"{0}\">{1}</a>", Url.Action("Index", "Profile", new { id = id }, Request.Url.Scheme), studentFullName));
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    throw new Exception("Index = " + index + " nameIndices.Count= " + nameIndices.Count, ex);
                 }
             }
-
             return body;
         }
 
@@ -1713,9 +2107,9 @@ namespace OSBLE.Controllers
                 return Json(new { userProfiles = new Dictionary<string, string>() });
             }
             List<UserProfile> userProfiles = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
+            var instructors = DBHelper.GetCourseInstructorIds(ActiveCourseUser.AbstractCourseID);
             Dictionary<string, string> nameIdPairs = new Dictionary<string, string>();
-
-            foreach (UserProfile userProfile in userProfiles)
+            foreach (UserProfile userProfile in userProfiles) //
             {
                 if (!nameIdPairs.ContainsKey(userProfile.ID.ToString()))
                 {
@@ -1777,14 +2171,14 @@ namespace OSBLE.Controllers
             if (parentEventId == -1) //feedpost
             {
                 FeedPostEvent feedPost = DBHelper.GetFeedPostEvent(eventId);
-                return feedPost.Comment;    
+                return feedPost.Comment;
             }
             else //logcomment
             {
                 LogCommentEvent logComment = DBHelper.GetLogCommentEvents(parentEventId).Where(lce => lce.EventLogId == eventId).FirstOrDefault();
                 return logComment.Content;
             }
-            
+
         }
 
         public JsonResult GetPermissions(int eventId)
@@ -1821,7 +2215,7 @@ namespace OSBLE.Controllers
                 canVote = e.CanVote,
                 showPicture = e.ShowProfilePicture,
                 eventVisibleTo = e.EventVisibleTo,
-                isAnonymous = e.IsAnonymous,
+                isAnonymous = e.IsAnonymous
             });
         }
 
@@ -1842,12 +2236,12 @@ namespace OSBLE.Controllers
         /// Autocomplete Search for Posts. Returns JSON.
         /// </summary>
         /// <returns></returns>
-        public ActionResult AutoCompleteNames()
+        public ActionResult AutoCompleteNames() //Not used?
         {
             string term = Request.Params["term"].ToString().ToLower();
-            // If we are not anonymous in a course, allow search of all users.
+            // If we are not anonymous or an Observer in a course, allow search of all users.
             List<int> authorizedCourses = currentCourses
-                .Where(c => c.AbstractRole.Anonymized == false)
+                .Where(c => c.AbstractRole.Anonymized == false && c.AbstractRoleID != (int)CourseRole.CourseRoles.Observer)
                 .Select(c => c.AbstractCourseID)
                 .ToList();
 
@@ -1856,9 +2250,9 @@ namespace OSBLE.Controllers
                 .Select(c => c.UserProfile)
                 .ToList();
 
-            // If we are anonymous, limit search to ourselves plus instructors/TAs
+            // If we are anonymous or an Observer, limit search to ourselves plus instructors/TAs
             List<int> addedCourses = currentCourses
-                .Where(c => c.AbstractRole.Anonymized == true)
+                .Where(c => c.AbstractRole.Anonymized == true || c.AbstractRoleID != (int)CourseRole.CourseRoles.Observer)
                 .Select(c => c.AbstractCourseID)
                 .ToList();
 

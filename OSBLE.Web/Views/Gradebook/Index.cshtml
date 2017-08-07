@@ -22,6 +22,16 @@
     bool EditSections = ViewBag.EditSections ?? false;
 
     string editToolTip = "Edit Section Values: \n\t toggle between sortable and editable for ALL instructors or TAs for this course.";
+
+    //ckfrancisco
+    Dictionary<string, int> AssignmentDict = ViewBag.AssignmentDict; //contains the name of the current course assignments and respective assinment id numbers
+    Dictionary<string, int> AssignmentFreq= new Dictionary<string, int>(); //used to count the frequency of an assignment name in the grade book to avoid posting rubrics for duplicates names
+                                                                           //NOTE: assignment names are used to dertmine the assignment id number
+    List<string> AssignmentNames = new List<string>(); //used to keep an index of assignment names respective to the order they are found in
+    int sectionRow = -1; //used to record the row assignment names are listed in
+    int cuID = ViewBag.cuID;
+    string WebClientRoot = ViewBag.WebClientRoot;
+    List<int> PublishedAssignmentIds = ViewBag.PublishedAssignmentIds; //list of published assignment ids for the current user
 }
 <style type="text/css">
     #gb_header > h2 {
@@ -280,9 +290,11 @@ else
 
                                 string displayValue = Table[i][j];
 
+                                //ckfrancisco
                                 if (displayValue.ToLower().Contains("section"))
                                 {
-                                    sectionIndex = j;
+                                    sectionIndex = j;   //record row and column of section label
+                                    sectionRow = i;     //NOTE: section label is used to determine where assignment names are listed
                                 }
 
                                 if (displayValue.ToLower().Contains("name"))
@@ -306,6 +318,22 @@ else
                                     else
                                     {
                                         <th>@displayValue <input type="hidden" id="@tdId" name="@tdId" value="@displayValue" readonly /> </th>                                        
+                                    }
+
+                                    //ckfrancisco
+                                    if(i == sectionRow && j > sectionIndex) //if cell is an assignment name
+                                    {
+                                        AssignmentNames.Add(displayValue);  //add name to list of names and increase frequency or set to 1
+                                        
+                                        if (AssignmentFreq.ContainsKey(displayValue))
+                                        {
+                                            AssignmentFreq[displayValue]++;
+                                        }
+
+                                        else
+                                        {
+                                            AssignmentFreq[displayValue] = 1;
+                                        }
                                     }                                    
                                 }
                                 else
@@ -320,7 +348,40 @@ else
                                             }
                                             else
                                             {
-                                                <td class="@tdClass">@displayValue</td>
+                                                //ckfrancisco
+                                                //if any of the checks below fail then post score in plain text
+                                                if (i == sectionRow + 1 && j > sectionIndex) //if cell is an assignment score
+                                                {
+                                                    string name = AssignmentNames[j - sectionIndex - 1]; //record name of the assignment
+                                                                                                         //NOTE: the assignment name is directly one row above so
+                                                                                                         // calculate the column to determine index in list of assignment names
+
+                                                    if (AssignmentDict.ContainsKey(name) && AssignmentFreq[name] == 1) //if assignment name is found in assignment id dictionary and only once in the grade book
+                                                    {
+                                                        int aID = AssignmentDict[name]; //record assignment id from the dictionary
+
+                                                        if (PublishedAssignmentIds.Contains(aID)) //if assignment is published for the current user then post score with link to the rubric
+                                                        {
+
+                                                            <td class="@tdClass"><a href="@string.Format("{0}Rubric/View?assignmentId={1}&cuId={2}", WebClientRoot, aID.ToString(), cuID.ToString())">@displayValue</a></td>
+                                                        }
+
+                                                        else
+                                                        {
+                                                            <td class="@tdClass">@displayValue</td>
+                                                        }
+                                                    }
+
+                                                    else
+                                                    {
+                                                        <td class="@tdClass">@displayValue</td>
+                                                    }
+                                                }
+
+                                                else
+                                                {
+                                                    <td class="@tdClass">@displayValue</td>
+                                                }
                                             }
                                         }
                                         else
@@ -338,14 +399,47 @@ else
                                             }
                                             else
                                             {
-                                                <td class="@tdClass">@displayValue</td>
+                                                //ckfrancisco
+                                                //if any of the checks below fail then post score in plain text
+                                                if (i == sectionRow + 1 && j > sectionIndex) //if cell is an assignment score
+                                                {
+                                                    string name = AssignmentNames[j - sectionIndex - 1]; //record name of the assignment
+                                                    //NOTE: the assignment name is directly one row above so
+                                                    // calculate the column to determine index in list of assignment names
+
+                                                    if (AssignmentDict.ContainsKey(name) && AssignmentFreq[name] == 1) //if assignment name is found in assignment id dictionary and only once in the grade book
+                                                    {
+                                                        int aID = AssignmentDict[name]; //record assignment id from the dictionary
+
+                                                        if (PublishedAssignmentIds.Contains(aID)) //if assignment is published for the current user then post score with link to the rubric
+                                                        {
+
+                                                            <td class="@tdClass"><a href="@string.Format("{0}Rubric/View?assignmentId={1}&cuId={2}", WebClientRoot, aID.ToString(), cuID.ToString())">@displayValue</a></td>
+                                                        }
+
+                                                        else
+                                                        {
+                                                            <td class="@tdClass">@displayValue</td>
+                                                        }
+                                                    }
+
+                                                    else
+                                                    {
+                                                        <td class="@tdClass">@displayValue</td>
+                                                    }
+                                                }
+
+                                                else
+                                                {
+                                                    <td class="@tdClass">@displayValue</td>
+                                                }
                                             }
                                         }
                                         else
                                         {
                                             <td class="@tdClass">@displayValue <input type="hidden" id="@tdId" name="@tdId" value="@displayValue" readonly /></td>
-                                        }   
-                                    }                                    
+                                        }
+                                    }
                                 }
                             }
                         }

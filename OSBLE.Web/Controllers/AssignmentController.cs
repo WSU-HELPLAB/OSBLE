@@ -199,7 +199,24 @@ namespace OSBLE.Controllers
                     }
                 }
             }
+            else if(ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer)
+            {
+                int cid = ActiveCourseUser.AbstractCourseID;
+                Assignments = DBHelper.GetObservableAssignments(cid);
+                
+                //For CanGrade roles, show all assignments
+               /* Assignments = (from assignment in db.Assignments
+                               where assignment.CourseID == ActiveCourseUser.AbstractCourseID
+                               orderby assignment.IsDraft, assignment.ReleaseDate
+                               select assignment).ToList();*/
 
+                //We want the number of Posters who's initial posts should be tracked. So students in this course.
+                ViewBag.TotalDiscussionPosters = (from cu in db.CourseUsers
+                                                  where cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                                                  cu.AbstractRoleID == (int)CourseRole.CourseRoles.Student
+                                                  select cu).Count();
+               
+            }
             //Seperate all assignments for organizing into one list
             List<Assignment> Past = (from a in Assignments
                                      where a.DueDate < DateTime.UtcNow &&
@@ -244,6 +261,19 @@ namespace OSBLE.Controllers
             ViewBag.Submitted = false;
                         
             return View("Index");
+        }
+
+
+        /// <summary>
+        /// Toggles the assignment to between observable and unobservable
+        /// </summary>
+        /// <param name="assignmentID"></param>
+        /// <returns></returns>
+        public ActionResult ToggleObservable(int assignmentID)
+        {
+            DBHelper.SwitchObservable(assignmentID);
+
+            return RedirectToRoute(new { action = "Index" });
         }
 
         /// <summary>
@@ -346,8 +376,21 @@ namespace OSBLE.Controllers
             }
             return Redirect(Request.UrlReferrer.ToString());
         }
-
-
+        /// <summary>
+        /// Unpublishes all rubrics for the selected assignment and removes the notifications sent for the assignment
+        /// </summary>
+        /// <param name="assignmentId"></param>
+        /// <returns></returns>
+        [CanGradeCourse]
+        public ActionResult UnPublishAllRubrics(int assignmentId)
+        {
+            if(assignmentId > 0)
+            {
+                DBHelper.UnPublishAllRubrics(assignmentId);
+                DBHelper.RemoveNotificationsForEntireAssignment(assignmentId, ActiveCourseUser.ID);
+            }
+            return Redirect(Request.UrlReferrer.ToString());
+        }
         
         /// <summary>
         /// This will display the team evaluations to the teacher. 
@@ -738,6 +781,21 @@ namespace OSBLE.Controllers
                 return RedirectToAction("Index", "Home", new { area = "AssignmentDetails", assignmentId = assignmentID }); 
                 
             
+        }
+
+
+
+        //ckfrancisco
+        //determine if assignment name is unique to the active course
+        [HttpPost]
+        public bool IsUniqueAssignmentName(string oldName, string newName)
+        {
+            Dictionary<string, int> assignmentDict = OSBLE.Utility.DBHelper.GetAssignmentDict(ActiveCourseUser.AbstractCourseID);
+
+            //remove the old name from the dictionary to allow the same name during editing
+            assignmentDict.Remove(oldName);
+
+            return !assignmentDict.ContainsKey(newName);
         }
     }
 }

@@ -12,6 +12,8 @@ using OSBLE.Areas.AssignmentDetails.Models.TableBuilder;
 using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models;
 using OSBLE.Models.AbstractCourses.Course;
+using OSBLEPlus.Services.Controllers;
+using OSBLE.Controllers;
 
 namespace OSBLE.Areas.AssignmentDetails.ViewModels
 {
@@ -102,6 +104,8 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.HeaderViews.Add("RubricGradingProgressDecorator");
                 }
 
+               
+
                 if (assignment.Type == AssignmentTypes.TeamEvaluation)
                 {
                     //Show progress of TeamEvaluation, such as "X of Y Team Evaluations completed"
@@ -133,8 +137,51 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.HeaderViews.Add("ABETOutcomesDecorator");
                 }
             }
+            else if (vm.Client.AbstractRoleID == (int)OSBLE.Models.Courses.CourseRole.CourseRoles.Observer)
+            {
+                //has discussion teams?
+                if (assignment.HasDiscussionTeams)
+                {
+                    vm.HeaderBuilder = new DiscussionTeamMemberDecorator(vm.HeaderBuilder, vm.Client);
+                    vm.HeaderViews.Add("DiscussionTeamMemberDecorator");
+                }
+                
+
+                if (assignment.HasRubric)
+                {
+                    //add link to rubric ViewAsUneditable mode
+                    vm.HeaderBuilder = new RubricDecorator(vm.HeaderBuilder);
+                    vm.HeaderViews.Add("RubricDecorator");
+                }
+                if (assignment.HasDeliverables && assignment.Type != AssignmentTypes.AnchoredDiscussion)
+                {
+                    //list deliverables add download link
+                    vm.HeaderBuilder = new TeacherDeliverablesHeaderDecorator(vm.HeaderBuilder);
+                    vm.HeaderViews.Add("TeacherDeliverablesHeaderDecorator");
+                }
+                else if (assignment.Type == AssignmentTypes.DiscussionAssignment && !assignment.HasDiscussionTeams)
+                {
+                    //link to classwide discussion
+                    vm.HeaderBuilder = new StudentDiscussionLinkDecorator(vm.HeaderBuilder, vm.Client);
+                    vm.HeaderViews.Add("StudentDiscussionLinkDecorator");
+                }
+                else if (assignment.Type == AssignmentTypes.CriticalReview)
+                {
+                    vm.HeaderBuilder = new TeacherDeliverablesHeaderDecorator(vm.HeaderBuilder);
+                    vm.HeaderViews.Add("TeacherDeliverablesHeaderDecorator");
+                }
+                
+                
+
+            }
             else if (vm.Client.AbstractRole.CanSubmit) //students
             {
+                DateTime due = assignment.DueDate.AddHours(assignment.HoursLateWindow);
+                due = due.UTCToCourse(vm.Client.AbstractCourseID);
+                DateTime now = DateTime.UtcNow;
+                now = now.UTCToCourse(vm.Client.AbstractCourseID);
+                bool canSub = (now < due);
+
                 //has discussion teams?
                 if (assignment.HasDiscussionTeams)
                 {
@@ -186,7 +233,7 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.HeaderBuilder = new StudentDiscussionLinkDecorator(vm.HeaderBuilder, vm.Client);
                     vm.HeaderViews.Add("StudentDiscussionLinkDecorator");
                 }
-                else if (assignment.Type == AssignmentTypes.TeamEvaluation)
+                else if (assignment.Type == AssignmentTypes.TeamEvaluation && canSub)
                 {
                     vm.HeaderBuilder = new StudentTeamEvalSubmissionDecorator(vm.HeaderBuilder, teamEvaluations, vm.Client);
                     vm.HeaderViews.Add("StudentTeamEvalSubmissionDecorator");
@@ -196,14 +243,47 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                 //rubric?
                 if (assignment.HasRubric)
                 {
-                    //add rubric link
-                    vm.HeaderBuilder = new RubricDecorator(vm.HeaderBuilder);
-                    vm.HeaderViews.Add("RubricDecorator");
 
+
+
+                    RubricEvaluation rubricEvaluation = null;
+
+
+
+                    //Getting the assignment team for Student, and if its non-null then we take that team ID and find the RubricEvaluation
+                    //that they were the recipient of. 
+                    AssignmentTeam at = OSBLEController.GetAssignmentTeam(assignment, vm.Client);
+                    int teamId = 0;
+                    if (at != null)
+                    {
+                        teamId = at.TeamID;
+
+                        using (OSBLEContext db = new OSBLEContext())
+                        {
+                            //Only want to look at evaluations where Evaluator.AbstractRole.CanGrade is true, otherwise
+                            //the rubric evaluation is a  student rubric (not interested in them here)
+                            rubricEvaluation = (from re in db.RubricEvaluations
+                                                where re.AssignmentID == assignment.ID &&
+                                                re.Evaluator.AbstractRole.CanGrade &&
+                                                re.RecipientID == teamId
+                                                select re).FirstOrDefault();
+                        }
+                    }
+                    //add rubric link
+                    if (rubricEvaluation == null)
+                    {
+                        vm.HeaderBuilder = new RubricDecorator(vm.HeaderBuilder);
+                        vm.HeaderViews.Add("RubricDecorator");
+                    }
                     //add link to graded rubric link
-                    vm.HeaderBuilder = new RubricGradeDecorator(vm.HeaderBuilder, vm.Client);
-                    vm.HeaderViews.Add("RubricGradeDecorator");
+                    else
+                    {
+                        vm.HeaderBuilder = new RubricGradeDecorator(vm.HeaderBuilder, vm.Client);
+                        vm.HeaderViews.Add("RubricGradeDecorator");
+                    }
                 }
+               
+
 
 
             }
@@ -371,6 +451,10 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                                                                     vm.TeamTableBuilders[assignmentTeam]
                                                                     );
                         vm.TableColumnHeaders["RubricTableDecorator"] = "Rubric Grade";
+
+                        vm.TableColumnHeaders["LateRubricGradeTableDecorator"] = "Late Rubric Grade";
+
+                        
                     }
 
                     if (assignment.HasDeliverables || (assignment.Type == AssignmentTypes.DiscussionAssignment || (assignment.Type == AssignmentTypes.CriticalReviewDiscussion)))

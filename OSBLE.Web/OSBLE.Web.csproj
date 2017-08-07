@@ -1249,6 +1249,7 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="Areas\Analytics\Content\jquery.datetimepicker.css" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\LateRubricGradeTableDecorator.cshtml" />
     <None Include="Properties\PublishProfiles\filesystem.pubxml" />
     <None Include="Scripts\jquery-2.0.1.intellisense.js" />
     <Content Include="Scripts\highlight.pack.js" />
