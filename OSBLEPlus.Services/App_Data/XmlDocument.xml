@@ -732,5 +732,12 @@
             </param>
             <returns></returns>
         </member>
+        <member name="M:OSBLEPlus.Services.Controllers.WordController.Post(OSBLEPlus.Services.Models.WordStats)">
+            <summary>
+            Web api function that processes wordstats submissions
+            </summary>
+            <param name="request">Word statistics</param>
+            <returns>HttpResponseMessage</returns>
+        </member>
     </members>
 </doc>
