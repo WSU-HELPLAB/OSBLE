@@ -97,10 +97,7 @@
                     </div>
                     <div data-bind="ifnot: IsSelf(senderId, activeCourseUserId, eventId)">
                         @* //If the post value is Resolved, other course users will see Resolved *@
-                        <div data-bind="attr: {id: 'mark-as-resolved-' + eventId}">
-                            <div data-bind="if: IsMarkedResolved(eventId)">
-                                <strong style="color:black"> <span class="glyphicon glyphicon-check" style="color:green"></span> Resolved </strong>
-                            </div>
+                        <div data-bind="attr: {id: 'mark-as-resolved-' + eventId}">                           
                         </div>
                         @* //Otherwise, they will see nothing *@
                     </div>
