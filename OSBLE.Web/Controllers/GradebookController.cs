@@ -1409,6 +1409,10 @@ namespace OSBLE.Controllers
                     if (!HasMultipleSections || (sectionParse && currentTASections.Contains(section.ToString())))
                     {
                         TATable.Add(gradebookTable[i].ToList());
+
+                        if (gradebookTable[i][0].Length > 0 && gradebookTable[i][0][0] == '#')
+                            studentGlobalRows.Add(TATable.Count - 1);
+
                     }
 
                     //Add global rows (denoted by a leading '#').

@@ -8,6 +8,8 @@
     }
 </style>
 
+<h1>Post-Reply Counts Report Configuration</h1>
+
 @using (Html.BeginForm("PostReplyReport", "Reports", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     <h2>Get post-reply count between dates:</h2>
@@ -50,5 +52,15 @@
 
             return date;
         }
+    });
+
+    $(document).ready(function () {
+        var today = new Date();
+        var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+        var tomorrowFormatted = (tomorrow.getMonth() + 1) + '/' + tomorrow.getDate() + '/' + tomorrow.getFullYear();
+        var lastWeek = new Date(today.getTime() - 168 * 60 * 60 * 1000);
+        var lastWeekFormatted = (lastWeek.getMonth() + 1) + '/' + lastWeek.getDate() + '/' + lastWeek.getFullYear();
+        $("#from").val(lastWeekFormatted);
+        $("#to").val(tomorrowFormatted);
     });
 </script>

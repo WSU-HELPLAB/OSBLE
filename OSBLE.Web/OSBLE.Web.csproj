@@ -1557,6 +1557,9 @@
     <Content Include="Views\PdfCriticalReviewHTTPS\Review.cshtml" />
     <Content Include="Views\Reports\PostReplyCounts.cshtml" />
     <Content Include="Views\Reports\PostReplyReport.cshtml" />
+    <Content Include="Views\Reports\Index.cshtml" />
+    <Content Include="Views\Reports\InterventionInteraction.cshtml" />
+    <Content Include="Views\Reports\InterventionInteractionReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

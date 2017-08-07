@@ -196,16 +196,15 @@
           <ButtonText>Submit Assignment</ButtonText>
         </Strings>
       </Button>
-
-      <!-- Hiding the suggestions button for control version of the plugin -->      
-      <!--<Button guid="guidOSBIDE_VSPackageCmdSet" id="cmdOsbideIntervention" priority="0x0100" type="Button">
+      
+      <Button guid="guidOSBIDE_VSPackageCmdSet" id="cmdOsbideIntervention" priority="0x0100" type="Button">
         <Parent guid="guidOSBIDE_VSPackageCmdSet" id="MyMenuGroup" />
         <Icon guid="guidImages" id="askForHelp" />
         <Strings>
           <CommandName>cmdOsbideIntervention</CommandName>
           <ButtonText>OSBLE+ Suggestions Dashboard</ButtonText>
         </Strings>
-      </Button>-->
+      </Button>
 
     </Buttons>
 

@@ -167,6 +167,7 @@
     <Compile Include="Models\Intervention\UserStatus.cs" />
     <Compile Include="Models\OSBLECommunity\OSBLECommunityGrid.cs" />
     <Compile Include="Models\OSBLEContext.cs" />
+    <Compile Include="Models\Report\OSBLEInterventionReportItem.cs" />
     <Compile Include="Models\School.cs" />
     <Compile Include="Models\Services\Uploader\AbstractListing.cs" />
     <Compile Include="Models\Services\Uploader\DirectoryListing.cs" />
