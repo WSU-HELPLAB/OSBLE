@@ -146,8 +146,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
 
             ViewBag.EvalsExist = (from re in db.RubricEvaluations
-                                    where re.AssignmentID == Assignment.ID
-                                    select re).Count() > 0;
+                                  where re.AssignmentID == Assignment.ID
+                                  select re).Count() > 0;
 
             ViewBag.globalCommentsCheckedValue = globalCommentsChecked ? "checked" : "";
             ViewBag.criteriaCommentsCheckedValue = criteriaCommentsChecked ? "checked" : "";
@@ -157,7 +157,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             ViewBag.levels = levels;
             ViewBag.ActiveCourse = ActiveCourseUser;
             ViewBag.rubricTable = rubricTable;
-            
+
             return View("Index", Assignment);
         }
 
@@ -212,11 +212,11 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 if (currentColumnCount == updatedRubricColumnCount && currentRowCount == updatedRubricRowCount)
                 {
                     //Updating a rubric equates to 
-                        //updating Rubric: updating HasCriteriaCOmments, HasGlobalComments, and DEscription (for name) of the rubirc
-                        //updating Rubric's Crition(s): weight and criteriontitle
-                        //updating Rubric's CellDescriptions: only Description needs to be modified
-                        //updating Rubric's Level(s): pointspread (if modified, must modify existing REs' (RubricEvaluations) scores), and leveltitle
-                        
+                    //updating Rubric: updating HasCriteriaCOmments, HasGlobalComments, and DEscription (for name) of the rubirc
+                    //updating Rubric's Crition(s): weight and criteriontitle
+                    //updating Rubric's CellDescriptions: only Description needs to be modified
+                    //updating Rubric's Level(s): pointspread (if modified, must modify existing REs' (RubricEvaluations) scores), and leveltitle
+
 
                     //Updating Rubric
                     Assignment.Rubric.Description = rubricDescription;
@@ -227,16 +227,16 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
                     //Updating Criteria and CellDescriptions
                     int outVal = 0;
-                    for(int i = 0; i < Assignment.Rubric.Criteria.Count; i++)
+                    for (int i = 0; i < Assignment.Rubric.Criteria.Count; i++)
                     {
                         //Criteria Titles are in the first column, weights are in the second column
                         Assignment.Rubric.Criteria[i].CriterionTitle = rubricTable[i][0];
                         int.TryParse(rubricTable[i][1], out outVal);
-                        Assignment.Rubric.Criteria[i].Weight= outVal;
+                        Assignment.Rubric.Criteria[i].Weight = outVal;
 
                         //Grabbing all CellDescriptions for that Criterion (based off the ID)
                         List<CellDescription> currentRowCells = Assignment.Rubric.CellDescriptions.Where(cd => cd.CriterionID == Assignment.Rubric.Criteria[i].ID).ToList();
-                        for(int j = 0; j < currentRowCells.Count; j++)
+                        for (int j = 0; j < currentRowCells.Count; j++)
                         {
                             currentRowCells[j].Description = rubricTable[i][j + 2]; //j + 2 to offset from weight/performacne crit columns
                         }
@@ -294,6 +294,11 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                                         rubricDescription);
                     Assignment.RubricID = rubricID;
                     db.Entry(Assignment).State = System.Data.EntityState.Modified;
+                    List<RubricEvaluation> toRemove = (from re in db.RubricEvaluations where re.AssignmentID == Assignment.ID select re).ToList();
+                    foreach (RubricEvaluation re in toRemove)
+                    {
+                        db.RubricEvaluations.Remove(re);
+                    }
                     db.SaveChanges();
                 }
             }
@@ -318,7 +323,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             List<int> joedirt = new List<int>();
             return joedirt;
         }
-    
+
         /// <summary>
         /// Returns a list of keys from the HttpPost
         /// </summary>
@@ -364,9 +369,9 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             List<int> pointSpreads = new List<int>();
 
             pointSpreads = (from k in keys
-                where Regex.Match(k, @"rubric:\d+:S").Success
-                orderby k
-                select Int32.Parse(Request.Params[k])).ToList();
+                            where Regex.Match(k, @"rubric:\d+:S").Success
+                            orderby k
+                            select Int32.Parse(Request.Params[k])).ToList();
 
             return pointSpreads;
         }
@@ -451,7 +456,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             if (stepValue == "quarterStep") return true;
             return false;
         }
-       
+
         /// <summary>
         /// Returns the name of the rubric from the HttpPost
         /// </summary>

@@ -1249,6 +1249,7 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="Areas\Analytics\Content\jquery.datetimepicker.css" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\LateRubricGradeTableDecorator.cshtml" />
     <None Include="Properties\PublishProfiles\filesystem.pubxml" />
     <None Include="Scripts\jquery-2.0.1.intellisense.js" />
     <Content Include="Scripts\highlight.pack.js" />
@@ -1557,6 +1558,9 @@
     <Content Include="Views\PdfCriticalReviewHTTPS\Review.cshtml" />
     <Content Include="Views\Reports\PostReplyCounts.cshtml" />
     <Content Include="Views\Reports\PostReplyReport.cshtml" />
+    <Content Include="Views\Reports\Index.cshtml" />
+    <Content Include="Views\Reports\InterventionInteraction.cshtml" />
+    <Content Include="Views\Reports\InterventionInteractionReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

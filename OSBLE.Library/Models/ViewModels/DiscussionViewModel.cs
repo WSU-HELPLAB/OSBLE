@@ -311,6 +311,7 @@ namespace OSBLE.Models.ViewModels
                 //Checking role of currentUser
                 bool currentUserIsStudent = currentUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student;
                 bool currentUserIsModerator = currentUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator;
+                bool currentUserIsObserver = currentUser.AbstractRoleID == (int)CourseRole.CourseRoles.Observer;
 
                 //Checking role of poster. Note: If the poster is a TA, we treat them like a moderator or instructor depending on the value
                 //of TAsCanPostToAllDiscussions
@@ -318,7 +319,9 @@ namespace OSBLE.Models.ViewModels
                 bool posterIsModerator = poster.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator ||
                         (!discussionSettings.TAsCanPostToAllDiscussions && poster.AbstractRoleID == (int)CourseRole.CourseRoles.TA);
                 bool posterIsInstructor = poster.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor ||
-                        (discussionSettings.TAsCanPostToAllDiscussions && poster.AbstractRoleID == (int)CourseRole.CourseRoles.TA); ;
+                        (discussionSettings.TAsCanPostToAllDiscussions && poster.AbstractRoleID == (int)CourseRole.CourseRoles.TA); 
+
+                
 
 
                 //if current user is a student, poster is a student, and student is anonymized to student
@@ -338,6 +341,10 @@ namespace OSBLE.Models.ViewModels
                 }
                 //if current user is a moderator, poster is a student, and student is anonymized to moderator 
                 else if (discussionSettings.HasAnonymousStudentsToModerators && currentUserIsModerator && posterIsStudent)
+                {
+                    Anonymous = true;
+                }
+                else if (currentUserIsObserver)
                 {
                     Anonymous = true;
                 }

@@ -140,7 +140,7 @@ namespace OSBLE.Controllers
             //Setup viewbags based on usertype
             if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor || ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
             {
-                //Setting instructor/Ta specific viewbags
+                //Setting instructor/TA specific viewbags
                 ViewBag.CanUpload = true;
 
                 //Grabbing error message then wiping it.
@@ -170,6 +170,14 @@ namespace OSBLE.Controllers
             ViewBag.HideMail = DBHelper.GetAbstractCourseHideMailValue(ActiveCourseUser.AbstractCourseID);
 
             ViewBag.EditSections = DBHelper.GetGradebookSectionEditableSettings(ActiveCourseUser.AbstractCourseID);
+
+            ViewBag.AssignmentDict = DBHelper.GetAssignmentDict(ActiveCourseUser.AbstractCourseID);
+
+            ViewBag.cuID = ActiveCourseUser.ID;
+
+            ViewBag.WebClientRoot = OSBLEPlus.Logic.Utility.StringConstants.WebClientRoot;
+
+            ViewBag.PublishedAssignmentIds = PublishedAssignmentIds();
 
             return View();
         }
@@ -204,12 +212,30 @@ namespace OSBLE.Controllers
                         }
                         else
                         {
+                            Dictionary<string, List<string>> gradebook = new Dictionary<string, List<string>>();
+                            MemoryStream tempMemoryStream = new MemoryStream();
+                            zip[i].Extract(tempMemoryStream);
+                            tempMemoryStream.Position = 0;
+                            StreamReader sr = new StreamReader(tempMemoryStream);
+                            string temp = sr.ReadToEnd().Replace("\r", String.Empty);
+                            List<string> newGradebookTab = temp.Split('\n').ToList();
+                            gradebook.Add(zip[i].FileName.Split('\\').Last(), newGradebookTab);
+
+                            int rowError = checkRowLimit(gfp, gradebook); 
+
+                            if (rowError > 0)
+                            {
+                                filesFailedToLoadCount++;
+                            }
+                            else
+                            {
                             //Add those extracted files from the zip right into the directory for the gradebook. 
                             zip[i].FileName = Path.GetFileName(zip[i].FileName);
                             zip[i].Extract(gfp.GetPath());
                         }
                     }
                 }
+            }
             }
             else
             {
@@ -239,11 +265,74 @@ namespace OSBLE.Controllers
                         }
                     }
                 }
-
+                int newGradebookCount = newGradebook.Count;
+                Dictionary<string, List<string>> approvedGradebook = checkRowLimitZipped(gfp, newGradebook);
+                int approvedGradebookCount = approvedGradebook.Count;
+                int rowErrors = newGradebookCount - approvedGradebookCount;
+                filesFailedToLoadCount += rowErrors; 
                 //process gradebooks
-                filesFailedToLoadCount += ProcessGradebookChanges(gfp, newGradebook, uploadingCourseUser);
+                filesFailedToLoadCount += ProcessGradebookChanges(gfp, approvedGradebook, uploadingCourseUser);
             }
             return filesFailedToLoadCount;
+        }
+
+        private Dictionary<string, List<string>> checkRowLimitZipped(GradebookFilePath gfp, Dictionary<string, List<string>> newGradebookDictionary)
+        {
+            Dictionary<string, List<string>> approvedGradebooks = new Dictionary<string, List<string>>(); 
+
+            foreach (KeyValuePair<string, List<string>> entry in newGradebookDictionary)
+            {
+                List<string> checkUploadedGradebook = entry.Value;
+                int count = 0;
+                bool isItWithinLimit = true; 
+                foreach (string gradebook in checkUploadedGradebook)
+                {
+                    if (count >= 2000)
+                    {
+                        isItWithinLimit = false; 
+                    }
+                    else
+                    {
+                        count++;
+                    }
+                }
+
+                if (isItWithinLimit == false)
+                {
+                    break;
+                }
+                else
+                {
+                    approvedGradebooks.Add(entry.Key, entry.Value);
+                }
+            }
+            return approvedGradebooks;
+        }
+
+        private Dictionary<string, List<string>> cleanUpKeys(Dictionary<string, List<string>> newGradebookDictionary)
+        {
+            Dictionary<string, List<string>> cleanedKeyGradebook = new Dictionary<string, List<string>>(); 
+
+            if(newGradebookDictionary.Count <= 1)
+            {
+                return newGradebookDictionary; 
+            }
+            else
+            {
+                foreach (KeyValuePair<string, List<string>> entry in newGradebookDictionary)
+                {
+                    string key = entry.Key;
+
+                    if (key.Contains("/"))
+                    {
+                        String[] rawKeys = key.Split('/');
+                        key = rawKeys.Last(); 
+                    }
+                    cleanedKeyGradebook.Add(key, entry.Value);
+                }
+                return cleanedKeyGradebook; 
+            }
+
         }
 
         /// <summary>
@@ -258,7 +347,7 @@ namespace OSBLE.Controllers
             //handle case where user is uploading from the Excel plugin
             int userRole = ActiveCourseUser == null ? uploadingCourseUser.AbstractRoleID : ActiveCourseUser.AbstractRoleID;
             int userProfileId = ActiveCourseUser == null ? uploadingCourseUser.UserProfileID : ActiveCourseUser.UserProfileID;
-
+            newGradebookDictionary = cleanUpKeys(newGradebookDictionary); 
             //first process gradebooks that already exist
             foreach (var existingGradebook in gfp.AllFiles())
             {
@@ -299,8 +388,6 @@ namespace OSBLE.Controllers
                                                         index + ", gradebook: " + existingGradebook);
                             return 1; //exit processing and add 1 to the filesFailedToLoadCount
                         }
-                            
-
                     //now split the rows to columns to check if they match. we know the number of global rows and index numbers match.
                     foreach (int index in newGradebookGlobalRows)
                     {   
@@ -847,6 +934,33 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
+        /// checks if the number of rows in the new gradebook does not exceed the row limit of 1000
+        /// </summary>
+        /// <param name="newGradebook">a list of new gradebook rows</param>
+        /// <returns>return 1 for exceeding row limit and 0 for maintaining row limit</returns>
+        private int checkRowLimit(GradebookFilePath gfp, Dictionary<string, List<string>> newGradebookDictionary)
+        {
+            int fileErrorCount = 0;
+            foreach (KeyValuePair<string, List<string>> entry in newGradebookDictionary)
+            {
+                List<string> checkUploadedGradebook = entry.Value;
+                int count = 0; 
+                foreach(string gradebook in checkUploadedGradebook)
+                {
+                    if(count >=2000)
+                    {
+                        fileErrorCount += 1;
+                        break; 
+                    }
+                    else
+                    {
+                        count++; 
+                    } 
+                }
+            }
+            return fileErrorCount; 
+        }
+        /// <summary>
         /// checks if the string row is a 'global' row
         /// </summary>
         /// <param name="gradebookRow">a string CSV row</param>
@@ -1139,7 +1253,16 @@ namespace OSBLE.Controllers
             newGradebook.Add(gradebookName + ".csv", modifiedGradeook.Split('\n').ToList());
             
             int filesFailedToLoadCount = 0; //integer used for error message
+             int rowErrors = checkRowLimit(gfp, newGradebook);
+
+             if (rowErrors > 0)
+             {
+                 filesFailedToLoadCount += rowErrors;
+             }
+             else
+             {
             filesFailedToLoadCount += ProcessGradebookChanges(gfp, newGradebook);
+             }
 
             //Generate error message.
             if (filesFailedToLoadCount > 0)
@@ -1195,10 +1318,16 @@ namespace OSBLE.Controllers
             else if (Path.GetExtension(file.FileName) == ".csv")
             {
                 Dictionary<string, List<string>> newGradebook = new Dictionary<string, List<string>>();
-                //
                 newGradebook.Add(file.FileName, new StreamReader(file.InputStream).ReadToEnd().Replace("\r", String.Empty).Split('\n').ToList());
-
+                int rowErrors = checkRowLimit(gfp,newGradebook); 
+                if(rowErrors > 0)
+                {
+                    filesFailedToLoadCount += rowErrors; 
+                }
+                else
+                {
                 filesFailedToLoadCount += ProcessGradebookChanges(gfp, newGradebook);
+            }
             }
             else
             {
@@ -1214,7 +1343,6 @@ namespace OSBLE.Controllers
                 {
                     Cache["UploadErrorMessage"] = filesFailedToLoadCount.ToString() + " file(s) during upload was not of .csv file type or did not match current gradebook format, upload may have failed.";
                 }
-            
             }
             return RedirectToAction("Index");
         }
@@ -1274,7 +1402,7 @@ namespace OSBLE.Controllers
             }
             else if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
             {
-                table = ParseTATable(table);
+                table = ParseTATable(table); //Displays the students' grades in any order
             }
             else
             {
@@ -1370,14 +1498,15 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-        /// Takes a full gradebook table and parses the table down to rows that have a leading "#" (indicating they are "global" rows)
-        /// and columns that do not have a leading "!" (indiciating they are not to be shown). This has special permissions when it comes to what a TA and instructor could see. 
+        /// Takes a full gradebook table and a boolean, indicating whether the output should be alphabetically sorted or
+        /// not and parses the table down to rows that have a leading "#" (indicating they are "global" rows)
+        /// and columns that do not have a leading "!" (indiciating they are not to be shown). This has special permissions 
+        /// when it comes to what a TA and instructor could see.
         /// </summary>
         /// <param name="gradebookTable"></param>
         /// <returns></returns>
         private List<List<string>> ParseTATable(List<List<string>> gradebookTable)
         {
-            
             //Declare all necessary empty lists.
             List<string> currentTASections = new List<string>();
             List<List<string>> TATable = new List<List<string>>();
@@ -1387,7 +1516,6 @@ namespace OSBLE.Controllers
             currentTASections = GetPermittedSections();
             //get sections in course
             bool HasMultipleSections = DBHelper.GetCourseSections(ActiveCourseUser.AbstractCourseID).Count() > 1 ? true : false;
-
             if (gradebookTable.Count > 0)
             {
                 //find section index
@@ -1402,25 +1530,24 @@ namespace OSBLE.Controllers
                 //find which rows should be displayed
                 for (int i = 0; i < gradebookTable.Count; i++)
                 {
-
                     int section = 0;
                     bool sectionParse = SectionColumn > 0 ? Int32.TryParse(gradebookTable[i][SectionColumn], out section) : false;
-
                     if (!HasMultipleSections || (sectionParse && currentTASections.Contains(section.ToString())))
                     {
                         TATable.Add(gradebookTable[i].ToList());
-                    }
 
-                    //Add global rows (denoted by a leading '#').
+                        if (gradebookTable[i][0].Length > 0 && gradebookTable[i][0][0] == '#')
+                            studentGlobalRows.Add(TATable.Count - 1);
+
+                    }
+                    //Add global rows (denoted by a leading '#') in any order.
                     else if (gradebookTable[i][0].Length > 0 && gradebookTable[i][0][0] == '#')
                     {
                         TATable.Add(gradebookTable[i].ToList());
                         studentGlobalRows.Add(TATable.Count - 1);
                     }
                 }
-
                 ViewBag.GlobalRows = studentGlobalRows;
-
                 //Iterating over studentTable to find columns that should not be displayed (denoted by leading '!')
                 List<int> columnsToRemove = new List<int>();
                 for (int i = 0; i < TATable.Count; i++)
@@ -1437,7 +1564,6 @@ namespace OSBLE.Controllers
                 //removing columns that were marked with a '!'.  
                 //Removing them in from highest index to lowest index so that indicies are not messed up upon first removal
                 columnsToRemove.Sort();
-
                 for (int i = columnsToRemove.Count() - 1; i >= 0; i--)
                 {
                     int currentStudentTableLength = TATable.Count;
@@ -1530,13 +1656,11 @@ namespace OSBLE.Controllers
                 return RedirectToAction("Index");
             }
         }
-
         private List<string> ReadCsv(string fileName)
         {
             List<string> lines = System.IO.File.ReadAllLines(fileName).ToList(); 
             return lines;
         }
-
         private static XLWorkbook ConvertWithClosedXml(XLWorkbook workbook, string worksheetName, List<string> csvLines)
         {
             if (csvLines == null || csvLines.Count() == 0)
@@ -1596,8 +1720,32 @@ namespace OSBLE.Controllers
             }            
             return (workbook);
         }        
-    }
 
+        //ckfrancisco
+        //return list of the current user's published assignment ids
+        public List<int> PublishedAssignmentIds()
+        {
+            //retrieve student team ids for the current user
+            List<int> studentTeamIds = (from t in db.Teams 
+                                        where t.Name==CurrentUser.FullName 
+                                        select t.ID).ToList();
+
+            List<int> publishedAssignmentIds = new List<int>();
+
+            //create a list of published assignment ids
+            foreach(int teamId in studentTeamIds)
+            {
+                //for each of the current user's student team ids retrieve a list of published assignments with the student team id
+                List<int> tmp = (from re in db.RubricEvaluations
+                           where re.RecipientID == teamId && re.IsPublished == true
+                           select re.AssignmentID).ToList();
+
+                publishedAssignmentIds.AddRange(tmp);
+            }
+
+            return publishedAssignmentIds;
+        }        
+    }
     /// <summary>
     /// class used to convert cell values to an appropriate numeric value
     /// </summary>

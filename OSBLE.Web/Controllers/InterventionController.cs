@@ -131,6 +131,7 @@ namespace OSBLE.Controllers
 
             ViewBag.CurrentUserName = ActiveCourseUser.UserProfile.FullName;
             ViewBag.CurrentUserProfileId = ActiveCourseUser.UserProfileID;
+            ViewBag.CurrentUserCourseRole = ActiveCourseUser.AbstractRoleID;
 
             BuildCourseSelectViewBag();
             BuildFeedbackItemViewBag(0, "Availability Details");
@@ -714,9 +715,10 @@ namespace OSBLE.Controllers
             foreach (KeyValuePair<string, string> user in userNameIdPairs)
             {
                 string name = user.Value.Replace(" ", "");
-                string id = "id=" + user.Key + ";";
+                string id = "@id=" + user.Key + ";";
                 //text = text.replace(name, id);
-                postContent = postContent.Replace(name, id);
+                string atMention = "@" + name;
+                postContent = postContent.Replace(atMention, id);
             }
 
             AskForHelpEvent post = new AskForHelpEvent();
@@ -941,6 +943,8 @@ namespace OSBLE.Controllers
             ViewBag.CurrentCourseUsers = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
             //Hashtags
             ViewBag.HashTags = DBHelper.GetHashTags();
+            //Current User Role ID
+            ViewBag.CurrentUserCourseRole = ActiveCourseUser.AbstractRoleID;
 
             ViewBag.HideLoadMore = true;
 
@@ -1729,7 +1733,9 @@ namespace OSBLE.Controllers
                     //3) of type FeedPost or AskForHelp
                     //4) within the last numberOfDays
                     //5) MAY have replies, but does NOT have any Helpful marks
+                    //6) Posts is not soft deleted (in EventLogs, IsDeleted = 1 if deleted, null otherwise)
                     string query = "(SELECT Id FROM EventLogs WHERE (CourseId = @CourseId OR CourseId IS NULL) " +
+                                   "AND (IsDeleted IS NULL OR IsDeleted != 1) " +
                                    "AND EventTypeId IN (7, 1) AND EventDate >= DATEADD(day, -@NumberOfDays, GETDATE()) " +
                                    "AND SenderId IN  " +
                                    "(SELECT UserProfileID FROM CourseUsers WHERE AbstractCourseID = @CourseId AND AbstractRoleID NOT IN (1, 2)) " +
@@ -1737,7 +1743,6 @@ namespace OSBLE.Controllers
                                    "(SELECT SourceEventLogId FROM LogCommentEvents WHERE Id IN  " +
                                    "(SELECT DISTINCT LogCommentEventId FROM HelpfulMarkGivenEvents))) " +
                                    "ORDER BY EventDate DESC";
-
                     var results = sqlConnection.Query<int>(query, new { CourseId = courseId, NumberOfDays = numberOfDays }).ToList();
 
                     foreach (var post in results)

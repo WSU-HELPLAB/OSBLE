@@ -40,7 +40,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
             {
                 foreach (TeamMember tm in dt.GetAllTeamMembers())
                 {
-                    if (tm.CourseUserID == Client.ID) //Checking if Client is a member within the DiscussionTeam
+                    if (tm.CourseUserID == Client.ID || Client.AbstractRoleID == (int)CourseRole.CourseRoles.Observer) //Checking if Client is a member within the DiscussionTeam
                     {
 
                         //generating a list of "Posters" which is a view model used to display courseusers with proper anonmization. 

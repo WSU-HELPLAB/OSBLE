@@ -462,6 +462,8 @@ namespace OSBLE.Controllers
             //remove any duplicate course names
             allCoursePrefix = allCoursePrefix.Distinct().ToList();
 
+            course.Add(new SelectListItem { Text = "Select a Course Prefix", Value = null});
+
             foreach(string prefix in allCoursePrefix)
                 course.Add(new SelectListItem { Text = prefix, Value = prefix });
 
@@ -487,10 +489,9 @@ namespace OSBLE.Controllers
         }
 
         [HttpPost]
-        public ActionResult SearchResults(string course, string number)
+        public ActionResult SearchResults(string course)
         {
-            if (number == "Search All")
-            {
+
                 var Results = from d in db.Courses
                               where d.Prefix == course 
                               select d;
@@ -502,70 +503,78 @@ namespace OSBLE.Controllers
                 TempData["SearchResults"] = Results.Distinct().ToList();
 
                 return RedirectToAction("CourseSearch", "Course");
-            }
-            else
-            {
-                var Results = from d in db.Courses
-                              where d.Prefix.Contains(course) && d.Number == number
-                              select d;
-
-                Results.GroupBy(x => x.Number)
-                        .OrderBy(x => x.Count())
-                        .Select(x => x.First());
-
-                TempData["SearchResults"] = Results.Distinct().ToList();
-
-                return RedirectToAction("CourseSearch", "Course");
-            }
-
 
         }
 
-        public ActionResult ReqestCourseJoin(string id)
+        public ActionResult ReqestCourseJoin(string id, int section)
         {
             //get course from ID
             int intID = Convert.ToInt32(id);
-            var request = (from c in db.Courses
+            var currentCourse = (from c in db.Courses
                            where c.ID == intID
                            select c).FirstOrDefault();
-
-            ViewBag.CourseName = request.Prefix.ToString() + " " + request.Number.ToString() + " - " + request.Name.ToString();
-
+            var currentCourseUsers = (from u in db.CourseUsers
+                                 where u.AbstractCourseID == currentCourse.ID
+                                 select u).ToList();
+            ViewBag.CourseName = currentCourse.Prefix.ToString() + " " + currentCourse.Number.ToString() + " - " + currentCourse.Name.ToString();
+            
             //user is already enrolled in the course...dummy
-            if (currentCourses.Select(x => x.AbstractCourse).Contains(request))
+            if (currentCourses.Select(x => x.AbstractCourse).Contains(currentCourse))
             {
                 return View("CourseCurrentlyEnrolled");
             }
-            
+
             //if the user is not enrolled in any courses but may be withdrawn in a course
             else if (ActiveCourseUser == null)
             {
-                //this is for checking if they are withdrawn, poo will be null if they are not in course, else it will return a CourseUser
+                //this is for checking if they are withdrawn, previousUser will be null if they are not in course, else it will return a CourseUser
                 var previousUser = (from d in db.CourseUsers
-                           where d.UserProfileID == this.CurrentUser.ID
-                           select d).FirstOrDefault();
-
-                if (previousUser != null)
+                                   where d.UserProfileID == this.CurrentUser.ID
+                                   select d).FirstOrDefault();
+                var currentCourseUser = (from d in db.CourseUsers
+                                         where d.UserProfileID == this.CurrentUser.ID && d.AbstractCourseID == currentCourse.ID
+                                         select d).FirstOrDefault();
+                if (previousUser != null) //If the user is withdrawn from any courses 
                 {
-                    CourseUser addedUser = new CourseUser();
-                    UserProfile prf = previousUser.UserProfile;
+                    //Check if the user is withdrawn from the current course
                     
-                    addedUser = previousUser;
-                    addedUser.UserProfile = prf;
-                    
-                    addedUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending;
-                    addedUser.AbstractCourseID = request.ID;
-                    addedUser.Hidden = true;
-
-                    db.CourseUsers.Add(addedUser);
-                   // db.Entry(previousUser).State = EntityState.Modified;
-                    db.SaveChanges();
-                    ActiveCourseUser = previousUser;
-
-                    using (NotificationController nc = new NotificationController())
+                    if (currentCourseUser != null) //If the user is currently in the course, change their role to Pending
                     {
-                        nc.SendCourseApprovalNotification(request, previousUser);
+                        currentCourseUser.AbstractCourseID = currentCourse.ID; //Make sure we are changing the user's status in the correct class!
+                        db.CourseUsers.Attach(currentCourseUser); //Attach is better than .Entry since only the editted attributes are marked dirty
+                        currentCourseUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending; //Update their status to Pending
+                        currentCourseUser.Section = section;
+
+                        db.SaveChanges();
+                        using (NotificationController nc = new NotificationController())
+                        {
+                            nc.SendCourseApprovalNotification(currentCourse, previousUser);
+                        }
                     }
+                    else
+                    {
+                        CourseUser addedUser = new CourseUser();
+                        UserProfile prf = previousUser.UserProfile;
+
+                        addedUser = previousUser;
+                        addedUser.UserProfile = prf;
+
+                        addedUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending;
+                        addedUser.AbstractCourseID = currentCourse.ID;
+                        addedUser.Hidden = true; //Temporarily hide course content from the user
+                        addedUser.Section = section; //Put them in the correct section
+
+                        db.CourseUsers.Add(addedUser);
+                        // db.Entry(previousUser).State = EntityState.Modified;
+                        db.SaveChanges();
+                        ActiveCourseUser = previousUser;
+
+                        using (NotificationController nc = new NotificationController())
+                        {
+                            nc.SendCourseApprovalNotification(currentCourse, previousUser);
+                        }
+                    }
+                    
                 }
                 else
                 {
@@ -576,8 +585,9 @@ namespace OSBLE.Controllers
                     newUser.UserProfile = profile;
                     newUser.UserProfileID = profile.ID;
                     newUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending; //FIX THIS NOW FORREST
-                    newUser.AbstractCourseID = request.ID;
+                    newUser.AbstractCourseID = currentCourse.ID;
                     newUser.Hidden = true;
+                    newUser.Section = section;
 
                     db.CourseUsers.Add(newUser);
                     db.SaveChanges();
@@ -586,31 +596,54 @@ namespace OSBLE.Controllers
 
                     using (NotificationController nc = new NotificationController())
                     {
-                        nc.SendCourseApprovalNotification(request, newUser);
+                        nc.SendCourseApprovalNotification(currentCourse, newUser);
                     }
                 }
 
 
                 return View("CourseAwaitingApproval");
             }
-            else
+
+            else //ActiveCourseUser is enrolled in courses but still may be Withdrawn from the course!
             {
-                //send notification to instructors
-                using (NotificationController nc = new NotificationController())
+                //THERE MAY BE MORE THAN ONE INSTANCE OF THE USER; MAKE SURE YOU ARE GETTING THE ONE IN THIS COURSE (CORRECT USER PROFILE ID)
+                var previousUser = (from d in db.CourseUsers
+                                    where d.UserProfileID == this.CurrentUser.ID && d.AbstractCourseID == currentCourse.ID
+                                    select d).FirstOrDefault();
+
+                //If the user exists in the database AND in the course
+                if (previousUser != null) 
                 {
-                    //temporaly put them in the course as hidden
-                    CourseUser tempUser = new CourseUser();
-                    UserProfile profile = db.UserProfiles.Where(up => up.ID == this.CurrentUser.ID).FirstOrDefault();
-                    tempUser.UserProfile = profile;
-                    tempUser.UserProfileID = profile.ID;
-                    tempUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending; //FIX THIS NOW FORREST
-                    tempUser.AbstractCourseID = request.ID;
-                    tempUser.Hidden = true;
+                    db.CourseUsers.Attach(previousUser); //Attach is better than .Entry since only the editted attributes are marked dirty
+                    previousUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending; //Update their status to Pending
+                    previousUser.Section = section;
 
-                    db.CourseUsers.Add(tempUser);
                     db.SaveChanges();
+                    using (NotificationController nc = new NotificationController())
+                    {
+                        nc.SendCourseApprovalNotification(currentCourse, previousUser);
+                    }
+                }
+                else
+                {
+                    //send notification to instructors
+                    using (NotificationController nc = new NotificationController())
+                    {
+                        //temporarily put them in the course as hidden
+                        CourseUser tempUser = new CourseUser();
+                        UserProfile profile = db.UserProfiles.Where(up => up.ID == this.CurrentUser.ID).FirstOrDefault();
+                        tempUser.UserProfile = profile;
+                        tempUser.UserProfileID = profile.ID;
+                        tempUser.AbstractRoleID = (int)CourseRole.CourseRoles.Pending; //FIX THIS NOW FORREST
+                        tempUser.AbstractCourseID = currentCourse.ID;
+                        tempUser.Hidden = true;
+                        tempUser.Section = section;
 
-                    nc.SendCourseApprovalNotification(request, tempUser);
+                        db.CourseUsers.Add(tempUser);
+                        db.SaveChanges();
+
+                        nc.SendCourseApprovalNotification(currentCourse, tempUser);
+                    }
                 }
                 return View("CourseAwaitingApproval");
             }

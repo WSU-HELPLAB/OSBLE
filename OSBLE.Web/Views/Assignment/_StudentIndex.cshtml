@@ -119,6 +119,7 @@
             <td>
                 @if (assignments[i].Type == AssignmentTypes.DiscussionAssignment || assignments[i].Type == AssignmentTypes.CriticalReviewDiscussion)
                 {
+                    
                     //Discussion Based Assignment: Display "View Discussion" 
                     if (dt != null)
                     {
@@ -148,14 +149,23 @@
                 }
                 else if (assignments[i].Type == AssignmentTypes.TeamEvaluation)
                 {
+                    DateTime now = DateTime.UtcNow;
+                    DateTime noSubmit = assignments[i].DueDate.AddHours((double)assignments[i].HoursLateWindow);
+                    noSubmit = noSubmit.UTCToCourse(assignments[i].CourseID);
+                    now = now.UTCToCourse(assignments[i].CourseID);
+                    bool CanSubmit = (now > noSubmit);
                     //Team Evaluation Assignment: Display "View/Edit Team Evalution" or "Submit Team Evaluation" depending if an evaluation exists
-                    if (teamEvals.Any(te => te.TeamEvaluationAssignmentID == assignments[i].ID))
+                    if (teamEvals.Any(te => te.TeamEvaluationAssignmentID == assignments[i].ID) && !CanSubmit)
                     {
                         @Html.ActionLink("View/Edit Team Evaluation", "StudentTeamEvaluation", "Assignment", new { assignmentId = assignments[i].ID }, new { })
                     }
                     else
                     {
-                        @Html.ActionLink("Submit Team Evaluation", "StudentTeamEvaluation", "Assignment", new { assignmentId = assignments[i].ID }, new { })
+                        if(!CanSubmit)
+                        {
+                            @Html.ActionLink("Submit Team Evaluation", "StudentTeamEvaluation", "Assignment", new { assignmentId = assignments[i].ID }, new { })
+
+                        }
                     }
                 }
                 else if(assignments[i].Type == AssignmentTypes.AnchoredDiscussion)
