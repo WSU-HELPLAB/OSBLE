@@ -96,12 +96,11 @@ namespace OSBLEPlus.Services.Controllers
                 eventSenderNotNull = true;
             }
 
-            var content = Posts.SaveEvent(request.SubmitEvent).ToString();
-            AddToSubmitEventProperties(Convert.ToInt16(content));
+            int eventLogId = Posts.SaveEvent(request.SubmitEvent);
+
+            AddToSubmitEventProperties(eventLogId);
+            
             Posts.SaveToFileSystem(request.SubmitEvent);
-
-
-
 
             try //don't want hub notification to break post
             {
@@ -110,7 +109,7 @@ namespace OSBLEPlus.Services.Controllers
                 {
                     using (EventCollectionController ecc = new EventCollectionController())
                     {
-                        ecc.NotifyHub(int.Parse(content), request.SubmitEvent.SenderId, request.SubmitEvent.EventType.ToString(), request.SubmitEvent.CourseId ?? 0);
+                        ecc.NotifyHub(eventLogId, request.SubmitEvent.SenderId, request.SubmitEvent.EventType.ToString(), request.SubmitEvent.CourseId ?? 0);
                     }
                 }
             }
@@ -128,11 +127,10 @@ namespace OSBLEPlus.Services.Controllers
             {
                 throw new Exception("failed to ProcessLogForIntervention(request)", e);
             }
-            
 
             return new HttpResponseMessage
             {
-                Content = new StringContent(content)
+                Content = new StringContent(eventLogId.ToString())
             };
         }
 
