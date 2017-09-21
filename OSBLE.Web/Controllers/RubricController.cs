@@ -1271,7 +1271,7 @@ namespace OSBLE.Controllers
                         //    throw;
                         //}
 
-                        if (submission != null)
+                        if (submission != null && critEval.Score == 0)
                         {
                             critEval.Score = 1;    
                         }
