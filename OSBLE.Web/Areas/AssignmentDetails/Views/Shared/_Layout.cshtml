@@ -183,7 +183,7 @@ else
                 linkTitle = "Publish Assignment";
                 linkImg = Helpers.PublishButton();
             }
-            <a href="@actionUrl" title="@linkTitle">@Html.Raw(linkImg.ToHtmlString())</a>
+            <a href="@actionUrl" title="@linkTitle">@Html.Raw(linkImg.ToHtmlString())</a>            
         </li>
             <li><a title="Click to Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = Model.CurrentAssignment.ID })">@Helpers.EditButton()</a>
             </li>
@@ -197,6 +197,16 @@ else
         class="pointerOnMouseOver" 
         href="@deleteLink"
         >@Helpers.DeleteButton()</a> </li>
+        <li>            
+            @{
+                string creditTooltip = "Give 100% pass/fail credit for all students with submissions and save each as draft.\nNote: This currently only works for rubrics with a single criterion and a 1 point spread.\nExample case: pass/fail assignments for submission credit.";
+                string giveCreditLink = Url.Action("GiveAllSubmissionsCredit", new { assignmentId = Model.CurrentAssignment.ID });
+            }
+            <a id="GiveAllSubmissionsCreditLink"
+               title="@creditTooltip"
+               class="pointerOnMouseOver"
+               href="@giveCreditLink"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></a>
+        </li>
     </ul>
 }
 <table id="AssignmentDetailsTable">

@@ -1235,5 +1235,61 @@ namespace OSBLE.Controllers
 
             return (finalString);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="assignmentId"></param>
+        public void RubricFullCredit(int assignmentId)
+        {
+            List<RubricViewModel> vms = new List<RubricViewModel>();
+            int courseId = ActiveCourseUser.AbstractCourseID;
+            var students = db.CourseUsers.Where(cu => cu.AbstractRoleID == (int)CourseRole.CourseRoles.Student && cu.AbstractCourseID == courseId).ToList();
+
+            foreach (var student in students)
+            {
+                vms.Add(GetRubricViewModel(assignmentId, student.ID));
+            }
+
+            if (vms.Count() > 0 && vms.First().Evaluation.CriterionEvaluations.Count() == 1) //for now this should only work for credit/no credit rubrics
+            {
+                foreach (var viewModel in vms)
+                {                    
+                    int teamId = viewModel.Evaluation.Recipient.ID; //recipientID is the teamId here
+                    var submission = OSBLE.Models.FileSystem.Directories.GetAssignmentSubmission(courseId, assignmentId, teamId);
+
+                    foreach (CriterionEvaluation critEval in viewModel.Evaluation.CriterionEvaluations)
+                    {   
+                        //TODO: make this work for any point spread or criterion count
+                        //int pointSpread = 0;
+                        //try
+                        //{
+                        //    pointSpread = critEval.Criterion.Rubric.Levels.Where(l => l.ID == critEval.Criterion.ID).FirstOrDefault().PointSpread;
+                        //}
+                        //catch (Exception)
+                        //{
+                        //    throw;
+                        //}
+
+                        if (submission != null)
+                        {
+                            critEval.Score = 1;    
+                        }
+                    }
+
+                    viewModel.Evaluation.DatePublished = DateTime.UtcNow;
+
+                    if (viewModel.Evaluation.ID != 0)
+                    {
+                        db.Entry(viewModel.Evaluation).State = EntityState.Modified;
+                    }
+                    else
+                    {
+                        db.RubricEvaluations.Add(viewModel.Evaluation);
+                    }
+                }
+                db.SaveChanges();
+            }
+        }
     }
 }
