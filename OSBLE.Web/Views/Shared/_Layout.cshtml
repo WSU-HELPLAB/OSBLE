@@ -137,7 +137,7 @@
                             {
                                 <li><a href="@Url.Action("Index", "Mail", new { area="" })"><span class="glyphicon glyphicon-envelope"></span> Mail (@ViewBag.UnreadMessageCount)</a></li>
                             }                           
-                            <li><a href="@Url.Action("Index", "Profile", new { area = "" })"><span class="glyphicon glyphicon-user"></span> View Profile</a></li>
+                            <li><a href="@Url.Action("Index", "Profile", new { id = "", area = "" })"><span class="glyphicon glyphicon-user"></span> View Profile</a></li>
                             <li><a href="@Url.Action("Profile", "Account", new { area = "" })"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
                             <li class="divider"></li>
                             <li><a href="@Url.Action("LogOff", "Account", new { area = "" })"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
