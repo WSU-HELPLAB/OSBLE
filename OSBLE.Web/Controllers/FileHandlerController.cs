@@ -73,9 +73,10 @@ namespace OSBLE.Controllers
                     }
 
                     //else just return the file
-                    if (Path.GetExtension(filePath).ToLower() == "pdf")
+                    if (Path.GetExtension(filePath).ToLower() == ".pdf")
                     {
-                        return new FileStreamResult(fileStream, "application/pdf") { FileDownloadName = fileName };
+                        Response.AppendHeader("content-disposition", "inline; filename=" + fileName);
+                        return new FileStreamResult(fileStream, "application/pdf");
                     }
                     else
                     {
