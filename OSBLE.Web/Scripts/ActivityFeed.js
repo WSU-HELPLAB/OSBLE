@@ -719,7 +719,7 @@ function FeedViewModel(userName, userId, current) {
             success: function (data, textStatus, jqXHR) {
                 var mappedItems = $.map(data.Feed, function (item) { return new FeedItem(item) });
                 self.items(mappedItems);
-                //self.items.reverse();
+                self.items.reverse();
 
                 if ($('#load-old-posts').hasClass('disabled')) {
                     $('#load-old-posts').removeClass('disabled');

@@ -2379,5 +2379,32 @@ namespace OSBLE.Controllers
             //redirect to the profile page of the user
             return RedirectToAction("Index", "Profile", new { id = id });
         }
+
+        /// <summary>
+        /// Returns a view that populates a list of feed posts that belong to the instructors and TAs of the current course
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult InstructorTAMessages()
+        {
+            
+            string postIds = DBHelper.GetInstructorAndTAFeedPostIds(ActiveCourseUser.AbstractCourseID); //default 2 weeks back
+            ViewBag.PostIds = postIds;
+
+            //Load the ViewBag
+            ViewBag.CurrentCourseId = ActiveCourseUser.AbstractCourseID;
+            //CurrentUser
+            ViewBag.CurrentUserProfileId = ActiveCourseUser.UserProfileID;
+            ViewBag.CurrentUserFullName = ActiveCourseUser.UserProfile.FullName;
+            //CourseUsers
+            ViewBag.CurrentCourseUsers = DBHelper.GetUserProfilesForCourse(ActiveCourseUser.AbstractCourseID);
+            //Hashtags
+            ViewBag.HashTags = DBHelper.GetHashTags();
+            //Current User Role ID
+            ViewBag.CurrentUserCourseRole = ActiveCourseUser.AbstractRoleID;
+
+            ViewBag.HideLoadMore = true;
+
+            return PartialView("InstructorTAMessages");
+        }
     }
 }

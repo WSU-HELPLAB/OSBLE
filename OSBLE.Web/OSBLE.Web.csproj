@@ -1561,6 +1561,7 @@
     <Content Include="Views\Reports\Index.cshtml" />
     <Content Include="Views\Reports\InterventionInteraction.cshtml" />
     <Content Include="Views\Reports\InterventionInteractionReport.cshtml" />
+    <Content Include="Views\Feed\InstructorTAMessages.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

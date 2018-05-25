@@ -875,7 +875,16 @@ namespace OSBLE.Controllers
                     UserProfile currentUser = db.UserProfiles.Find(OsbleAuthentication.CurrentUser.ID);
                     if (currentUser != null)
                     {
-                        string oldPasswordHash = db.UserProfiles.Where(up => up.ID == ActiveCourseUser.UserProfileID).FirstOrDefault().Password;
+                        string oldPasswordHash = "";
+
+                        if (ActiveCourseUser != null)
+                        {
+                            oldPasswordHash = db.UserProfiles.Where(up => up.ID == ActiveCourseUser.UserProfileID).FirstOrDefault().Password;
+                        }
+                        else
+                        {
+                            oldPasswordHash = db.UserProfiles.Where(up => up.ID == OsbleAuthentication.CurrentUser.ID).FirstOrDefault().Password;
+                        }
 
                         if (UserProfile.GetPasswordHash(model.OldPassword) == oldPasswordHash)
                         {
@@ -898,6 +907,7 @@ namespace OSBLE.Controllers
                 catch (Exception ex)
                 {
                     changePasswordSucceeded = false;
+                    throw new Exception("Password change failed", ex);
                 }
 
                 if (changePasswordSucceeded)

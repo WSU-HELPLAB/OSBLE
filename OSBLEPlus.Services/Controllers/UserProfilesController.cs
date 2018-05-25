@@ -11,6 +11,13 @@ using OSBLEPlus.Logic.DomainObjects.Helpers;
 using OSBLEPlus.Logic.DomainObjects.Profiles;
 using OSBLEPlus.Logic.Utility.Auth;
 using OSBLEPlus.Services.Models;
+using System.Web.Http.Cors;
+using OSBLE.Models;
+using OSBLE.Models.Users;
+using OSBLEPlus.Logic.Utility;
+using System.Data.SqlClient;
+using Dapper;
+using System.Linq;
 
 namespace OSBLEPlus.Services.Controllers
 {
@@ -170,6 +177,64 @@ namespace OSBLEPlus.Services.Controllers
                            ? HttpStatusCode.OK
                            : HttpStatusCode.InternalServerError
             };
+        }
+
+        /// <summary>
+        /// Takes a username and password, authenticates the user credentials, and returns the user FirstName and LastName if authenticated, otherwise "false"
+        /// </summary>
+        /// <param name="model">Username, and Password input parameters for a LogOnModel</param>
+        /// <returns>a string that is either the user Firstname and Lastname or 'false'</returns>
+        [HttpPost]
+        [EnableCors(origins: "*", headers: "*", methods: "*")]
+        public string LogOnNameAuthentication(LogOnModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                model.UserName = model.UserName.Trim();
+                model.Password = model.Password.Trim();
+
+                //do we have a valid password
+                bool isApproved = UserProfile.ValidateUser(model.UserName, model.Password);
+                
+                if (isApproved)
+                {   
+                    return GetUserFullName(model.UserName);
+                }
+                else
+                {
+                    return "false";
+                }
+
+            }
+            // If we got this far, something failed, redisplay form
+            return "false";
+        }
+
+        /// <summary>
+        /// takes the username (email address) and returns the the users full name (first last)
+        /// </summary>
+        /// <param name="username">email address user name</param>
+        /// <returns>string: firstname lastname</returns>
+        private string GetUserFullName(string username)
+        {
+            string fullName = username;
+            try
+            {
+                using (var sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+                    string query = "SELECT TOP 1 FirstName + ' ' + LastName as 'FullName' FROM UserProfiles where UserName = @UserName ";
+
+                    fullName = sqlConnection.Query<string>(query, new { UserName = username }).FirstOrDefault();
+
+                    sqlConnection.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error in GetUserFullName()", e);
+            }
+            return fullName;
         }
     }
 }

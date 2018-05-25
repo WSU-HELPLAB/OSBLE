@@ -732,6 +732,20 @@
             </param>
             <returns></returns>
         </member>
+        <member name="M:OSBLEPlus.Services.Controllers.UserProfilesController.LogOnNameAuthentication(OSBLE.Models.LogOnModel)">
+            <summary>
+            Takes a username and password, authenticates the user credentials, and returns the user FirstName and LastName if authenticated, otherwise "false"
+            </summary>
+            <param name="model">Username, and Password input parameters for a LogOnModel</param>
+            <returns>a string that is either the user Firstname and Lastname or 'false'</returns>
+        </member>
+        <member name="M:OSBLEPlus.Services.Controllers.UserProfilesController.GetUserFullName(System.String)">
+            <summary>
+            takes the username (email address) and returns the the users full name (first last)
+            </summary>
+            <param name="username">email address user name</param>
+            <returns>string: firstname lastname</returns>
+        </member>
         <member name="M:OSBLEPlus.Services.Controllers.WordController.Post(OSBLEPlus.Services.Models.WordStats)">
             <summary>
             Web api function that processes wordstats submissions

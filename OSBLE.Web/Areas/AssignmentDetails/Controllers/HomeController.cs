@@ -17,7 +17,7 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
     public class HomeController : OSBLEController
     {
         public ActionResult Index(int assignmentId)
-        {   
+        {
             if (ActiveCourseUser == null) //user is not logged in
             {
                 return RedirectToRoute(new { controller = "Home", action = "Index", area = "" });
@@ -27,7 +27,7 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
             Assignment assignment = db.Assignments.Find(assignmentId);
 
             //If the assignment does not exist, or the assignment has not been released and the user is a student: kick them out
-            if (assignment == null 
+            if (assignment == null
                 || (assignment.ReleaseDate > DateTime.UtcNow && ActiveCourseUser.AbstractRoleID == (int)OSBLE.Models.Courses.CourseRole.CourseRoles.Student))
             {
                 return RedirectToRoute(new { action = "Index", controller = "Assignment", area = "" });
@@ -45,7 +45,7 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
                     OSBLE.Models.FileSystem.Directories.GetAssignment(
                         assignment.CourseID.Value, assignmentId);
                 OSBLEDirectory attrFiles = fs.AttributableFiles;
-                OSBLE.Models.FileSystem.FileCollection files = 
+                OSBLE.Models.FileSystem.FileCollection files =
                     attrFiles.GetFilesWithSystemAttribute("assignment_description", assignmentId.ToString());
                 if (files.Count > 0)
                 {
@@ -54,16 +54,16 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
                     {
                         //Check to see if the user is an admin
                         if (CurrentUser.CanCreateCourses == true)
-                        {                                  
+                        {
                             //Build the URL action for deleting
                             //Assignment file deletion is handled different.
                             string UrlAction = Url.Action("DeleteAssignmentFile", "Home", new { courseID = assignment.CourseID.Value, assignmentID = assignment.ID, fileName = System.IO.Path.GetFileName(fileName) });
-                            
+
                             // Make a link for the file
                             sb.AppendFormat(
                                 "<li><a href=\"/Services/CourseFilesOps.ashx?cmd=assignment_file_download" +
-                                "&courseID={0}&assignmentID={1}&filename={2}\">{2}      </a>" + 
-                                "<a href=\"" + UrlAction + "\"><img src=\"/Content/images/delete_up.png\" alt=\"Delete Button\"></img></a>" +                             
+                                "&courseID={0}&assignmentID={1}&filename={2}\">{2}      </a>" +
+                                "<a href=\"" + UrlAction + "\"><img src=\"/Content/images/delete_up.png\" alt=\"Delete Button\"></img></a>" +
                                 "</li>",
                                 assignment.CourseID.Value,
                                 assignment.ID,
@@ -80,9 +80,9 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
                         }
                     }
                     sb.Append("</ul>");
-                    ViewBag.DescFilesHTML = sb.ToString();                   
+                    ViewBag.DescFilesHTML = sb.ToString();
                 }
-                
+
                 //Check for solution files and if they exist create a string to send to the assignment details
                 attrFiles = fs.AttributableFiles;
                 files = attrFiles.GetFilesWithSystemAttribute("assignment_solution", assignmentId.ToString());
@@ -94,7 +94,7 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
                 // needs to check if the User is enrolled in the current course ID
                 // this will cause errors in the future, noted for now
                 //////////////////////////
-                
+
                 //if (files.Count > 0 && (ActiveCourseUser.AbstractCourseID == 1 ||ActiveCourseUser.AbstractCourseID == 2 ||
                 //    ActiveCourseUser.AbstractCourseID == 3 || ActiveCourseUser.AbstractCourseID == 5))
                 if(currentCourses.Contains(ActiveCourseUser))
@@ -103,7 +103,7 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
                         ActiveCourseUser.AbstractCourseID);
                     DateTime? CourseTimeAfterDueDate = DBHelper.AssignmentDueDateWithLateHoursInCourseTime(assignmentId,
                         ActiveCourseUser.AbstractCourseID);
-                    
+
                     StringBuilder sb;
 
                     // make sure we don't have an incorrect assignmentId
@@ -129,7 +129,7 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
                                     "</li>",
                                     assignment.CourseID.Value,
                                     assignment.ID,
-                                    fName, 
+                                    fName,
                                     fName + " (Viewable after " + CourseTimeAfterDueDate + ")");
                             }
                             else if (!pastCourseDueDate)
@@ -151,7 +151,7 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
                         sb.Append("</ul>");
                         ViewBag.SoluFilesHTML = sb.ToString();
                     }
-                    
+
                 }
 
             }
@@ -196,7 +196,7 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
             // Get the attributable file storage
             OSBLEDirectory attrFiles =
                OSBLE.Models.FileSystem.Directories.GetAssignment(courseID, assignmentID).AttributableFiles;
-            
+
             //If no files exist return to the assignment details page.
             if (null == attrFiles)
             {
@@ -274,6 +274,16 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
 
             // Send the user back to the assignments index page
             return RedirectToRoute(new { action = "Index", controller = "Assignment", area = "" });
+        }
+
+        [CanModifyCourse]
+        public ActionResult GiveAllSubmissionsCredit(int assignmentId)
+        {            
+            using (RubricController rc = new RubricController())
+            {
+                rc.RubricFullCredit(assignmentId);
+            }
+            return Index(assignmentId);
         }
     }
 }

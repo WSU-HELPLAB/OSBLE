@@ -79,7 +79,7 @@ namespace OSBLE.Models
         public static string VisibilitySelectedUsers = "Your post will be visible to only the selected users.";
 
         public static string AnonymousPost = "Your post will be anonymized by hiding your name from public view. NOTE: Using the anonymous option will force post visibility to 'Everyone'";
-        public static string FilesLinksCreateLink = "To create a .link file for upload, create text file your URL in it and change extension to .link. This will create a clickable link under 'Files & Links'."; 
+        public static string FilesLinksCreateLink = "To create a hyperlink to an external file or website, create an empty text file with a URL as its only contents. Save the text file with the extension .link. Uploading this file will create a clickable hyperlink under the 'Files & Links' folder it was uploaded to."; 
         #endregion
 
         #region HomeToolTips

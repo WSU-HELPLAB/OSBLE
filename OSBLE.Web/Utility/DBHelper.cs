@@ -2829,5 +2829,38 @@ namespace OSBLE.Utility
             }
             return reportItems;
         }
+
+        /// <summary>
+        /// Gets and returns a list of eventlog Ids for feed post events by instructors and TAs (in a comma separated string) for the specific course
+        /// </summary>
+        /// <param name="courseId"></param>
+        /// <returns>a comma separated list of integer values for feed post events</returns>
+        internal static string GetInstructorAndTAFeedPostIds(int courseId)
+        {
+            string instructorTAPostIds = "";
+            try
+            {
+                using (SqlConnection sqlConnection = new SqlConnection(StringConstants.ConnectionString))
+                {
+                    sqlConnection.Open();
+                    string query =  "SELECT Id FROM EventLogs WHERE EventTypeId = 7 AND CourseId = @CourseId " + //7 is feedpostevent
+                                    "AND SenderId IN (SELECT UserProfileID FROM CourseUsers WHERE AbstractRoleID IN (1,2) AND AbstractCourseID = @CourseId)"; //1,2 is instructor and TA
+
+                    var results = sqlConnection.Query<int>(query, new { CourseId = courseId }).ToList();
+
+                    foreach (var id in results)
+                    {
+                        instructorTAPostIds += id.ToString() + ",";
+                    }
+                    sqlConnection.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error in GetInstructorAndTAFeedPostIds(): ", e);
+            }
+            instructorTAPostIds = instructorTAPostIds.Length > 1 ? instructorTAPostIds.Remove(instructorTAPostIds.Length - 1) : instructorTAPostIds;//remove the last comma
+            return instructorTAPostIds;
+        }
     }
 }

@@ -141,8 +141,8 @@ namespace OSBLE.Models.Assignments
             }
         }
 
-        [Required(ErrorMessage="Please indicate whether or not submission can be annotated.")]
-        [Display(Name= "The instructor will annotate submissions (PDF only)")]
+        [Required(ErrorMessage = "Please indicate whether or not submission can be annotated.")]
+        [Display(Name = "The instructor will annotate submissions (PDF only)")]
         public bool IsAnnotatable { get; set; }
 
         /// <summary>
@@ -228,11 +228,13 @@ namespace OSBLE.Models.Assignments
         [Display(Name = "Late Submission Window")]
         public int HoursLateWindow { get; set; }
 
-        [Required(ErrorMessage = "Please specify the percent that should be deducted per hour late")]
+        [Required(ErrorMessage = "Please specify the percent that should be deducted per hour late. ")]
+        [Range(0.1, double.MaxValue, ErrorMessage = "The percent deducted per hour late must be a value greater than 0. ")]
         [Display(Name = "Penalty of")]
         public double DeductionPerUnit { get; set; }
 
         [Required(ErrorMessage = "Please specify the hours per percent deduction.")]
+        [Range(0.1, double.MaxValue, ErrorMessage = "The hours per percent deduction must be a value greater than 0. ")]
         [Display(Name = "hour(s) late")]
         public double HoursPerDeduction { get; set; }
 
@@ -382,15 +384,15 @@ namespace OSBLE.Models.Assignments
         /// <returns></returns>
         public int GetCompletedTeamEvaluationsCount()
         {
-            
+
             int returnVal = 0;
             using (ContextBase db = new SimpleContext())
             {
                 //X teamevaluations are completed from a user Y, where user Y's team from the preceding assignment was of size X.
                 //But, we want to consider one group of teamevaluations submitted by user Y as 1 team evaluation complete. 
                 returnVal = (from te in db.TeamEvaluations
-                                         where te.TeamEvaluationAssignmentID == this.ID
-                                         select te.EvaluatorID).Distinct().Count();
+                             where te.TeamEvaluationAssignmentID == this.ID
+                             select te.EvaluatorID).Distinct().Count();
             }
             return returnVal;
         }
@@ -420,7 +422,7 @@ namespace OSBLE.Models.Assignments
                 {
                     //Initial posts are posts that have no ParentPost, 
                     //in addition, we only want to count each CourseUser once
-                        //and only want to count students (as initial posts by non-students are not important)
+                    //and only want to count students (as initial posts by non-students are not important)
                     returnVal = (from p in db.DiscussionPosts
                                  where p.ParentPostID == null &&
                                  p.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student &&
@@ -480,8 +482,8 @@ namespace OSBLE.Models.Assignments
                 using (ContextBase db = new SimpleContext())
                 {
                     returnVal = (from dp in db.DiscussionPosts
-                                  where dp.AssignmentID == this.ID
-                                  select dp).Count();
+                                 where dp.AssignmentID == this.ID
+                                 select dp).Count();
                 }
             }
             return returnVal;

@@ -146,7 +146,13 @@ else // Files
             {
                 target = "_blank";
                 download = "";
-            }        
+            }
+
+            if (extension == ".pdf")
+            {
+                target = "_blank";
+                download = "";
+            }
         }
 
         <a class="file-header" href="/FileHandler/CourseDocument?courseId=@courseID&filePath=@path" title="@name" target="@target" @download>
