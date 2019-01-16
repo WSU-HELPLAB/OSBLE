@@ -212,7 +212,7 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8: OSBLE+ Visual Studio Plugin Prerequisites"
+        "ProductName" = "8:OSBLE+ Visual Studio Plugin Prerequisites"
         "ProductCode" = "8:{AFD5CE6F-B6B3-4B8B-8E70-149BAD4852AB}"
         "PackageCode" = "8:{847D7D9F-42C4-4F5B-A1DE-601851914C73}"
         "UpgradeCode" = "8:{379FC376-46A5-401E-989E-50379DB0F398}"
@@ -225,7 +225,7 @@
         "Manufacturer" = "8:HELP Lab"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://plus.osble.org"
-        "Title" = "8: OSBLE+ Visual Studio Plugin Prerequisite Installer"
+        "Title" = "8:OSBLE+ Visual Studio Plugin Prerequisite Installer"
         "Subject" = "8:"
         "ARPCONTACT" = "8:Washington State University"
         "Keywords" = "8:"
