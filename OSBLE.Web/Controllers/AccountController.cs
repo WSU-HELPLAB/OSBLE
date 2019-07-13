@@ -32,6 +32,17 @@ namespace OSBLE.Controllers
 #endif
     public class AccountController : OSBLEController
     {
+        static private List<string> adminEmails = GetEmailsFromConfig();
+
+        static private List<string> GetEmailsFromConfig()
+        {
+            string emailsFromConfig = ConfigurationManager.AppSettings["AdminEmailsList"];
+
+            List<string> adminEmailsList = emailsFromConfig.Split(';').Select(p => p.Trim()).ToList();
+            
+            return adminEmailsList;
+        }
+
         public ActionResult ErrorPage()
         {
             return View();
@@ -1108,9 +1119,18 @@ namespace OSBLE.Controllers
                     string body = model.Message;
                     body += "<br />reply to: " + model.Email;
                     List<MailAddress> to = new List<MailAddress>();
-                    to.Add(new MailAddress("daniel.olivares@wsu.edu"));
-                    to.Add(new MailAddress("hundhaus@wsu.edu"));
-                    //to.Add(new MailAddress("me@adam-carter.com"));
+
+                    if (adminEmails.Count == 0)
+                    {
+                        adminEmails.Add("support@osble.org");
+                    }
+
+                    //add admin emails to the list
+                    foreach (string email in adminEmails)
+                    {
+                        to.Add(new MailAddress(email));
+                    }
+                    
                     Email.Send(subject, body, to);
                     ViewBag.CUName = model.Name;
                     return View("ContactUsSuccess");
